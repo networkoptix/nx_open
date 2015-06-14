@@ -15,7 +15,6 @@ QtControls.TextField
 
     property bool showNow: false;
     property bool changed: false;    
-    property var changesHandler;
     
     property var date;
     property var initDate;
@@ -43,21 +42,13 @@ QtControls.TextField
         renderType: Text.NativeRendering;
     }
 
-    
-    onChangedChanged: 
-    {
-        if (changesHandler)
-            changesHandler.changed = true;
-    }
-
     onTextChanged: 
     {
         date = Date.fromLocaleDateString(Qt.locale(), text, Locale.ShortFormat);
         if (!initDate && (text === impl.emptyMaskValue))
             return;
         
-        if (initDate && date && (impl.stringFromDate(initDate) !== impl.stringFromDate(date)))
-            thisComponent.changed = true;
+        thisComponent.changed = initDate && date && (impl.stringFromDate(initDate) !== impl.stringFromDate(date));
     }
     
     property QtObject impl: QtObject

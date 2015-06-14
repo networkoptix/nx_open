@@ -8,12 +8,25 @@ import "../../common" as Common;
 Base.Column
 {
     id: thisComponent;
-    
-    property var changesHandler;
 
+    property bool changed:
+    {      
+        var result = false;
+        var children = column.children;
+        for (var i = 0; i !== children.length; ++i)
+        {
+            var item = children[i];
+            if (!item.hasOwnProperty("changed"))
+                continue;
+            
+            result |= item.changed;
+        }
+        return result;
+    }
+    
     function applyButtonPressed()
     {
-        if (!thisComponent.changesHandler || !thisComponent.changesHandler.changed)
+        if (!thisComponent.changed)
             return;
 
         var children = column.children;
@@ -54,12 +67,11 @@ Base.Column
         Repeater
         {
             id: repeater;
+            
             model: rtuContext.ipSettingsModel();
             
             delegate: Rtu.IpChangeLine
             {
-                changesHandler: thisComponent.changesHandler;        
-                
                 isSingleSelectionModel: (repeater.model ? repeater.model.isSingleSelection : true);
                 
                 useDHCPControl.initialCheckedState: (isSingleSelectionModel ? useDHCP : false);

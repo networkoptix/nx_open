@@ -11,8 +11,7 @@ TextField
     property bool changed: (text !== initialText);
     
     property string initialText: "";
-    property var changesHandler;
-    
+
     implicitHeight: Common.SizeManager.clickableSizes.medium;
     implicitWidth: implicitHeight * 4;
 
@@ -36,14 +35,5 @@ TextField
         if (activeFocus)
             selectAll();
     }
-
-    onTextChanged: 
-    {
-        if (changesHandler && (text !== initialText))
-        {
-            thisComponent.changesHandler.changed = true;
-        }
-    }
-    
 }
 

@@ -10,8 +10,6 @@ Grid
     property bool changed: (useDHCPCheckBox.changed || ipControl.changed || subnetMask.changed);
     property bool isSingleSelectionModel: false;
 
-    property var changesHandler;
-
     readonly property alias useDHCPControl: useDHCPCheckBox;
     readonly property alias ipAddressControl: ipControl;
     readonly property alias subnetMaskControl: subnetMask;
@@ -54,8 +52,6 @@ Grid
     {
         id: ipControl
 
-        changesHandler: thisComponent.changesHandler;
-
         enabled: !useDHCPCheckBox.checked && thisComponent.isSingleSelectionModel;
         opacity: ( enabled ? 1 : 0.5 );
     }
@@ -63,8 +59,6 @@ Grid
     Base.IpControl
     {
         id: subnetMask;
-
-        changesHandler: thisComponent.changesHandler;
 
         enabled: !useDHCPCheckBox.checked && thisComponent.isSingleSelectionModel;
         opacity: ( enabled ? 1 : 0.5 );
@@ -76,7 +70,5 @@ Grid
 
         height: subnetMask.height;
         text: qsTr("Use DHCP");
-
-        changesHandler: thisComponent.changesHandler;
     }
 }

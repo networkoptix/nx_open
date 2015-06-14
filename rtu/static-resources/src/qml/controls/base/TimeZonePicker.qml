@@ -9,8 +9,7 @@ ComboBox
     
     signal timeZoneChanged(string from, string to);
     
-    property bool changed: false;
-    property var changesHandler;
+    property bool changed: (currentIndex !== initIndex);
     
     property int initIndex: init;
     property int lastSelectedIndex;
@@ -23,12 +22,6 @@ ComboBox
     
     textRole: "display";
     
-    onChangedChanged: 
-    {
-        if (changesHandler)
-            changesHandler.changed = true;
-    }
-    
     property bool firstTimeChange: true;
     
     onCurrentIndexChanged:
@@ -38,13 +31,6 @@ ComboBox
             firstTimeChange = false;
             lastSelectedIndex = currentIndex;
         }
-
-        if (changesHandler && (currentIndex !== initIndex))
-        {
-            thisComponent.changed = true;
-            console.log("changed: " + currentIndex + ":" + initIndex)
-        }
-        console.log(currentIndex + ":" + initIndex)
 
         if (!changed)
             return;

@@ -15,7 +15,6 @@ QtControls.TextField
 
     property bool showNow: false;
     property bool changed: false;    
-    property var changesHandler;
     
     property var time;
     property var initTime;
@@ -42,12 +41,6 @@ QtControls.TextField
     {
         renderType: Text.NativeRendering;
     }
-    
-    onChangedChanged: 
-    {
-        if (changesHandler)
-            changesHandler.changed = true;
-    }
 
     onTextChanged: 
     {
@@ -55,8 +48,8 @@ QtControls.TextField
         if (!initTime && (text === impl.emptyMaskValue))
             return;
         
-        if (initTime && time && (impl.stringFromTime(initTime) !== impl.stringFromTime(time)))
-            thisComponent.changed = true;
+        thisComponent.changed = (initTime && time 
+            && (impl.stringFromTime(initTime) !== impl.stringFromTime(time)));
     }
     
     property QtObject impl: QtObject

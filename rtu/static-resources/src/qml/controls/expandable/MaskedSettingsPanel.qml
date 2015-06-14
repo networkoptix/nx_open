@@ -11,7 +11,8 @@ GenericSettingsPanel
     id: thisComponent;
 
     property Component propertiesDelegate;
-
+    property var maskedArea: area.item;
+    
     property bool warned: (rtuContext.selection && (rtuContext.selection !== null)
         && (rtuContext.selection.count === 1) ? true : false);
 

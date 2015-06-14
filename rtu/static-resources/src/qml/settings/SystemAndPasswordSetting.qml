@@ -8,6 +8,8 @@ Expandable.MaskedSettingsPanel
 {
     id: thisComponent;
 
+    changed:  (maskedArea && maskedArea.changed?  true : false);
+    
     propertiesGroupName: qsTr("System name and password");
 
     propertiesDelegate: Component
@@ -16,8 +18,9 @@ Expandable.MaskedSettingsPanel
 
         Item
         {
+            property bool changed: systemName.changed || password.changed;
             height: settingsColumn.height + settingsColumn.anchors.topMargin;
-
+            
             Connections
             {
                 target: thisComponent;
@@ -55,7 +58,6 @@ Expandable.MaskedSettingsPanel
 
                     initialText: (rtuContext.selection && rtuContext.selection !== null ?
                         rtuContext.selection.systemName : "");
-                    changesHandler: thisComponent;
                 }
 
                 Base.Text
@@ -69,7 +71,6 @@ Expandable.MaskedSettingsPanel
 
                     implicitWidth: systemName.implicitWidth;
 
-                    changesHandler: thisComponent;
                     initialText: rtuContext.selection.password;
                 }
             }

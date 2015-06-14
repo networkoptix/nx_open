@@ -10,11 +10,15 @@ import networkoptix.rtu 1.0 as Utils;
 Expandable.MaskedSettingsPanel
 {
     id: thisComponent;
-
+    
+    changed:  (maskedArea && maskedArea.changed?  true : false);
+    
     propertiesGroupName: qsTr("Date and time");
     propertiesDelegate: Item
     {
-        
+        property bool changed: (!flagged.showFirst ? false 
+            : flagged.currentItem.changed);
+    
         width: flagged.width + flagged.anchors.leftMargin;
         height: flagged.height + flagged.anchors.topMargin;
         
@@ -41,7 +45,8 @@ Expandable.MaskedSettingsPanel
                 Grid
                 {
                     id: dateTimeGrid;
-                    
+                 
+                    property bool changed: (timePicker.changed || timeZonePicker.changed || datePicker.changed);
                     enabled: (Utils.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
     
                     verticalItemAlignment: Grid.AlignVCenter;
@@ -80,8 +85,6 @@ Expandable.MaskedSettingsPanel
                     Base.TimeZonePicker
                     {
                         id: timeZonePicker;
-                        changesHandler: thisComponent;    
-                        
                         
                         model: rtuContext.timeZonesModel(this);
                         initIndex: timeZonePicker.model.initIndex;
@@ -98,7 +101,6 @@ Expandable.MaskedSettingsPanel
                     {
                         id: datePicker;
                         
-                        changesHandler: thisComponent;
                         initDate: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
                     }
@@ -107,7 +109,6 @@ Expandable.MaskedSettingsPanel
                     {
                         id: timePicker;
                         
-                        changesHandler: thisComponent;
                         initTime: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
                     }
@@ -115,9 +116,7 @@ Expandable.MaskedSettingsPanel
                     Base.CheckBox
                     {
                         id: useCurrentTimeCheckbox;
-    
-                        changesHandler: thisComponent;
-    
+        
                         text: qsTr("Set current date/time");
                         initialCheckedState: Qt.Unchecked;
                         
