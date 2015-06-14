@@ -13,7 +13,7 @@ Expandable.MaskedSettingsPanel
     
     changed:  (maskedArea && maskedArea.changed?  true : false);
     
-    propertiesGroupName: qsTr("Date and time");
+    propertiesGroupName: qsTr("Set Device Date & Time");
     propertiesDelegate: Item
     {
         property bool changed: (!flagged.showFirst ? false 
@@ -64,16 +64,19 @@ Expandable.MaskedSettingsPanel
                     Base.Text
                     {
                         text: qsTr("Time zone");
+                        font.pixelSize: Common.SizeManager.fontSizes.base;
                     }
                     
                     Base.Text
                     {
                         text: qsTr("Date");
+                        font.pixelSize: Common.SizeManager.fontSizes.base;
                     }
     
                     Base.Text
                     {
                         text: qsTr("Time");
+                        font.pixelSize: Common.SizeManager.fontSizes.base;
                     }
     
                     Item

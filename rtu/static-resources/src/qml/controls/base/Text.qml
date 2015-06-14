@@ -5,8 +5,12 @@ import "../../common" as Common;
 QtQuick.Text
 {
     id: thisComponent;
-    
-    renderType: QtQuick.Text.NativeRendering;
-    font.pointSize: Common.SizeManager.fontSizes.medium;
+
+    property bool thin: true;    
+   
+    font.family: (thin ? Common.SizeManager.regularFont.name
+        : Common.SizeManager.mediumFont.name );
+
+    font.pixelSize: Common.SizeManager.fontSizes.base;
 }
 

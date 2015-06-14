@@ -24,7 +24,7 @@ CheckBox
         {
             id: checkboxLabel;
 
-            font.pointSize: thisComponent.fontSize;
+            font.pixelSize: thisComponent.fontSize;
             text: thisComponent.text;
             renderType: Text.NativeRendering;
         }

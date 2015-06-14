@@ -1,19 +1,29 @@
 import QtQuick 2.1;
 import QtQuick.Window 2.0;
 import QtQuick.Controls 1.1;
+import QtQuick.Layouts 1.0;
 
 import networkoptix.rtu 1.0 as NxRtu;
 
 import "pages" as Pages;
-import "common" as Common;
 
 Window
 {
     id: mainWindow;
     
+    title: qsTr("Nx1 Setup & Configuration Tool");
+        
     width: 1024;
     height: 600;
+    
+    color: "white";
+
+    minimumHeight: 480;
+    minimumWidth: selectionPage.width 
+        + (loader.item && loader.item.minWidth ? loader.item.minWidth : 0);
+    
     visible: true;
+    
     
     Component
     {
@@ -21,15 +31,14 @@ Window
 
         Pages.EmptySelectionPage {}
     }
-
+   
     Component
     {
         id: settingsPageComponent;
         
         Pages.SettingsPage
         {
-            selectedServersModel: serversSelectionListView.selectedServersModel;
-            id: settingsPage;
+            selectedServersModel: selectionPage.selectedServersModel;
         }
     }
     
@@ -52,14 +61,13 @@ Window
         anchors.fill: parent;
         orientation: Qt.Horizontal;
         
-        
         Pages.ServerSelectionPage
         {
-            id: serversSelectionListView;
-            askForSelectionChanges: (loader.item && loader.item.hasOwnProperty("parametersChanged")
+            id: selectionPage;
+            
+            askForSelectionChange: (loader.item && loader.item.hasOwnProperty("parametersChanged")
                 ? loader.item.parametersChanged : false);
             
-
             enabled: (rtuContext.currentPage === NxRtu.Constants.SettingsPage);
             opacity: enabled ? 1 : 0.5;
         }
@@ -68,7 +76,11 @@ Window
         {
             id: loader;
             
+            Layout.minimumWidth: (item && item.minWidth ? item.minWidth : 0);
+            Layout.minimumHeight: (item && item.minHeight ? item.minHeight : 0);
+            
             sourceComponent: emptyPage;
+            
             Connections
             {
                 target: rtuContext;
@@ -83,20 +95,22 @@ Window
                 {
                 case NxRtu.Constants.ProgressPage:
                     loader.sourceComponent = progressPageComponent;
-                    return;
+                    break;
                 case NxRtu.Constants.SummaryPage:
                     loader.sourceComponent = summaryPageComponent;
-                    return;
+                    break;
+                default:
+                    loader.sourceComponent = (rtuContext.selection && (rtuContext.selection !== null)
+                        && rtuContext.selection.count ? settingsPageComponent : emptyPage);
                 }
-
-                loader.sourceComponent = (rtuContext.selection && (rtuContext.selection !== null)
-                    && rtuContext.selection.count ? settingsPageComponent : emptyPage);
             }
         }
     }
     
     Component.onCompleted: 
     {
-        serversSelectionListView.width = mainWindow.width / 3;
+        selectionPage.width = mainWindow.width / 3.5;
+        
+        selectionPage.Layout.minimumWidth = selectionPage.width;
     }
 }

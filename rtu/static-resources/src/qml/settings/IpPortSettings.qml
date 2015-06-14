@@ -14,7 +14,7 @@ Expandable.MaskedSettingsPanel
     
     changed:  (maskedArea && maskedArea.changed?  true : false);
 
-    propertiesGroupName: qsTr("IP address and port");
+    propertiesGroupName: qsTr("Configure Device Network Settings");
 
     propertiesDelegate: Component
     {
@@ -39,11 +39,15 @@ Expandable.MaskedSettingsPanel
             Rtu.FlaggedItem
             {
                 id: flagged;
- 
-                property bool changed: (showFirst ? currentItem.changed : false);
+
+                property bool changed: (showFirst && currentItem.changed ? true : false);
                 
                 message: qsTr("Can not change interfaces settings for some selected servers");
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors
+                {
+                    top: (showFirst ? parent.top : undefined);
+                    verticalCenter: (showFirst ? undefined : parent.verticalCenter);
+                }
                 showItem: ((Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags)
                     || (rtuContext.selection.count === 1));
                 
@@ -56,10 +60,12 @@ Expandable.MaskedSettingsPanel
             Base.Column
             {
                 id: portColumn;
-                                         
+                
+                anchors.top: parent.top;
+                
                 Base.Text
                 {
-                    text: qsTr("Port number:");
+                    text: qsTr("Port:");
                 }
                 
                 Base.PortControl

@@ -15,6 +15,7 @@ QtControls.TextField
 
     property bool showNow: false;
     property bool changed: false;    
+    property int fontSize: Common.SizeManager.fontSizes.base;
     
     property var date;
     property var initDate;
@@ -23,7 +24,7 @@ QtControls.TextField
     width: height * 3;
     
     opacity: enabled ? 1.0 : 0.5;
-
+    
     text: impl.stringFromDate(initDate);
     inputMask: impl.mask;
     
@@ -35,7 +36,7 @@ QtControls.TextField
         text = (showNow ? impl.stringFromDate(date) : qsTr("<now>"));
     }
 
-    font.pointSize: Common.SizeManager.fontSizes.medium;
+    font.pixelSize: fontSize;
     
     style: TextFieldStyle
     {

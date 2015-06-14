@@ -74,12 +74,7 @@ Expandable.ExpandableItem
                     {
                         id: captionText;
 
-                        font
-                        {
-                            bold: true;
-                            pointSize: Common.SizeManager.fontSizes.large;
-                        }
-
+                        font.pixelSize: Common.SizeManager.fontSizes.large;
                         text: propertiesGroupName;
                     }
 
@@ -88,44 +83,19 @@ Expandable.ExpandableItem
                         visible: thisComponent.changed;
                         anchors.verticalCenter: captionText.verticalCenter;
                     }
-
                 }
-
-                Base.Button
-                {
-                    id: toggleButton;
-
-                    width: height;
-                    anchors
-                    {
-                        right: parent.right;
-                        verticalCenter: header.verticalCenter;
-                    }
-
-                    text: (thisComponent.expanded ? "^" : "v");
-                    onClicked: { thisComponent.toggle(); }
-                }
-
             }
 
             Base.LineDelimiter
             {
-                id: line;
+                color: "#e4e4e4";
+                
                 anchors
                 {
                    left: parent.left;
                    right: parent.right;
                 }
             }
-        }
-
-        MouseArea
-        {
-            id: expandMouseArea;
-
-            anchors.fill: parent;
-
-            onClicked: { thisComponent.toggle(); }
         }
     }
 }

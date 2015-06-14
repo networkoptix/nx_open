@@ -119,7 +119,7 @@ namespace
         /// System's specific roles
         , kSelectedServersCountRoleId
         , kServersCountRoleId
-        , kLoggedToAllServersRoleId
+        , kLoggedState
         
         /// Server's specific roles
         , kIdRoleId
@@ -139,10 +139,10 @@ namespace
         result.insert(kIsSystemRoleId, "isSystem");
         result.insert(kNameRoleId, "name");
         result.insert(kSelectedStateRoleId, "selectedState");
-            
+
         result.insert(kSelectedServersCountRoleId, "selectedServersCount");
         result.insert(kServersCountRoleId, "serversCount");
-        result.insert(kLoggedToAllServersRoleId, "loggedToAllServers");
+        result.insert(kLoggedState, "loggedState");
 
         result.insert(kIdRoleId, "id");
         result.insert(kSystemNameRoleId, "systemName");
@@ -367,14 +367,14 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         case kIdRoleId:
             return info.baseInfo().id;
         case kMacAddressRoleId:
-            return info.baseInfo().id.toString();
+            return (info.hasExtraInfo() && !info.extraInfo().interfaces.empty() ? 
+                info.extraInfo().interfaces.front().macAddress : "");//QString("--:--:--:--:--:--"));
         case kLogged:
             return info.hasExtraInfo();
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
             return (info.hasExtraInfo() && rtu::defaultAdminPasswords().contains(info.extraInfo().password));
-            
         case kIpAddressRoleId: 
             return (!serverInfo.serverInfo.hasExtraInfo() || (info.extraInfo().interfaces.empty())
                 ? QVariant() : QVariant::fromValue(info.extraInfo().interfaces));
@@ -393,9 +393,10 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         case kSelectedStateRoleId:
             return (systemInfo.servers.empty() || !systemInfo.selectedServers ? Qt::Unchecked :
                 (systemInfo.selectedServers == systemInfo.servers.size() ? Qt::Checked : Qt::PartiallyChecked));
-            
-        case kLoggedToAllServersRoleId:
-            return (systemInfo.loggedServers == systemInfo.servers.size());
+        case kLoggedState:
+            return (!systemInfo.loggedServers ? Constants::NotLogged 
+                : (systemInfo.loggedServers == systemInfo.servers.size() ? Constants::LoggedToAllServers
+                : Constants::PartiallyLogged));
         case kSelectedServersCountRoleId:
             return systemInfo.selectedServers;
         case kServersCountRoleId:
@@ -890,4 +891,4 @@ QVariant rtu::ServersSelectionModel::data(const QModelIndex &index
 rtu::Roles rtu::ServersSelectionModel::roleNames() const
 {
     return kRolesDescription;
-}
+} 

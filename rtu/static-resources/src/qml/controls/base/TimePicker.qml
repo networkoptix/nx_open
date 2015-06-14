@@ -15,6 +15,7 @@ QtControls.TextField
 
     property bool showNow: false;
     property bool changed: false;    
+    property int fontSize: Common.SizeManager.fontSizes.base;
     
     property var time;
     property var initTime;
@@ -35,7 +36,7 @@ QtControls.TextField
         text = (showNow ? impl.stringFromTime(time) : qsTr("<now>"));
     }
 
-    font.pointSize: Common.SizeManager.fontSizes.medium;
+    font.pixelSize: fontSize;
     
     style: TextFieldStyle
     {

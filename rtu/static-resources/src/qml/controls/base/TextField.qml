@@ -16,7 +16,7 @@ TextField
     implicitWidth: implicitHeight * 4;
 
     text: initialText;
-    font.pointSize: Common.SizeManager.fontSizes.medium;
+    font.pixelSize: Common.SizeManager.fontSizes.base;
     
     Binding
     {

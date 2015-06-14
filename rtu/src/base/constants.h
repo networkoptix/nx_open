@@ -33,6 +33,15 @@ namespace rtu
             , SummaryPage
         };
         Q_ENUMS(Pages)
+        
+        enum LoggedState
+        {
+            LoggedToAllServers
+            , PartiallyLogged
+            , NotLogged
+        };
+        
+        Q_ENUMS(LoggedState)
     };
 }
 

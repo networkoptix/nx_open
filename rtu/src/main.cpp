@@ -25,6 +25,8 @@ void registerTypes()
 }
 
 #include <helpers/time_helper.h>
+#include <QFont>
+#include <QFontDatabase>
 
 int main(int argc, char *argv[])
 {
@@ -33,9 +35,9 @@ int main(int argc, char *argv[])
     rtu::RtuContext rtuContext(&app);
     
     QQmlApplicationEngine engine;
-    
+        
     registerTypes();
-
+    
     engine.rootContext()->setContextProperty("rtuContext", &rtuContext);
     engine.load(QUrl(QStringLiteral("qrc:/src/qml/main.qml")));
 

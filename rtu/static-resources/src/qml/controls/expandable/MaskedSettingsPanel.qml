@@ -57,22 +57,23 @@ GenericSettingsPanel
                         leftMargin: Common.SizeManager.spacing.base;
                     }
 
-                    text: qsTr("Settings in this section are different for selected servers");
-                    font.pointSize: Common.SizeManager.fontSizes.medium;
+                    wrapMode: Text.Wrap;
+                    font.pixelSize: Common.SizeManager.fontSizes.medium;
+                    text: qsTr("Settings in this partition are different for selected servers.");
                 }
 
                 Row
                 {
                     id: editButtonArea;
 
-                    spacing: Common.SizeManager.spacing.small;
+                    spacing: Common.SizeManager.spacing.medium;
 
                     Base.Button
                     {
                         id: editAllButton;
 
                         height: Common.SizeManager.clickableSizes.medium;
-                        width: height * 3;
+                        width: height * 4;
                         text: qsTr("Edit all");
 
                         onClicked: { thisComponent.warned = true; }
@@ -84,9 +85,11 @@ GenericSettingsPanel
                         id: warningText;
 
                         anchors.verticalCenter: parent.verticalCenter;
-
+                        
+                        color: "#666666";
                         wrapMode: Text.Wrap;
-                        text: qsTr("If you doesn't click this button nothing will be changed");
+                        font.pixelSize: Common.SizeManager.fontSizes.base;
+                        text: qsTr("If you doesn't click this button,\nnothing will changed");
                     }
                 }
             }
