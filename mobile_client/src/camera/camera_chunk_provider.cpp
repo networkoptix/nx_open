@@ -63,6 +63,48 @@ QDateTime QnCameraChunkProvider::bottomBound() const {
         return QDateTime();
 }
 
+QDateTime QnCameraChunkProvider::closestChunkStartDate(const QDateTime &dateTime, bool forward) const {
+    auto it = m_periodList.findNearestPeriod(dateTime.toMSecsSinceEpoch(), forward);
+    if (it == m_periodList.end())
+        return QDateTime();
+    return QDateTime::fromMSecsSinceEpoch(it->startTimeMs, Qt::UTC);
+}
+
+qint64 QnCameraChunkProvider::closestChunkStartMs(const QDateTime &dateTime, bool forward) const {
+    auto it = m_periodList.findNearestPeriod(dateTime.toMSecsSinceEpoch(), forward);
+    if (it == m_periodList.end())
+        return -1;
+    return it->startTimeMs;
+}
+
+QDateTime QnCameraChunkProvider::closestChunkEndDate(const QDateTime &dateTime, bool forward) const {
+    auto it = m_periodList.findNearestPeriod(dateTime.toMSecsSinceEpoch(), forward);
+    if (it == m_periodList.end())
+        return QDateTime();
+    return QDateTime::fromMSecsSinceEpoch(it->endTimeMs(), Qt::UTC);
+}
+
+qint64 QnCameraChunkProvider::closestChunkEndMs(const QDateTime &dateTime, bool forward) const {
+    auto it = m_periodList.findNearestPeriod(dateTime.toMSecsSinceEpoch(), forward);
+    if (it == m_periodList.end())
+        return -1;
+    return it->endTimeMs();
+}
+
+QDateTime QnCameraChunkProvider::nextChunkStartDate(const QDateTime &dateTime, bool forward) const {
+    auto it = m_periodList.findNearestPeriod(dateTime.toMSecsSinceEpoch(), forward);
+    if (it == m_periodList.end() || ++it == m_periodList.end())
+        return QDateTime();
+    return QDateTime::fromMSecsSinceEpoch(it->startTimeMs, Qt::UTC);
+}
+
+qint64 QnCameraChunkProvider::nextChunkStartMs(const QDateTime &dateTime, bool forward) const {
+    auto it = m_periodList.findNearestPeriod(dateTime.toMSecsSinceEpoch(), forward);
+    if (it == m_periodList.end() || ++it == m_periodList.end())
+        return -1;
+    return it->startTimeMs;
+}
+
 void QnCameraChunkProvider::update() {
     m_loader->load(QString(), 1);
 }

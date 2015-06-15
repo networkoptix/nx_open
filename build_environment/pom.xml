@@ -290,7 +290,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.digia</groupId>
-                    <version>5.2.1-SNAPSHOT</version>
+                    <version>5.4.1-SNAPSHOT</version>
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
@@ -328,6 +328,7 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${additional.compiler}</classifier>
                 </dependency>
+                <!--
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
@@ -335,6 +336,7 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
+                -->
                 <dependency>
                     <groupId>com.google</groupId>
                     <artifactId>gtest</artifactId>
