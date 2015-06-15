@@ -520,7 +520,7 @@ bool QnAuthHelper::isNonceValid(const QByteArray& nonce)
 {
     {
         // nonce cache will help if time just changed
-        QMutexLocker lock(&m_nonceMtx);
+        QnMutexLocker lock(&m_nonceMtx);
         if (m_digestNonceCache.contains(nonce) && m_digestNonceCache[nonce]->elapsed() < NONCE_TIMEOUT)
             return true;
     }
@@ -535,7 +535,7 @@ QByteArray QnAuthHelper::getNonce()
     QByteArray result = QByteArray::number(qnSyncTime->currentUSecsSinceEpoch(), 16);
     QElapsedTimer* timeout = new QElapsedTimer();
     timeout->restart();
-    QMutexLocker lock(&m_nonceMtx);
+    QnMutexLocker lock(&m_nonceMtx);
     m_digestNonceCache.insert(result, timeout);
     return result;
 }

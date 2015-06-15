@@ -1532,28 +1532,30 @@ namespace ec2
         }
     }
 
-    void QnTransactionMessageBus::dropConnections()
-void QnTransactionMessageBus::connectionFailure( const QnUuid& connectionGuid )
-{
-    QMutexLocker lock( &m_mutex );
-    for( QnTransactionTransport* transport : m_connections )
+    void QnTransactionMessageBus::connectionFailure( const QnUuid& connectionGuid )
     {
-        QnMutexLocker lock(&m_mutex);
-        m_remoteUrls.clear();
-        for(QnTransactionTransport* transport: m_connections) {
-            qWarning() << "Disconnected from peer" << transport->remoteAddr();
-            transport->setState(QnTransactionTransport::Error);
+        QnMutexLocker lock( &m_mutex );
+        for( QnTransactionTransport* transport : m_connections )
+        {
+            if( transport->connectionGuid() != connectionGuid )
+                continue;
+            //mutex is unlocked if we go to wait
+            transport->connectionFailure();
+            return;
         }
-        for (auto transport: m_connectingConnections) 
-            transport->setState(ec2::QnTransactionTransport::Error);
-        if( transport->connectionGuid() != connectionGuid )
-            continue;
-        //mutex is unlocked if we go to wait
-        transport->connectionFailure();
-        return;
     }
-}
 
+    void QnTransactionMessageBus::dropConnections()
+    {
+        QnMutexLocker lock( &m_mutex );
+        m_remoteUrls.clear();
+        for( QnTransactionTransport* transport : m_connections )
+        {
+            qWarning() << "Disconnected from peer" << transport->remoteAddr();
+            transport->setState( QnTransactionTransport::Error );
+        }
+        for( auto transport : m_connectingConnections )
+            transport->setState( ec2::QnTransactionTransport::Error );
     }
 
     QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const
