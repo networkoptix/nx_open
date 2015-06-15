@@ -26,14 +26,13 @@ Expandable.MaskedSettingsPanel
             
             spacing: Common.SizeManager.spacing.large;
             
-            height: Math.max(flagged.height, portColumn.height) + anchors.topMargin;
+            height: Math.max(flagged.height, portColumn.height);
          
             anchors
             {
                 left: (parent ? parent.left : undefined);
                 top: (parent ? parent.top : undefined);
                 leftMargin: Common.SizeManager.spacing.base;
-                topMargin: Common.SizeManager.spacing.base;
             }
 
             Rtu.FlaggedItem
@@ -42,26 +41,26 @@ Expandable.MaskedSettingsPanel
 
                 property bool changed: (showFirst && currentItem.changed ? true : false);
                 
-                message: qsTr("Can not change interfaces settings for some selected servers");
                 anchors
                 {
-                    top: (showFirst ? parent.top : undefined);
-                    verticalCenter: (showFirst ? undefined : parent.verticalCenter);
+                   top: (showFirst ? parent.top : undefined);
+                   verticalCenter: (showFirst ? undefined : parent.verticalCenter);
                 }
+                
+                message: qsTr("Can not change interfaces settings for some selected servers");
                 showItem: ((Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags)
                     || (rtuContext.selection.count === 1));
                 
                 item: Rtu.IpSettingsList
                 {
                     id: ipList;
+                    enabled: (Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags);
                 }
             }
-            
+        
             Base.Column
             {
                 id: portColumn;
-                
-                anchors.top: parent.top;
                 
                 Base.Text
                 {

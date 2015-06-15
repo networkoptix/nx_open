@@ -19,7 +19,7 @@ Expandable.MaskedSettingsPanel
         Item
         {
             property bool changed: systemName.changed || password.changed;
-            height: settingsColumn.height + settingsColumn.anchors.topMargin;
+            height: settingsColumn.height;
             
             Connections
             {
@@ -42,7 +42,6 @@ Expandable.MaskedSettingsPanel
                     left: parent.left;
                     top: parent.top;
                     leftMargin: Common.SizeManager.spacing.base;
-                    topMargin: Common.SizeManager.spacing.medium;
                 }
 
                 Base.Text

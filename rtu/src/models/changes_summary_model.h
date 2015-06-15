@@ -18,6 +18,7 @@ namespace rtu
         virtual ~ChangesSummaryModel();
         
         Q_PROPERTY(int changesCount READ changesCount NOTIFY changesCountChanged)
+        Q_PROPERTY(int columnsCount READ columnsCount NOTIFY columnsCountChanged)
         
     public:
         void addRequestResult(const ServerInfo &info
@@ -27,8 +28,12 @@ namespace rtu
         
         int changesCount() const;
         
+        int columnsCount() const;
+        
     signals:
         void changesCountChanged();
+        
+        void columnsCountChanged();
         
     private:
         int rowCount(const QModelIndex &parent = QModelIndex()) const;

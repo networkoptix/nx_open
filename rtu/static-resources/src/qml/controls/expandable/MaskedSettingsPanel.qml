@@ -22,7 +22,7 @@ GenericSettingsPanel
 
         Item
         {
-            height: warningSpacer.height + warningSpacer.anchors.topMargin + warningSpacer.anchors.bottomMargin;
+            height: warningSpacer.height + warningSpacer.anchors.bottomMargin;
             anchors
             {
                 left: ( parent ? parent.left : undefined );
@@ -41,7 +41,6 @@ GenericSettingsPanel
                     top: parent.top;
 
                     leftMargin: Common.SizeManager.spacing.base;
-                    topMargin: Common.SizeManager.spacing.large;
                     bottomMargin: warningSpacer.anchors.topMargin;
                 }
 

@@ -29,15 +29,8 @@ Base.StatefulComponent
 
                 verticalAlignment: Text.AlignVCenter;
                 horizontalAlignment: Text.AlignHCenter;
-/*
-                anchors
-                {
-                    left: parent.left;
-                    leftMargin: Common.SizeManager.spacing.base;
-                    verticalCenter: parent.verticalCenter;
-                }
-*/
-                color: "red";
+
+                color: "#FF0000";
                 text: thisComponent.message;
                 wrapMode: Text.Wrap;
 

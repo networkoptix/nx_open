@@ -11,7 +11,7 @@ CheckBox
     property bool changed: checkedState != initialCheckedState;
         
     property int initialCheckedState: Qt.Checked;
-    property int fontSize: Common.SizeManager.fontSizes.medium;
+    property int fontSize: Common.SizeManager.fontSizes.base;
 
     opacity: enabled ? 1.0 : 0.5;
     checkedState: initialCheckedState;

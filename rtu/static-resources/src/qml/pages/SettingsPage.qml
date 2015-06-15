@@ -36,7 +36,7 @@ Item
             {
                 id: settingsColumn;
     
-                spacing: Common.SizeManager.spacing.large;
+                spacing: Common.SizeManager.spacing.medium;
                 anchors
                 {
                     left: parent.left;

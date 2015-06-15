@@ -20,7 +20,7 @@ Expandable.MaskedSettingsPanel
             : flagged.currentItem.changed);
     
         width: flagged.width + flagged.anchors.leftMargin;
-        height: flagged.height + flagged.anchors.topMargin;
+        height: flagged.height;
         
         Rtu.FlaggedItem
         {
@@ -35,7 +35,6 @@ Expandable.MaskedSettingsPanel
                 left: parent.left;
                 top: parent.top;
                 leftMargin: Common.SizeManager.spacing.base;
-                topMargin: Common.SizeManager.spacing.base;
             }
 
             item : Component
@@ -64,19 +63,16 @@ Expandable.MaskedSettingsPanel
                     Base.Text
                     {
                         text: qsTr("Time zone");
-                        font.pixelSize: Common.SizeManager.fontSizes.base;
                     }
                     
                     Base.Text
                     {
                         text: qsTr("Date");
-                        font.pixelSize: Common.SizeManager.fontSizes.base;
                     }
     
                     Base.Text
                     {
                         text: qsTr("Time");
-                        font.pixelSize: Common.SizeManager.fontSizes.base;
                     }
     
                     Item
@@ -126,9 +122,7 @@ Expandable.MaskedSettingsPanel
                         onCheckedChanged: 
                         {
                             if (checked)
-                            {
                                 timeZonePicker.currentIndex = timeZonePicker.model.currentTimeZoneIndex;
-                            }
                             
                             datePicker.showNow = checked;
                             timePicker.showNow = checked;

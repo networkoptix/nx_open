@@ -24,7 +24,6 @@ Window
     
     visible: true;
     
-    
     Component
     {
         id: emptyPage;
@@ -46,7 +45,12 @@ Window
     {
         id: progressPageComponent;
         
-        Pages.ProgressPage {}
+        Pages.ProgressPage 
+        {
+            caption: qsTr("Applying changes...");
+            changesCount: rtuContext.changesManager().totalChangesCount;
+            currentCount: rtuContext.changesManager().appliedChangesCount;
+        }
     }
     
     Component

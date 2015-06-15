@@ -14,11 +14,6 @@ Grid
     columns: repeater.model.columnsCount;
     spacing: Common.SizeManager.spacing.medium;
 
-    onColumnsChanged:
-    {
-        console.log("Columns: " + columns);
-    }
-
     Component
     {
         id: requestStateComponent;

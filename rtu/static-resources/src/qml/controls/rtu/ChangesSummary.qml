@@ -12,6 +12,7 @@ Expandable.ExpandableWithHeader
     property int changesCount: 0;
     property string captionTemplate;
     property var model;
+    
 
     headerText: captionTemplate.arg(changesCount);
     visible: changesCount;

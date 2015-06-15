@@ -15,9 +15,11 @@ Grid
     readonly property alias subnetMaskControl: subnetMask;
 
     property string adapterNameValue;
+    
+    
+    Component.onCompleted: console.log("s" + spacing);
 
-    spacing: Common.SizeManager.spacing.small;
-
+    spacing: Common.SizeManager.spacing.base;
     columns: 3;
 
 
@@ -25,20 +27,14 @@ Grid
     {
         id: adapterName;
 
-        height: Common.SizeManager.clickableSizes.base;
-
         text: (thisComponent.isSingleSelectionModel ? readableName: qsTr("Multiple interfaces"));
-        verticalAlignment: Text.AlignVCenter;
     }
 
     Base.Text
     {
         id: subnetMaskCaption;
 
-        height: Common.SizeManager.clickableSizes.base;
-
         text: (thisComponent.isSingleSelectionModel && (model.index === 0) ? "Mask": " ");
-        verticalAlignment: Text.AlignVCenter;
     }
 
     Item

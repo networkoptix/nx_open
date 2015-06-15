@@ -55,7 +55,7 @@ Base.Column
         }
     }
     
-    Base.Column
+    Column
     {
         id: column;
 
@@ -97,6 +97,5 @@ Base.Column
         
         visible: !repeater.model.isSingleSelection;
     }
-    onWidthChanged: console.log("**width: " + width);
 }
 

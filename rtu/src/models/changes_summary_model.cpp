@@ -72,6 +72,8 @@ public:
 public:
     int changesCount() const;
     
+    int columnsCount() const;
+    
     int rowCount() const;
 
     QVariant data(const QModelIndex &index
@@ -134,6 +136,17 @@ int rtu::ChangesSummaryModel::Impl::changesCount() const
     return m_changesCount;
 }
 
+int rtu::ChangesSummaryModel::Impl::columnsCount() const
+{
+    enum
+    {
+        kSuccesfulChangesColumnsCount = 3
+        , kFailedChangesColumnsCount = 4
+    };
+    return (m_successfulChangesModel ? kSuccesfulChangesColumnsCount 
+        : kFailedChangesColumnsCount);
+}
+
 int rtu::ChangesSummaryModel::Impl::rowCount() const
 {
     return m_requests.size();
@@ -187,6 +200,11 @@ void rtu::ChangesSummaryModel::addRequestResult(const ServerInfo &info
 int rtu::ChangesSummaryModel::changesCount() const
 {
     return m_impl->changesCount();
+}
+
+int rtu::ChangesSummaryModel::columnsCount() const
+{
+    return m_impl->columnsCount();
 }
 
 int rtu::ChangesSummaryModel::rowCount(const QModelIndex &parent) const

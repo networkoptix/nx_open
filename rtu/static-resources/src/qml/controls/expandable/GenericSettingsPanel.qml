@@ -74,7 +74,8 @@ Expandable.ExpandableItem
                     {
                         id: captionText;
 
-                        font.pixelSize: Common.SizeManager.fontSizes.large;
+                        thin: false;
+                        font.pixelSize: Common.SizeManager.fontSizes.medium;
                         text: propertiesGroupName;
                     }
 
@@ -95,6 +96,13 @@ Expandable.ExpandableItem
                    left: parent.left;
                    right: parent.right;
                 }
+            }
+            
+            Item
+            {
+                id: spacer;
+                width: 1;
+                height: Common.SizeManager.spacing.medium;
             }
         }
     }

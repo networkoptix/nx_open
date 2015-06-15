@@ -149,7 +149,7 @@ Item
             id: loginButton;
             
             visible: (thisComponent.loggedState !== NxRtu.Constants.LoggedToAllServers);
-            height: (visible ? Common.SizeManager.clickableSizes.medium : 0);
+            height: (visible ? Common.SizeManager.clickableSizes.base : 0);
             
             anchors
             {
