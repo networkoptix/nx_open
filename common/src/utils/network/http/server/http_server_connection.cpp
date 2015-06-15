@@ -42,18 +42,18 @@ namespace nx_http
         //    authentication manager should be able to return some custom data
         //    which will be forwarded to the request handler.
         //    Should this data be template parameter?
-        header::WWWAuthenticate wwwAuthenticate;
-        if( !nx_http::ServerManagers::instance()->authenticationManager()->authenticate(
-                *this,
-                *request.request,
-                &wwwAuthenticate ) )
+        if( const auto auth = nx_http::ServerManagers::instance()->authenticationManager() )
         {
-            nx_http::Message response( nx_http::MessageType::response );
-            response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
-            response.response->headers.emplace(
-                header::WWWAuthenticate::NAME,
-                wwwAuthenticate.serialized() );
-            return prepareAndSendResponse( std::move( response ), nullptr );
+            header::WWWAuthenticate wwwAuthenticate;
+            if( !auth->authenticate( *this, *request.request, &wwwAuthenticate ) )
+            {
+                nx_http::Message response( nx_http::MessageType::response );
+                response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
+                response.response->headers.emplace(
+                    header::WWWAuthenticate::NAME,
+                    wwwAuthenticate.serialized() );
+                return prepareAndSendResponse( std::move( response ), nullptr );
+            }
         }
 
         auto sendResponseFunc = [this](

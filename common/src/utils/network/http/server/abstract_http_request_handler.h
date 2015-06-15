@@ -92,7 +92,6 @@ namespace nx_http
         std::map<size_t, RequestContext> m_idToReqCtx;
         std::mutex m_mutex;
 
-    protected:
         void requestDone(
             size_t reqID,
             nx_http::StatusCode::Value statusCode,
