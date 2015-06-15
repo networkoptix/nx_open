@@ -97,7 +97,8 @@ namespace nx_http
             if( contentLength )
                 responseMsg.response->headers.emplace(
                     "Content-Size",
-                    QByteArray::number( contentLength.get() ) );
+                    QByteArray::number( static_cast< qulonglong >(
+                        contentLength.get() ) ) );
         }
 
         completionHandler(

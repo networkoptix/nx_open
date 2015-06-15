@@ -6,9 +6,11 @@
 #include "mediator_service.h"
 
 #ifdef _WIN32
-#include <windows.h>
+    #include <windows.h>
+#else
+    #include <sys/types.h>
+    #include <signal.h>
 #endif
-
 
 static MediatorProcess* serviceInstance = NULL;
 

@@ -26,7 +26,11 @@ protected:
     //!Implementation of \a RegisterSystemHttpHandler::AbstractHttpRequestHandler
     virtual void processRequest(
         const nx_http::HttpServerConnection& connection,
-        const nx_http::Request& request ) override;
+        const nx_http::Request& request,
+        nx_http::Response* const response,
+        std::function<void(
+            const nx_http::StatusCode::Value statusCode,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) override;
 };
 
 #endif  //NX_REGISTER_HTTP_HANDLER_H

@@ -171,7 +171,7 @@ namespace nx_stun
         m_socket->close();
     }
 
-    void StunClientConnection::onRequestMessageRecv( nx_stun::Message& msg ) 
+    void StunClientConnection::onRequestMessageRecv( nx_stun::Message&& msg )
     {
         // Checking the message to see whether it is an valid message or not
         if( msg.header.messageClass == nx_stun::MessageClass::errorResponse ) {
@@ -187,7 +187,7 @@ namespace nx_stun
         resetOutstandingRequest();
     }
 
-    void StunClientConnection::onIndicationMessageRecv( nx_stun::Message& msg ) 
+    void StunClientConnection::onIndicationMessageRecv( nx_stun::Message&& msg )
     {
         if( m_indicationHandler ) 
             m_indicationHandler(std::move(msg));

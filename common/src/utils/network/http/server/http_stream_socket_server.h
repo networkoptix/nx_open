@@ -10,7 +10,6 @@
 
 #include "http_server_connection.h"
 
-
 namespace nx_http
 {
     class HttpStreamSocketServer

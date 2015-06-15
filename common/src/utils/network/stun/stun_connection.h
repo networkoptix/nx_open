@@ -12,6 +12,7 @@
 #include <atomic>
 
 #include <utils/network/connection_server/base_stream_protocol_connection.h>
+#include <utils/network/connection_server/stream_socket_server.h>
 #include <utils/common/stoppable.h>
 
 #include "stun_message.h"
@@ -99,9 +100,9 @@ namespace nx_stun
         */
         void processMessage( nx_stun::Message&& msg );
 
-        void onRequestMessageRecv( nx_stun::Message& msg );
+        void onRequestMessageRecv( nx_stun::Message&& msg );
 
-        void onIndicationMessageRecv( nx_stun::Message& msg );
+        void onIndicationMessageRecv( nx_stun::Message&& msg );
         
         void onConnectionComplete( SystemError::ErrorCode , const std::function<void(SystemError::ErrorCode)>& func );
 

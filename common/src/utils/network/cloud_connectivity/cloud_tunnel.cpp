@@ -46,4 +46,17 @@ namespace nx_cc
             return;
         }
     }
+
+    std::shared_ptr<CloudTunnel> CloudTunnelPool::getTunnelToHost(
+            const HostAddress& targetHost )
+    {
+        QMutexLocker lock( &m_mutex );
+        auto it = m_Pool.find( targetHost );
+        if( it == m_Pool.end() )
+            it = m_Pool.insert( std::make_pair(
+                // TODO: #ak implementation?
+                targetHost, std::shared_ptr<CloudTunnel>() ) ).first;
+
+        return it->second;
+    }
 }

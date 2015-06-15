@@ -53,7 +53,7 @@ namespace nx_cc
         virtual ~MediatorConnection();
 
         //!Implementation of QnStoppableAsync::pleaseStop
-        virtual void pleaseStop( std::function<void()>&& completionHandler ) override;
+        virtual void pleaseStop( std::function<void()>&& /*completionHandler*/ ) override {}
 
         //!Initiate asynchronous connection to mediator on address \a mediatorAddress
         /*!

@@ -47,9 +47,15 @@ template<class CustomServerType, class ConnectionType>
 :
     public StreamConnectionHolder<ConnectionType>
 {
-public:
-    typedef typename StreamSocketServer<CustomServerType, ConnectionType> SelfType;
+    typedef StreamConnectionHolder<ConnectionType> BaseType;
 
+#if defined(_MSC_VER)
+    typedef typename StreamSocketServer<CustomServerType, ConnectionType> SelfType;
+#else
+    typedef StreamSocketServer<CustomServerType, ConnectionType> SelfType;
+#endif
+
+public:
     //!Initialization
     StreamSocketServer( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
     :
@@ -98,9 +104,9 @@ public:
             std::unique_ptr<ConnectionType> conn( new ConnectionType( static_cast<CustomServerType*>(this), newConnection ) );
             if( conn->startReadingConnection() )
             {
-                std::unique_lock<std::mutex> lk( m_mutex );
+                std::unique_lock<std::mutex> lk( BaseType::m_mutex );
                 ConnectionType* connectionPtr = conn.get();
-                m_connections.emplace( connectionPtr, std::move(conn) );
+                BaseType::m_connections.emplace( connectionPtr, std::move(conn) );
             }
         }
         m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) );

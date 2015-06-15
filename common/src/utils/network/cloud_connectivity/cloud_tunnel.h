@@ -16,6 +16,7 @@
 #include "cc_common.h"
 #include "../abstract_socket.h"
 
+#include <QMutex>
 
 namespace nx_cc
 {
@@ -27,7 +28,7 @@ namespace nx_cc
         /*!
             \param handler void( nx_cc::ErrorDescription, std::unique_ptr<AbstractStreamSocket> )
         */
-        template<class Handler> bool connectAsync( Handler handler );
+        template<class Handler> bool connectAsync( Handler handler ) { return false; }
         virtual HostAddress remoteHost() const = 0;
 
     private:
@@ -181,7 +182,11 @@ namespace nx_cc
             Always returns not null tunnel.
             If tunnel does not exist, allocates new tunnel object, initiates cloud connection and returns tunnel object
         */
-        std::shared_ptr<CloudTunnel> getTunnelToHost( const HostAddress& targetHost ) const;
+        std::shared_ptr<CloudTunnel> getTunnelToHost( const HostAddress& targetHost );
+
+    private:
+        QMutex m_mutex;
+        std::map< HostAddress, std::shared_ptr<CloudTunnel> > m_Pool;
     };
 }
 

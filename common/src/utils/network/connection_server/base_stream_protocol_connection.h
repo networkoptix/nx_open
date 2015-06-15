@@ -128,7 +128,7 @@ namespace nx_api
                 assert( false );
             }
             //assuming that all bytes will be written or none
-            if( !sendBufAsync( m_writeBuffer ) )
+            if( !BaseType::sendBufAsync( m_writeBuffer ) )
             {
                 auto sendCompletionHandlerBak = std::move( m_sendCompletionHandler );
                 sendCompletionHandlerBak( SystemError::getLastOSErrorCode() );
@@ -162,7 +162,7 @@ namespace nx_api
             m_sendCompletionHandler = std::forward<Handler>( handler );
             m_writeBuffer = std::forward<BufferType>( data );
             m_serializerState = SerializerState::done;
-            return sendBufAsync( m_writeBuffer );
+            return BaseType::sendBufAsync( m_writeBuffer );
         }
 
     private:

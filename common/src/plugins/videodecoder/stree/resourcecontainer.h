@@ -38,7 +38,7 @@ namespace stree
             *value = untypedValue.value<T>();
             return true;
         }
-        template<> bool get( int resID, QVariant* const value ) const
+        bool get( int resID, QVariant* const value ) const
         {
             return getAsVariant( resID, value );
         }

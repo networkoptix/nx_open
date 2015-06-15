@@ -16,10 +16,6 @@
 #include <utils/network/connection_server/base_stream_protocol_connection.h>
 #include <utils/network/connection_server/stream_socket_server.h>
 
-
-class StunServerConnection;
-extern template class StreamConnectionHolder<StunServerConnection>;
-
 class StunServerConnection
 :
     public nx_api::BaseStreamProtocolConnection<

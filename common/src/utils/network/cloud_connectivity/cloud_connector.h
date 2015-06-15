@@ -10,6 +10,7 @@
 
 #include <utils/common/singleton.h>
 #include <utils/common/stoppable.h>
+#include <utils/network/cloud_connectivity/cloud_tunnel.h>
 
 #include "cc_common.h"
 #include "../abstract_socket.h"
@@ -45,7 +46,7 @@ namespace nx_cc
             const HostAddress& targetHost,
             Handler&& completionHandler )
         {
-            auto tunnel = CloudTunnelPool::instance()->getTunnelToHost( hostname );
+            auto tunnel = CloudTunnelPool::instance()->getTunnelToHost( targetHost );
             assert( tunnel );
             return tunnel->connect( std::forward<Handler>(completionHandler) );
         }

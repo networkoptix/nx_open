@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!--
         Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
+
         A solution can be a group of projects, but here we only have one.
-        It should also be possible to have one maven project per solution project, 
+        It should also be possible to have one maven project per solution project,
         and have a parent pom to deletegate the build.
     -->
 
@@ -19,24 +19,24 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>connection_mediator</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Cloud Connection Mediator</name>    
+    <name>Nx Cloud Connection Mediator</name>
 
     <properties>
-        <product.title>${company.name} Mediator</product.title>  
-        <!--Global libs-->        
+        <product.title>${company.name} Mediator</product.title>
+        <!--Global libs-->
         <qt.libs>core network concurrent</qt.libs>
         <global.libs>-lcommon -ludt</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
         <windows.oslibs.release/>
-        <windows.oslibs.debug/>        
-        <linux.oslibs></linux.oslibs>
+        <windows.oslibs.debug/>
+        <linux.oslibs>-lavcodec -lavformat -lavutil</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>
-        <mac.defines/>      
-    </properties>    
+        <mac.defines/>
+    </properties>
 </project>

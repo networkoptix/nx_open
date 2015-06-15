@@ -16,7 +16,7 @@ namespace nx_hpm
     {
         enum Value
         {
-            listen = nx_stun::MethodType::userMethod,
+            listen = static_cast<int>( nx_stun::MethodType::userMethod ),
             connect,
             connectionRequested
         };
@@ -25,7 +25,7 @@ namespace nx_hpm
     //TODO custom stun requests parameters
     namespace StunParameters {
         enum Value {
-            systemName=nx_stun::attr::AttributeType::userDefine,
+            systemName = static_cast<int>( nx_stun::attr::AttributeType::userDefine ),
             authorization,
             serverId
         };

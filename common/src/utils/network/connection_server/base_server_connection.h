@@ -100,7 +100,8 @@ namespace nx_api
 
         void closeConnection()
         {
-            m_connectionManager->closeConnection( static_cast<CustomConnectionManagerType::ConnectionType*>(this) );
+            typedef typename CustomConnectionManagerType::ConnectionType ConncetionType;
+            m_connectionManager->closeConnection( static_cast<ConncetionType*>(this) );
         }
 
         //!Register handler to be executed when connection just about to be destroyed
@@ -109,7 +110,7 @@ namespace nx_api
         */
         void registerCloseHandler( std::function<void()>&& handler )
         {
-            m_connectionCloseHandlers.push_back( std::move(handler) );
+            m_connectionCloseHandlers.push_front( std::move(handler) );
         }
 
     private:
@@ -122,11 +123,12 @@ namespace nx_api
         void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
         {
             using namespace std::placeholders;
+            typedef typename CustomConnectionManagerType::ConnectionType ConncetionType;
 
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
             if( bytesRead == 0 )    //connection closed by remote peer
-                return m_connectionManager->closeConnection( static_cast<CustomConnectionManagerType::ConnectionType*>(this) );
+                return m_connectionManager->closeConnection( static_cast<ConncetionType*>(this) );
 
             assert( m_readBuffer.size() == bytesRead );
             static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer ); 
@@ -142,11 +144,13 @@ namespace nx_api
 
             assert( count == m_bytesToSend );
 
+            typedef typename CustomConnectionManagerType::ConnectionType ConncetionType;
             static_cast<CustomConnectionType*>(this)->readyToSendData();
         }
 
         void handleSocketError( SystemError::ErrorCode errorCode )
         {
+            typedef typename CustomConnectionManagerType::ConnectionType ConncetionType;
             switch( errorCode )
             {
                 case SystemError::noError:
@@ -155,11 +159,11 @@ namespace nx_api
 
                 case SystemError::connectionReset:
                 case SystemError::notConnected:
-                    return m_connectionManager->closeConnection( static_cast<CustomConnectionManagerType::ConnectionType*>(this) );
+                    return m_connectionManager->closeConnection( static_cast<ConncetionType*>(this) );
 
                 default:
                     //TODO #ak process error code
-                    return m_connectionManager->closeConnection( static_cast<CustomConnectionManagerType::ConnectionType*>(this) );
+                    return m_connectionManager->closeConnection( static_cast<ConncetionType*>(this) );
             }
         }
     };

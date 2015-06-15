@@ -208,16 +208,14 @@ namespace nx_stun
 
 namespace nx_stun {
 
-    namespace {
-        // A specialized hash class for C++11 since it doesn't comes with built-in enum hash
-        // function. Not a specialized template for hash class in namespace std .
-        template< typename T > struct StunHash {};
-        template<> struct StunHash<attr::AttributeType> {
-            std::size_t operator () ( const attr::AttributeType& a ) {
-                return static_cast<std::size_t>(a);
-            }
-        };
-    }
+    // A specialized hash class for C++11 since it doesn't comes with built-in enum hash
+    // function. Not a specialized template for hash class in namespace std .
+    template< typename T > struct StunHash {};
+    template<> struct StunHash<attr::AttributeType> {
+        std::size_t operator () ( const attr::AttributeType& a ) const noexcept {
+            return static_cast<std::size_t>(a);
+        }
+    };
 
     class Message
     {

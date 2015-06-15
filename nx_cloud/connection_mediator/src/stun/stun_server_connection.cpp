@@ -28,7 +28,7 @@ void StunServerConnection::processMessage( nx_stun::Message&& message )
     switch( message.header.messageClass )
     {
         case nx_stun::MessageClass::request:
-            switch( message.header.method )
+            switch( static_cast< nx_stun::MethodType >( message.header.method ) )
             {
                 case nx_stun::MethodType::binding:
                     processGetIPAddressRequest( std::move(message) );
