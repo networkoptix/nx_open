@@ -8,6 +8,7 @@
 #include <common/systemexcept_win32.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/synctime.h>
 
 #include "ec2_thread_pool.h"
@@ -100,6 +101,7 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
     m_activeCollection.waitForFinished();
 
     m_activeCollection = QnConcurrent::run(Ec2ThreadPool::instance(), [=](){
+        QnScopedThreadRollback reservedThread( 1 );
         return scanAndReport(settings);
     });
 }
