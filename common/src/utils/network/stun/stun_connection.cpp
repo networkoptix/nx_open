@@ -10,31 +10,34 @@ namespace nx_stun
 
     StunClientConnection::StunClientConnection(
         const SocketAddress& stunServerEndpoint,
-        bool useSsl,
-        SocketFactory::NatTraversalType natTraversalType ) :
+        bool useSsl )
+    :
         m_stunServerEndpoint( stunServerEndpoint ),
         m_state(NOT_CONNECTED)
     {
-        m_socket.reset( SocketFactory::createStreamSocket( useSsl, natTraversalType ) );
+        m_socket.reset( SocketFactory::createStreamSocket( useSsl, SocketFactory::nttDisabled ) );
         m_socket->setNonBlockingMode(true);
-        m_baseConnection.reset( new BaseConnectionType( this, m_socket.get() ) );
-        using namespace std::placeholders;
-        m_baseConnection->setMessageHandler( [this]( nx_stun::Message&& msg ) { processMessage( std::move(msg) ); } );
     }
 
     void StunClientConnection::pleaseStop( std::function<void()>&& completionHandler )
     {
         // Cancel the Pending IO operations
-        if( m_state != NOT_CONNECTED ) {
-            m_socket->cancelAsyncIO();
-            m_baseConnection->closeConnection();
-            m_outstandingRequest.reset();
-            if( m_state.load(std::memory_order_acquire) != CONNECTED ) {
-                m_state = NOT_CONNECTED;
-            }
+        if( m_state == NOT_CONNECTED )
+        {
             if( completionHandler )
                 completionHandler();
+            return;
         }
+
+        //TODO #ak pass completionHandler to m_socket->cancelAsyncIO
+        //m_socket->cancelAsyncIO();
+        m_baseConnection->closeConnection();
+        m_outstandingRequest.reset();
+        if( m_state.load(std::memory_order_acquire) != CONNECTED ) {
+            m_state = NOT_CONNECTED;
+        }
+        if( completionHandler )
+            completionHandler();
     }
 
     void StunClientConnection::enqueuePendingRequest( nx_stun::Message&& msg , std::function<void(SystemError::ErrorCode,nx_stun::Message&&)>&& func ) {
@@ -50,16 +53,30 @@ namespace nx_stun
         m_outstandingRequest.reset();
     }
 
-    void StunClientConnection::onConnectionComplete( SystemError::ErrorCode ec , 
-        const std::function<void(SystemError::ErrorCode)>& completion_handler ) {
+    void StunClientConnection::onConnectionComplete(
+        SystemError::ErrorCode ec , 
+        const std::function<void(SystemError::ErrorCode)>& completion_handler )
+    {
         if( completion_handler )
             completion_handler(ec);
-        if( ec ) {
+
+        if( ec )
+        {
             m_state.store(NOT_CONNECTED,std::memory_order_release);
             return;
-        } else {
+        }
+        else
+        {
             m_state.store(CONNECTED,std::memory_order_release);
         }
+
+        m_baseConnection.reset( new BaseConnectionType( this, std::move(m_socket) ) );
+        using namespace std::placeholders;
+        m_baseConnection->setMessageHandler(
+            [this]( nx_stun::Message&& msg ) {
+                processMessage( std::move( msg ) );
+            } );
+
         // Set up the read connection. If this cannot be setup we treat it
         // as cannot finish the connection .
         if( ec == SystemError::noError && !m_baseConnection->startReadingConnection() ) {
@@ -114,8 +131,9 @@ namespace nx_stun
             m_stunServerEndpoint,
             std::bind(
             &StunClientConnection::onConnectionComplete,
-            this,
-            std::placeholders::_1,std::move(completionHandler)));
+                this,
+                std::placeholders::_1,
+                std::move(completionHandler) ) );
     }
 
     void StunClientConnection::registerIndicationHandler( std::function<void(nx_stun::Message&&)>&& indicationHandler )
@@ -136,19 +154,24 @@ namespace nx_stun
                 Q_ASSERT(!m_outstandingRequest);
                 // The following code is not thread safe in terms of pending request queue since 
                 // this is OK. Without connection, no other thread will use our API .
-                m_outstandingRequest.reset(
-                    new PendingRequest(std::move(request),std::move(completionHandler)));
+                m_outstandingRequest.reset( new PendingRequest(
+                    std::move(request),
+                    std::move(completionHandler)));
                 bool ret = openConnection(
                     std::bind(
                     &StunClientConnection::onConnectionComplete,
-                    this,
-                    std::placeholders::_1,
-                    std::function<void(SystemError::ErrorCode)>()));
-                enqueuePendingRequest(std::move(request),std::move(completionHandler));
+                        this,
+                        std::placeholders::_1,
+                        std::function<void(SystemError::ErrorCode)>() ) );
+                enqueuePendingRequest(
+                    std::move(request),
+                    std::move(completionHandler));
                 return ret;
             }
         case CONNECTING:
-            enqueuePendingRequest( std::move(request),std::move(completionHandler) );
+            enqueuePendingRequest(
+                std::move(request),
+                std::move(completionHandler) );
             return true;
         case CONNECTED:
             {
@@ -189,21 +212,22 @@ namespace nx_stun
 
     void StunClientConnection::onIndicationMessageRecv( nx_stun::Message&& msg )
     {
-        if( m_indicationHandler ) 
+        if( m_indicationHandler )
             m_indicationHandler(std::move(msg));
     }
 
     void StunClientConnection::processMessage( nx_stun::Message&& msg )
     {
         switch(msg.header.messageClass) {
-        case nx_stun::MessageClass::errorResponse:
-        case nx_stun::MessageClass::successResponse:
-            onRequestMessageRecv(std::move(msg));
-            return;
-        case nx_stun::MessageClass::indication:
-            onIndicationMessageRecv(std::move(msg));
-            return;
-        default: return;
+            case nx_stun::MessageClass::errorResponse:
+            case nx_stun::MessageClass::successResponse:
+                onRequestMessageRecv(std::move(msg));
+                return;
+            case nx_stun::MessageClass::indication:
+                onIndicationMessageRecv(std::move(msg));
+                return;
+            default:
+                return;
         }
     }
 

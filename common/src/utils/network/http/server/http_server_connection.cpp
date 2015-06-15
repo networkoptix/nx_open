@@ -18,9 +18,9 @@ namespace nx_http
 {
     HttpServerConnection::HttpServerConnection(
         nx_http::HttpStreamSocketServer* socketServer,
-        AbstractCommunicatingSocket* sock )
+        std::unique_ptr<AbstractCommunicatingSocket> sock )
     :
-        BaseType( socketServer, sock )
+        BaseType( socketServer, std::move(sock) )
     {
     }
 
@@ -140,6 +140,7 @@ namespace nx_http
         }
 
         //TODO #ak read and send message body async
+        //    move async reading/writing to some separate class (async pipe) to enable reusage
 
         if( !sendData(
                 std::move( buf ),

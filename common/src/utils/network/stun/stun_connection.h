@@ -43,11 +43,10 @@ namespace nx_stun
 
         StunClientConnection(
             const SocketAddress& stunServerEndpoint,
-            bool useSsl = false,
-            SocketFactory::NatTraversalType natTraversalType = SocketFactory::nttAuto );
+            bool useSsl = false );
 
         virtual ~StunClientConnection() {
-            pleaseStop( std::function<void()>() );
+            join();
         }
 
         //!Implementation of QnStoppableAsync::pleaseStop

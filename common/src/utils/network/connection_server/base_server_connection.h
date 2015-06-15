@@ -57,10 +57,10 @@ namespace nx_api
         */
         BaseServerConnection(
             CustomConnectionManagerType* connectionManager,
-            AbstractCommunicatingSocket* streamSocket )
+            std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
         :
             m_connectionManager( connectionManager ),
-            m_streamSocket( streamSocket ),
+            m_streamSocket( std::move(streamSocket) ),
             m_bytesToSend( 0 )
         {
             m_readBuffer.reserve( READ_BUFFER_CAPACITY );
@@ -115,7 +115,7 @@ namespace nx_api
 
     private:
         CustomConnectionManagerType* m_connectionManager;
-        AbstractCommunicatingSocket* m_streamSocket;
+        std::unique_ptr<AbstractCommunicatingSocket> m_streamSocket;
         nx::Buffer m_readBuffer;
         size_t m_bytesToSend;
         std::forward_list<std::function<void()>> m_connectionCloseHandlers;

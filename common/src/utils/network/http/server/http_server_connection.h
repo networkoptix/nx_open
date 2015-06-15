@@ -39,7 +39,7 @@ namespace nx_http
 
         HttpServerConnection(
             nx_http::HttpStreamSocketServer* socketServer,
-            AbstractCommunicatingSocket* sock );
+            std::unique_ptr<AbstractCommunicatingSocket> sock );
         ~HttpServerConnection();
 
         void processMessage( nx_http::Message&& request );

@@ -7,6 +7,7 @@
 #define QNSTOPPABLE_H
 
 #include <functional>
+#include <future>
 
 
 //!Abstract class providing interface to stop doing anything without object destruction
@@ -31,6 +32,15 @@ public:
         \note If operation is already stopped it is allowed for \a completionHandler to be executed directly in \a QnStoppableAsync::pleaseStop
     */
     virtual void pleaseStop( std::function<void()>&& completionHandler ) = 0;
+
+    //!Cals \a QnStoppableAsync::pleaseStop and waits for completion
+    void join()
+    {
+        std::promise<void> promise;
+        auto fut = promise.get_future();
+        pleaseStop( [&](){ promise.set_value(); } );
+        fut.wait();
+    }
 };
 
 #endif  //QNSTOPPABLE_H
