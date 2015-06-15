@@ -24,7 +24,9 @@ public:
     QDateTime bottomBound() const;
 
     Q_INVOKABLE QDateTime closestChunkStartDate(const QDateTime &dateTime, bool forward) const;
+    Q_INVOKABLE qint64 closestChunkStartMs(const QDateTime &dateTime, bool forward) const;
     Q_INVOKABLE QDateTime closestChunkEndDate(const QDateTime &dateTime, bool forward) const;
+    Q_INVOKABLE qint64 closestChunkEndMs(const QDateTime &dateTime, bool forward) const;
 
 public slots:
     void update();

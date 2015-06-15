@@ -130,6 +130,8 @@ Page {
                     var startDate = chunkProvider.closestChunkStartDate(positionDate, true)
                     if (positionDate < startDate)
                         positionDate = startDate
+                    if (chunkProvider.closestChunkStartMs(positionDate, true) === -1)
+                        stickToEnd = true
                 }
 
                 if (stickToEnd)

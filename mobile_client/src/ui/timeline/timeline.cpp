@@ -1162,7 +1162,6 @@ void QnTimelinePrivate::zoomWindow(qreal factor, int x, qint64 stickyTime) {
 }
 
 void QnTimelinePrivate::setStickToEnd(bool stickToEnd) {
-    qDebug() << "stick: " << stickToEnd;
     if (this->stickToEnd == stickToEnd)
         return;
 
