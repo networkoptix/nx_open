@@ -13,7 +13,7 @@ QtObject
 
     property QtObject clickableSizes: QtObject
     {
-        readonly property real small: base * 0.8; 
+        readonly property real small: base * 0.5; 
         readonly property real base: impl.sizeSourceButton.height * 1.2;
         readonly property real medium: base * 1.3;
         readonly property real large: medium * 1.3;
@@ -21,7 +21,7 @@ QtObject
     
     property QtObject fontSizes: QtObject
     {
-        readonly property real small: 12;
+        readonly property real small: 13;
         readonly property real base: 15;
         readonly property real medium: 17;
         readonly property real large: 20;

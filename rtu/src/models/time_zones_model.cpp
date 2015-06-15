@@ -9,7 +9,7 @@
 namespace
 {
     const QByteArray utcIanaTemplate = "UTC";
-    
+    const QByteArray gmtIanaTemplate = "GMT";
     QStringList getBaseTimeZones()
     {
         const QList<QByteArray> timeZones = QTimeZone::availableTimeZoneIds();
@@ -17,8 +17,7 @@ namespace
         QStringList result;
         for(const auto &zoneIanaId: timeZones)
         {
-            if (!zoneIanaId.contains(utcIanaTemplate)
-                || (zoneIanaId.size() == utcIanaTemplate.size()))
+            if (!zoneIanaId.contains(utcIanaTemplate) && !zoneIanaId.contains(gmtIanaTemplate))
                 result.push_back(zoneIanaId);
         };
     

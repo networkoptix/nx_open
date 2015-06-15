@@ -700,11 +700,10 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
         removeServerImpl(baseInfo.id, targetSystemExists);
         
         SystemModelInfo &system = *searchInfo.systemInfoIterator;
-        if (!targetSystemExists && system.servers.empty())
-        {
+        const bool inplaceRename = !targetSystemExists && system.servers.empty();
+        if (inplaceRename)
             system.name = baseInfo.systemName;
-            m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
-        }
+//            m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
 
         foundServer.setBaseInfo(baseInfo);
         addServer(foundServer, selected);
@@ -875,8 +874,9 @@ rtu::ServerInfoList rtu::ServersSelectionModel::selectedServers()
 
 int rtu::ServersSelectionModel::rowCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent);
-    return m_impl->rowCount();
+    if (!parent.isValid())
+        return m_impl->rowCount();
+    return 0;
 }
 
 QVariant rtu::ServersSelectionModel::data(const QModelIndex &index

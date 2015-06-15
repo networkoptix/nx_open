@@ -1,68 +1,177 @@
 import QtQuick 2.1;
+import QtQuick.Controls 1.1;
+import QtQuick.Controls.Styles 1.1;
 
 import "../rtu" as Rtu;
 import "../base" as Base;
 import "../expandable" as Expandable;
 import "../../common" as Common;
 
-Expandable.ExpandableWithHeader
+Expandable.ExpandableItem
 {
     id: thisComponent;
 
-    property int changesCount: 0;
-    property string captionTemplate;
+    property bool successfulSummary: true;
+    property string caption;
     property var model;
     
+    expanded: !successfulSummary;
 
-    headerText: captionTemplate.arg(changesCount);
-    visible: changesCount;
-
-    areaDelegate: Column
+    headerDelegate: Item
     {
-        spacing: Common.SizeManager.spacing.large;
-
+        height: captionText.height + delimiter.height + delimiter.anchors.topMargin
+            + (showChangesButton.visible ? showChangesButton.height + showChangesButton.anchors.topMargin : 0)
+            + Common.SizeManager.spacing.large;
+        
         anchors
         {
             left: parent.left;
             right: parent.right;
-            leftMargin: Common.SizeManager.spacing.base;
         }
-
-        Item
+        
+        Base.Text
         {
-            id: spacingItem;
-            height: 1;
-            width: 1;
+            id: captionText;
+            
+            text: caption;
+            font.pixelSize: Common.SizeManager.fontSizes.large;
         }
-
-        Repeater
+       
+        Base.LineDelimiter
         {
-            id: repeater;
-
-            model: thisComponent.model;
-
-            delegate: Column
+            id: delimiter;
+            anchors
             {
-                spacing: Common.SizeManager.spacing.medium;
+                top: captionText.bottom;
+                topMargin: Common.SizeManager.spacing.medium;
+            }
+        }
 
-                anchors
-                {
-                    left: parent.left;
-                    right: parent.right;
-                }
+        Base.Button
+        {
+            id: showChangesButton;
+            
+            height: Common.SizeManager.clickableSizes.medium;
+            width: height * 4;   
+            
+            anchors
+            {
+                top: delimiter.bottom;
+                topMargin: Common.SizeManager.spacing.medium;
+            }
+            
+            visible: successfulSummary;
+            text: qsTr("Changelog");
+            
+            onClicked: 
+            {
+                thisComponent.expanded = !thisComponent.expanded;
+            }
+        }
+    }    
 
-                Base.Text
-                {
-                    text: model.serverName;
-                    font.bold: true;
-                }
+    areaDelegate: TableView
+    {
+        id: table;
 
-                RequestResultDelegate
+        height: 0;
+        anchors
+        {
+            left: parent.left;
+            right: parent.right;
+        }
+        
+        backgroundVisible: false;
+        headerVisible: false;
+        contentHeader: Item {}
+        contentFooter: Item {}
+        style: ScrollViewStyle
+        {
+            frame: Rectangle {}
+        }
+
+        selectionMode: SelectionMode.NoSelection;
+        model: thisComponent.model;
+    
+        rowDelegate: Item
+        {
+            height: Common.SizeManager.spacing.medium;
+            Component.onCompleted: table.height += height;
+        }
+    
+        section
+        {
+            property: "id";
+            delegate: Rtu.SummaryTextDelegate
+            {
+                property string base: section;
+            
+                parentColumn: nameColumn;
+                fontSize: Common.SizeManager.fontSizes.medium;
+                verticalSpace:Common.SizeManager.spacing.medium;
+                text: base.substr(base.indexOf('}') + 1);
+            
+                Component.onCompleted: table.height += height;
+            }
+        }
+    
+        TableViewColumn
+        {
+            id: nameColumn;
+            role: "name";
+            width: 0;
+
+            delegate: Rtu.SummaryTextDelegate
+            {
+                parentColumn: nameColumn;
+                text: styleData.value;
+            }
+        }
+    
+        TableViewColumn
+        {
+            id: valueColumn;
+            role: "value";
+            width: 0;
+        
+            delegate: Rtu.SummaryTextDelegate
+            {
+                color: (table.model.isSuccessChangesModel ? "black" : "red");
+                parentColumn: valueColumn;
+                text: styleData.value;
+            }
+        }   
+
+        TableViewColumn
+        {
+            id: stateColumn;
+            role: "success";
+            width: Common.SizeManager.clickableSizes.base;
+
+            delegate: Item
+            {
+                Image
                 {
-                    model: resultsModel;
+                    height: Common.SizeManager.clickableSizes.small;
+                    width: Common.SizeManager.clickableSizes.small;
+                    anchors.centerIn: parent;
+                    source: (table.model.isSuccessChangesModel ? "qrc:/resources/changelog-ok.png"
+                        : "qrc:/resources/changelog-fail.png");
                 }
             }
         }
+    
+        TableViewColumn
+        {
+            id: reasonColumn;
+            role: "reason";
+            width: 0;
+        
+            delegate: Rtu.SummaryTextDelegate
+            {
+                parentColumn: reasonColumn; 
+                text: styleData.value;
+            }
+        }
     }
-
 }

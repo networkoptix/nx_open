@@ -26,6 +26,7 @@ Window
         {
             password.text = "";
             showPasswordCheckbox.checked = false;
+            password.focus = true;
         }
     }
 

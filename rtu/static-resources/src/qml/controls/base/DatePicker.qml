@@ -32,8 +32,8 @@ QtControls.TextField
 
     onShowNowChanged:
     {
-        inputMask = (showNow ? impl.mask : "");
-        text = (showNow ? impl.stringFromDate(date) : qsTr("<now>"));
+        inputMask = (showNow ? "" : impl.mask);
+        text = (showNow ? qsTr("<now>") : impl.stringFromDate(initDate));
     }
 
     font.pixelSize: fontSize;

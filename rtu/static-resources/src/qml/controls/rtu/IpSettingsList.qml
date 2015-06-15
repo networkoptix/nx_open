@@ -55,7 +55,7 @@ Base.Column
         }
     }
     
-    Column
+    Base.Column
     {
         id: column;
 

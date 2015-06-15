@@ -12,7 +12,7 @@ Item
         || ipPortSettings.changed || dateTimeSettings.changed;
 
     anchors.fill: parent;
-
+   
     ScrollView
     {
         anchors
@@ -61,6 +61,12 @@ Item
                 Settings.SystemAndPasswordSetting
                 {
                     id: systemAndPasswordSettings;
+                }
+                
+                Item
+                {
+                    width: 1;
+                    height: Common.SizeManager.spacing.base;
                 }
             }
         }

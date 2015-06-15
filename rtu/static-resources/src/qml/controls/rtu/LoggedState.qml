@@ -14,6 +14,6 @@ Image
     height: Common.SizeManager.clickableSizes.small;
 
     source: (loggedState === NxRtu.Constants.LoggedToAllServers ? ""
-        : (loggedState === NxRtu.Constants.PartiallyLogged ? "qrc:/resources/lock-open.svg"
-        : "qrc:/resources/lock.svg" ));
+        : (loggedState === NxRtu.Constants.PartiallyLogged ? "qrc:/resources/lock-open.png"
+        : "qrc:/resources/lock-closed.png" ));
 }

@@ -90,6 +90,9 @@ Expandable.MaskedSettingsPanel
     
                         onTimeZoneChanged:
                         {
+                            if (useCurrentTimeCheckbox.checked)
+                                return;
+                            
                             var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, from, to);
                             datePicker.setDate(dateTime);
                             timePicker.setTime(dateTime);
@@ -144,6 +147,8 @@ Expandable.MaskedSettingsPanel
                                     var now = new Date();
                                     newDate = now;
                                     newTime = now;
+                                    
+                                    console.log(now);
                                 }
         
                                 rtuContext.changesManager().addDateTimeChange(

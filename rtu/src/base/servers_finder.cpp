@@ -37,7 +37,7 @@ namespace
     enum 
     {
         kUpdateServersInfoInterval = 500
-        , kServerAliveTimeout = 100 * 1000
+        , kServerAliveTimeout = 1000 * 1000
     };
 }
 
@@ -108,14 +108,11 @@ namespace
             return false;
 
         const QStringList &keys = jsonObject.keys();
-        /*
-        if (!jsonObject.value("systemName").toString().contains("rtu_"))
+        
+        if (!jsonObject.value("systemName").toString().contains("__rtu")
+                && !jsonObject.value("systemName").toString().contains("nx1"))
             return false;
-//        if (!jsonObject.value("systemName").toString().contains("rtu_roma"))
-//            return false;
-        if (jsonObject.value("name").toString() == "win7")
-            return false;
-        */
+        
         for (const auto &key: keys)
         {
             const auto itHandler = parser.find(key);

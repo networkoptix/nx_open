@@ -110,20 +110,6 @@ namespace
         
         return result;
     }
-    
-    void cmdDebugOutput(const QUrl &url
-        , const QString &password
-        , const QByteArray &data = QByteArray())
-    {
-        qDebug() << "*** Sending command:";
-        qDebug() << url;
-        qDebug() << password;
-        
-        if (!data.isEmpty())
-            qDebug() << data;
-        
-        qDebug() << "\n";
-    }
 }
 
 /// Forward declarations
@@ -387,7 +373,6 @@ bool rtu::sendSetTimeRequest(HttpClient *client
     
     const AffectedEntities affected = (kDateTimeAffected | kTimeZoneAffected);
     
-    cmdDebugOutput(url, info.extraInfo().password);
     client->sendGet(url, makeReplyCallback(callback, affected)
         , makeErrorCallback(callback, affected));
     return true;
@@ -413,8 +398,6 @@ bool rtu::sendSetSystemNameRequest(HttpClient *client
     QUrl url = makeUrl(info, kConfigureCommand);
     url.setQuery(query);
 
-    
-    cmdDebugOutput(url, info.extraInfo().password);
     client->sendGet(url, makeReplyCallback(callback, kSystemNameAffected)
         , makeErrorCallback(callback, kSystemNameAffected));
     return true;
@@ -442,7 +425,6 @@ bool rtu::sendSetPasswordRequest(HttpClient *client
     QUrl url = makeUrl(info.baseInfo().hostAddress, info.baseInfo().port, authPass, kConfigureCommand);
     url.setQuery(query);
     
-    cmdDebugOutput(url, authPass);
     client->sendGet(url, makeReplyCallback(callback, kPasswordAffected)
         , makeErrorCallback(callback, kPasswordAffected));
     
@@ -469,7 +451,6 @@ bool rtu::sendSetPortRequest(HttpClient *client
     QUrl url = makeUrl(info, kConfigureCommand);
     url.setQuery(query);
 
-    cmdDebugOutput(url, info.extraInfo().password);
     client->sendGet(url, makeReplyCallback(callback, kPortAffected)
         , makeErrorCallback(callback, kPortAffected));
     
@@ -508,8 +489,7 @@ bool rtu::sendIfListRequest(HttpClient *client
         }
     };
 
-    cmdDebugOutput(url, password);
-    client->sendGet(url, successfullCallback
+   client->sendGet(url, successfullCallback
         , makeErrorCallback(failed, kAllAddressFlagsAffected));
     return true;
 }
@@ -553,8 +533,6 @@ void rtu::sendChangeItfRequest(HttpClient *client
     }
 
     QUrl url = makeUrl(info, kIfConfigCommand);
-
-    cmdDebugOutput(url, info.extraInfo().password, QJsonDocument(jsonInfoChanges).toJson());
     
     client->sendPost(url, QJsonDocument(jsonInfoChanges).toJson()
         , makeReplyCallback(callback, affected)
