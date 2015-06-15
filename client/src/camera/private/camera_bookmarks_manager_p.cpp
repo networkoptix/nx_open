@@ -5,7 +5,6 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <camera/data/bookmark_camera_data.h>
 #include <camera/loaders/bookmark_camera_data_loader.h>
 
 namespace

@@ -470,7 +470,7 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
 
     QnTimePeriodList result;
 
-    int maxSize = std::max<int>(
+    int maxSize = std::min<int>(
         limit,
         std::max_element(nonEmptyPeriods.cbegin(), nonEmptyPeriods.cend(), [](const QnTimePeriodList &l, const QnTimePeriodList &r) {return l.size() < r.size(); })->size()
         );

@@ -47,7 +47,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const MultiServerCam
     int maxSize = 0;
     for (const auto &list: nonEmptyLists)
         maxSize += list.size();
-    result.reserve(std::max(maxSize, limit));
+    result.reserve(std::min(maxSize, limit));
 
     int minIndex = 0;
     while (minIndex != -1) {
