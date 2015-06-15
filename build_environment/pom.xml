@@ -276,7 +276,14 @@
                     <version>1.7.0-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>      
+                </dependency>
+                <dependency>
+                    <groupId>com.sourceforge.cloudcity</groupId>
+                    <artifactId>bespin</artifactId>
+                    <version>1.2.1-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
+                </dependency>                 
             </dependencies>           
         </profile>
         <profile>
@@ -295,6 +302,13 @@
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
                 </dependency>
+                <dependency>
+                    <groupId>com.sourceforge.cloudcity</groupId>
+                    <artifactId>bespin</artifactId>
+                    <version>1.2-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
+                </dependency> 
             </dependencies>
         </profile>  		
         <profile>
@@ -320,14 +334,7 @@
                     <version>${festival.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>                                   
-                <dependency>
-                    <groupId>com.sourceforge.cloudcity</groupId>
-                    <artifactId>bespin</artifactId>
-                    <version>1.2-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
-                </dependency>                   
+                </dependency>                                                     
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
