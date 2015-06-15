@@ -101,7 +101,7 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
     m_activeCollection.waitForFinished();
 
     m_activeCollection = QnConcurrent::run(Ec2ThreadPool::instance(), [=](){
-        QnScopedThreadRollback reservedThread( 1 );
+        QnScopedThreadRollback reservedThread( 1, Ec2ThreadPool::instance() );
         return scanAndReport(settings);
     });
 }
