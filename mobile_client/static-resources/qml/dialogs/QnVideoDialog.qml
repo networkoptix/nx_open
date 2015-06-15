@@ -20,10 +20,41 @@ Page {
 
     readonly property var __locale: Qt.locale()
 
+    property var __chunkEndDate
+    property var __nextChunkStartDate
+    readonly property bool __playing: video.playbackState == MediaPlayer.PlayingState && video.position > 0
+
+    function alignToChunk(pos) {
+        if (!timeline.stickToEnd) {
+            var startMs = -1
+            var startDate
+
+            if (!isNaN(pos.getTime())) {
+                startDate = chunkProvider.closestChunkStartDate(pos, true)
+                startMs = chunkProvider.closestChunkStartMs(pos, true)
+                __chunkEndDate = chunkProvider.closestChunkEndDate(pos, true)
+                __nextChunkStartDate = chunkProvider.nextChunkStartDate(pos, true)
+            }
+
+            if (startMs === -1) {
+                timeline.stickToEnd = true
+            } else {
+                if (pos < startDate)
+                    pos = startDate
+
+                video.setPositionDate(pos)
+                resourceHelper.setDateTime(pos)
+                timeline.positionDate = pos
+            }
+        }
+
+        if (timeline.stickToEnd)
+            resourceHelper.setLive()
+    }
+
     QnMediaResourceHelper {
         id: resourceHelper
         resourceId: videoPlayer.resourceId
-        onMediaUrlChanged: console.log(mediaUrl)
         screenSize: Qt.size(videoPlayer.width, videoPlayer.height)
     }
 
@@ -45,9 +76,9 @@ Page {
 
         property int videoWidth: metaData.resolution ? metaData.resolution.width : 0
         property int videoHeight: metaData.resolution ? metaData.resolution.height : 0
-        property date startPosition: new Date()
-        property date positionDate: new Date()
+        property date positionDate
         property int __prevPosition: 0
+        property bool __updateTimeline: false
 
         width: parent.width
         height: parent.height
@@ -55,24 +86,33 @@ Page {
         source: resourceHelper.mediaUrl
         autoPlay: !playbackController.paused
 
-        onPlaybackStateChanged: {
-            if (playbackState == MediaPlayer.PlayingState) {
-                startPosition = timeline.positionDate
-                positionDate = timeline.positionDate
+        onPositionChanged: {
+            if (position == 0)
+                __prevPosition = 0
+
+            setPositionDate(new Date(positionDate.getTime() + (position - __prevPosition)))
+
+            if (timeline.stickToEnd || timeline.dragging)
+                return
+
+            if (__chunkEndDate < positionDate) {
+                videoPlayer.alignToChunk(__nextChunkStartDate)
+            } else if (__updateTimeline) {
+                timeline.positionDate = video.positionDate
+                __updateTimeline = false
             }
         }
 
-        onPositionChanged: {
-            var diff = position - __prevPosition
+        function setPositionDate(pos) {
+            positionDate = pos
             __prevPosition = position
-            positionDate = new Date(startPosition.getTime() + diff)
         }
     }
 
     Timer {
         interval: 5000
-        running: !timeline.stickToEnd && (video.playbackState === MediaPlayer.PlayingState)
-        onTriggered: timeline.positionDate = video.positionDate
+        running: !timeline.stickToEnd && !timeline.dragging && __playing
+        onTriggered: video.__updateTimeline = true
     }
 
     Item {
@@ -123,22 +163,9 @@ Page {
             chunkProvider: chunkProvider
             startBoundDate: chunkProvider.bottomBound
 
-            autoPlay: !stickToEnd && video.playbackState == MediaPlayer.PlayingState
+            autoPlay: !stickToEnd && __playing
 
-            onMoveFinished: {
-                if (!stickToEnd) {
-                    var startDate = chunkProvider.closestChunkStartDate(positionDate, true)
-                    if (positionDate < startDate)
-                        positionDate = startDate
-                    if (chunkProvider.closestChunkStartMs(positionDate, true) === -1)
-                        stickToEnd = true
-                }
-
-                if (stickToEnd)
-                    resourceHelper.setLive()
-                else
-                    resourceHelper.setDateTime(positionDate)
-            }
+            onMoveFinished: videoPlayer.alignToChunk(positionDate)
         }
 
         Rectangle {

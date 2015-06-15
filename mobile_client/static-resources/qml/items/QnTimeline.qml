@@ -16,6 +16,7 @@ Item {
     property alias chunkProvider: timeline.chunkProvider
     property alias startBoundDate: timeline.startBoundDate
     property alias autoPlay: timeline.autoPlay
+    readonly property bool dragging: mouseArea.pressed || pinchArea.pinch.active
 
     signal dragFinished()
     signal moveFinished()
@@ -36,6 +37,8 @@ Item {
     }
 
     PinchArea {
+        id: pinchArea
+
         anchors.fill: parent
         pinch.minimumRotation: 0
         pinch.maximumRotation: 0
@@ -49,6 +52,8 @@ Item {
         }
 
         MouseArea {
+            id: mouseArea
+
             property int pressX: -1
 
             anchors.fill: parent
