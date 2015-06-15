@@ -2,8 +2,8 @@
 
 namespace rpi_omx
 {
-    std::atomic<uint32_t> OMXExeption::lastError_;
-    std::atomic<uint32_t> OMXExeption::eventError_;
+    std::atomic<uint32_t> OMXExeption::m_lastError;
+    std::atomic<uint32_t> OMXExeption::m_eventError;
 
     static OMX_ERRORTYPE callback_EventHandler(
         OMX_HANDLETYPE hComponent,

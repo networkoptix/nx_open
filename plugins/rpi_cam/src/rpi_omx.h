@@ -43,30 +43,30 @@ namespace rpi_omx
         static const unsigned MAX_LEN = 256;
 
         OMXExeption(OMX_ERRORTYPE errCode, const char * file, unsigned line, const char * msg = nullptr)
-        :   errCode_(errCode)
+        :   m_errCode(errCode)
         {
             setLastError(errCode);
 
             if (msg && msg[0])
-                snprintf(msg_, MAX_LEN, "%s:%d OpenMAX IL error: 0x%08x. %s", file, line, errCode, msg);
+                snprintf(m_msg, MAX_LEN, "%s:%d OpenMAX IL error: 0x%08x. %s", file, line, errCode, msg);
             else
-                snprintf(msg_, MAX_LEN, "%s:%d OpenMAX IL error: 0x%08x", file, line, errCode);
+                snprintf(m_msg, MAX_LEN, "%s:%d OpenMAX IL error: 0x%08x", file, line, errCode);
         }
 
-        OMX_ERRORTYPE code() const { return errCode_; }
-        virtual const char * what() const noexcept override { return msg_; }
+        OMX_ERRORTYPE code() const { return m_errCode; }
+        virtual const char * what() const noexcept override { return m_msg; }
 
         static bool hasError() { return lastError() || eventError(); }
-        static uint32_t lastError() { return lastError_; }
-        static uint32_t eventError() { return eventError_; }
-        static void setLastError(uint32_t code = OMX_ErrorNone) { lastError_.store(code); }
-        static void setEventError(uint32_t code = OMX_ErrorNone) { eventError_.store(code); }
+        static uint32_t lastError() { return m_lastError; }
+        static uint32_t eventError() { return m_eventError; }
+        static void setLastError(uint32_t code = OMX_ErrorNone) { m_lastError.store(code); }
+        static void setEventError(uint32_t code = OMX_ErrorNone) { m_eventError.store(code); }
 
     private:
-        OMX_ERRORTYPE errCode_;
-        char msg_[MAX_LEN];
-        static std::atomic<uint32_t> lastError_;
-        static std::atomic<uint32_t> eventError_;
+        OMX_ERRORTYPE m_errCode;
+        char m_msg[MAX_LEN];
+        static std::atomic<uint32_t> m_lastError;
+        static std::atomic<uint32_t> m_eventError;
     };
 
     ///
@@ -126,25 +126,25 @@ namespace rpi_omx
 
         void init()
         {
-            memset(&param_, 0, sizeof(param_));
-            param_.nSize = sizeof(param_);
-            param_.nVersion.nVersion = OMX_VERSION;
-            param_.nVersion.s.nVersionMajor = OMX_VERSION_MAJOR;
-            param_.nVersion.s.nVersionMinor = OMX_VERSION_MINOR;
-            param_.nVersion.s.nRevision = OMX_VERSION_REVISION;
-            param_.nVersion.s.nStep = OMX_VERSION_STEP;
+            memset(&m_param, 0, sizeof(m_param));
+            m_param.nSize = sizeof(m_param);
+            m_param.nVersion.nVersion = OMX_VERSION;
+            m_param.nVersion.s.nVersionMajor = OMX_VERSION_MAJOR;
+            m_param.nVersion.s.nVersionMinor = OMX_VERSION_MINOR;
+            m_param.nVersion.s.nRevision = OMX_VERSION_REVISION;
+            m_param.nVersion.s.nStep = OMX_VERSION_STEP;
         }
 
-        T& operator * () { return param_; }
-        T* operator & () { return &param_; }
-        T* operator -> () { return &param_; }
+        T& operator * () { return m_param; }
+        T* operator & () { return &m_param; }
+        T* operator -> () { return &m_param; }
 
-        const T& operator * () const { return param_; }
-        const T* operator & () const { return &param_; }
-        const T* operator -> () const { return &param_; }
+        const T& operator * () const { return m_param; }
+        const T* operator & () const { return &m_param; }
+        const T* operator -> () const { return &m_param; }
 
     private:
-        T param_;
+        T m_param;
     };
 
     /// OpenMAX IL CPU<->GPU buffer
@@ -152,36 +152,36 @@ namespace rpi_omx
     {
     public:
         Buffer()
-        :   ppBuffer_(nullptr),
-            fillDone_(false)
+        :   m_ppBuffer(nullptr),
+            m_fillDone(false)
         {}
 
-        bool filled() const { return fillDone_; }
-        void setFilled(bool val = true) { fillDone_ = val; }
+        bool filled() const { return m_fillDone; }
+        void setFilled(bool val = true) { m_fillDone = val; }
 
-        OMX_BUFFERHEADERTYPE ** pHeader() { return &ppBuffer_; }
-        OMX_BUFFERHEADERTYPE * header() { return ppBuffer_; }
-        OMX_U32 flags() const { return ppBuffer_->nFlags; }
-        OMX_U32& flags() { return ppBuffer_->nFlags; }
-        OMX_TICKS timeStamp() { return ppBuffer_->nTimeStamp; } // need OMX_IndexParamCommonUseStcTimestamps
+        OMX_BUFFERHEADERTYPE ** pHeader() { return &m_ppBuffer; }
+        OMX_BUFFERHEADERTYPE * header() { return m_ppBuffer; }
+        OMX_U32 flags() const { return m_ppBuffer->nFlags; }
+        OMX_U32& flags() { return m_ppBuffer->nFlags; }
+        OMX_TICKS timeStamp() { return m_ppBuffer->nTimeStamp; } // need OMX_IndexParamCommonUseStcTimestamps
 
-        OMX_U8 * data() { return  ppBuffer_->pBuffer + ppBuffer_->nOffset; }
-        OMX_U32 dataSize() const { return ppBuffer_->nFilledLen; }
-        OMX_U32 allocSize() const { return ppBuffer_->nAllocLen; }
+        OMX_U8 * data() { return  m_ppBuffer->pBuffer + m_ppBuffer->nOffset; }
+        OMX_U32 dataSize() const { return m_ppBuffer->nFilledLen; }
+        OMX_U32 allocSize() const { return m_ppBuffer->nAllocLen; }
 
     private:
-        OMX_BUFFERHEADERTYPE * ppBuffer_;
-        std::atomic_bool fillDone_;
+        OMX_BUFFERHEADERTYPE * m_ppBuffer;
+        std::atomic_bool m_fillDone;
     };
 
     /// Base class for OpenMAX IL components
     class Component
     {
     public:
-        OMX_HANDLETYPE& component() { return component_; }
-        ComponentType type() const { return type_; }
-        const char * name() const { return componentType2name(type_); }
-        unsigned numPorts() const { return componentPortsCount(type_); }
+        OMX_HANDLETYPE& component() { return m_component; }
+        ComponentType type() const { return m_type; }
+        const char * name() const { return componentType2name(m_type); }
+        unsigned numPorts() const { return componentPortsCount(m_type); }
 
         void dumpPort(OMX_U32 nPortIndex, bool dumpFormats = false)
         {
@@ -198,7 +198,7 @@ namespace rpi_omx
 
                 for (;; portformat->nIndex++)
                 {
-                    OMX_ERRORTYPE err = OMX_GetParameter(component_, OMX_IndexParamVideoPortFormat, &portformat);
+                    OMX_ERRORTYPE err = OMX_GetParameter(m_component, OMX_IndexParamVideoPortFormat, &portformat);
                     if (err != OMX_ErrorNone)
                         break;
 
@@ -210,16 +210,16 @@ namespace rpi_omx
         OMX_STATETYPE state()
         {
             OMX_STATETYPE state;
-            ERR_OMX( OMX_GetState(component_, &state), "OMX_GetState" );
+            ERR_OMX( OMX_GetState(m_component, &state), "OMX_GetState" );
             return state;
         }
 
         void switchState(OMX_STATETYPE newState)
         {
-            unsigned value = eventState_ + 1;
-            ERR_OMX( OMX_SendCommand(component_, OMX_CommandStateSet, newState, NULL), "switch state");
+            unsigned value = m_eventState + 1;
+            ERR_OMX( OMX_SendCommand(m_component, OMX_CommandStateSet, newState, NULL), "switch state");
 
-            if (! waitValue(eventState_, value))
+            if (! waitValue(m_eventState, value))
                 debug_print("%s - lost state changed event\n", name());
 
             if (state() != newState)
@@ -230,41 +230,41 @@ namespace rpi_omx
 
         void enablePort(OMX_U32 nPortIndex = OMX_ALL)
         {
-            unsigned value = eventEnabled_ + count2wait(nPortIndex);
-            ERR_OMX( OMX_SendCommand(component_, OMX_CommandPortEnable, nPortIndex, NULL), "enable port");
+            unsigned value = m_eventEnabled + count2wait(nPortIndex);
+            ERR_OMX( OMX_SendCommand(m_component, OMX_CommandPortEnable, nPortIndex, NULL), "enable port");
 
-            if (! waitValue(eventEnabled_, value))
+            if (! waitValue(m_eventEnabled, value))
                 debug_print("%s - port %d lost enable port event\n", name(), nPortIndex);
         }
 
         void disablePort(OMX_U32 nPortIndex = OMX_ALL)
         {
-            unsigned value = eventDisabled_ + count2wait(nPortIndex);
-            ERR_OMX( OMX_SendCommand(component_, OMX_CommandPortDisable, nPortIndex, NULL), "disable port");
+            unsigned value = m_eventDisabled + count2wait(nPortIndex);
+            ERR_OMX( OMX_SendCommand(m_component, OMX_CommandPortDisable, nPortIndex, NULL), "disable port");
 
-            if (! waitValue(eventDisabled_, value))
+            if (! waitValue(m_eventDisabled, value))
                 debug_print("%s - port %d lost disable port event\n", name(), nPortIndex);
         }
 
         void flushPort(OMX_U32 nPortIndex = OMX_ALL)
         {
-            unsigned value = eventFlushed_ + count2wait(nPortIndex);
-            ERR_OMX( OMX_SendCommand(component_, OMX_CommandFlush, nPortIndex, NULL), "flush buffers");
+            unsigned value = m_eventFlushed + count2wait(nPortIndex);
+            ERR_OMX( OMX_SendCommand(m_component, OMX_CommandFlush, nPortIndex, NULL), "flush buffers");
 
-            if (! waitValue(eventFlushed_, value))
+            if (! waitValue(m_eventFlushed, value))
                 debug_print("%s - port %d lost flush port event\n", name(), nPortIndex);
         }
 
         void getPortDefinition(OMX_U32 nPortIndex, Parameter<OMX_PARAM_PORTDEFINITIONTYPE>& portDef)
         {
             portDef->nPortIndex = nPortIndex;
-            ERR_OMX( OMX_GetParameter(component_, OMX_IndexParamPortDefinition, &portDef), "get port definition");
+            ERR_OMX( OMX_GetParameter(m_component, OMX_IndexParamPortDefinition, &portDef), "get port definition");
         }
 
         void setPortDefinition(OMX_U32 nPortIndex, Parameter<OMX_PARAM_PORTDEFINITIONTYPE>& portDef)
         {
             portDef->nPortIndex = nPortIndex;
-            ERR_OMX( OMX_SetParameter(component_, OMX_IndexParamPortDefinition, &portDef), "set port definition");
+            ERR_OMX( OMX_SetParameter(m_component, OMX_IndexParamPortDefinition, &portDef), "set port definition");
         }
 
         void allocBuffers(OMX_U32 nPortIndex, Buffer& buffer)
@@ -272,17 +272,17 @@ namespace rpi_omx
             Parameter<OMX_PARAM_PORTDEFINITIONTYPE> portDef;
             getPortDefinition(nPortIndex, portDef);
 
-            ERR_OMX( OMX_AllocateBuffer(component_, buffer.pHeader(), nPortIndex, 0, portDef->nBufferSize), "OMX_AllocateBuffer");
+            ERR_OMX( OMX_AllocateBuffer(m_component, buffer.pHeader(), nPortIndex, 0, portDef->nBufferSize), "OMX_AllocateBuffer");
         }
 
         void freeBuffers(OMX_U32 nPortIndex, Buffer& buffer)
         {
-            ERR_OMX( OMX_FreeBuffer(component_, nPortIndex, buffer.header()), "OMX_FreeBuffer");
+            ERR_OMX( OMX_FreeBuffer(m_component, nPortIndex, buffer.header()), "OMX_FreeBuffer");
         }
 
         void callFillThisBuffer(Buffer& buffer)
         {
-            ERR_OMX( OMX_FillThisBuffer(component_, buffer.header()), "OMX_FillThisBuffer");
+            ERR_OMX( OMX_FillThisBuffer(m_component, buffer.header()), "OMX_FillThisBuffer");
         }
 
         // from callbacks
@@ -292,19 +292,19 @@ namespace rpi_omx
             switch (cmd)
             {
                 case OMX_CommandStateSet:
-                    ++eventState_;
+                    ++m_eventState;
                     break;
 
                 case OMX_CommandFlush:
-                    ++eventFlushed_;
+                    ++m_eventFlushed;
                     break;
 
                 case OMX_CommandPortDisable:
-                    ++eventDisabled_;
+                    ++m_eventDisabled;
                     break;
 
                 case OMX_CommandPortEnable:
-                    ++eventEnabled_;
+                    ++m_eventEnabled;
                     break;
 
                 case OMX_CommandMarkBuffer:
@@ -317,23 +317,23 @@ namespace rpi_omx
         {
         }
 
-        //VcosSemaphore * semaphore() { return &sem_; }
+        //VcosSemaphore * semaphore() { return &m_sem; }
 
     protected:
-        OMX_HANDLETYPE component_;
-        ComponentType type_;
-        //VcosSemaphore sem_; // commented: synced by atomics
+        OMX_HANDLETYPE m_component;
+        ComponentType m_type;
+        //VcosSemaphore m_sem; // commented: synced by atomics
 
         Component(ComponentType type, OMX_PTR pAppData, OMX_CALLBACKTYPE * callbacks)
-        :   type_(type),
-            //sem_("rpi_cam:event"),
-            eventState_(0),
-            eventFlushed_(0),
-            eventDisabled_(0),
-            eventEnabled_(0)
+        :   m_type(type),
+            //m_sem("rpi_cam:event"),
+            m_eventState(0),
+            m_eventFlushed(0),
+            m_eventDisabled(0),
+            m_eventEnabled(0)
         {
             OMX_STRING xName = const_cast<OMX_STRING>(name());
-            ERR_OMX( OMX_GetHandle(&component_, xName, pAppData, callbacks), "OMX_GetHandle");
+            ERR_OMX( OMX_GetHandle(&m_component, xName, pAppData, callbacks), "OMX_GetHandle");
 
             disablePort();
         }
@@ -342,7 +342,7 @@ namespace rpi_omx
         {
             try
             {
-                ERR_OMX( OMX_FreeHandle(component_), "OMX_FreeHandle" );
+                ERR_OMX( OMX_FreeHandle(m_component), "OMX_FreeHandle" );
             }
             catch (const OMXExeption& e)
             {
@@ -352,14 +352,14 @@ namespace rpi_omx
         }
 
         // type_ equals to first port number
-        unsigned n2idx(OMX_U32 nPortIndex) const { return nPortIndex - type_; }
-        unsigned idx2n(unsigned idx) const { return type_ + idx; }
+        unsigned n2idx(OMX_U32 nPortIndex) const { return nPortIndex - m_type; }
+        unsigned idx2n(unsigned idx) const { return m_type + idx; }
 
     private:
-        std::atomic<uint32_t> eventState_;
-        std::atomic<uint32_t> eventFlushed_;
-        std::atomic<uint32_t> eventDisabled_;
-        std::atomic<uint32_t> eventEnabled_;
+        std::atomic<uint32_t> m_eventState;
+        std::atomic<uint32_t> m_eventFlushed;
+        std::atomic<uint32_t> m_eventDisabled;
+        std::atomic<uint32_t> m_eventEnabled;
 
         bool waitValue(std::atomic<uint32_t>& value, unsigned wantedValue)
         {
@@ -408,7 +408,7 @@ namespace rpi_omx
         // 8. Change state to IDLE, and proceed as required.
         Camera()
         :   Component(cType, (OMX_PTR) this, &cbsEvents),
-            ready_(false)
+            m_ready(false)
         {
             requestCallback();
             setDeviceNumber(CAM_DEVICE_NUMBER);
@@ -416,7 +416,7 @@ namespace rpi_omx
             Parameter<OMX_PARAM_TIMESTAMPMODETYPE> tsMode;
             tsMode->eTimestampMode = OMX_TimestampModeRawStc;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexParamCommonUseStcTimestamps, &tsMode), "camera timestamp mode");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexParamCommonUseStcTimestamps, &tsMode), "camera timestamp mode");
         }
 
         void requestCallback()
@@ -426,7 +426,7 @@ namespace rpi_omx
             cbtype->nIndex     = OMX_IndexParamCameraDeviceNumber;
             cbtype->bEnable    = OMX_TRUE;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigRequestCallback, &cbtype), "request callbacks");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigRequestCallback, &cbtype), "request callbacks");
         }
 
         void setDeviceNumber(unsigned camNumber)
@@ -435,7 +435,7 @@ namespace rpi_omx
             device->nPortIndex = OMX_ALL;
             device->nU32 = camNumber;
 
-            ERR_OMX( OMX_SetParameter(component_, OMX_IndexParamCameraDeviceNumber, &device), "set camera device number");
+            ERR_OMX( OMX_SetParameter(m_component, OMX_IndexParamCameraDeviceNumber, &device), "set camera device number");
         }
 
         void setVideoFromat(const VideoFromat& videoFormat)
@@ -459,7 +459,7 @@ namespace rpi_omx
             framerate->xEncodeFramerate = fps << 16;
             framerate->nPortIndex = OPORT_VIDEO;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigVideoFramerate, &framerate), "set framerate");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigVideoFramerate, &framerate), "set framerate");
         }
 
         // -100 .. 100
@@ -469,7 +469,7 @@ namespace rpi_omx
             sharpness->nPortIndex = nPortIndex;
             sharpness->nSharpness = nSharpness;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigCommonSharpness, &sharpness), "set camera sharpness");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigCommonSharpness, &sharpness), "set camera sharpness");
         }
 
         // -100 .. 100
@@ -479,7 +479,7 @@ namespace rpi_omx
             contrast->nPortIndex = nPortIndex;
             contrast->nContrast = nContrast;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigCommonContrast, &contrast), "set camera contrast");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigCommonContrast, &contrast), "set camera contrast");
         }
 
         // -100 .. 100
@@ -489,7 +489,7 @@ namespace rpi_omx
             saturation->nPortIndex = nPortIndex;
             saturation->nSaturation = nSaturation;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigCommonSaturation, &saturation), "set camera saturation");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigCommonSaturation, &saturation), "set camera saturation");
         }
 
         // 0 .. 100
@@ -499,7 +499,7 @@ namespace rpi_omx
             brightness->nPortIndex = nPortIndex;
             brightness->nBrightness = nBrightness;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigCommonBrightness, &brightness), "set camera brightness");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigCommonBrightness, &brightness), "set camera brightness");
         }
 
         void setExposureValue(OMX_U32 nPortIndex = OMX_ALL,
@@ -511,7 +511,7 @@ namespace rpi_omx
             exposure_value->nSensitivity = nSensitivity;
             exposure_value->bAutoSensitivity = bAutoSensitivity;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigCommonExposureValue, &exposure_value), "set camera exposure value");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigCommonExposureValue, &exposure_value), "set camera exposure value");
         }
 
         void setFrameStabilisation(OMX_U32 nPortIndex = OMX_ALL, OMX_BOOL bStab = OMX_TRUE)
@@ -520,7 +520,7 @@ namespace rpi_omx
             frame_stabilisation_control->nPortIndex = nPortIndex;
             frame_stabilisation_control->bStab = bStab;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigCommonFrameStabilisation, &frame_stabilisation_control),
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigCommonFrameStabilisation, &frame_stabilisation_control),
                      "set camera frame stabilisation");
         }
 
@@ -530,7 +530,7 @@ namespace rpi_omx
             white_balance_control->nPortIndex = nPortIndex;
             white_balance_control->eWhiteBalControl = eWhiteBalControl;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigCommonWhiteBalance, &white_balance_control),
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigCommonWhiteBalance, &white_balance_control),
                      "set camera frame white balance");
         }
 
@@ -540,7 +540,7 @@ namespace rpi_omx
             image_filter->nPortIndex = nPortIndex;
             image_filter->eImageFilter = eImageFilter;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigCommonImageFilter, &image_filter), "set camera image filter");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigCommonImageFilter, &image_filter), "set camera image filter");
         }
 
         // OMX_MirrorHorizontal | OMX_MirrorVertical | OMX_MirrorBoth
@@ -550,7 +550,7 @@ namespace rpi_omx
             mirror->nPortIndex = nPortIndex;
             mirror->eMirror = eMirror;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigCommonMirror, &mirror), "set cammera mirror");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigCommonMirror, &mirror), "set cammera mirror");
         }
 
         void setImageDefaults()
@@ -571,22 +571,22 @@ namespace rpi_omx
             capture->nPortIndex = nPortIndex;
             capture->bEnabled = bEnabled;
 
-            ERR_OMX( OMX_SetParameter(component_, OMX_IndexConfigPortCapturing, &capture), "switch capture on port");
+            ERR_OMX( OMX_SetParameter(m_component, OMX_IndexConfigPortCapturing, &capture), "switch capture on port");
         }
 
         void allocBuffers()
         {
-            Component::allocBuffers(IPORT, bufferIn_);
+            Component::allocBuffers(IPORT, m_bufferIn);
         }
 
         void freeBuffers()
         {
-            Component::freeBuffers(IPORT, bufferIn_);
+            Component::freeBuffers(IPORT, m_bufferIn);
         }
 
         void eventReady()
         {
-            ready_ = true;
+            m_ready = true;
         }
 
         bool waitReady()
@@ -596,7 +596,7 @@ namespace rpi_omx
 
             for (unsigned i = 0; i < MAX_ATTEMPTS; ++i)
             {
-                if (ready_)
+                if (m_ready)
                     return true;
                 usleep(TIMEOUT_US);
             }
@@ -606,8 +606,8 @@ namespace rpi_omx
         }
 
     private:
-        Buffer bufferIn_;
-        std::atomic_bool ready_;
+        Buffer m_bufferIn;
+        std::atomic_bool m_ready;
     };
 
 #if 0 // not used
@@ -632,7 +632,7 @@ namespace rpi_omx
             //clockState->eState = OMX_TIME_ClockStateWaitingForStartTime;
             clockState->nWaitMask |= OMX_CLOCKPORT0;
 
-            ERR_OMX( OMX_SetConfig(component_, OMX_IndexConfigTimeClockState, &clockState), "set clock state");
+            ERR_OMX( OMX_SetConfig(m_component, OMX_IndexConfigTimeClockState, &clockState), "set clock state");
         }
     };
 #endif
@@ -648,7 +648,7 @@ namespace rpi_omx
 
         Encoder()
         :   Component(cType, (OMX_PTR) this, &cbsEvents),
-            empty_(true)
+            m_empty(true)
         {
         }
 
@@ -675,13 +675,13 @@ namespace rpi_omx
             format->nPortIndex = OPORT;
             format->eCompressionFormat = codec;
 
-            ERR_OMX( OMX_SetParameter(component_, OMX_IndexParamVideoPortFormat, &format), "set video format");
+            ERR_OMX( OMX_SetParameter(m_component, OMX_IndexParamVideoPortFormat, &format), "set video format");
 
             Parameter<OMX_CONFIG_PORTBOOLEANTYPE> ppsOption;
             ppsOption->nPortIndex = OPORT;
             ppsOption->bEnabled = OMX_TRUE;
 
-            ERR_OMX( OMX_SetParameter(component_, OMX_IndexParamBrcmVideoAVCInlineHeaderEnable, &ppsOption), "enable SPS/PPS insertion");
+            ERR_OMX( OMX_SetParameter(m_component, OMX_IndexParamBrcmVideoAVCInlineHeaderEnable, &ppsOption), "enable SPS/PPS insertion");
         }
 
         void setBitrate(OMX_U32 bitrate, OMX_VIDEO_CONTROLRATETYPE type = OMX_Video_ControlRateVariable)
@@ -691,7 +691,7 @@ namespace rpi_omx
             brate->eControlRate = type;
             brate->nTargetBitrate = bitrate;
 
-            ERR_OMX( OMX_SetParameter(component_, OMX_IndexParamVideoBitrate, &brate), "set bitrate");
+            ERR_OMX( OMX_SetParameter(m_component, OMX_IndexParamVideoBitrate, &brate), "set bitrate");
         }
 
         void setIFramePeriod(unsigned value)
@@ -700,40 +700,40 @@ namespace rpi_omx
             period->nPortIndex = OPORT;
             period->nU32 = value;
 
-            ERR_OMX( OMX_SetParameter(component_, OMX_IndexConfigBrcmVideoIntraPeriod, &period), "set IFrame period");
+            ERR_OMX( OMX_SetParameter(m_component, OMX_IndexConfigBrcmVideoIntraPeriod, &period), "set IFrame period");
         }
 
         void allocBuffers()
         {
-            Component::allocBuffers(OPORT, bufferOut_);
+            Component::allocBuffers(OPORT, m_bufferOut);
         }
 
         void freeBuffers()
         {
-            empty_ = true;
-            Component::freeBuffers(OPORT, bufferOut_);
+            m_empty = true;
+            Component::freeBuffers(OPORT, m_bufferOut);
         }
 
         void callFillThisBuffer()
         {
-            Component::callFillThisBuffer(bufferOut_);
+            Component::callFillThisBuffer(m_bufferOut);
         }
 
         void prepare()
         {
-            if (empty_)
+            if (m_empty)
             {
                 callFillThisBuffer();
-                empty_ = false;
+                m_empty = false;
             }
         }
 
-        Buffer& outBuffer() { return bufferOut_; }
+        Buffer& outBuffer() { return m_bufferOut; }
 
     private:
-        Parameter<OMX_PARAM_PORTDEFINITIONTYPE> encoderPortDef_;
-        Buffer bufferOut_;
-        bool empty_;
+        Parameter<OMX_PARAM_PORTDEFINITIONTYPE> m_encoderPortDef;
+        Buffer m_bufferOut;
+        bool m_empty;
     };
 
     /// OMX.broadcom.null_sink
