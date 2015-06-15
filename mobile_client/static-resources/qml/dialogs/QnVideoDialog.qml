@@ -42,14 +42,18 @@ Page {
                 if (pos < startDate)
                     pos = startDate
 
-                video.setPositionDate(pos)
                 resourceHelper.setDateTime(pos)
+                video.setPositionDate(pos)
+                video.source = ""
+                video.source = resourceHelper.mediaUrl
                 timeline.positionDate = pos
             }
         }
 
-        if (timeline.stickToEnd)
+        if (timeline.stickToEnd) {
             resourceHelper.setLive()
+            video.source = resourceHelper.mediaUrl
+        }
     }
 
     QnMediaResourceHelper {
@@ -83,7 +87,6 @@ Page {
         width: parent.width
         height: parent.height
 
-        source: resourceHelper.mediaUrl
         autoPlay: !playbackController.paused
 
         onPositionChanged: {
