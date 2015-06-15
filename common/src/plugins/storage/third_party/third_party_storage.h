@@ -280,7 +280,7 @@ namespace Qn
         /**
         *   \return available utf8 encoded urls list. Iterate till NULL.
         */
-        virtual const char** STORAGE_METHOD_CALL findAvailable();
+        virtual const char** STORAGE_METHOD_CALL findAvailable() const = 0;
          
         /**
         *   \param  url     Storage root URL. This should be NULL terminated utf8 encoded C string.
@@ -290,12 +290,12 @@ namespace Qn
         virtual Storage* STORAGE_METHOD_CALL createStorage(
             const char* url,
             int*        ecode
-        );
+        ) = 0;
  
         /**
         *   \return ascii string with storage type
         */
-        virtual const char* STORAGE_METHOD_CALL storageType() const;
+        virtual const char* STORAGE_METHOD_CALL storageType() const = 0;
     };
 }
  
