@@ -760,6 +760,11 @@ void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> 
     m_cond.wakeAll();    //signalling that we are not waiting anymore
 }
 
+void QnTransactionTransport::connectionFailure()
+{
+    setState( Error );
+}
+
 void QnTransactionTransport::sendHttpKeepAlive( quint64 taskID )
 {
     QnMutexLocker lock(&m_mutex);
@@ -857,8 +862,8 @@ void QnTransactionTransport::aggregateOutgoingTransactionsNonSafe()
 bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 {
     QnMutexLocker lock( &m_mutex );
-    return m_lastReceiveTimer.isValid() &&  //if not valid we still have not begun receiving transactions
-        (m_lastReceiveTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE);
+    return (m_lastReceiveTimer.isValid() &&  //if not valid we still have not begun receiving transactions
+         (m_lastReceiveTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE));
 }
 
 void QnTransactionTransport::serializeAndSendNextDataBuffer()

@@ -3,7 +3,7 @@
 
 #include <QStringListModel>
 
-#include <models/types.h>
+#include <base/types.h>
 
 namespace rtu
 {
@@ -12,7 +12,8 @@ namespace rtu
         Q_OBJECT
         
         Q_PROPERTY(int initIndex READ initIndex NOTIFY initIndexChanged)
-       
+        Q_PROPERTY(int currentTimeZoneIndex READ currentTimeZoneIndex NOTIFY currentTimeZoneIndexChanged)
+
     public:
         explicit TimeZonesModel(const ServerInfoList &selectedServers
             , QObject *parent = nullptr);
@@ -22,11 +23,15 @@ namespace rtu
     public:
         int initIndex() const;
         
+        int currentTimeZoneIndex();
+
     public slots:
         int onCurrentIndexChanged(int index);
         
     signals:
         void initIndexChanged();
+
+        void currentTimeZoneIndexChanged();
         
     private:
         class Impl;

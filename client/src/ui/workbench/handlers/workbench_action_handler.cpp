@@ -2494,7 +2494,7 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     auto result = QMessageBox::information(
         mainWindow(),
         tr("Anonymous Usage Statistics"),                                   
-        tr("System shares anonymous usage and crash statistics with the software development team to help us improve your user experience.\n"
+        tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
            "If you would like to disable this feature you can do so in the System Settings dialog."),
         QMessageBox::Ok | QMessageBox::Cancel,
         QMessageBox::Ok);

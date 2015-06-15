@@ -58,13 +58,14 @@ public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnTCPConnectionProcessorPrivate():
-        socket(0),
+        tcpReadBuffer(new quint8[TCP_READ_BUFFER_SIZE]),
+        socketTimeout(5*1000),
+        chunkedMode(false),
         clientRequestOffset(0),
+        prevSocketError(SystemError::noError),
         interleavedMessageDataPos(0),
         currentRequestSize(0)
     {
-        tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
-        socketTimeout = 5 * 1000;
     }
 
     virtual ~QnTCPConnectionProcessorPrivate()
@@ -90,6 +91,7 @@ public:
     int clientRequestOffset;
     QDateTime lastModified;
     QnUuid authUserId;
+    SystemError::ErrorCode prevSocketError;
 
 private:
     QByteArray interleavedMessageData;

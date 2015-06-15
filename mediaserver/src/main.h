@@ -35,7 +35,6 @@ public:
     void stopObjects();
     void run();
 
-    void changePort(quint16 port);
 public slots:
     void stopAsync();
     void stopSync();

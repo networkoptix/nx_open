@@ -1533,6 +1533,10 @@ namespace ec2
     }
 
     void QnTransactionMessageBus::dropConnections()
+void QnTransactionMessageBus::connectionFailure( const QnUuid& connectionGuid )
+{
+    QMutexLocker lock( &m_mutex );
+    for( QnTransactionTransport* transport : m_connections )
     {
         QnMutexLocker lock(&m_mutex);
         m_remoteUrls.clear();
@@ -1542,6 +1546,14 @@ namespace ec2
         }
         for (auto transport: m_connectingConnections) 
             transport->setState(ec2::QnTransactionTransport::Error);
+        if( transport->connectionGuid() != connectionGuid )
+            continue;
+        //mutex is unlocked if we go to wait
+        transport->connectionFailure();
+        return;
+    }
+}
+
     }
 
     QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const

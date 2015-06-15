@@ -198,6 +198,7 @@ int rtu::ServerChangesModel::changesCount() const
 
 int rtu::ServerChangesModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return m_impl->rowCount();
 }
 

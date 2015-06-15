@@ -9,6 +9,7 @@
             <directory>${libdir}/${arch}/bin/release</directory>
             <outputDirectory>..</outputDirectory>
             <includes>
+                <include>platforms/*.dll</include>
                 <include>icu*.dll</include>
                 <include>Qt5Core.dll</include>
                 <include>Qt5Gui.dll</include>

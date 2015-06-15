@@ -3,8 +3,8 @@
 
 #include <functional>
 
-#include <server_info.h>
-#include <models/types.h>
+#include <base/types.h>
+#include <base/server_info.h>
 #include <models/servers_selection_model.h>
 
 namespace
@@ -52,7 +52,11 @@ namespace
         if (servers.size() == kSingleSelection)
             return (firstServerInfo.extraInfo().interfaces);
     
-        const Qt::CheckState initialUseDHCP = firstServerInfo.extraInfo().interfaces.begin()->useDHCP;
+        const rtu::InterfaceInfoList &interfaces = firstServerInfo.extraInfo().interfaces;
+        if (interfaces.empty())
+            return rtu::InterfaceInfoList();
+        
+        const Qt::CheckState initialUseDHCP = interfaces.begin()->useDHCP;
         
         const bool diffUseDHCP = (servers.end() == std::find_if(servers.begin(), servers.end()
             , [initialUseDHCP](const rtu::ServerInfo *info)
