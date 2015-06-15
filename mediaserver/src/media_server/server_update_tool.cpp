@@ -25,7 +25,7 @@ namespace {
     const QString updatesDirSuffix = lit("mediaserver/updates");
     const QString updateInfoFileName = lit("update.json");
     const QString updateLogFileName = lit("update.log");
-    const int installationDelay = 5000;
+    const int installationDelay = 15000;
 
     QDir getUpdatesDir() {
         const QString& dataDir = MSSettings::roSettings()->value( "dataDir" ).toString();
