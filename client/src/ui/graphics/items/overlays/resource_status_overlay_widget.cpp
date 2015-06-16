@@ -59,6 +59,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[OfflineText] = tr("NO SIGNAL");
     m_staticTexts[ServerOfflineText] = tr("Server offline");
     m_staticTexts[UnauthorizedText] = tr("Unauthorized");
+    //TODO: #GDM #High #TR #2.3.2 remove html tags - br is just not needed here.
     m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information<br/>in camera settings");
     m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
     m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");

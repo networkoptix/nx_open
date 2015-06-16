@@ -272,7 +272,7 @@ namespace nx_http
             if( reconnectIfAppropriate() )
                 return;
             NX_LOG( lit( "Error sending (1) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+            m_state = sFailed;
             lk.unlock();
             emit done( sharedThis );
             lk.relock();
@@ -328,7 +328,11 @@ namespace nx_http
             if( reconnectIfAppropriate() )
                 return;
             NX_LOG(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+            m_state = 
+                ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
+                    m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
+                ? sDone
+                : sFailed;
             lk.unlock();
             emit done( sharedThis );
             lk.relock();
