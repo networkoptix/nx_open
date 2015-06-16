@@ -50,7 +50,7 @@ QtControls.TextField
 
     onTextChanged: 
     {
-        time = Date.fromLocaleTimeString(Qt.locale(), text, Locale.ShortFormat);
+        time = Date.fromLocaleTimeString(Qt.locale(), text, impl.timeFormat);
         if (!initTime && (text === impl.emptyMaskValue))
             return;
         

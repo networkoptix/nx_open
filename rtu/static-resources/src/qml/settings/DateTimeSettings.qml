@@ -45,7 +45,7 @@ Expandable.MaskedSettingsPanel
                 {
                     id: dateTimeGrid;
                  
-                    property bool changed: (timePicker.changed || timeZonePicker.changed || datePicker.changed);
+                    property bool changed: (timeZonePicker.changed || timePicker.changed || datePicker.changed);
                     enabled: (Utils.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
     
                     verticalItemAlignment: Grid.AlignVCenter;
@@ -98,7 +98,7 @@ Expandable.MaskedSettingsPanel
                             timePicker.setTime(dateTime);
                         }
                     }
-    
+
                     Base.DatePicker
                     {
                         id: datePicker;
@@ -106,7 +106,6 @@ Expandable.MaskedSettingsPanel
                         initDate: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
                     }
-
                     Base.TimePicker
                     {
                         id: timePicker;
@@ -114,7 +113,7 @@ Expandable.MaskedSettingsPanel
                         initTime: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
                     }
-    
+                    
                     Base.CheckBox
                     {
                         id: useCurrentTimeCheckbox;
@@ -132,6 +131,7 @@ Expandable.MaskedSettingsPanel
                         }
                     }
                     
+
                     Connections
                     {
                         target: thisComponent;
