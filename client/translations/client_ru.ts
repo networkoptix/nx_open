@@ -6647,7 +6647,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server v%1&lt;br/&gt;</source>
-        <translation>Сервер v%1</translation>
+        <translation>Сервер v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
