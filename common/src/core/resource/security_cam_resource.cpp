@@ -210,6 +210,7 @@ void QnSecurityCamResource::initializationDone()
     QnNetworkResource::initializationDone();
     if( m_inputPortListenerCount.load() > 0 )
         startInputPortMonitoringAsync( std::function<void(bool)>() );
+    resetCachedValues();
 }
 
 bool QnSecurityCamResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ ) {
