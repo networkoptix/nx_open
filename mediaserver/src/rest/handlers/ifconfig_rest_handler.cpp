@@ -250,6 +250,22 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("Can't write network settings file"));
     }
+    return CODE_OK;
+}
+
+void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
+{
+    Q_UNUSED(path);
+    Q_UNUSED(owner);
+    QnJsonRestResult reply;
+    if (!QJson::deserialize(body, &reply) || reply.error() !=  QnJsonRestResult::NoError)
+        return;
+
+    bool ok = false;
+    QnNetworkAddressEntryList currentSettings = readNetworSettings(&ok);
+    if (!ok)
+        return;
+    
 #ifndef Q_OS_WIN
     if (system("/etc/init.d/networking restart") != 0)
         qWarning() << "Failed to restart networking service";
@@ -257,5 +273,4 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
         if (system(lit("ifconfig %1 up").arg(value.name).toLatin1().data()) != 0)
             qWarning() << "Failed to restart network interface " << value.name;
 #endif
-    return CODE_OK;
 }
