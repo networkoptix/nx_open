@@ -18,6 +18,8 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QObject *parent
     , m_loaderByResource()
     , m_requests()
 {
+    //TODO: #GDM #Bookmarks clear cache on time changed and on history change. Should we refresh the cache on timer?
+
 }
 
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
@@ -113,14 +115,13 @@ void QnCameraBookmarksManagerPrivate::bookmarksDataEvent(const QnCameraBookmarkL
     }*/
 }
 
-QnBookmarksLoader * QnCameraBookmarksManagerPrivate::loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists /*= true*/) {
+QnBookmarksLoader * QnCameraBookmarksManagerPrivate::loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists) {
     LoadersContainer::const_iterator pos = m_loaderByResource.find(camera);
     if(pos != m_loaderByResource.cend())
         return *pos;
 
     if (!createIfNotExists)
         return nullptr;
-
     
     QnBookmarksLoader *loader = new QnBookmarksLoader(camera, this);
     connect(loader, &QnBookmarksLoader::bookmarksChanged, [this, camera] {
@@ -145,4 +146,14 @@ void QnCameraBookmarksManagerPrivate::clearCache() {
     for (QnBookmarksLoader* loader: m_loaderByResource)
         if (loader)
             loader->discardCachedData();
+}
+
+void QnCameraBookmarksManagerPrivate::loadBookmarks(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod &period) {
+    if (!camera || !period.isValid())
+        return;
+
+    auto loaderForCamera = loader(camera);
+    Q_ASSERT_X(loaderForCamera, Q_FUNC_INFO, "Loader must be created here");
+    if (loaderForCamera)
+        loaderForCamera->load(period);
 }

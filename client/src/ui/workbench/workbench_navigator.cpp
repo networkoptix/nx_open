@@ -1807,8 +1807,7 @@ void QnWorkbenchNavigator::loadBookmarks() {
     QnTimePeriod timeSliderPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
 
     /* m_currentWidget and its resource are checked inside the isBookmarksLoadingAvailable() method. */
-    auto loader = context()->instance<QnCameraBookmarksManager>()->loader(m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>());
-    loader->load(timeSliderPeriod);
+    context()->instance<QnCameraBookmarksManager>()->loadBookmarks(m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>(), timeSliderPeriod);
 }
 
 bool QnWorkbenchNavigator::isBookmarksLoadingAvailable() const {

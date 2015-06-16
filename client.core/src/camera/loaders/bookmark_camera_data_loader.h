@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtGui/QRegion>
+#include <array>
 
-#include <api/media_server_connection.h>
+#include <QtCore/QObject>
+#include <QtCore/QElapsedTimer>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark.h>
@@ -47,6 +47,9 @@ signals:
     void bookmarksChanged(const QnCameraBookmarkList &bookmarks);
 
 private:
+    void queueToLoad(const QnTimePeriod &period);
+    void processLoadQueue();
+
     void sendRequest(const QnTimePeriod &period);
     Q_SLOT void handleDataLoaded(int status, const QnCameraBookmarkList &data, int requestHandle);
 private:
@@ -57,4 +60,7 @@ private:
     //TODO: #GDM #Bookmarks replace structure with indexed tree
     QnCameraBookmarkList m_loadedData;
 
+    QElapsedTimer m_timer;
+
+    QnTimePeriod m_queuedPeriod;
 };

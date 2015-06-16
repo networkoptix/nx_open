@@ -24,13 +24,9 @@ public:
     /// @param callback Callback for receiving bookmarks data
     void getBookmarksAsync(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, const QUuid &requestId, BookmarksCallbackType callback);
 
+    void loadBookmarks(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod &period);   
 
-
-    QnBookmarksLoader *loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists = true);
-
-    QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera) const;
-
-    void clearCache();
+    QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera) const;    
 protected:
     Q_DECLARE_PRIVATE(QnCameraBookmarksManager);
 

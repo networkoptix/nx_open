@@ -1,5 +1,6 @@
 #include "bookmark_camera_data_loader.h"
 
+#include <api/media_server_connection.h>
 #include <api/helpers/bookmark_request_data.h>
 
 #include <common/common_module.h>
@@ -14,26 +15,10 @@
 //#define QN_BOOKMARK_CAMERA_DATA_LOADER_DEBUG
 
 namespace {
-    /** Minimum time (in milliseconds) for overlapping time periods requests.  */
-    const int minOverlapDuration = 120*1000;
+    const qint64 requestIntervalMs = 5 * 1000;
+    const qint64 processQueueIntervalMs = requestIntervalMs / 5;
 
-    qint64 bookmarkResolution(qint64 periodDuration) {
-        const int maxPeriodsPerTimeline = 1024; // magic const, thus visible periods can be edited through right-click
-        qint64 maxPeriodLength = periodDuration / maxPeriodsPerTimeline;
-
-        static const std::vector<qint64> steps = [maxPeriodLength](){ 
-            std::vector<qint64> result;
-            for (int i = 0; i < 40; ++i)
-                result.push_back(1ll << i);
-
-            result.push_back(maxPeriodLength);  /// To avoid end() result from lower_bound
-            return result; 
-        }();
-
-        auto step = std::lower_bound(steps.cbegin(), steps.cend(), maxPeriodLength);
-        return *step;
-
-    }
+    const int bookmarksLimitPerRequest = 1024;
 }
 
 QnBookmarksLoader::QnBookmarksLoader(const QnVirtualCameraResourcePtr &camera, QObject *parent):
@@ -41,42 +26,37 @@ QnBookmarksLoader::QnBookmarksLoader(const QnVirtualCameraResourcePtr &camera, Q
     m_camera(camera)
 {
     Q_ASSERT_X(m_camera, Q_FUNC_INFO, "Camera must exist here");
+
+    //TODO: #GDM #Bookmarks we have a lot of timers here and in CachingBookmarksLoader's and they all are enabled all the time
+    QTimer *loadTimer = new QTimer(this);
+    loadTimer->setSingleShot(false);
+    loadTimer->setInterval(processQueueIntervalMs);
+    connect(loadTimer, &QTimer::timeout, this, &QnBookmarksLoader::processLoadQueue);
+    loadTimer->start();
 }
 
+void QnBookmarksLoader::queueToLoad(const QnTimePeriod &period) {   
+    m_queuedPeriod = period;
+    /* Check if we already ready to load. */
+    processLoadQueue();
+}
 
-void QnBookmarksLoader::load(const QnTimePeriod &period) {
-    if (!m_camera)
+void QnBookmarksLoader::processLoadQueue() {
+    if (m_queuedPeriod.isNull())
         return;
 
-    sendRequest(period);
-    //TODO: #GDM #Bookmarks think about optimization
+    if (!m_timer.hasExpired(requestIntervalMs))
+        return;
 
-    /* Check whether data is currently being loaded. */
- /*   if (m_loading.handle > 0 && m_loading.period.contains(period)) {
-        auto handle = qn_fakeHandle.fetchAndAddAcquire(1);
-        m_loading.waitingHandles << handle;
-        return handle;
-    }
+    sendRequest(m_queuedPeriod);
+    m_queuedPeriod = QnTimePeriod();
+}
 
+void QnBookmarksLoader::load(const QnTimePeriod &period) {
+    if (!m_camera || !period.isValid())
+        return;
 
-
-    qint64 startTimeMs = 0;
-    if (m_loadedData && !m_loadedData->dataSource().isEmpty()) {
-        auto last = m_loadedData->dataSource().last();
-        if (last.isInfinite())
-            startTimeMs = last.startTimeMs;
-        else
-            startTimeMs = last.endTimeMs() - minOverlapDuration;
-    }
-
-#ifdef QN_BOOKMARK_CAMERA_DATA_LOADER_DEBUG
-    qDebug() << "QnBookmarksLoader::" << "loading period from" << startTimeMs;
-#endif
-
-    m_loading.clear(); 
-    m_loading.startTimeMs = startTimeMs;
-    m_loading.handle = sendRequest(startTimeMs);
-    return m_loading.handle;*/
+    queueToLoad(period);
 }
 
 QnCameraBookmarkList QnBookmarksLoader::bookmarks() const {
@@ -99,20 +79,24 @@ void QnBookmarksLoader::sendRequest(const QnTimePeriod &period) {
     if (!connection)
         return;
 
+    m_timer.restart();
+
     QnBookmarkRequestData requestData;
     requestData.cameras << m_camera;
+    requestData.format = Qn::JsonFormat;
     requestData.filter.startTimeMs = period.startTimeMs;
     requestData.filter.endTimeMs = period.isInfinite()
         ? DATETIME_NOW
         : period.endTimeMs();
     requestData.filter.strategy = Qn::LongestFirst;
-    requestData.format = Qn::JsonFormat;
+    requestData.filter.limit = bookmarksLimitPerRequest;
 
     //TODO: #GDM #Bookmarks #IMPLEMENT ME
     connection->getBookmarksAsync(requestData, this, SLOT(handleDataLoaded(int, const QnCameraBookmarkList &, int)));
 }
 
 void QnBookmarksLoader::handleDataLoaded(int status, const QnCameraBookmarkList &data, int requestHandle) {
+    Q_UNUSED(requestHandle);
     if (status != 0)
         return;
 
@@ -120,8 +104,14 @@ void QnBookmarksLoader::handleDataLoaded(int status, const QnCameraBookmarkList 
     qDebug() << "QnBookmarksLoader::" << "loaded data for" << m_loading.startTimeMs;
 #endif
 
-    //TODO: #GDM #bookmarks merge
-
-    m_loadedData = data;
+    if (m_loadedData.isEmpty()) {
+        m_loadedData = data;
+    } else {
+        MultiServerCameraBookmarkList mergeSource;
+        mergeSource.push_back(m_loadedData);
+        mergeSource.push_back(data);
+        m_loadedData = QnCameraBookmark::mergeCameraBookmarks(mergeSource);
+    }
+   
     emit bookmarksChanged(m_loadedData);
 }

@@ -26,17 +26,12 @@ void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceLi
     d->getBookmarksAsync(cameras, filter, requestId, callback);
 }
 
-QnBookmarksLoader * QnCameraBookmarksManager::loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists /*= true*/) {
-    Q_D(QnCameraBookmarksManager);
-    return d->loader(camera, createIfNotExists);
-}
-
-void QnCameraBookmarksManager::clearCache() {
-    Q_D(QnCameraBookmarksManager);
-    d->clearCache();
-}
-
 QnCameraBookmarkList QnCameraBookmarksManager::bookmarks(const QnVirtualCameraResourcePtr &camera) const {
     const Q_D(QnCameraBookmarksManager);
     return d->bookmarks(camera);
+}
+
+void QnCameraBookmarksManager::loadBookmarks(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod &period) {
+    Q_D(QnCameraBookmarksManager);
+    d->loadBookmarks(camera, period);
 }

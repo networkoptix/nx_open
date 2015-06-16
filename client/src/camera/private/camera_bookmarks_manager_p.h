@@ -19,7 +19,7 @@ public:
 
     void getBookmarksAsync(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, const QUuid &requestId, BookmarksCallbackType callback);
 
-    QnBookmarksLoader *loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists = true);
+    void loadBookmarks(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod &period);
 
     QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera) const;
 
@@ -27,6 +27,8 @@ public:
 private:
     /// @brief Callback for bookmarks. If data is nullptr it means error occurred
     void bookmarksDataEvent(const QnCameraBookmarkList &bookmarks);
+
+    QnBookmarksLoader *loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists = true);
 
 private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
