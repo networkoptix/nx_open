@@ -20,10 +20,10 @@
         <product.title>HD Cloud Connection Mediator Unit Tests</product.title>
         <!--Global libs-->
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lconnection_mediator -lgtest -ludt</global.libs>
+        <global.libs>-lcommon -ludt -lconnection_mediator -lgtest</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs></windows.oslibs>
-        <linux.oslibs></linux.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil</linux.oslibs>
         <linux.arm.oslibs></linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>

@@ -57,9 +57,6 @@ namespace nx_stun
         SystemError::ErrorCode ec , 
         const std::function<void(SystemError::ErrorCode)>& completion_handler )
     {
-        if( completion_handler )
-            completion_handler(ec);
-
         if( ec )
         {
             m_state.store(NOT_CONNECTED,std::memory_order_release);
@@ -82,6 +79,10 @@ namespace nx_stun
         if( ec == SystemError::noError && !m_baseConnection->startReadingConnection() ) {
             ec = STUN_CONN_CANNOT_READ;
         }
+
+        if( completion_handler )
+            completion_handler(ec);
+
         bool ret = dispatchPendingRequest(ec);
         if( !ret ) {
             if( m_outstandingRequest ) {
@@ -151,12 +152,6 @@ namespace nx_stun
         case NOT_CONNECTED:
             {
                 m_state.store(CONNECTING,std::memory_order_relaxed);
-                Q_ASSERT(!m_outstandingRequest);
-                // The following code is not thread safe in terms of pending request queue since 
-                // this is OK. Without connection, no other thread will use our API .
-                m_outstandingRequest.reset( new PendingRequest(
-                    std::move(request),
-                    std::move(completionHandler)));
                 bool ret = openConnection(
                     std::bind(
                     &StunClientConnection::onConnectionComplete,
@@ -191,7 +186,8 @@ namespace nx_stun
     void StunClientConnection::closeConnection( BaseConnectionType* connection )
     {
         assert( connection == m_baseConnection.get() );
-        m_socket->close();
+        if( m_socket )
+            m_socket->close();
     }
 
     void StunClientConnection::onRequestMessageRecv( nx_stun::Message&& msg )

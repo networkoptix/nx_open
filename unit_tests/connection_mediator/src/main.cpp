@@ -9,11 +9,6 @@
 
 #include <utils/common/log.h>
 
-TEST( Dummy, Ok )
-{
-    EXPECT_TRUE( true );
-}
-
 int main( int argc, char **argv )
 {
 #if 0

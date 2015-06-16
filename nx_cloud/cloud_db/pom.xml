@@ -30,7 +30,7 @@
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs></linux.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines/>

@@ -23,8 +23,10 @@ namespace nx_hpm
     };
 
     //TODO custom stun requests parameters
-    namespace StunParameters {
-        enum Value {
+    namespace StunParameters
+    {
+        enum Value
+        {
             systemName = static_cast<int>( nx_stun::attr::AttributeType::userDefine ),
             authorization,
             serverId
