@@ -3,7 +3,9 @@
 
 #include <QtCore/Qt>
 
-class QnResolutionUtil {
+#include <utils/common/singleton.h>
+
+class QnResolutionUtil : public Singleton<QnResolutionUtil> {
 public:
 
     enum DensityClass {
@@ -15,12 +17,24 @@ public:
         Xxxhdpi
     };
 
-    static DensityClass currentDensityClass();
-
-    static qreal densityMultiplier(DensityClass densityClass);
     static QString densityName(DensityClass densityClass);
+    static qreal densityMultiplier(DensityClass densityClass);
+
+    QnResolutionUtil();
+
+    DensityClass densityClass() const;
+    QString densityName() const;
+    qreal densityMultiplier() const;
+
+    int dp(qreal dpix) const;
+    int sp(qreal dpix) const;
 
 private:
+    DensityClass currentDensityClass() const;
+
+private:
+    DensityClass m_densityClass;
+    qreal m_multiplier;
 };
 
 #endif // RESOLUTION_UTIL_H

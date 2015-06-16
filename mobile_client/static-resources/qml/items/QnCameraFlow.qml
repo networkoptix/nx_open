@@ -15,7 +15,7 @@ Flickable {
     Flow {
         id: flow
 
-        spacing: Units.dp(8)
+        spacing: dp(8)
         width: rootItem.width
 
         Repeater {
@@ -45,7 +45,7 @@ Flickable {
                     id: label
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
-                    anchors.margins: Units.dp(8)
+                    anchors.margins: dp(8)
                     text: resourceName
                 }
 

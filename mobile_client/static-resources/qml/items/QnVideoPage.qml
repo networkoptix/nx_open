@@ -1,22 +1,22 @@
 import QtQuick 2.2
+import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
 import QtMultimedia 5.0
 
 import com.networkoptix.qml 1.0
-import Material 0.1
 
-import "../items"
+import "../controls"
 
-Page {
+QnPage {
     id: videoPlayer
 
     title: resourceHelper.resourceName
 
     property string resourceId
     property bool videoZoomed: false
-    property real cursorTickMargin: Units.dp(10)
+    property real cursorTickMargin: dp(10)
     property real timelineTextMargin: timeline.height - timeline.chunkBarHeight
-    property real cursorWidth: Units.dp(2)
+    property real cursorWidth: dp(2)
 
     readonly property var __locale: Qt.locale()
 
@@ -158,7 +158,7 @@ Page {
 
             anchors.bottom: parent.bottom
             width: parent.width
-            height: Units.dp(140)
+            height: dp(140)
 
             endDate: new Date(Date.now() + 5 * 60 * 1000)
             startDate: new Date(Date.now() - 5 * 60 * 1000)
@@ -168,10 +168,10 @@ Page {
 
             stickToEnd: true
 
-            font.pixelSize: Units.dp(18)
+            font.pixelSize: dp(18)
             font.weight: Font.Bold
 
-            chunkBarHeight: Units.dp(36)
+            chunkBarHeight: dp(36)
 
             chunkProvider: chunkProvider
             startBoundDate: chunkProvider.bottomBound
@@ -184,20 +184,20 @@ Page {
         Rectangle {
             id: navigationPanel
             width: parent.width
-            height: Units.dp(56)
+            height: dp(56)
             anchors.top: timeline.bottom
             color: "#0d0d0d"
 
             Button {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                backgroundColor: parent.color
+//                backgroundColor: parent.color
                 text: qsTr("LIVE")
                 onClicked: timeline.stickToEnd = true
                 opacity: timeline.stickToEnd ? 0.0 : 1.0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
-
+/*
             IconButton {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
@@ -222,7 +222,6 @@ Page {
                 color: "white"
                 iconName: "content/add"
             }
-
             Timer {
                 interval: 100
                 repeat: true
@@ -235,6 +234,7 @@ Page {
                         timeline.zoomOut()
                 }
             }
+*/
         }
 
         Rectangle {
@@ -245,7 +245,7 @@ Page {
             anchors.centerIn: timeline
             anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
             width: timeline.height - timeline.chunkBarHeight
-            height: timeLabel.width + Units.dp(64)
+            height: timeLabel.width + dp(64)
 
             rotation: 90
             gradient: Gradient {
@@ -265,7 +265,7 @@ Page {
                 verticalCenterOffset: -timeline.chunkBarHeight / 2 - timeLabel.height / 2
             }
 
-            font.pixelSize: Units.dp(20)
+            font.pixelSize: dp(20)
             font.weight: Font.Light
 
             text: timeline.positionDate.toLocaleDateString(__locale, qsTr("d MMMM yyyy"))
@@ -286,7 +286,7 @@ Page {
 
             Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: 200 } }
 
-            font.pixelSize: Units.dp(48)
+            font.pixelSize: dp(48)
             font.weight: Font.Light
 
             text: timeline.stickToEnd ? qsTr("LIVE") : timeline.positionDate.toTimeString()
@@ -297,11 +297,11 @@ Page {
             id: playbackController
 
             width: parent.width - height / 3
-            height: Units.dp(80)
+            height: dp(80)
             anchors.bottom: timeline.top
             anchors.horizontalCenter: parent.horizontalCenter
             tickSize: cursorTickMargin
-            lineWidth: Units.dp(2)
+            lineWidth: dp(2)
             color: colorTheme.color("nx_baseText")
             markersBackground: Qt.darker(color, 100)
             highlightColor: "#2fffffff"

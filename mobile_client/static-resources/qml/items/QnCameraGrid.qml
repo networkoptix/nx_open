@@ -6,7 +6,9 @@ import "../main.js" as Main
 GridView {
     id: gridView
 
-    property real spacing: Units.dp(8)
+    signal videoRequested(string uuid)
+
+    property real spacing: dp(8)
 
     cellWidth: width / 2
     cellHeight: cellWidth / 4 * 3
@@ -37,13 +39,13 @@ GridView {
             id: label
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.margins: Units.dp(8)
+            anchors.margins: dp(8)
             text: resourceName
         }
 
         Ink {
             anchors.fill: parent
-            onClicked: Main.openVideo(uuid)
+            onClicked: gridView.videoRequested(uuid)
         }
     }
 
