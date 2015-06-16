@@ -126,7 +126,6 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path, const QnR
     if (!request.isValid())
         return nx_http::StatusCode::badRequest;
     QnCameraBookmarkList outputData = loadDataSync(request);
-    //TODO: #GDM #Bookmarks serialization
-    //QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType);
+    QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType);
     return nx_http::StatusCode::ok;
 }

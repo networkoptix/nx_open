@@ -16,7 +16,7 @@ struct QnCameraBookmarkSearchFilter;
 typedef QStringList QnCameraBookmarkTags;
 typedef std::function<void (bool success, const QnCameraBookmarkList &bookmarks)> BookmarksCallbackType;
 
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (sql_record)(json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (sql_record)(json)(ubjson)(xml)(csv_record)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq))
 
 #endif // QN_CAMERA_BOOKMARK_FWD_H
