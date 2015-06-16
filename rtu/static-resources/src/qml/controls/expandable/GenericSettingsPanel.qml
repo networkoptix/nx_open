@@ -102,7 +102,7 @@ Expandable.ExpandableItem
             {
                 id: spacer;
                 width: 1;
-                height: Common.SizeManager.spacing.medium;
+                height: Common.SizeManager.spacing.base;
             }
         }
     }

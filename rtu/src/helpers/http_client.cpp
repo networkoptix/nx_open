@@ -60,7 +60,9 @@ void rtu::HttpClient::Impl::sendGet(const QUrl &url
     , const ReplyCallback &successfullCallback
     , const ErrorCallback &errorCallback)
 {
-    m_replies.insert(m_manager->get(QNetworkRequest(url))
+    QNetworkReply *reply = m_manager->get(QNetworkRequest(url));
+    qDebug() << reply << " sending command: " << url; 
+    m_replies.insert(reply
         , CallbacksPair(successfullCallback, errorCallback));
 }
 
@@ -91,13 +93,19 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
     const int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     const bool isRequestError = (errorCode != QNetworkReply::NoError);
     const bool isHttpError = ((httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast));
+    const QByteArray &data = reply->readAll();
+    
+    qDebug() << reply << " netowrk reply: " << errorCode << " : " << httpCode;
+    qDebug() << data;
     if (isRequestError || isHttpError)
     { 
         const ErrorCallback &errorCallback = it->second;
         if (errorCallback)
         {
-            const QString httpError = reply->attribute(
-                QNetworkRequest::HttpReasonPhraseAttribute).toString();
+            const QVariant &httpErrorVar = 
+                reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute);
+            const QString &httpError = (httpErrorVar.isValid() ? 
+                httpErrorVar.toString() : QString());
             const QString &errorReason = (!httpError.isEmpty()? httpError 
                 : QString("Netowrk error #%1").arg(errorCode));
             errorCallback(errorReason, httpCode);
@@ -105,7 +113,7 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
     }
     else if (const ReplyCallback &successCallback = it->first)
     {
-        successCallback(reply->readAll());
+        successCallback(data);
     }
     m_replies.erase(it);
 }

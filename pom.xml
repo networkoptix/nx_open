@@ -10,14 +10,14 @@
     <scm>
         <connection>scm:hg:file:///${basedir}</connection>
         <developerConnection>scm:hg:file:///${basedir}</developerConnection>
-    </scm>  
+    </scm>
 
     <distributionManagement>
         <repository>
             <id>nexus-snapshots</id>
             <url>https://noptix.enk.me/nexus/content/repositories/snapshots/</url>
         </repository>
-    </distributionManagement>   
+    </distributionManagement>
 
     <properties>
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -50,7 +50,7 @@
         <beta>true</beta>
         <final.artifact.name>${project.artifactId}</final.artifact.name>
         <build.suffix>${arch}</build.suffix>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>        
+        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <!-- compile.option1. See profile no-webkit -->
@@ -66,7 +66,7 @@
         <!-- Used for cross-compilation to add -m32 on Linux to compile x86 on x64 -->
         <compiler.arguments />
 
-        <libdir>${root.dir}/build_environment/target</libdir>        
+        <libdir>${root.dir}/build_environment/target</libdir>
         <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
@@ -82,16 +82,16 @@
         <bespin.version>1.2-SNAPSHOT</bespin.version>
         <quazip.version>0.6.2-SNAPSHOT</quazip.version>
 
-        <!-- Set parent (parent.customization) and child (customization) customizations here -->         
+        <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
-        <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
-        <toolchain.version>none</toolchain.version>            
+        <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
+        <toolchain.version>none</toolchain.version>
 
         <additional.defines/>
         <customization.defines/>
 
-        <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
+        <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlib1>Core</qtlib1>
         <qtlib2>Network</qtlib2>
         <qtlib3>Xml</qtlib3>
@@ -101,9 +101,9 @@
         <qtlib7>OpenGL</qtlib7>
         <qtlib8>Widgets</qtlib8>
         <qtlib9>Gui</qtlib9>
-        <qtlib10>X11Extras</qtlib10>                    
+        <qtlib10>X11Extras</qtlib10>
         <qtlib11>PrintSupport</qtlib11>
-        <qtlib12>WebKit</qtlib12> 
+        <qtlib12>WebKit</qtlib12>
         <qtlib13>WebKitWidgets</qtlib13>
         <qtlib14>MultimediaWidgets</qtlib14>
         <qtlib15>Quick</qtlib15>
@@ -114,10 +114,10 @@
         <qtlib19></qtlib19>
         <qtlib20>XmlPatterns</qtlib20>
 
-        <!--QT plugins used-->      
+        <!--QT plugins used-->
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
-        <qtplugin3/>    
+        <qtplugin3/>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -145,7 +145,7 @@
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
                             </files>
                         </configuration>
-                    </execution>                   
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -180,7 +180,7 @@
                     <doCheck>false</doCheck>
                     <doUpdate>true</doUpdate>
                 </configuration>
-            </plugin>       
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -196,16 +196,16 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <overwrite>true</overwrite>
-                            <encoding>ISO-8859-1</encoding>                            
-                            <resources>          
+                            <encoding>ISO-8859-1</encoding>
+                            <resources>
                                 <resource>
                                     <directory>${basedir}/maven/filter-resources</directory>
                                     <filtering>true</filtering>
-                                </resource> 
+                                </resource>
                                 <resource>
                                     <directory>${basedir}/maven/bin-resources</directory>
                                     <filtering>false</filtering>
-                                </resource>                                
+                                </resource>
                                 <resource>
                                     <directory>${parent.customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
@@ -213,51 +213,51 @@
                                         <exclude>**/_unused/**</exclude>
                                         <exclude>**/intro.*</exclude>
                                     </excludes>
-                                </resource>    
+                                </resource>
                                 <resource>
                                     <directory>${customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
-                                </resource>                                                                          
-                            </resources>              
-                        </configuration>            
+                                </resource>
+                            </resources>
+                        </configuration>
                     </execution>
                 </executions>
-            </plugin>           
-        </plugins>          
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
         <profile>
             <id>android</id>
-            <activation>            
+            <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>Windows</family>
-                </os>               
+                </os>
                 <property>
                     <name>mobile</name>
                     <value>true</value>
-                </property>             
+                </property>
             </activation>
             <modules>
                 <module>android-client/protobuf-classes</module>
                 <module>android-client/android-main</module>
             </modules>
-        </profile>  
+        </profile>
         <profile>
             <id>ios</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>mac</family>
-                </os>               
+                </os>
                 <property>
                     <name>mobile</name>
                     <value>true</value>
-                </property>                 
+                </property>
             </activation>
             <modules>
                 <module>ios-client</module>
@@ -272,10 +272,10 @@
                     <value>true</value>
                 </property>
             </activation>
-            <modules>   
-                <module>plugins/quicksyncdecoder</module>       
-            </modules>  
-        </profile>   
+            <modules>
+                <module>plugins/quicksyncdecoder</module>
+            </modules>
+        </profile>
 
         <profile>
             <id>main</id>
@@ -291,30 +291,42 @@
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
-        </profile> 
+        </profile>
         <profile>
+            <id>unit_tests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>ut</name>
+                </property>
+            </activation>
+            <modules>
+                <module>unit_tests/common</module>
+            </modules>
+        </profile>
+       <profile>
             <id>nomac</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>!mac</family>
-                </os> 
+                </os>
             </activation>
             <modules>
                 <!--<module>plugins/axiscamplugin</module>-->
-                <module>nx_sdk</module>  
+                <module>nx_sdk</module>
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>
                 <!--<module>mediaproxy</module> -->
                 <!-- <module>testcamera</module> -->
-            </modules>            
+            </modules>
             <properties>
-                <additional.compiler>${compiler}</additional.compiler>         
+                <additional.compiler>${compiler}</additional.compiler>
             </properties>
-        </profile>  
-        <profile>        
+        </profile>
+        <profile>
             <id>desktop</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -326,13 +338,13 @@
             <properties>
                 <qtlib19>DBus</qtlib19>
             </properties>
-            <modules>                       
-                <module>applauncher</module> 
-                <module>client</module>     
-                <module>client.core</module>     
+            <modules>
+                <module>applauncher</module>
+                <module>client</module>
+                <module>client.core</module>
                 <module>client.bin</module>
-            </modules>  
-        </profile>         
+            </modules>
+        </profile>
         <profile>
             <id>windows</id>
             <activation>
@@ -340,12 +352,12 @@
                     <family>Windows</family>
                 </os>
             </activation>
-            <modules>     
+            <modules>
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-                <!--<module>vmaxproxy</module>  -->                   
+                <!--<module>vmaxproxy</module>  -->
                 <module>client</module>
-                <module>client.core</module>     
+                <module>client.core</module>
                 <module>axclient</module>
                 <module>rtu</module>
                 <module>client.bin</module>
@@ -359,7 +371,7 @@
                 <qt.dir>${libdir}/${arch}</qt.dir>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
-                <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
+                <python.dir>${libdir}/${arch}/python/scripts</python.dir>
                 <python.executable>python.exe</python.executable>
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
                 <buildenv.script>get_buildenv.bat</buildenv.script>
@@ -374,9 +386,9 @@
                 <modification>win78</modification> -->
                 <qt.spec>win32-msvc2012xp</qt.spec>
                 <PlatformToolSet>v110_xp</PlatformToolSet>
-                <modification>winxp</modification>                
-                
-                <profile.classifier>${platform}</profile.classifier>                
+                <modification>winxp</modification>
+
+                <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
@@ -393,7 +405,7 @@
                 <property>
                     <name>box</name>
                     <value>winxp</value>
-                </property>             
+                </property>
             </activation>
 
             <properties>
@@ -409,15 +421,15 @@
             <activation>
                 <os>
                     <family>unix</family>
-                </os> 
+                </os>
             </activation>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <init.python.dir>/usr/bin</init.python.dir>                
+                <init.python.dir>/usr/bin</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <python.executable>python2</python.executable>
                 <python.virtualenv>virtualenv2</python.virtualenv>
-                <buildenv.script>get_buildenv.sh</buildenv.script>                
+                <buildenv.script>get_buildenv.sh</buildenv.script>
                 <qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
@@ -426,7 +438,7 @@
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
             </properties>
-        </profile>        
+        </profile>
         <profile>
             <id>linux</id>
             <activation>
@@ -442,7 +454,6 @@
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
-                <module>plugins/it930x_plugin</module>
             </modules>
         </profile>
         <profile>
@@ -450,9 +461,9 @@
             <activation>
                 <os>
                     <family>mac</family>
-                </os> 
+                </os>
             </activation>
-            <properties>        
+            <properties>
                 <platform>macosx</platform>
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
@@ -463,30 +474,30 @@
             </properties>
             <modules>
                 <module>macsetup/client-dmg</module>
-            </modules>            
-        </profile>        
+            </modules>
+        </profile>
 
-        <profile>        
+        <profile>
             <id>linux-noarm</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
                     <name>linux</name>
-                </os> 
+                </os>
                 <property>
                     <name>arch</name>
                     <value>!arm</value>
                 </property>
             </activation>
-            <modules>                       
+            <modules>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
-            </modules>  
+            </modules>
             <properties>
                 <modification>ubuntu</modification>
             </properties>
-        </profile>         
+        </profile>
 
         <profile>
             <id>linux-arm</id>
@@ -495,7 +506,7 @@
                 <os>
                     <family>unix</family>
                     <name>linux</name>
-                </os> 
+                </os>
                 <property>
                     <name>arch</name>
                     <value>arm</value>
@@ -511,7 +522,7 @@
             <build>
                 <directory>target-${box}</directory>
             </build>
-        </profile> 
+        </profile>
 
         <profile>
             <id>linux-isd-jaguar</id>
@@ -520,7 +531,7 @@
                 <os>
                     <family>unix</family>
                     <name>linux</name>
-                </os> 
+                </os>
                 <property>
                     <name>box</name>
                     <value>isd</value>
@@ -537,7 +548,7 @@
             <modules>
                 <module>plugins/isd_native_plugin</module>
                 <module>edge_firmware/isd</module>
-            </modules>            
+            </modules>
         </profile>
 
         <profile>
@@ -547,7 +558,7 @@
                 <os>
                     <family>unix</family>
                     <name>linux</name>
-                </os> 
+                </os>
                 <property>
                     <name>box</name>
                     <value>isd_s2</value>
@@ -564,7 +575,7 @@
             <modules>
                 <module>plugins/isd_native_plugin</module>
                 <module>edge_firmware/isd</module>
-            </modules>            
+            </modules>
         </profile>
 
         <profile>
@@ -589,7 +600,7 @@
             </properties>
             <modules>
                 <module>edge_firmware/rpi</module>
-            </modules>             
+            </modules>
         </profile>
 
         <!-- Banana Pie box -->
@@ -627,7 +638,7 @@
                     <family>unix</family>
                     <name>linux</name>
                     <arch>amd64</arch>
-                </os> 
+                </os>
                 <property>
                     <name>arch</name>
                     <value>!arm</value>
@@ -636,7 +647,7 @@
             <properties>
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
-		<target.arch>amd64</target.arch>
+        <target.arch>amd64</target.arch>
             </properties>
         </profile>
         <profile>
@@ -655,9 +666,9 @@
             <properties>
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-		<target.arch>i386</target.arch>
+        <target.arch>i386</target.arch>
             </properties>
-        </profile>  
+        </profile>
         <profile>
             <id>linux-x86-on-x64</id>
             <activation>
@@ -675,9 +686,9 @@
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-		<target.arch>i386</target.arch>
+        <target.arch>i386</target.arch>
             </properties>
-        </profile>          
+        </profile>
         <profile>
             <id>nobeta</id>
             <activation>
@@ -691,19 +702,19 @@
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
             </properties>
-        </profile>     
+        </profile>
         <profile>
             <id>no-webkit</id>
             <activation>
                 <property>
                     <name>webkit</name>
                     <value>false</value>
-                </property>                
+                </property>
             </activation>
             <properties>
                 <compile.option1/>
             </properties>
-        </profile>      
+        </profile>
         <profile>
             <id>angle</id>
             <activation>
@@ -713,11 +724,11 @@
                 <property>
                     <name>angle</name>
                     <value>true</value>
-                </property>                
+                </property>
             </activation>
             <properties>
                 <compile.option2>-angle</compile.option2>
             </properties>
-        </profile>          
-    </profiles> 
+        </profile>
+    </profiles>
 </project>

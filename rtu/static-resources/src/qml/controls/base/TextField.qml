@@ -8,6 +8,7 @@ TextField
 {
     id: thisComponent;
 
+    property bool revertOnEmpty: false;
     property bool changed: (text !== initialText);
     
     property string initialText: "";
@@ -33,7 +34,13 @@ TextField
     onActiveFocusChanged: 
     {
         if (activeFocus)
+        {
             selectAll();
+        }
+        else if (revertOnEmpty && text.length === 0)
+        {
+            text = initialText;
+        }
     }
 }
 

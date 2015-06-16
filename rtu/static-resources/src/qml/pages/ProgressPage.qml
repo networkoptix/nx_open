@@ -38,7 +38,7 @@ Base.Column
         text: thisComponent.caption;
         thin: false;
         wrapMode: Text.Wrap;
-        font.pointSize: Common.SizeManager.fontSizes.large;
+        font.pixelSize: Common.SizeManager.fontSizes.large;
     }
 
 
