@@ -16,12 +16,29 @@ Expandable.MaskedSettingsPanel
 
     propertiesGroupName: qsTr("Configure Device Network Settings");
 
+    function tryApplyChanges()
+    {
+        if (!changed)
+            return true;
+        
+        return maskedArea.tryApplyChanges();
+    }
+
     propertiesDelegate: Component
     {
         id: test;
 
         Row
         {
+            function tryApplyChanges()
+            {
+                if (portNumber.changed)
+                    rtuContext.changesManager().addPortChange(Number(portNumber.text));
+                    
+                console.log(flagged.showFirst, flagged.currentItem);
+                return (!flagged.showFirst || flagged.currentItem.tryApplyChanges());
+            }
+
             property bool changed: portNumber.changed || flagged.changed;
             
             spacing: Common.SizeManager.spacing.large;
@@ -73,20 +90,6 @@ Expandable.MaskedSettingsPanel
                     
                     width: Common.SizeManager.clickableSizes.base * 3;
                     initialPort: rtuContext.selection.port;
-                }
-            }
-            
-            Connections
-            {
-                target: thisComponent;
-                
-                onApplyButtonPressed:
-                {
-                    if (portNumber.changed)
-                        rtuContext.changesManager().addPortChange(Number(portNumber.text));
-                    
-                    if (flagged.showFirst)
-                        flagged.currentItem.applyButtonPressed();       
                 }
             }
         }

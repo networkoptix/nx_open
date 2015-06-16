@@ -24,10 +24,10 @@ Base.Column
         return result;
     }
     
-    function applyButtonPressed()
+    function tryApplyChanges()
     {
         if (!thisComponent.changed)
-            return;
+            return true;
 
         var children = column.children;
         for (var i = 0; i !== children.length; ++i)
@@ -44,15 +44,26 @@ Base.Column
             {
                 var forceUseDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
                 rtuContext.changesManager().turnOnDhcp();
-                return;
+                return true;
             }
 
             var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
+            if (!useDHCP && !item.ipAddressControl.acceptableInput)
+            {
+                item.ipAddressControl.focus = true;
+                return false;
+            }
+            if (!useDHCP && !item.subnetMaskControl.acceptableInput)
+            {
+                item.subnetMaskControl.focus = true;
+                return false;
+            }
+
             var ipAddress = (item.ipAddressControl.changed || !useDHCP ? item.ipAddressControl.text : "");
             var subnetMask = (item.subnetMaskControl.changed || !useDHCP ? item.subnetMaskControl.text : "");
-            rtuContext.changesManager().addIpChange(
-                item.adapterNameValue, useDHCP, ipAddress, subnetMask);
+            rtuContext.changesManager().addIpChange(item.adapterNameValue, useDHCP, ipAddress, subnetMask);
         }
+        return true;
     }
     
     Base.Column

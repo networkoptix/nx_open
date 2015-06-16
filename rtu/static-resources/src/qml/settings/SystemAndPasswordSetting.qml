@@ -10,6 +10,13 @@ Expandable.MaskedSettingsPanel
 
     changed:  (maskedArea && maskedArea.changed?  true : false);
     
+    function tryApplyChanges()
+    {
+        if (!changed)
+            return true;
+        return maskedArea.tryApplyChanges();
+    }
+
     propertiesGroupName: qsTr("Set System Name and Password");
 
     propertiesDelegate: Component
@@ -20,17 +27,30 @@ Expandable.MaskedSettingsPanel
         {
             property bool changed: systemName.changed || password.changed;
             height: settingsColumn.height;
-            
-            Connections
+
+            function tryApplyChanges()
             {
-                target: thisComponent;
-                onApplyButtonPressed:
+                if (systemName.changed)
                 {
-                    if (systemName.changed)
-                        rtuContext.changesManager().addSystemChange(systemName.text);
-                    if (password.changed)
-                        rtuContext.changesManager().addPasswordChange(password.text);
+                    if (systemName.text.length === 0)
+                    {
+                        systemName.focus = true;
+                        return false;
+                    }
+
+                    rtuContext.changesManager().addSystemChange(systemName.text);
                 }
+                if (password.changed)
+                {
+                    if (password.text.length === 0)
+                    {
+                        password.focus = true;
+                        return false;
+                    }
+
+                    rtuContext.changesManager().addPasswordChange(password.text);
+                }
+                return true;
             }
 
             Base.Column

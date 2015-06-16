@@ -52,6 +52,8 @@ namespace rtu
         
         void applyChanges();
         
+        void clearChanges();
+        
     public slots:
         int totalChangesCount() const;
         

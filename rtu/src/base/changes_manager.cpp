@@ -109,6 +109,8 @@ public:
 
     void applyChanges();
 
+    void clearChanges();
+    
     int totalChangesCount() const;
     
     int appliedChangesCount() const;
@@ -241,6 +243,11 @@ void rtu::ChangesManager::Impl::addDateTimeChange(const QDateTime &utcTime
     , const QByteArray &timeZoneId)
 {
     getChangeset().dateTime.reset(new DateTime(utcTime, QTimeZone(timeZoneId)));
+}
+
+void rtu::ChangesManager::Impl::clearChanges()
+{
+    m_changeset.reset();
 }
 
 void rtu::ChangesManager::Impl::applyChanges()
@@ -746,6 +753,11 @@ void rtu::ChangesManager::turnOnDhcp()
 void rtu::ChangesManager::applyChanges()
 {
     m_impl->applyChanges();
+}
+
+void rtu::ChangesManager::clearChanges()
+{
+    m_impl->clearChanges();
 }
 
 int rtu::ChangesManager::totalChangesCount() const

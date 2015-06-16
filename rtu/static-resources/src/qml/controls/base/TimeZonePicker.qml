@@ -45,7 +45,7 @@ ComboBox
         var lastTimeZone = textAt(lastSelectedIndex);
         var lastTimeZoneString = (lastTimeZone ? lastTimeZone : "");
         
-        if (newTimeZoneString !== lastTimeZoneString)
+        if ((newTimeZoneString !== lastTimeZoneString) && (model.isValidValue(lastSelectedIndex)))
             timeZoneChanged(lastTimeZoneString, newTimeZoneString);
 
         lastSelectedIndex = currentIndex;

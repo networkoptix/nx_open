@@ -71,7 +71,7 @@ Item
             }
         }
     }
-    
+   
     Item
     {
         id: buttonsPanel;
@@ -127,11 +127,30 @@ Item
                 
                 onClicked:
                 {
-                    ipPortSettings.applyButtonPressed();
-                    systemAndPasswordSettings.applyButtonPressed();
-                    dateTimeSettings.applyButtonPressed();
-    
-                    rtuContext.changesManager().applyChanges();
+                    var children = settingsColumn.children;
+                    var childrenCount = children.length;
+                    var changesCount = 0;
+                    var entitiesCount = 0;
+                    for (var i = 0; i !== childrenCount; ++i)
+                    {
+                        var child = children[i];
+                        if (!child.hasOwnProperty("tryApplyChanges"))
+                            continue;
+                        ++entitiesCount;
+                        
+                        if (!child.tryApplyChanges())
+                            break;
+                        ++changesCount;
+                    }
+        
+                    if (changesCount && (changesCount == entitiesCount))
+                    {
+                        rtuContext.changesManager().applyChanges();
+                    }
+                    else
+                    {
+                        rtuContext.changesManager().clearChanges();
+                    }
                 }
             }
     

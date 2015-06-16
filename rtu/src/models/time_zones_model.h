@@ -26,7 +26,7 @@ namespace rtu
         int currentTimeZoneIndex();
 
     public slots:
-        void onCurrentIndexChanged(int index);
+        bool isValidValue(int index);
         
     signals:
         void initIndexChanged();

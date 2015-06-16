@@ -637,9 +637,9 @@ void rtu::ServersSelectionModel::Impl::updatePasswordInfo(const QUuid &id
     for (ServerModelInfo &otherInfo: searchInfo.systemInfoIterator->servers)
     {
         if ((info.baseInfo().systemName == otherInfo.serverInfo.baseInfo().systemName)
-            && (oldPassword == info.extraInfo().password))
+            && (oldPassword == otherInfo.serverInfo.extraInfo().password))
         {
-            otherInfo.serverInfo.writableExtraInfo().password = oldPassword;
+            otherInfo.serverInfo.writableExtraInfo().password = password;
         }
     }
         
