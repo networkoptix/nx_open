@@ -13,8 +13,9 @@ namespace
     const static int defaultSearchLimit = 100;
 }
 
-QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QObject *parent)
+QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent)
     : QObject(parent)
+    , q_ptr(parent)
     , m_loaderByResource()
     , m_requests()
 {
