@@ -86,6 +86,7 @@ Page {
 
         width: parent.width
         height: parent.height
+        source: resourceHelper.mediaUrl
 
         autoPlay: !playbackController.paused
 
