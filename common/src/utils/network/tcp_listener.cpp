@@ -5,7 +5,7 @@
 
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
-
+#include <atomic>
 
 // ------------------------ QnTcpListenerPrivate ---------------------------
 
@@ -15,11 +15,10 @@ public:
     AbstractStreamServerSocket* serverSocket;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
-    mutable QMutex portMutex;
     QMutex connectionMtx;
-    int newPort;
+    std::atomic<int> newPort;
     QHostAddress serverAddress;
-    int localPort;
+    std::atomic<int> localPort;
     bool useSSL;
     int maxConnections;
     bool ddosWarned;
@@ -198,7 +197,6 @@ void QnTcpListener::removeAllConnections()
 void QnTcpListener::updatePort(int newPort)
 {
     Q_D(QnTcpListener);
-    QMutexLocker lock(&d->portMutex);
     d->newPort = newPort;
 }
 
@@ -212,7 +210,7 @@ void QnTcpListener::run()
     if( !d->serverSocket )
         bindToLocalAddress();
 
-    NX_LOG( lit("Entered QnTcpListener::run. %1:%2, system thread id %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(systemThreadId()), cl_logWARNING );
+    NX_LOG( lit("Entered QnTcpListener::run. %1:%2, system thread id %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(systemThreadId()), cl_logINFO );
     try
     {
         if (!d->serverSocket)
@@ -221,19 +219,17 @@ void QnTcpListener::run()
         {
             if (d->newPort)
             {
-                QMutexLocker lock(&d->portMutex);
-                NX_LOG( lit("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
+                int oldPort = d->localPort;
+                d->localPort = d->newPort.exchange(0);
+                NX_LOG( lit("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort), cl_logINFO );
                 removeAllConnections();
                 delete d->serverSocket;
-                int oldPort = d->localPort;
-                d->localPort = d->newPort;
-                d->newPort = 0;
                 if( !bindToLocalAddress() )
                 {
                     QThread::msleep(1000);
                     continue;
                 }
-                NX_LOG( lit("TCPListener (%1:%2). Switched to port %3").arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort), cl_logWARNING );
+                NX_LOG( lit("TCPListener (%1:%2). Switched to port %3").arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort), cl_logINFO );
             }
 
             AbstractStreamSocket* clientSocket = d->serverSocket->accept();
@@ -268,7 +264,7 @@ void QnTcpListener::run()
                     NX_LOG( lit("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
                         arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
                     QThread::msleep(1000);
-                    d->newPort = d->localPort; // reopen tcp socket
+                    d->newPort.store(d->localPort); // reopen tcp socket
                 }
             }
             doPeriodicTasks();
@@ -287,10 +283,7 @@ void QnTcpListener::run()
 int QnTcpListener::getPort() const
 {
     Q_D(const QnTcpListener);
-    QMutexLocker lock(&d->portMutex);
-    if (!d->serverSocket)
-        return -1;
-    return d->serverSocket->getLocalAddress().port;
+    return d->localPort;
 }
 
 static QByteArray m_defaultPage;
