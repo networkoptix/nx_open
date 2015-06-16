@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
@@ -23,6 +23,7 @@
 
 namespace ec2
 {
+    // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnectionFactory
     class Ec2DirectConnectionFactory
     :
         public AbstractECConnectionFactory,
@@ -49,7 +50,7 @@ namespace ec2
     private:
         ServerQueryProcessor m_serverQueryProcessor;
         ClientQueryProcessor m_remoteQueryProcessor;
-        QMutex m_mutex;
+        QnMutex m_mutex;
         ResourceContext m_resCtx;
         std::unique_ptr<QnDbManager> m_dbManager;
         std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;

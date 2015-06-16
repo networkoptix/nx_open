@@ -11,6 +11,7 @@
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include <utils/common/log.h>
+#include <utils/common/unused.h>
 
 
 namespace ec2
@@ -114,6 +115,7 @@ namespace ec2
         template <class T1, class T2>
         ErrorCode doQuery(const T1& t1, T2& t2)
         {
+            QN_UNUSED(t1);
             QWriteLocker lock(&m_mutex);
             return doQueryNoLock(t1, t2);
         }
@@ -539,6 +541,7 @@ namespace ec2
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
+        bool removeEmptyLayoutsFromTransactionLog();
         bool tuneDBAfterOpen();
         bool removeOldCameraHistory();
         bool migrateServerGUID(const QString& table, const QString& field);

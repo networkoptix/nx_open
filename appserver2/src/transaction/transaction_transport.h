@@ -6,7 +6,6 @@
 #include <QByteArray>
 #include <QElapsedTimer>
 #include <QSet>
-#include <QtCore/QWaitCondition>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -14,6 +13,7 @@
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
+#include "utils/common/id.h"
 #include <utils/common/log.h>
 #include <utils/common/uuid.h>
 #include <utils/network/abstract_socket.h>
@@ -22,7 +22,8 @@
 #include "utils/network/http/httpstreamreader.h"
 #include "utils/network/http/http_message_stream_parser.h"
 #include "utils/network/http/multipart_content_parser.h"
-#include "utils/common/id.h"
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #ifdef _DEBUG
 #include <common/common_module.h>
@@ -168,6 +169,8 @@ public:
     void setState(State state);
     State getState() const;
 
+    bool isIncoming() const;
+
     void setRemoteIdentityTime(qint64 time);
     qint64 remoteIdentityTime() const;
 
@@ -214,6 +217,8 @@ public:
             until \a QnTransactionTransport::waitForNewTransactionsReady has returned
     */
     void waitForNewTransactionsReady( std::function<void()> invokeBeforeWait );
+    //!Transport level logic should use this method to report connection problem
+    void connectionFailure();
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 
@@ -246,7 +251,7 @@ private:
     bool m_syncInProgress; // sync request was send and sync process still in progress
     bool m_needResync; // sync request should be send int the future as soon as possible
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QSharedPointer<AbstractStreamSocket> m_incomingDataSocket;
     QSharedPointer<AbstractStreamSocket> m_outgoingDataSocket;
     nx_http::AsyncHttpClientPtr m_httpClient;
@@ -264,7 +269,7 @@ private:
     static QSet<QnUuid> m_existConn;
     typedef QMap<QnUuid, QPair<bool, bool>> ConnectingInfoMap;
     static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
-    static QMutex m_staticMutex;
+    static QnMutex m_staticMutex;
 
     QByteArray m_extraData;
     bool m_authByKey;
@@ -292,7 +297,7 @@ private:
     nx_http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
     //!Number of threads waiting on \a QnTransactionTransport::waitForNewTransactionsReady
     int m_waiterCount;
-    QWaitCondition m_cond;
+    QnWaitCondition m_cond;
 
 private:
     void default_initializer();

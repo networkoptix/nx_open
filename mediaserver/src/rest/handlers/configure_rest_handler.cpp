@@ -14,8 +14,9 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/module_finder.h"
 #include "api/model/configure_reply.h"
+#include "rest/server/rest_connection_processor.h"
+#include "utils/network/tcp_listener.h"
 
-void changePort(quint16 port);
 
 namespace {
     enum Result {
@@ -68,6 +69,16 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     reply.restartNeeded = false;
     result.setReply(reply);
     return CODE_OK;
+}
+
+void QnConfigureRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
+{
+    QnJsonRestResult reply;
+    if (QJson::deserialize(body, &reply) && reply.error() ==  QnJsonRestResult::NoError) {
+        int port = params.value(lit("port")).toInt();
+        if (port)
+            owner->owner()->updatePort(port);
+    }
 }
 
 int QnConfigureRestHandler::changeSystemName(const QString &systemName, qint64 sysIdTime, bool wholeSystem, qint64 remoteTranLogTime) {
@@ -134,7 +145,17 @@ int QnConfigureRestHandler::changePort(int port) {
         if (!socket.bind(port, bindMode))
             return ResultFail;
     }
-    ::changePort(port);
+    
+    QnMediaServerResourcePtr savedServer;
+    QUrl url = server->getUrl();
+    url.setPort(port);
+    server->setUrl(url.toString());
+    url = server->getApiUrl();
+    url.setPort(port);
+    server->setApiUrl(url.toString());
+    if (QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(server, &savedServer) != ec2::ErrorCode::ok)
+        return ResultFail;
+
 
     MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
 

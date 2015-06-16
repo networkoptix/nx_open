@@ -57,6 +57,7 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/collection.h>
 #include <utils/common/synctime.h>
+#include <utils/common/system_information.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/router.h>
 #include <utils/reconnect_helper.h>
@@ -84,8 +85,10 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         /* Reload all dialogs and dependent data. */
         context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
 
+        menu()->triggerIfPossible(Qn::AllowStatisticsReportMessageAction);
+
         /* Collect and send crash dumps if allowed */
-        m_crashReporter.scanAndReportAsync(qnResPool->getAdministrator(), qnSettings->rawSettings());
+        m_crashReporter.scanAndReportAsync(qnSettings->rawSettings());
 
         /* We are just reconnected automatically, e.g. after update. */
         if (!m_readyForConnection)
@@ -97,10 +100,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         if(!watcher->hasMismatches())
             return;
 
-        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
-            return;
-
-        menu()->trigger(Qn::VersionMismatchMessageAction);
+        menu()->triggerIfPossible(Qn::VersionMismatchMessageAction);
     });
 
     QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();
@@ -267,6 +267,14 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     {
         const auto hwId = LLUtil::getMainHardwareIds(0, qnSettings->rawSettings()).last();
         clientData.id = QnUuid::fromHardwareId(hwId);
+
+        const auto skin = qnSettings->clientSkin();
+        /**/ if (skin == Qn::DarkSkin) clientData.skin = lit("Dark");
+        else if (skin == Qn::LightSkin) clientData.skin = lit("Light");
+        else clientData.skin = lit("Unknown");
+
+        const auto systemInfo = QnSystemInformation::currentSystemInformation();
+        clientData.systemInfo = systemInfo.toString();
 
         const auto& hw = HardwareInformation::instance();
         clientData.phisicalMemory = hw.phisicalMemory;

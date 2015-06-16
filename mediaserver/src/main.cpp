@@ -120,14 +120,18 @@
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/iflist_rest_handler.h>
+#include <rest/handlers/json_aggregator_rest_handler.h>
+#include <rest/handlers/ifconfig_rest_handler.h>
+#include <rest/handlers/settime_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
 #include <rest/handlers/current_user_rest_handler.h>
 #include <rest/handlers/backup_db_rest_handler.h>
 #include <rest/handlers/discovered_peers_rest_handler.h>
+#include <rest/handlers/multiserver_chunks_rest_handler.h>
+#include <rest/handlers/camera_history_rest_handler.h>
+#include <rest/handlers/multiserver_bookmarks_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
-
-#include <streaming/hls/hls_server.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -161,6 +165,7 @@
 #endif
 
 #include "platform/hardware_information.h"
+#include "platform/platform_abstraction.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
@@ -170,6 +175,8 @@
 #include "compatibility.h"
 #include "media_server/file_connection_processor.h"
 #include "streaming/hls/hls_session_pool.h"
+#include "streaming/hls/hls_server.h"
+#include "streaming/streaming_chunk_transcoder.h"
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -184,8 +191,7 @@
 #include "network/universal_request_processor.h"
 #include "core/resource/camera_history.h"
 #include "utils/network/nettools.h"
-#include "rest/handlers/multiserver_chunks_rest_handler.h"
-#include "rest/handlers/camera_history_rest_handler.h"
+
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -202,6 +208,7 @@ static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QByteArray SYSTEM_NAME_KEY("systemName");
+static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -360,10 +367,10 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 static int lockmgr(void **mtx, enum AVLockOp op)
 {
-    QMutex** qMutex = (QMutex**) mtx;
+    QnMutex** qMutex = (QnMutex**) mtx;
     switch(op) {
         case AV_LOCK_CREATE:
-            *qMutex = new QMutex();
+            *qMutex = new QnMutex();
             return 0;
         case AV_LOCK_OBTAIN:
             (*qMutex)->lock();
@@ -408,6 +415,15 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     if (resType)
         storage->setTypeId(resType->getId());
     storage->setParentId(serverGuid());
+
+    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+    const auto it = std::find_if(partitions.begin(), partitions.end(),
+                                 [&](const QnPlatformMonitor::PartitionSpace& part)
+        { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
+    
+    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+    storage->setStorageType(QnLexical::serialized(storageType));
 
     return storage;
 }
@@ -621,7 +637,7 @@ void QnMain::dumpSystemUsageStats()
     qnPlatform->monitor()->totalHddLoad();
     qnPlatform->monitor()->totalNetworkLoad();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
         return;
     m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
@@ -856,7 +872,7 @@ QnMain::~QnMain()
 
 bool QnMain::isStopping() const
 {
-    QMutexLocker lock(&m_stopMutex);
+    QnMutexLocker lock( &m_stopMutex );
     return m_stopping;
 }
 
@@ -888,7 +904,7 @@ void QnMain::stopSync()
     NX_LOG( lit("Stopping server"), cl_logALWAYS );
     if (serviceMainInstance) {
         {
-            QMutexLocker lock(&m_stopMutex);
+            QnMutexLocker lock( &m_stopMutex );
             m_stopping = true;
         }
         serviceMainInstance->pleaseStop();
@@ -1200,6 +1216,12 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
             ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
             ec2Connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         }
+
+        const auto publicIp = m_publicAddress.toString();
+        if (server->getProperty(Qn::PUBLIC_IP) != publicIp) {
+            server->setProperty(Qn::PUBLIC_IP, publicIp);
+            propertyDictionary->saveParams(server->getId());
+        }
     }
 }
 
@@ -1339,6 +1361,9 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/iflist", new QnIfListRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/aggregator", new QnJsonAggregatorRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler());
@@ -1348,6 +1373,7 @@ bool QnMain::initTcpListener()
 
     QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
     QnRestProcessorPool::instance()->registerHandler("ec2/cameraHistory", new QnCameraHistoryRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
@@ -1521,13 +1547,36 @@ void QnMain::run()
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
     qnCommon->setModuleGUID(serverGuid());
+
+    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
+    const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    bool isLocal = isLocalAppServer(appserverHostString);
+    int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
+#ifdef EDGE_SERVER
+    serverFlags |= Qn::SF_Edge;
+#endif
+    if (QnAppInfo::armBox() == "bpi" || compatibilityMode) // check compatibilityMode here for testing purpose
+        serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
+
+    if (!isLocal)
+        serverFlags |= Qn::SF_RemoteEC;
+    m_publicAddress = getPublicAddress();
+    if (!m_publicAddress.isNull())
+        serverFlags |= Qn::SF_HasPublicIP;
+
+
     QString systemName = settings->value(SYSTEM_NAME_KEY).toString();
 #ifdef __arm__
     if (systemName.isEmpty()) {
-        systemName = QString(lit("system_%1")).arg(getMacFromPrimaryIF());
+        systemName = QString(lit("%1system_%2")).arg(QString::fromLatin1(AUTO_GEN_SYSTEM_NAME)).arg(getMacFromPrimaryIF());
         settings->setValue(SYSTEM_NAME_KEY, systemName);
     }
 #endif
+    if (systemName.startsWith(AUTO_GEN_SYSTEM_NAME)) {
+        serverFlags |= Qn::SF_AutoSystemName;
+        systemName = systemName.mid(AUTO_GEN_SYSTEM_NAME.length());
+    }
+
     qnCommon->setLocalSystemName(systemName);
 
     qint64 systemIdentityTime = MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
@@ -1606,7 +1655,6 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
-    m_publicAddress = getPublicAddress();
     if (!m_publicAddress.isNull()) 
     {
         if (!m_ipDiscovery->publicIP().isNull()) {
@@ -1664,6 +1712,8 @@ void QnMain::run()
     if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( restProcessorPool.get() );
 
+    std::unique_ptr<StreamingChunkTranscoder> streamingChunkTranscoder(
+        new StreamingChunkTranscoder( StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
     if( !initTcpListener() )
@@ -1692,18 +1742,6 @@ void QnMain::run()
             isNewServerInstance = true;
         }
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
-
-        QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
-        bool isLocal = isLocalAppServer(appserverHostString);
-
-        int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
-#ifdef EDGE_SERVER
-        serverFlags |= Qn::SF_Edge;
-#endif
-        if (!isLocal)
-            serverFlags |= Qn::SF_RemoteEC;
-        if (!m_publicAddress.isNull())
-            serverFlags |= Qn::SF_HasPublicIP;
 
         server->setServerFlags((Qn::ServerFlags) serverFlags);
 
@@ -1786,6 +1824,25 @@ void QnMain::run()
         if (server->getProperty(Qn::BETA) != isBeta)
             server->setProperty(Qn::BETA, isBeta);
 
+        if (!m_publicAddress.isNull())
+        {
+            const auto publicIp = m_publicAddress.toString();
+            if (server->getProperty(Qn::PUBLIC_IP) != publicIp)
+                server->setProperty(Qn::PUBLIC_IP, publicIp);
+        }
+
+        const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
+        if (!confStats.isNull()) // if present
+        {
+            const bool normStats = confStats.toBool();
+            const bool msStats = QnLexical::deserialized(server->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true);
+            if (normStats != msStats)
+                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(normStats));
+
+            MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
+            MSSettings::roSettings()->sync();
+        }
+
         propertyDictionary->saveParams(server->getId());
 
         if (m_mediaServer.isNull())
@@ -1814,8 +1871,6 @@ void QnMain::run()
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     qnResPool->addResource(m_mediaServer);
 
-    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
-
     QString moduleName = qApp->applicationName();
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
@@ -1826,6 +1881,7 @@ void QnMain::run()
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
+    selfInformation.flags = m_mediaServer->getServerFlags();
 
     qnCommon->setModuleInformation(selfInformation);
     qnCommon->bindModuleinformation(m_mediaServer);
@@ -1959,14 +2015,6 @@ void QnMain::run()
 
     typedef ec2::Ec2StaticticsReporter stats;
     bool adminParamsChanged = false;
-    if (MSSettings::roSettings()->value(stats::SR_ALLOWED, false).toBool())
-    {
-        if (adminUser->getProperty(stats::SR_ALLOWED).toInt() == 0)        // == 0 => false
-            adminUser->setProperty(stats::SR_ALLOWED, QString::number(1)); // != 0 => true
-
-        MSSettings::roSettings()->remove(stats::SR_ALLOWED);
-        adminParamsChanged = true;
-    }
 
     // TODO: fix, when VS supports init lists:
     //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
@@ -2066,7 +2114,7 @@ void QnMain::run()
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
         m_dumpSystemResourceUsageTaskID = 0;
     }
@@ -2082,6 +2130,7 @@ void QnMain::run()
     TimerManager::instance()->stop();
 
     hlsSessionPool.reset();
+    streamingChunkTranscoder.reset();
 
     delete QnRecordingManager::instance();
     QnRecordingManager::initStaticInstance( NULL );
@@ -2156,12 +2205,6 @@ void QnMain::run()
     m_mediaServer.clear();
 }
 
-void QnMain::changePort(quint16 port) {
-    m_universalTcpListener->updatePort(port);
-    QString address = QUrl(m_mediaServer->getApiUrl()).host();
-    setServerNameAndUrls(m_mediaServer, address, port);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(m_mediaServer, this, &QnMain::at_serverSaved);
-}
 
 void QnMain::at_appStarted()
 {
@@ -2169,7 +2212,7 @@ void QnMain::at_appStarted()
         return;
 
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
-    m_crashReporter.scanAndReportAsync(qnResPool->getAdministrator(), MSSettings::runTimeSettings());
+    m_crashReporter.scanAndReportAsync(MSSettings::runTimeSettings());
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
@@ -2368,11 +2411,15 @@ void restartServer(int restartTimeout)
     }
 }
 
-void changePort(quint16 port)
+/*
+bool changePort(quint16 port)
 {
     if (serviceMainInstance)
-        serviceMainInstance->changePort(port);
+        return serviceMainInstance->changePort(port);
+    else
+        return false;
 }
+*/
 
 static void printVersion();
 

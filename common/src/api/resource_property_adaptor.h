@@ -140,7 +140,7 @@ private:
     const QScopedPointer<QnAbstractResourcePropertyHandler> m_handler;
     QAtomicInt m_pendingSave;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnResourcePtr m_resource;
     QString m_serializedValue;
     QVariant m_value;

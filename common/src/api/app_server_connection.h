@@ -1,7 +1,7 @@
 #ifndef QN_APP_SERVER_CONNECTION_H
 #define QN_APP_SERVER_CONNECTION_H
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/request_param.h>
 #include <utils/common/software_version.h>
@@ -51,7 +51,7 @@ public:
     static ec2::AbstractECConnectionPtr getConnection2();
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QUrl m_url;
 
     /** Videowall-related fields */

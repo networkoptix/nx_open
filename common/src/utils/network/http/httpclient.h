@@ -8,8 +8,8 @@
 
 #include "asynchttpclient.h"
 
-#include <QtCore/QWaitCondition>
-#include <QtCore/QMutex>
+#include <utils/thread/wait_condition.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/stoppable.h>
 
@@ -68,8 +68,8 @@ namespace nx_http
 
     private:
         std::shared_ptr<AsyncHttpClient> m_asyncHttpClient;
-        QWaitCondition m_cond;
-        mutable QMutex m_mutex;
+        QnWaitCondition m_cond;
+        mutable QnMutex m_mutex;
         bool m_done;
         bool m_terminated;
         nx_http::BufferType m_msgBodyBuffer;

@@ -4,11 +4,12 @@
 #include "ec2_statictics_reporter.h"
 
 #include <utils/common/concurrent.h>
+#include <utils/thread/mutex.h>
 
 #include <QDir>
-#include <QMutex>
 #include <QSettings>
 #include <set>
+
 
 namespace ec2 {
 
@@ -23,8 +24,8 @@ public:
      *  \note Might be used on the start up in  every binary which generates crash dumps by
      *        \class win32_exception or \class linux_exception
      */
-    bool scanAndReport(QnUserResourcePtr admin, QSettings* settings);
-    void scanAndReportAsync(QnUserResourcePtr admin, QSettings* settings);
+    bool scanAndReport(QSettings* settings);
+    void scanAndReportAsync(QSettings* settings);
 
     /** Sends \param crash to \param serverApi asynchronously
      *  \note Might be used for debug purposes
@@ -34,7 +35,7 @@ public:
 private:
     friend class ReportData;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QnConcurrent::QnFuture<bool> m_activeCollection;
     std::set<nx_http::AsyncHttpClientPtr> m_activeHttpClients;
 };

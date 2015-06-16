@@ -87,11 +87,13 @@ private:
     QnCameraBookmarksManager * const m_bookmarksManager;
 
     QnCameraBookmarkList m_bookmarks;
-    QnCameraBookmarksManager::FilterParameters m_filter;
+    QnVirtualCameraResourceList m_cameras;
+    QnCameraBookmarkSearchFilter m_filter;
     UniqIdToStringMap m_camerasNames;
 
     int m_sortingColumn;
     Qt::SortOrder m_sortingOrder;
+    QUuid m_searchRequestId;
 };
 
 ///
@@ -111,6 +113,7 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
 
     , m_sortingColumn(kInvalidSortingColumn)
     , m_sortingOrder(Qt::AscendingOrder)
+    , m_searchRequestId(QUuid::createUuid())
 {
 }
 
@@ -123,8 +126,8 @@ void QnSearchBookmarksModel::Impl::setDates(const QDate &start
 {
     static const QTime kStartOfTheDayTime = QTime(0, 0, 0, 0);
     static const QTime kEndOfTheDayTime = QTime(23, 59, 59, 999);
-    m_filter.startTime = QDateTime(start, kStartOfTheDayTime).toMSecsSinceEpoch();
-    m_filter.finishTime = QDateTime(finish, kEndOfTheDayTime).toMSecsSinceEpoch();
+    m_filter.startTimeMs = QDateTime(start, kStartOfTheDayTime).toMSecsSinceEpoch();
+    m_filter.endTimeMs = QDateTime(finish, kEndOfTheDayTime).toMSecsSinceEpoch();
 }
 
 void QnSearchBookmarksModel::Impl::setFilterText(const QString &text)
@@ -134,16 +137,15 @@ void QnSearchBookmarksModel::Impl::setFilterText(const QString &text)
 
 void QnSearchBookmarksModel::Impl::setCameras(const QnVirtualCameraResourceList &cameras)
 {
-    m_filter.cameras = cameras;
+    m_cameras = cameras;
 }
 
 void QnSearchBookmarksModel::Impl::applyFilter(bool clearBookmarksCache)
 {
-    QnCameraBookmarksManager::FilterParameters filter = m_filter;
-    if (filter.cameras.empty())
-        filter.cameras = qnResPool->getAllCameras(QnResourcePtr(), true);
+    if (m_cameras.empty())
+        m_cameras = qnResPool->getAllCameras(QnResourcePtr(), true);
 
-    m_bookmarksManager->getBookmarksAsync(filter, clearBookmarksCache
+    m_bookmarksManager->getBookmarksAsync(m_cameras, m_filter, m_searchRequestId
         , [this](bool success, const QnCameraBookmarkList &bookmarks)
     {
         m_beginResetModel();

@@ -9,7 +9,7 @@
 #include <map>
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
@@ -190,7 +190,7 @@ namespace nx_http
         QString m_userPassword;
         bool m_authorizationTried;
         bool m_terminated;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
         unsigned int m_responseReadTimeoutMs;

@@ -70,26 +70,26 @@ int QnCameraBookmarksRestHandler::deleteCameraBookmarkAction(const QnRequestPara
 int QnCameraBookmarksRestHandler::getCameraBookmarksAction(const QnRequestParams & params, QnJsonRestResult & result) {
     //TODO: #GDM #Bookmarks check time periods existence via qnStorageMan
 
-    QString id = params.value("id");
-    QnCameraBookmarkSearchFilter filter;
-    bool ok;
-    if (qint64 value = params["minDurationMs"].toLongLong(&ok))
-        if (ok) filter.minDurationMs = value;
-    if (qint64 value = params["minStartTimeMs"].toLongLong(&ok))
-        if (ok) filter.minStartTimeMs = value;
-    if (qint64 value = params["maxStartTimeMs"].toLongLong(&ok))
-        if (ok) filter.maxStartTimeMs = value;
-    filter.text = params["text"];
-
-    QnTimePeriod period(filter.minStartTimeMs, filter.maxStartTimeMs - filter.minStartTimeMs);
-    qDebug() << "bookmarks requested with resolution" << filter.minDurationMs << "for" << period;   //TODO: #GDM #Bookmarks remove when profiling will be finished
-
-    QnCameraBookmarkList bookmarks;
-    if (!qnStorageMan->getBookmarks(id.toUtf8(), filter, bookmarks))
-        return CODE_INVALID_PARAMETER;
-
-    result.setReply(bookmarks);
-    return CODE_OK;
+//     QString id = params.value("id");
+//     QnCameraBookmarkSearchFilter filter;
+//     bool ok;
+//     if (qint64 value = params["minDurationMs"].toLongLong(&ok))
+//         if (ok) filter.minDurationMs = value;
+//     if (qint64 value = params["minStartTimeMs"].toLongLong(&ok))
+//         if (ok) filter.minStartTimeMs = value;
+//     if (qint64 value = params["maxStartTimeMs"].toLongLong(&ok))
+//         if (ok) filter.maxStartTimeMs = value;
+//     filter.text = params["text"];
+// 
+//     QnTimePeriod period(filter.minStartTimeMs, filter.maxStartTimeMs - filter.minStartTimeMs);
+//     qDebug() << "bookmarks requested with resolution" << filter.minDurationMs << "for" << period;   //TODO: #GDM #Bookmarks remove when profiling will be finished
+// 
+//     QnCameraBookmarkList bookmarks;
+//     if (!qnStorageMan->getBookmarks(id.toUtf8(), filter, bookmarks))
+//         return CODE_INVALID_PARAMETER;
+// 
+//     result.setReply(bookmarks);
+     return CODE_OK;
 }
 
 

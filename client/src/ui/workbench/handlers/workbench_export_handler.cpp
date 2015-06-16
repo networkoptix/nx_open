@@ -9,6 +9,7 @@
 #include <common/common_globals.h>
 
 #include <camera/loaders/caching_camera_data_loader.h>
+
 #include <camera/client_video_camera.h>
 #include <camera/client_video_camera_export_tool.h>
 #include <camera/camera_data_manager.h>
@@ -150,7 +151,6 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     }
 
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
-    exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
     exportProgressDialog->show();
 
@@ -420,7 +420,6 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnProgressDialog *exportProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
     exportProgressDialog->setWindowTitle(tr("Exporting Video"));
     exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
-    exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
 
     QnMediaResourcePtr resource = widget->resource();

@@ -8,12 +8,12 @@
 
 #include <set>
 
-#include <QtCore/QMutex>
 #include <QtCore/QObject>
-#include <QtCore/QWaitCondition>
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/joinable.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include "http/asynchttpclient.h"
 #include "../common/stoppable.h"
@@ -51,8 +51,8 @@ private:
     QStringList m_openedIPs;
     //!It is only because of aio::AsyncHttpClient API bug we have to create this terrible dictionary. it will be fixed soon
     std::set<nx_http::AsyncHttpClientPtr> m_socketsBeingScanned;
-    mutable QMutex m_mutex;
-    QWaitCondition m_cond;
+    mutable QnMutex m_mutex;
+    QnWaitCondition m_cond;
     int m_portToScan;
     quint32 m_startIpv4;
     quint32 m_endIpv4;

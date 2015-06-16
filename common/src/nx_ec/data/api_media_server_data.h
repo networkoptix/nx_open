@@ -13,8 +13,9 @@ namespace ec2
 
         qint64          spaceLimit;
         bool            usedForWriting;
+        QString         storageType;
     };
-#define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)
+#define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)(storageType)
 
 
     struct ApiMediaServerData: ApiResourceData
@@ -60,12 +61,34 @@ namespace ec2
         std::vector<ApiResourceParamData> addParams;
         ApiStorageDataList storages;
 
-        template<class ApiMediaServerDataRefType>
-        ApiMediaServerDataEx( ApiMediaServerDataRefType&& mediaServerData )
-        :
-            ApiMediaServerData( std::forward<ApiMediaServerDataRefType>(mediaServerData) ),
-            status(Qn::Offline)
+        ApiMediaServerDataEx( ApiMediaServerData&& mediaServerData )
+        :   
+            ApiMediaServerData( std::move( mediaServerData ) ),
+            status( Qn::Offline )
         {
+        }
+
+        ApiMediaServerDataEx( ApiMediaServerDataEx&& mediaServerData )
+        :
+            ApiMediaServerData( std::move( mediaServerData ) ),
+            ApiMediaServerUserAttributesData( std::move( mediaServerData ) ),
+            status( mediaServerData.status ),
+            addParams( std::move( mediaServerData.addParams ) ),
+            storages( std::move( mediaServerData.storages ) )
+        {
+        }
+
+        ApiMediaServerDataEx& operator=( ApiMediaServerDataEx&& mediaServerData )
+        {
+            static_cast< ApiMediaServerData& >( *this ) =
+                    std::move( static_cast< ApiMediaServerData&& >( mediaServerData ) );
+            static_cast< ApiMediaServerUserAttributesData& >( *this ) =
+                    std::move( static_cast< ApiMediaServerUserAttributesData&& >( mediaServerData ) );
+
+            status = mediaServerData.status;
+            addParams = std::move( mediaServerData.addParams );
+            storages = std::move( mediaServerData.storages );
+            return *this;
         }
     };
 #define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields_Short (status)(addParams) (storages)

@@ -70,7 +70,7 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
 }
 
 bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( !m_cameraManager3 )
         return false;
@@ -118,7 +118,7 @@ bool QnThirdPartyResource::setParamsEnd() {
 }
 
 bool QnThirdPartyResource::setParam(const char * id, const char * value) {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( !m_cameraManager3 )
         return false;
 
@@ -385,7 +385,7 @@ void QnThirdPartyResource::inputPortStateChanged(
 
 const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( int encoderNumber ) const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_encoderData[encoderNumber].resolutionList;
 }
 
@@ -397,7 +397,7 @@ bool QnThirdPartyResource::hasDualStreaming() const
 
 nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder( int encoderIndex ) const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( (size_t)encoderIndex < m_selectedEncoderResolutions.size() )
         return m_selectedEncoderResolutions[encoderIndex];
     return nxcip::Resolution();
@@ -409,7 +409,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     if( !m_camManager )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         //restoring camera parameters
         if( strlen(m_camInfo.uid) == 0 )
@@ -443,11 +443,13 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         if( strlen(m_camInfo.defaultLogin) == 0 )
         {
             const QByteArray userName = getAuth().user().toLatin1();
+            memset( m_camInfo.defaultLogin, 0, sizeof( m_camInfo.defaultLogin ) );
             strncpy( m_camInfo.defaultLogin, userName.constData(), std::min<size_t>(userName.size(), sizeof(m_camInfo.defaultLogin)-1) );
         }
         if( strlen(m_camInfo.defaultPassword) == 0 )
         {
             const QByteArray userPassword = getAuth().password().toLatin1();
+            memset( m_camInfo.defaultPassword, 0, sizeof( m_camInfo.defaultPassword ) );
             strncpy( m_camInfo.defaultPassword, userPassword.constData(), std::min<size_t>(userPassword.size(), sizeof(m_camInfo.defaultPassword)-1) );
         }
 
@@ -613,7 +615,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
 
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_encoderData = encoderDataTemp;
     }
 
@@ -674,7 +676,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
 
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_selectedEncoderResolutions = std::move( selectedEncoderResolutions );
     }
 

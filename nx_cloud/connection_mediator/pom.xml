@@ -5,12 +5,12 @@
     <parent>
         <artifactId>nx_cloud</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.3.1-SNAPSHOT</version>
+        <version>2.4.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.4.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>connection_mediator</artifactId>
     <packaging>pom</packaging>
@@ -35,13 +35,15 @@
         <mac.defines/>
     </properties>
 
-    <dependency>
-        <groupId>nx_cloud</groupId>
-        <artifactId>connection_mediator</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>system</scope>
-        <systemPath>${root.dir}/common/pom.xml</systemPath>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>nx_cloud</groupId>
+            <artifactId>connection_mediator</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
 
 </project>

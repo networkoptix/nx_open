@@ -98,7 +98,7 @@ private:
     friend class QnAviAudioLayout;
     AVIOContext* m_ioContext;
     bool m_eofReached;
-    QMutex m_openMutex;
+    QnMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
     bool m_fastStreamFind;
 };

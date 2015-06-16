@@ -59,11 +59,11 @@ private:
     QString m_chunkReaderKey;
     QnTimePeriodList m_chunks;
     
-    QMutex m_mutexChunks;
-    //QWaitCondition m_chunksCond;
+    QnMutex m_mutexChunks;
+    //QnWaitCondition m_chunksCond;
     bool m_chunksReady;
 
-    static QMutex m_chunkReaderMutex;
+    static QnMutex m_chunkReaderMutex;
     static QMap<QString, QnVMax480ChunkReader*> m_chunkReaderMap;
 };
 

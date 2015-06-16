@@ -123,7 +123,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     qSort(resolutions.begin(), resolutions.end(), sizeCompare);
 
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_resolution1 = resolutions[0];
         m_resolution2 = QSize(0,0);
 
@@ -221,13 +221,13 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
 QSize QnPlIsdResource::getPrimaryResolution() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_resolution1;
 }
 
 QSize QnPlIsdResource::getSecondaryResolution() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_resolution2;
 }
 

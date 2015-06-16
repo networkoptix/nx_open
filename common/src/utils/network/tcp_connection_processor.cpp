@@ -146,7 +146,7 @@ bool QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
 {
     Q_D(QnTCPConnectionProcessor);
 
-    QMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock( &d->sockMutex );
     return sendData(sendBuffer.data(), sendBuffer.size());
 }
 
@@ -154,7 +154,7 @@ bool QnTCPConnectionProcessor::sendBuffer(const QByteArray& sendBuffer)
 {
     Q_D(QnTCPConnectionProcessor);
 
-    QMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock( &d->sockMutex );
     return sendData(sendBuffer.data(), sendBuffer.size());
 }
 
@@ -238,7 +238,7 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
         arg(d->socket->getForeignAddress().toString()).
         arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->responseBody.size() : 0)))), cl_logDEBUG1 );
 
-    QMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock( &d->sockMutex );
     sendData(response.data(), response.size());
 }
 
@@ -362,6 +362,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
     d->requestBody.clear();
     d->responseBody.clear();
     d->currentRequestSize = 0;
+    d->prevSocketError = SystemError::noError;
 
     if( !d->clientRequest.isEmpty() )   //TODO #ak it is more reliable to check for the first call of this method
     {
@@ -376,15 +377,15 @@ bool QnTCPConnectionProcessor::readSingleRequest()
 
     while (!needToStop() && d->socket->isConnected())
     {
-        if( d->interleavedMessageDataPos == d->interleavedMessageData.size() )
+        if( d->interleavedMessageDataPos == (size_t)d->interleavedMessageData.size() )
         {
             //buffer depleted, draining more data
             const int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
             if (readed <= 0)
             {
-                const int lastOSErrorCode = SystemError::getLastOSErrorCode();
+                d->prevSocketError = SystemError::getLastOSErrorCode();
                 NX_LOG( lit("Error reading request from %1: %2").
-                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString(lastOSErrorCode)),
+                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString( d->prevSocketError )),
                     cl_logDEBUG1 );
                 return false;
             }
@@ -444,7 +445,7 @@ QUrl QnTCPConnectionProcessor::getDecodedUrl() const
     return d->request.requestLine.url;
 }
 
-void QnTCPConnectionProcessor::execute(QMutex& mutex)
+void QnTCPConnectionProcessor::execute(QnMutex& mutex)
 {
     m_needStop = false;
     mutex.unlock();

@@ -40,7 +40,7 @@ public:
     //!Rest handler can use following methods to access http request/response directly
     const nx_http::Request& request() const;
     nx_http::Response* response() const;
-
+    QnTcpListener* owner() const;
 protected:
     virtual void run() override;
 
