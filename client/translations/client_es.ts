@@ -6587,7 +6587,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation>Servidor v%1 en %2&lt;/br&gt;</translation>
+        <translation>Servidor v%1 en %2&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Server v%1&lt;br/&gt;</source>
