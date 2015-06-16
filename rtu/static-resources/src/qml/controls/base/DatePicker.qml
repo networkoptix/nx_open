@@ -32,8 +32,8 @@ QtControls.TextField
 
     onShowNowChanged:
     {
-        inputMask = (showNow ? impl.mask : "");
-        text = (showNow ? impl.stringFromDate(date) : qsTr("<now>"));
+        inputMask = (showNow ? "" : impl.mask);
+        text = (showNow ? qsTr("<now>") : impl.stringFromDate(initDate));
     }
 
     font.pixelSize: fontSize;
@@ -45,7 +45,7 @@ QtControls.TextField
 
     onTextChanged: 
     {
-        date = Date.fromLocaleDateString(Qt.locale(), text, Locale.ShortFormat);
+        date = Date.fromLocaleDateString(Qt.locale(), text, impl.dateFormat);
         if (!initDate && (text === impl.emptyMaskValue))
             return;
         
@@ -54,7 +54,7 @@ QtControls.TextField
     
     property QtObject impl: QtObject
     {
-        readonly property string dateFormat: Qt.locale().dateFormat(Locale.NarrowFormat);
+        readonly property string dateFormat: "dd.MM.yyyy";
         readonly property string mask: (dateFormat.replace(new RegExp(/[a-zA-Z0-9]/g), "9") + ";-");
         readonly property string emptyMaskValue: ":";  
     

@@ -21,7 +21,7 @@ QtControls.TextField
     property var initTime;
     
     height: Common.SizeManager.clickableSizes.medium;
-    width: height * 2;
+    width: height * 3;
 
     opacity: enabled ? 1.0 : 0.5;
 
@@ -32,8 +32,8 @@ QtControls.TextField
     
     onShowNowChanged:
     {
-        inputMask = (showNow ? impl.mask : "");
-        text = (showNow ? impl.stringFromTime(time) : qsTr("<now>"));
+        inputMask = (showNow ? "" : impl.mask);
+        text = (showNow ? qsTr("<now>") : impl.stringFromTime(initTime));
     }
 
     font.pixelSize: fontSize;
@@ -43,9 +43,14 @@ QtControls.TextField
         renderType: Text.NativeRendering;
     }
 
+    validator: RegExpValidator
+    {
+        regExp: /([01]?[0-9]|2[0-3]):[0-5][0-9]/;
+    }
+
     onTextChanged: 
     {
-        time = Date.fromLocaleTimeString(Qt.locale(), text, Locale.ShortFormat);
+        time = Date.fromLocaleTimeString(Qt.locale(), text, impl.timeFormat);
         if (!initTime && (text === impl.emptyMaskValue))
             return;
         

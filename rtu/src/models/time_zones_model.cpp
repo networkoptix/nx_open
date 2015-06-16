@@ -8,8 +8,10 @@
 
 namespace
 {
-    const QByteArray utcIanaTemplate = "UTC";
+    enum { kInvalidIndex = -1 };
     
+    const QByteArray utcIanaTemplate = "UTC";
+    const QByteArray gmtIanaTemplate = "GMT";
     QStringList getBaseTimeZones()
     {
         const QList<QByteArray> timeZones = QTimeZone::availableTimeZoneIds();
@@ -17,21 +19,20 @@ namespace
         QStringList result;
         for(const auto &zoneIanaId: timeZones)
         {
-            if (!zoneIanaId.contains(utcIanaTemplate)
-                || (zoneIanaId.size() == utcIanaTemplate.size()))
+            if (!zoneIanaId.contains(utcIanaTemplate) && !zoneIanaId.contains(gmtIanaTemplate))
                 result.push_back(zoneIanaId);
         };
     
         return result;
     }
     
-    enum { kDifferentTimeZoneDefaultIndex = 0};
     const QString kDiffTimeZonesTag = QT_TR_NOOP("<Different>");
+    const QString kUndefinedTimeZoneTag = QT_TR_NOOP("Undefined");
     const QStringList baseTimeZonesInfo = getBaseTimeZones();
     const QStringList timeZonesInfoWithDiff = []() -> QStringList
     {
         QStringList result = getBaseTimeZones();
-        result.insert(kDifferentTimeZoneDefaultIndex, kDiffTimeZonesTag);
+        result.push_back(kDiffTimeZonesTag);
         return result;
     }();
     
@@ -60,7 +61,7 @@ public:
     virtual ~Impl();
     
 public:
-    int onCurrentIndexChanged(int index);
+    void onCurrentIndexChanged(int index);
     
     int initIndex() const;
     
@@ -79,10 +80,15 @@ rtu::TimeZonesModel::Impl::Impl(rtu::TimeZonesModel *owner
     , m_owner(owner)
     , m_initSelectionTimeZone(selectionTimeZone(selectedServers))
     , m_withDiffTimeZoneItem(m_initSelectionTimeZone == kDiffTimeZonesTag)
-    , m_initIndex(m_withDiffTimeZoneItem ? kDifferentTimeZoneDefaultIndex 
+    , m_initIndex(m_withDiffTimeZoneItem ? timeZonesInfoWithDiff.indexOf(kDiffTimeZonesTag) 
         : baseTimeZonesInfo.indexOf(m_initSelectionTimeZone))
 {
-    const QStringList zones = (m_withDiffTimeZoneItem ? timeZonesInfoWithDiff : baseTimeZonesInfo);
+    QStringList zones = (m_withDiffTimeZoneItem ? timeZonesInfoWithDiff : baseTimeZonesInfo);
+    if (m_initIndex == kInvalidIndex)
+    {
+        zones.push_back(kUndefinedTimeZoneTag);
+        m_initIndex = zones.size() - 1;
+    }
     m_owner->setStringList(zones);
 }
 
@@ -90,20 +96,22 @@ rtu::TimeZonesModel::Impl::~Impl()
 {
 }
 
-int rtu::TimeZonesModel::Impl::onCurrentIndexChanged(int index)
+void rtu::TimeZonesModel::Impl::onCurrentIndexChanged(int index)
 {
-    if (!m_withDiffTimeZoneItem || (index == kDifferentTimeZoneDefaultIndex))
-        return false;
+    QStringList zones = m_owner->stringList();
+    const int undefIndex = zones.indexOf(kUndefinedTimeZoneTag);
+    const int diffIndex = zones.indexOf(kDiffTimeZonesTag);
+    const int tagIndex = (undefIndex != kInvalidIndex ? undefIndex 
+        : (diffIndex != kInvalidIndex ? diffIndex : index));
     
-    /// removes <Different> value from available timezones
-    m_owner->removeRow(kDifferentTimeZoneDefaultIndex);
+    if (tagIndex == index)
+        return;
+    m_owner->removeRow(tagIndex);
+    
     m_withDiffTimeZoneItem = false;
     
-    enum { kInvalidIndex = -1 };
     m_initIndex = kInvalidIndex;
     emit m_owner->initIndexChanged();
-    emit m_owner->currentTimeZoneIndexChanged();
-    return index - 1;
 }
 
 int rtu::TimeZonesModel::Impl::initIndex() const
@@ -116,6 +124,7 @@ int rtu::TimeZonesModel::Impl::currentTimeZoneIndex() const
     QStringList zones = m_owner->stringList();
     const QString currentTimeZoneId =  QDateTime::currentDateTime().timeZone().id();
     const int result = zones.indexOf(currentTimeZoneId);
+
     return result;
 }
 
@@ -143,9 +152,9 @@ int rtu::TimeZonesModel::currentTimeZoneIndex()
     return m_impl->currentTimeZoneIndex();
 }
 
-int rtu::TimeZonesModel::onCurrentIndexChanged(int index)
+void rtu::TimeZonesModel::onCurrentIndexChanged(int index)
 {
-    return m_impl->onCurrentIndexChanged(index);
+    m_impl->onCurrentIndexChanged(index);
 }
 
 

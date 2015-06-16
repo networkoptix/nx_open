@@ -71,7 +71,7 @@ namespace
 
 namespace
 {
-    const bool kNonBlockingRequest = false;
+    const bool kNonBlockingRequest = true;
     const bool kBlockingRequest = true;
 }
 

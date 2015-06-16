@@ -76,39 +76,46 @@ Window
             opacity: enabled ? 1 : 0.5;
         }
         
-        Loader
+        Item
         {
-            id: loader;
+            id: holder;
             
-            Layout.minimumWidth: (item && item.minWidth ? item.minWidth : 0);
-            Layout.minimumHeight: (item && item.minHeight ? item.minHeight : 0);
-            
-            sourceComponent: emptyPage;
-            
-            Connections
+            Loader
             {
-                target: rtuContext;
-                onCurrentPageChanged: { loader.reloadPage(); }
-                onSelectionChanged: { loader.reloadPage(); }
-            }
-            
-            function reloadPage()
-            {
-                loader.sourceComponent = undefined;
-                switch(rtuContext.currentPage)
+                id: loader;
+                
+                anchors.fill: parent;
+                Layout.minimumWidth: (item && item.minWidth ? item.minWidth : 0);
+                Layout.minimumHeight: (item && item.minHeight ? item.minHeight : 0);
+                
+                sourceComponent: emptyPage;
+                    
+                Connections
                 {
-                case NxRtu.Constants.ProgressPage:
-                    loader.sourceComponent = progressPageComponent;
-                    break;
-                case NxRtu.Constants.SummaryPage:
-                    loader.sourceComponent = summaryPageComponent;
-                    break;
-                default:
-                    loader.sourceComponent = (rtuContext.selection && (rtuContext.selection !== null)
-                        && rtuContext.selection.count ? settingsPageComponent : emptyPage);
+                    target: rtuContext;
+                    onCurrentPageChanged: { loader.reloadPage(); }
+                    onSelectionChanged: { loader.reloadPage(); }
+                }
+                
+                function reloadPage()
+                {
+                    loader.sourceComponent = undefined;
+                    switch(rtuContext.currentPage)
+                    {
+                    case NxRtu.Constants.ProgressPage:
+                        loader.sourceComponent = progressPageComponent;
+                        break;
+                    case NxRtu.Constants.SummaryPage:
+                        loader.sourceComponent = summaryPageComponent;
+                        break;
+                    default:
+                        loader.sourceComponent = (rtuContext.selection && (rtuContext.selection !== null)
+                            && rtuContext.selection.count ? settingsPageComponent : emptyPage);
+                    }
                 }
             }
         }
+
     }
     
     Component.onCompleted: 

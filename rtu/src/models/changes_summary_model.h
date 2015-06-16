@@ -18,7 +18,7 @@ namespace rtu
         virtual ~ChangesSummaryModel();
         
         Q_PROPERTY(int changesCount READ changesCount NOTIFY changesCountChanged)
-        Q_PROPERTY(int columnsCount READ columnsCount NOTIFY columnsCountChanged)
+        Q_PROPERTY(bool isSuccessChangesModel READ isSuccessChangesModel NOTIFY isSuccessChangesModelChanged)
         
     public:
         void addRequestResult(const ServerInfo &info
@@ -28,12 +28,12 @@ namespace rtu
         
         int changesCount() const;
         
-        int columnsCount() const;
+        bool isSuccessChangesModel() const;
         
     signals:
         void changesCountChanged();
         
-        void columnsCountChanged();
+        void isSuccessChangesModelChanged();
         
     private:
         int rowCount(const QModelIndex &parent = QModelIndex()) const;

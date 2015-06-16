@@ -71,7 +71,7 @@ Expandable.MaskedSettingsPanel
                 {
                     id: portNumber;
                     
-                    width: Common.SizeManager.clickableSizes.base * 3.5;
+                    width: Common.SizeManager.clickableSizes.base * 3;
                     initialPort: rtuContext.selection.port;
                 }
             }

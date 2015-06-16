@@ -15,9 +15,6 @@ Grid
     readonly property alias subnetMaskControl: subnetMask;
 
     property string adapterNameValue;
-    
-    
-    Component.onCompleted: console.log("s" + spacing);
 
     spacing: Common.SizeManager.spacing.base;
     columns: 3;

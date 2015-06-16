@@ -54,6 +54,7 @@ Expandable.MaskedSettingsPanel
                 {
                     id: systemName;
                     
+                    revertOnEmpty: true;
                     implicitWidth: implicitHeight * 6;
                     initialText: (rtuContext.selection && rtuContext.selection !== null ?
                         rtuContext.selection.systemName : "");
@@ -76,6 +77,7 @@ Expandable.MaskedSettingsPanel
                 {
                     id: password;
 
+                    revertOnEmpty: true;
                     implicitWidth: systemName.implicitWidth;
                     initialText: rtuContext.selection.password;
                 }

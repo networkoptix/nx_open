@@ -45,7 +45,7 @@ Expandable.MaskedSettingsPanel
                 {
                     id: dateTimeGrid;
                  
-                    property bool changed: (timePicker.changed || timeZonePicker.changed || datePicker.changed);
+                    property bool changed: (timeZonePicker.changed || timePicker.changed || datePicker.changed);
                     enabled: (Utils.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
     
                     verticalItemAlignment: Grid.AlignVCenter;
@@ -90,12 +90,15 @@ Expandable.MaskedSettingsPanel
     
                         onTimeZoneChanged:
                         {
+                            if (useCurrentTimeCheckbox.checked)
+                                return;
+                            
                             var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, from, to);
                             datePicker.setDate(dateTime);
                             timePicker.setTime(dateTime);
                         }
                     }
-    
+
                     Base.DatePicker
                     {
                         id: datePicker;
@@ -103,7 +106,6 @@ Expandable.MaskedSettingsPanel
                         initDate: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
                     }
-
                     Base.TimePicker
                     {
                         id: timePicker;
@@ -111,7 +113,7 @@ Expandable.MaskedSettingsPanel
                         initTime: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
                     }
-    
+                    
                     Base.CheckBox
                     {
                         id: useCurrentTimeCheckbox;
@@ -129,6 +131,7 @@ Expandable.MaskedSettingsPanel
                         }
                     }
                     
+
                     Connections
                     {
                         target: thisComponent;
@@ -144,6 +147,8 @@ Expandable.MaskedSettingsPanel
                                     var now = new Date();
                                     newDate = now;
                                     newTime = now;
+                                    
+                                    console.log(now);
                                 }
         
                                 rtuContext.changesManager().addDateTimeChange(
