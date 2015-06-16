@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>unit_tests</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.3.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.3.1-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>connection_mediator_ut</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Cloud Connection Mediator Unit Tests</name>
+
+    <properties>
+        <product.title>HD Cloud Connection Mediator Unit Tests</product.title>
+        <!--Global libs-->
+        <qt.libs>core network xml concurrent sql multimedia</qt.libs>
+        <global.libs>-lconnection_mediator -lgtest -ludt</global.libs>
+        <!--Specific os libs used-->
+        <windows.oslibs></windows.oslibs>
+        <linux.oslibs></linux.oslibs>
+        <linux.arm.oslibs></linux.arm.oslibs>
+        <windows.oslibs.release></windows.oslibs.release>
+        <windows.oslibs.debug></windows.oslibs.debug>
+        <mac.oslibs></mac.oslibs>
+        <!--Global defines-->
+        <global.defines></global.defines>
+        <!--Specific os defines-->
+        <windows.defines></windows.defines>
+        <linux.defines/>
+        <mac.defines/>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>nx_cloud</groupId>
+            <artifactId>connection_mediator</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
+</project>

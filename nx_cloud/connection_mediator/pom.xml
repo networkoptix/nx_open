@@ -1,11 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-        Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-        A solution can be a group of projects, but here we only have one.
-        It should also be possible to have one maven project per solution project,
-        and have a parent pom to deletegate the build.
-    -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <artifactId>nx_cloud</artifactId>
@@ -25,7 +20,7 @@
         <product.title>${company.name} Mediator</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon -ludt</global.libs>
+        <global.libs>-lcommon -ludt -lconnection_mediator</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
         <windows.oslibs.release/>
@@ -39,4 +34,14 @@
         <linux.defines/>
         <mac.defines/>
     </properties>
+
+    <dependency>
+        <groupId>nx_cloud</groupId>
+        <artifactId>connection_mediator</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>system</scope>
+        <systemPath>${root.dir}/common/pom.xml</systemPath>
+    </dependency>
+
 </project>

@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--
+        Example pom for delegating maven goals to msbuild so it builds the "solution"
+
+        A solution can be a group of projects, but here we only have one.
+        It should also be possible to have one maven project per solution project,
+        and have a parent pom to deletegate the build.
+    -->
+
+    <parent>
+        <artifactId>nx_cloud</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.3.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.3.1-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>libconnection_mediator</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx Cloud Connection Mediator Lib</name>
+
+    <properties>
+        <product.title>${company.name} Mediator Lib</product.title>
+        <!--Global libs-->
+        <qt.libs>core network concurrent</qt.libs>
+        <global.libs>-lcommon -ludt</global.libs>
+        <!--Specific os libs used-->
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>
+        <linux.oslibs>-lavcodec -lavformat -lavutil</linux.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <!--Global defines-->
+        <global.defines/>
+        <!--Specific os defines-->
+        <windows.defines/>
+        <linux.defines/>
+        <mac.defines/>
+    </properties>
+
+    <build>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
+        </profile>
+    </profiles>
+
+</project>

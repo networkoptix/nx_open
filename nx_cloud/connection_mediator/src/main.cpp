@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "mediator_service.h"
+#include <mediator_service.h>
 
 #ifdef _WIN32
     #include <windows.h>
