@@ -36,7 +36,7 @@ public:
 
     StunServerConnection(
         StreamConnectionHolder<StunServerConnection>* socketServer,
-        AbstractCommunicatingSocket* sock );
+        std::unique_ptr<AbstractCommunicatingSocket> sock );
 
     void processMessage( nx_stun::Message&& request );
 

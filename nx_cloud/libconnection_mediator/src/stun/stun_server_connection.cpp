@@ -13,9 +13,9 @@
 
 StunServerConnection::StunServerConnection(
     StreamConnectionHolder<StunServerConnection>* socketServer,
-    AbstractCommunicatingSocket* sock )
+    std::unique_ptr<AbstractCommunicatingSocket> sock )
 :
-    BaseType( socketServer, sock )
+    BaseType( socketServer, std::move( sock ) )
 {
     peer_address_ = sock->getForeignAddress();
     // No way to detect error here

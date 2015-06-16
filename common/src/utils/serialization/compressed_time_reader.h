@@ -7,6 +7,7 @@
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
+#include <QtEndian>
 
 #include "binary_stream.h"
 #include "compressed_time_fwd.h"

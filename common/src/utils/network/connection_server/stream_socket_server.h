@@ -103,7 +103,7 @@ public:
         {
             std::unique_ptr<ConnectionType> conn( new ConnectionType(
                 static_cast<CustomServerType*>(this),
-                std::unique_ptr<AbstractStreamSocket*>(newConnection) ) );
+                std::unique_ptr<AbstractStreamSocket>(newConnection) ) );
             if( conn->startReadingConnection() )
             {
                 std::unique_lock<std::mutex> lk( BaseType::m_mutex );

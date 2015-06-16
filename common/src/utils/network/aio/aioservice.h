@@ -136,7 +136,7 @@ namespace aio
         template<class SocketType, class Handler>
         bool dispatch( SocketType* sock, Handler&& handler )
         {
-            nMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             //if sock is not still bound to aio thread, binding it
             typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load( std::memory_order_relaxed );
             if( !threadToUse )  //socket has not been bound to aio thread yet
@@ -256,7 +256,7 @@ namespace aio
             SocketType* const sock,
             bool waitForRunningHandlerCompletion = true )
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             cancelPostedCallsNonSafe( sock, waitForRunningHandlerCompletion );
         }
 

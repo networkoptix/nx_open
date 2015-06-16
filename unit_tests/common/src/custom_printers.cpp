@@ -9,7 +9,7 @@
 #include <QByteArray>
 
 
-void printto(const qbytearray& val, ::std::ostream* os) {
-    *os << std::string(val.constdata(), val.size());
+void PrintTo(const QByteArray& val, ::std::ostream* os) {
+    *os << std::string(val.constData(), val.size());
 }
 
