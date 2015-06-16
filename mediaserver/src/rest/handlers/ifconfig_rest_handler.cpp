@@ -163,6 +163,9 @@ bool QnIfConfigRestHandler::checkData(const QnNetworkAddressEntryList& newSettin
 {
     for (const auto& value: newSettings) 
     {
+        if (value.name == "lo")
+            continue;
+
         if (!value.ipAddr.isNull() && !isValidIP(value.ipAddr)) {
             *errString = tr("Invalid IP address for interface '%1'").arg(value.name);
             return false;
