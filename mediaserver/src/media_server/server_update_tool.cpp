@@ -324,6 +324,7 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
 }
 
 void QnServerUpdateTool::installUpdateDelayed(const QString &updateId) {
+    NX_LOG(lit("QnServerUpdateTool: Requested delayed installation of %1. Installing in %2 ms.").arg(updateId).arg(installationDelay), cl_logINFO);
     executeDelayed([updateId, this]() { installUpdate(updateId); }, installationDelay, thread());
 }
 
