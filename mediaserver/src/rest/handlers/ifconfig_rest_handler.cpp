@@ -1,7 +1,6 @@
 #include <QFile>
 
 #include "ifconfig_rest_handler.h"
-#include "network_address_entry.h"
 #include "utils/network/http/linesplitter.h"
 #include <utils/network/tcp_connection_priv.h>
 #include "common/common_module.h"
@@ -55,6 +54,8 @@ QnNetworkAddressEntryList readNetworSettings(bool* ok)
                 result.last().netMask = worlds[1].trimmed();
             else if (data.startsWith("gateway"))
                 result.last().gateway = worlds[1].trimmed();
+            else if (data.startsWith("dns-nameservers"))
+                result.last().dns_servers = worlds[1].trimmed();
             else if (data.startsWith("auto"))
                 ;
             else
@@ -96,6 +97,8 @@ bool writeNetworSettings(const QnNetworkAddressEntryList& settings)
             out << "    netmask " << value.netMask << ENDL;
         if (!value.gateway.isEmpty())
             out << "    gateway " << value.gateway << ENDL;
+        if (!value.dns_servers.isEmpty())
+            out << "    dns-nameservers " << value.dns_servers << ENDL;
         for(auto itr = value.extraParams.constBegin(); itr != value.extraParams.constEnd(); ++itr)
             out << "    " << itr.key() << " " << itr.value() << ENDL;
         out << ENDL;
@@ -119,6 +122,8 @@ void updateSettings(QnNetworkAddressEntryList& currentSettings, QnNetworkAddress
                 value.netMask = newValue.netMask;
             if (!newValue.gateway.isNull())
                 value.gateway = newValue.gateway;
+            if (!newValue.dns_servers.isNull())
+                value.dns_servers = newValue.dns_servers;
             value.dhcp = newValue.dhcp;
             newSettings.erase(itr);
             break;
@@ -146,26 +151,52 @@ bool isValidMask(const QString& ipAddr)
     return (value & (value+1)) == 0;
 }
 
-bool checkData(const QnNetworkAddressEntryList& newSettings, QString* errString)
+quint32 getNetworkAddr(const QString& addrStr, const QString& maskStr)
+{
+    quint32 addr = QHostAddress(addrStr).toIPv4Address();
+    quint32 mask = QHostAddress(maskStr).toIPv4Address();
+
+    return addr & mask;
+}
+
+bool QnIfConfigRestHandler::checkData(const QnNetworkAddressEntryList& newSettings, QString* errString)
 {
     for (const auto& value: newSettings) 
     {
         if (!value.ipAddr.isNull() && !isValidIP(value.ipAddr)) {
-            *errString = lit("Invalid IP address for interface '%1'").arg(value.name);
+            *errString = tr("Invalid IP address for interface '%1'").arg(value.name);
             return false;
         }
         
         if (!value.netMask.isNull() && !isValidMask(value.netMask)) {
-            *errString = lit("Invalid network mask for interface '%1'").arg(value.name);
+            *errString = tr("Invalid network mask for interface '%1'").arg(value.name);
             return false;
         }
 
-        if (!value.gateway.isNull() && !isValidIP(value.gateway)) {
-            *errString = lit("Invalid gateway for interface '%1'").arg(value.name);
-            return false;
+        if (!value.gateway.isEmpty()) 
+        {
+            if (!isValidIP(value.gateway)) {
+                *errString = tr("Invalid gateway address for interface '%1'").arg(value.name);
+                return false;
+            }
+            if (!value.netMask.isEmpty() && !value.ipAddr.isEmpty()) 
+            {
+                if (getNetworkAddr(value.ipAddr, value.netMask) != getNetworkAddr(value.gateway, value.netMask)) {
+                    *errString = tr("IP address and gateway belong to different networks for interface '%1'").arg(value.name);
+                    return false;
+                }
+            }
         }
+
+        for (const QString& dns: value.dns_servers.split(L' ')) {
+            if (!dns.isEmpty() && !isValidIP(dns)) {
+                *errString = tr("Invalid dns server for interface '%1'").arg(value.name);
+                return false;
+            }
+        }
+
         if ((value.ipAddr.isEmpty() || value.netMask.isEmpty()) && !value.dhcp) {
-            *errString = lit("IP address or network mask for interface '%1' is empty.").arg(value.name);
+            *errString = tr("IP address or network mask for interface '%1' is empty.").arg(value.name);
             return false;
         }
     }
@@ -205,15 +236,16 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
         result.setErrorString(lit("Invalid message body format"));
         return CODE_OK;
     }
-    
+
+    updateSettings(currentSettings, newSettings);
+
     QString errString;
-    if (!checkData(newSettings, &errString)) {
+    if (!checkData(currentSettings, &errString)) {
         result.setError(QnJsonRestResult::InvalidParameter);
         result.setErrorString(errString);
         return CODE_OK;
     }
 
-    updateSettings(currentSettings, newSettings);
     if (!writeNetworSettings(currentSettings)) {
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("Can't write network settings file"));
