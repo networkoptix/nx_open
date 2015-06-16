@@ -787,9 +787,10 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
-int QnMediaServerConnection::installUpdate(const QString &updateId, QObject *target, const char *slot) {
+int QnMediaServerConnection::installUpdate(const QString &updateId, bool delayed, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("updateId", updateId);
+    params << QnRequestParam("delayed", delayed);
 
     return sendAsyncGetRequest(InstallUpdateObject, params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }

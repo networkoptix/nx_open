@@ -324,7 +324,7 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
 }
 
 void QnServerUpdateTool::installUpdateDelayed(const QString &updateId) {
-    executeDelayed([updateId, this]() { installUpdate(updateId); }, installationDelay);
+    executeDelayed([updateId, this]() { installUpdate(updateId); }, installationDelay, thread());
 }
 
 void QnServerUpdateTool::clearUpdatesLocation(const QString &idToLeave) {
