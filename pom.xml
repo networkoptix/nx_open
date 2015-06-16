@@ -289,6 +289,7 @@
                 <module>common</module>
                 <module>nx_cloud/cloud_db</module>
                 <module>nx_cloud/connection_mediator</module>
+                <module>nx_cloud/libconnection_mediator</module>
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -303,6 +304,7 @@
             </activation>
             <modules>
                 <module>unit_tests/common</module>
+                <module>unit_tests/connection_mediator</module>
             </modules>
         </profile>
        <profile>
