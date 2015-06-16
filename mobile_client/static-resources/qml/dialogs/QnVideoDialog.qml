@@ -22,7 +22,6 @@ Page {
 
     property var __chunkEndDate
     property var __nextChunkStartDate
-    readonly property bool __playing: video.playbackState == MediaPlayer.PlayingState && video.position > 0
 
     function alignToChunk(pos) {
         if (!timeline.stickToEnd) {
@@ -44,8 +43,10 @@ Page {
 
                 resourceHelper.setDateTime(pos)
                 video.setPositionDate(pos)
-                video.source = ""
+                video.stop()
                 video.source = resourceHelper.mediaUrl
+                if (!playbackController.paused)
+                    video.play()
                 timeline.positionDate = pos
             }
         }
@@ -83,6 +84,7 @@ Page {
         property date positionDate
         property int __prevPosition: 0
         property bool __updateTimeline: false
+        property bool __playing
 
         width: parent.width
         height: parent.height
@@ -91,6 +93,8 @@ Page {
         autoPlay: !playbackController.paused
 
         onPositionChanged: {
+            __playing = (playbackState == MediaPlayer.PlayingState) && (position > 0)
+
             if (position == 0)
                 __prevPosition = 0
 
@@ -107,6 +111,11 @@ Page {
             }
         }
 
+        onPlaybackStateChanged: __playing = (playbackState == MediaPlayer.PlayingState) && (position > 0)
+
+        onPaused: timeline.stickToEnd = false
+        onPlaying: videoPlayer.alignToChunk(timeline.positionDate)
+
         function setPositionDate(pos) {
             positionDate = pos
             __prevPosition = position
@@ -115,7 +124,7 @@ Page {
 
     Timer {
         interval: 5000
-        running: !timeline.stickToEnd && !timeline.dragging && __playing
+        running: !timeline.stickToEnd && !timeline.dragging && video.__playing
         onTriggered: video.__updateTimeline = true
     }
 
@@ -167,7 +176,7 @@ Page {
             chunkProvider: chunkProvider
             startBoundDate: chunkProvider.bottomBound
 
-            autoPlay: !stickToEnd && __playing
+            autoPlay: !stickToEnd && video.__playing
 
             onMoveFinished: videoPlayer.alignToChunk(positionDate)
         }
