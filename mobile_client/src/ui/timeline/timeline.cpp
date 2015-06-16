@@ -20,6 +20,8 @@
 
 namespace {
 
+    const bool drawDebugTicks = false;
+
     const int zoomLevelsVisible = 3;
     const qreal maxZoomLevelDiff = 1.0;
     const int minTickDps = 8;
@@ -645,6 +647,10 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
     int zoomIndex = cFloor(d->zoomLevel);
     const QnTimelineZoomLevel &zoomLevel = d->zoomLevels[zoomIndex];
 
+    int lineWidth = d->dp(1);
+    int lineHeight = d->dp(3);
+    qreal correction = lineWidth / 2.0;
+
     qint64 windowSize = windowEnd() - windowStart();
     qint64 windowStartAligned = zoomLevel.alignTick(d->adjustTime(windowStart()));
     qint64 windowEndAligned = zoomLevel.alignTick(d->adjustTime(windowEnd()));
@@ -662,6 +668,9 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
     QSGGeometryNode *lowerTextNode;
     QSGGeometry *lowerTextGeometry;
     QSGOpacityNode *lowerTextOpacityNode;
+
+    QSGGeometry *ticksGeometry = nullptr;
+    QSGGeometryNode *ticksNode = nullptr;
 
     if (!textNode) {
         textNode = new QSGGeometryNode();
@@ -689,6 +698,22 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
         lowerTextNode->setMaterial(textMaterial);
         lowerTextOpacityNode->appendChildNode(lowerTextNode);
         textNode->appendChildNode(lowerTextOpacityNode);
+
+        if (drawDebugTicks) {
+            ticksNode = new QSGGeometryNode();
+
+            ticksGeometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), tickCount * 2);
+            ticksGeometry->setDrawingMode(GL_LINES);
+
+            QSGFlatColorMaterial *ticksMaterial = new QSGFlatColorMaterial();
+            ticksMaterial->setColor(d->textColor);
+
+            ticksNode->setGeometry(ticksGeometry);
+            ticksNode->setFlag(QSGNode::OwnsMaterial);
+            ticksNode->setMaterial(ticksMaterial);
+            ticksNode->setFlag(QSGNode::OwnsMaterial);
+            textNode->appendChildNode(ticksNode);
+        }
     } else {
         d->prevZoomIndex = zoomIndex;
         textNode = static_cast<QSGGeometryNode*>(textNode);
@@ -701,6 +726,14 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
         if (textMaterial->texture() != d->textTexture) {
             delete textMaterial->texture();
             textMaterial->setTexture(d->textTexture);
+        }
+
+        if (drawDebugTicks) {
+            ticksNode = static_cast<QSGGeometryNode*>(textNode->childAtIndex(1));
+            ticksGeometry = ticksNode->geometry();
+            ticksGeometry->allocate(tickCount * 2);
+            QSGFlatColorMaterial *ticksMaterial = static_cast<QSGFlatColorMaterial*>(ticksNode->material());
+            ticksMaterial->setColor(d->textColor);
         }
     }
 
@@ -736,6 +769,12 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
     int textCount = 0;
     int lowerTextCount = 0;
 
+    QSGGeometry::Point2D *tickPoints = nullptr;
+    if (drawDebugTicks) {
+        tickPoints = ticksGeometry->vertexDataAsPoint2D();
+        ticksNode->markDirty(QSGNode::DirtyGeometry);
+    }
+
     for (int i = 0; i < tickCount; ++i) {
         int tickLevel = d->tickLevel(tick);
         int *count = textMarkLevel == tickLevel ? &lowerTextCount : &textCount;
@@ -756,6 +795,12 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
             *count += (!baseValue.isEmpty() && !baseValue[0].isDigit()) ? 1 : baseValue.size();
             if (!d->zoomLevels[tickLevel].suffix().isEmpty())
                 ++(*count);
+        }
+
+        if (drawDebugTicks) {
+            tickPoints[0].set(x + correction, correction);
+            tickPoints[1].set(x + correction, lineHeight + correction);
+            tickPoints += 2;
         }
 
         tick = zoomLevel.nextTick(tick);
