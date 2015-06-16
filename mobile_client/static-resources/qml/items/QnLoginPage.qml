@@ -2,6 +2,7 @@ import QtQuick 2.4
 import QtQuick.Controls 1.2
 
 import "../controls"
+import "../controls/style"
 import "QnLoginPage.js" as LoginFunctions
 
 QnPage {
@@ -73,20 +74,26 @@ QnPage {
                 width: parent.width
                 spacing: dp(16)
 
-                Button {
+                QnButton {
                     id: saveButton
                     text: qsTr("Save")
                     width: parent.width * 3 / 5
+                    style: QnButtonStyle {
+                        color: "#2b383f"
+                    }
                 }
 
-                Button {
+                QnButton {
                     id: deleteButton
                     text: qsTr("Delete")
                     width: parent.width * 2 / 5 - parent.spacing
+                    style: QnButtonStyle {
+                        color: "#d65029"
+                    }
                 }
             }
 
-            Button {
+            QnButton {
                 id: connectButton
                 width: parent.width
                 text: qsTr("Connect")
