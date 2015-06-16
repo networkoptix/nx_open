@@ -781,7 +781,7 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
 
         qreal x;
         if (zoomLevel.isMonotonic())
-            x = xStart + xStep * (i - 1);
+            x = xStart + xStep * i;
         else
             x = xStart + (tick - windowStartAligned) * width() / windowSize;
 
