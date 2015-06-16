@@ -3,11 +3,14 @@ import QtQuick.Controls.Styles 1.2
 
 import com.networkoptix.qml 1.0
 
-import "../../common_functions.js" as CommonFunctions
-
 TextFieldStyle {
-    textColor: colorTheme.color("inputText")
-    placeholderTextColor: colorTheme.color("inputPlaceholderText")
+    SystemPalette {
+        id: palette
+        colorGroup: SystemPalette.Active
+    }
+
+    textColor: palette.text
+    placeholderTextColor: colorTheme.color("textInput")
     background: Item {
         Rectangle {
             anchors {
@@ -19,8 +22,8 @@ TextFieldStyle {
                 bottomMargin: -4
             }
             border.width: 0
-            height: CommonFunctions.dp(2)
-            color: control.activeFocus ? colorTheme.color("inputBorderActive") : colorTheme.color("inputBorder")
+            height: dp(1)
+            color: control.activeFocus ? palette.highlight : colorTheme.color("textInput")
         }
     }
 }

@@ -36,7 +36,7 @@ QnPage {
                 width: parent.width
                 spacing: dp(16)
 
-                TextField {
+                QnTextField {
                     id: hostField
                     width: parent.width * 3 / 5
                     placeholderText: qsTr("Host")
@@ -44,7 +44,7 @@ QnPage {
                     text: "127.0.0.1"
                 }
 
-                TextField {
+                QnTextField {
                     id: portField
                     width: parent.width * 2 / 5 - parent.spacing
                     placeholderText: qsTr("Port")
@@ -53,7 +53,7 @@ QnPage {
                 }
             }
 
-            TextField {
+            QnTextField {
                 id: loginField
                 width: parent.width
                 placeholderText: qsTr("Login")
@@ -61,7 +61,7 @@ QnPage {
                 text: "admin"
             }
 
-            TextField {
+            QnTextField {
                 id: passwordField
                 width: parent.width
                 placeholderText: qsTr("Password")
