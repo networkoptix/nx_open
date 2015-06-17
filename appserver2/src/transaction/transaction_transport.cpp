@@ -343,6 +343,7 @@ void QnTransactionTransport::setStateNoLock(State state)
         this->m_state = state;
         emit stateChanged(state);
     }
+    m_cond.wakeAll();
 }
 
 QnTransactionTransport::State QnTransactionTransport::getState() const
@@ -744,15 +745,16 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
 void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> invokeBeforeWait )
 {
     QMutexLocker lk( &m_mutex );
-    if( m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME )
+
+    if( m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME && m_state >= ReadyForStreaming)
         return;
 
     //waiting for some transactions to be processed
     ++m_waiterCount;
     if( invokeBeforeWait )
         invokeBeforeWait();
-    while( (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME) &&
-           (m_state != Closed) )
+    while( (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME && m_state != Closed) ||
+            m_state < ReadyForStreaming)
     {
         m_cond.wait( lk.mutex() );
     }
