@@ -1525,6 +1525,16 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
         transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
         return;
     }
+    
+    for( QnTransactionTransport* transport: m_connectingConnections )
+    {
+        if( transport->connectionGuid() != connectionGuid )
+            continue;
+        //mutex is unlocked if we go to wait
+        transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+        return;
+    }
+
 }
 
 void QnTransactionMessageBus::connectionFailure( const QnUuid& connectionGuid )

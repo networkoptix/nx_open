@@ -137,6 +137,7 @@ namespace ec2
             if( connectionGuid.isNull() )
             {
                 connectionGuid = requestConnectionGuid;
+                QnTransactionMessageBus::instance()->waitForNewTransactionsReady( connectionGuid ); // wait while transaction transport goes to the ReadyForStreamingState
             }
             else if( requestConnectionGuid != connectionGuid )
             {
