@@ -140,6 +140,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         if (QnCachingCameraDataLoader *loader =  m_cameraDataManager->loader(camera))
             loader->discardCachedData();
     });
+
     for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
 
@@ -165,8 +166,9 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
                 m_dayTimeWidget->setSecondaryTimePeriods(timePeriodType, result);
         });
         chunksMergeTool->start();
-        
-        QTimer* updateCameraHistoryTimer = new QTimer(this);
+    }
+
+    QTimer* updateCameraHistoryTimer = new QTimer(this);
     updateCameraHistoryTimer->setInterval(cameraHistoryRetryTimeoutMs);
     updateCameraHistoryTimer->setSingleShot(false);
     connect(updateCameraHistoryTimer, &QTimer::timeout, this, [this] {
@@ -178,7 +180,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     });
     updateCameraHistoryTimer->start();
 
-    }
+
 
     connect(workbench(), &QnWorkbench::layoutChangeProcessStarted, this, [this] {
         m_chunkMergingProcessHandle = qn_threadedMergeHandle.fetchAndAddAcquire(1);
@@ -1102,10 +1104,6 @@ void QnWorkbenchNavigator::updateSyncedPeriods(qint64 startTimeMs) {
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, qint64 startTimeMs) {
-#ifndef QN_ENABLE_BOOKMARKS
-    if (timePeriodType == Qn::BookmarksContent)
-        return;
-#endif
     /* Merge is not required. */
     if (!m_timeSlider)
         return;

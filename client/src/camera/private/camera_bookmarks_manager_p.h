@@ -13,7 +13,7 @@ class QnCameraBookmarksManager;
 class QnCameraBookmarksManagerPrivate : public QObject {
     Q_OBJECT
 public:
-    QnCameraBookmarksManagerPrivate(QObject *parent);
+    QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent);
     
     virtual ~QnCameraBookmarksManagerPrivate();
 
