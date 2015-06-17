@@ -541,18 +541,17 @@ void QnServerSettingsDialog::updateRebuildUi(const QnStorageScanData& reply) {
      m_rebuildState = reply;
 
      ui->rebuildGroupBox->setEnabled(reply.state != Qn::RebuildState_Unknown);
-     //TODO: #TR #gdm remove trailing spaces from messages
      QString status;
      if (!reply.path.isEmpty()) {
          if (reply.state == Qn::RebuildState_FullScan)
-            status = tr("Rebuild archive index for storage '%1' in progress").arg(reply.path);
+            status = tr("Rebuild archive index for storage '%1' is in progress").arg(reply.path);
          else if (reply.state == Qn::RebuildState_PartialScan)
-             status = tr("Fast archive scan for storage '%1' in progress ").arg(reply.path);
+             status = tr("Fast archive scan for storage '%1' is in progress").arg(reply.path);
      }
      else if (reply.state == Qn::RebuildState_FullScan)
-         status = tr("Rebuild archive index for storage '%1' in progress").arg(reply.path);
+         status = tr("Rebuild archive index for storage '%1' is in progress").arg(reply.path);
      else if (reply.state == Qn::RebuildState_PartialScan)
-         status = tr("Fast archive scan for storage '%1' in progress ").arg(reply.path);
+         status = tr("Fast archive scan for storage '%1' is in progress").arg(reply.path);
      
      ui->rebuildStatusLabel->setText(status);
          
