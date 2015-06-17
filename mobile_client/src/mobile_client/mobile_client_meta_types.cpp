@@ -35,4 +35,6 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnContextSettings>("com.networkoptix.qml", 1, 0, "QnContextSettings");
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
+
+    qmlRegisterSingletonType(QUrl(lit("qrc:///qml/QnTheme.qml")), "com.networkoptix.qml", 1, 0, "QnTheme");
 }

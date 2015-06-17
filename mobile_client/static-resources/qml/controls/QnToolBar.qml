@@ -6,8 +6,8 @@ Item {
     property alias color: backgroundRectangle.color
     property alias textColor: label.color
 
-    property Component leftComponent
-    property Component rightComponent
+    property alias leftComponent: leftLoader.sourceComponent
+    property alias rightComponent: rightLoader.sourceComponent
     property alias label: label.text
 
     width: parent.width
@@ -21,14 +21,12 @@ Item {
 
     Loader {
         id: leftLoader
-        sourceComponent: leftComponent
         anchors.verticalCenter: parent.verticalCenter
         x: dp(16)
     }
 
     Loader {
         id: rightLoader
-        sourceComponent: rightComponent
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: dp(16)
@@ -39,5 +37,6 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         x: dp(72)
         font.pixelSize: sp(20)
+        font.weight: Font.DemiBold
     }
 }

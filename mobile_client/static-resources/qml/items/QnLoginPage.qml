@@ -1,8 +1,11 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.2
 
+import com.networkoptix.qml 1.0
+
 import "../controls"
 import "../controls/style"
+import "../icons"
 import "QnLoginPage.js" as LoginFunctions
 
 QnPage {
@@ -11,6 +14,10 @@ QnPage {
     property string newConnectionLabel: qsTr("New Connection")
 
     title: newConnectionLabel
+
+    leftToolBarComponent: QnMenuBackIcon {
+
+    }
 
     Flickable {
         id: flickable
@@ -27,9 +34,21 @@ QnPage {
 
             Rectangle {
                 id: warningRect
-                width: parent.width
                 height: visible ? dp(48) : 0
+                width: loginPage.width
+                anchors.horizontalCenter: parent.horizontalCenter
+                color: QnTheme.attentionColor
                 visible: false
+
+                Behavior on height { NumberAnimation { duration: 200 } }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: qsTr("Incorrect login or password")
+                    font.pixelSize: sp(16)
+                    font.weight: Font.Bold
+                    color: QnTheme.textColor
+                }
             }
 
             Row {
@@ -65,6 +84,7 @@ QnPage {
                 id: passwordField
                 width: parent.width
                 placeholderText: qsTr("Password")
+                echoMode: TextInput.Password
 
                 text: "123"
             }

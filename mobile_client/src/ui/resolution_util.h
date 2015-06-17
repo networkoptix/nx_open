@@ -21,6 +21,7 @@ public:
     static qreal densityMultiplier(DensityClass densityClass);
 
     QnResolutionUtil();
+    QnResolutionUtil(DensityClass customDensityClass);
 
     DensityClass densityClass() const;
     QString densityName() const;

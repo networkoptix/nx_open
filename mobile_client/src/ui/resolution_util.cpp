@@ -77,6 +77,12 @@ QnResolutionUtil::QnResolutionUtil():
 {
 }
 
+QnResolutionUtil::QnResolutionUtil(QnResolutionUtil::DensityClass customDensityClass):
+    m_densityClass(customDensityClass),
+    m_multiplier(densityMultiplier(m_densityClass))
+{
+}
+
 QnResolutionUtil::DensityClass QnResolutionUtil::densityClass() const {
     return m_densityClass;
 }

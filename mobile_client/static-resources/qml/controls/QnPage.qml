@@ -4,8 +4,8 @@ Item {
 
     property string title
 
-    property Item leftToolBarComponent
-    property Item rightToolBarComponent
+    property Component leftToolBarComponent
+    property Component rightToolBarComponent
 
     anchors.fill: parent
 }

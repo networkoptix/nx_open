@@ -2,6 +2,7 @@ import QtQuick 2.4
 import com.networkoptix.qml 1.0
 
 import "../controls"
+import "../icons"
 
 QnPage {
     id: resourcesPage
@@ -9,6 +10,10 @@ QnPage {
     signal videoRequested(string uuid)
 
     title: qsTr("Resources")
+
+    leftToolBarComponent: QnMenuBackIcon {
+
+    }
 
     QnCameraListModel {
         id: camerasModel
