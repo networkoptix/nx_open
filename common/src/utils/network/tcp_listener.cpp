@@ -264,7 +264,8 @@ void QnTcpListener::run()
                     NX_LOG( lit("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
                         arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
                     QThread::msleep(1000);
-                    d->newPort.store(d->localPort); // reopen tcp socket
+                    int zerro = 0;
+                    d->newPort.compare_exchange_strong(zerro, d->localPort);  // reopen tcp socket
                 }
             }
             doPeriodicTasks();
