@@ -108,24 +108,23 @@ Expandable.MaskedSettingsPanel
     
                     Base.Text
                     {
+                        thin: false;
                         text: qsTr("Time zone");
                     }
                     
                     Base.Text
                     {
+                        thin: false;
                         text: qsTr("Date");
                     }
     
                     Base.Text
                     {
+                        thin: false;
                         text: qsTr("Time");
                     }
     
-                    Item
-                    {
-                        width: 1;
-                        height: 1;
-                    }
+                    Base.EmptyCell {}
     
                     Base.TimeZonePicker
                     {

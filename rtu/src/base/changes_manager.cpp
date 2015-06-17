@@ -91,22 +91,10 @@ public:
     rtu::ChangesSummaryModel *failedResultsModel();
         
 public:
-    void addSystemChange(const QString &systemName);
+    Changeset &getChangeset();
 
-    void addPasswordChange(const QString &password);
-
-    void addPortChange(int port);
-
-    void addIpChange(const QString &name
-        , bool useDHCP
-        , const QString &address
-        , const QString &mask);
-
-    void turnOnDHCP();
-
-    void addDateTimeChange(const QDateTime &utcTime
-        , const QByteArray &timeZoneId);
-
+    rtu::ItfUpdateInfo &getItfUpdateInfo(const QString &name);
+    
     void applyChanges();
 
     void clearChanges();
@@ -118,8 +106,6 @@ public:
     void serverDiscovered(const rtu::BaseServerInfo &info);
     
 private:
-    Changeset &getChangeset();
-
     void onChangeApplied();
 
     void sendRequests();
@@ -207,42 +193,22 @@ rtu::ChangesSummaryModel *rtu::ChangesManager::Impl::failedResultsModel()
     return m_failedChangesModel;
 }
 
-void rtu::ChangesManager::Impl::addSystemChange(const QString &systemName)
+rtu::ItfUpdateInfo &rtu::ChangesManager::Impl::getItfUpdateInfo(const QString &name)
 {
-    getChangeset().systemName.reset(new QString(systemName));
-}
-
-void rtu::ChangesManager::Impl::addPasswordChange(const QString &password)
-{
-    getChangeset().password.reset(new QString(password));
-}
-
-void rtu::ChangesManager::Impl::addPortChange(int port)
-{
-    getChangeset().port.reset(new int(port));
-}
-
-void rtu::ChangesManager::Impl::addIpChange(const QString &name
-    , bool useDHCP
-    , const QString &address
-    , const QString &mask)
-{
-    getChangeset().itfUpdateInfo.push_back(
-        ItfUpdateInfo(name, useDHCP
-        , address.isEmpty() ? StringPointer(nullptr) : StringPointer(new QString(address))
-        , mask.isEmpty() ? StringPointer(nullptr) : StringPointer(new QString(mask)) ));
-}
-
-void rtu::ChangesManager::Impl::turnOnDHCP()
-{
-    /// Just add change, it doesn't matter what the parameters passed
-    getChangeset().itfUpdateInfo.push_back(ItfUpdateInfo());
-}
-
-void rtu::ChangesManager::Impl::addDateTimeChange(const QDateTime &utcTime
-    , const QByteArray &timeZoneId)
-{
-    getChangeset().dateTime.reset(new DateTime(utcTime, QTimeZone(timeZoneId)));
+    Changeset &changeset = getChangeset();
+    ItfUpdateInfoContainer &itfUpdate = changeset.itfUpdateInfo;
+    auto it = std::find_if(itfUpdate.begin(), itfUpdate.end()
+        , [&name](const ItfUpdateInfo &itf)
+    {
+        return (itf.name == name);
+    });
+    
+    if (it == itfUpdate.end())
+    {
+        itfUpdate.push_back(ItfUpdateInfo(name));
+        return itfUpdate.back();
+    }
+    return *it;
 }
 
 void rtu::ChangesManager::Impl::clearChanges()
@@ -325,9 +291,12 @@ rtu::InterfaceInfoList::const_iterator changeAppliedPos(const rtu::InterfaceInfo
         return it;
 
     const rtu::InterfaceInfo &info = *it;
-    const bool applied = ((change.useDHCP == (info.useDHCP == Qt::Checked))
+    const bool applied = 
+        ((!change.useDHCP || (*change.useDHCP == (info.useDHCP == Qt::Checked)))
         && (!change.ip || (*change.ip == info.ip))
-        && (!change.mask || (*change.mask == info.mask)));
+        && (!change.mask || (*change.mask == info.mask))
+        && (!change.dns || (*change.dns == info.dns))
+        && (!change.gateway || (*change.gateway == info.gateway)));
     
     return (applied ? it : itf.end());
 }
@@ -388,7 +357,7 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
             const QString errorReason = (applied ? QString() : QString("Can't apply this parameter"));
             const AffectedEntities affected = (applied ? kNoEntitiesAffected : kAllEntitiesAffected);
             
-            const QString useDHCPValue = (change.useDHCP ? kYes : kNo);
+            const QString useDHCPValue = (change.useDHCP && *change.useDHCP? kYes : kNo);
             addSummaryItem(info, kDHCPDescription, useDHCPValue, errorReason
                 , kDHCPUsageAffected, affected);
             
@@ -404,6 +373,20 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
                 static const QString &kMaskDescription = "mask";
                 addSummaryItem(info, kMaskDescription, *change.mask, errorReason
                     , kMaskAffected, affected);
+            }
+
+            if (change.dns)
+            {
+                static const QString &kDnsDescription = "dns";
+                addSummaryItem(info, kDnsDescription, *change.dns, errorReason
+                    , kDNSAffected, affected);
+            }
+            
+            if (change.gateway)
+            {
+                static const QString &kGatewayDescription = "gateway";
+                addSummaryItem(info, kGatewayDescription, *change.gateway, errorReason
+                    , kGatewayAffected, affected);
             }
             
             if (applied)
@@ -619,7 +602,9 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
         ItfUpdateInfoContainer changes;
         for (const InterfaceInfo &itfInfo: info->extraInfo().interfaces)
         {
-            changes.push_back(ItfUpdateInfo(itfInfo.name, true));
+            ItfUpdateInfo turnOnDhcpUpdate(itfInfo.name);
+            turnOnDhcpUpdate.useDHCP.reset(new bool(true));
+            changes.push_back(turnOnDhcpUpdate);
         }
         addRequest(info, changes);
     }
@@ -716,25 +701,47 @@ QObject *rtu::ChangesManager::failedResultsModel()
 
 void rtu::ChangesManager::addSystemChange(const QString &systemName)
 {
-    m_impl->addSystemChange(systemName);
+    m_impl->getChangeset().systemName.reset(new QString(systemName));
 }
 
 void rtu::ChangesManager::addPasswordChange(const QString &password)
 {
-    m_impl->addPasswordChange(password);
+    m_impl->getChangeset().password.reset(new QString(password));
 }
 
 void rtu::ChangesManager::addPortChange(int port)
 {
-    m_impl->addPortChange(port);
+    m_impl->getChangeset().port.reset(new int(port));
 }
 
-void rtu::ChangesManager::addIpChange(const QString &name
-    , bool useDHCP                                
-    , const QString &address
+void rtu::ChangesManager::addDHCPChange(const QString &name
+    , bool useDHCP)
+{
+    m_impl->getItfUpdateInfo(name).useDHCP.reset(new bool(useDHCP));
+}
+
+void rtu::ChangesManager::addAddressChange(const QString &name
+    , const QString &address)
+{
+    m_impl->getItfUpdateInfo(name).ip.reset(new QString(address));
+}
+
+void rtu::ChangesManager::addMaskChange(const QString &name
     , const QString &mask)
 {
-    m_impl->addIpChange(name, useDHCP, address, mask);
+    m_impl->getItfUpdateInfo(name).mask.reset(new QString(mask));
+}
+
+void rtu::ChangesManager::addDNSChange(const QString &name
+    , const QString &dns)
+{
+    m_impl->getItfUpdateInfo(name).dns.reset(new QString(dns));
+}
+
+void rtu::ChangesManager::addGatewayChange(const QString &name
+    , const QString &gateway)
+{
+    m_impl->getItfUpdateInfo(name).gateway.reset(new QString(gateway));
 }
 
 void rtu::ChangesManager::addDateTimeChange(const QDate &date
@@ -742,12 +749,15 @@ void rtu::ChangesManager::addDateTimeChange(const QDate &date
     , const QByteArray &timeZoneId)
 {
     const QDateTime &utcTime = utcFromTimeZone(date, time, QTimeZone(timeZoneId));
-    m_impl->addDateTimeChange(utcTime, timeZoneId);
+    m_impl->getChangeset().dateTime.reset(new DateTime(utcTime, QTimeZone(timeZoneId)));
 }
 
 void rtu::ChangesManager::turnOnDhcp()
 {
-    m_impl->turnOnDHCP();
+    static const QString &kAnyName = "blah blah";
+    /// In this case it is multiple selection. Just add empty interface
+    /// change information to indicate that we should force dhcp on
+    m_impl->getItfUpdateInfo(kAnyName);
 }
 
 void rtu::ChangesManager::applyChanges()

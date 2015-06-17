@@ -26,15 +26,18 @@ namespace rtu
         , kPasswordAffected         = 0x2
         , kSystemNameAffected       = 0x4
 
-        , kIpAddressAffected        = 0x8
-        , kMaskAffected       = 0x10
-        , kDHCPUsageAffected        = 0x20
+        , kIpAddressAffected        = 0x10
+        , kMaskAffected             = 0x20
+        , kDHCPUsageAffected        = 0x30
+        , kDNSAffected              = 0x40
+        , kGatewayAffected          = 0x80
         , kAllAddressFlagsAffected  = kIpAddressAffected | kMaskAffected | kDHCPUsageAffected
+            | kDNSAffected | kGatewayAffected
 
-        , kDateTimeAffected         = 0x40
-        , kTimeZoneAffected         = 0x80
+        , kDateTimeAffected         = 0x100
+        , kTimeZoneAffected         = 0x200
         
-        , kAllEntitiesAffected      = 0xFF
+        , kAllEntitiesAffected      = 0xFFF
     };
     
     Q_DECLARE_FLAGS(AffectedEntities, AffectedEntity)
@@ -46,18 +49,17 @@ namespace rtu
     {
         QString name;
 
-        bool useDHCP;
+        BoolPointer useDHCP;
         StringPointer ip;
         StringPointer mask;
+        StringPointer dns;
+        StringPointer gateway;
 
         ItfUpdateInfo();
 
         ItfUpdateInfo(const ItfUpdateInfo &other);
         
-        ItfUpdateInfo(const QString &initName
-            , bool initUseDHCP
-            , const StringPointer &initIp = StringPointer()
-            , const StringPointer &initMask = StringPointer());
+        ItfUpdateInfo(const QString &initName);
         
         ItfUpdateInfo &operator =(const ItfUpdateInfo &other);
     };

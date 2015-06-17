@@ -35,8 +35,16 @@ Expandable.MaskedSettingsPanel
                 if (portNumber.changed)
                     rtuContext.changesManager().addPortChange(Number(portNumber.text));
                     
-                console.log(flagged.showFirst, flagged.currentItem);
-                return (!flagged.showFirst || flagged.currentItem.tryApplyChanges());
+                if (!flagged.showFirst) // No changes 
+                    return true;
+                
+                if (flagged.dhcpForceOnly && flagged.currentItem.forceUseDHCP)
+                {
+                    rtuContext.changesManager().turnOnDhcp();
+                    return true;
+                }
+
+                return (flagged.currentItem.item.tryApplyChanges());
             }
 
             property bool changed: portNumber.changed || flagged.changed;
@@ -56,7 +64,8 @@ Expandable.MaskedSettingsPanel
             {
                 id: flagged;
 
-                property bool changed: (showFirst && currentItem.changed ? true : false);
+                property bool changed: (showFirst && currentItem.item.changed ? true : false);
+                property bool dhcpForceOnly: (rtuContext.selection.count !== 1);
                 
                 anchors
                 {
@@ -68,10 +77,32 @@ Expandable.MaskedSettingsPanel
                 showItem: ((Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags)
                     || (rtuContext.selection.count === 1));
                 
-                item: Rtu.IpSettingsList
+                Component
                 {
-                    id: ipList;
-                    enabled: (Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags);
+                    id: singleSelectionInterfaceList;
+                        
+                    Rtu.IpSettingsList
+                    {
+                        enabled: (Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags);
+                    }
+                }
+
+                Component
+                {
+                    id: multipleSelectionInterfaceList;
+                    
+                    Rtu.MultipleSelectionInterfaceList
+                    {
+                        dhcpState: rtuContext.selection.dhcpState;
+                    }
+                }
+                
+                item: Loader
+                {
+                    id: loader;
+                    
+                    sourceComponent: (flagged.dhcpForceOnly ? 
+                        multipleSelectionInterfaceList : singleSelectionInterfaceList);
                 }
             }
         
@@ -81,6 +112,7 @@ Expandable.MaskedSettingsPanel
                 
                 Base.Text
                 {
+                    thin: false;
                     text: qsTr("Port:");
                 }
                 

@@ -4,7 +4,9 @@ import QtQuick.Controls 1.1;
 import "." as Rtu;
 import "../base" as Base;
 import "../../common" as Common;
+import "../../dialogs" as Dialogs;
 
+    
 Base.Column
 {
     id: thisComponent;
@@ -12,7 +14,7 @@ Base.Column
     property bool changed:
     {      
         var result = false;
-        var children = column.children;
+        var children = thisComponent.children;
         for (var i = 0; i !== children.length; ++i)
         {
             var item = children[i];
@@ -24,89 +26,121 @@ Base.Column
         return result;
     }
     
-    function tryApplyChanges()
+    function tryApplyChanges () { return impl.tryApplyChanges(); }
+    
+    anchors.left: (parent ? parent.left : undefined);
+
+    Repeater
     {
-        if (!thisComponent.changed)
-            return true;
-
-        var children = column.children;
-        for (var i = 0; i !== children.length; ++i)
+        id: repeater;
+        
+        model: rtuContext.ipSettingsModel();
+        
+        delegate: Rtu.IpChangeLine
         {
-            var item = children[i];
-            if (!item.hasOwnProperty("adapterNameValue")|| !item.hasOwnProperty("isSingleSelectionModel") 
-                || !item.hasOwnProperty("changed") || !item.hasOwnProperty("isSingleSelectionModel")
-                || !item.changed)
-            {
-                continue;
-            }
+            useDHCPControl.initialCheckedState: useDHCP;
+
+            ipAddressControl.initialText: model.address;
+            subnetMaskControl.initialText: model.subnetMask;
+            dnsControl.initialText: model.dns;
+            gatewayControl.initialText: model.gateway;
             
-            if (!item.isSingleSelectionModel)
-            {
-                var forceUseDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
-                rtuContext.changesManager().turnOnDhcp();
-                return true;
-            }
-
-            var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
-            if (!useDHCP && !item.ipAddressControl.acceptableInput)
-            {
-                item.ipAddressControl.focus = true;
-                return false;
-            }
-            if (!useDHCP && !item.subnetMaskControl.acceptableInput)
-            {
-                item.subnetMaskControl.focus = true;
-                return false;
-            }
-
-            var ipAddress = (item.ipAddressControl.changed || !useDHCP ? item.ipAddressControl.text : "");
-            var subnetMask = (item.subnetMaskControl.changed || !useDHCP ? item.subnetMaskControl.text : "");
-            rtuContext.changesManager().addIpChange(item.adapterNameValue, useDHCP, ipAddress, subnetMask);
+            adapterNameValue: model.adapterName;
+            interfaceCaption: model.readableName;
         }
-        return true;
     }
     
-    Base.Column
+    Dialogs.ErrorDialog
     {
-        id: column;
+        id: errorDialog;
+    }
+    
+    ///
 
-        anchors
+    property QtObject impl : QtObject
+    {
+        readonly property string errorTemplate: 
+            qsTr("Invalid %1 for interface %2 specified. Can't apply changes.");
+        
+        function tryApplyChanges()
         {
-            left: parent.left;            
-        }
-
-        Repeater
-        {
-            id: repeater;
-            
-            model: rtuContext.ipSettingsModel();
-            
-            delegate: Rtu.IpChangeLine
+            if (!thisComponent.changed)
+                return true;
+        
+            var children = thisComponent.children;
+            for (var i = 0; i !== children.length; ++i)
             {
-                isSingleSelectionModel: (repeater.model ? repeater.model.isSingleSelection : true);
-                
-                useDHCPControl.initialCheckedState: (isSingleSelectionModel ? useDHCP : false);
-                useDHCPControl.text: (isSingleSelectionModel ? qsTr("Use DHCP") : qsTr("Force use DHCP on selection"));
-                
+                var item = children[i];
+                if (!item.hasOwnProperty("adapterNameValue")
+                    || !item.hasOwnProperty("changed")
+                    || !item.changed)
+                {
+                    continue;
+                }
 
-                ipAddressControl.initialText: (isSingleSelectionModel ? address : qsTr("Multiple interfaces"));
-                subnetMaskControl.initialText: (isSingleSelectionModel ? subnetMask : qsTr("Multiple interfaces"));
+                var name = item.adapterNameValue;
                 
-                adapterNameValue: adapterName;
+                var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
+                if (item.useDHCPControl.changed)
+                    rtuContext.changesManager().addDHCPChange(name, useDHCP);
+
+                if (item.ipAddressControl.changed || !useDHCP)
+                {
+                    if (!item.ipAddressControl.acceptableInput)
+                    {
+                        errorDialog.message = errorTemplate.arg(qsTr("ip address")).arg(name);
+                        errorDialog.show();
+            
+                        item.ipAddressControl.focus = true;
+                        return false;
+                    }
+                    rtuContext.changesManager().addAddressChange(name, item.ipAddressControl.text);
+                }
+                
+                if (!item.subnetMaskControl.changed || !useDHCP)
+                {
+                    if (!item.subnetMaskControl.acceptableInput)
+                    {
+                        errorDialog.message = errorTemplate.arg(qsTr("mask")).arg(name);
+                        errorDialog.show();
+                        
+                        item.subnetMaskControl.focus = true;
+                        return false;
+                    }
+                    rtuContext.changesManager().addMaskChange(name, item.subnetMaskControl.text);
+                }
+                
+                if (item.dnsControl.changed)
+                {
+                    if (item.dnsControl.text.trim().length && !item.dnsControl.acceptableInput)
+                    {
+                        errorDialog.message = errorTemplate.arg(qsTr("dns")).arg(name);
+                        errorDialog.show();
+                        
+                        item.dnsControl.focus = true;
+                        return false;
+                    }
+                    rtuContext.changesManager().addDNSChange(name, item.dnsControl.text);
+                }
+
+                if (item.gatewayControl.changed)
+                {
+                    if (item.gatewayControl.text.trim().length && !item.gatewayControl.acceptableInput)
+                    {
+                        errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(name);
+                        errorDialog.show();
+                        
+                        item.gatewayControl.focus = true;
+                        return false;
+                    }
+                    rtuContext.changesManager().addGatewayChange(name, item.gatewayControl.text);
+                }
             }
+            return true;
         }
     }
-
-    Base.Text
-    {
-        wrapMode: Text.Wrap;
-
-        anchors.left: column.left;
-        
-        color: "darkred";
-        text: qsTr("Ip address and subnet mask cannot be changed for multiple servers");
-        
-        visible: !repeater.model.isSingleSelection;
-    }
+    
+    
 }
+
 

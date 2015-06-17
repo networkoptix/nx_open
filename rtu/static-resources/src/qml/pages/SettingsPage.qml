@@ -7,12 +7,42 @@ import "../controls/base" as Base;
 
 Item
 {
+    id: thisComponent;
+    
     property var selectedServersModel;
     property bool parametersChanged: systemAndPasswordSettings.changed 
         || ipPortSettings.changed || dateTimeSettings.changed;
 
     anchors.fill: parent;
    
+    function applyChanges()
+    {
+        var children = settingsColumn.children;
+        var childrenCount = children.length;
+        var changesCount = 0;
+        var entitiesCount = 0;
+        for (var i = 0; i !== childrenCount; ++i)
+        {
+            var child = children[i];
+            if (!child.hasOwnProperty("tryApplyChanges"))
+                continue;
+            ++entitiesCount;
+            
+            if (!child.tryApplyChanges())
+                break;
+            ++changesCount;
+        }
+
+        if (changesCount && (changesCount == entitiesCount))
+        {
+            rtuContext.changesManager().applyChanges();
+        }
+        else
+        {
+            rtuContext.changesManager().clearChanges();
+        }
+    }
+    
     ScrollView
     {
         anchors
@@ -36,7 +66,7 @@ Item
             {
                 id: settingsColumn;
     
-                spacing: Common.SizeManager.spacing.medium;
+                spacing: Common.SizeManager.spacing.large;
                 anchors
                 {
                     left: parent.left;
@@ -125,33 +155,7 @@ Item
                 anchors.verticalCenter: parent.verticalCenter;
                 enabled: systemAndPasswordSettings.changed || ipPortSettings.changed || dateTimeSettings.changed;
                 
-                onClicked:
-                {
-                    var children = settingsColumn.children;
-                    var childrenCount = children.length;
-                    var changesCount = 0;
-                    var entitiesCount = 0;
-                    for (var i = 0; i !== childrenCount; ++i)
-                    {
-                        var child = children[i];
-                        if (!child.hasOwnProperty("tryApplyChanges"))
-                            continue;
-                        ++entitiesCount;
-                        
-                        if (!child.tryApplyChanges())
-                            break;
-                        ++changesCount;
-                    }
-        
-                    if (changesCount && (changesCount == entitiesCount))
-                    {
-                        rtuContext.changesManager().applyChanges();
-                    }
-                    else
-                    {
-                        rtuContext.changesManager().clearChanges();
-                    }
-                }
+                onClicked: thisComponent.applyChanges();
             }
     
             Base.Button

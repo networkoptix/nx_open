@@ -16,6 +16,7 @@ TextField
     implicitHeight: Common.SizeManager.clickableSizes.medium;
     implicitWidth: implicitHeight * 4;
 
+    opacity: (enabled ? 1 : 0.5);
     text: initialText;
     font.pixelSize: Common.SizeManager.fontSizes.base;
     

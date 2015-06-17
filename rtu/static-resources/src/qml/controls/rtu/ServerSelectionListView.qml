@@ -6,10 +6,14 @@ import "../base" as Base;
 import "../../common" as Common;
 import "../../dialogs" as Dialogs;
 
+import networkoptix.rtu 1.0 as NxRtu;
+
 ListView
 {
     id: thisComponent;
 
+    signal applyChanges();
+    
     property bool askForSelectionChange: false;
 
     clip: true;
@@ -56,7 +60,6 @@ ListView
             }
         }
 
-        height: meatLoader.item.height;
         width: parent.width;
 
         sourceComponent: (model.isSystem ? systemDelegate : serverDelegate);
@@ -70,9 +73,34 @@ ListView
         }
     }
 
-    Dialogs.ConfirmSelectionChangeDialog 
+    Dialogs.MessageDialog 
     {
         id: confirmationDialog;
+        
+        property var changeSelectionFunc;
+        property var applyChangesFunc;
+        
+        buttons: (NxRtu.Buttons.ApplyChanges 
+            | NxRtu.Buttons.DiscardChanges | NxRtu.Buttons.Cancel);
+        styledButtons: NxRtu.Buttons.ApplyChanges;
+        
+        title: qsTr("Confirmation");
+        message: qsTr("Configuration changes have not been saved yet");
+        
+        onButtonClicked:
+        {
+            switch(id)
+            {
+            case NxRtu.Buttons.ApplyChanges:
+                if (applyChangesFunc)
+                    applyChangesFunc();
+                return;
+            case NxRtu.Buttons.DiscardChanges:
+                if (changeSelectionFunc)
+                    changeSelectionFunc();
+                return;
+            }
+        }
     }
 
     property QtObject impl: QtObject
@@ -81,8 +109,9 @@ ListView
         {
             if (askForSelectionChange)
             {
-                confirmationDialog.changeFunc = function() { changeFunc(index); }
-                confirmationDialog.open();
+                confirmationDialog.changeSelectionFunc = function() { changeFunc(index); }
+                confirmationDialog.applyChangesFunc = thisComponent.applyChanges;
+                confirmationDialog.show();
             }
             else
             {

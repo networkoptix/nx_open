@@ -1,9 +1,10 @@
+
+#include <QtQml>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
-#include <QtQml>
-#include <models/ip_settings_model.h>
-#include <models/servers_selection_model.h>
+
+#include <models/buttons.h>
 #include <base/constants.h>
 #include <base/rtu_context.h>
 
@@ -19,9 +20,12 @@ void registerTypes()
     };
     
     const char kServerFlagsQmlTypeName[] = "Constants";
-
     qmlRegisterUncreatableType<rtu::Constants>(kRtuDomainName
         , kMajorVersion, kMinorVersion, kServerFlagsQmlTypeName, kServerFlagsQmlTypeName);
+
+    const char kButtonsModelQmlTypeName[] = "Buttons";
+    qmlRegisterType<rtu::Buttons>(kRtuDomainName
+        , kMajorVersion, kMinorVersion, kButtonsModelQmlTypeName);
 }
 
 #include <helpers/time_helper.h>

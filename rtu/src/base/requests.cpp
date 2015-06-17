@@ -161,11 +161,13 @@ bool parseIfListCmd(const QJsonObject &object
         static const QString &kMacAddressTag = "mac";
         static const QString &kNameTag = "name";
         static const QString &kMaskTag = "netMask";
+        static const QString &kDnsTag = "dns_servers";
 
         const QJsonObject &ifObject = interface.toObject();
         if (!ifObject.contains(kDHCPTag) || !ifObject.contains(kGateWayTag)
             || !ifObject.contains(kIpAddressTag) || !ifObject.contains(kMacAddressTag)
-            || !ifObject.contains(kNameTag) || !ifObject.contains(kMaskTag))
+            || !ifObject.contains(kNameTag) || !ifObject.contains(kMaskTag)
+            || !ifObject.contains(kDnsTag))
         {
             return false;
         }
@@ -176,6 +178,7 @@ bool parseIfListCmd(const QJsonObject &object
             , ifObject.value(kMacAddressTag).toString()
             , ifObject.value(kMaskTag).toString()
             , ifObject.value(kGateWayTag).toString()
+            , ifObject.value(kDnsTag).toString().split(' ').front()
             , ifObject.value(kDHCPTag).toBool() ? Qt::Checked : Qt::Unchecked);
         interfaces.push_back(ifInfo);
     }
@@ -509,13 +512,18 @@ void rtu::sendChangeItfRequest(HttpClient *client
         static const QString kMaskTag = "netMask";
         static const QString kDHCPFlagTag = "dhcp";
         static const QString kNameTag = "name";
+        static const QString kDnsTag = "dns_servers";
+        static const QString kGatewayTag = "gateway";
         
         QJsonObject jsonInfoChange;
         if (!change.name.isEmpty())
             jsonInfoChange.insert(kNameTag, change.name);
         
-        jsonInfoChange.insert(kDHCPFlagTag, change.useDHCP);
-        affected |= rtu::kDHCPUsageAffected;
+        if (change.useDHCP)
+        {
+            jsonInfoChange.insert(kDHCPFlagTag, *change.useDHCP);
+            affected |= rtu::kDHCPUsageAffected;
+        }
         
         if (change.ip && !change.ip->isEmpty())
         {
@@ -527,6 +535,18 @@ void rtu::sendChangeItfRequest(HttpClient *client
         {
             jsonInfoChange.insert(kMaskTag, *change.mask);
             affected |= rtu::kMaskAffected;
+        }
+        
+        if (change.dns)
+        {
+            jsonInfoChange.insert(kDnsTag, *change.dns);
+            affected |= rtu::kDNSAffected;
+        }
+        
+        if (change.gateway)
+        {
+            jsonInfoChange.insert(kGatewayTag, *change.gateway);
+            affected |= rtu::kGatewayAffected;
         }
         
         jsonInfoChanges.append(jsonInfoChange);   
@@ -543,9 +563,11 @@ void rtu::sendChangeItfRequest(HttpClient *client
 
 rtu::ItfUpdateInfo::ItfUpdateInfo()
     : name()
-    , useDHCP(true)
+    , useDHCP()
     , ip()
     , mask()
+    , dns()
+    , gateway()
 {
 }
 
@@ -554,17 +576,18 @@ rtu::ItfUpdateInfo::ItfUpdateInfo(const ItfUpdateInfo &other)
     , useDHCP(other.useDHCP)
     , ip(other.ip ? new QString(*other.ip) : nullptr)
     , mask(other.mask ? new QString(*other.mask) : nullptr)
+    , dns(other.dns ? new QString(*other.dns) : nullptr)
+    , gateway(other.gateway ? new QString(*other.gateway) : nullptr)
 {
 }
 
-rtu::ItfUpdateInfo::ItfUpdateInfo(const QString &initName
-    , bool initUseDHCP
-    , const StringPointer &initIp
-    , const StringPointer &initMask)
+rtu::ItfUpdateInfo::ItfUpdateInfo(const QString &initName)
     : name(initName)
-    , useDHCP(initUseDHCP)
-    , ip(initIp ? new QString(*initIp) : nullptr)
-    , mask(initMask ? new QString(*initMask) : nullptr)
+    , useDHCP()
+    , ip()
+    , mask()
+    , dns()
+    , gateway()    
 {
 }
 
