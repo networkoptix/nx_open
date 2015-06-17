@@ -8,7 +8,9 @@ Expandable.MaskedSettingsPanel
 {
     id: thisComponent;
 
-    propertiesGroupName: qsTr("System name and password");
+    changed:  (maskedArea && maskedArea.changed?  true : false);
+    
+    propertiesGroupName: qsTr("Set System Name and Password");
 
     propertiesDelegate: Component
     {
@@ -16,17 +18,18 @@ Expandable.MaskedSettingsPanel
 
         Item
         {
-            height: settingsColumn.height + settingsColumn.anchors.topMargin;
-
+            property bool changed: systemName.changed || password.changed;
+            height: settingsColumn.height;
+            
             Connections
             {
                 target: thisComponent;
                 onApplyButtonPressed:
                 {
                     if (systemName.changed)
-                        rtuContext.changesManager().addSystemChangeRequest(systemName.text);
+                        rtuContext.changesManager().addSystemChange(systemName.text);
                     if (password.changed)
-                        rtuContext.changesManager().addPasswordChangeRequest(password.text);
+                        rtuContext.changesManager().addPasswordChange(password.text);
                 }
             }
 
@@ -39,37 +42,43 @@ Expandable.MaskedSettingsPanel
                     left: parent.left;
                     top: parent.top;
                     leftMargin: Common.SizeManager.spacing.base;
-                    topMargin: Common.SizeManager.spacing.large;
                 }
 
                 Base.Text
                 {
-                    text: qsTr("System name");
+                    text: qsTr("System Name");
+                    font.pixelSize: Common.SizeManager.fontSizes.base;
                 }
 
                 Base.TextField
                 {
                     id: systemName;
                     
+                    revertOnEmpty: true;
                     implicitWidth: implicitHeight * 6;
-
                     initialText: (rtuContext.selection && rtuContext.selection !== null ?
                         rtuContext.selection.systemName : "");
-                    changesHandler: thisComponent;
+                }
+
+                Item
+                {
+                    id: spacer;
+                    width: 1;
+                    height: Common.SizeManager.spacing.base;
                 }
 
                 Base.Text
                 {
-                    text: qsTr("New password");
+                    text: qsTr("System Password");
+                    font.pixelSize: Common.SizeManager.fontSizes.base;
                 }
 
                 Base.TextField
                 {
                     id: password;
 
+                    revertOnEmpty: true;
                     implicitWidth: systemName.implicitWidth;
-
-                    changesHandler: thisComponent;
                     initialText: rtuContext.selection.password;
                 }
             }

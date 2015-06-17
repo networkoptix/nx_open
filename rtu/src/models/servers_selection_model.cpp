@@ -119,7 +119,7 @@ namespace
         /// System's specific roles
         , kSelectedServersCountRoleId
         , kServersCountRoleId
-        , kLoggedToAllServersRoleId
+        , kLoggedState
         
         /// Server's specific roles
         , kIdRoleId
@@ -139,10 +139,10 @@ namespace
         result.insert(kIsSystemRoleId, "isSystem");
         result.insert(kNameRoleId, "name");
         result.insert(kSelectedStateRoleId, "selectedState");
-            
+
         result.insert(kSelectedServersCountRoleId, "selectedServersCount");
         result.insert(kServersCountRoleId, "serversCount");
-        result.insert(kLoggedToAllServersRoleId, "loggedToAllServers");
+        result.insert(kLoggedState, "loggedState");
 
         result.insert(kIdRoleId, "id");
         result.insert(kSystemNameRoleId, "systemName");
@@ -234,6 +234,7 @@ public:
         , const QDateTime &timestamp);
     
     void updateInterfacesInfo(const QUuid &id
+        , const QString &host
         , const InterfaceInfoList &interfaces);
 
     void updateSystemNameInfo(const QUuid &id
@@ -366,14 +367,14 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         case kIdRoleId:
             return info.baseInfo().id;
         case kMacAddressRoleId:
-            return info.baseInfo().id.toString();
+            return (info.hasExtraInfo() && !info.extraInfo().interfaces.empty() ? 
+                info.extraInfo().interfaces.front().macAddress : "");//QString("--:--:--:--:--:--"));
         case kLogged:
             return info.hasExtraInfo();
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
             return (info.hasExtraInfo() && rtu::defaultAdminPasswords().contains(info.extraInfo().password));
-            
         case kIpAddressRoleId: 
             return (!serverInfo.serverInfo.hasExtraInfo() || (info.extraInfo().interfaces.empty())
                 ? QVariant() : QVariant::fromValue(info.extraInfo().interfaces));
@@ -392,9 +393,10 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         case kSelectedStateRoleId:
             return (systemInfo.servers.empty() || !systemInfo.selectedServers ? Qt::Unchecked :
                 (systemInfo.selectedServers == systemInfo.servers.size() ? Qt::Checked : Qt::PartiallyChecked));
-            
-        case kLoggedToAllServersRoleId:
-            return (systemInfo.loggedServers == systemInfo.servers.size());
+        case kLoggedState:
+            return (!systemInfo.loggedServers ? Constants::NotLogged 
+                : (systemInfo.loggedServers == systemInfo.servers.size() ? Constants::LoggedToAllServers
+                : Constants::PartiallyLogged));
         case kSelectedServersCountRoleId:
             return systemInfo.selectedServers;
         case kServersCountRoleId:
@@ -539,29 +541,6 @@ void rtu::ServersSelectionModel::Impl::tryLoginWith(const QString &password)
         }
     }
 }
-/*
-void rtu::ServersSelectionModel::Impl::selectionPasswordChanged(const QString &password)
-{
-    for (SystemModelInfo &system: m_systems)
-    {
-        if (system.selectedServers)
-        {
-            for (ServerModelInfo &info: system.servers)
-            {
-                if (info.selectedState == Qt::Unchecked)
-                    continue;
-
-                if (info.serverInfo.hasExtraInfo())
-                {
-                    info.serverInfo.resetExtraInfo();
-                    --system.loggedServers;
-                }
-                m_loginManager->loginToServer(info.serverInfo.baseInfo(), password);
-            }
-        }
-    }
-}
-*/
 
 void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
     , const QDateTime &utcDateTime
@@ -583,6 +562,7 @@ void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
 }
 
 void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
+    , const QString &host
     , const InterfaceInfoList &interfaces)
 {
     ItemSearchInfo searchInfo;
@@ -590,10 +570,27 @@ void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
         return;
     
     ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
+    info.writableBaseInfo().hostAddress = host;
     if (!info.hasExtraInfo())
         info.setExtraInfo(ExtraServerInfo());
     
-    info.writableExtraInfo().interfaces = interfaces;
+    ExtraServerInfo &extra = info.writableExtraInfo();
+    for (const InterfaceInfo &itf: interfaces)
+    {
+        InterfaceInfoList &oldItf = extra.interfaces;
+        const auto &it = std::find_if(oldItf.begin(), oldItf.end()
+            , [itf](const InterfaceInfo &param)
+        {
+            return (param.name == itf.name);
+        });
+        
+        if (it == oldItf.end())
+        {
+            oldItf.push_back(itf);
+            continue;
+        }    
+        *it = itf;
+    }
 }
 
 void rtu::ServersSelectionModel::Impl::updateSystemNameInfo(const QUuid &id
@@ -606,6 +603,7 @@ void rtu::ServersSelectionModel::Impl::updateSystemNameInfo(const QUuid &id
     BaseServerInfo base =
         searchInfo.serverInfoIterator->serverInfo.baseInfo();
     base.systemName = systemName;
+    base.flags &= ~Constants::IsFactoryFlag;
     changeServer(base);
 }
 
@@ -629,16 +627,22 @@ void rtu::ServersSelectionModel::Impl::updatePasswordInfo(const QUuid &id
     if (!findServer(id, searchInfo))
         return;
 
-    for (ServerModelInfo &serverInfo: searchInfo.systemInfoIterator->servers)
+    ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
+    if (!info.hasExtraInfo())
+        info.setExtraInfo(ExtraServerInfo());
+
+    const QString oldPassword = info.extraInfo().password;
+    info.writableExtraInfo().password = password;
+    
+    for (ServerModelInfo &otherInfo: searchInfo.systemInfoIterator->servers)
     {
-
-        ServerInfo &info = serverInfo.serverInfo;
-        if (!info.hasExtraInfo())
-            info.setExtraInfo(ExtraServerInfo());
-
-        info.writableExtraInfo().password = password;
+        if ((info.baseInfo().systemName == otherInfo.serverInfo.baseInfo().systemName)
+            && (oldPassword == info.extraInfo().password))
+        {
+            otherInfo.serverInfo.writableExtraInfo().password = oldPassword;
+        }
     }
-
+        
     m_changeHelper->dataChanged(searchInfo.systemRowIndex
         , searchInfo.systemRowIndex + searchInfo.systemInfoIterator->servers.size());
 }
@@ -696,11 +700,10 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
         removeServerImpl(baseInfo.id, targetSystemExists);
         
         SystemModelInfo &system = *searchInfo.systemInfoIterator;
-        if (!targetSystemExists && system.servers.empty())
-        {
+        const bool inplaceRename = !targetSystemExists && system.servers.empty();
+        if (inplaceRename)
             system.name = baseInfo.systemName;
-            m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
-        }
+//            m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
 
         foundServer.setBaseInfo(baseInfo);
         addServer(foundServer, selected);
@@ -835,9 +838,10 @@ void rtu::ServersSelectionModel::updateTimeDateInfo(const QUuid &id
 }
 
 void rtu::ServersSelectionModel::updateInterfacesInfo(const QUuid &id
+    , const QString &host                                                      
     , const InterfaceInfoList &interfaces)
 {
-    m_impl->updateInterfacesInfo(id, interfaces);
+    m_impl->updateInterfacesInfo(id, host, interfaces);
 }
 
 void rtu::ServersSelectionModel::updateSystemNameInfo(const QUuid &id
@@ -870,8 +874,9 @@ rtu::ServerInfoList rtu::ServersSelectionModel::selectedServers()
 
 int rtu::ServersSelectionModel::rowCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent);
-    return m_impl->rowCount();
+    if (!parent.isValid())
+        return m_impl->rowCount();
+    return 0;
 }
 
 QVariant rtu::ServersSelectionModel::data(const QModelIndex &index
@@ -886,4 +891,4 @@ QVariant rtu::ServersSelectionModel::data(const QModelIndex &index
 rtu::Roles rtu::ServersSelectionModel::roleNames() const
 {
     return kRolesDescription;
-}
+} 

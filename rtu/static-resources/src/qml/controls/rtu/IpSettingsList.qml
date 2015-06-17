@@ -8,12 +8,25 @@ import "../../common" as Common;
 Base.Column
 {
     id: thisComponent;
-    
-    property var changesHandler;
 
+    property bool changed:
+    {      
+        var result = false;
+        var children = column.children;
+        for (var i = 0; i !== children.length; ++i)
+        {
+            var item = children[i];
+            if (!item.hasOwnProperty("changed"))
+                continue;
+            
+            result |= item.changed;
+        }
+        return result;
+    }
+    
     function applyButtonPressed()
     {
-        if (!thisComponent.changesHandler || !thisComponent.changesHandler.changed)
+        if (!thisComponent.changed)
             return;
 
         var children = column.children;
@@ -21,15 +34,23 @@ Base.Column
         {
             var item = children[i];
             if (!item.hasOwnProperty("adapterNameValue")|| !item.hasOwnProperty("isSingleSelectionModel") 
-                || !item.hasOwnProperty("changed") || !item.changed)
+                || !item.hasOwnProperty("changed") || !item.hasOwnProperty("isSingleSelectionModel")
+                || !item.changed)
             {
                 continue;
             }
             
+            if (!item.isSingleSelectionModel)
+            {
+                var forceUseDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
+                rtuContext.changesManager().turnOnDhcp();
+                return;
+            }
+
             var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
-            var ipAddress = (item.ipAddressControl.changed && !useDHCP ? item.ipAddressControl.text : "");
-            var subnetMask = (item.subnetMaskControl.changed && !useDHCP ? item.subnetMaskControl.text : "");
-            rtuContext.changesManager().addIpChangeRequest(
+            var ipAddress = (item.ipAddressControl.changed || !useDHCP ? item.ipAddressControl.text : "");
+            var subnetMask = (item.subnetMaskControl.changed || !useDHCP ? item.subnetMaskControl.text : "");
+            rtuContext.changesManager().addIpChange(
                 item.adapterNameValue, useDHCP, ipAddress, subnetMask);
         }
     }
@@ -41,21 +62,22 @@ Base.Column
         anchors
         {
             left: parent.left;            
-            leftMargin: Common.SizeManager.spacing.base;
         }
 
         Repeater
         {
             id: repeater;
+            
             model: rtuContext.ipSettingsModel();
             
             delegate: Rtu.IpChangeLine
             {
-                changesHandler: thisComponent.changesHandler;        
-                
                 isSingleSelectionModel: (repeater.model ? repeater.model.isSingleSelection : true);
                 
-                useDHCPControl.initialCheckedState: useDHCP;
+                useDHCPControl.initialCheckedState: (isSingleSelectionModel ? useDHCP : false);
+                useDHCPControl.text: (isSingleSelectionModel ? qsTr("Use DHCP") : qsTr("Force use DHCP on selection"));
+                
+
                 ipAddressControl.initialText: (isSingleSelectionModel ? address : qsTr("Multiple interfaces"));
                 subnetMaskControl.initialText: (isSingleSelectionModel ? subnetMask : qsTr("Multiple interfaces"));
                 

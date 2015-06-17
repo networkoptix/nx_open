@@ -85,43 +85,46 @@ namespace
         if (servers.empty())
             return QDateTime();
         
-        const int selectedCount = servers.size();
-        const rtu::ServerInfo &firstInfo = **servers.begin();
-        if (selectedCount == kSingleServerSelectionCount)
-        {
-            if (!firstInfo.hasExtraInfo())
-                return QDateTime();
-
-            return rtu::convertUtcToTimeZone(firstInfo.extraInfo().utcDateTime
-                , firstInfo.extraInfo().timeZone);
-        }
-        else if (!(flags & rtu::Constants::ServerFlag::AllowChangeDateTimeFlag))
-        {
-            return QDateTime();
-        }
-    
-        static const auto &eq = [](const QDateTime &first, const QDateTime &second) -> bool
-        {
-            enum { kEps = 3 * 1000};    /// 3 seconds
-            return (std::abs(first.toMSecsSinceEpoch() - second.toMSecsSinceEpoch()) < kEps);
-        };
-    
         const qint64 now = QDateTime::currentMSecsSinceEpoch();
         const auto &getter = [now](const rtu::ServerInfo &info) -> QDateTime
         {
             if (!info.hasExtraInfo())
                 return QDateTime();
-            
+
             const qint64 dateMsecs = info.extraInfo().utcDateTime.toMSecsSinceEpoch();
             const qint64 timestamp = info.extraInfo().timestamp.toMSecsSinceEpoch();
             return QDateTime::fromMSecsSinceEpoch(dateMsecs + (now - timestamp));
         };
+
+        const int selectedCount = servers.size();
+        if (selectedCount == kSingleServerSelectionCount)
+        {
+            const rtu::ServerInfo &firstInfo = **servers.begin();
+            const QDateTime time = getter(firstInfo);
+            if (!time.isValid() || time.isNull())
+                return QDateTime();
+
+            return rtu::convertUtcToTimeZone(time, firstInfo.extraInfo().timeZone);
+        }
+    
+        static const auto &eq = [](const QDateTime &first, const QDateTime &second) -> bool
+        {
+            enum { kEps = 130 * 1000};    /// 30 seconds
+            return (std::abs(first.toMSecsSinceEpoch() - second.toMSecsSinceEpoch()) < kEps);
+        };
+    
     
         const QDateTime result = getSelectionValue<QDateTime>(
             servers, QDateTime(), QDateTime(), eq, getter);
 
-        return result;
-        return (!result.isNull() && result.isValid() ? result.toLocalTime() : QDateTime());
+        const QByteArray tz = getSelectionValue<QByteArray>(servers, QByteArray(), QByteArray()
+            , std::equal_to<QByteArray>(), [](const rtu::ServerInfo &info) -> QByteArray
+        {
+            return (info.hasExtraInfo() ? info.extraInfo().timeZone.id() : QByteArray());
+        });
+
+        return (result.isNull() || !result.isValid() || tz.isEmpty() ?
+            QDateTime() : rtu::convertUtcToTimeZone(result, QTimeZone(tz)));
     }
 
     

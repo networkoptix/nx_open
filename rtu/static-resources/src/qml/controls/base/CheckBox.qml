@@ -8,12 +8,12 @@ CheckBox
 {
     id: thisComponent;
 
-    property bool changed: false;
+    property bool changed: checkedState != initialCheckedState;
         
-    property var changesHandler;
     property int initialCheckedState: Qt.Checked;
-    property int fontSize: Common.SizeManager.fontSizes.medium;
+    property int fontSize: Common.SizeManager.fontSizes.base;
 
+    opacity: enabled ? 1.0 : 0.5;
     checkedState: initialCheckedState;
 
     style: CheckBoxStyle
@@ -24,20 +24,9 @@ CheckBox
         {
             id: checkboxLabel;
 
-            font.pointSize: thisComponent.fontSize;
+            font.pixelSize: thisComponent.fontSize;
             text: thisComponent.text;
             renderType: Text.NativeRendering;
-        }
-    }
-
-    onCheckedStateChanged: 
-    {
-        if (checkedState != initialCheckedState)
-        {
-            if (changesHandler)
-                changesHandler.changed = true;
-
-            changed = true;
         }
     }
 }

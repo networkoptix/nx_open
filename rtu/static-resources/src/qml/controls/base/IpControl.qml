@@ -1,40 +1,34 @@
 import QtQuick 2.1;
-import QtQuick.Controls 1.1;
 
-TextField
+import "../base" as Base;
+
+
+Base.TextField
 {
     id: thisComponent;
 
-    signal ipAddressChanged;
-    property alias correct: thisComponent.acceptableInput;
-
-    focus: true;
-    inputMask: "000.000.000.000; "
+    property string defaultEmptyValue: "0.0.0.0";
+    
     validator: RegExpValidator
     {
         regExp: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     }
 
-    onActiveFocusChanged:
+    text: initialText;
+    
+    onActiveFocusChanged: 
     {
-        if (activeFocus)
+        if (!activeFocus && !acceptableInput)
         {
-            selectAll();
+            if (initialText.length !== 0)
+            {
+                text = initialText;
+            }
+            else
+            {
+                text = defaultEmptyValue;
+            }
         }
-        else if (!acceptableInput)
-        {
-//            cursorPosition = 1;
-            selectAll();
-//            forceActiveFocus();
-        }
-
-
-    }
-
-    onEditingFinished:
-    {
-        if (!acceptableInput)
-            selectAll();
     }
 }
 

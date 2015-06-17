@@ -5,158 +5,143 @@ import "../rtu" as Rtu;
 import "../base" as Base;
 import "../../common" as Common;
 
+import networkoptix.rtu 1.0 as NxRtu;
+
 Item
 {
     id: thisComponent;
 
-    property bool logged: model.logged;
+    property int selectedState;
+    property bool logged;
+    property string serverName;
+    property string macAddress;
     
     signal selectionStateShouldBeChanged(int currentItemIndex);
     signal explicitSelectionCalled(int currentItemIndex);
-
+    
     height: column.height;
     anchors
     {
         left: parent.left;
         right: parent.right;
     }
-
-    Base.Column
+    
+    opacity: (logged ? 1 : 0.3);
+    
+    Column
     {
         id: column;
 
+        spacing: Common.SizeManager.spacing.base;
         anchors
         {
             left: parent.left;
             right: parent.right;
+                
+            leftMargin: Common.SizeManager.spacing.medium;
+            rightMargin: Common.SizeManager.spacing.medium;
         }
-
-        spacing: Common.SizeManager.spacing.small;
 
         Item
         {
-            id: topSpacer;
-            height: Common.SizeManager.spacing.base;
-
-            anchors
-            {
-                left: parent.left;
-                right: parent.right;
-            }
+            id: bottomSpacer;
+            
+            width: parent.width;
+            height: Common.SizeManager.spacing.small;
         }
-
+        
         Item
         {
             id: placer;
 
             height: descriptionColumn.height;
-            anchors
+            width: parent.width;
+
+            Base.CheckBox
             {
-                left: parent.left;
-                right: parent.right;
-            }
-
-            Rectangle
-            {
-                id: selectionChackboxHolder;
-                
-                width: Common.SizeManager.clickableSizes.medium * 1.5;
-                height: Common.SizeManager.clickableSizes.medium;
-
-                Base.CheckBox
-                {
-                    id: selectionCheckbox;
-
-                    anchors.centerIn: parent;
-
-                    onClicked: 
-                    {
-                        if (thisComponent.logged)
-                        {
-                            thisComponent.selectionStateShouldBeChanged(index); 
-                        }
-                        else
-                        {
-                            thisComponent.ss = 3;
-                        }
-                    }
-
-                    Binding
-                    {
-                        target: selectionCheckbox;
-                        property: "checkedState";
-                        value: model.selectedState;
-                    }
-                }
-            }
-
-            Base.Column
-            {
-                id: descriptionColumn;
-
+                id: selectionCheckbox;
+            
                 anchors
                 {
-                    left: selectionChackboxHolder.right;
-                    right: loggedState.right;
+                    left: parent.left;
+                    verticalCenter: parent.verticalCenter;                    
                 }
 
-                spacing: Common.SizeManager.spacing.small;
-
-                Base.Text
+                onClicked: 
                 {
-                    id: caption;
-
-                    anchors
-                    {
-                        left: parent.left;
-                        right: parent.right;
-                    }
-
-                    font.bold: true;
-                    text: model.name;
+                    if (logged)
+                        thisComponent.selectionStateShouldBeChanged(index); 
                 }
 
-                Base.Text
+                Binding
                 {
-                    id: macAddress;
-
-                    anchors
-                    {
-                        left: parent.left;
-                        right: parent.right;
-                    }
-
-                    font.pointSize: Common.SizeManager.fontSizes.base;
-                    text: model.macAddress;
+                    target: selectionCheckbox;
+                    property: "checkedState";
+                    value: selectedState;
                 }
             }
             
-            Rectangle
+            Item
             {
-                id: loggedState;
-                
-                height: width;
-                width: selectionChackboxHolder.height;
+                id: descriptionColumn;
+
+                height: serverNameText.height + textSpacer.height
+                    + (macAddressText.visible ? macAddressText.height : 0);
                 
                 anchors
                 {
-                    verticalCenter: selectionChackboxHolder.verticalCenter;
+                    left: selectionCheckbox.right;
                     right: parent.right;
+                    
+                    leftMargin: Common.SizeManager.spacing.medium;
+                    rightMargin: Common.SizeManager.spacing.medium;
                 }
 
-                color: (!thisComponent.logged ? "red" : (model.defaultPassword ? "white" : "green"));
-            }
+                Base.Text
+                {
+                    id: serverNameText;
+                    
+                    anchors
+                    {
+                        left: parent.left;
+                        right: parent.right;
+                    }
 
+                    text: serverName;
+                    font.pixelSize: Common.SizeManager.fontSizes.base;
+                }
+                
+                Item
+                {
+                    id: textSpacer;
+                    
+                    width: parent.width;
+                    height: (visible ? Common.SizeManager.spacing.small : 0);
+                    visible: macAddressText.visible;
+                    
+                    anchors.top: serverNameText.bottom;
+                }
+
+                Base.Text
+                {
+                    id: macAddressText;
+                    
+                    anchors
+                    {
+                        left: parent.left;
+                        right: parent.right;
+                        top: textSpacer.bottom;
+                    }
+                    visible: (text.length !== 0);
+                    text: macAddress;
+                    font.pixelSize: Common.SizeManager.fontSizes.small;
+                }
+            }
         }
 
         Base.LineDelimiter
         {
-            color: "lightgrey";
-            anchors
-            {
-                left: parent.left;
-                right: parent.right;
-            }
+            color: "#e4e4e4";
         }
     }
 
@@ -170,15 +155,8 @@ Item
         onDoubleClicked:
         {
             clickFilterTimer.stop();
-            
             if (thisComponent.logged)
-            {
                 thisComponent.explicitSelectionCalled(index);
-            }
-            else
-            {
-                thisComponent.ss = 3;
-            }
         }
 
         Timer
@@ -189,20 +167,15 @@ Item
             onTriggered: 
             {
                 if (thisComponent.logged)
-                {
                     thisComponent.selectionStateShouldBeChanged(index); 
-                }
-                else
-                {
-                    thisComponent.ss = 3;
-                }
             }
         }
     }
 
-    Rtu.SelectionMark
+    Rtu.Mark
     {
-        selected: (model.selectedState === Qt.Checked);
+        enabled: logged;
+        selected: (selectedState === Qt.Checked);
         anchors.fill: parent;
     }
 }

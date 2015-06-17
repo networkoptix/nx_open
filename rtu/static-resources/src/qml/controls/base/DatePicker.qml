@@ -13,52 +13,48 @@ QtControls.TextField
         text = impl.stringFromDate(newTime);
     }
 
+    property bool showNow: false;
     property bool changed: false;    
-    property var changesHandler;
+    property int fontSize: Common.SizeManager.fontSizes.base;
     
     property var date;
     property var initDate;
     
     height: Common.SizeManager.clickableSizes.medium;
     width: height * 3;
+    
     opacity: enabled ? 1.0 : 0.5;
+    
+    text: impl.stringFromDate(initDate);
+    inputMask: impl.mask;
+    
+    enabled: !showNow;
 
-    text: (enabled ? impl.stringFromDate(initDate) : "<now>");
-
-    onEnabledChanged:
+    onShowNowChanged:
     {
-        inputMask = (enabled ? impl.mask : "");
-        text = (enabled ? impl.stringFromDate(date) : qsTr("<now>"));
+        inputMask = (showNow ? "" : impl.mask);
+        text = (showNow ? qsTr("<now>") : impl.stringFromDate(initDate));
     }
 
-    font.pointSize: Common.SizeManager.fontSizes.medium;
+    font.pixelSize: fontSize;
     
     style: TextFieldStyle
     {
         renderType: Text.NativeRendering;
     }
 
-    inputMask: impl.mask;
-    
-    onChangedChanged: 
-    {
-        if (changesHandler)
-            changesHandler.changed = true;
-    }
-
     onTextChanged: 
     {
-        date = Date.fromLocaleDateString(Qt.locale(), text, Locale.ShortFormat);
+        date = Date.fromLocaleDateString(Qt.locale(), text, impl.dateFormat);
         if (!initDate && (text === impl.emptyMaskValue))
             return;
         
-        if (initDate && date && (impl.stringFromDate(initDate) !== impl.stringFromDate(date)))
-            thisComponent.changed = true;
+        thisComponent.changed = initDate && date && (impl.stringFromDate(initDate) !== impl.stringFromDate(date));
     }
     
     property QtObject impl: QtObject
     {
-        readonly property string dateFormat: Qt.locale().dateFormat(Locale.NarrowFormat);
+        readonly property string dateFormat: "dd.MM.yyyy";
         readonly property string mask: (dateFormat.replace(new RegExp(/[a-zA-Z0-9]/g), "9") + ";-");
         readonly property string emptyMaskValue: ":";  
     

@@ -20,8 +20,6 @@ namespace rtu
         Q_PROPERTY(int totalChangesCount READ totalChangesCount NOTIFY totalChangesCountChanged)
         Q_PROPERTY(int appliedChangesCount READ appliedChangesCount NOTIFY appliedChangesCountChanged)
 
-        Q_PROPERTY(int errorsCount READ errorsCount NOTIFY errorsCountChanged)
-
     public:
         ChangesManager(RtuContext *context
             , HttpClient *httpClient
@@ -35,25 +33,23 @@ namespace rtu
         
         QObject *failedResultsModel();
         
-        void addSystemChangeRequest(const QString &newSystemName);
+        void addSystemChange(const QString &systemName);
         
-        void addPasswordChangeRequest(const QString &password);
+        void addPasswordChange(const QString &password);
         
-        void addPortChangeRequest(int port);
+        void addPortChange(int port);
         
-        void addIpChangeRequest(const QString &name
+        void addIpChange(const QString &name
             , bool useDHCP                                
             , const QString &address
-            , const QString &subnetMask);
-        
-        void addSelectionDHCPStateChange(bool useDHCP);
+            , const QString &mask);
         
         void addDateTimeChange(const QDate &date
             , const QTime &time
             , const QByteArray &timeZoneId);
-        
-        void clearChanges();
 
+        void turnOnDhcp();
+        
         void applyChanges();
         
     public slots:
@@ -61,16 +57,12 @@ namespace rtu
         
         int appliedChangesCount() const;
         
-        int errorsCount() const;
-
         void serverDiscovered(const rtu::BaseServerInfo &info);
         
     signals:
         void totalChangesCountChanged();
         
         void appliedChangesCountChanged();
-        
-        void errorsCountChanged();
         
     private:
         class Impl;

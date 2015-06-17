@@ -6,11 +6,15 @@ import "../controls/rtu" as Rtu;
 import "../controls/base" as Base;
 import "../controls/expandable" as Expandable;
 
+import networkoptix.rtu 1.0 as Utils;
+
 Expandable.MaskedSettingsPanel
 {
     id: thisComponent;
+    
+    changed:  (maskedArea && maskedArea.changed?  true : false);
 
-    propertiesGroupName: qsTr("IP address and port");
+    propertiesGroupName: qsTr("Configure Device Network Settings");
 
     propertiesDelegate: Component
     {
@@ -18,40 +22,57 @@ Expandable.MaskedSettingsPanel
 
         Row
         {
+            property bool changed: portNumber.changed || flagged.changed;
+            
             spacing: Common.SizeManager.spacing.large;
             
-            height: ((ipList.height ? ipList.height : portColumn.height) + anchors.topMargin);
+            height: Math.max(flagged.height, portColumn.height);
          
             anchors
             {
+                left: (parent ? parent.left : undefined);
+                top: (parent ? parent.top : undefined);
                 leftMargin: Common.SizeManager.spacing.base;
-                topMargin: Common.SizeManager.spacing.base;
             }
 
-            Rtu.IpSettingsList
+            Rtu.FlaggedItem
             {
-                id: ipList;
-            
-                changesHandler: thisComponent;
+                id: flagged;
+
+                property bool changed: (showFirst && currentItem.changed ? true : false);
+                
+                anchors
+                {
+                   top: (showFirst ? parent.top : undefined);
+                   verticalCenter: (showFirst ? undefined : parent.verticalCenter);
+                }
+                
+                message: qsTr("Can not change interfaces settings for some selected servers");
+                showItem: ((Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags)
+                    || (rtuContext.selection.count === 1));
+                
+                item: Rtu.IpSettingsList
+                {
+                    id: ipList;
+                    enabled: (Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags);
+                }
             }
-             
+        
             Base.Column
             {
                 id: portColumn;
-                         
+                
                 Base.Text
                 {
-                    text: qsTr("Port number:");
+                    text: qsTr("Port:");
                 }
                 
-                Base.TextField
+                Base.PortControl
                 {
                     id: portNumber;
                     
-                    changesHandler: thisComponent;
-                    
-                    width: Common.SizeManager.clickableSizes.base * 2.5;
-                    initialText: rtuContext.selection.port;
+                    width: Common.SizeManager.clickableSizes.base * 3;
+                    initialPort: rtuContext.selection.port;
                 }
             }
             
@@ -62,9 +83,10 @@ Expandable.MaskedSettingsPanel
                 onApplyButtonPressed:
                 {
                     if (portNumber.changed)
-                        rtuContext.changesManager().addPortChangeRequest(Number(portNumber.text));
+                        rtuContext.changesManager().addPortChange(Number(portNumber.text));
                     
-                    ipList.applyButtonPressed();       
+                    if (flagged.showFirst)
+                        flagged.currentItem.applyButtonPressed();       
                 }
             }
         }

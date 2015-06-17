@@ -8,8 +8,23 @@ Base.Column
 {
     id: thisComponent;
     
-    anchors.fill: parent;
+    anchors
+    {
+        left: (parent ? parent.left : undefined);
+        right: (parent ? parent.right : undefined);
+        top: (parent ? parent.top : undefined);
+        bottom: (parent ? parent.bottom : undefined);
+        
+        leftMargin: Common.SizeManager.spacing.medium;
+        rightMargin: Common.SizeManager.spacing.medium;
+        topMargin: Common.SizeManager.spacing.medium;
+        bottomMargin: Common.SizeManager.spacing.medium;
+    }           
 
+    property string caption;
+    property int changesCount;
+    property int currentCount;
+    
     Base.Text
     {
         id: caption;
@@ -18,20 +33,19 @@ Base.Column
         {
             left: parent.left;
             right: parent.right;
-            leftMargin: Common.SizeManager.spacing.base;
-            rightMargin: Common.SizeManager.spacing.base;
         }
 
-        text: qsTr("Applying changes...");
-        font
-        {
-            bold: true;
-            pointSize: Common.SizeManager.fontSizes.large;
-        }
+        text: thisComponent.caption;
+        thin: false;
+        wrapMode: Text.Wrap;
+        font.pixelSize: Common.SizeManager.fontSizes.large;
     }
 
 
-    Base.LineDelimiter { }
+    Base.LineDelimiter 
+    {
+        color: "#e4e4e4";
+    }
 
     ProgressBar
     {
@@ -42,13 +56,11 @@ Base.Column
         {
             left: parent.left;
             right: parent.right;
-            leftMargin: Common.SizeManager.spacing.base;
-            rightMargin: Common.SizeManager.spacing.base;
         }
 
         minimumValue: 0;
-        maximumValue: rtuContext.changesManager().totalChangesCount;
-        value: rtuContext.changesManager().appliedChangesCount;
+        maximumValue: thisComponent.changesCount;
+        value: currentCount;
     }
 
 }

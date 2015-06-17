@@ -10,16 +10,13 @@ Grid
     property bool changed: (useDHCPCheckBox.changed || ipControl.changed || subnetMask.changed);
     property bool isSingleSelectionModel: false;
 
-    property var changesHandler;
-
     readonly property alias useDHCPControl: useDHCPCheckBox;
     readonly property alias ipAddressControl: ipControl;
     readonly property alias subnetMaskControl: subnetMask;
 
     property string adapterNameValue;
 
-    spacing: Common.SizeManager.spacing.small;
-
+    spacing: Common.SizeManager.spacing.base;
     columns: 3;
 
 
@@ -27,20 +24,14 @@ Grid
     {
         id: adapterName;
 
-        height: Common.SizeManager.clickableSizes.base;
-
         text: (thisComponent.isSingleSelectionModel ? readableName: qsTr("Multiple interfaces"));
-        verticalAlignment: Text.AlignVCenter;
     }
 
     Base.Text
     {
         id: subnetMaskCaption;
 
-        height: Common.SizeManager.clickableSizes.base;
-
         text: (thisComponent.isSingleSelectionModel && (model.index === 0) ? "Mask": " ");
-        verticalAlignment: Text.AlignVCenter;
     }
 
     Item
@@ -50,21 +41,17 @@ Grid
         height: 1;
     }
 
-    Base.TextField
+    Base.IpControl
     {
         id: ipControl
-
-        changesHandler: thisComponent.changesHandler;
 
         enabled: !useDHCPCheckBox.checked && thisComponent.isSingleSelectionModel;
         opacity: ( enabled ? 1 : 0.5 );
     }
 
-    Base.TextField
+    Base.IpControl
     {
         id: subnetMask;
-
-        changesHandler: thisComponent.changesHandler;
 
         enabled: !useDHCPCheckBox.checked && thisComponent.isSingleSelectionModel;
         opacity: ( enabled ? 1 : 0.5 );
@@ -76,7 +63,5 @@ Grid
 
         height: subnetMask.height;
         text: qsTr("Use DHCP");
-
-        changesHandler: thisComponent.changesHandler;
     }
 }

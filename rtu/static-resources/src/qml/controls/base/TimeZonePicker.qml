@@ -1,6 +1,8 @@
 import QtQuick 2.1;
 import QtQuick.Controls 1.1;
+import QtQuick.Controls.Styles 1.1;
 
+import "." as Base;
 import "../../common" as Common;
 
 ComboBox
@@ -9,40 +11,32 @@ ComboBox
     
     signal timeZoneChanged(string from, string to);
     
-    property bool changed: false;
-    property var changesHandler;
+    property bool changed: (currentIndex !== initIndex);
     
     property int initIndex: init;
     property int lastSelectedIndex;
+    property int fontSize: Common.SizeManager.fontSizes.base;
     
     height: Common.SizeManager.clickableSizes.medium;
-    width: height * 3;
+    width: height * 4;
     opacity: enabled ? 1.0 : 0.5;
 
     currentIndex: initIndex;
     
     textRole: "display";
     
-    onChangedChanged: 
-    {
-        if (changesHandler)
-            changesHandler.changed = true;
-    }
-    
     property bool firstTimeChange: true;
     
     onCurrentIndexChanged:
     {
+        console.log("----------------- " + initIndex + ":" + currentIndex);
         if ((currentIndex == initIndex) && firstTimeChange)
         {
             firstTimeChange = false;
             lastSelectedIndex = currentIndex;
         }
 
-        if (changesHandler && (currentIndex !== initIndex))
-            thisComponent.changed = true;
-
-        if (!changed)
+        if ((currentIndex === initIndex) )
             return;
         
         var newTimeZone = textAt(currentIndex);
@@ -57,4 +51,15 @@ ComboBox
         lastSelectedIndex = currentIndex;
     }
     
+    style: ComboBoxStyle
+    {
+        label: Base.Text
+        {
+            font.pixelSize: fontSize;
+            text: thisComponent.currentText;
+            verticalAlignment: Text.AlignVCenter;
+        }
+    }
+
+    onTimeZoneChanged: console.log(from + ":" + to);
 }

@@ -162,8 +162,15 @@ QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     , const QByteArray &prevTimeZoneId
     , const QByteArray &newTimeZoneId)
 {
-    return convertDateTime(date, time, QTimeZone(prevTimeZoneId)
-        , QTimeZone(newTimeZoneId)).toLocalTime();
+    const QTimeZone prevTimeZone(prevTimeZoneId);
+    const QTimeZone nextTimeZone(newTimeZoneId);
+    if (date.isNull() || time.isNull() || !prevTimeZone.isValid()
+        || !nextTimeZone.isValid() || !date.isValid() || !time.isValid())
+    {
+        return QDateTime();
+    }
+    \
+    return convertDateTime(date, time, prevTimeZone, nextTimeZone).toLocalTime();
 }
 
 void rtu::RtuContext::tryLoginWith(const QString &password)

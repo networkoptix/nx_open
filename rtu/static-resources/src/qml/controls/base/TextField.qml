@@ -8,30 +8,39 @@ TextField
 {
     id: thisComponent;
 
-    property bool changed: false;
+    property bool revertOnEmpty: false;
+    property bool changed: (text !== initialText);
     
     property string initialText: "";
-    property var changesHandler;
-    
+
     implicitHeight: Common.SizeManager.clickableSizes.medium;
     implicitWidth: implicitHeight * 4;
 
     text: initialText;
-    font.pointSize: Common.SizeManager.fontSizes.medium;
+    font.pixelSize: Common.SizeManager.fontSizes.base;
     
+    Binding
+    {
+        target: thisComponent;
+        property: "text";
+        value: initialText;
+    }
+   
     style: TextFieldStyle
     {
         renderType: Text.NativeRendering;
     }
 
-    onTextChanged: 
+    onActiveFocusChanged: 
     {
-        if (changesHandler && (text !== initialText))
+        if (activeFocus)
         {
-            thisComponent.changesHandler.changed = true;
-            thisComponent.changed = true;
+            selectAll();
+        }
+        else if (revertOnEmpty && text.length === 0)
+        {
+            text = initialText;
         }
     }
-    
 }
 

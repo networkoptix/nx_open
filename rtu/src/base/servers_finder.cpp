@@ -37,7 +37,7 @@ namespace
     enum 
     {
         kUpdateServersInfoInterval = 500
-        , kServerAliveTimeout = 100 * 1000
+        , kServerAliveTimeout = 1000 * 1000
     };
 }
 
@@ -81,7 +81,7 @@ namespace
                 for (const TextFlagsInfo &flagInfo: kKnownFlags)
                 {
                     if (textFlags.contains(flagInfo.first))
-                        info.flags &= flagInfo.second;
+                        info.flags |= flagInfo.second;
                 }
             });
         return result;
@@ -109,8 +109,9 @@ namespace
 
         const QStringList &keys = jsonObject.keys();
         
-        if (!jsonObject.value("systemName").toString().contains("rtu_"))
-            return false;
+//        if (!jsonObject.value("systemName").toString().contains("__rtu")
+  //              && !jsonObject.value("systemName").toString().contains("nx1"))
+    //        return false;
         
         for (const auto &key: keys)
         {
