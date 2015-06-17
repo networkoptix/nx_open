@@ -27,9 +27,9 @@ namespace Qn
     {
         enum mode_t
         {
-            NotOpen         = 0x0000,
-            ReadOnly        = 0x0001,
-            WriteOnly       = 0x0002,
+            NotOpen         = 0x0001,
+            ReadOnly        = 0x0002,
+            WriteOnly       = 0x0004,
             ReadWrite       = ReadOnly | WriteOnly,
         };
     }
@@ -41,11 +41,11 @@ namespace Qn
     {
         enum cap_t
         {
-            ListFile        = 0x0000,                   // capable of listing files
-            RemoveFile      = 0x0001,                   // capable of removing files
-            ReadFile        = 0x0002,                   // capable of reading files
-            WriteFile       = 0x0004,                   // capable of writing files
-            DBReady         = 0x0008,                   // capable of DB hosting
+            ListFile        = 0x0001,                   // capable of listing files
+            RemoveFile      = 0x0002,                   // capable of removing files
+            ReadFile        = 0x0004,                   // capable of reading files
+            WriteFile       = 0x0008,                   // capable of writing files
+            DBReady         = 0x0010,                   // capable of DB hosting
         };
     }
 
