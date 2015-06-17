@@ -227,8 +227,10 @@ void QnInstallUpdatesPeerTask::at_gotModuleInformation(int status, const QList<Q
         if (!server)
             continue;
 
-        if (moduleInformation.protoVersion != nx_ec::EC2_PROTO_VERSION)
+        if (!m_protoProblemDetected && moduleInformation.protoVersion != nx_ec::EC2_PROTO_VERSION) {
             m_protoProblemDetected = true;
+            emit protocolProblemDetected();
+        }
 
         if (server->getVersion() != moduleInformation.version) {
             server->setVersion(moduleInformation.version);

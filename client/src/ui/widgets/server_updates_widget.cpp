@@ -334,7 +334,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
 
                 QMessageBox::information(this, tr("Update is successful"), message);
 
-                bool unholdConnection = !clientUpdated || result.clientInstallerRequired;
+                bool unholdConnection = !clientUpdated || result.clientInstallerRequired || result.protocolChanged;
                 if (clientUpdated && !result.clientInstallerRequired) {
                     if (applauncher::restartClient(result.targetVersion) != applauncher::api::ResultType::ok) {
                         unholdConnection = true;
@@ -350,6 +350,9 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
 
                 if (unholdConnection)
                     qnClientMessageProcessor->setHoldConnection(false);
+
+                if (result.protocolChanged)
+                    action(Qn::DisconnectAction)->trigger();
             }
             break;
         case QnUpdateResult::Cancelled:

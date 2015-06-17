@@ -23,6 +23,9 @@ public:
     void setUpdateId(const QString &updateId);
     void setVersion(const QnSoftwareVersion &version);
 
+signals:
+    void protocolProblemDetected();
+
 protected:
     virtual void doStart() override;
 
