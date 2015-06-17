@@ -22,14 +22,14 @@ Item {
     Loader {
         id: leftLoader
         anchors.verticalCenter: parent.verticalCenter
-        x: dp(16)
+        x: dp(10)
     }
 
     Loader {
         id: rightLoader
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
-        anchors.rightMargin: dp(16)
+        anchors.rightMargin: dp(10)
     }
 
     Text {

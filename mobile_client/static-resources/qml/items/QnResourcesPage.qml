@@ -2,7 +2,6 @@ import QtQuick 2.4
 import com.networkoptix.qml 1.0
 
 import "../controls"
-import "../icons"
 
 QnPage {
     id: resourcesPage
@@ -11,7 +10,7 @@ QnPage {
 
     title: qsTr("Resources")
 
-    leftToolBarComponent: QnMenuBackIcon {
+    leftToolBarComponent: QnMenuBackButton {
 
     }
 

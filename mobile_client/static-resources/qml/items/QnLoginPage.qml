@@ -5,7 +5,6 @@ import com.networkoptix.qml 1.0
 
 import "../controls"
 import "../controls/style"
-import "../icons"
 import "QnLoginPage.js" as LoginFunctions
 
 QnPage {
@@ -15,7 +14,7 @@ QnPage {
 
     title: newConnectionLabel
 
-    leftToolBarComponent: QnMenuBackIcon {
+    leftToolBarComponent: QnMenuBackButton {
 
     }
 

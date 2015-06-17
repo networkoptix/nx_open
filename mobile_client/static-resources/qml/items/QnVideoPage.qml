@@ -6,7 +6,6 @@ import QtMultimedia 5.0
 import com.networkoptix.qml 1.0
 
 import "../controls"
-import "../icons"
 
 QnPage {
     id: videoPlayer
@@ -24,7 +23,7 @@ QnPage {
     property var __chunkEndDate
     property var __nextChunkStartDate
 
-    leftToolBarComponent: QnMenuBackIcon {
+    leftToolBarComponent: QnMenuBackButton {
 
     }
 
