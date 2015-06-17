@@ -26,7 +26,7 @@ namespace {
     };
 }
 
-int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
 {
     Q_UNUSED(path)
 
@@ -68,17 +68,26 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     QnConfigureReply reply;
     reply.restartNeeded = false;
     result.setReply(reply);
+
+    if (port) {
+        owner->owner()->updatePort(port);
+        owner->owner()->waitForPortUpdated();
+    }
+
     return CODE_OK;
 }
 
 void QnConfigureRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
 {
+    /*
     QnJsonRestResult reply;
     if (QJson::deserialize(body, &reply) && reply.error() ==  QnJsonRestResult::NoError) {
         int port = params.value(lit("port")).toInt();
-        if (port)
+        if (port) {
             owner->owner()->updatePort(port);
+        }
     }
+    */
 }
 
 int QnConfigureRestHandler::changeSystemName(const QString &systemName, qint64 sysIdTime, bool wholeSystem, qint64 remoteTranLogTime) {

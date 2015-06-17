@@ -200,6 +200,13 @@ void QnTcpListener::updatePort(int newPort)
     d->newPort = newPort;
 }
 
+void QnTcpListener::waitForPortUpdated()
+{
+    Q_D(QnTcpListener);
+    while (d->newPort != 0)
+        msleep(1);
+}
+
 void QnTcpListener::run()
 {
     Q_D(QnTcpListener);
@@ -220,18 +227,18 @@ void QnTcpListener::run()
             if (d->newPort)
             {
                 int oldPort = d->localPort;
-                d->localPort = d->newPort.exchange(0);
+                d->localPort.store(d->newPort);
                 NX_LOG( lit("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort), cl_logINFO );
-                removeAllConnections();
+                //removeAllConnections();
                 delete d->serverSocket;
                 if( !bindToLocalAddress() )
                 {
-                    int zerro = 0;
-                    d->newPort.compare_exchange_strong(zerro, d->localPort);  // reopen tcp socket
                     QThread::msleep(1000);
                     continue;
                 }
                 NX_LOG( lit("TCPListener (%1:%2). Switched to port %3").arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort), cl_logINFO );
+                int currentValue = d->localPort;
+                d->newPort.compare_exchange_strong(currentValue, 0);  // reset newPort if no more changes
             }
 
             AbstractStreamSocket* clientSocket = d->serverSocket->accept();
