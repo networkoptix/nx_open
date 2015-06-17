@@ -226,6 +226,8 @@ void QnTcpListener::run()
                 delete d->serverSocket;
                 if( !bindToLocalAddress() )
                 {
+                    int zerro = 0;
+                    d->newPort.compare_exchange_strong(zerro, d->localPort);  // reopen tcp socket
                     QThread::msleep(1000);
                     continue;
                 }
