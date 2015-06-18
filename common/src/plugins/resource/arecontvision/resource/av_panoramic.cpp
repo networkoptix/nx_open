@@ -175,6 +175,8 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout(
 
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
+    const auto resourceId = getId();    //saving id before locking m_layoutMutex to avoid potential deadlock
+
     Q_UNUSED(dataProvider)
     QMutexLocker lock(&m_layoutMutex);
 
@@ -195,11 +197,11 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const Q
         layout = m_rotatedLayout;
     }
 
-    QString oldVideoLayout = propertyDictionary->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
+    QString oldVideoLayout = propertyDictionary->value(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
     QString newVideoLayout = layout->toString();
     if (newVideoLayout != oldVideoLayout) {
-        propertyDictionary->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
-        propertyDictionary->saveParams(getId());
+        propertyDictionary->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
+        propertyDictionary->saveParams(resourceId );
     }
 
     return layout;
