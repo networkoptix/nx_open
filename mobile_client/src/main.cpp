@@ -14,6 +14,7 @@
 #include "plugins/resource/server_camera/server_camera_factory.h"
 #include "utils/common/app_info.h"
 #include "utils/common/log.h"
+#include "utils/network/module_finder.h"
 
 #include "context/context.h"
 #include "mobile_client/mobile_client_module.h"
@@ -80,6 +81,8 @@ int runApplication(QGuiApplication *application) {
     runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
+
+    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true, false));
 
     int result = runUi(application);
 

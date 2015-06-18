@@ -42,14 +42,12 @@ Button {
         if (navigationDrawer)
             progress = Qt.binding(function(){ return navigationDrawer.panelProgress })
         else
-            progress = 0.0
+            progress = 1.0
     }
 
     onClicked: {
         if (navigationDrawer)
             navigationDrawer.toggle()
-        else
-            progress = _menuOpened ? 0.0 : 1.0
     }
 
     onProgressChanged: {

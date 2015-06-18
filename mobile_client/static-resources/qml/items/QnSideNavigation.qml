@@ -3,9 +3,14 @@ import QtQuick 2.4
 import com.networkoptix.qml 1.0
 
 import "../controls"
+import "../main.js" as Main
+import "../items/QnLoginPage.js" as LoginFunctions
 
 QnNavigationDrawer {
     id: panel
+
+    property string activeSessionId
+    readonly property alias savedSessionsModel: savedSessionsModel
 
     parent: _findRootItem()
 
@@ -61,7 +66,14 @@ QnNavigationDrawer {
                     Rectangle {
                         width: parent.width
                         height: dp(120)
-                        color: QnTheme.sideNavigationBackground
+                        color: active ? QnTheme.sessionItemBackgroundActive : QnTheme.sideNavigationBackground
+
+                        property bool active: activeSessionId == sessionId
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: LoginFunctions.connectToServer(address, port, user, password)
+                        }
 
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
@@ -87,6 +99,11 @@ QnNavigationDrawer {
                                         verticalCenter: parent.verticalCenter
                                         left: parent.right
                                         margins: dp(16)
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: Main.openSavedSession(sessionId, address, port, user, password, systemName)
                                     }
                                 }
                             }

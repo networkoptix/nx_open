@@ -1,50 +1,35 @@
-/*
-function openLoginDialog() {
-    stackView.push({
-        item: Qt.resolvedUrl("dialogs/QnLoginDialog.qml"),
-        properties: {
-            width: stackView.width,
-            height: stackView.height
-        }
-    })
-}
-
-function openResources() {
-    stackView.push({
-        item: Qt.resolvedUrl("dialogs/QnResourcesDialog.qml"),
-        properties: {
-            width: stackView.width,
-            height: stackView.height
-        },
-        replace: true
-    })
-}
-
-*/
-
-/*
-function openVideo(id) {
-    pageStack.push({
-        item: Qt.resolvedUrl("dialogs/QnVideoDialog.qml"),
-        properties: {
-            width: pageStack.width,
-            height: pageStack.height,
-            resourceId: id
-        },
-        destroyOnPop: true
-    })
-}
-
-*/
-
 function openDiscoveredSession(_host, _port, _systemName) {
+    sideNavigation.hide()
+
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
         properties: {
             title: _systemName,
             host: _host,
             port: _port,
-            state: "Discovered"
+            state: "Discovered",
+            sideNavigationItem: sideNavigation
         }
     })
+}
+
+function openSavedSession(_sessionId, _host, _port, _login, _password, _systemName) {
+    sideNavigation.hide()
+
+    stackView.push({
+        item: Qt.resolvedUrl("items/QnLoginPage.qml"),
+        properties: {
+            title: _systemName,
+            host: _host,
+            port: _port,
+            login: _login,
+            password: _password,
+            sessionId: _sessionId,
+            state: "Saved"
+        }
+    })
+}
+
+function backToNewSession() {
+    stackView.pop()
 }

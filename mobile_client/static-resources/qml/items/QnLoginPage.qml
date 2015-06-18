@@ -6,6 +6,7 @@ import com.networkoptix.qml 1.0
 import "../controls"
 import "../controls/style"
 import "../items"
+import "../main.js" as Main
 import "QnLoginPage.js" as LoginFunctions
 
 QnPage {
@@ -15,24 +16,23 @@ QnPage {
     property alias port: portField.text
     property alias login: loginField.text
     property alias password: passwordField.text
+    property string sessionId
+    property var sideNavigationItem
 
     property string newConnectionLabel: qsTr("New Connection")
 
     signal openDiscoveredSessionRequested(string host, int port, string systemName)
+    signal openSavedSessionRequested()
 
     title: newConnectionLabel
 
     leftToolBarComponent: QnMenuBackButton {
-        navigationDrawer: navDrawer
-    }
-
-    QnSideNavigation {
-        id: navDrawer
-    }
-
-    QnLoginSessionsModel {
-        id: discoveredSessionsModel
-        displayMode: QnLoginSessionsModel.ShowDiscovered
+        id: backButton
+        navigationDrawer: sideNavigationItem
+        onClicked: {
+            if (state != "New")
+                Main.backToNewSession()
+        }
     }
 
     Flickable {
@@ -108,6 +108,8 @@ QnPage {
                     id: saveButton
                     text: qsTr("Save")
                     width: parent.width * 3 / 5
+
+                    onClicked: LoginFunctions.saveSession(hostField.text, portField.text, loginField.text, passwordField.text, title)
                 }
 
                 QnButton {
@@ -117,6 +119,8 @@ QnPage {
                     style: QnButtonStyle {
                         color: QnTheme.buttonAttentionBackground
                     }
+
+                    onClicked: LoginFunctions.deleteSesion(sessionId)
                 }
             }
 
@@ -155,8 +159,12 @@ QnPage {
 
             Repeater {
                 id: discoveredSessionRepeater
-                model: discoveredSessionsModel
                 width: parent.width
+
+                model: QnLoginSessionsModel {
+                    id: discoveredSessionsModel
+                    displayMode: QnLoginSessionsModel.ShowDiscovered
+                }
 
                 Rectangle {
                     width: parent.width
@@ -186,7 +194,7 @@ QnPage {
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: loginPage.openDiscoveredSessionRequested(address, port, systemName)
+                        onClicked: Main.openDiscoveredSession(address, port, systemName)
                     }
                 }
             }
@@ -222,6 +230,10 @@ QnPage {
             PropertyChanges {
                 target: editButtons
                 visible: true
+            }
+            PropertyChanges {
+                target: connectButton
+                visible: false
             }
         }
     ]

@@ -1,37 +1,45 @@
-var __currentAddress
-var __currentPort
-var __currentUser
-var __currentPassword
+.import "../main.js" as Main
 
-function makeUrl(address, port, user, password) {
-    return "http://" + user + ":" + password + "@" + address + ":" + port
+var currentHost
+var currentPort
+var currentLogin
+var currentPasswrod
+
+function makeUrl(host, port, login, password) {
+    return "http://" + login + ":" + password + "@" + host + ":" + port
 }
 
-function updateCurrent(address, port, user, password) {
-    __currentAddress = address
-    __currentPort = port
-    __currentUser = user
-    __currentPassword = password
+function updateSession(host, port, login, password, systemName) {
+    sideNavigation.savedSessionsModel.updateSession(host, port, login, password, systemName)
 }
 
-function connectToServer(address, port, user, password) {
-    updateCurrent(address, port, user, password)
-    connectionManager.connectToServer(makeUrl(address, port, user, password))
+function clearCurrentSession() {
+    currentPort = -1
 }
 
-function saveCurrentSession() {
-    discoveredSessionsModel.updateSession(__currentAddress, __currentPort, __currentUser, __currentPassword, connectionManager.systemName)
+function updateCurrentSession() {
+    if (currentPort > 0)
+        updateSession(currentHost, currentPort, currentLogin, currentPasswrod, connectionManager.systemName)
 }
 
-function select(id) {
-    if (sessionsList.selection.indexOf(id) == -1) {
-        var tmp = sessionsList.selection
-        tmp.push(id)
-        sessionsList.selection = tmp
-    }
+function connectToServer(host, port, login, password) {
+    currentHost = host
+    currentPort = port
+    currentLogin = login
+    currentPasswrod = password
+
+    sideNavigation.hide()
+    connectionManager.connectToServer(makeUrl(host, port, login, password))
 }
 
-function deleteSesions(sessions) {
-    for (var i = 0; i < sessions.length; i++)
-        discoveredSessionsModel.deleteSession(sessions[i])
+function saveSession(host, port, login, password, systemName) {
+    updateSession(host, port, login, password, systemName)
+    Main.backToNewSession()
+    sideNavigation.show()
+}
+
+function deleteSesion(sessionId) {
+    sideNavigation.savedSessionsModel.deleteSession(sessionId)
+    Main.backToNewSession()
+    sideNavigation.show()
 }

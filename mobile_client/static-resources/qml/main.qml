@@ -8,6 +8,7 @@ import "items"
 import "controls"
 
 import "main.js" as Main
+import "items/QnLoginPage.js" as LoginFunctions
 
 Window {
     id: mainWindow
@@ -25,6 +26,10 @@ Window {
 
     QnToolBar {
         id: toolBar
+    }
+
+    QnSideNavigation {
+        id: sideNavigation
     }
 
     StackView {
@@ -75,6 +80,7 @@ Window {
     Connections {
         target: connectionManager
         onConnected: {
+            LoginFunctions.updateCurrentSession()
             stackView.replace(resourcesPage)
         }
     }

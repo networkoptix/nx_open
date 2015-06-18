@@ -82,7 +82,7 @@ private:
 
 private:
     DisplayModeFlags m_displayMode;
-    QScopedPointer<QnModuleFinder> m_moduleFinder;
+    QnModuleFinder *m_moduleFinder;
 
     QList<QnLoginSession> m_savedSessions;
     QList<QnLoginSession> m_discoveredSessions;

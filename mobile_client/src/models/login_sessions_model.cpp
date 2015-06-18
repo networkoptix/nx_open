@@ -8,13 +8,13 @@
 QnLoginSessionsModel::QnLoginSessionsModel(QObject *parent) :
     QAbstractListModel(parent),
     m_displayMode(ShowAll),
-    m_moduleFinder(new QnModuleFinder(true, false))
+    m_moduleFinder(QnModuleFinder::instance())
 {
     loadFromSettings();
 
     m_moduleFinder->start();
-    connect(m_moduleFinder.data(),  &QnModuleFinder::moduleAddressFound,    this,   &QnLoginSessionsModel::at_moduleFinder_moduleAddressFound);
-    connect(m_moduleFinder.data(),  &QnModuleFinder::moduleAddressLost,     this,   &QnLoginSessionsModel::at_moduleFinder_moduleAddressLost);
+    connect(m_moduleFinder,     &QnModuleFinder::moduleAddressFound,    this,   &QnLoginSessionsModel::at_moduleFinder_moduleAddressFound);
+    connect(m_moduleFinder,     &QnModuleFinder::moduleAddressLost,     this,   &QnLoginSessionsModel::at_moduleFinder_moduleAddressLost);
 
 //    QnLoginSession s;
 //    s.systemName = lit("DEMO_SYSTEM");
