@@ -20,7 +20,7 @@ function connectToServer(address, port, user, password) {
 }
 
 function saveCurrentSession() {
-    sessionsModel.updateSession(__currentAddress, __currentPort, __currentUser, __currentPassword, connectionManager.systemName)
+    discoveredSessionsModel.updateSession(__currentAddress, __currentPort, __currentUser, __currentPassword, connectionManager.systemName)
 }
 
 function select(id) {
@@ -33,5 +33,5 @@ function select(id) {
 
 function deleteSesions(sessions) {
     for (var i = 0; i < sessions.length; i++)
-        sessionsModel.deleteSession(sessions[i])
+        discoveredSessionsModel.deleteSession(sessions[i])
 }

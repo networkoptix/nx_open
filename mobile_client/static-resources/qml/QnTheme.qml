@@ -20,6 +20,14 @@ QtObject {
     property color inputTextError
     property color inputPlaceholder
 
+    property color listSectionText
+    property color listText
+    property color listSubText
+
+    property color sessionItemBackground
+    property color sessionItemBackgroundActive
+    property color sessionItemActiveMark
+
     property color attentionBackground
 
     function loadColors() {
@@ -35,6 +43,12 @@ QtObject {
         inputText               = colorTheme.color("input.text")
         inputTextError          = colorTheme.color("input.textError")
         inputPlaceholder        = colorTheme.color("input.placeholder")
+        listSectionText         = colorTheme.color("list.sectionText")
+        listText                = colorTheme.color("list.text")
+        listSubText             = colorTheme.color("list.subText")
+        sessionItemBackground   = colorTheme.color("sessionItem.background")
+        sessionItemBackgroundActive = colorTheme.color("sessionItem.backgroundActive")
+        sessionItemActiveMark   = colorTheme.color("sessionItem.activeMark")
         attentionBackground     = colorTheme.color("other.attentionBackground")
     }
 

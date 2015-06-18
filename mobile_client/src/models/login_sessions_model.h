@@ -23,6 +23,11 @@ struct QnLoginSession {
 
 class QnLoginSessionsModel : public QAbstractListModel {
     Q_OBJECT
+
+    Q_FLAGS(DisplayMode DisplayModeFlags)
+
+    Q_PROPERTY(DisplayModeFlags displayMode READ displayMode WRITE setDisplayMode NOTIFY displayModeChanged)
+
 public:
     enum Roles {
         SystemNameRole = Qt::UserRole + 1,
@@ -34,6 +39,14 @@ public:
         SessionIdRole
     };
 
+    enum DisplayMode {
+        ShowSaved = 0x1,
+        ShowDiscovered = 0x2,
+        ShowAll = ShowSaved | ShowDiscovered
+    };
+
+    Q_DECLARE_FLAGS(DisplayModeFlags, DisplayMode)
+
     QnLoginSessionsModel(QObject *parent = 0);
     ~QnLoginSessionsModel();
 
@@ -43,9 +56,15 @@ public:
 
     void resetSessions(const QList<QnLoginSession> &savedSessions, const QList<QnLoginSession> &discoveredSessions);
 
+    DisplayModeFlags displayMode() const;
+    void setDisplayMode(DisplayModeFlags displayMode);
+
 public slots:
     void updateSession(const QString &address, const int port, const QString &user, const QString &password, const QString &systemName);
     void deleteSession(const QString &id);
+
+signals:
+    void displayModeChanged();
 
 private:
     void at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address);
@@ -54,12 +73,15 @@ private:
 private:
     int savedSessionIndex(int row) const;
     int discoveredSessionIndex(int row) const;
+    int savedSessionRow(int index) const;
+    int discoveredSessionRow(int index) const;
     QnLoginSession session(int row) const;
 
     void loadFromSettings();
     void saveToSettings();
 
 private:
+    DisplayModeFlags m_displayMode;
     QScopedPointer<QnModuleFinder> m_moduleFinder;
 
     QList<QnLoginSession> m_savedSessions;

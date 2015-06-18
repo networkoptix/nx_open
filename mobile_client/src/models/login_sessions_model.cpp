@@ -7,6 +7,7 @@
 
 QnLoginSessionsModel::QnLoginSessionsModel(QObject *parent) :
     QAbstractListModel(parent),
+    m_displayMode(ShowAll),
     m_moduleFinder(new QnModuleFinder(true, false))
 {
     loadFromSettings();
@@ -46,7 +47,13 @@ QnLoginSessionsModel::~QnLoginSessionsModel() {
 int QnLoginSessionsModel::rowCount(const QModelIndex &parent) const {
     Q_UNUSED(parent)
 
-    return m_savedSessions.size() + m_discoveredSessions.size();
+    int result = 0;
+    if (m_displayMode.testFlag(ShowSaved))
+        result += m_savedSessions.size();
+    if (m_displayMode.testFlag(ShowDiscovered))
+        result += m_discoveredSessions.size();
+
+    return result;
 }
 
 QVariant QnLoginSessionsModel::data(const QModelIndex &index, int role) const {
@@ -94,6 +101,19 @@ void QnLoginSessionsModel::resetSessions(const QList<QnLoginSession> &savedSessi
     endResetModel();
 }
 
+QnLoginSessionsModel::DisplayModeFlags QnLoginSessionsModel::displayMode() const {
+    return m_displayMode;
+}
+
+void QnLoginSessionsModel::setDisplayMode(DisplayModeFlags displayMode) {
+    if (m_displayMode == displayMode)
+        return;
+
+    beginResetModel();
+    m_displayMode = displayMode;
+    endResetModel();
+}
+
 void QnLoginSessionsModel::updateSession(const QString &address, const int port, const QString &user, const QString &password, const QString &systemName) {
     auto predicate = [&](const QnLoginSession &session) -> bool {
         return session.address == address && session.port == port && session.user == user;
@@ -104,11 +124,11 @@ void QnLoginSessionsModel::updateSession(const QString &address, const int port,
         it->password = password;
         it->systemName = systemName;
 
-        int row = it - m_savedSessions.begin();
+        int row = savedSessionRow(it - m_savedSessions.begin());
         if (row == 0) {
             QModelIndex index = this->index(0);
             emit dataChanged(index, index);
-        } else {
+        } else if (row > 0) {
             beginMoveRows(QModelIndex(), row, row, QModelIndex(), 0);
             m_savedSessions.move(row, 0);
             endInsertRows();
@@ -121,9 +141,14 @@ void QnLoginSessionsModel::updateSession(const QString &address, const int port,
         session.user = user;
         session.password = password;
 
-        beginInsertRows(QModelIndex(), 0, 0);
-        m_savedSessions.insert(0, session);
-        endInsertRows();
+        int row = savedSessionRow(0);
+        if (row >= 0) {
+            beginInsertRows(QModelIndex(), 0, 0);
+            m_savedSessions.insert(0, session);
+            endInsertRows();
+        } else {
+            m_savedSessions.insert(0, session);
+        }
     }
 
     saveToSettings();
@@ -134,9 +159,14 @@ void QnLoginSessionsModel::deleteSession(const QString &id) {
         if (m_savedSessions[i].id() != id)
             continue;
 
-        beginRemoveRows(QModelIndex(), i, i);
-        m_savedSessions.removeAt(i);
-        endRemoveRows();
+        int row = savedSessionRow(i);
+        if (row >= 0) {
+            beginRemoveRows(QModelIndex(), i, i);
+            m_savedSessions.removeAt(i);
+            endRemoveRows();
+        } else {
+            m_savedSessions.removeAt(i);
+        }
     }
 
     saveToSettings();
@@ -159,10 +189,14 @@ void QnLoginSessionsModel::at_moduleFinder_moduleAddressFound(const QnModuleInfo
     session.port = address.port;
     session.systemName = moduleInformation.systemName;
 
-    int row = rowCount();
-    beginInsertRows(QModelIndex(), row, row);
-    m_discoveredSessions.append(session);
-    endInsertRows();
+    int row = discoveredSessionRow(m_discoveredSessions.size());
+    if (row >= 0) {
+        beginInsertRows(QModelIndex(), row, row);
+        m_discoveredSessions.append(session);
+        endInsertRows();
+    } else {
+        m_discoveredSessions.append(session);
+    }
 }
 
 void QnLoginSessionsModel::at_moduleFinder_moduleAddressLost(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
@@ -175,22 +209,47 @@ void QnLoginSessionsModel::at_moduleFinder_moduleAddressLost(const QnModuleInfor
     if (i == m_discoveredSessions.size())
         return;
 
-    int row = m_savedSessions.size() + i;
-    beginRemoveRows(QModelIndex(), row, row);
-    m_discoveredSessions.removeAt(i);
-    endInsertRows();
+    int row = discoveredSessionRow(i);
+    if (row >= 0) {
+        beginRemoveRows(QModelIndex(), row, row);
+        m_discoveredSessions.removeAt(i);
+        endInsertRows();
+    } else {
+        m_discoveredSessions.removeAt(i);
+    }
 }
 
 int QnLoginSessionsModel::savedSessionIndex(int row) const {
-    if (row < m_savedSessions.size())
+    if (m_displayMode.testFlag(ShowSaved) && row < m_savedSessions.size())
         return row;
+
     return -1;
 }
 
 int QnLoginSessionsModel::discoveredSessionIndex(int row) const {
-    if (row >= m_savedSessions.size() && row < rowCount())
-        return row - m_savedSessions.size();
+    if (!m_displayMode.testFlag(ShowDiscovered))
+        return -1;
+
+    int savedCount = m_displayMode.testFlag(ShowSaved) ? m_savedSessions.size() : 0;
+
+    if (row >= savedCount && row < rowCount())
+        return row - savedCount;
+
     return -1;
+}
+
+int QnLoginSessionsModel::savedSessionRow(int index) const {
+    if (!m_displayMode.testFlag(ShowSaved))
+        return -1;
+
+    return index;
+}
+
+int QnLoginSessionsModel::discoveredSessionRow(int index) const {
+    if (!m_displayMode.testFlag(ShowDiscovered))
+        return -1;
+
+    return index + (m_displayMode.testFlag(ShowSaved) ? m_savedSessions.size() : 0);
 }
 
 QnLoginSession QnLoginSessionsModel::session(int row) const {

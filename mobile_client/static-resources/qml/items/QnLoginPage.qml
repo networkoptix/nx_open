@@ -18,6 +18,11 @@ QnPage {
         navigationDrawer: navDrawer
     }
 
+    QnLoginSessionsModel {
+        id: discoveredSessionsModel
+        displayMode: QnLoginSessionsModel.ShowDiscovered
+    }
+
     Flickable {
         id: flickable
         anchors.fill: parent
@@ -25,6 +30,7 @@ QnPage {
         anchors.rightMargin: dp(16)
         contentWidth: width
         contentHeight: content.height
+        clip: true
 
         Column {
             id: content
@@ -118,6 +124,60 @@ QnPage {
                 }
 
                 onClicked: LoginFunctions.connectToServer(hostField.text, portField.text, loginField.text, passwordField.text)
+            }
+
+            Column {
+                id: discoveredSessionsList
+                spacing: dp(1)
+                width: parent.width
+
+                Text {
+                    height: dp(48)
+                    verticalAlignment: Text.AlignVCenter
+                    text: qsTr("Auto-discovered systems")
+                    color: QnTheme.listSectionText
+                    font.pixelSize: sp(14)
+                    font.weight: Font.DemiBold
+                }
+
+                Repeater {
+                    id: discoveredSessionRepeater
+                    model: discoveredSessionsModel
+                    width: parent.width
+
+                    Rectangle {
+                        width: parent.width
+                        height: dp(72)
+                        color: QnTheme.sessionItemBackground
+                        radius: dp(2)
+
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: dp(8)
+                            x: dp(16)
+                            width: parent.width - 2 * x
+
+                            Text {
+                                text: systemName
+                                color: QnTheme.listText
+                                font.pixelSize: sp(16)
+                                font.weight: Font.Bold
+                            }
+
+                            Text {
+                                text: address + ":" + port
+                                color: QnTheme.listSubText
+                                font.pixelSize: sp(14)
+                            }
+                        }
+                    }
+                }
+
+                Item {
+                    /*padding*/
+                    width: parent.width
+                    height: dp(16)
+                }
             }
         }
     }
