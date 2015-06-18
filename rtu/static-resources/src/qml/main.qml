@@ -37,7 +37,14 @@ Window
         
         Pages.SettingsPage
         {
+            id: settingsPage;
             selectedServersModel: selectionPage.selectedServersModel;
+            
+            Connections
+            {
+                target: selectionPage;
+                onApplyChanges: { settingsPage.applyChanges(); }
+            }
         }
     }
     
@@ -121,7 +128,6 @@ Window
     Component.onCompleted: 
     {
         selectionPage.width = mainWindow.width / 3.5;
-        
         selectionPage.Layout.minimumWidth = selectionPage.width;
     }
 }

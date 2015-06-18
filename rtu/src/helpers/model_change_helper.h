@@ -13,16 +13,18 @@ namespace rtu
     class ModelChangeHelper : public QObject
     {
         typedef std::function<void (int, int)> RowsActionFunction;
-        typedef std::function<void ()> EndActionFunction;
+        typedef std::function<void ()> ActionFunction;
         
     public:
         class ChangeGuard;
         typedef QSharedPointer<ChangeGuard> Guard;
         
         ModelChangeHelper(const RowsActionFunction &beginInsertRows
-            , const EndActionFunction &endInsertRows
+            , const ActionFunction &endInsertRows
             , const RowsActionFunction &beginRemoveRows
-            , const EndActionFunction &endRemoveRows
+            , const ActionFunction &endRemoveRows
+            , const ActionFunction &beginResetModel
+            , const ActionFunction &endResetModel
             , const RowsActionFunction &dataChangedFunction
             , QObject *parent);
         
@@ -34,14 +36,18 @@ namespace rtu
         Guard removeRowsGuard(int startIndex
             , int finishIndex);
         
+        Guard resetModelGuard();
+        
         void dataChanged(int startIndex
             , int finishIndex);
         
     private:
         const RowsActionFunction m_beginInsertRows;
-        const EndActionFunction m_endInsertRows;
+        const ActionFunction m_endInsertRows;
         const RowsActionFunction m_beginRemoveRows;
-        const EndActionFunction m_endRemoveRows;
+        const ActionFunction m_endRemoveRows;
+        const ActionFunction m_beginResetModel;
+        const ActionFunction m_endResetModel;
         const RowsActionFunction m_dataChangedFunction;
     };
 
@@ -50,11 +56,13 @@ namespace rtu
 #define CREATE_MODEL_CHANGE_HELPER(parent)                                      \
     new ModelChangeHelper(                                                      \
         [this](int startIndex, int finishIndex)                                 \
-            { emit beginInsertRows(QModelIndex(), startIndex, finishIndex); }   \
-        , [this]() { emit endInsertRows(); }                                    \
+            { beginInsertRows(QModelIndex(), startIndex, finishIndex); }        \
+        , [this]() { endInsertRows(); }                                         \
         , [this](int startIndex, int finishIndex)                               \
-            { emit beginRemoveRows(QModelIndex(), startIndex, finishIndex); }   \
-        , [this]() { emit endRemoveRows(); }                                    \
+            { beginRemoveRows(QModelIndex(), startIndex, finishIndex); }        \
+        , [this]() { endRemoveRows(); }                                         \
+        , [this]() { beginResetModel(); }                                       \
+        , [this]() { endResetModel(); }                                         \
         , [this](int startIndex, int finishIndex)                               \
             { emit dataChanged(index(startIndex), index(finishIndex)); }        \
         , parent)

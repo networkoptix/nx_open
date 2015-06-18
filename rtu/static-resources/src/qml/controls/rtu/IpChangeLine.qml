@@ -7,61 +7,109 @@ Grid
 {
     id: thisComponent;
 
-    property bool changed: (useDHCPCheckBox.changed || ipControl.changed || subnetMask.changed);
-    property bool isSingleSelectionModel: false;
+    property bool changed: (useDHCPCheckBox.changed || ipControlField.changed 
+        || subnetMaskField.changed || dnsControl.changed || gatewayControl.changed);
 
     readonly property alias useDHCPControl: useDHCPCheckBox;
-    readonly property alias ipAddressControl: ipControl;
-    readonly property alias subnetMaskControl: subnetMask;
-
+    readonly property alias ipAddressControl: ipControlField;
+    readonly property alias subnetMaskControl: subnetMaskField;
+    readonly property alias dnsControl: dnsServerField;
+    readonly property alias gatewayControl: defaultGatewayField;
+    
     property string adapterNameValue;
+    property string interfaceCaption;
 
     spacing: Common.SizeManager.spacing.base;
+    
+    verticalItemAlignment: Grid.AlignVCenter;
+    
     columns: 3;
-
 
     Base.Text
     {
         id: adapterName;
 
-        text: (thisComponent.isSingleSelectionModel ? readableName: qsTr("Multiple interfaces"));
+        thin: false;
+        text: interfaceCaption;
     }
+    
+    Base.EmptyCell {}
+    
+    Base.EmptyCell {}
 
+    ///
     Base.Text
     {
-        id: subnetMaskCaption;
-
-        text: (thisComponent.isSingleSelectionModel && (model.index === 0) ? "Mask": " ");
+        id: ipAddressText;
+        
+        text: qsTr("IP");
     }
-
-    Item
-    {
-        id: fakeEmptyItem;
-        width: 1;
-        height: 1;
-    }
-
+    
     Base.IpControl
     {
-        id: ipControl
+        id: ipControlField
 
-        enabled: !useDHCPCheckBox.checked && thisComponent.isSingleSelectionModel;
-        opacity: ( enabled ? 1 : 0.5 );
+        enabled: !useDHCPCheckBox.checked;
     }
-
-    Base.IpControl
-    {
-        id: subnetMask;
-
-        enabled: !useDHCPCheckBox.checked && thisComponent.isSingleSelectionModel;
-        opacity: ( enabled ? 1 : 0.5 );
-    }
-
+    
     Base.CheckBox
     {
         id: useDHCPCheckBox;
 
-        height: subnetMask.height;
+        height: subnetMaskField.height;
         text: qsTr("Use DHCP");
     }
+    
+    ///
+    
+    Base.Text
+    {
+        id: subnetMaskCaption;
+
+        text: qsTr("Subnet mask");
+    }
+
+    
+    Base.IpControl
+    {
+        id: subnetMaskField;
+
+        enabled: !useDHCPCheckBox.checked;
+    }
+
+    Base.EmptyCell {}    
+
+    ///
+    
+    Base.Text
+    {
+        id: dnsServerText;
+        
+        text: qsTr("DNS server");
+    }
+    
+    Base.IpControl
+    {
+        id: dnsServerField;
+        
+        enabled: !useDHCPCheckBox.checked;
+    }
+    
+    Base.EmptyCell {}
+
+    ///
+    
+    Base.Text
+    {
+        id: defaultGatewayText;
+        
+        text: qsTr("Default Gateway");
+    }
+    
+    Base.IpControl
+    {
+        id: defaultGatewayField;
+    }
+    
+    Base.EmptyCell {}
 }

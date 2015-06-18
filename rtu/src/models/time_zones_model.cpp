@@ -27,7 +27,7 @@ namespace
     }
     
     const QString kDiffTimeZonesTag = QT_TR_NOOP("<Different>");
-    const QString kUndefinedTimeZoneTag = QT_TR_NOOP("Undefined");
+    const QString kUnknownTimeZoneTag = QT_TR_NOOP("<Unknown>");
     const QStringList baseTimeZonesInfo = getBaseTimeZones();
     const QStringList timeZonesInfoWithDiff = []() -> QStringList
     {
@@ -61,7 +61,7 @@ public:
     virtual ~Impl();
     
 public:
-    void onCurrentIndexChanged(int index);
+    bool isValidValue(int index);
     
     int initIndex() const;
     
@@ -86,7 +86,7 @@ rtu::TimeZonesModel::Impl::Impl(rtu::TimeZonesModel *owner
     QStringList zones = (m_withDiffTimeZoneItem ? timeZonesInfoWithDiff : baseTimeZonesInfo);
     if (m_initIndex == kInvalidIndex)
     {
-        zones.push_back(kUndefinedTimeZoneTag);
+        zones.push_back(kUnknownTimeZoneTag);
         m_initIndex = zones.size() - 1;
     }
     m_owner->setStringList(zones);
@@ -96,22 +96,14 @@ rtu::TimeZonesModel::Impl::~Impl()
 {
 }
 
-void rtu::TimeZonesModel::Impl::onCurrentIndexChanged(int index)
+bool rtu::TimeZonesModel::Impl::isValidValue(int index)
 {
-    QStringList zones = m_owner->stringList();
-    const int undefIndex = zones.indexOf(kUndefinedTimeZoneTag);
-    const int diffIndex = zones.indexOf(kDiffTimeZonesTag);
-    const int tagIndex = (undefIndex != kInvalidIndex ? undefIndex 
-        : (diffIndex != kInvalidIndex ? diffIndex : index));
+    const QStringList &zones = m_owner->stringList();
+    if ((index >= zones.size()) || (index < 0))
+        return false;
     
-    if (tagIndex == index)
-        return;
-    m_owner->removeRow(tagIndex);
-    
-    m_withDiffTimeZoneItem = false;
-    
-    m_initIndex = kInvalidIndex;
-    emit m_owner->initIndexChanged();
+    const QString &value = zones.at(index);
+    return ((value != kUnknownTimeZoneTag) && (value != kDiffTimeZonesTag));
 }
 
 int rtu::TimeZonesModel::Impl::initIndex() const
@@ -152,9 +144,9 @@ int rtu::TimeZonesModel::currentTimeZoneIndex()
     return m_impl->currentTimeZoneIndex();
 }
 
-void rtu::TimeZonesModel::onCurrentIndexChanged(int index)
+bool rtu::TimeZonesModel::isValidValue(int index)
 {
-    m_impl->onCurrentIndexChanged(index);
+    return m_impl->isValidValue(index);
 }
 
 

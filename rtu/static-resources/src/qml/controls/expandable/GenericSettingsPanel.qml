@@ -11,8 +11,6 @@ Expandable.ExpandableItem
 {
     id: thisComponent;
 
-    signal applyButtonPressed();
-    
     property string propertiesGroupName;
 
     property bool changed: false;

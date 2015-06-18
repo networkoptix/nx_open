@@ -3,6 +3,7 @@ import QtQuick 2.1;
 import "../common" as Common;
 import "../controls/base" as Base;
 import "../controls/expandable" as Expandable;
+import "../dialogs" as Dialogs;
 
 Expandable.MaskedSettingsPanel
 {
@@ -10,6 +11,13 @@ Expandable.MaskedSettingsPanel
 
     changed:  (maskedArea && maskedArea.changed?  true : false);
     
+    function tryApplyChanges()
+    {
+        if (!changed)
+            return true;
+        return maskedArea.tryApplyChanges();
+    }
+
     propertiesGroupName: qsTr("Set System Name and Password");
 
     propertiesDelegate: Component
@@ -20,17 +28,43 @@ Expandable.MaskedSettingsPanel
         {
             property bool changed: systemName.changed || password.changed;
             height: settingsColumn.height;
+
             
-            Connections
+            Dialogs.ErrorDialog
             {
-                target: thisComponent;
-                onApplyButtonPressed:
+                id: errorDialog;
+            }
+            
+            readonly property string errorTemplate: qsTr("Invalid %1 specified. Can't apply changes");
+            function tryApplyChanges()
+            {
+                if (systemName.changed)
                 {
-                    if (systemName.changed)
-                        rtuContext.changesManager().addSystemChange(systemName.text);
-                    if (password.changed)
-                        rtuContext.changesManager().addPasswordChange(password.text);
+                    if (systemName.text.length === 0)
+                    {
+                        errorDialog.message = errorTemplate.arg(qsTr("system name"));
+                        errorDialog.show();
+                        
+                        systemName.focus = true;
+                        return false;
+                    }
+
+                    rtuContext.changesManager().addSystemChange(systemName.text);
                 }
+                if (password.changed)
+                {
+                    if (password.text.length === 0)
+                    {
+                        errorDialog.message = errorTemplate.arg(qsTr("password"));
+                        errorDialog.show();
+                        
+                        password.focus = true;
+                        return false;
+                    }
+
+                    rtuContext.changesManager().addPasswordChange(password.text);
+                }
+                return true;
             }
 
             Base.Column
@@ -46,15 +80,14 @@ Expandable.MaskedSettingsPanel
 
                 Base.Text
                 {
+                    thin: false;
                     text: qsTr("System Name");
-                    font.pixelSize: Common.SizeManager.fontSizes.base;
                 }
 
                 Base.TextField
                 {
                     id: systemName;
                     
-                    revertOnEmpty: true;
                     implicitWidth: implicitHeight * 6;
                     initialText: (rtuContext.selection && rtuContext.selection !== null ?
                         rtuContext.selection.systemName : "");
@@ -69,15 +102,14 @@ Expandable.MaskedSettingsPanel
 
                 Base.Text
                 {
+                    thin: false;
                     text: qsTr("System Password");
-                    font.pixelSize: Common.SizeManager.fontSizes.base;
                 }
 
                 Base.TextField
                 {
                     id: password;
 
-                    revertOnEmpty: true;
                     implicitWidth: systemName.implicitWidth;
                     initialText: rtuContext.selection.password;
                 }

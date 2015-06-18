@@ -99,7 +99,6 @@ GenericSettingsPanel
     {
         id: areaDelegateLoader;
         
-        height: (item ? item.height : 0);
         sourceComponent: (thisComponent.warned ? propertiesDelegate : maskingPanel);
     }
 }

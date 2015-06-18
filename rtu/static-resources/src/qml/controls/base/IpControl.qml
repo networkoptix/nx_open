@@ -15,20 +15,5 @@ Base.TextField
     }
 
     text: initialText;
-    
-    onActiveFocusChanged: 
-    {
-        if (!activeFocus && !acceptableInput)
-        {
-            if (initialText.length !== 0)
-            {
-                text = initialText;
-            }
-            else
-            {
-                text = defaultEmptyValue;
-            }
-        }
-    }
 }
 

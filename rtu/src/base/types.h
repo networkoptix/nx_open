@@ -20,4 +20,5 @@ namespace rtu
 
     typedef QSharedPointer<QString> StringPointer;
     typedef QSharedPointer<int> IntPointer;
+    typedef QSharedPointer<bool> BoolPointer;
 }

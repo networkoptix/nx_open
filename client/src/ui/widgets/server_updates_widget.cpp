@@ -22,7 +22,7 @@
 #include <ui/delegates/update_status_item_delegate.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
-
+#include <ui/actions/action_manager.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -334,7 +334,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
 
                 QMessageBox::information(this, tr("Update is successful"), message);
 
-                bool unholdConnection = !clientUpdated || result.clientInstallerRequired;
+                bool unholdConnection = !clientUpdated || result.clientInstallerRequired || result.protocolChanged;
                 if (clientUpdated && !result.clientInstallerRequired) {
                     if (applauncher::restartClient(result.targetVersion) != applauncher::api::ResultType::ok) {
                         unholdConnection = true;
@@ -350,6 +350,9 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
 
                 if (unholdConnection)
                     qnClientMessageProcessor->setHoldConnection(false);
+
+                if (result.protocolChanged)
+                    menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
             }
             break;
         case QnUpdateResult::Cancelled:
