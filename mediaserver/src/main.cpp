@@ -140,6 +140,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/common/system_information.h>
+#include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
@@ -1224,6 +1225,27 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
     }
 }
 
+void QnMain::at_adminUserChanged( const QnResourcePtr& resource )
+{
+    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+    if( !user )
+        return;
+
+    if( !user->isAdmin() )
+        return;
+
+#ifdef __linux__
+    if( QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1" )
+    {
+        //changing root password in system
+        if( !setRootPasswordDigest( "root", user->getCryptSha512Hash() ) )
+        {
+            qWarning()<<"Failed to set root password on current system";
+        }
+    }
+#endif
+}
+
 void QnMain::at_localInterfacesChanged()
 {
     if (isStopping())
@@ -1490,6 +1512,10 @@ void QnMain::run()
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
+    connect(
+        resourcePool.get(), &QnResourcePool::resourceChanged,
+        this, &QnMain::at_adminUserChanged );
+    
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
@@ -2251,6 +2277,7 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
                     ec2::ApiUserData userData;
                     fromResourceToApi(user, userData);
                     user->setDigest(userData.digest);
+                    user->setCryptSha512Hash(userData.cryptSha512Hash);
                 }
                 m_updateUserRequests.remove(user->getId());
             } );
