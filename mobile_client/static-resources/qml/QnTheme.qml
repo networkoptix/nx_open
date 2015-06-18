@@ -9,6 +9,8 @@ QtObject {
     property color windowText
 
     property color buttonBackground
+    property color buttonAccentBackground
+    property color buttonAttentionBackground
     property color buttonText
 
     property color inputBorder
@@ -24,6 +26,8 @@ QtObject {
         windowBackground        = colorTheme.color("window.background")
         windowText              = colorTheme.color("window.text")
         buttonBackground        = colorTheme.color("button.background")
+        buttonAccentBackground  = colorTheme.color("button.accentBackground")
+        buttonAttentionBackground = colorTheme.color("button.attentionBackground")
         buttonText              = colorTheme.color("button.text")
         inputBorder             = colorTheme.color("input.border")
         inputBorderActive       = colorTheme.color("input.borderActive")

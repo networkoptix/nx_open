@@ -97,9 +97,6 @@ QnPage {
                     id: saveButton
                     text: qsTr("Save")
                     width: parent.width * 3 / 5
-                    style: QnButtonStyle {
-                        color: "#2b383f"
-                    }
                 }
 
                 QnButton {
@@ -107,7 +104,7 @@ QnPage {
                     text: qsTr("Delete")
                     width: parent.width * 2 / 5 - parent.spacing
                     style: QnButtonStyle {
-                        color: "#d65029"
+                        color: QnTheme.buttonAttentionBackground
                     }
                 }
             }
@@ -116,6 +113,9 @@ QnPage {
                 id: connectButton
                 width: parent.width
                 text: qsTr("Connect")
+                style: QnButtonStyle {
+                    color: QnTheme.buttonAccentBackground
+                }
 
                 onClicked: LoginFunctions.connectToServer(hostField.text, portField.text, loginField.text, passwordField.text)
             }
