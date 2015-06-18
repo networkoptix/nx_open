@@ -104,7 +104,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             }
             sendResponse(
                 isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
-                d->responseBody.isEmpty() ? QByteArray() : "text/html; charset=iso-8859-1",
+                d->responseBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
                 contentEncoding );
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT)

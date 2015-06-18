@@ -18,7 +18,7 @@ static const QByteArray STATIC_UNAUTHORIZED_HTML("\
     <HTML>\
     <HEAD>\
     <TITLE>Error</TITLE>\
-    <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">\
+    <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=utf-8\">\
     </HEAD>\
     <BODY><H1>401 Unauthorized.</H1></BODY>\
     </HTML>"
@@ -29,7 +29,7 @@ static const QByteArray STATIC_PROXY_UNAUTHORIZED_HTML("\
     <HTML>\
     <HEAD>\
     <TITLE>Error</TITLE>\
-    <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">\
+    <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=utf-8\">\
     </HEAD>\
     <BODY><H1>407 Proxy Unauthorized.</H1></BODY>\
     </HTML>"
