@@ -10,12 +10,23 @@ import "QnLoginPage.js" as LoginFunctions
 QnPage {
     id: loginPage
 
+    property alias host: hostField.text
+    property alias port: portField.text
+    property alias login: loginField.text
+    property alias password: passwordField.text
+
     property string newConnectionLabel: qsTr("New Connection")
+
+    signal openDiscoveredSessionRequested(string host, int port, string systemName)
 
     title: newConnectionLabel
 
     leftToolBarComponent: QnMenuBackButton {
         navigationDrawer: navDrawer
+    }
+
+    QnNavigationDrawer {
+        id: navDrawer
     }
 
     QnLoginSessionsModel {
@@ -98,6 +109,7 @@ QnPage {
                 id: editButtons
                 width: parent.width
                 spacing: dp(16)
+                visible: false
 
                 QnButton {
                     id: saveButton
@@ -126,63 +138,93 @@ QnPage {
                 onClicked: LoginFunctions.connectToServer(hostField.text, portField.text, loginField.text, passwordField.text)
             }
 
-            Column {
-                id: discoveredSessionsList
-                spacing: dp(1)
+            Loader {
+                id: discoveredSessionsLoader
                 width: parent.width
-
-                Text {
-                    height: dp(48)
-                    verticalAlignment: Text.AlignVCenter
-                    text: qsTr("Auto-discovered systems")
-                    color: QnTheme.listSectionText
-                    font.pixelSize: sp(14)
-                    font.weight: Font.DemiBold
-                }
-
-                Repeater {
-                    id: discoveredSessionRepeater
-                    model: discoveredSessionsModel
-                    width: parent.width
-
-                    Rectangle {
-                        width: parent.width
-                        height: dp(72)
-                        color: QnTheme.sessionItemBackground
-                        radius: dp(2)
-
-                        Column {
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: dp(8)
-                            x: dp(16)
-                            width: parent.width - 2 * x
-
-                            Text {
-                                text: systemName
-                                color: QnTheme.listText
-                                font.pixelSize: sp(16)
-                                font.weight: Font.Bold
-                            }
-
-                            Text {
-                                text: address + ":" + port
-                                color: QnTheme.listSubText
-                                font.pixelSize: sp(14)
-                            }
-                        }
-                    }
-                }
-
-                Item {
-                    /*padding*/
-                    width: parent.width
-                    height: dp(16)
-                }
             }
         }
     }
 
-    QnNavigationDrawer {
-        id: navDrawer
+    Component {
+        id: discoveredSessionsList
+
+        Column {
+            spacing: dp(1)
+
+            Text {
+                height: dp(48)
+                verticalAlignment: Text.AlignVCenter
+                text: qsTr("Auto-discovered systems")
+                color: QnTheme.listSectionText
+                font.pixelSize: sp(14)
+                font.weight: Font.DemiBold
+            }
+
+            Repeater {
+                id: discoveredSessionRepeater
+                model: discoveredSessionsModel
+                width: parent.width
+
+                Rectangle {
+                    width: parent.width
+                    height: dp(72)
+                    color: QnTheme.sessionItemBackground
+                    radius: dp(2)
+
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: dp(8)
+                        x: dp(16)
+                        width: parent.width - 2 * x
+
+                        Text {
+                            text: systemName
+                            color: QnTheme.listText
+                            font.pixelSize: sp(16)
+                            font.weight: Font.Bold
+                        }
+
+                        Text {
+                            text: address + ":" + port
+                            color: QnTheme.listSubText
+                            font.pixelSize: sp(14)
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: loginPage.openDiscoveredSessionRequested(address, port, systemName)
+                    }
+                }
+            }
+
+            Item {
+                /*padding*/
+                width: parent.width
+                height: dp(16)
+            }
+        }
     }
+
+    state: "New"
+
+    states: [
+        State {
+            name: "New"
+            PropertyChanges {
+                target: discoveredSessionsLoader
+                sourceComponent: discoveredSessionsList
+            }
+        },
+        State {
+            name: "Discovered"
+        },
+        State {
+            name: "Saved"
+            PropertyChanges {
+                target: editButtons
+                visible: true
+            }
+        }
+    ]
 }

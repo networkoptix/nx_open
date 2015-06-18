@@ -1,4 +1,5 @@
-/*function openLoginDialog() {
+/*
+function openLoginDialog() {
     stackView.push({
         item: Qt.resolvedUrl("dialogs/QnLoginDialog.qml"),
         properties: {
@@ -21,6 +22,7 @@ function openResources() {
 
 */
 
+/*
 function openVideo(id) {
     pageStack.push({
         item: Qt.resolvedUrl("dialogs/QnVideoDialog.qml"),
@@ -33,3 +35,16 @@ function openVideo(id) {
     })
 }
 
+*/
+
+function openDiscoveredSession(_host, _port, _systemName) {
+    stackView.push({
+        item: Qt.resolvedUrl("items/QnLoginPage.qml"),
+        properties: {
+            title: _systemName,
+            host: _host,
+            port: _port,
+            state: "Discovered"
+        }
+    })
+}

@@ -7,7 +7,7 @@ import com.networkoptix.qml 1.0
 import "items"
 import "controls"
 
-//import "main.js" as Main
+import "main.js" as Main
 
 Window {
     id: mainWindow
@@ -48,7 +48,7 @@ Window {
         id: loginPage
 
         QnLoginPage {
-
+            onOpenDiscoveredSessionRequested: Main.openDiscoveredSession(host, port, systemName)
         }
     }
 
