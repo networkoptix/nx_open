@@ -50,6 +50,11 @@ namespace rpi_cam
     /// Encoder parameters
     struct EncoderParameters
     {
+        EncoderParameters()
+        :   vfmt(rpi_omx::VF_1280x960),
+            bitrateKbps(0)
+        {}
+
         rpi_omx::VideoFromat vfmt;
         unsigned bitrateKbps;
     };

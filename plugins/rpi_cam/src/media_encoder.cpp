@@ -7,8 +7,6 @@
 
 namespace rpi_cam
 {
-    DEFAULT_REF_COUNTER(nxcip::CameraMediaEncoder3)
-
     MediaEncoder::MediaEncoder(std::shared_ptr<RPiCamera> camera, unsigned encoderNumber)
     :   m_camera(camera),
         m_encoderNumber(encoderNumber)

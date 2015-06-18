@@ -19,8 +19,8 @@ namespace rpi_cam
     class DefaultRefCounter : public T
     {
     public:
-        virtual unsigned int addRef() override;
-        virtual unsigned int releaseRef() override;
+        virtual unsigned int addRef() override { return m_refManager.addRef(); }
+        virtual unsigned int releaseRef() override { return m_refManager.releaseRef(); }
 
     protected:
         nxpt::CommonRefManager m_refManager;
@@ -33,10 +33,6 @@ namespace rpi_cam
         :   m_refManager(refManager)
         {}
     };
-
-    #define DEFAULT_REF_COUNTER(T) \
-        template <> unsigned int DefaultRefCounter<T>::addRef() { return m_refManager.addRef(); } \
-        template <> unsigned int DefaultRefCounter<T>::releaseRef() { return m_refManager.releaseRef(); }
 }
 
 #endif //DEFAULT_REF_COUNTER_H

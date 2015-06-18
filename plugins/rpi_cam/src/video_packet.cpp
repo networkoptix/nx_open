@@ -16,8 +16,6 @@ namespace
 
 namespace rpi_cam
 {
-    DEFAULT_REF_COUNTER(nxcip::VideoDataPacket)
-
     VideoPacket::VideoPacket(const uint8_t * data, size_t size, uint64_t ts, unsigned flags)
     :   m_size(0),
         m_time(ts),

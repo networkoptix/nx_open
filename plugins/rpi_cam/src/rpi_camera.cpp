@@ -237,8 +237,7 @@ namespace rpi_cam
     {
         debug_print("%s\n", __FUNCTION__);
 
-        m_rw.writeLock();
-        RWLock::Scope scope(m_rw);
+        rw_lock::ScopedLock<rw_lock::WRITE> scope(m_rw);
 
         std::lock_guard<std::recursive_mutex> lock(m_mutex); // LOCK
 
@@ -268,9 +267,9 @@ namespace rpi_cam
         if (streamNo >= STREAMS_NUM())
             return false;
 
-        if (! m_rw.tryReadLock())
+        rw_lock::ScopedLock<rw_lock::TRY_READ> scope(m_rw);
+        if (!scope)
             return false;
-        RWLock::Scope scope(m_rw);
 
         Encoder * encoder = m_encoders[streamNo].get();
         if (! encoder)
@@ -289,14 +288,7 @@ namespace rpi_cam
                 if (encBuffer.filled())
                 {
                     flags = encBuffer.flags();
-#if 0
-                    if (flags & FLAG_DATACORRUPT || flags & FLAG_EOS)
-                    {
-                        debug_print("RPiCamera.read() stop. Flags: %d\n", flags);
-                        data.clear();
-                        return false;
-                    }
-#endif
+
                     unsigned bufSize = encBuffer.dataSize();
                     if (bufSize)
                     {

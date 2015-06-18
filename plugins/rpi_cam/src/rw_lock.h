@@ -1,27 +1,12 @@
 #include <mutex>
 #include <condition_variable>
-#include <chrono>
 
 namespace rw_lock
 {
-    //
+    ///
     class OneWriterManyReaders
     {
     public:
-        struct Scope
-        {
-            OneWriterManyReaders& m_rw;
-
-            Scope(OneWriterManyReaders& rw)
-            :   m_rw(rw)
-            {}
-
-            ~Scope()
-            {
-                m_rw.unlock();
-            }
-        };
-
         OneWriterManyReaders()
         :   m_readers(0)
         {}
@@ -50,22 +35,14 @@ namespace rw_lock
             return false;
         }
 
-        void writeLock(unsigned timeoutMS = 10)
+        void writeLock()
         {
-            std::chrono::milliseconds timeout(timeoutMS);
+            std::unique_lock<std::mutex> lock(m_mutex); // LOCK
 
-            for (;;)
-            {
-                std::unique_lock<std::mutex> lock(m_mutex); // LOCK
+            if (m_readers != 0)
+                m_cv.wait(lock, [=]{ return m_readers == 0; } );
 
-                if (m_readers == 0)
-                {
-                    m_readers = -1;
-                    break;
-                }
-
-                m_cv.wait_for(lock, timeout); // WAIT. Could miss notify event - timeout
-            }
+            m_readers = -1;
         }
 
         void unlock()
@@ -87,4 +64,50 @@ namespace rw_lock
         int32_t m_readers;
         std::condition_variable m_cv;
     };
+
+    typedef enum
+    {
+        READ,
+        WRITE,
+        TRY_READ,
+        TRY_WRITE
+    } LockType;
+
+    ///
+    template<LockType LT>
+    class ScopedLock
+    {
+    public:
+        ScopedLock(OneWriterManyReaders& rw)
+        :   m_rw(rw),
+            m_own(false)
+        {
+            acquire();
+        }
+
+        ~ScopedLock()
+        {
+            if (m_own)
+                m_rw.unlock();
+        }
+
+        operator bool () const { return m_own; }
+
+    private:
+        OneWriterManyReaders& m_rw;
+        bool m_own;
+
+        void acquire();
+    };
+
+    template <> inline void ScopedLock<WRITE>::acquire()
+    {
+        m_rw.writeLock();
+        m_own = true;
+    }
+
+    template <> inline void ScopedLock<TRY_READ>::acquire()
+    {
+        m_own = m_rw.tryReadLock();
+    }
 }

@@ -6,8 +6,6 @@
 
 namespace rpi_cam
 {
-    DEFAULT_REF_COUNTER(nxcip::StreamReader)
-
     TimeCorrection StreamReader::m_timeCorrect;
 
     StreamReader::StreamReader(std::shared_ptr<RPiCamera> camera, unsigned encoderNumber)

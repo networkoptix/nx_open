@@ -163,7 +163,7 @@ namespace rpi_omx
         OMX_BUFFERHEADERTYPE * header() { return m_ppBuffer; }
         OMX_U32 flags() const { return m_ppBuffer->nFlags; }
         OMX_U32& flags() { return m_ppBuffer->nFlags; }
-        OMX_TICKS timeStamp() { return m_ppBuffer->nTimeStamp; } // need OMX_IndexParamCommonUseStcTimestamps
+        OMX_TICKS timeStamp() const { return m_ppBuffer->nTimeStamp; } // need OMX_IndexParamCommonUseStcTimestamps
 
         OMX_U8 * data() { return  m_ppBuffer->pBuffer + m_ppBuffer->nOffset; }
         OMX_U32 dataSize() const { return m_ppBuffer->nFilledLen; }

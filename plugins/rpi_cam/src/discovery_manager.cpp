@@ -13,8 +13,6 @@ extern "C"
 
 namespace rpi_cam
 {
-    DEFAULT_REF_COUNTER(nxcip::CameraDiscoveryManager)
-
     DiscoveryManager * DiscoveryManager::Instance;
 
     DiscoveryManager::DiscoveryManager()

@@ -20,8 +20,6 @@ namespace rpi_cam
 {
     static unsigned ENCODERS_COUNT = 2;
 
-    DEFAULT_REF_COUNTER(nxcip::BaseCameraManager)
-
     CameraManager::CameraManager()
     :   DefaultRefCounter( DiscoveryManager::refManager() )
     {
