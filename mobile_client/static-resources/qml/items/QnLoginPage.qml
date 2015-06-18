@@ -5,6 +5,7 @@ import com.networkoptix.qml 1.0
 
 import "../controls"
 import "../controls/style"
+import "../items"
 import "QnLoginPage.js" as LoginFunctions
 
 QnPage {
@@ -25,7 +26,7 @@ QnPage {
         navigationDrawer: navDrawer
     }
 
-    QnNavigationDrawer {
+    QnSideNavigation {
         id: navDrawer
     }
 
@@ -37,15 +38,15 @@ QnPage {
     Flickable {
         id: flickable
         anchors.fill: parent
-        anchors.leftMargin: dp(16)
-        anchors.rightMargin: dp(16)
+        leftMargin: dp(16)
+        rightMargin: dp(16)
         contentWidth: width
         contentHeight: content.height
         clip: true
 
         Column {
             id: content
-            width: parent.width
+            width: parent.width - flickable.leftMargin - flickable.rightMargin
             spacing: dp(16)
 
             Rectangle {

@@ -65,19 +65,9 @@ Rectangle {
     readonly property int _openMarginSize: dp(16)
 
     property real _velocity: 0
-    property real _oldMouseX: -1
+    property real _oldX: -1
 
-    function _findRootItem() {
-        return visualParent
-        /*
-        var p = panel;
-        while (p.parent != null)
-            p = p.parent;
-        return p;
-        */
-    }
-
-    property Item _rootItem: _findRootItem()
+    property Item _rootItem: visualParent
     height: parent.height
     on_RightEdgeChanged: _setupAnchors()
     onOpenChanged: completeSlideDirection()
@@ -86,7 +76,7 @@ Rectangle {
     z: 10
 
     function _setupAnchors() {     // Note that we can't reliably apply anchors using bindings
-        _rootItem = _findRootItem();
+        _rootItem = visualParent
 
         shadow.anchors.right = undefined;
         shadow.anchors.left = undefined;
@@ -176,23 +166,28 @@ Rectangle {
 
     MouseArea {
         id: mouse
-        parent: _rootItem
+        parent: panel
 
-        y: visualParent.y
-        width: open ? _rootItem.width : _openMarginSize
-        height: visualParent.height
+        width: open ? _rootItem.width : panel.width + _openMarginSize
+        height: panel.height
         onPressed:  if (!open) holdAnimation.restart();
         onClicked: handleClick(mouse)
         drag.target: panel
         drag.minimumX: _minimumX
         drag.maximumX: _maximumX
         drag.axis: Qt.Horizontal
-        drag.onActiveChanged: if (active) holdAnimation.stop()
+        drag.onActiveChanged: if (drag.active) holdAnimation.stop()
+        drag.filterChildren: true
         onReleased: handleRelease()
-        z: open ? 1 : 0
         onMouseXChanged: {
-            _velocity = (mouse.x - _oldMouseX);
-            _oldMouseX = mouse.x;
+            _velocity = (panel.x - _oldX);
+            _oldX = panel.x;
+        }
+
+        Item {
+            id: contentItem
+            anchors.fill: parent
+            clip: true
         }
     }
 
@@ -202,17 +197,6 @@ Rectangle {
         anchors.fill: parent
         opacity: 0.5 * Math.min(1, Math.abs(panel.x - _collapsedX) / _rootItem.width/2)
         color: "black"
-    }
-
-    Item {
-        id: contentItem
-        parent: _rootItem
-        width: panel.width
-        height: panel.height
-        x: panel.x
-        y: panel.y
-        z: open ? 5 : 0
-        clip: true
     }
 
     Item {

@@ -28,6 +28,11 @@ QtObject {
     property color sessionItemBackgroundActive
     property color sessionItemActiveMark
 
+    property color sideNavigationBackground
+    property color sideNavigationCopyright
+    property color sideNavigationSplitter
+    property color sideNavigationSection
+
     property color attentionBackground
 
     function loadColors() {
@@ -49,6 +54,10 @@ QtObject {
         sessionItemBackground   = colorTheme.color("sessionItem.background")
         sessionItemBackgroundActive = colorTheme.color("sessionItem.backgroundActive")
         sessionItemActiveMark   = colorTheme.color("sessionItem.activeMark")
+        sideNavigationBackground = colorTheme.color("sideNavigation.background")
+        sideNavigationCopyright = colorTheme.color("sideNavigation.copyright")
+        sideNavigationSplitter  = colorTheme.color("sideNavigation.splitter")
+        sideNavigationSection   = colorTheme.color("sideNavigation.section")
         attentionBackground     = colorTheme.color("other.attentionBackground")
     }
 
