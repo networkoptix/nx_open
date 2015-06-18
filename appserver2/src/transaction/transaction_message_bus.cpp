@@ -1640,7 +1640,7 @@ namespace ec2
     }
 
 	void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* handler) {
-    	QMutexLocker lock(&m_mutex);
+    	QnMutexLocker lock(&m_mutex);
 	    Q_ASSERT(!m_thread->isRunning());
     	Q_ASSERT_X(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
 	    if( m_handler == handler )
@@ -1649,7 +1649,7 @@ namespace ec2
 
 	QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* peerDistance) const
 	{
-	    QMutexLocker lock(&m_mutex);
+	    QnMutexLocker lock(&m_mutex);
 	    *peerDistance = INT_MAX;
 	    const auto itr = m_alivePeers.find(dstPeer);
     	if (itr == m_alivePeers.cend())

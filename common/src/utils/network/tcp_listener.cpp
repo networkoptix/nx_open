@@ -18,6 +18,7 @@ public:
     QnMutex connectionMtx;
     std::atomic<int> newPort;
     QHostAddress serverAddress;
+    std::atomic<int> localPort;
     bool useSSL;
     int maxConnections;
     bool ddosWarned;
