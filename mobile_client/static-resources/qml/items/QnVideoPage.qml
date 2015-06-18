@@ -148,6 +148,7 @@ QnPage {
             drag.axis: Drag.YAxis
             drag.minimumY: videoPlayer.height - navigator.height - navigationPanel.height
             drag.maximumY: videoPlayer.height - navigator.height
+            drag.filterChildren: true
             onReleased: {
                 var mid = (drag.minimumY + drag.maximumY) / 2
                 if (navigator.y < mid)
@@ -155,176 +156,176 @@ QnPage {
                 else
                     navigator.y = drag.maximumY
             }
-        }
 
-        QnTimeline {
-            id: timeline
+            QnTimeline {
+                id: timeline
 
-            anchors.bottom: parent.bottom
-            width: parent.width
-            height: dp(140)
+                anchors.bottom: parent.bottom
+                width: parent.width
+                height: dp(140)
 
-            endDate: new Date(Date.now() + 5 * 60 * 1000)
-            startDate: new Date(Date.now() - 5 * 60 * 1000)
+                endDate: new Date(Date.now() + 5 * 60 * 1000)
+                startDate: new Date(Date.now() - 5 * 60 * 1000)
 
-            textColor: "#484848"
-            chunkColor: "#589900"
+                textColor: "#484848"
+                chunkColor: "#589900"
 
-            stickToEnd: true
+                stickToEnd: true
 
-            font.pixelSize: dp(18)
-            font.weight: Font.Bold
+                font.pixelSize: dp(18)
+                font.weight: Font.Bold
 
-            chunkBarHeight: dp(36)
+                chunkBarHeight: dp(36)
 
-            chunkProvider: chunkProvider
-            startBoundDate: chunkProvider.bottomBound
+                chunkProvider: chunkProvider
+                startBoundDate: chunkProvider.bottomBound
 
-            autoPlay: !stickToEnd && video.__playing
+                autoPlay: !stickToEnd && video.__playing
 
-            onMoveFinished: videoPlayer.alignToChunk(positionDate)
-        }
+                onMoveFinished: videoPlayer.alignToChunk(positionDate)
+            }
 
-        Rectangle {
-            id: navigationPanel
-            width: parent.width
-            height: dp(56)
-            anchors.top: timeline.bottom
-            color: "#0d0d0d"
+            Rectangle {
+                id: navigationPanel
+                width: parent.width
+                height: dp(56)
+                anchors.top: timeline.bottom
+                color: "#0d0d0d"
 
-            Button {
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-//                backgroundColor: parent.color
-                text: qsTr("LIVE")
-                onClicked: timeline.stickToEnd = true
+                Button {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+    //                backgroundColor: parent.color
+                    text: qsTr("LIVE")
+                    onClicked: timeline.stickToEnd = true
+                    opacity: timeline.stickToEnd ? 0.0 : 1.0
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                }
+    /*
+                IconButton {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: "white"
+                    iconName: "action/today"
+                }
+
+                IconButton {
+                    id: zoomOutButton
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.horizontalCenterOffset: -width / 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: "white"
+                    iconName: "content/remove"
+                }
+
+                IconButton {
+                    id: zoomInButton
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.horizontalCenterOffset: width / 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: "white"
+                    iconName: "content/add"
+                }
+                Timer {
+                    interval: 100
+                    repeat: true
+                    running: zoomInButton.pressed || zoomOutButton.pressed
+                    triggeredOnStart: true
+                    onTriggered: {
+                        if (zoomInButton.pressed)
+                            timeline.zoomIn()
+                        else
+                            timeline.zoomOut()
+                    }
+                }
+    */
+            }
+
+            Rectangle {
+                id: timeLabelBackground
+
+                property color baseColor: colorTheme.color("nx_baseBackground")
+
+                anchors.centerIn: timeline
+                anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
+                width: timeline.height - timeline.chunkBarHeight
+                height: timeLabel.width + dp(64)
+
+                rotation: 90
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: Qt.rgba(timeLabelBackground.baseColor.r, timeLabelBackground.baseColor.g, timeLabelBackground.baseColor.b, 0) }
+                    GradientStop { position: 0.2; color: timeLabelBackground.baseColor }
+                    GradientStop { position: 0.8; color: timeLabelBackground.baseColor }
+                    GradientStop { position: 1.0; color: Qt.rgba(timeLabelBackground.baseColor.r, timeLabelBackground.baseColor.g, timeLabelBackground.baseColor.b, 0) }
+                }
+            }
+
+            Text {
+                id: dateLabel
+
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    verticalCenter: timeline.verticalCenter
+                    verticalCenterOffset: -timeline.chunkBarHeight / 2 - timeLabel.height / 2
+                }
+
+                font.pixelSize: dp(20)
+                font.weight: Font.Light
+
+                text: timeline.positionDate.toLocaleDateString(__locale, qsTr("d MMMM yyyy"))
+                color: "white"
+
                 opacity: timeline.stickToEnd ? 0.0 : 1.0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
-/*
-            IconButton {
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
+
+            Text {
+                id: timeLabel
+
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    verticalCenter: timeline.verticalCenter
+                    verticalCenterOffset: -timeline.chunkBarHeight / 2 + (timeline.stickToEnd ? 0 : dateLabel.height / 2)
+                }
+
+                Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: 200 } }
+
+                font.pixelSize: dp(48)
+                font.weight: Font.Light
+
+                text: timeline.stickToEnd ? qsTr("LIVE") : timeline.positionDate.toTimeString()
                 color: "white"
-                iconName: "action/today"
             }
 
-            IconButton {
-                id: zoomOutButton
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.horizontalCenterOffset: -width / 2
-                anchors.verticalCenter: parent.verticalCenter
-                color: "white"
-                iconName: "content/remove"
-            }
+            QnPlaybackController {
+                id: playbackController
 
-            IconButton {
-                id: zoomInButton
+                width: parent.width - height / 3
+                height: dp(80)
+                anchors.bottom: timeline.top
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.horizontalCenterOffset: width / 2
-                anchors.verticalCenter: parent.verticalCenter
-                color: "white"
-                iconName: "content/add"
-            }
-            Timer {
-                interval: 100
-                repeat: true
-                running: zoomInButton.pressed || zoomOutButton.pressed
-                triggeredOnStart: true
-                onTriggered: {
-                    if (zoomInButton.pressed)
-                        timeline.zoomIn()
+                tickSize: cursorTickMargin
+                lineWidth: dp(2)
+                color: colorTheme.color("nx_baseText")
+                markersBackground: Qt.darker(color, 100)
+                highlightColor: "#2fffffff"
+                speedEnabled: false
+
+                onPausedChanged: {
+                    if (paused)
+                        video.pause()
                     else
-                        timeline.zoomOut()
+                        video.play()
                 }
             }
-*/
-        }
 
-        Rectangle {
-            id: timeLabelBackground
-
-            property color baseColor: colorTheme.color("nx_baseBackground")
-
-            anchors.centerIn: timeline
-            anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
-            width: timeline.height - timeline.chunkBarHeight
-            height: timeLabel.width + dp(64)
-
-            rotation: 90
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.rgba(timeLabelBackground.baseColor.r, timeLabelBackground.baseColor.g, timeLabelBackground.baseColor.b, 0) }
-                GradientStop { position: 0.2; color: timeLabelBackground.baseColor }
-                GradientStop { position: 0.8; color: timeLabelBackground.baseColor }
-                GradientStop { position: 1.0; color: Qt.rgba(timeLabelBackground.baseColor.r, timeLabelBackground.baseColor.g, timeLabelBackground.baseColor.b, 0) }
+            Rectangle {
+                color: "white"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                width: cursorWidth
+                height: timeline.chunkBarHeight + cursorTickMargin
             }
-        }
-
-        Text {
-            id: dateLabel
-
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                verticalCenter: timeline.verticalCenter
-                verticalCenterOffset: -timeline.chunkBarHeight / 2 - timeLabel.height / 2
-            }
-
-            font.pixelSize: dp(20)
-            font.weight: Font.Light
-
-            text: timeline.positionDate.toLocaleDateString(__locale, qsTr("d MMMM yyyy"))
-            color: "white"
-
-            opacity: timeline.stickToEnd ? 0.0 : 1.0
-            Behavior on opacity { NumberAnimation { duration: 200 } }
-        }
-
-        Text {
-            id: timeLabel
-
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                verticalCenter: timeline.verticalCenter
-                verticalCenterOffset: -timeline.chunkBarHeight / 2 + (timeline.stickToEnd ? 0 : dateLabel.height / 2)
-            }
-
-            Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: 200 } }
-
-            font.pixelSize: dp(48)
-            font.weight: Font.Light
-
-            text: timeline.stickToEnd ? qsTr("LIVE") : timeline.positionDate.toTimeString()
-            color: "white"
-        }
-
-        QnPlaybackController {
-            id: playbackController
-
-            width: parent.width - height / 3
-            height: dp(80)
-            anchors.bottom: timeline.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            tickSize: cursorTickMargin
-            lineWidth: dp(2)
-            color: colorTheme.color("nx_baseText")
-            markersBackground: Qt.darker(color, 100)
-            highlightColor: "#2fffffff"
-            speedEnabled: false
-
-            onPausedChanged: {
-                if (paused)
-                    video.pause()
-                else
-                    video.play()
-            }
-        }
-
-        Rectangle {
-            color: "white"
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            width: cursorWidth
-            height: timeline.chunkBarHeight + cursorTickMargin
         }
     }
 }
