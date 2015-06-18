@@ -1,5 +1,6 @@
-function openDiscoveredSession(_host, _port, _systemName) {
+function openDiscoveredSession(_sessionId, _host, _port, _systemName) {
     sideNavigation.hide()
+    sideNavigation.activeSessionId = _sessionId
 
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
@@ -15,6 +16,7 @@ function openDiscoveredSession(_host, _port, _systemName) {
 
 function openSavedSession(_sessionId, _host, _port, _login, _password, _systemName) {
     sideNavigation.hide()
+    sideNavigation.activeSessionId = _sessionId
 
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
@@ -31,5 +33,6 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
 }
 
 function backToNewSession() {
+    sideNavigation.activeSessionId = ""
     stackView.pop()
 }

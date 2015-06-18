@@ -114,7 +114,7 @@ void QnLoginSessionsModel::setDisplayMode(DisplayModeFlags displayMode) {
     endResetModel();
 }
 
-void QnLoginSessionsModel::updateSession(const QString &address, const int port, const QString &user, const QString &password, const QString &systemName) {
+QString QnLoginSessionsModel::updateSession(const QString &address, const int port, const QString &user, const QString &password, const QString &systemName) {
     auto predicate = [&](const QnLoginSession &session) -> bool {
         return session.address == address && session.port == port && session.user == user;
     };
@@ -152,6 +152,8 @@ void QnLoginSessionsModel::updateSession(const QString &address, const int port,
     }
 
     saveToSettings();
+
+    return m_savedSessions[0].id();
 }
 
 void QnLoginSessionsModel::deleteSession(const QString &id) {

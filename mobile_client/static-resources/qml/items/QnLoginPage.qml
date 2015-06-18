@@ -21,9 +21,6 @@ QnPage {
 
     property string newConnectionLabel: qsTr("New Connection")
 
-    signal openDiscoveredSessionRequested(string host, int port, string systemName)
-    signal openSavedSessionRequested()
-
     title: newConnectionLabel
 
     leftToolBarComponent: QnMenuBackButton {
@@ -132,7 +129,7 @@ QnPage {
                     color: QnTheme.buttonAccentBackground
                 }
 
-                onClicked: LoginFunctions.connectToServer(hostField.text, portField.text, loginField.text, passwordField.text)
+                onClicked: LoginFunctions.connectToServer("", hostField.text, portField.text, loginField.text, passwordField.text)
             }
 
             Loader {
@@ -194,7 +191,7 @@ QnPage {
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: Main.openDiscoveredSession(address, port, systemName)
+                        onClicked: Main.openDiscoveredSession(sessionId, address, port, systemName)
                     }
                 }
             }

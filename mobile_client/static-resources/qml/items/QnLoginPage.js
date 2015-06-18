@@ -18,18 +18,20 @@ function clearCurrentSession() {
 }
 
 function updateCurrentSession() {
-    if (currentPort > 0)
-        updateSession(currentHost, currentPort, currentLogin, currentPasswrod, connectionManager.systemName)
+    if (currentPort > 0) {
+        sideNavigation.activeSessionId = updateSession(currentHost, currentPort, currentLogin, currentPasswrod, connectionManager.systemName)
+    }
 }
 
-function connectToServer(host, port, login, password) {
+function connectToServer(sessionId, host, port, login, password) {
     currentHost = host
     currentPort = port
     currentLogin = login
     currentPasswrod = password
 
     sideNavigation.hide()
-    connectionManager.connectToServer(makeUrl(host, port, login, password))
+    sideNavigation.activeSessionId = sessionId
+    connectionManager.connectToServer(sessionId, makeUrl(host, port, login, password))
 }
 
 function saveSession(host, port, login, password, systemName) {

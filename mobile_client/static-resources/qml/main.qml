@@ -53,7 +53,6 @@ Window {
         id: loginPage
 
         QnLoginPage {
-            onOpenDiscoveredSessionRequested: Main.openDiscoveredSession(host, port, systemName)
         }
     }
 

@@ -12,6 +12,8 @@ QnNavigationDrawer {
     property string activeSessionId
     readonly property alias savedSessionsModel: savedSessionsModel
 
+    onActiveSessionIdChanged: console.log(activeSessionId)
+
     parent: _findRootItem()
 
     color: QnTheme.sideNavigationBackground
@@ -68,11 +70,18 @@ QnNavigationDrawer {
                         height: dp(120)
                         color: active ? QnTheme.sessionItemBackgroundActive : QnTheme.sideNavigationBackground
 
+                        Rectangle {
+                            height: parent.height
+                            width: dp(3)
+                            color: QnTheme.sessionItemActiveMark
+                            visible: active
+                        }
+
                         property bool active: activeSessionId == sessionId
 
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: LoginFunctions.connectToServer(address, port, user, password)
+                            onClicked: LoginFunctions.connectToServer(sessionId, address, port, user, password)
                         }
 
                         Column {
