@@ -1,6 +1,6 @@
 import QtQuick 2.4
 
-Item {
+FocusScope {
     property string title
 
     property Component leftToolBarComponent

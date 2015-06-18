@@ -113,6 +113,8 @@ FocusScope {
                     textField.accepted()
                 }
 
+                font.pixelSize: sp(16)
+
                 onEditingFinished: textField.editingFinished()
                 onCursorPositionChanged: {
                     if (!cursorVisible)

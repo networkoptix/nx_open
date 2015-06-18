@@ -75,16 +75,12 @@ QnPage {
                     id: hostField
                     width: parent.width * 3 / 5
                     placeholderText: qsTr("Host")
-
-                    text: "127.0.0.1"
                 }
 
                 QnTextField {
                     id: portField
                     width: parent.width * 2 / 5 - parent.spacing
                     placeholderText: qsTr("Port")
-
-                    text: "7001"
                 }
             }
 
@@ -92,8 +88,6 @@ QnPage {
                 id: loginField
                 width: parent.width
                 placeholderText: qsTr("Login")
-
-                text: "admin"
             }
 
             QnTextField {
@@ -101,8 +95,6 @@ QnPage {
                 width: parent.width
                 placeholderText: qsTr("Password")
                 echoMode: TextInput.Password
-
-                text: "123"
             }
 
             Row {
@@ -218,6 +210,11 @@ QnPage {
         },
         State {
             name: "Discovered"
+            StateChangeScript {
+                script: {
+                    loginField.forceActiveFocus()
+                }
+            }
         },
         State {
             name: "Saved"
