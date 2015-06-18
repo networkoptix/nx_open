@@ -15,7 +15,7 @@ QnPage {
     title: newConnectionLabel
 
     leftToolBarComponent: QnMenuBackButton {
-
+        navigationDrawer: navDrawer
     }
 
     Flickable {
@@ -120,5 +120,9 @@ QnPage {
                 onClicked: LoginFunctions.connectToServer(hostField.text, portField.text, loginField.text, passwordField.text)
             }
         }
+    }
+
+    QnNavigationDrawer {
+        id: navDrawer
     }
 }
