@@ -1,5 +1,7 @@
 import QtQuick 2.0
 
+import com.networkoptix.qml 1.0
+
 import "../icons"
 
 Item {
@@ -117,7 +119,7 @@ Item {
         id: grip
 
         property real defaultX: (parent.width - width) / 2
-        property color idleColor: Qt.rgba(rootItem.color.r, rootItem.color.g, rootItem.color.b, 0)
+        property color idleColor: QnTheme.transparent(rootItem.color, 0)
 
         x: defaultX
 

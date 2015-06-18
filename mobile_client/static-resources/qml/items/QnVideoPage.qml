@@ -244,7 +244,7 @@ QnPage {
             Rectangle {
                 id: timeLabelBackground
 
-                property color baseColor: colorTheme.color("nx_baseBackground")
+                property color baseColor: QnTheme.windowBackground
 
                 anchors.centerIn: timeline
                 anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
@@ -253,10 +253,10 @@ QnPage {
 
                 rotation: 90
                 gradient: Gradient {
-                    GradientStop { position: 0.0; color: Qt.rgba(timeLabelBackground.baseColor.r, timeLabelBackground.baseColor.g, timeLabelBackground.baseColor.b, 0) }
+                    GradientStop { position: 0.0; color: QnTheme.transparent(timeLabelBackground.baseColor, 0) }
                     GradientStop { position: 0.2; color: timeLabelBackground.baseColor }
                     GradientStop { position: 0.8; color: timeLabelBackground.baseColor }
-                    GradientStop { position: 1.0; color: Qt.rgba(timeLabelBackground.baseColor.r, timeLabelBackground.baseColor.g, timeLabelBackground.baseColor.b, 0) }
+                    GradientStop { position: 1.0; color: QnTheme.transparent(timeLabelBackground.baseColor, 0) }
                 }
             }
 
@@ -306,7 +306,7 @@ QnPage {
                 anchors.horizontalCenter: parent.horizontalCenter
                 tickSize: cursorTickMargin
                 lineWidth: dp(2)
-                color: colorTheme.color("nx_baseText")
+                color: QnTheme.windowText
                 markersBackground: Qt.darker(color, 100)
                 highlightColor: "#2fffffff"
                 speedEnabled: false

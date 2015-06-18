@@ -9,17 +9,13 @@ Item {
     property int type
     property string resourceId
 
-    property var __syspal: SystemPalette {
-        colorGroup: SystemPalette.Active
-    }
-
     height: text.height
 
     Text {
         id: text
         text: name
         renderType: Text.NativeRendering
-        color: __syspal.windowText
+        color: QnTheme.windowText
     }
 
     MouseArea {

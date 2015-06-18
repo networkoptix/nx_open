@@ -15,6 +15,9 @@ public:
     Q_INVOKABLE QColor color(const QString &key) const;
     QPalette palette() const;
 
+signals:
+    void updated();
+
 private:
     QHash<QString, QColor> m_colors;
     QPalette m_palette;

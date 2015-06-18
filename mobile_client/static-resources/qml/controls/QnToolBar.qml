@@ -1,14 +1,13 @@
 import QtQuick 2.4
 
+import com.networkoptix.qml 1.0
+
 Item {
     id: toolbar
 
-    property alias color: backgroundRectangle.color
-    property alias textColor: label.color
-
     property alias leftComponent: leftLoader.sourceComponent
     property alias rightComponent: rightLoader.sourceComponent
-    property alias label: label.text
+    property alias title: label.text
 
     width: parent.width
     height: dp(56)
@@ -16,7 +15,7 @@ Item {
     Rectangle {
         id: backgroundRectangle
         anchors.fill: parent
-        color: "transparent"
+        color: QnTheme.windowBackground
     }
 
     Loader {
@@ -38,5 +37,6 @@ Item {
         x: dp(72)
         font.pixelSize: sp(20)
         font.weight: Font.DemiBold
+        color: QnTheme.windowText
     }
 }

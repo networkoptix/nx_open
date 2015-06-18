@@ -18,17 +18,12 @@ FocusScope {
 
     property int textPadding: 0
 
-    property color inactiveColor: colorTheme.color("textInput")
-    property color activeColor: palette.button
-    property alias textColor: palette.text
+    property color inactiveColor: QnTheme.inputBorder
+    property color activeColor: QnTheme.inputBorderActive
+    property color textColor: QnTheme.inputText
 
     signal accepted()
     signal editingFinished()
-
-    SystemPalette {
-        id: palette
-        colorGroup: SystemPalette.Active
-    }
 
     implicitWidth: Math.round(textInput.contentHeight * 8)
     implicitHeight: Math.max(25, Math.round(textInput.contentHeight * 1.2))

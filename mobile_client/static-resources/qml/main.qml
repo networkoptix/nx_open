@@ -18,19 +18,13 @@ Window {
 
     property string activeResourceId
 
-    SystemPalette {
-        id: palette
-        colorGroup: SystemPalette.Active
-    }
-
     Rectangle {
         anchors.fill: parent
-        color: palette.window
+        color: QnTheme.windowBackground
     }
 
     QnToolBar {
         id: toolBar
-        textColor: palette.windowText
     }
 
     StackView {
@@ -43,7 +37,7 @@ Window {
 
         onCurrentItemChanged: {
             if (currentItem) {
-                toolBar.label = currentItem.title
+                toolBar.title = currentItem.title
                 toolBar.leftComponent = currentItem.leftToolBarComponent
                 toolBar.rightComponent = currentItem.rightToolBarComponent
             }
@@ -83,5 +77,10 @@ Window {
         onConnected: {
             stackView.replace(resourcesPage)
         }
+    }
+
+    Connections {
+        target: colorTheme
+        onUpdated: QnTheme.loadColors()
     }
 }

@@ -36,7 +36,7 @@ QnPage {
                 height: visible ? dp(48) : 0
                 width: loginPage.width
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: QnTheme.attentionColor
+                color: QnTheme.attentionBackground
                 visible: false
 
                 Behavior on height { NumberAnimation { duration: 200 } }
@@ -46,7 +46,7 @@ QnPage {
                     text: qsTr("Incorrect login or password")
                     font.pixelSize: sp(16)
                     font.weight: Font.Bold
-                    color: QnTheme.textColor
+                    color: QnTheme.windowText
                 }
             }
 

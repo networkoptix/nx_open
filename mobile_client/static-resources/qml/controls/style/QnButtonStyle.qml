@@ -6,13 +6,8 @@ import com.networkoptix.qml 1.0
 ButtonStyle {
     id: style
 
-    SystemPalette {
-        id: palette
-        colorGroup: SystemPalette.Active
-    }
-
-    property color color: palette.button
-    property color textColor: palette.buttonText
+    property color color: QnTheme.buttonBackground
+    property color textColor: QnTheme.buttonText
 
     background: Item {
         implicitHeight: dp(48)

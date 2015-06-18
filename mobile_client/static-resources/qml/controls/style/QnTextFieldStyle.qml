@@ -4,13 +4,8 @@ import QtQuick.Controls.Styles 1.2
 import com.networkoptix.qml 1.0
 
 TextFieldStyle {
-    SystemPalette {
-        id: palette
-        colorGroup: SystemPalette.Active
-    }
-
-    textColor: palette.text
-    placeholderTextColor: colorTheme.color("textInput")
+    textColor: QnTheme.inputText
+    placeholderTextColor: QnTheme.inputPlaceholder
     background: Item {
         Rectangle {
             anchors {
@@ -23,7 +18,7 @@ TextFieldStyle {
             }
             border.width: 0
             height: dp(1)
-            color: control.activeFocus ? palette.highlight : colorTheme.color("textInput")
+            color: control.activeFocus ? QnTheme.inputBorderActive : QnTheme.inputBorder
         }
     }
 }
