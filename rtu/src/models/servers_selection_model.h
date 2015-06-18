@@ -14,6 +14,8 @@ namespace rtu
         Q_OBJECT
 
         Q_PROPERTY(int selectedCount READ selectedCount NOTIFY selectionChanged)
+        Q_PROPERTY(int serversCount READ serversCount NOTIFY serversCountChanged)
+        
     public:
         ServersSelectionModel(QObject *parent = nullptr);
         
@@ -24,7 +26,7 @@ namespace rtu
         
         void setItemSelected(int rowIndex);
 
-//        void selectionPasswordChanged(const QString &password);
+        void setAllItemSelected(bool selected);
         
         void tryLoginWith(const QString &password);
 
@@ -34,6 +36,8 @@ namespace rtu
         
         ServerInfoList selectedServers();
 
+        int serversCount() const;
+        
         ///
 
         void addServer(const BaseServerInfo &baseInfo);
@@ -62,6 +66,8 @@ namespace rtu
 
     signals:
         void selectionChanged();
+        
+        void serversCountChanged();
         
         void serverLogged(const ServerInfo &info);
     private:

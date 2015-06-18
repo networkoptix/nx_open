@@ -28,10 +28,6 @@ void registerTypes()
         , kMajorVersion, kMinorVersion, kButtonsModelQmlTypeName);
 }
 
-#include <helpers/time_helper.h>
-#include <QFont>
-#include <QFontDatabase>
-
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);

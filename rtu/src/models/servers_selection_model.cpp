@@ -214,11 +214,16 @@ public:
     
     int rowCount() const;
     
+    int serversCount() const;
+    
     QVariant data(const QModelIndex &index
         , int role) const;
     
     void changeItemSelectedState(int rowIndex
-        , bool explicitSelection);
+        , bool explicitSelection
+        , bool updateSelection = true);
+    
+    void setAllItemSelected(bool selected);
     
     int selectedCount() const;
     
@@ -326,13 +331,20 @@ rtu::ServersSelectionModel::Impl::~Impl() {}
 
 int rtu::ServersSelectionModel::Impl::rowCount() const
 {
+    return serversCount() + m_systems.count();
+}
+
+int rtu::ServersSelectionModel::Impl::serversCount() const
+{
     int count = 0;
-    std::for_each(m_systems.begin(), m_systems.end(), [&count](const SystemModelInfo& systemInfo)
+    std::for_each(m_systems.begin(), m_systems.end()
+        , [&count](const SystemModelInfo& systemInfo)
     {
-        count += kSystemItemCapacity + systemInfo.servers.size();
+        count += systemInfo.servers.size();
     });
     return count;
 }
+
 
 QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
     , int role) const
@@ -445,7 +457,8 @@ void rtu::ServersSelectionModel::Impl::setSystemSelectedStateImpl(SystemModelInf
 }
 
 void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
-    , bool explicitSelection)
+    , bool explicitSelection
+    , bool updateSelection)
 {
     ItemSearchInfo searchInfo;
     if (!findItem(rowIndex, m_systems, searchInfo))
@@ -453,6 +466,10 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
     
     if (searchInfo.serverInfoIterator != searchInfo.systemInfoIterator->servers.end())
     {
+        if (!searchInfo.serverInfoIterator->serverInfo.hasExtraInfo())
+        {
+            int i = 0;
+        }
         const ServerModelInfo &serverInfo = *searchInfo.serverInfoIterator;
         const bool wasSelected = (serverInfo.selectedState != Qt::Unchecked);
 
@@ -495,7 +512,38 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
             , searchInfo.systemInfoIterator->servers.size() + 1);
     }
 
-    emit m_owner->selectionChanged();
+    if (updateSelection)
+        emit m_owner->selectionChanged();
+}
+
+void rtu::ServersSelectionModel::Impl::setAllItemSelected(bool selected)
+{
+    bool selectionChanged = false;
+    int index = 0;
+    for (int systemIndex = 0; systemIndex != m_systems.count(); ++systemIndex)
+    {
+        index += kSystemItemCapacity;
+        
+        const SystemModelInfo &systemInfo = m_systems.at(systemIndex);
+        if ((selected && (systemInfo.selectedServers != systemInfo.servers.size()))
+            || (!selected && systemInfo.selectedServers))
+        {
+            for (int serverIndex = 0; serverIndex != systemInfo.servers.size(); ++serverIndex)
+            {
+                const ServerModelInfo &serverInfo = systemInfo.servers.at(serverIndex);
+                const bool wasSelected = (serverInfo.selectedState == Qt::Checked);
+                if ((wasSelected != selected) && serverInfo.serverInfo.hasExtraInfo())
+                {
+                    changeItemSelectedState(index + serverIndex, false, false);
+                    selectionChanged = true;
+                }
+            }
+        }
+        index += systemInfo.servers.size();
+    }
+    
+    if (selectionChanged)
+        emit m_owner->selectionChanged();
 }
 
 int rtu::ServersSelectionModel::Impl::selectedCount() const
@@ -681,6 +729,8 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     
     if (!info.hasExtraInfo())
         m_loginManager->loginToServer(info.baseInfo());
+    
+    emit m_owner->serversCountChanged();
 }
 
 void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseInfo)
@@ -747,6 +797,8 @@ void rtu::ServersSelectionModel::Impl::removeServers(const IDsVector &removed)
 
     if (wasSelected && !selectedNow)
         emit m_owner->selectionChanged();
+    
+    emit m_owner->serversCountChanged();
 }
 
 bool rtu::ServersSelectionModel::Impl::removeServerImpl(const QUuid &id
@@ -806,6 +858,12 @@ void rtu::ServersSelectionModel::changeItemSelectedState(int rowIndex)
 void rtu::ServersSelectionModel::setItemSelected(int rowIndex)
 {
     m_impl->changeItemSelectedState(rowIndex, true);
+    emit dataChanged(index(0), index(m_impl->rowCount() - 1));
+}
+
+void rtu::ServersSelectionModel::setAllItemSelected(bool selected)
+{
+    m_impl->setAllItemSelected(selected);
     emit dataChanged(index(0), index(m_impl->rowCount() - 1));
 }
 
@@ -870,6 +928,11 @@ int rtu::ServersSelectionModel::selectedCount() const
 rtu::ServerInfoList rtu::ServersSelectionModel::selectedServers()
 {
     return m_impl->selectedServers();
+}
+
+int rtu::ServersSelectionModel::serversCount() const
+{
+    return m_impl->serversCount();
 }
 
 int rtu::ServersSelectionModel::rowCount(const QModelIndex &parent) const

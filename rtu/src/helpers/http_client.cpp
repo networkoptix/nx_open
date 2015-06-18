@@ -107,7 +107,7 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
             const QString &httpError = (httpErrorVar.isValid() ? 
                 httpErrorVar.toString() : QString());
             const QString &errorReason = (!httpError.isEmpty()? httpError 
-                : QString("Netowrk error #%1").arg(errorCode));
+                : QString("Network error #%1").arg(errorCode));
             errorCallback(errorReason, httpCode);
         }
     }

@@ -64,7 +64,8 @@ Expandable.MaskedSettingsPanel
             {
                 id: flagged;
 
-                property bool changed: (showFirst && currentItem.item.changed ? true : false);
+                property bool changed: (showFirst && currentItem.item 
+                    && currentItem.item.changed ? true : false);
                 property bool dhcpForceOnly: (rtuContext.selection.count !== 1);
                 
                 anchors

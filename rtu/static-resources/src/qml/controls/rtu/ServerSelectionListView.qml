@@ -21,13 +21,36 @@ ListView
 
     model: rtuContext.selectionModel();
     
-    header: Rtu.SelectionHeader {}
+    header: Rtu.SelectionHeader 
+    {
+        selectAllCheckedState: (!model.serversCount || !model.selectedCount ? Qt.Unchecked
+            : (model.selectedCount === model.serversCount ? Qt.Checked : Qt.PartiallyChecked));
+        
+        onSelectAllServers:
+        {
+            var selectedParam = select;
+            impl.tryChangeSelectedServers(function()
+            {
+                thisComponent.model.setAllItemSelected(selectedParam);
+            });
+        }
+    }
 
+    footer: Rtu.SelectionFooter 
+    {
+        enabled: (model.serversCount && (model.selectedCount !== model.serversCount));
+    
+        onSelectAllClicked: impl.tryChangeSelectedServers(function()
+        {
+            thisComponent.model.setAllItemSelected(true);
+        });
+       
+    }
+    
     delegate: Loader
     {
         id: meatLoader;
 
-        
         Component
         {
             id: systemDelegate;
@@ -55,7 +78,11 @@ ListView
                 
                 onExplicitSelectionCalled: 
                 {
-                    impl.tryChangeSelectedServers(thisComponent.model.setItemSelected, index);
+                    var selectedIndex = index;
+                    impl.tryChangeSelectedServers(function() 
+                    {
+                        thisComponent.model.setItemSelected(index);
+                    });
                 }
             }
         }
@@ -68,7 +95,11 @@ ListView
             target: meatLoader.item;
             onSelectionStateShouldBeChanged: 
             {
-                impl.tryChangeSelectedServers(thisComponent.model.changeItemSelectedState, index);
+                var selectedIndex = index;
+                impl.tryChangeSelectedServers( function() 
+                {
+                    thisComponent.model.changeItemSelectedState(index);
+                });
             }
         }
     }
@@ -105,17 +136,17 @@ ListView
 
     property QtObject impl: QtObject
     {
-        function tryChangeSelectedServers(changeFunc, index)
+        function tryChangeSelectedServers(changeFunc)
         {
             if (askForSelectionChange)
             {
-                confirmationDialog.changeSelectionFunc = function() { changeFunc(index); }
+                confirmationDialog.changeSelectionFunc = function() { changeFunc(); }
                 confirmationDialog.applyChangesFunc = thisComponent.applyChanges;
                 confirmationDialog.show();
             }
             else
             {
-                changeFunc(index);
+                changeFunc();
             }
         }
     }
