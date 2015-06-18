@@ -1,3 +1,5 @@
 #pragma once
 
-void executeDelayed(std::function<void()> callback, int delayMs = 1);
+class QThread;
+
+void executeDelayed(std::function<void()> callback, int delayMs = 1, QThread *targetThread = nullptr);

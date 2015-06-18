@@ -76,7 +76,7 @@ namespace ec2
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
         ECConnectionNotificationManager* notificationManager() { return m_notificationManager.get(); }
 
-        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer) const override;
+        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     protected:
         QueryProcessorType* m_queryProcessor;
         ResourceContext m_resCtx;

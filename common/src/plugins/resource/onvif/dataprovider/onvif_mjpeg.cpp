@@ -6,6 +6,7 @@
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/network/http/httptypes.h"
+#include "utils/media/jpeg_utils.h"
 
 /*
 inline static int findJPegStartCode(const char *data, int datalen)
@@ -133,8 +134,13 @@ QnAbstractMediaDataPtr MJPEGStreamReader::getNextData()
         videoData->m_data.finishWriting(-1);
 
     videoData->compressionType = CODEC_ID_MJPEG;
-    videoData->width = 1920;
-    videoData->height = 1088;
+
+    nx_jpg::ImageInfo imgInfo;
+    if( nx_jpg::readJpegImageInfo( (const quint8*)videoData->data(), videoData->dataSize(), &imgInfo ) )
+    {
+        videoData->width = imgInfo.width;
+        videoData->height = imgInfo.height;
+    }
     videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     videoData->channelNumber = 0;
     videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;

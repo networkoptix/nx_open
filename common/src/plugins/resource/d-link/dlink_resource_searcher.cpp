@@ -137,7 +137,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
             QnPlDlinkResourcePtr resource ( new QnPlDlinkResource() );
 
-            QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+            QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
             if (rt.isNull())
                 continue;
 
@@ -208,7 +208,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
         return QList<QnResourcePtr>();
 
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 

@@ -1525,6 +1525,16 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
         transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
         return;
     }
+    
+    for( QnTransactionTransport* transport: m_connectingConnections )
+    {
+        if( transport->connectionGuid() != connectionGuid )
+            continue;
+        //mutex is unlocked if we go to wait
+        transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+        return;
+    }
+
 }
 
 void QnTransactionMessageBus::connectionFailure( const QnUuid& connectionGuid )
@@ -1632,9 +1642,10 @@ void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* han
         m_handler = nullptr;
 }
 
-QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
+QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* peerDistance) const
 {
     QMutexLocker lock(&m_mutex);
+    *peerDistance = INT_MAX;
     const auto itr = m_alivePeers.find(dstPeer);
     if (itr == m_alivePeers.cend())
         return QnUuid(); // route info not found
@@ -1649,6 +1660,7 @@ QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
             result = itr2.key();
         }
     }
+    *peerDistance = minDistance;
     return result;
 }
 
