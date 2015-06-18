@@ -163,6 +163,8 @@ void QnColorTheme::readFromFile(const QString &fileName) {
 
     m_colors = parseColors(colorsMap);
     fillPalette(m_palette, m_colors);
+
+    emit updated();
 }
 
 QColor QnColorTheme::color(const QString &key) const {

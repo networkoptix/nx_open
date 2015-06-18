@@ -12,22 +12,18 @@ FocusScope {
     property alias validator: textInput.validator
     property alias echoMode: textInput.echoMode
     property alias inputMethodHints: textInput.inputMethodHints
-    property int leftPadding
-    property int rightPadding
+    property int leftPadding: dp(6)
+    property int rightPadding: dp(6)
     property alias passwordCharacter: textInput.passwordCharacter
 
     property int textPadding: 0
 
-    property color inactiveColor: Qt.rgba(0, 0, 0, 0.3)
-    property color activeColor: __syspal.button
-    property alias textColor: textInput.color
+    property color inactiveColor: QnTheme.inputBorder
+    property color activeColor: QnTheme.inputBorderActive
+    property color textColor: QnTheme.inputText
 
     signal accepted()
     signal editingFinished()
-
-    property var __syspal: SystemPalette {
-        colorGroup: SystemPalette.Active
-    }
 
     implicitWidth: Math.round(textInput.contentHeight * 8)
     implicitHeight: Math.max(25, Math.round(textInput.contentHeight * 1.2))
@@ -41,7 +37,29 @@ FocusScope {
         }
         y: parent.height
         border.width: 0
-        height: textInput.activeFocus ? CommonFunctions.dp(2) : CommonFunctions.dp(1)
+        height: textInput.activeFocus ? CommonFunctions.dp(1) : CommonFunctions.dp(1)
+        color: textInput.activeFocus ? activeColor : inactiveColor
+    }
+
+    Rectangle {
+        anchors {
+            left: parent.left
+            bottom: parent.bottom
+        }
+        border.width: 0
+        height: dp(6)
+        width: dp(1)
+        color: textInput.activeFocus ? activeColor : inactiveColor
+    }
+
+    Rectangle {
+        anchors {
+            right: parent.right
+            bottom: parent.bottom
+        }
+        border.width: 0
+        height: dp(6)
+        width: dp(1)
         color: textInput.activeFocus ? activeColor : inactiveColor
     }
 
@@ -78,6 +96,8 @@ FocusScope {
                 id: textInput
                 focus: true
                 selectByMouse: Qt.platform.os !== "android" // Workaround for QTBUG-36515
+
+                color: textField.textColor
 
                 verticalAlignment: Text.AlignVCenter
                 clip: false

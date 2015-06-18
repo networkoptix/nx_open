@@ -11,7 +11,7 @@ namespace {
     const qreal referencePpi = 160.0;
 }
 
-QnResolutionUtil::DensityClass QnResolutionUtil::currentDensityClass() {
+QnResolutionUtil::DensityClass QnResolutionUtil::currentDensityClass() const {
     static QList<qreal> standardMultipliers;
     if (standardMultipliers.isEmpty()) {
         standardMultipliers << densityMultiplier(Ldpi)
@@ -69,4 +69,36 @@ QString QnResolutionUtil::densityName(QnResolutionUtil::DensityClass densityClas
     case Xxxhdpi: return lit("xxxhdpi");
     }
     return QString();
+}
+
+QnResolutionUtil::QnResolutionUtil():
+    m_densityClass(currentDensityClass()),
+    m_multiplier(densityMultiplier(m_densityClass))
+{
+}
+
+QnResolutionUtil::QnResolutionUtil(QnResolutionUtil::DensityClass customDensityClass):
+    m_densityClass(customDensityClass),
+    m_multiplier(densityMultiplier(m_densityClass))
+{
+}
+
+QnResolutionUtil::DensityClass QnResolutionUtil::densityClass() const {
+    return m_densityClass;
+}
+
+QString QnResolutionUtil::densityName() const {
+    return densityName(m_densityClass);
+}
+
+qreal QnResolutionUtil::densityMultiplier() const {
+    return m_multiplier;
+}
+
+int QnResolutionUtil::dp(qreal dpix) const {
+    return qRound(dpix * m_multiplier);
+}
+
+int QnResolutionUtil::sp(qreal dpix) const {
+    return dp(dpix);
 }

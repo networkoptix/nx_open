@@ -26,17 +26,17 @@
 #include "version.h"
 
 int runUi(QGuiApplication *application) {
-    QnResolutionUtil::DensityClass densityClass = QnResolutionUtil::currentDensityClass();
-    qDebug() << "Starting with density class: " << QnResolutionUtil::densityName(densityClass);
-
-    QFileSelector fileSelector;
-    fileSelector.setExtraSelectors(QStringList() << QnResolutionUtil::densityName(densityClass));
-
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
     thumbnailProvider->setThumbnailCache(thumbnailsCache.data());
 
     QnContext context;
+
+    QnResolutionUtil::DensityClass densityClass = QnResolutionUtil::instance()->densityClass();
+    qDebug() << "Starting with density class: " << QnResolutionUtil::densityName(densityClass);
+
+    QFileSelector fileSelector;
+    fileSelector.setExtraSelectors(QStringList() << QnResolutionUtil::densityName(densityClass));
 
     context.colorTheme()->readFromFile(fileSelector.select(lit(":/color_theme.json")));
     qApp->setPalette(context.colorTheme()->palette());
@@ -47,7 +47,7 @@ int runUi(QGuiApplication *application) {
 
     engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
     engine.rootContext()->setContextObject(&context);
-    engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::densityMultiplier(densityClass));
+    engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::instance()->densityMultiplier());
 
     QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
     QScopedPointer<QObject> mainWindow(mainComponent.create());

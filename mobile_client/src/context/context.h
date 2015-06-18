@@ -9,6 +9,7 @@
 class QnConnectionManager;
 class QnColorTheme;
 class QnMobileAppInfo;
+class QnResolutionUtil;
 
 class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
@@ -33,6 +34,9 @@ public:
         return m_appInfo;
     }
 
+    Q_INVOKABLE int dp(qreal dpix) const;
+    Q_INVOKABLE int sp(qreal dpix) const;
+
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
     void connectionManagerChanged();
@@ -47,6 +51,8 @@ private:
     QnConnectionManager *m_connectionManager;
     QnColorTheme *m_colorTheme;
     QnMobileAppInfo *m_appInfo;
+
+    QScopedPointer<QnResolutionUtil> m_resolutionUtil;
 };
 
 Q_DECLARE_METATYPE(QnContext*)

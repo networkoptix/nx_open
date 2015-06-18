@@ -3,9 +3,6 @@ import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.2
 
-import Material 0.1
-import Material.ListItems 0.1 as ListItem
-
 import com.networkoptix.qml 1.0
 
 import "../controls"
@@ -13,7 +10,7 @@ import "../controls"
 import "login_dialog_functions.js" as LoginDialogFunctions
 import "../common_functions.js" as CommonFunctions
 
-Page {
+Item {
     id: loginPage
 
     property string __currentId
@@ -113,7 +110,7 @@ Page {
         anchors {
             bottom: parent.bottom
             right: parent.right
-            margins: Units.dp(16)
+            margins: dp(16)
         }
         iconName: "content/add"
         onClicked: sessionEditDialog.openNewSession()
