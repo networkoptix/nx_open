@@ -19,6 +19,12 @@ Window {
 
     property string activeResourceId
 
+    property string currentHost
+    property int currentPort
+    property string currentLogin
+    property string currentPasswrod
+    property string currentSessionId
+
     Rectangle {
         anchors.fill: parent
         color: QnTheme.windowBackground
@@ -64,6 +70,7 @@ Window {
 
     QnSideNavigation {
         id: sideNavigation
+        activeSessionId: currentSessionId
     }
 
     StackView {
@@ -81,25 +88,27 @@ Window {
     }
 
     Component {
-        id: loginPage
+        id: loginPageComponent
 
         QnLoginPage {
         }
     }
 
     Component {
-        id: resourcesPage
+        id: resourcesPageComponent
 
         QnResourcesPage {
+            id: resourcesPage
+
             onVideoRequested: {
                 activeResourceId = uuid
-                stackView.push(videoPlayer)
+                stackView.push(videoPlayerComponent)
             }
         }
     }
 
     Component {
-        id: videoPlayer
+        id: videoPlayerComponent
 
         QnVideoPage {
             id: videoPlayerContent
@@ -110,7 +119,7 @@ Window {
     Connections {
         target: connectionManager
         onConnected: {
-            LoginFunctions.updateCurrentSession()
+            LoginFunctions.saveCurrentSession()
             Main.gotoResources()
         }
     }
@@ -121,6 +130,6 @@ Window {
     }
 
     Component.onCompleted: {
-        stackView.push([resourcesPage, loginPage])
+        stackView.push([resourcesPageComponent, loginPageComponent])
     }
 }

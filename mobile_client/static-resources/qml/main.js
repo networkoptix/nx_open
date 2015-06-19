@@ -1,4 +1,5 @@
-function openDiscoveredSession(_sessionId, _host, _port, _systemName) {
+function openDiscoveredSession(_host, _port, _systemName) {
+    mainWindow.currentSessionId = ""
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
@@ -9,13 +10,13 @@ function openDiscoveredSession(_sessionId, _host, _port, _systemName) {
             title: _systemName,
             host: _host,
             port: _port,
-            state: "Discovered",
-            sideNavigationItem: sideNavigation
+            state: "Discovered"
         }
     })
 }
 
 function openSavedSession(_sessionId, _host, _port, _login, _password, _systemName) {
+    mainWindow.currentSessionId = _sessionId
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
@@ -28,13 +29,13 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
             port: _port,
             login: _login,
             password: _password,
-            sessionId: _sessionId,
             state: "Saved"
         }
     })
 }
 
-function backToNewSession() {
+function gotoNewSession() {
+    mainWindow.currentSessionId = ""
     menuBackButton.animateToMenu()
     sideNavigation.activeSessionId = ""
     sideNavigation.enabled = true
@@ -42,5 +43,14 @@ function backToNewSession() {
 }
 
 function gotoResources() {
-    stackView.pop(resourcesPage)
+    menuBackButton.animateToMenu()
+    sideNavigation.enabled = true
+    stackView.pop(stackView.get(0))
+}
+
+function gotoMainScreen() {
+    if (connectionManager.isConnected)
+        gotoResources()
+    else
+        gotoNewSession()
 }

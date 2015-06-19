@@ -8,17 +8,17 @@ class SocketAddress;
 struct QnModuleInformation;
 
 struct QnLoginSession {
+    QString sessionId;
     QString systemName;
     QString address;
     int port;
     QString user;
     QString password;
 
-    QnLoginSession() : port(-1) {}
+    QnLoginSession();
 
     QVariantMap toVariant() const;
     static QnLoginSession fromVariant(const QVariantMap &variant);
-    QString id() const;
 };
 
 class QnLoginSessionsModel : public QAbstractListModel {
@@ -60,7 +60,7 @@ public:
     void setDisplayMode(DisplayModeFlags displayMode);
 
 public slots:
-    QString updateSession(const QString &address, const int port, const QString &user, const QString &password, const QString &systemName);
+    QString updateSession(const QString &sessionId, const QString &address, const int port, const QString &user, const QString &password, const QString &systemName);
     void deleteSession(const QString &id);
 
 signals:

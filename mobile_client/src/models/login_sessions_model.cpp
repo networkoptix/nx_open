@@ -64,7 +64,7 @@ QVariant QnLoginSessionsModel::data(const QModelIndex &index, int role) const {
 
     switch (role) {
     case SessionIdRole:
-        return session.id();
+        return session.sessionId;
     case SystemNameRole:
         return session.systemName;
     case AddressRole:
@@ -114,13 +114,16 @@ void QnLoginSessionsModel::setDisplayMode(DisplayModeFlags displayMode) {
     endResetModel();
 }
 
-QString QnLoginSessionsModel::updateSession(const QString &address, const int port, const QString &user, const QString &password, const QString &systemName) {
-    auto predicate = [&](const QnLoginSession &session) -> bool {
-        return session.address == address && session.port == port && session.user == user;
+QString QnLoginSessionsModel::updateSession(const QString &sessionId, const QString &address, const int port, const QString &user, const QString &password, const QString &systemName) {
+    auto predicate = [&sessionId](const QnLoginSession &session) -> bool {
+        return session.sessionId == sessionId;
     };
 
     auto it = std::find_if(m_savedSessions.begin(), m_savedSessions.end(), predicate);
     if (it != m_savedSessions.end()) {
+        it->address = address;
+        it->port = port;
+        it->user = user;
         it->password = password;
         it->systemName = systemName;
 
@@ -153,12 +156,12 @@ QString QnLoginSessionsModel::updateSession(const QString &address, const int po
 
     saveToSettings();
 
-    return m_savedSessions[0].id();
+    return m_savedSessions[0].sessionId;
 }
 
 void QnLoginSessionsModel::deleteSession(const QString &id) {
     for (int i = 0; i < m_savedSessions.size(); i++) {
-        if (m_savedSessions[i].id() != id)
+        if (m_savedSessions[i].sessionId != id)
             continue;
 
         int row = savedSessionRow(i);
@@ -288,8 +291,13 @@ void QnLoginSessionsModel::saveToSettings() {
     qnSettings->setSavedSessions(variantList);
 }
 
+QnLoginSession::QnLoginSession() : port(-1) {
+    sessionId = QnUuid::createUuid().toString();
+}
+
 QVariantMap QnLoginSession::toVariant() const {
     QVariantMap variant;
+    variant[lit("sessionId")] = sessionId;
     variant[lit("systemName")] = systemName;
     variant[lit("address")] = address;
     variant[lit("port")] = port;
@@ -300,14 +308,11 @@ QVariantMap QnLoginSession::toVariant() const {
 
 QnLoginSession QnLoginSession::fromVariant(const QVariantMap &variant) {
     QnLoginSession session;
+    session.sessionId = variant[lit("sessionId")].toString();
     session.systemName = variant[lit("systemName")].toString();
     session.address = variant[lit("address")].toString();
     session.port = variant.value(lit("port"), -1).toInt();
     session.user = variant[lit("user")].toString();
     session.password = variant[lit("password")].toString();
     return session;
-}
-
-QString QnLoginSession::id() const {
-    return address + QString::number(port) + user;
 }

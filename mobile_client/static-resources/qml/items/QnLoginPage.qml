@@ -16,7 +16,7 @@ QnPage {
     property alias port: portField.text
     property alias login: loginField.text
     property alias password: passwordField.text
-    property string sessionId
+    property string sessionId: mainWindow.currentSessionId
 
     property string newConnectionLabel: qsTr("New Connection")
 
@@ -26,7 +26,7 @@ QnPage {
         target: menuBackButton
         onClicked: {
             if (state != "New")
-                Main.backToNewSession()
+                Main.gotoMainScreen()
         }
     }
 
@@ -104,7 +104,7 @@ QnPage {
                     text: qsTr("Save")
                     width: parent.width * 3 / 5
 
-                    onClicked: LoginFunctions.saveSession(hostField.text, portField.text, loginField.text, passwordField.text, title)
+                    onClicked: LoginFunctions.saveSession(sessionId, hostField.text, portField.text, loginField.text, passwordField.text, title)
                 }
 
                 QnButton {
@@ -189,7 +189,7 @@ QnPage {
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: Main.openDiscoveredSession(sessionId, address, port, systemName)
+                        onClicked: Main.openDiscoveredSession(address, port, systemName)
                     }
                 }
             }

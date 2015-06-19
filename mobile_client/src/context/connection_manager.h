@@ -10,6 +10,8 @@ class QnConnectionManager : public QObject, public QnContextAware {
     Q_ENUMS(ConnectionStatus)
 
     Q_PROPERTY(QString systemName READ systemName NOTIFY systemNameChanged)
+    Q_PROPERTY(bool isConnected READ isConnected NOTIFY isConnectedChanged)
+
 public:
     enum ConnectionStatus {
         Success,
@@ -30,6 +32,7 @@ signals:
     void disconnected();
     void systemNameChanged(const QString &systemName);
     void initialResourcesReceived();
+    void isConnectedChanged();
 
 public slots:
     bool connectToServer(const QUrl &url);

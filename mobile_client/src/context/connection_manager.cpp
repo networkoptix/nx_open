@@ -93,6 +93,7 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
 
     m_connected = true;
     emit connected(url);
+    emit isConnectedChanged();
 //    context()->setUserName(appServerUrl.userName());
 
     connect(QnMobileClientMessageProcessor::instance(), &QnMobileClientMessageProcessor::initialResourcesReceived, this, &QnConnectionManager::initialResourcesReceived);
@@ -117,5 +118,6 @@ bool QnConnectionManager::disconnectFromServer(bool force) {
 //    context()->setUserName(QString());
     m_connected = false;
     emit disconnected();
+    emit isConnectedChanged();
     return true;
 }

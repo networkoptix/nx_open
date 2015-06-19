@@ -12,8 +12,6 @@ QnNavigationDrawer {
     property string activeSessionId
     readonly property alias savedSessionsModel: savedSessionsModel
 
-    onActiveSessionIdChanged: console.log(activeSessionId)
-
     parent: _findRootItem()
 
     color: QnTheme.sideNavigationBackground
