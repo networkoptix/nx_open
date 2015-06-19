@@ -9,14 +9,15 @@ namespace ec2
     struct ApiUserData : ApiResourceData {
         ApiUserData(): isAdmin(false), permissions(0) {}
 
-        //QString password;
         bool isAdmin;
         qint64 permissions;
         QString email;
         QnLatin1Array digest;
-        QnLatin1Array hash; 
+        QnLatin1Array hash;
+        //!Hash suitable to be used in /etc/shadow file
+        QnLatin1Array cryptSha512Hash;
     };
-#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)
+#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)(cryptSha512Hash)
 
 }
 

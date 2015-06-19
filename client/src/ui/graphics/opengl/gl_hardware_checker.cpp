@@ -17,32 +17,26 @@ bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
     cl_log.log(lit("OpenGL renderer: %1.").arg(QLatin1String(rendererString.constData())), cl_logINFO);
     cl_log.log(lit("OpenGL vendor: %1.").arg(QLatin1String(vendorString.constData())), cl_logINFO);
 
-    bool softwareTrouble = false;
-    bool hardwareTrouble = false;
+    bool contextIsValid = true;
 
     if (!versionString.contains("ES 2.0")) { //TODO: #asinaisky more strict check required
         QnSoftwareVersion version(versionString);
         if (version < QnSoftwareVersion(2, 0, 0, 0)) {
             qnWarning("OpenGL version %1 is not supported.", versionString);
-            softwareTrouble = true;
+            contextIsValid = false;
         }
     }
 
     /* Note that message will be shown in destructor, 
      * close to the event loop. */
-    if(displayWarnings) {
-        if (hardwareTrouble) {
-            const QString message = lit("%1\n%2")
-                .arg(tr("We have detected that your video card is not supported. You can proceed at your own risk."))
-                .arg(tr("Installing and/or updating your video drivers may resolve the problem."));
-            QMessageBox::critical(NULL, tr("Critical Performance Tip"), message, QMessageBox::Ok);
-        } else if(softwareTrouble) {
-            const QString message = lit("%1\n%2")
-                .arg(tr("We have detected that your video card drivers may be not installed or are out of date."))
-                .arg(tr("Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video."));
-            QMessageBox::critical(NULL, tr("Important Performance Tip"), message, QMessageBox::Ok);
-        }
+    if(displayWarnings && !contextIsValid) {
+        const QString title = tr("Important Performance Tip");
+        QStringList messageParts;
+        messageParts << tr("We have detected that your video card drivers may be not installed or are out of date.");
+        messageParts << tr("This could lead to client software malfunction including crash.");
+        messageParts << tr("Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.");
+        QMessageBox::critical(NULL, title, messageParts.join(L'\n'), QMessageBox::Ok);
     }
 
-    return !hardwareTrouble && !softwareTrouble;
+    return contextIsValid;
 }

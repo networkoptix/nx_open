@@ -237,7 +237,7 @@ void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, c
 }
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
-    QnServerUpdateTool::instance()->installUpdate(updateId);
+    QnServerUpdateTool::instance()->installUpdateDelayed(updateId);
 }
 
 void QnServerMessageProcessor::at_reverseConnectionRequested(const ec2::ApiReverseConnectionData &data) {

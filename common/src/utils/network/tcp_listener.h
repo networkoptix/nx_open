@@ -34,6 +34,7 @@ public:
     bool bindToLocalAddress();
 
     void updatePort(int newPort);
+    void waitForPortUpdated();
 
     int getPort() const;
 

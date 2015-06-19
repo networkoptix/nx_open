@@ -1,9 +1,14 @@
 #include "crash_reporter.h"
 
+#include <api/app_server_connection.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+
 #include <common/systemexcept_linux.h>
 #include <common/systemexcept_win32.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/synctime.h>
 
 #include "ec2_thread_pool.h"
@@ -33,9 +38,13 @@ CrashReporter::~CrashReporter()
     }
 }
 
-bool CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
+bool CrashReporter::scanAndReport(QSettings* settings)
 {
-    if (admin->getProperty(Ec2StaticticsReporter::SR_ALLOWED).toInt() == 0)
+    const auto admin = qnResPool->getAdministrator();
+    if (!admin) return false;
+
+    const auto msManager = QnAppServerConnectionFactory::getConnection2()->getMediaServerManager();
+    if (!Ec2StaticticsReporter::isAllowed(msManager))
     {
         qDebug() << "CrashReporter::scanAndReport: sending is not allowed";
         return false;
@@ -84,7 +93,7 @@ bool CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
     return false;
 }
 
-void CrashReporter::scanAndReportAsync(QnUserResourcePtr admin, QSettings* settings)
+void CrashReporter::scanAndReportAsync(QSettings* settings)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -92,7 +101,8 @@ void CrashReporter::scanAndReportAsync(QnUserResourcePtr admin, QSettings* setti
     m_activeCollection.waitForFinished();
 
     m_activeCollection = QnConcurrent::run(Ec2ThreadPool::instance(), [=](){
-        return scanAndReport(admin, settings);
+        QnScopedThreadRollback reservedThread( 1, Ec2ThreadPool::instance() );
+        return scanAndReport(settings);
     });
 }
 
@@ -169,7 +179,7 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
 #endif
     auto version = QnAppInfo::applicationFullVersion();
     auto systemInfo = QnAppInfo::applicationSystemInfo();
-    auto timestamp = m_crashFile.created().toUTC().toString("yyyy-MM-dd hh:mm:ss");
+    auto timestamp = m_crashFile.created().toUTC().toString("yyyy-MM-dd_hh-mm-ss");
     auto extension = fileName.split(QChar('.')).last();
 
     nx_http::HttpHeaders headers;

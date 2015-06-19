@@ -26,10 +26,14 @@ const QString& compileCpuArchicture()
         return CPU_IA64;
 
     #elif defined(__arm__) || defined(_M_ARM)
-        #if defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6Z__) || defined(__ARM_ARCH_6ZK__) || defined(_M_ARM) && (_M_ARM == 6)
+        #if defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) || defined(__ARM_ARCH_6K__) \
+                || defined(__ARM_ARCH_6Z__) || defined(__ARM_ARCH_6ZK__) \
+                || (_M_ARM == 6)
             return CPU_ARM6;
 
-        #elif defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7S__) || defined(_M_ARM) && (_M_ARM == 7)
+        #elif defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7R__) \
+                || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7S__) \
+                || (_M_ARM == 7)
             return CPU_ARM7;
 
         #else

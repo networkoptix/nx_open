@@ -17,6 +17,7 @@
 #include "transaction_transport.h"
 #include <transaction/transaction_log.h>
 #include "runtime_transaction_log.h"
+#include "transport_connection_info.h"
 
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
@@ -43,6 +44,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
+        QList<QnTransportConnectionInfo> connectionsInfo() const;
         void gotConnectionFromRemotePeer(
             const QnUuid& connectionGuid,
             QSharedPointer<AbstractStreamSocket> socket,
@@ -69,6 +71,7 @@ namespace ec2
             const QByteArray& requestMsgBody );
         //!Blocks till connection \a connectionGuid is ready to accept new transactions
         void waitForNewTransactionsReady( const QnUuid& connectionGuid );
+        void connectionFailure( const QnUuid& connectionGuid );
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -140,7 +143,7 @@ namespace ec2
         * If can't find route info then return null value. 
         * Otherwise return route gateway.
         */
-        QnUuid routeToPeerVia(const QnUuid& dstPeer) const;
+        QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
 
     signals:
         void peerLost(ApiPeerAliveData data);
@@ -153,7 +156,6 @@ namespace ec2
         //void gotUnlockRequest(ApiLockData);
         void gotLockResponse(ApiLockData);
 
-        void transactionProcessed(const QnAbstractTransaction &transaction);
         void remotePeerUnauthorized(const QnUuid& id);
     private:
         friend class QnTransactionTransport;

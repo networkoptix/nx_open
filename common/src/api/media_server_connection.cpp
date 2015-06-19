@@ -787,9 +787,10 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
-int QnMediaServerConnection::installUpdate(const QString &updateId, QObject *target, const char *slot) {
+int QnMediaServerConnection::installUpdate(const QString &updateId, bool delayed, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("updateId", updateId);
+    params << QnRequestParam("delayed", delayed);
 
     return sendAsyncGetRequest(InstallUpdateObject, params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }
@@ -809,13 +810,16 @@ int QnMediaServerConnection::restart(QObject *target, const char *slot) {
     return sendAsyncGetRequest(Restart, QnRequestParamList(), NULL, target, slot);
 }
 
-int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot) {
+int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash,
+    const QByteArray &passwordDigest, const QByteArray &cryptSha512Hash, int port, QObject *target, const char *slot)
+{
     QnRequestParamList params;
     params << QnRequestParam("wholeSystem", wholeSystem ? lit("true") : lit("false"));
     params << QnRequestParam("systemName", systemName);
     params << QnRequestParam("password", password);
     params << QnRequestParam("passwordHash", QString::fromLatin1(passwordHash));
     params << QnRequestParam("passwordDigest", QString::fromLatin1(passwordDigest));
+    params << QnRequestParam("cryptSha512Hash", QString::fromLatin1(cryptSha512Hash) );
     params << QnRequestParam("port", port);
 
     return sendAsyncGetRequest(ConfigureObject, params, QN_STRINGIZE_TYPE(QnConfigureReply), target, slot);

@@ -168,6 +168,8 @@ public:
     void setState(State state);
     State getState() const;
 
+    bool isIncoming() const;
+
     void setRemoteIdentityTime(qint64 time);
     qint64 remoteIdentityTime() const;
 
@@ -214,6 +216,8 @@ public:
             until \a QnTransactionTransport::waitForNewTransactionsReady has returned
     */
     void waitForNewTransactionsReady( std::function<void()> invokeBeforeWait );
+    //!Transport level logic should use this method to report connection problem
+    void connectionFailure();
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 

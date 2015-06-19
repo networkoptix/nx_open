@@ -781,6 +781,12 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("Show Beta Version Warning Message"));
 
+    factory(Qn::AllowStatisticsReportMessageAction).
+        flags(Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Ask About Statistics Reporting"));
+
     factory(Qn::BrowseUrlAction).
         flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).

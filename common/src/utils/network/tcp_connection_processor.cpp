@@ -362,6 +362,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
     d->requestBody.clear();
     d->responseBody.clear();
     d->currentRequestSize = 0;
+    d->prevSocketError = SystemError::noError;
 
     if( !d->clientRequest.isEmpty() )   //TODO #ak it is more reliable to check for the first call of this method
     {
@@ -376,15 +377,15 @@ bool QnTCPConnectionProcessor::readSingleRequest()
 
     while (!needToStop() && d->socket->isConnected())
     {
-        if( d->interleavedMessageDataPos == d->interleavedMessageData.size() )
+        if( d->interleavedMessageDataPos == (size_t)d->interleavedMessageData.size() )
         {
             //buffer depleted, draining more data
             const int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
             if (readed <= 0)
             {
-                const int lastOSErrorCode = SystemError::getLastOSErrorCode();
+                d->prevSocketError = SystemError::getLastOSErrorCode();
                 NX_LOG( lit("Error reading request from %1: %2").
-                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString(lastOSErrorCode)),
+                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString( d->prevSocketError )),
                     cl_logDEBUG1 );
                 return false;
             }
@@ -467,7 +468,7 @@ void QnTCPConnectionProcessor::releaseSocket()
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
 {
     Q_D(QnTCPConnectionProcessor);
-    contentType = "text/html; charset=iso-8859-1";
+    contentType = "text/html; charset=utf-8";
     d->responseBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
     d->response.headers.insert(nx_http::HttpHeader("Location", page));
     return CODE_MOVED_PERMANENTLY;

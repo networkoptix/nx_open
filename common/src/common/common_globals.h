@@ -332,7 +332,10 @@ public:
         SF_None         = 0x0, 
         SF_Edge         = 0x1,
         SF_RemoteEC     = 0x2,
-        SF_HasPublicIP  = 0x4
+        SF_HasPublicIP  = 0x4,
+        SF_IfListCtrl   = 0x8,
+        SF_timeCtrl     = 0x10,
+        SF_AutoSystemName = 0x20
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 

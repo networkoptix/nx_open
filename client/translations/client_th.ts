@@ -6580,7 +6580,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>บางส่วนของระบบจะไม่อัพเดท: &lt;br/&gt; %1 &lt;br/&gt; โปรดทำการอัพเดตทุกองค์ประกอบจาก รุ่นล่าสุด %2.</translation>
+        <translation>บางส่วนของระบบจะไม่อัพเดท:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt; โปรดทำการอัพเดตทุกองค์ประกอบจาก รุ่นล่าสุด %2.</translation>
     </message>
     <message>
         <source>Version Mismatch</source>

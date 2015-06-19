@@ -363,6 +363,15 @@ void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, b
     handlePeerAliveChanged(itr.value().peer, false, sendTran);
     m_alivePeers.erase(itr);
 
+#ifdef _DEBUG
+    if (m_alivePeers.isEmpty()) {
+        QnTranState runtimeState;
+        QList<QnTransaction<ApiRuntimeData>> result;
+        m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
+        Q_ASSERT(result.size() == 1 && result[0].peerID == qnCommon->moduleGUID());
+    }
+#endif
+
     // 2. remove peers proxy via current peer
     if (isRecursive)
         return;
@@ -816,7 +825,6 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
 
     // proxy incoming transaction to other peers.
     if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
-        emit transactionProcessed(tran);
         return; // all dstPeers already processed
     }
 
@@ -847,7 +855,6 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("proxy transaction %1 to (%2)").arg(tran.toString()).arg(proxyListStr), cl_logDEBUG1);
         }
 
-    emit transactionProcessed(tran);
 };
 
 void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
@@ -1498,6 +1505,28 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
     }
 }
 
+QList<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() const {
+    QList<QnTransportConnectionInfo> connections;
+
+    auto storeTransport = [&connections](const QnTransactionTransport *transport) {
+        QnTransportConnectionInfo info;
+        info.url = transport->remoteAddr();
+        info.state = transport->getState();
+        info.incoming = transport->isIncoming();
+        info.remotePeerId = transport->remotePeer().id;
+        connections.append(info);
+    };
+
+    QMutexLocker lock(&m_mutex);
+
+    for (const QnTransactionTransport *transport: m_connections.values())
+        storeTransport(transport);
+    for (const QnTransactionTransport *transport: m_connectingConnections)
+        storeTransport(transport);
+
+    return connections;
+}
+
 void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
 {
     QMutexLocker lock(&m_mutex);
@@ -1507,6 +1536,29 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
             continue;
         //mutex is unlocked if we go to wait
         transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+        return;
+    }
+    
+    for( QnTransactionTransport* transport: m_connectingConnections )
+    {
+        if( transport->connectionGuid() != connectionGuid )
+            continue;
+        //mutex is unlocked if we go to wait
+        transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+        return;
+    }
+
+}
+
+void QnTransactionMessageBus::connectionFailure( const QnUuid& connectionGuid )
+{
+    QMutexLocker lock( &m_mutex );
+    for( QnTransactionTransport* transport : m_connections )
+    {
+        if( transport->connectionGuid() != connectionGuid )
+            continue;
+        //mutex is unlocked if we go to wait
+        transport->connectionFailure();
         return;
     }
 }
@@ -1603,9 +1655,10 @@ void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* han
         m_handler = nullptr;
 }
 
-QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
+QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* peerDistance) const
 {
     QMutexLocker lock(&m_mutex);
+    *peerDistance = INT_MAX;
     const auto itr = m_alivePeers.find(dstPeer);
     if (itr == m_alivePeers.cend())
         return QnUuid(); // route info not found
@@ -1620,6 +1673,7 @@ QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
             result = itr2.key();
         }
     }
+    *peerDistance = minDistance;
     return result;
 }
 

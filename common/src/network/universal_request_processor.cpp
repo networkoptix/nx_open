@@ -69,8 +69,11 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         const bool isProxy = d->owner->isProxy(d->request);
         QElapsedTimer t;
         t.restart();
-        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId) && d->socket->isConnected())
+        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId))
         {
+            if( !d->socket->isConnected() )
+                return false;   //connection has been closed
+
             if( d->request.requestLine.method == nx_http::Method::GET ||
                 d->request.requestLine.method == nx_http::Method::HEAD )
             {
@@ -101,7 +104,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             }
             sendResponse(
                 isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
-                d->responseBody.isEmpty() ? QByteArray() : "text/html; charset=iso-8859-1",
+                d->responseBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
                 contentEncoding );
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT)

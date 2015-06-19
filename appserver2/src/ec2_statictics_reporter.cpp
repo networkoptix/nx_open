@@ -2,13 +2,20 @@
 
 #include "ec2_connection.h"
 
+#include <boost/range/algorithm/count_if.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
+
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/synctime.h>
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
 static const bool DEFAULT_SERVER_AUTH = true;
 
-static const uint DELAY_RATIO = 50;    /* 50% about 15 days */
+static const uint MIN_DELAY_RATIO = 30;
+static const uint RND_DELAY_RATIO = 50;    /* 50% about 15 days */
+static const uint MAX_DELAY_RATIO = MIN_DELAY_RATIO + RND_DELAY_RATIO;
+
 static const uint TIMER_CYCLE = 60000; /* msecs, update state every minute */
 static const QString SERVER_API_COMMAND = lit("statserver/api/report");
 
@@ -17,7 +24,6 @@ static const QString JUST_INITIATED = lit("just initiated");
 
 namespace ec2
 {
-    const QString Ec2StaticticsReporter::SR_ALLOWED = lit("statisticsReportAllowed");
     const QString Ec2StaticticsReporter::SR_LAST_TIME = lit("statisticsReportLastTime");
     const QString Ec2StaticticsReporter::SR_TIME_CYCLE = lit("statisticsReportTimeCycle");
     const QString Ec2StaticticsReporter::SR_SERVER_API = lit("statisticsReportServerApi");
@@ -54,13 +60,19 @@ namespace ec2
 
     Ec2StaticticsReporter::Ec2StaticticsReporter(
             const AbstractUserManagerPtr& userManager,
-            const AbstractResourceManagerPtr& resourceManager)
+            const AbstractResourceManagerPtr& resourceManager,
+            const AbstractMediaServerManagerPtr& msManager)
         : m_admin(getAdmin(userManager))
         , m_desktopCameraTypeId(getDesktopCameraTypeId(resourceManager))
+        , m_msManager(msManager)
         , m_timerDisabled(false)
         , m_timerId(boost::none)
     {
-        setupTimer();
+        Q_ASSERT(MAX_DELAY_RATIO <= 100);
+
+        // Just in case assert did not work!
+        if (m_admin)
+            setupTimer();
     }
 
     Ec2StaticticsReporter::~Ec2StaticticsReporter()
@@ -118,6 +130,44 @@ namespace ec2
         return initiateReport(&outData->url);
     }
 
+    bool Ec2StaticticsReporter::isDefined(const QnMediaServerResourceList &servers)
+    {
+        /* Returns if any of the server has explicitly defined value. */
+        return boost::algorithm::any_of(servers, [](const QnMediaServerResourcePtr& ms) {
+            return ms->hasProperty(Qn::STATISTICS_REPORT_ALLOWED);
+        });
+    }
+
+    bool Ec2StaticticsReporter::isAllowed(const QnMediaServerResourceList &servers)
+    {
+        int result = 0;
+        for (const QnMediaServerResourcePtr &server: servers) {
+            if (!server->hasProperty(Qn::STATISTICS_REPORT_ALLOWED))
+                continue;
+            bool allowedForServer = QnLexical::deserialized(server->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true);
+            if (allowedForServer)
+                ++result;
+            else
+                --result;
+        }
+        return result >= 0;
+    }
+
+    bool Ec2StaticticsReporter::isAllowed(const AbstractMediaServerManagerPtr& msManager)
+    {
+        QnMediaServerResourceList msList;
+        if (msManager->getServersSync(QnUuid(), &msList) != ErrorCode::ok)
+            return false;
+        return isAllowed(msList);
+    }
+
+    void Ec2StaticticsReporter::setAllowed(const QnMediaServerResourceList &servers, bool value)
+    {
+        const QString serializedValue = QnLexical::serialized(value);
+        for (const QnMediaServerResourcePtr &server: servers)
+            server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, serializedValue);
+    }
+
     QnUserResourcePtr Ec2StaticticsReporter::getAdmin(const AbstractUserManagerPtr& manager)
     {
         QnUserResourceList userList;
@@ -126,7 +176,8 @@ namespace ec2
             if (user->isAdmin())
                 return user;
 
-        qFatal("Can not get user admin");
+        qFatal("Admin user does not exist");
+        NX_LOG(lit("Ec2StaticticsReporter: Admin user does not exist"), cl_logERROR); // In case qFatal didnt work!
         return QnUserResourcePtr();
     }
 
@@ -176,7 +227,7 @@ namespace ec2
 
     void Ec2StaticticsReporter::timerEvent()
     {
-        if (m_admin->getProperty(SR_ALLOWED).toInt() == 0)
+        if (!isAllowed(m_msManager))
         {
             NX_LOG(lit("Ec2StaticticsReporter: Automatic report system is disabled"),
                    cl_logDEBUG2);
@@ -190,15 +241,16 @@ namespace ec2
         const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), Qt::ISODate);
 
         const uint timeCycle = secsWithPostfix(m_admin->getProperty(SR_TIME_CYCLE), DEFAULT_TIME_CYCLE);
-        const uint maxDelay = timeCycle * DELAY_RATIO / 100;
+        const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
 
         if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(timeCycle + maxDelay))
         {
             static std::once_flag flag;
             std::call_once(flag, [](){ qsrand((uint)QTime::currentTime().msec()); });
 
-            const auto delay = static_cast<uint>(qrand()) % maxDelay;
-            m_plannedReportTime = lastTime.addSecs(timeCycle + delay);
+            const auto minDelay = timeCycle * MIN_DELAY_RATIO / 100;
+            const auto rndDelay = timeCycle * (static_cast<uint>(qrand()) % RND_DELAY_RATIO) / 100;
+            m_plannedReportTime = lastTime.addSecs(timeCycle + minDelay + rndDelay);
             
             NX_LOG(lit("Ec2StaticticsReporter: Last report was at %1, the next planned for %2")
                    .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))

@@ -816,10 +816,6 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "guid", guids))
         return false;
 
-    //guids = getGuidList("SELECT resource_ptr_id, '__USER__' || username from auth_user JOIN vms_userprofile on user_id = auth_user.id WHERE auth_user.username != 'admin' order by resource_ptr_id", CM_MakeHash);
-    //if (!updateTableGuids("vms_resource", "guid", guids))
-    //    return false;
-
     guids = getGuidList("SELECT li.id, r.guid FROM vms_layoutitem_tmp li JOIN vms_resource r on r.id = li.resource_id order by li.id", CM_Binary);
     if (!updateTableGuids("vms_layoutitem", "resource_guid", guids))
         return false;
@@ -1105,6 +1101,31 @@ bool QnDbManager::removeServerStatusFromTransactionLog()
     return true;
 }
 
+bool QnDbManager::removeEmptyLayoutsFromTransactionLog()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT r.guid from vms_layout l JOIN vms_resource r on r.id = l.resource_ptr_id WHERE NOT EXISTS(SELECT 1 FROM vms_layoutitem li WHERE li.layout_id = l.resource_ptr_id)");
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return false;
+    }
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM transaction_log WHERE tran_guid = ?");
+    while (query.next()) {
+        QnUuid id = QnSql::deserialized_field<QnUuid>(query.value(0));
+        delQuery.bindValue(0, QnSql::serialized_field(id));
+        if (!delQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << __LINE__ << delQuery.lastError();
+            return false;
+        }
+        if (removeLayout(id) != ErrorCode::ok)
+            return false;
+    }
+
+    return true;
+}
+
 bool QnDbManager::tuneDBAfterOpen()
 {
     QSqlQuery enableWalQuery(m_sdb);
@@ -1300,6 +1321,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/36_fix_brules.sql")) {
         return fixBusinessRules();
+    }
+    else if (updateName == lit(":/updates/37_remove_empty_layouts.sql")) {
+        return removeEmptyLayoutsFromTransactionLog();
     }
 
     return true;
@@ -1549,21 +1573,25 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     }
 
     QSqlQuery insQuery2(m_sdb);
-    insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, rights) VALUES (:internalId, :internalId, :digest, :permissions)");
+    insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, crypt_sha512_hash, rights) "
+                      "VALUES (:internalId, :internalId, :digest, :cryptSha512Hash, :permissions)");
     QnSql::bind(data, &insQuery2);
     if (data.digest.isEmpty())
     {
         // keep current digest value if exists
         QSqlQuery digestQuery(m_sdb);
         digestQuery.setForwardOnly(true);
-        digestQuery.prepare("SELECT digest FROM vms_userprofile WHERE user_id = ?");
+        digestQuery.prepare("SELECT digest, crypt_sha512_hash FROM vms_userprofile WHERE user_id = ?");
         digestQuery.addBindValue(internalId);
         if (!digestQuery.exec()) {
             qWarning() << Q_FUNC_INFO << digestQuery.lastError().text();
             return ErrorCode::dbError;
         }
         if (digestQuery.next())
+        {
             insQuery2.bindValue(":digest", digestQuery.value(0).toByteArray());
+            insQuery2.bindValue(":cryptSha512Hash", digestQuery.value(1).toByteArray());
+        }
     }
     insQuery2.bindValue(":internalId", internalId);
     if (!insQuery2.exec())
@@ -1731,8 +1759,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorage
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_storage (space_limit, used_for_writing, resource_ptr_id) \
-        VALUES (:spaceLimit, :usedForWriting, :internalId)\
+        INSERT OR REPLACE INTO vms_storage (space_limit, used_for_writing, storage_type, resource_ptr_id) \
+        VALUES (:spaceLimit, :usedForWriting, :storageType, :internalId)\
     ");
     QnSql::bind(tran.params, &insQuery);
     insQuery.bindValue(":internalId", internalId);
@@ -1817,9 +1845,11 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_client_infos values (?, ?, ?, ?, ?, ?, ?, ?)");
+    query.prepare("INSERT OR REPLACE INTO vms_client_infos values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     query.addBindValue(tran.params.id.toRfc4122());
 	query.addBindValue(tran.params.parentId.toRfc4122());
+    query.addBindValue(tran.params.skin);
+    query.addBindValue(tran.params.systemInfo);
     query.addBindValue(tran.params.cpuArchitecture);
     query.addBindValue(tran.params.cpuModelName);
     query.addBindValue(tran.params.phisicalMemory);
@@ -2919,7 +2949,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     queryStorage.setForwardOnly(true);
     queryStorage.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        s.space_limit as spaceLimit, s.used_for_writing as usedForWriting \
+        s.space_limit as spaceLimit, s.used_for_writing as usedForWriting, s.storage_type as storageType \
         FROM vms_resource r \
         JOIN vms_storage s on s.resource_ptr_id = r.id \
         %1 \
@@ -3269,7 +3299,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& userId, ApiUserDataList& user
     query.setForwardOnly(true);
     query.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        u.is_superuser as isAdmin, u.email, p.digest as digest, u.password as hash, p.rights as permissions \
+        u.is_superuser as isAdmin, u.email, p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, u.password as hash, p.rights as permissions \
         FROM vms_resource r \
         JOIN auth_user u  on u.id = r.id\
         JOIN vms_userprofile p on p.user_id = u.id\
@@ -3337,14 +3367,16 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataLi
     while (query.next()) {
         ApiClientInfoData info;
 
-		info.id = QnSql::deserialized_field<QnUuid>(query.value(0));
-		info.parentId = QnSql::deserialized_field<QnUuid>(query.value(1));
-		info.cpuArchitecture = query.value(2).toString();
-		info.cpuModelName = query.value(3).toString();
-		info.phisicalMemory = query.value(4).toLongLong();
-		info.openGLVersion = query.value(5).toString();
-		info.openGLVendor = query.value(6).toString();
-		info.openGLRenderer = query.value(7).toString();
+        info.id                 = QnSql::deserialized_field<QnUuid>(query.value(0));
+        info.parentId           = QnSql::deserialized_field<QnUuid>(query.value(1));
+        info.skin               = query.value(2).toString();
+        info.systemInfo         = query.value(3).toString();
+        info.cpuArchitecture    = query.value(4).toString();
+        info.cpuModelName       = query.value(5).toString();
+        info.phisicalMemory     = query.value(6).toLongLong();
+        info.openGLVersion      = query.value(7).toString();
+        info.openGLVendor       = query.value(8).toString();
+        info.openGLRenderer     = query.value(9).toString();
 
 		data.push_back(std::move(info));
     }

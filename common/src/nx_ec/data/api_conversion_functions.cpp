@@ -580,6 +580,7 @@ void fromResourceToApi(const QnAbstractStorageResourcePtr &src, ApiStorageData &
 
     dst.spaceLimit = src->getSpaceLimit();
     dst.usedForWriting = src->isUsedForWriting();
+    dst.storageType = src->getStorageType();
 }
 
 void fromResourceToApi(const QnAbstractStorageResourceList &src, ApiStorageDataList &dst)
@@ -597,6 +598,7 @@ void fromApiToResource(const ApiStorageData &src, QnAbstractStorageResourcePtr &
 
     dst->setSpaceLimit(src.spaceLimit);
     dst->setUsedForWriting(src.usedForWriting);
+    dst->setStorageType(src.storageType);
 }
 
 void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &dst) {
@@ -775,6 +777,7 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
 
     dst->setPermissions(src.permissions);
     dst->setDigest(src.digest);
+    dst->setCryptSha512Hash(src.cryptSha512Hash);
 }
 
 void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
@@ -784,6 +787,7 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     dst.isAdmin = src->isAdmin();
     dst.permissions = src->getPermissions();
     dst.email = src->getEmail();
+    dst.cryptSha512Hash = src->getCryptSha512Hash();
 }
 
 template<class List>

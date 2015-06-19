@@ -118,7 +118,7 @@ static void printThreadData(int fd, pthread_t thread, int signal,
 
         // TODO: consider to save some extra information from info and context
         backtrace_symbols_fd(bt + STACK_SHIFT, size - STACK_SHIFT, fd);
-        fdatasync(fd);
+        sync();
     }
 }
 

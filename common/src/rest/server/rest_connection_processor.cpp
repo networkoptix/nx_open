@@ -61,6 +61,12 @@ QnRestConnectionProcessor::~QnRestConnectionProcessor()
     stop();
 }
 
+QnTcpListener* QnRestConnectionProcessor::owner() const
+{
+    Q_D(const QnRestConnectionProcessor);
+    return d->owner;
+}
+
 void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
@@ -102,6 +108,7 @@ void QnRestConnectionProcessor::run()
         rez = redirectTo(QnTcpListener::defaultPage(), contentType);
     }
     QByteArray contentEncoding;
+    QByteArray uncompressedResponse = d->responseBody;
     if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty() && rez == CODE_OK) 
     {
         if (!contentType.contains("image")) {
@@ -113,6 +120,8 @@ void QnRestConnectionProcessor::run()
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Cache-Control", "post-check=0, pre-check=0"));
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Pragma", "no-cache"));
     sendResponse(rez, contentType, contentEncoding, false);
+    if (handler)
+        handler->afterExecute(url.path(), params, uncompressedResponse, this);
 }
 
 QnUuid QnRestConnectionProcessor::authUserId() const

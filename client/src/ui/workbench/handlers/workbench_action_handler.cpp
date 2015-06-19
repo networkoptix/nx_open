@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <QtCore/QProcess>
 
 #include <QtWidgets/QApplication>
@@ -15,6 +17,7 @@
 #include <QtGui/QImageWriter>
 
 #include <api/network_proxy_factory.h>
+#include <ec2_statictics_reporter.h>
 
 #include <business/business_action_parameters.h>
 
@@ -294,6 +297,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
+    connect(action(Qn::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
+
     /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
     connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
@@ -2397,57 +2402,48 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
         latestMsVersion = latestVersion;
 
-    QString components;
+    QStringList messageParts;
+    messageParts << tr("Some components of the system are not updated");
+    messageParts << QString();
+
     foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
         QString component;
         switch(data.component) {
         case Qn::ClientComponent:
-            component = tr("Client v%1<br/>").arg(data.version.toString());
+            component = tr("Client v%1").arg(data.version.toString());
             break;
         case Qn::ServerComponent: {
             QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
             if(resource) {
-                component = tr("Server v%1 at %2<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
+                component = tr("Server v%1 at %2").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
             } else {
-                component = tr("Server v%1<br/>").arg(data.version.toString());
+                component = tr("Server v%1").arg(data.version.toString());
             }
         }
         default:
             break;
         }
 
-        bool updateRequested = false;
-        switch (data.component) {
-        case Qn::ServerComponent:
-            updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
-            break;
-        case Qn::ClientComponent:
-            updateRequested = false;
-            break;
-        default:
-            break;
-        }
+        bool updateRequested = (data.component == Qn::ServerComponent) &&
+            QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
             component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
         
-        components += component;
+        messageParts << component;
     }
 
+    messageParts << QString();
+    messageParts << tr("Please update all components to the latest version %1.").arg(latestMsVersion.toString());
 
-    QString message = tr(
-        "Some components of the system are not updated:<br/>"
-        "<br/>"
-        "%1"
-        "<br/>"
-        "Please update all components to the latest version %2."
-    ).arg(components).arg(latestMsVersion.toString());
+    QString message = messageParts.join(lit("<br/>"));
 
     QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
         new QnWorkbenchStateDependentDialog<QnMessageBox>(mainWindow()));
     messageBox->setIcon(QMessageBox::Warning);
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);
+    messageBox->setTextFormat(Qt::RichText);
     messageBox->setStandardButtons(QMessageBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
@@ -2465,6 +2461,42 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
                          tr("You are running beta version of %1.")
                          .arg(qApp->applicationDisplayName()));
 }
+
+void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
+
+    const QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+
+    /* Check if we are not connected yet. */
+    if (servers.isEmpty())
+        return;
+
+    /* Check if user already made a decision. */
+    if (ec2::Ec2StaticticsReporter::isDefined(servers))
+        return;
+
+    /* Suppress notification if no server has internet access. */
+    bool atLeastOneServerHasInternetAccess = boost::algorithm::any_of(servers, [](const QnMediaServerResourcePtr &server) {
+        return (server->getServerFlags() & Qn::SF_HasPublicIP);
+    });
+    if (!atLeastOneServerHasInternetAccess)
+        return;
+
+    auto result = QMessageBox::information(
+        mainWindow(),
+        tr("Anonymous Usage Statistics"),                                   
+        tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
+           "If you would like to disable this feature you can do so in the System Settings dialog."),
+        QMessageBox::Ok | QMessageBox::Cancel,
+        QMessageBox::Ok);
+
+    if (result == QMessageBox::Ok) {
+        ec2::Ec2StaticticsReporter::setAllowed(servers, true);
+        propertyDictionary->saveParamsAsync(idListFromResList(servers));
+    } else {
+        menu()->triggerIfPossible(Qn::SystemAdministrationAction);
+    }
+}
+
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());

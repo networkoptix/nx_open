@@ -96,6 +96,7 @@ bool changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLo
     MSSettings::roSettings()->setValue("systemName", systemName);
     qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
     server->setSystemName(systemName);
+    server->setServerFlags(server->getServerFlags() & ~Qn::SF_AutoSystemName);
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
