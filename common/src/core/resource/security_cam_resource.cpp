@@ -145,8 +145,6 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
-        QnConstResourceVideoLayoutPtr layout = getVideoLayout();
-
         if (other_casted->m_groupId != m_groupId)
             modifiedFields << "groupIdChanged";
 
