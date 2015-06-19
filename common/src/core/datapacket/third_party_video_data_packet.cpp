@@ -10,37 +10,36 @@
 #include <utils/common/log.h>
 
 
-QnThirdPartyCompressedVideoData::QnThirdPartyCompressedVideoData(
-    nxcip::VideoDataPacket* videoPacket,
+QnThirdPartyCompressedVideoData::QnThirdPartyCompressedVideoData(nxcip::MediaDataPacket* videoPacket,
     QnMediaContextPtr ctx )
 :
     QnCompressedVideoData( ctx ),
-    m_videoPacket( videoPacket )
+    m_mediaPacket( videoPacket )
 {
 }
 
 QnThirdPartyCompressedVideoData::~QnThirdPartyCompressedVideoData()
 {
-    m_videoPacket->releaseRef();
-    m_videoPacket = nullptr;
+    m_mediaPacket->releaseRef();
+    m_mediaPacket = nullptr;
 }
 
 QnWritableCompressedVideoData* QnThirdPartyCompressedVideoData::clone( QnAbstractAllocator* allocator ) const
 {
     QnWritableCompressedVideoData* cloned = new QnWritableCompressedVideoData(allocator);
     cloned->QnCompressedVideoData::assign( this );
-    cloned->m_data.write( static_cast<const char*>(m_videoPacket->data()), m_videoPacket->dataSize() );
+    cloned->m_data.write( static_cast<const char*>(m_mediaPacket->data()), m_mediaPacket->dataSize() );
     return cloned;
 }
 
 const char* QnThirdPartyCompressedVideoData::data() const
 {
-    return static_cast<const char*>(m_videoPacket->data());
+    return static_cast<const char*>(m_mediaPacket->data());
 }
 
 size_t QnThirdPartyCompressedVideoData::dataSize() const
 {
-    return m_videoPacket->dataSize();
+    return m_mediaPacket->dataSize();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -1,6 +1,8 @@
 #ifndef NX_CAMERA_PLUGIN_H
 #define NX_CAMERA_PLUGIN_H
 
+#include <stdint.h>
+
 #include "camera_plugin_types.h"
 #include "plugin_api.h"
 
@@ -332,7 +334,7 @@ namespace nxcip
         }
     };
 
-        // {9A1BDA18-563C-42de-8E23-B9244FD00658}
+    // {9A1BDA18-563C-42de-8E23-B9244FD00658}
     static const nxpl::NX_GUID IID_CameraMediaEncoder2 = { { 0x9a, 0x1b, 0xda, 0x18, 0x56, 0x3c, 0x42, 0xde, 0x8e, 0x23, 0xb9, 0x24, 0x4f, 0xd0, 0x6, 0x58 } };
 
     //!Extends \a CameraMediaEncoder by adding functionality for plugin to directly provide live media stream
@@ -354,6 +356,70 @@ namespace nxcip
         virtual int getAudioFormat( AudioFormat* audioFormat ) const = 0;
     };
 
+#ifndef __GNUC__
+#pragma pack(push, 1)
+#define PACKED
+#else
+#define PACKED __attribute__((__packed__))
+#endif
+    //!Live stream parameters
+    /*!
+        \note Derived classes shouldn't have non-static data members
+    */
+    struct PACKED LiveStreamConfig
+    {
+        enum LiveStreamFlags
+        {
+            LIVE_STREAM_FLAG_AUDIO_ENABLED = 0x1
+        };
+
+        int32_t reserved_head;      //!< reserved, do not use
+        int32_t flags;              //!< \sa LiveStreamFlags
+        int32_t codec;              //!< \sa nxcip::CompressionType
+        int32_t width;
+        int32_t height;
+        float framerate;
+        int32_t bitrateKbps;
+        int16_t quality;
+        int16_t gopLength;
+        uint8_t reserved_tail[96];  //!< reserved, do not use
+    };
+#ifndef __GNUC__
+#pragma pack(pop)
+#endif
+#undef PACKED
+
+    // {D1C7F082-B6F9-45F3-82D6-3CFE3EAE0260}
+    static const nxpl::NX_GUID IID_CameraMediaEncoder3 = { { 0xd1, 0xc7, 0xf0, 0x82, 0xb6, 0xf9, 0x45, 0xf3, 0x82, 0xd6, 0x3c, 0xfe, 0x3e, 0xae, 0x2, 0x60 } };
+
+    //!Extends \a CameraMediaEncoder2 by adding configured stream opening
+    class CameraMediaEncoder3
+    :
+        public CameraMediaEncoder2
+    {
+    public:
+        //!Returns configured stream reader, providing live data stream
+        /*!
+            \a BaseCameraManager::nativeMediaStreamCapability should be present.
+
+            \param[in] config
+            \param[out] reader
+            \return \a nxcip::NX_NO_ERROR on success, otherwise - error code
+            \note It's possible to return both NULL as a reader and \a nxcip::NX_NO_ERROR as error code.\n
+                - \a CameraMediaEncoder::getMediaUrl() will be used in this case.
+            \note Using with this call \a setResolution(), \a setFps() and \a setBitrate() may return \a nxcip::NX_NOT_IMPLEMENTED
+        */
+        virtual int getConfiguredLiveStreamReader(LiveStreamConfig * config, StreamReader ** reader) = 0;
+
+        //!Returns video format
+        /*!
+            \param[out] codec
+            \param[out] pixelFormat
+            \return \a nxcip::NX_NO_ERROR on success, otherwise - error code
+            \sa nxcip::CompressionType \sa nxcip::PixelFormat
+        */
+        virtual int getVideoFormat(CompressionType * codec, PixelFormat * pixelFormat) const = 0;
+    };
 
     class CameraPtzManager;
     class CameraMotionDataProvider;
@@ -424,8 +490,13 @@ namespace nxcip
             shareIpCapability                   = 0x0080,     //!< allow multiple instances on a same IP address
             dtsArchiveCapability                = 0x0100,     //!< camera has archive storage and provides access to its archive
             nativeMediaStreamCapability         = 0x0200,     //!< provides media stream through \a StreamReader interface, otherwise - \a CameraMediaEncoder::getMediaUrl is used
-            primaryStreamSoftMotionCapability   = 0x0400      //!< it is allowed to detect motion by primary stream (if no dual streaming on camera)
+            primaryStreamSoftMotionCapability   = 0x0400,     //!< it is allowed to detect motion by primary stream (if no dual streaming on camera)
+            cameraParamsPersistentCapability    = 0x0800,     //!< camera parameters can be read/set even if camera is not accessible at the moment
+            searchByMotionMaskCapability        = 0x1000,     //!< if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
+            motionRegionCapability              = 0x2000,     //!< if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
+            needIFrameDetectionCapability       = 0x4000      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
         };
+
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
         /*!
             \param[out] capabilitiesMask
@@ -635,7 +706,7 @@ namespace nxcip
     public:
         enum CameraCapability3
         { 
-            cameraParamsPersistentCapability   = 0x0800      //!<Camera parameters can be read/set even if camera is not accessible at the moment
+            cameraParamsPersistentCapability   = 0x0800,    //!< Camera parameters can be read/set even if camera is not accessible at the moment
         };
 
         //!Returns XML describing camera parameters
@@ -859,8 +930,7 @@ namespace nxcip
             fReverseStream      = 0x02,
             //!set in first packet of gop block of reverse stream (see \a nxcip::DtsArchiveReader::setReverseMode)
             fReverseBlockStart  = 0x04,
-            //!packet belongs to low-quality stream. If unset, assuming frame is in high quality
-            fLowQuality         = 0x08,
+            DEPRECATED_fLowQuality = 0x08,
             /*!
                 MUST be set after each \a nxcip::DtsArchiveReader::seek, \a nxcip::DtsArchiveReader::reverseModeCapability, 
                 \a nxcip::DtsArchiveReader::setQuality to signal discontinuity in timestamp
