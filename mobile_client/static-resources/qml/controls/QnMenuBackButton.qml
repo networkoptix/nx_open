@@ -8,9 +8,8 @@ Button {
     id: button
 
     property real progress: 0.0
-    property var navigationDrawer
 
-    property bool _menuOpened: false
+    property bool menuOpened: false
 
     style: ButtonStyle {
         background: Item {
@@ -28,32 +27,10 @@ Button {
         }
     }
 
-    Behavior on progress {
-        id: progressBehavior
-        enabled: !navigationDrawer
-        NumberAnimation {
-            duration: 200
-            easing.type: Easing.OutCubic
-            running: false
-        }
-    }
-
-    onNavigationDrawerChanged: {
-        if (navigationDrawer)
-            progress = Qt.binding(function(){ return navigationDrawer.panelProgress })
-        else
-            progress = 1.0
-    }
-
-    onClicked: {
-        if (navigationDrawer)
-            navigationDrawer.toggle()
-    }
-
     onProgressChanged: {
         if (progress == 0.0)
-            _menuOpened = false
+            menuOpened = false
         else if (progress == 1.0)
-            _menuOpened = true
+            menuOpened = true
     }
 }

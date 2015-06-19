@@ -26,6 +26,40 @@ Window {
 
     QnToolBar {
         id: toolBar
+
+        QnMenuBackButton {
+            id: menuBackButton
+
+            property bool transitionAnimated: false
+
+            x: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+
+            Behavior on progress {
+                enabled: menuBackButton.transitionAnimated
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            function animateToMenu() {
+                transitionAnimated = true
+                progress = 0.0
+            }
+
+            function animateToBack() {
+                transitionAnimated = true
+                progress = 1.0
+            }
+
+            onMenuOpenedChanged: transitionAnimated = false
+
+            onClicked: {
+                if (!menuOpened)
+                    sideNavigation.show()
+            }
+        }
     }
 
     QnSideNavigation {
@@ -38,12 +72,9 @@ Window {
         anchors.top: toolBar.bottom
         anchors.bottom: parent.bottom
 
-        initialItem: loginPage
-
         onCurrentItemChanged: {
             if (currentItem) {
                 toolBar.title = currentItem.title
-                toolBar.leftComponent = currentItem.leftToolBarComponent
                 toolBar.rightComponent = currentItem.rightToolBarComponent
             }
         }
@@ -80,12 +111,16 @@ Window {
         target: connectionManager
         onConnected: {
             LoginFunctions.updateCurrentSession()
-            stackView.replace(resourcesPage)
+            Main.gotoResources()
         }
     }
 
     Connections {
         target: colorTheme
         onUpdated: QnTheme.loadColors()
+    }
+
+    Component.onCompleted: {
+        stackView.push([resourcesPage, loginPage])
     }
 }

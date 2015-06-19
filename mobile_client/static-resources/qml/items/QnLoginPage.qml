@@ -17,15 +17,13 @@ QnPage {
     property alias login: loginField.text
     property alias password: passwordField.text
     property string sessionId
-    property var sideNavigationItem
 
     property string newConnectionLabel: qsTr("New Connection")
 
     title: newConnectionLabel
 
-    leftToolBarComponent: QnMenuBackButton {
-        id: backButton
-        navigationDrawer: sideNavigationItem
+    Connections {
+        target: menuBackButton
         onClicked: {
             if (state != "New")
                 Main.backToNewSession()

@@ -5,7 +5,6 @@ import com.networkoptix.qml 1.0
 Item {
     id: toolbar
 
-    property alias leftComponent: leftLoader.sourceComponent
     property alias rightComponent: rightLoader.sourceComponent
     property alias title: label.text
 
@@ -16,12 +15,6 @@ Item {
         id: backgroundRectangle
         anchors.fill: parent
         color: QnTheme.windowBackground
-    }
-
-    Loader {
-        id: leftLoader
-        anchors.verticalCenter: parent.verticalCenter
-        x: dp(10)
     }
 
     Loader {

@@ -31,7 +31,7 @@ function connectToServer(sessionId, host, port, login, password) {
 
     sideNavigation.hide()
     sideNavigation.activeSessionId = sessionId
-    connectionManager.connectToServer(sessionId, makeUrl(host, port, login, password))
+    connectionManager.connectToServer(makeUrl(host, port, login, password))
 }
 
 function saveSession(host, port, login, password, systemName) {
