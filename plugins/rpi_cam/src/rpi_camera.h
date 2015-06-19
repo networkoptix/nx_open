@@ -81,8 +81,6 @@ namespace rpi_cam
         static constexpr unsigned BITRATE_1() { return 500; }
         static constexpr unsigned IFRAME_PERIOD() { return 5; }
 
-        static constexpr const char * UID() { return "Raspberry Pi Camera 0"; }
-
         static void init();
         static void deinit();
         static const rpi_omx::VideoFromat * getVideoFormats(unsigned& num, bool resized = false);

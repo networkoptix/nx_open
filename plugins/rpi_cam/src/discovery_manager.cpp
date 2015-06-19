@@ -1,3 +1,6 @@
+#include <string>
+#include <fstream>
+
 #include "rpi_camera.h"
 
 #include "camera_manager.h"
@@ -8,6 +11,28 @@ extern "C"
     nxpl::PluginInterface* createNXPluginInstance()
     {
         return new rpi_cam::DiscoveryManager();
+    }
+}
+
+namespace
+{
+    void getSerial(std::string& serial)
+    {
+        std::ifstream ifs("/proc/cpuinfo");
+
+        std::string tmp;
+        while (ifs.good())
+        {
+            ifs >> std::skipws >> tmp;
+            if (tmp.find("Serial") != std::string::npos)
+            {
+                ifs >> std::skipws >> tmp;  // read ":"
+                ifs >> std::skipws >> serial;
+                break;
+            }
+        }
+
+        debug_print("Serial: %s\n", serial.c_str());
     }
 }
 
@@ -63,7 +88,12 @@ namespace rpi_cam
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             if (! m_camera)
-                m_camera = new CameraManager();
+            {
+                std::string serial;
+                getSerial(serial);
+
+                m_camera = new CameraManager(serial);
+            }
         }
 
         unsigned cameraNum = 0;
