@@ -44,7 +44,7 @@ public:
         \return \a false if failed to save to DB
     */
     bool flushRecords();
-    QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
+    QVector<DeviceFileCatalogPtr> loadFullFileCatalog(const QnStorageResourcePtr&);
 
     void beforeDelete();
     void afterDelete();
@@ -68,7 +68,12 @@ private:
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
     QVector<DeviceFileCatalogPtr> loadBookmarksFileCatalog();
 
-    void addCatalogFromMediaFolder(const QString& postfix, QnServer::ChunksCatalog catalog, QVector<DeviceFileCatalogPtr>& result);
+    void addCatalogFromMediaFolder(
+        const QString&                  postfix, 
+        QnServer::ChunksCatalog         catalog, 
+        QVector<DeviceFileCatalogPtr>&  result,
+        const QnStorageResourcePtr&     stor
+    );
 
 private:
     int m_storageIndex;

@@ -219,13 +219,24 @@ bool QnStorageDb::initializeBookmarksFtsTable() {
 }
 
 
-QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
+QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog(const QnStorageResourcePtr& stor) {
     QVector<DeviceFileCatalogPtr> result;
     result << loadChunksFileCatalog();
     result << loadBookmarksFileCatalog();
 
-    addCatalogFromMediaFolder(lit("hi_quality"), QnServer::HiQualityCatalog, result);
-    addCatalogFromMediaFolder(lit("low_quality"), QnServer::LowQualityCatalog, result);
+    addCatalogFromMediaFolder(
+        lit("hi_quality"), 
+        QnServer::HiQualityCatalog, 
+        result,
+        stor
+    );
+    
+    addCatalogFromMediaFolder(
+        lit("low_quality"), 
+        QnServer::LowQualityCatalog, 
+        result,
+        stor
+    );
 
     return result;
 }
@@ -240,21 +251,15 @@ bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServe
     return false;
 }
 
-void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix, QnServer::ChunksCatalog catalog, QVector<DeviceFileCatalogPtr>& result)
+void QnStorageDb::addCatalogFromMediaFolder(
+    const QString&                  postfix, 
+    QnServer::ChunksCatalog         catalog, 
+    QVector<DeviceFileCatalogPtr>&  result,
+    const QnStorageResourcePtr&     stor
+)
 {
-    if (!QnStoragePluginFactory::instance()->existsFactoryForProtocol("file"))
-    {
-        QnStoragePluginFactory::instance()->registerStoragePlugin(
-            "file", 
-            QnFileStorageResource::instance, 
-            true
-        );
-    }
-
-    QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("db"));
-
     QString root = closeDirPath(QFileInfo(m_sdb.databaseName()).absoluteDir().path()) + postfix;
-    QFileInfoList files = storage->getFileList(root);
+    QFileInfoList files = stor->getFileList(root);
 
     for (const QFileInfo& fi: files)
     {

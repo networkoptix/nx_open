@@ -333,7 +333,7 @@ void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
         return;
     
     // load from database
-    for(const DeviceFileCatalogPtr& c: sdb->loadFullFileCatalog())
+    for(const DeviceFileCatalogPtr& c: sdb->loadFullFileCatalog(storage))
     {
         DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraUniqueId(), c->getCatalog());
         fileCatalog->addChunks(c->m_chunks);
