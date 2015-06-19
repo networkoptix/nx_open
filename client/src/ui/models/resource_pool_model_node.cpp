@@ -158,7 +158,8 @@ void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
         return;
 
     if(m_resource && (m_type == Qn::ItemNode || m_type == Qn::VideoWallItemNode))
-        m_model->m_itemNodesByResource[m_resource].removeOne(this);
+        if (m_model->m_itemNodesByResource.contains(m_resource))
+            m_model->m_itemNodesByResource[m_resource].removeOne(this);
 
     m_resource = resource;
 
