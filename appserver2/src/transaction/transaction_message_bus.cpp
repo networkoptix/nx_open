@@ -363,6 +363,15 @@ void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, b
     handlePeerAliveChanged(itr.value().peer, false, sendTran);
     m_alivePeers.erase(itr);
 
+#ifdef _DEBUG
+    if (m_alivePeers.isEmpty()) {
+        QnTranState runtimeState;
+        QList<QnTransaction<ApiRuntimeData>> result;
+        m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
+        Q_ASSERT(result.size() == 1 && result[0].peerID == qnCommon->moduleGUID());
+    }
+#endif
+
     // 2. remove peers proxy via current peer
     if (isRecursive)
         return;
