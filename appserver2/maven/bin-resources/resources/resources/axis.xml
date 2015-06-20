@@ -123,5 +123,13 @@
         <resource name = "AXISQ1931" public = "AXISQ1921"/>        
         <resource name = "AXISP3365" public = "AXISP3301"/>
         <resource name = "AXISM1145" public = "AXISM1103"/>
+
+        <resource name = "AXISP8221" public = "AXIS_COMMON">
+            <params>
+                <param name = "ioModule"
+                default_value ="1"/>
+            </params>
+        </resource>
+
     </oem>
 </resources>

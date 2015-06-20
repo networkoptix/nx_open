@@ -346,7 +346,8 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         
     QByteArray body;
     http.readAll(body);
-
+    
+    if (!getProperty(lit("ioModule")).toInt())
     {
         QMutexLocker lock(&m_mutex);
 
@@ -397,17 +398,18 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         }
     }   //releasing mutex so that not to make other threads using the resource to wait for completion of heavy-wait io & pts initialization,
             //m_initMutex is locked up the stack
-    
-    qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
+    if (!getProperty(lit("ioModule")).toInt()) 
+    {
+        qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
 
-    //detecting primary & secondary resolution
-    m_resolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution();
-    m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(
-        QSize(480,316),
-        getResolutionAspectRatio(getMaxResolution()) );
-    if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
-        m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
-
+        //detecting primary & secondary resolution
+        m_resolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution();
+        m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(
+            QSize(480,316),
+            getResolutionAspectRatio(getMaxResolution()) );
+        if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
+            m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
+    }
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
