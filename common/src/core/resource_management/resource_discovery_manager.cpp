@@ -541,15 +541,15 @@ bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoM
 
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
 {
+    const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (server)
+        updateSearchersUsage();
+
     QMutexLocker lock(&m_searchersListMutex);
     QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
     if (itr != m_manualCameraMap.end())
         m_manualCameraMap.erase(itr);
     m_recentlyDeleted << resource->getUrl();
-
-    const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (server)
-        updateSearchersUsage();
 }
 
 void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
