@@ -1122,7 +1122,12 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
             tran.params.persistentState = transactionLog->getTransactionsState();
             tran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
         }
-        sendTransaction(tran);
+        if (transactionLog && peer.id == m_localPeer.id)
+            sendTransaction(tran);
+        else  {
+            int delay = rand() % (ALIVE_RESEND_TIMEOUT_MAX - ALIVE_RESEND_TIMEOUT_MIN) + ALIVE_RESEND_TIMEOUT_MIN;
+            addDelayedAliveTran(std::move(tran), delay);
+        }
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("sending peerAlive info. id=%1 type=%2 isAlive=%3").arg(peer.id.toString()).arg(peer.peerType).arg(isAlive), cl_logDEBUG1);
     }
 
@@ -1190,7 +1195,6 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
     {
     case QnTransactionTransport::Error: 
         transport->close();
-        m_delayedAliveTran.remove(transport->remotePeer().id); // cancel delayed status tran if connection was closed
         break;
     case QnTransactionTransport::Connected:
     {
