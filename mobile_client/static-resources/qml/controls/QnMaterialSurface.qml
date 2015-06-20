@@ -4,13 +4,16 @@ MouseArea {
     id: materialSurface
 
     property color color: "#30ffffff"
+    property bool selected: false
 
     clip: true
+
+    readonly property bool _focused: pressed || selected
 
     Rectangle {
         id: focusBackground
         anchors.fill: parent
-        opacity: materialSurface.pressed ? 1.0 : 0.0
+        opacity: materialSurface._focused ? 1.0 : 0.0
         color: materialSurface.color
         Behavior on opacity { OpacityAnimator { duration: 500; easing.type: Easing.OutCubic } }
     }
@@ -46,7 +49,7 @@ MouseArea {
 
         onOpacityChanged: {
             if (opacity == 1.0) {
-                if (!materialSurface.pressed)
+                if (!materialSurface._focused)
                     opacity = 0.0
                 else
                     opacityAnimation.duration = 500
@@ -85,7 +88,25 @@ MouseArea {
         }
     }
 
-    onPressed: tapCircle.fadeIn(mouse.x, mouse.y)
-    onReleased: tapCircle.fadeOut()
+    Behavior on color { ColorAnimation { duration: opacityAnimation.duration } }
+
+    onSelectedChanged: {
+        if (selected) {
+            if (!pressed)
+                tapCircle.fadeIn(width / 2, height / 2)
+        } else {
+            if (!pressed)
+                tapCircle.fadeOut()
+        }
+    }
+
+    onPressed: {
+        if (!selected)
+            tapCircle.fadeIn(mouse.x, mouse.y)
+    }
+    onReleased: {
+        if (!selected)
+            tapCircle.fadeOut()
+    }
 }
 
