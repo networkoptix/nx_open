@@ -9,10 +9,6 @@ QnPage {
 
     title: connectionManager.systemName
 
-    leftToolBarComponent: QnMenuBackButton {
-
-    }
-
     QnCameraListModel {
         id: camerasModel
     }
