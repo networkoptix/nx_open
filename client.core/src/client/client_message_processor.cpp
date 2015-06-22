@@ -6,25 +6,21 @@
 #include "core/resource/user_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
-#include <core/resource_management/incompatible_server_watcher.h>
 
 #include <nx_ec/ec_api.h>
 
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
-#include "plugins/resource/server_camera/server_camera.h"
 
 #include <utils/common/app_info.h>
 
 
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
-    m_incompatibleServerWatcher(new QnIncompatibleServerWatcher(this)),
     m_connected(false),
     m_holdConnection(false)
 {
     m_status.setState(QnConnectionState::Disconnected);
-    connect(this, &QnClientMessageProcessor::connectionClosed, m_incompatibleServerWatcher, &QnIncompatibleServerWatcher::stop);
 }
 
 void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection) {
@@ -54,10 +50,6 @@ QnConnectionState QnClientMessageProcessor::connectionState() const {
     return m_status.state();
 }
 
-QnIncompatibleServerWatcher *QnClientMessageProcessor::incompatibleServerWatcher() const {
-    return m_incompatibleServerWatcher;
-}
-
 void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
     if (m_holdConnection == holdConnection)
         return;
@@ -72,8 +64,6 @@ void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     base_type::connectToConnection(connection);
     connect(connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
             this, &QnClientMessageProcessor::at_systemNameChangeRequested);
-    connect(connection->getMiscManager(), &ec2::AbstractMiscManager::gotInitialModules,
-            this, &QnClientMessageProcessor::at_gotInitialModules);
 }
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
@@ -173,11 +163,6 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
         return;
 
     qnCommon->setLocalSystemName(systemName);
-}
-
-void QnClientMessageProcessor::at_gotInitialModules(const QList<QnModuleInformationWithAddresses> &modules) {
-    m_incompatibleServerWatcher->start();
-    m_incompatibleServerWatcher->createModules(modules);
 }
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
