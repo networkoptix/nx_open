@@ -1,80 +1,25 @@
-import QtQuick 2.2
-import QtQuick.Controls 1.2
-import QtQuick.Controls.Styles 1.2
+import QtQuick 2.4
 
-import "../common_functions.js" as Common
+Item {
+    id: iconButton
 
-Button {
-    id: button
+    property alias icon: image.source
 
-    property int size: Common.dp(36)
-    property string icon
+    signal clicked()
 
-    property bool __clipped: false
+    width: dp(48)
+    height: dp(48)
 
-    width: size
-    height: size
+    onWidthChanged: console.log(width)
 
-    style: ButtonStyle {
-        background: Item {}
+    QnMaterialSurface {
+        onClicked: iconButton.clicked()
+        centered: true
+        backlight: false
+    }
 
-        label: Item {
-            id: label
-            Rectangle {
-                id: roundClip
-                anchors.centerIn: parent
-                radius: width / 2
-                color: "transparent"
-
-                states: [
-                    State {
-                        name: "NORMAL"
-                        when: !control.__clipped
-                        PropertyChanges {
-                            target: roundClip
-                            width: label.width
-                            height: label.height
-                            clip: false
-                        }
-                    },
-                    State {
-                        name: "CLIPPED"
-                        when: control.__clipped
-                        PropertyChanges {
-                            target: roundClip
-                            width: 0
-                            height: 0
-                            clip: true
-                        }
-                    }
-                ]
-
-                transitions: [
-                    Transition {
-                        from: "NORMAL"
-                        to: "CLIPPED"
-                        SequentialAnimation {
-                            PropertyAction { property: "clip" }
-                            NumberAnimation { properties: "width,height"; easing.type: Easing.OutQuad; duration: 100 }
-                        }
-                    },
-                    Transition {
-                        from: "CLIPPED"
-                        to: "NORMAL"
-                        SequentialAnimation {
-                            NumberAnimation { properties: "width,height"; easing.type: Easing.OutQuad; duration: 100 }
-                            PropertyAction { property: "clip" }
-                        }
-                    }
-                ]
-
-                Image {
-                    id: image
-                    anchors.centerIn: parent
-                    source: control.icon
-                    fillMode: Qt.KeepAspectRatio
-                }
-            }
-        }
+    Image {
+        id: image
+        anchors.centerIn: parent
     }
 }

@@ -127,9 +127,7 @@ QnPage {
                     id: deleteButton
                     text: qsTr("Delete")
                     width: parent.width * 2 / 5 - parent.spacing
-                    style: QnButtonStyle {
-                        color: QnTheme.buttonAttentionBackground
-                    }
+                    color: QnTheme.buttonAttentionBackground
 
                     onClicked: LoginFunctions.deleteSesion(sessionId)
                 }
@@ -139,9 +137,7 @@ QnPage {
                 id: connectButton
                 width: parent.width
                 text: qsTr("Connect")
-                style: QnButtonStyle {
-                    color: QnTheme.buttonAccentBackground
-                }
+                color: QnTheme.buttonAccentBackground
 
                 onClicked: {
                     loginPage.removeWarnings()

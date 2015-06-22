@@ -5,6 +5,9 @@ Item {
 
     property color color: "#20ffffff"
     property bool selected: false
+    property bool centered: false
+    property bool circular: false
+    property bool backlight: true
 
     signal clicked(real x, real y)
     signal pressAndHold(real x, real y)
@@ -17,8 +20,10 @@ Item {
     Rectangle {
         id: focusBackground
         anchors.fill: parent
+        visible: backlight
         opacity: 0.0
         color: materialSurface.color
+        radius: materialSurface.circular ? Math.min(width, height) / 2 : 0
         Behavior on opacity { OpacityAnimator { duration: 500; easing.type: Easing.OutCubic } }
     }
 
@@ -65,14 +70,19 @@ Item {
         function getEndRadius(x, y) {
             var dx = Math.max(x, parent.width - x)
             var dy = Math.max(y, parent.height - y)
-            return Math.sqrt(dx * dx + dy * dy)
+            return Math.max(dx, dy)
         }
 
         function fadeIn(mouseX, mouseY) {
             opacityAnimation.duration = 300
 
-            circleX = mouseX
-            circleY = mouseY
+            if (materialSurface.centered) {
+                circleX = materialSurface.width / 2
+                circleY = materialSurface.height / 2
+            } else {
+                circleX = mouseX
+                circleY = mouseY
+            }
 
             radius = tapCircle.startRadius
             opacity = 1.0
@@ -80,7 +90,7 @@ Item {
 
             radiusBehavior.enabled = true
 
-            radius = getEndRadius(mouseX, mouseY)
+            radius = getEndRadius(circleX, circleY)
         }
 
         function fadeOut() {
