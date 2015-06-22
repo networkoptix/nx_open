@@ -78,7 +78,7 @@ QnNavigationDrawer {
             Item {
                 id: spacer
                 width: parent.width
-                height: Math.max(0, panel.height - savedSessions.height - bottomButtons.height)
+                height: Math.max(dp(8), panel.height - savedSessions.height - bottomButtons.height)
             }
 
             Column {
@@ -95,7 +95,7 @@ QnNavigationDrawer {
 
                 Item {
                     width: parent.width
-                    height: dp(16)
+                    height: dp(8)
                 }
 
                 QnSideNavigationButtonItem {
