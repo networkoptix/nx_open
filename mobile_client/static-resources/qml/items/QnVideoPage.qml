@@ -5,6 +5,7 @@ import QtMultimedia 5.0
 
 import com.networkoptix.qml 1.0
 
+import "../main.js" as Main
 import "../controls"
 
 QnPage {
@@ -23,8 +24,9 @@ QnPage {
     property var __chunkEndDate
     property var __nextChunkStartDate
 
-    leftToolBarComponent: QnMenuBackButton {
-
+    Connections {
+        target: menuBackButton
+        onClicked: Main.gotoMainScreen()
     }
 
     function alignToChunk(pos) {

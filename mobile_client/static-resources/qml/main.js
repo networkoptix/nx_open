@@ -65,3 +65,11 @@ function gotoMainScreen() {
     else
         gotoNewSession()
 }
+
+function openMediaResource(uuid) {
+    mainWindow.activeResourceId = uuid
+    sideNavigation.hide()
+    sideNavigation.enabled = false
+    menuBackButton.animateToBack()
+    stackView.push(videoPlayerComponent)
+}

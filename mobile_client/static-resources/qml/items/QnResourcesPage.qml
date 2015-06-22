@@ -1,12 +1,11 @@
 import QtQuick 2.4
 import com.networkoptix.qml 1.0
 
+import "../main.js" as Main
 import "../controls"
 
 QnPage {
     id: resourcesPage
-
-    signal videoRequested(string uuid)
 
     title: qsTr("Resources")
 
@@ -23,16 +22,8 @@ QnPage {
         anchors.fill: parent
         model: camerasModel
 
-        onVideoRequested: resourcesPage.videoRequested(uuid)
+        onVideoRequested: Main.openMediaResource(uuid)
     }
-
-//    QnSideMenu {
-//        id: sidebar
-//        anchors.fill: parent
-//        content: QnSideBar {
-//            id: menuContent
-//        }
-//    }
 
     onWidthChanged: updateLayout()
 

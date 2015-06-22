@@ -100,11 +100,6 @@ Window {
 
         QnResourcesPage {
             id: resourcesPage
-
-            onVideoRequested: {
-                activeResourceId = uuid
-                stackView.push(videoPlayerComponent)
-            }
         }
     }
 
