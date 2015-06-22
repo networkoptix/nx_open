@@ -59,6 +59,7 @@ private slots:
     void at_adminUserChanged(const QnResourcePtr& resource);
 
 private:
+    void syncLocalHostRootPasswordWithAdminIfNeeded( const QnUserResourcePtr& user );
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
     bool initTcpListener();
@@ -68,6 +69,7 @@ private:
     void dumpSystemUsageStats();
     void saveAdminPswdHash();
     bool isStopping() const;
+
 private:
     int m_argc;
     char** m_argv;

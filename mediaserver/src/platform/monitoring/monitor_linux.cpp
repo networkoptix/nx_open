@@ -595,6 +595,7 @@ SystemError::ErrorCode readPartitionsAndSizes( QList<QnPlatformMonitor::Partitio
             continue;
 
         QnPlatformMonitor::PartitionSpace partitionInfo;
+        partitionInfo.devName = deviceAndPath.first;
         partitionInfo.path = deviceAndPath.second.first;
         partitionInfo.type = fsNameToType( deviceAndPath.second.second );
         partitionInfo.sizeBytes = (int64_t)vfsInfo.f_blocks * vfsInfo.f_frsize;
