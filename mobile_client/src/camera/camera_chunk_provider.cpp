@@ -43,7 +43,7 @@ void QnCameraChunkProvider::setResourceId(const QString &id) {
     if (!camera)
         return;
 
-    m_loader = new QnFlatCameraDataLoader(camera, Qn::RecordedTimePeriod, this);
+    m_loader = new QnFlatCameraDataLoader(camera, Qn::RecordingContent, this);
     connect(m_loader, &QnFlatCameraDataLoader::ready, this, [this](const QnAbstractCameraDataPtr &data) {
         m_periodList = data->dataSource();
         emit timePeriodsUpdated();
