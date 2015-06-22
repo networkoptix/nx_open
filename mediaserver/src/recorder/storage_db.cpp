@@ -12,8 +12,9 @@
 
 static const int COMMIT_INTERVAL = 1000 * 60 * 1;
 
-QnStorageDb::QnStorageDb(int storageIndex):
+QnStorageDb::QnStorageDb(QnStorageResourcePtr s, int storageIndex):
     QnDbHelper(),
+    m_storage(s),
     m_storageIndex(storageIndex),
     m_tran(m_sdb, m_mutex),
     m_needReopenDB(false)
@@ -173,6 +174,8 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
 
 bool QnStorageDb::open(const QString& fileName)
 {
+    // TODO: If storage is DBReady, DB should work via Storage::IODevice.
+    //       But this change requires DB implementation to be able to work via IODevice, and this is not the case right now.
     m_sdb = QSqlDatabase::addDatabase("QSQLITE", QString("QnStorageManager_%1").arg(fileName));
     m_sdb.setDatabaseName(fileName);
     return m_sdb.open() && createDatabase();
@@ -219,7 +222,7 @@ bool QnStorageDb::initializeBookmarksFtsTable() {
 }
 
 
-QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog(const QnStorageResourcePtr& stor) {
+QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
     QVector<DeviceFileCatalogPtr> result;
     result << loadChunksFileCatalog();
     result << loadBookmarksFileCatalog();
@@ -227,15 +230,13 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog(const QnStorageRe
     addCatalogFromMediaFolder(
         lit("hi_quality"), 
         QnServer::HiQualityCatalog, 
-        result,
-        stor
+        result
     );
     
     addCatalogFromMediaFolder(
         lit("low_quality"), 
         QnServer::LowQualityCatalog, 
-        result,
-        stor
+        result
     );
 
     return result;
@@ -254,12 +255,11 @@ bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServe
 void QnStorageDb::addCatalogFromMediaFolder(
     const QString&                  postfix, 
     QnServer::ChunksCatalog         catalog, 
-    QVector<DeviceFileCatalogPtr>&  result,
-    const QnStorageResourcePtr&     stor
+    QVector<DeviceFileCatalogPtr>&  result
 )
 {
     QString root = closeDirPath(QFileInfo(m_sdb.databaseName()).absoluteDir().path()) + postfix;
-    QFileInfoList files = stor->getFileList(root);
+    QFileInfoList files = m_storage->getFileList(root);
 
     for (const QFileInfo& fi: files)
     {

@@ -42,12 +42,14 @@ private:
     QString removeProtocolPrefix(const QString& url);
     bool updatePermissions() const;
     bool checkWriteCap() const;
+    bool isStorageDirMounted() const;
+    bool checkDBCap() const;
+
 private:
     // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
     float m_storageBitrateCoeff;
     mutable bool m_durty;
 
-    bool isStorageDirMounted() const;
 private:
     mutable QMutex  m_mutexPermission;
     int             m_capabilities;

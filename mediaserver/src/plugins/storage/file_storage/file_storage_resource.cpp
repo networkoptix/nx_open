@@ -8,6 +8,8 @@
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
+#include <platform/monitoring/global_monitor.h>
+#include <platform/platform_abstraction.h>
 
 #ifdef Q_OS_WIN
 #include "windows.h"
@@ -100,6 +102,26 @@ bool QnFileStorageResource::checkWriteCap() const
     return result;
 }
 
+bool QnFileStorageResource::checkDBCap() const
+{
+#ifdef _WIN32
+    return true;
+#else
+    QString storagePath = getPath();
+
+    QList<QnPlatformMonitor::PartitionSpace> partitions = 
+        qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
+            QnPlatformMonitor::NetworkPartition );
+
+    for(const QnPlatformMonitor::PartitionSpace& partition: partitions)
+    {
+        if(storagePath.startsWith(partition.path))
+            return false;
+    }
+    return true;
+#endif
+}
+
 int QnFileStorageResource::getCapabilities() const
 {
     return m_capabilities | (checkWriteCap() ? QnAbstractStorageResource::cap::WriteFile : 0);
@@ -120,6 +142,9 @@ QnFileStorageResource::QnFileStorageResource():
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
     m_capabilities |= QnAbstractStorageResource::cap::ReadFile;
+
+    if (checkDBCap())
+        m_capabilities |= QnAbstractStorageResource::cap::DBReady;
 };
 
 QnFileStorageResource::~QnFileStorageResource()

@@ -333,7 +333,7 @@ void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
         return;
     
     // load from database
-    for(const DeviceFileCatalogPtr& c: sdb->loadFullFileCatalog(storage))
+    for(const DeviceFileCatalogPtr& c: sdb->loadFullFileCatalog())
     {
         DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraUniqueId(), c->getCatalog());
         fileCatalog->addChunks(c->m_chunks);
@@ -476,19 +476,24 @@ static const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
 static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
 {
+    if (!(storage->getCapabilities() & QnAbstractStorageResource::WriteFile))
+        return false;
+
     QString storagePath = storage->getPath();
     const QString dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
 
     QByteArray dbRefGuidStr;
     //checking for file db_ref.guid existence
-    if( QFile::exists(dbRefFilePath) )
+    if (storage->isFileExists(dbRefFilePath))
     {
         //have to use db from data directory, not from storage
         //reading guid from file
-        QFile dbGuidFile( dbRefFilePath );
-        if( !dbGuidFile.open( QIODevice::ReadOnly ) )
+        QIODevice *dbGuidFile = storage->open(dbRefFilePath, QIODevice::ReadOnly);
+
+        if (dbGuidFile == nullptr)
             return false;
-        dbRefGuidStr = dbGuidFile.readAll();
+        dbRefGuidStr = dbGuidFile->readAll();
+        dbGuidFile->close();
     }
 
     if( !dbRefGuidStr.isEmpty() )
@@ -505,15 +510,8 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
     //On linux, sqlite db cannot be safely placed on a network partition due to lock problem
         //So, for such storages creating DB in data dir
 
-    QList<QnPlatformMonitor::PartitionSpace> partitions = 
-        qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-            QnPlatformMonitor::NetworkPartition );
-
-    for( const QnPlatformMonitor::PartitionSpace& partition: partitions )
+    if (!(storage->getCapabilities() & QnAbstractStorageResource::DBReady))
     {
-        if( !storagePath.startsWith( partition.path ) )
-            continue;
-
         dbRefGuidStr = QUuid::createUuid().toString().toLatin1();
         if( dbRefGuidStr.size() < 2 )
             return false;   //bad guid, somehow
@@ -521,17 +519,16 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
         dbRefGuidStr.remove( dbRefGuidStr.size()-1, 1 );
         dbRefGuidStr.remove( 0, 1 );
         //saving db ref guid to file on storage
-        QFile dbGuidFile( dbRefFilePath );
-        if( !dbGuidFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+        QIODevice *dbGuidFile = storage->open( QIODevice::WriteOnly | QIODevice::Truncate );
+        if (dbGuidFile == nullptr)
             return false;
-        if( dbGuidFile.write( dbRefGuidStr ) != dbRefGuidStr.size() )
+        if( dbGuidFile->write( dbRefGuidStr ) != dbRefGuidStr.size() )
             return false;
-        dbGuidFile.close();
+        dbGuidFile->close();
 
         storagePath = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
         if( !QDir().mkpath( storagePath ) )
             return false;
-        break;
     }
 
     *dbDirectory = storagePath;
@@ -554,10 +551,14 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
         }
         QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
         QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
-        if (QFile::exists(oldFileName) && !QFile::exists(fileName))
-            QFile::rename(oldFileName, fileName);
+        
+        //if (QFile::exists(oldFileName) && !QFile::exists(fileName))
+        //    QFile::rename(oldFileName, fileName);
+        if (storage->isFileExists(oldFileName) && !storage->isFileExists(fileName))
+            storage->renameFile(oldFileName, fileName);
 
-        sdb = m_chunksDB[storage->getPath()] = QnStorageDbPtr(new QnStorageDb(getStorageIndex(storage)));
+        sdb = m_chunksDB[storage->getPath()] = QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
+
         if (!sdb->open(fileName))
         {
             qWarning() << "can't initialize sqlLite database! Actions log is not created!";

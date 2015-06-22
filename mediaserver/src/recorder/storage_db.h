@@ -30,7 +30,7 @@ public:
         qint64 startTimeMs;
     };
 
-    QnStorageDb(int storageIndex);
+    QnStorageDb(QnStorageResourcePtr storage, int storageIndex);
     virtual ~QnStorageDb();
 
     bool open(const QString& fileName);
@@ -44,7 +44,7 @@ public:
         \return \a false if failed to save to DB
     */
     bool flushRecords();
-    QVector<DeviceFileCatalogPtr> loadFullFileCatalog(const QnStorageResourcePtr&);
+    QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
     void beforeDelete();
     void afterDelete();
@@ -71,11 +71,11 @@ private:
     void addCatalogFromMediaFolder(
         const QString&                  postfix, 
         QnServer::ChunksCatalog         catalog, 
-        QVector<DeviceFileCatalogPtr>&  result,
-        const QnStorageResourcePtr&     stor
+        QVector<DeviceFileCatalogPtr>&  result
     );
 
 private:
+    QnStorageResourcePtr m_storage;
     int m_storageIndex;
     QElapsedTimer m_lastTranTime;
 
