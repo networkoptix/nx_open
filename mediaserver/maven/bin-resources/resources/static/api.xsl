@@ -111,7 +111,7 @@
                                                       select="$quotedName"/></xsl:attribute>
                                                 <xsl:if test="caption">
                                                     <h4><div><xsl:value-of select="caption"/><br/></div></h4>
-                                                </xsl:if>                                                      
+                                                </xsl:if>
                                                 <h4>
                                                     <span class="label label-info"><xsl:value-of
                                                       select="method"/></span>

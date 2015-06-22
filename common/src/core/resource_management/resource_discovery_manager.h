@@ -138,9 +138,9 @@ private:
     void appendManualDiscoveredResources(QnResourceList& resources);
     void dtsAssignment();
 
-    void updateSearcherUsage(QnAbstractResourceSearcher *searcher);
+    void updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable);
     void updateSearchersUsage();
-
+    bool isRedundancyUsing() const;
 private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;

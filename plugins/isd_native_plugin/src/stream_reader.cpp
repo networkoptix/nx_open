@@ -396,8 +396,7 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
         &m_allocator,
         0, // channel
         calcNextTimestamp( frame.vmux_info.PTS, absoluteTime ),
-        (frame.vmux_info.pic_type == VMUX_IDR_FRAME ? nxcip::MediaDataPacket::fKeyPacket : 0) | 
-            (m_encoderNum > 0 ? nxcip::MediaDataPacket::fLowQuality : 0),
+        (frame.vmux_info.pic_type == VMUX_IDR_FRAME ? nxcip::MediaDataPacket::fKeyPacket : 0),
         0, // cseq
         m_videoCodec ));
     videoPacket->resizeBuffer( frame.frame_size );

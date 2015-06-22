@@ -16,6 +16,7 @@
 
 #include "utils/network/abstract_socket.h"
 
+#include "auth_cache.h"
 #include "httpstreamreader.h"
 
 
@@ -94,7 +95,11 @@ namespace nx_http
         bool doPost(
             const QUrl& url,
             const nx_http::StringType& contentType,
-            const nx_http::StringType& messageBody);
+            const nx_http::StringType& messageBody );
+        bool doPut(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody );
         const nx_http::Request& request() const;
         /*!
             Response is valid only after signal \a responseReceived() has been emitted
@@ -145,6 +150,7 @@ namespace nx_http
             m_additionalHeaders = std::forward<HttpHeadersRef>(additionalHeaders);
         }
         void setAuthType( AuthType value );
+        AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
 
         static QByteArray calcHa1(
             const QByteArray& userName,
@@ -224,11 +230,7 @@ namespace nx_http
         HttpHeaders m_additionalHeaders;
         int m_awaitedMessageNumber;
         SocketAddress m_remoteEndpoint;
-        //!Authorization header, successfully used with \a m_url
-        /*!
-            //TODO #ak (2.4) this information should stored globally depending on server endpoint, server path, user credentials 
-        */
-        std::unique_ptr<nx_http::header::Authorization> m_currentUrlAuthorization;
+        AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );

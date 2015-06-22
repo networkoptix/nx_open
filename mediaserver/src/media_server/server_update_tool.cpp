@@ -18,12 +18,14 @@
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
     const QString updatesDirSuffix = lit("mediaserver/updates");
     const QString updateInfoFileName = lit("update.json");
     const QString updateLogFileName = lit("update.log");
+    const int installationDelay = 15000;
 
     QDir getUpdatesDir() {
         const QString& dataDir = MSSettings::roSettings()->value( "dataDir" ).toString();
@@ -135,6 +137,8 @@ qint64 QnServerUpdateTool::addUpdateFileChunkSync(const QString &updateId, const
     switch (reply) {
     case UploadFinished:
         return processUpdate(updateId, m_file.data(), true);
+    case NoFreeSpace:
+        return NoFreeSpace;
     case UnknownError:
     case NoReply:
         return UnknownError;
@@ -158,6 +162,9 @@ void QnServerUpdateTool::addUpdateFileChunkAsync(const QString &updateId, const 
         }
         break;
     case NoReply:
+        return;
+    case NoFreeSpace:
+        sendReply(NoFreeSpace);
         return;
     case UnknownError:
         sendReply(ec2::AbstractUpdatesManager::UnknownError);
@@ -209,7 +216,8 @@ qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString &updateId, c
     if (!data.isEmpty()) {
         if (m_file->pos() >= offset) {
             m_file->seek(offset);
-            m_file->write(data);
+            if (m_file->write(data) != data.size())
+                return NoFreeSpace;
         }
         return m_file->pos();
     }
@@ -313,6 +321,11 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     QDir::setCurrent(currentDir);
 
     return true;
+}
+
+void QnServerUpdateTool::installUpdateDelayed(const QString &updateId) {
+    NX_LOG(lit("QnServerUpdateTool: Requested delayed installation of %1. Installing in %2 ms.").arg(updateId).arg(installationDelay), cl_logINFO);
+    executeDelayed([updateId, this]() { installUpdate(updateId); }, installationDelay, thread());
 }
 
 void QnServerUpdateTool::clearUpdatesLocation(const QString &idToLeave) {

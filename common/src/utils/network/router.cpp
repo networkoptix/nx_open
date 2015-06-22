@@ -34,14 +34,18 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     bool isknownServer = qnResPool->getResourceById<QnMediaServerResource>(id) != 0;
     bool isClient = qnCommon->remoteGUID() != qnCommon->moduleGUID();
     if (!isknownServer && isClient) {
+        if (qnCommon->remoteGUID().isNull())
+            return result;
         result.addr = m_moduleFinder->primaryAddress(qnCommon->remoteGUID());
         Q_ASSERT_X(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
         if (!result.addr.isNull())
             result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
+		// todo: add distance for camera route
         return result;
     }
 
-    QnUuid routeVia = connection->routeToPeerVia(id);
+    result.distance = INT_MAX;
+    QnUuid routeVia = connection->routeToPeerVia(id, &result.distance);
     if (routeVia.isNull())
         return result; // can't route
     if (routeVia == id) {

@@ -45,6 +45,7 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     /* Can't use resourceChanged signal because it's not emited when we are saving server locally. */
     connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::updateModuleInformation);
     connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::updateModuleInformation);
+    connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::updateModuleInformation);
 }
 
 void QnCommonModule::bindModuleinformation(const QnUserResourcePtr &adminUser) {
@@ -127,6 +128,7 @@ void QnCommonModule::updateModuleInformation() {
         QnModuleInformation moduleInformation = server->getModuleInformation();
         moduleInformationCopy.port = moduleInformation.port;
         moduleInformationCopy.name = moduleInformation.name;
+        moduleInformationCopy.flags = moduleInformation.flags;
     }
 
     QnUserResourcePtr admin = qnResPool->getAdministrator();

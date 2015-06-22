@@ -4,7 +4,6 @@
 
 #include <utils/serialization/lexical.h>
 
-#include <unordered_map>
 
 const static QString __CAMERA_EXCEPT_PARAMS[] = {
 	Qn::CAMERA_CREDENTIALS_PARAM_NAME,
@@ -18,16 +17,6 @@ const static QString __CAMERA_EXCEPT_PARAMS[] = {
 // TODO: remove this hack when VISUAL STUDIO supports initializer lists
 #define INIT_LIST(array) &array[0], &array[(sizeof(array)/sizeof(array[0]))]
 
-static ec2::ApiResourceParamDataList getExtraParams( const ec2::ApiResourceParamDataList& paramList,
-                                                     const std::unordered_set<QString>& exceptSet)
-{
-    ec2::ApiResourceParamDataList extraParams;
-    for (auto& param : paramList)
-        if (!exceptSet.count(param.name))
-            extraParams.push_back(param);
-    return extraParams;
-}
-
 namespace ec2 {
 
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
@@ -38,30 +27,47 @@ namespace ec2 {
 
     ApiCameraDataStatistics::ApiCameraDataStatistics() {}
 
-    ApiCameraDataStatistics::ApiCameraDataStatistics(const ApiCameraDataEx&& data)
-        : ApiCameraDataEx(data)
-        , addParams(getExtraParams(ApiCameraDataEx::addParams, EXCEPT_PARAMS)) {}
+    ApiCameraDataStatistics::ApiCameraDataStatistics(ApiCameraDataEx&& data)
+        : ApiCameraDataEx(std::move(data))
+    {
+        // find out if default password worked
+        const auto& defCred = Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME;
+        const auto it = std::find_if(addParams.begin(), addParams.end(),
+            [&defCred](const ApiResourceParamData& param) { return param.name == defCred; });
+        const bool isDefCred = (it != ApiCameraDataEx::addParams.end()) && !it->value.isEmpty();
 
-	const std::unordered_set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(INIT_LIST(__CAMERA_EXCEPT_PARAMS));
+        // remove confidential information
+        auto rm = std::remove_if(addParams.begin(), addParams.end(),
+                                 [](const ec2::ApiResourceParamData& param)
+                                 { return EXCEPT_PARAMS.count(param.name); });
+        
+        addParams.erase(rm, addParams.end());
+        addParams.push_back(ApiResourceParamData(defCred, isDefCred ? lit("true") : lit("false")));
+    }
+
+    const std::set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(
+            INIT_LIST(__CAMERA_EXCEPT_PARAMS));
 
     ApiStorageDataStatistics::ApiStorageDataStatistics() {}
 
-    ApiStorageDataStatistics::ApiStorageDataStatistics(const ApiStorageData&& data)
-		: ApiStorageData(data) 
+    ApiStorageDataStatistics::ApiStorageDataStatistics(ApiStorageData&& data)
+        : ApiStorageData(std::move(data))
 	{}
 
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics() {}
 
-    ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(const ApiMediaServerDataEx&& data)
-        : ApiMediaServerDataEx(data)
+    ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data)
+        : ApiMediaServerDataEx(std::move(data))
     {
         for (auto s : ApiMediaServerDataEx::storages)
             storages.push_back(std::move(s));
     }
 
-    ApiLicenseStatistics::ApiLicenseStatistics() {}
+    ApiLicenseStatistics::ApiLicenseStatistics()
+        : cameraCount(0) {}
 
     ApiLicenseStatistics::ApiLicenseStatistics(const ApiLicenseData& data)
+        : cameraCount(0)
     {
         QMap<QString, QString> parsed;
         for (auto value : data.licenseBlock.split('\n'))
@@ -72,6 +78,7 @@ namespace ec2 {
         }
 
         name        = parsed[lit("NAME")];
+        key         = parsed[lit("SERIAL")];
 		licenseType = parsed[lit("CLASS")];
         cameraCount = parsed[lit("COUNT")].toLongLong();
         version     = parsed[lit("VERSION")];
@@ -81,8 +88,8 @@ namespace ec2 {
 
 	ApiBusinessRuleStatistics::ApiBusinessRuleStatistics() {}
 
-    ApiBusinessRuleStatistics::ApiBusinessRuleStatistics(const ApiBusinessRuleData&& data)
-		: ApiBusinessRuleData(data)
+    ApiBusinessRuleStatistics::ApiBusinessRuleStatistics(ApiBusinessRuleData&& data)
+        : ApiBusinessRuleData(std::move(data))
 	{}
 
 } // namespace ec2

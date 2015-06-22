@@ -69,13 +69,16 @@ QnAuthHelper* QnAuthHelper::m_instance;
 
 static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
 static const qint64 COOKIE_EXPERATION_PERIOD = 3600;
-static const QString REALM(lit("NetworkOptix"));
+
+// TODO: #2.4 replace with customization value
+const QString QnAuthHelper::REALM(lit("NetworkOptix"));
 
 QnAuthHelper::QnAuthHelper()
 {
     connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(qnResPool, SIGNAL(resourceChanged(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    m_digestNonceCache.setMaxCost(100);
 }
 
 QnAuthHelper::~QnAuthHelper()
@@ -515,6 +518,13 @@ void QnAuthHelper::addAuthHeader(nx_http::Response& response, bool isProxy)
 
 bool QnAuthHelper::isNonceValid(const QByteArray& nonce)
 {
+    {
+        // nonce cache will help if time just changed
+        QMutexLocker lock(&m_nonceMtx);
+        if (m_digestNonceCache.contains(nonce) && m_digestNonceCache[nonce]->elapsed() < NONCE_TIMEOUT)
+            return true;
+    }
+    // trust to unknown nonce to allow one step digest auth
     qint64 n1 = nonce.toLongLong(0, 16);
     qint64 n2 = qnSyncTime->currentUSecsSinceEpoch();
     return qAbs(n2 - n1) < NONCE_TIMEOUT;
@@ -522,7 +532,12 @@ bool QnAuthHelper::isNonceValid(const QByteArray& nonce)
 
 QByteArray QnAuthHelper::getNonce()
 {
-    return QByteArray::number(qnSyncTime->currentUSecsSinceEpoch(), 16);
+    QByteArray result = QByteArray::number(qnSyncTime->currentUSecsSinceEpoch(), 16);
+    QElapsedTimer* timeout = new QElapsedTimer();
+    timeout->restart();
+    QMutexLocker lock(&m_nonceMtx);
+    m_digestNonceCache.insert(result, timeout);
+    return result;
 }
 
 void QnAuthHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)

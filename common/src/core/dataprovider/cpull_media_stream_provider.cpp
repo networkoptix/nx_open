@@ -146,8 +146,10 @@ void QnClientPullMediaStreamProvider::run()
 
         putData(std::move(data));
 
-        if (videoData && !isMaxFps())
-            m_fpsSleep.sleep(1000*1000/getLiveParams().fps/numberOfChnnels);
+        if (videoData && !isMaxFps()) {
+            qint64 sleepTimeUsec = 1000*1000ll / getLiveParams().fps;
+            m_fpsSleep.sleep(sleepTimeUsec / numberOfChnnels); // reduce sleep time if camera has several channels to archive requested fps per channel
+        }
 
     }
 

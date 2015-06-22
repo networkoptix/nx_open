@@ -21,7 +21,7 @@ namespace nx_http
     {
     }
 
-    void MultipartContentParser::processData( const QnByteArrayConstRef& data )
+    bool MultipartContentParser::processData( const QnByteArrayConstRef& data )
     {
         for( size_t offset = 0; offset < data.size(); )
         {
@@ -54,7 +54,8 @@ namespace nx_http
                         case readingTextData:
                             if( lineBuffer == m_startBoundaryLine || lineBuffer == m_endBoundaryLine )
                             {
-                                m_nextFilter->processData( m_currentFrame );
+                                if( !m_nextFilter->processData( m_currentFrame ) )
+                                    return false;
                                 m_currentFrame.clear();
 
                                 m_state = readingHeaders;
@@ -124,7 +125,8 @@ namespace nx_http
                     if( (size_t)m_currentFrame.size() == m_contentLength )
                     {
                         m_state = waitingBoundary;
-                        m_nextFilter->processData( m_currentFrame );
+                        if( !m_nextFilter->processData( m_currentFrame ) )
+                            return false;
                         m_currentFrame.clear();
                         m_contentLength = (unsigned int)-1;
                     }
@@ -134,8 +136,13 @@ namespace nx_http
                 case readingUnsizedBinaryData:
                     readUnsizedBinaryData( data, &offset );
                     break;
+
+                default:
+                    return false;
             }
         }
+
+        return true;
     }
 
     size_t MultipartContentParser::flush()
@@ -200,7 +207,7 @@ namespace nx_http
         return m_currentFrameHeaders;
     }
 
-    void MultipartContentParser::readUnsizedBinaryData(
+    bool MultipartContentParser::readUnsizedBinaryData(
         const QnByteArrayConstRef& data,
         size_t* const offset )
     {
@@ -216,7 +223,7 @@ namespace nx_http
                 {
                     m_currentFrame += data.mid( *offset );
                     *offset = data.size();
-                    return;
+                    return true;
                 }
                 //saving data up to found \r
                 m_currentFrame += data.mid( *offset, (slashRPos-data.constData())-*offset );
@@ -253,14 +260,15 @@ namespace nx_http
                     //waiting for more data
                     m_supposedBoundary += data.mid( *offset );
                     *offset = data.size();
-                    return;
+                    return true;
                 }
 
                 //checking if boundary has been met
                 if( supposedBoundary == m_boundaryForUnsizedBinaryParsing )
                 {
                     //found frame delimiter
-                    m_nextFilter->processData( m_currentFrame );
+                    if( !m_nextFilter->processData( m_currentFrame ) )
+                        return false;
                     m_currentFrame.clear();
 
                     m_state = readingHeaders;
@@ -277,5 +285,7 @@ namespace nx_http
                 break;
             }
         }
+
+        return true;
     }
 }

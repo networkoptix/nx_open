@@ -15,6 +15,8 @@
 #include <utils/common/concurrent.h>
 #include <utils/network/simple_http_client.h>
 
+#include <rest/active_connections_rest_handler.h>
+
 #include "compatibility/old_ec_connection.h"
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
@@ -300,6 +302,8 @@ namespace ec2
                 return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(nullptr, out);
             } );
 
+        restProcessorPool->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler());
+
         //using HTTP processor since HTTP REST does not support HTTP interleaving
         //restProcessorPool->registerHandler(
         //    QLatin1String(INCOMING_TRANSACTIONS_PATH),
@@ -351,23 +355,18 @@ namespace ec2
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
         loginInfo.clientInfo = clientInfo;
+
         {
             QMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return INVALID_REQ_ID;
             ++m_runningRequests;
         }
-#if 1
+
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(
-            addr, ApiCommand::connect, std::nullptr_t(), func );
-#else
-        //TODO: #ak following does not compile due to msvc2012 restriction: no more than 6 arguments to std::bind
-        using namespace std::placeholders;
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            addr, ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, reqID, _1, _2, addr, handler) );
-#endif
+            addr, ApiCommand::connect, loginInfo, func );
         return reqID;
     }
 

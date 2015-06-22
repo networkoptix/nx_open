@@ -146,7 +146,7 @@ namespace nx_http
             Func func );
         unsigned int hexCharToInt( BufferType::value_type ch );
         //!Returns nullptr if \a encodingName is unknown
-        AbstractByteStreamConverter* createContentDecoder( const nx_http::StringType& encodingName );
+        AbstractByteStreamFilter* createContentDecoder( const nx_http::StringType& encodingName );
         void resetStateInternal();
     };
 }

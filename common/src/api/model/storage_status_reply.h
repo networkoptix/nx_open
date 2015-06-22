@@ -16,9 +16,10 @@ struct QnStorageSpaceData {
     bool isExternal;
     bool isWritable;
     bool isUsedForWriting;
+    QString storageType;
 };
 
-#define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)
+#define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)(storageType)
 
 struct QnStorageStatusReply {
     bool pluginExists;

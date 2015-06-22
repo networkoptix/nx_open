@@ -27,6 +27,9 @@ public:
     QByteArray getDigest() const;
     void setDigest(const QByteArray& digest);
 
+    QByteArray getCryptSha512Hash() const;
+    void setCryptSha512Hash(const QByteArray& hash);
+        
     quint64 getPermissions() const;
     void setPermissions(quint64 permissions);
 
@@ -36,13 +39,16 @@ public:
     QString getEmail() const;
     void setEmail(const QString &email);
     virtual Qn::ResourceStatus getStatus() const override;
+
 signals:
     void hashChanged(const QnResourcePtr &resource);
     void passwordChanged(const QnResourcePtr &resource);
     void digestChanged(const QnResourcePtr &resource);
+    void cryptSha512HashChanged(const QnResourcePtr &resource);
     void permissionsChanged(const QnResourcePtr &user);
     void adminChanged(const QnResourcePtr &resource);
     void emailChanged(const QnResourcePtr &user);
+
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
@@ -50,6 +56,7 @@ private:
     QString m_password;
     QByteArray m_hash;
     QByteArray m_digest;
+    QByteArray m_cryptSha512Hash;
     quint64 m_permissions;
     bool m_isAdmin;
     QString m_email;

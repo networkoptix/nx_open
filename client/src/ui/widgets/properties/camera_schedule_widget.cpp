@@ -590,17 +590,6 @@ void QnCameraScheduleWidget::setFps(int value)
     ui->fpsSpinBox->setValue(value);
 }
 
-void QnCameraScheduleWidget::showMaxFpsWarning(int setValue, int maxValue) {
-    QMessageBox::warning(this, tr("FPS value is too high"),
-        tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.").arg(setValue).arg(maxValue));
-}
-
-void QnCameraScheduleWidget::showMaxDualStreamingWarning(int setValue, int maxValue) {
-    QMessageBox::warning(this, tr("FPS value is too high"),
-        tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.")
-        .arg(setValue).arg(maxValue));
-}
-
 void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
     /* Silently ignoring invalid input is OK here. */
     if(value < ui->fpsSpinBox->minimum())

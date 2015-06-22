@@ -450,11 +450,13 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         if( strlen(m_camInfo.defaultLogin) == 0 )
         {
             const QByteArray userName = getAuth().user().toLatin1();
+            memset( m_camInfo.defaultLogin, 0, sizeof( m_camInfo.defaultLogin ) );
             strncpy( m_camInfo.defaultLogin, userName.constData(), std::min<size_t>(userName.size(), sizeof(m_camInfo.defaultLogin)-1) );
         }
         if( strlen(m_camInfo.defaultPassword) == 0 )
         {
             const QByteArray userPassword = getAuth().password().toLatin1();
+            memset( m_camInfo.defaultPassword, 0, sizeof( m_camInfo.defaultPassword ) );
             strncpy( m_camInfo.defaultPassword, userPassword.constData(), std::min<size_t>(userPassword.size(), sizeof(m_camInfo.defaultPassword)-1) );
         }
 
@@ -566,7 +568,11 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
+#else
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("hardwaregrid"));
+#endif
     }
     else
     {

@@ -1,6 +1,8 @@
 #ifndef API_STATISTICS_H
 #define API_STATISTICS_H
 
+#include <set>
+
 #include "api_globals.h"
 #include "api_resource_data.h"
 #include "api_media_server_data.h"
@@ -9,7 +11,6 @@
 #include "api_license_data.h"
 #include "api_business_rule_data.h"
 
-#include <unordered_set>
 
 namespace std
 {
@@ -28,11 +29,9 @@ namespace ec2 {
 		: ApiCameraDataEx
     {
         ApiCameraDataStatistics();
-        ApiCameraDataStatistics(const ApiCameraDataEx&& data);
+        ApiCameraDataStatistics(ApiCameraDataEx&& data);
 
-		const static std::unordered_set<QString> EXCEPT_PARAMS;
-
-        ApiResourceParamDataList addParams;
+		const static std::set<QString> EXCEPT_PARAMS;
     };
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
@@ -43,17 +42,17 @@ namespace ec2 {
 		: ApiStorageData
     {
         ApiStorageDataStatistics();
-        ApiStorageDataStatistics(const ApiStorageData&& data);
+        ApiStorageDataStatistics(ApiStorageData&& data);
     };
-#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)
+#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)(storageType)
 
     struct ApiMediaServerDataStatistics
 		: ApiMediaServerDataEx
     {
         ApiMediaServerDataStatistics();
-        ApiMediaServerDataStatistics(const ApiMediaServerDataEx&& data);
+        ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data);
 
-        ApiStorageDataStatisticsList    storages;
+        ApiStorageDataStatisticsList storages;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
     (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy)
@@ -63,19 +62,16 @@ namespace ec2 {
         ApiLicenseStatistics();
         ApiLicenseStatistics(const ApiLicenseData& data);
 
-        QString name, licenseType, version, brand, expiration;
+        QString name, key, licenseType, version, brand, expiration;
         qint64 cameraCount;
 	};
-#define ApiLicenseStatistics_Fields (name)(cameraCount)(licenseType)(version)(brand)(expiration)
+#define ApiLicenseStatistics_Fields (name)(key)(cameraCount)(licenseType)(version)(brand)(expiration)
 
 	struct ApiBusinessRuleStatistics
 		: ApiBusinessRuleData
 	{
         ApiBusinessRuleStatistics();
-        ApiBusinessRuleStatistics(const ApiBusinessRuleData&& data);
-
-		// TODO: Convert enums to strings
-		// QString actionType, eventState, eventType; 
+        ApiBusinessRuleStatistics(ApiBusinessRuleData&& data);
 	};
 #define ApiBusinessRuleStatistics_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState) \
 	(actionType)(actionResourceIds)(actionParams)(aggregationPeriod)(disabled)(schedule)(system)

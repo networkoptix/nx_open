@@ -46,7 +46,7 @@ namespace ec2
 
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
-        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer) const override;
+        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     protected:
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, ec2::impl::SimpleHandlerPtr handler ) override;

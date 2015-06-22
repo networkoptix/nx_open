@@ -16,7 +16,7 @@ namespace nx_http
     {
     }
 
-    void HttpMessageStreamParser::processData( const QnByteArrayConstRef& data )
+    bool HttpMessageStreamParser::processData( const QnByteArrayConstRef& data )
     {
         size_t bytesProcessed = 0;
         while( bytesProcessed < data.size() )
@@ -26,18 +26,22 @@ namespace nx_http
                 m_httpStreamReader.state() == HttpStreamReader::parseError )
             {
                 m_httpStreamReader.resetState();
-                //TODO #ak reporting error
+                //reporting error
+                return false;
             }
 
             //TODO #ak limiting message size since message body is aggregated in parser
 
             if( m_httpStreamReader.state() == HttpStreamReader::messageDone )
             {
-                m_nextFilter->processData( m_httpStreamReader.fetchMessageBody() );
+                if( !m_nextFilter->processData( m_httpStreamReader.fetchMessageBody() ) )
+                    return false;
                 m_httpStreamReader.resetState();
             }
             bytesProcessed += localBytesProcessed;
         }
+
+        return true;
     }
 
     size_t HttpMessageStreamParser::flush()

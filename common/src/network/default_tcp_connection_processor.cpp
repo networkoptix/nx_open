@@ -23,5 +23,5 @@ void QnDefaultTcpConnectionProcessor::run()
     d->responseBody.append("</body>\n");
     d->responseBody.append("</html>\n");
 
-    sendResponse(CODE_NOT_FOUND, "text/html; charset=iso-8859-1");
+    sendResponse(CODE_NOT_FOUND, "text/html; charset=utf-8");
 }

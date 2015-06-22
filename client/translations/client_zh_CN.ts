@@ -6586,7 +6586,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>系统部分组件未更新:&lt; br / &gt; &lt; br / &gt; %1 &lt; br / &gt;,请更新到最新版本%2所有组件。</translation>
+        <translation>系统部分组件未更新&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;请更新到最新版本%2所有组件。</translation>
     </message>
     <message>
         <source>Update...</source>

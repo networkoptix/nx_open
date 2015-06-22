@@ -6,6 +6,8 @@
 
 #include <boost/array.hpp>
 
+#include <client/client_runtime_settings.h>
+
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
@@ -518,7 +520,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    setOptions(StickToMinimum | StickToMaximum | PreserveWindowSize | UpdateToolTip | SelectionEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick);
+    QnTimeSlider::Options defaultOptions = StickToMinimum | StickToMaximum |PreserveWindowSize | UpdateToolTip | SelectionEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick;
+    setOptions(defaultOptions);
 
     setToolTipFormat(lit("hh:mm:ss"));
     setRulerHeight(60.0);
@@ -790,8 +793,23 @@ void QnTimeSlider::setWindowEnd(qint64 windowEnd) {
 }
 
 void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
+    qint64 targetWindowSize = end - start;
+
     start = qBound(minimum(), start, maximum());
     end = qMax(start, qBound(minimum(), end, maximum()));
+
+    /* Check if window size was spoiled and fix it if possible. */
+    if (m_options & PreserveWindowSize) {
+        qint64 newWindowSize = end - start;
+        qint64 range = maximum() - minimum();
+        if (newWindowSize < targetWindowSize && newWindowSize < range) {
+            qint64 windowSize = qMin(targetWindowSize, range);
+            if (start == minimum())
+                end = start + windowSize;
+            else
+                start = end - windowSize;
+        }
+    }
 
     if(end - start < m_minimalWindow) {
         qint64 delta = (m_minimalWindow - (end - start) + 1) / 2;
