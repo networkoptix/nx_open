@@ -35,7 +35,7 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
 }
 
 function gotoNewSession() {
-    sideNavigation.activeSessionId = ""
+    mainWindow.currentSessionId = ""
     sideNavigation.enabled = true
 
     if (connectionManager.connected) {

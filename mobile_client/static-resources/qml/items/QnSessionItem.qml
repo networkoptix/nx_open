@@ -66,5 +66,11 @@ QnSideNavigationItem {
         }
     }
 
-    onClicked: LoginDialog.connectToServer(sessionId, address, port, user, password)
+    onClicked: {
+        if (!active) {
+            LoginDialog.connectToServer(sessionId, address, port, user, password)
+        } else {
+            sideNavigation.hide()
+        }
+    }
 }
