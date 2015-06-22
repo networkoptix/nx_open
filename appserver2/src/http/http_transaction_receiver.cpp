@@ -118,31 +118,40 @@ namespace ec2
             }
 
             if( !readSingleRequest() )
-                return;
+            {
+                if( d->prevSocketError == SystemError::timedOut )
+                {
+                    NX_LOG( lit("QnHttpTransactionReceiver. Keep-alive timeout on transaction connection %1 from peer %2").
+                        arg(connectionGuid.toString()).arg(d->socket->getForeignAddress().toString()),
+                        cl_logDEBUG1 );
+                }
+                break;
+            }
             
             if( d->request.requestLine.method != nx_http::Method::POST )
             {
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-                return;
+                break;
             }
 
             auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
             if( connectionGuidIter == d->request.headers.end() )
             {
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-                return;
+                break;
             }
 
             const QnUuid requestConnectionGuid( connectionGuidIter->second );
             if( connectionGuid.isNull() )
             {
                 connectionGuid = requestConnectionGuid;
+                QnTransactionMessageBus::instance()->waitForNewTransactionsReady( connectionGuid ); // wait while transaction transport goes to the ReadyForStreamingState
             }
             else if( requestConnectionGuid != connectionGuid )
             {
                 //not allowing to use TCP same connection for multiple transaction connections
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-                return;
+                break;
             }
 
             if( !QnTransactionMessageBus::instance()->gotTransactionFromRemotePeer(
@@ -153,7 +162,7 @@ namespace ec2
                 NX_LOG( lit("QnHttpTransactionReceiver. Received transaction from %1 for unknown connection %2").
                     arg(d->socket->getForeignAddress().toString()).arg(connectionGuid.toString()), cl_logWARNING );
                 sendResponse( nx_http::StatusCode::notFound, nx_http::StringType() );
-                return;
+                break;
             }
 
             //checking whether connection persistent or not...
@@ -174,7 +183,10 @@ namespace ec2
             sendResponse( nx_http::StatusCode::ok, nx_http::StringType() );
 
             if( closeConnection )
-                return;
+                break;
         }
+
+        if( !connectionGuid.isNull() )
+            QnTransactionMessageBus::instance()->connectionFailure( connectionGuid );
     }
 }

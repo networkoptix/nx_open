@@ -215,6 +215,8 @@ public:
             until \a QnTransactionTransport::waitForNewTransactionsReady has returned
     */
     void waitForNewTransactionsReady( std::function<void()> invokeBeforeWait );
+    //!Transport level logic should use this method to report connection problem
+    void connectionFailure();
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 

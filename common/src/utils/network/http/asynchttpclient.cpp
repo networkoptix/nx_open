@@ -23,7 +23,7 @@
 //TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
 //TODO: #ak reconnect support
 
-static const int DEFAULT_CONNECT_TIMEOUT = 3000;
+static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
 //static const int DEFAULT_HTTP_PORT = 80;
 
@@ -42,6 +42,7 @@ namespace nx_http
         m_terminated( false ),
         m_totalBytesRead( 0 ),
         m_contentEncodingUsed( true ),
+        m_sendTimeoutMs( DEFAULT_SEND_TIMEOUT ),
         m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
         m_msgBodyReadTimeoutMs( 0 ),
         m_authType(authBasicAndDigest),
@@ -196,6 +197,11 @@ namespace nx_http
         m_userPassword = userPassword;
     }
 
+    void AsyncHttpClient::setSendTimeoutMs( unsigned int sendTimeoutMs )
+    {
+        m_sendTimeoutMs = sendTimeoutMs;
+    }
+
     void AsyncHttpClient::setResponseReadTimeoutMs( unsigned int _responseReadTimeoutMs )
     {
         m_responseReadTimeoutMs = _responseReadTimeoutMs;
@@ -272,7 +278,7 @@ namespace nx_http
             if( reconnectIfAppropriate() )
                 return;
             NX_LOG( lit( "Error sending (1) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+            m_state = sFailed;
             lk.unlock();
             emit done( sharedThis );
             lk.relock();
@@ -328,7 +334,11 @@ namespace nx_http
             if( reconnectIfAppropriate() )
                 return;
             NX_LOG(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+            m_state = 
+                ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
+                    m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
+                ? sDone
+                : sFailed;
             lk.unlock();
             emit done( sharedThis );
             lk.relock();
@@ -588,7 +598,7 @@ namespace nx_http
         m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
         m_connectionClosed = false;
         if( !m_socket->setNonBlockingMode( true ) ||
-            !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
+            !m_socket->setSendTimeout( m_sendTimeoutMs ) ||
             !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
         {
             NX_LOG( lit("Failed to put socket to non blocking mode. %1").

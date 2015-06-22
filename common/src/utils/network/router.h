@@ -11,10 +11,12 @@ class QnModuleFinder;
 
 struct QnRoute
 {
+    QnRoute(): distance(0) {}
+
     SocketAddress addr; // address for physical connect
     QnUuid id;          // requested server ID
     QnUuid gatewayId;   // proxy server ID. May be null
-
+    int distance;
     bool isValid() const { return !addr.isNull(); }
 };
 

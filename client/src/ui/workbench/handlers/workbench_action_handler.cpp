@@ -2398,6 +2398,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
         latestMsVersion = latestVersion;
 
+    //TODO: #GDM #High #TR #2.3.2 remove html tags
     QString components;
     foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
         QString component;
