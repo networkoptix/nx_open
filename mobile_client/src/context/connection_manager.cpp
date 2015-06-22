@@ -14,6 +14,12 @@
 #include "mobile_client/mobile_client_settings.h"
 #include "common/common_module.h"
 
+namespace {
+
+    QnSoftwareVersion minimalSupportedVersion(2, 4, 0, 0);
+
+}
+
 QnConnectionManager::QnConnectionManager(QObject *parent) :
     QObject(parent)
 {
@@ -53,23 +59,25 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
 
     QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     ConnectionStatus status = Success;
+    QString statusMessage;
 
     if (errorCode == ec2::ErrorCode::unauthorized) {
         status = Unauthorized;
-        qDebug() << "authorization failed";
+        statusMessage = tr("Incorrect login or password");
     } else if (errorCode != ec2::ErrorCode::ok) {
         status = NetworkError;
-        qDebug() << "unknown error, errorCode = " << static_cast<int>(errorCode);
+        statusMessage = tr("Server or network is not available");
     } else if (!connectionInfo.brand.isEmpty() && connectionInfo.brand != QnAppInfo::productNameShort()) {
         status = InvalidServer;
-        qDebug() << "connecting to incompatible server: " << connectionInfo.brand;
-    } else if (!isCompatible(connectionInfo.version, QnSoftwareVersion(QnAppInfo::applicationVersion()))) {
+        statusMessage = tr("Incompatible server");
+    } else if (connectionInfo.version < minimalSupportedVersion) {
         status = InvalidVersion;
-        qDebug() << "connecting to incompatible server: " << connectionInfo.version.toString() << " current: " << QnAppInfo::applicationVersion();
+        statusMessage = tr("Server version %1 is too old").arg(connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat));
     }
 
     if (status != Success) {
-        emit connectionFailed(url, status);
+        qWarning() << "QnConnectionManager" << statusMessage;
+        emit connectionFailed(status, statusMessage);
         return false;
     }
 

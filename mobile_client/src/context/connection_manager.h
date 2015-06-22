@@ -27,7 +27,7 @@ public:
     QString systemName() const;
 
 signals:
-    void connectionFailed(const QUrl &url, ConnectionStatus status);
+    void connectionFailed(ConnectionStatus status, const QString &statusMessage);
     void systemNameChanged(const QString &systemName);
     void initialResourcesReceived();
     void connectedChanged();

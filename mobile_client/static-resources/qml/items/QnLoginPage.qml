@@ -22,6 +22,12 @@ QnPage {
 
     title: newConnectionLabel
 
+    property bool _authError: false
+    property bool _serverError: false
+    property bool _showWarning: false
+
+    property int _warningAnimationDuration: 500
+
     Connections {
         target: menuBackButton
         onClicked: {
@@ -46,17 +52,19 @@ QnPage {
 
             Rectangle {
                 id: warningRect
-                height: visible ? dp(48) : 0
+                height: _showWarning ? dp(48) : 0
                 width: loginPage.width
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: QnTheme.attentionBackground
-                visible: false
+                clip: true
 
-                Behavior on height { NumberAnimation { duration: 200 } }
+                Behavior on height { NumberAnimation { duration: _warningAnimationDuration; easing.type: Easing.OutCubic } }
 
                 Text {
-                    anchors.centerIn: parent
-                    text: qsTr("Incorrect login or password")
+                    id: warningText
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.top
+                    anchors.verticalCenterOffset: dp(24)
                     font.pixelSize: sp(16)
                     font.weight: Font.Bold
                     color: QnTheme.windowText
@@ -71,12 +79,16 @@ QnPage {
                     id: hostField
                     width: parent.width * 3 / 5
                     placeholderText: qsTr("Host")
+                    warning: _serverError
+                    onTextChanged: loginPage.removeWarnings()
                 }
 
                 QnTextField {
                     id: portField
                     width: parent.width * 2 / 5 - parent.spacing
                     placeholderText: qsTr("Port")
+                    warning: _serverError
+                    onTextChanged: loginPage.removeWarnings()
                 }
             }
 
@@ -84,6 +96,8 @@ QnPage {
                 id: loginField
                 width: parent.width
                 placeholderText: qsTr("Login")
+                warning: _authError
+                onTextChanged: loginPage.removeWarnings()
             }
 
             QnTextField {
@@ -91,6 +105,8 @@ QnPage {
                 width: parent.width
                 placeholderText: qsTr("Password")
                 echoMode: TextInput.Password
+                warning: _authError
+                onTextChanged: loginPage.removeWarnings()
             }
 
             Row {
@@ -127,7 +143,16 @@ QnPage {
                     color: QnTheme.buttonAccentBackground
                 }
 
-                onClicked: LoginFunctions.connectToServer("", hostField.text, portField.text, loginField.text, passwordField.text)
+                onClicked: {
+                    loginPage.removeWarnings()
+
+                    if (_showWarning) {
+                        _showWarning = false
+                        delayedLoginTimer.start()
+                    } else {
+                        loginWithCurrentFields()
+                    }
+                }
             }
 
             Loader {
@@ -232,4 +257,34 @@ QnPage {
             }
         }
     ]
+
+    Connections {
+        target: connectionManager
+
+        onConnectionFailed: {
+            warningText.text = statusMessage
+            if (status == QnConnectionManager.Unauthorized)
+                _authError = true
+            else
+                _serverError = true
+            _showWarning = true
+        }
+    }
+
+    Timer {
+        id: delayedLoginTimer
+        interval: _warningAnimationDuration
+        running: false
+        repeat: false
+        onTriggered: loginWithCurrentFields()
+    }
+
+    function removeWarnings() {
+        _authError = false
+        _serverError = false
+    }
+
+    function loginWithCurrentFields() {
+        LoginFunctions.connectToServer("", hostField.text, portField.text, loginField.text, passwordField.text)
+    }
 }

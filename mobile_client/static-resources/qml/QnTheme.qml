@@ -15,10 +15,12 @@ QtObject {
 
     property color inputBorder
     property color inputBorderActive
-    property color inputBorderError
     property color inputText
-    property color inputTextError
     property color inputPlaceholder
+    property color inputBorderError
+    property color inputBorderActiveError
+    property color inputTextError
+    property color inputPlaceholderError
 
     property color listSectionText
     property color listText
@@ -44,10 +46,12 @@ QtObject {
         buttonText              = colorTheme.color("button.text")
         inputBorder             = colorTheme.color("input.border")
         inputBorderActive       = colorTheme.color("input.borderActive")
-        inputBorderError        = colorTheme.color("input.borderError")
         inputText               = colorTheme.color("input.text")
-        inputTextError          = colorTheme.color("input.textError")
         inputPlaceholder        = colorTheme.color("input.placeholder")
+        inputBorderError        = colorTheme.color("input.borderError")
+        inputBorderActiveError  = colorTheme.color("input.borderActiveError")
+        inputTextError          = colorTheme.color("input.textError")
+        inputPlaceholderError   = colorTheme.color("input.placeholderError")
         listSectionText         = colorTheme.color("list.sectionText")
         listText                = colorTheme.color("list.text")
         listSubText             = colorTheme.color("list.subText")
