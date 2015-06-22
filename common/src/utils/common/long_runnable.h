@@ -105,6 +105,16 @@ struct QnRunnableCleanup {
             delete runnable;
         }
     }
+
+    static inline void cleanupSync(QnLongRunnable *runnable) {
+        if(!runnable)
+            return;
+
+        if(runnable->isRunning()) 
+            runnable->stop();
+        
+        delete runnable;
+    }
 };
 
 

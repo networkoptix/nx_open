@@ -161,13 +161,18 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         }
 
     });
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
+        QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(resource));
+        delete m_loaderByResource.take(resource);
+    });
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
     foreach(QnThumbnailsLoader *loader, m_thumbnailLoaderByResource)
-        QnRunnableCleanup::cleanup(loader);
+        QnRunnableCleanup::cleanupSync(loader);
     for (QnThreadedChunksMergeTool* tool: m_threadedChunksMergeTool)
-        QnRunnableCleanup::cleanup(tool);
+        QnRunnableCleanup::cleanupSync(tool);
 }
 
 QnTimeSlider *QnWorkbenchNavigator::timeSlider() const {
