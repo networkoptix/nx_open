@@ -93,6 +93,20 @@ QnNavigationDrawer {
                     color: QnTheme.sideNavigationSplitter
                 }
 
+                Item {
+                    width: parent.width
+                    height: dp(16)
+                }
+
+                QnSideNavigationButtonItem {
+                    id: newConnectionButton
+                    text: qsTr("New connection")
+                    icon: "qrc:///images/plus.png"
+                    active: !activeSessionId
+
+                    onClicked: Main.gotoNewSession()
+                }
+
                 Text {
                     x: dp(16)
                     height: dp(48)

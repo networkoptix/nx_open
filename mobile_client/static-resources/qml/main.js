@@ -35,11 +35,22 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
 }
 
 function gotoNewSession() {
-    mainWindow.currentSessionId = ""
-    menuBackButton.animateToMenu()
     sideNavigation.activeSessionId = ""
     sideNavigation.enabled = true
-    stackView.pop()
+
+    if (connectionManager.connected) {
+        connectionManager.disconnectFromServer(true)
+        return
+    }
+
+    var item = stackView.find(function(item, index) { return item.objectName === "newConnectionPage" })
+
+    if (item) {
+        menuBackButton.animateToMenu()
+        stackView.pop(item)
+    } else {
+        stackView.push(loginPageComponent)
+    }
 }
 
 function gotoResources() {
@@ -49,7 +60,7 @@ function gotoResources() {
 }
 
 function gotoMainScreen() {
-    if (connectionManager.isConnected)
+    if (connectionManager.connected)
         gotoResources()
     else
         gotoNewSession()

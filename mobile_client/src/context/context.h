@@ -44,8 +44,7 @@ signals:
     void applicationInfoChanged();
 
 private slots:
-    void at_connectionManager_connected();
-    void at_connectionManager_disconnected();
+    void at_connectionManager_connectedChanged();
 
 private:
     QnConnectionManager *m_connectionManager;

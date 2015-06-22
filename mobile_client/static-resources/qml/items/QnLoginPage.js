@@ -36,7 +36,7 @@ function connectToServer(sessionId, host, port, login, password) {
 function saveSession(sessionId, host, port, login, password, systemName) {
     updateSession(sessionId, host, port, login, password, systemName)
 
-    if (!connectionManager.isConnected)
+    if (!connectionManager.connected)
         sideNavigation.show()
     Main.gotoMainScreen()
 }

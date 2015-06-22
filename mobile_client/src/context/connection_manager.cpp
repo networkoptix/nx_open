@@ -15,15 +15,18 @@
 #include "common/common_module.h"
 
 QnConnectionManager::QnConnectionManager(QObject *parent) :
-    QObject(parent),
-    m_connected(false),
-    m_connectHandle(-1)
+    QObject(parent)
 {
     connect(qnCommon, &QnCommonModule::systemNameChanged, this, &QnConnectionManager::systemNameChanged);
+
+    QnMobileClientMessageProcessor *messageProcessor = static_cast<QnMobileClientMessageProcessor*>(QnMobileClientMessageProcessor::instance());
+    connect(messageProcessor,   &QnMobileClientMessageProcessor::connectionOpened,  this,   &QnConnectionManager::connectedChanged);
+    connect(messageProcessor,   &QnMobileClientMessageProcessor::connectionClosed,  this,   &QnConnectionManager::connectedChanged);
 }
 
-bool QnConnectionManager::isConnected() const {
-    return m_connected;
+bool QnConnectionManager::connected() const {
+    QnMobileClientMessageProcessor *messageProcessor = static_cast<QnMobileClientMessageProcessor*>(QnMobileClientMessageProcessor::instance());
+    return messageProcessor->isConnected();
 }
 
 QString QnConnectionManager::systemName() const {
@@ -35,18 +38,18 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
         return true;
     }
 
-    if (isConnected() && !disconnectFromServer(false))
+    if (connected() && !disconnectFromServer(false))
         return true;
 
     QnEc2ConnectionRequestResult result;
-    m_connectHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+    int connectHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
         url, ec2::ApiClientInfoData(), &result, &QnEc2ConnectionRequestResult::processEc2Reply);
 
     ec2::ErrorCode errorCode = static_cast<ec2::ErrorCode>(result.exec());
-    if (m_connectHandle != result.handle())
+    if (connectHandle != result.handle())
         return true;
 
-    m_connectHandle = -1;
+    connectHandle = -1;
 
     QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     ConnectionStatus status = Success;
@@ -91,9 +94,6 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
 
     qnCommon->setLocalSystemName(connectionInfo.systemName);
 
-    m_connected = true;
-    emit connected(url);
-    emit isConnectedChanged();
 //    context()->setUserName(appServerUrl.userName());
 
     connect(QnMobileClientMessageProcessor::instance(), &QnMobileClientMessageProcessor::initialResourcesReceived, this, &QnConnectionManager::initialResourcesReceived);
@@ -116,8 +116,5 @@ bool QnConnectionManager::disconnectFromServer(bool force) {
 //    QnResource::stopCommandProc();
 
 //    context()->setUserName(QString());
-    m_connected = false;
-    emit disconnected();
-    emit isConnectedChanged();
     return true;
 }

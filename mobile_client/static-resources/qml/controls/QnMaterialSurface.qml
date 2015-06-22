@@ -3,7 +3,7 @@ import QtQuick 2.4
 MouseArea {
     id: materialSurface
 
-    property color color: "#30ffffff"
+    property color color: "#20ffffff"
     property bool selected: false
 
     clip: true

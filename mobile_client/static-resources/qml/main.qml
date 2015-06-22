@@ -91,6 +91,7 @@ Window {
         id: loginPageComponent
 
         QnLoginPage {
+            objectName: "newConnectionPage"
         }
     }
 
@@ -118,9 +119,14 @@ Window {
 
     Connections {
         target: connectionManager
-        onConnected: {
-            LoginFunctions.saveCurrentSession()
-            Main.gotoResources()
+
+        onConnectedChanged: {
+            if (connectionManager.connected) {
+                LoginFunctions.saveCurrentSession()
+                Main.gotoResources()
+            } else {
+                Main.gotoNewSession()
+            }
         }
     }
 

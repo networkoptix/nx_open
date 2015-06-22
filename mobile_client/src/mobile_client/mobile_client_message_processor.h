@@ -17,6 +17,8 @@ public:
 
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) override;
 
+    bool isConnected() const;
+
 private slots:
     void at_remotePeerFound(ec2::ApiPeerAliveData data);
     void at_remotePeerLost(ec2::ApiPeerAliveData data);

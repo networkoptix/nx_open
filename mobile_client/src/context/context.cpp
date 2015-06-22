@@ -21,8 +21,7 @@ QnContext::QnContext(QObject *parent):
     m_appInfo(new QnMobileAppInfo(this)),
     m_resolutionUtil(custonDensityClass == -1 ? new QnResolutionUtil() : new QnResolutionUtil(static_cast<QnResolutionUtil::DensityClass>(custonDensityClass)))
 {
-    connect(m_connectionManager,    &QnConnectionManager::connected,    this,   &QnContext::at_connectionManager_connected);
-    connect(m_connectionManager,    &QnConnectionManager::disconnected, this,   &QnContext::at_connectionManager_disconnected);
+    connect(m_connectionManager, &QnConnectionManager::connectedChanged, this, &QnContext::at_connectionManager_connectedChanged);
 }
 
 QnContext::~QnContext() {}
@@ -35,12 +34,13 @@ int QnContext::sp(qreal dpix) const {
     return m_resolutionUtil->sp(dpix);
 }
 
-void QnContext::at_connectionManager_connected() {
-    if (QnCameraThumbnailCache::instance())
-        QnCameraThumbnailCache::instance()->start();
-}
+void QnContext::at_connectionManager_connectedChanged() {
+    QnCameraThumbnailCache *thumbnailCache = QnCameraThumbnailCache::instance();
+    if (!thumbnailCache)
+        return;
 
-void QnContext::at_connectionManager_disconnected() {
-    if (QnCameraThumbnailCache::instance())
-        QnCameraThumbnailCache::instance()->stop();
+    if (m_connectionManager->connected())
+        thumbnailCache->start();
+    else
+        thumbnailCache->stop();
 }

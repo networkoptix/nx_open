@@ -5,7 +5,7 @@ import com.networkoptix.qml 1.0
 import "QnLoginPage.js" as LoginDialog
 import "../main.js" as Main
 
-Item {
+QnSideNavigationItem {
     id: sessionItem
 
     property string sessionId
@@ -15,20 +15,8 @@ Item {
     property string user
     property string password
 
-    property alias active: background.active
-
     width: parent.width
     height: dp(120)
-
-    QnSessionItemBackground {
-        id: background
-        anchors.fill: parent
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: LoginDialog.connectToServer(sessionId, address, port, user, password)
-    }
 
     Column {
         anchors.verticalCenter: parent.verticalCenter
@@ -77,4 +65,6 @@ Item {
             color: QnTheme.listSubText
         }
     }
+
+    onClicked: LoginDialog.connectToServer(sessionId, address, port, user, password)
 }

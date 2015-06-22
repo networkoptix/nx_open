@@ -47,6 +47,10 @@ void QnMobileClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr
     resource->setStatus(status);
 }
 
+bool QnMobileClientMessageProcessor::isConnected() const {
+    return m_connected;
+}
+
 void QnMobileClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data) {
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerFound received while disconnected";
