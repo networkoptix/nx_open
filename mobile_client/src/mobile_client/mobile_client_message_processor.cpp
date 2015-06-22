@@ -12,5 +12,12 @@ QnMobileClientMessageProcessor::QnMobileClientMessageProcessor() :
 }
 
 bool QnMobileClientMessageProcessor::isConnected() const {
-    return connectionState() == QnConnectionState::Connected;
+    switch (connectionState()) {
+    case QnConnectionState::Connected:
+    case QnConnectionState::Reconnecting:
+    case QnConnectionState::Ready:
+        return true;
+    default:
+        return false;
+    }
 }
