@@ -388,6 +388,10 @@
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
         <translation>系統管理中的&quot;允許系統優化攝影機設定&quot;功能已關閉.</translation>
     </message>
+    <message>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -412,16 +416,20 @@
 <context>
     <name>CameraManagementWidget</name>
     <message>
-        <source>Enable camera auto discovery</source>
-        <translation>允許自動尋找攝影機</translation>
-    </message>
-    <message>
         <source>Allow system to optimize camera settings (Recommended)</source>
         <translation>允許系統自動優化攝影機設定(建議)</translation>
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
         <translation>警告! 錄影排程的 FPS 及 畫質設定將無作用!</translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -761,12 +769,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>同時開啟所有伺服器的系統資源監視器</translation>
     </message>
     <message>
-        <source>Camera Management</source>
-        <translation>攝影機管理</translation>
-    </message>
-    <message>
         <source>System Configuration Backup and Restore</source>
         <translation>系統設定備份及還原</translation>
+    </message>
+    <message>
+        <source>System Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2519,6 +2527,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>File Settings...</source>
         <translation>檔案設定...</translation>
     </message>
+    <message>
+        <source>Ask About Statistics Reporting</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -3254,18 +3266,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>開</translation>
     </message>
     <message>
-        <source>FPS value is too high</source>
-        <translation>FPS 數值太高</translation>
-    </message>
-    <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>目前在排程表格為 %1 FPS. FPS 將降為攝影機的最大值 %2.</translation>
-    </message>
-    <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>軟體位移偵測保留 2.FPS 給第二串流。目前在排程表格為 %1 FPS。FPS 將降為 %2. </translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
@@ -3892,18 +3892,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation>我們偵測到您的顯示卡太老舊或不支援. 若要繼續執行程式造成之風險請自行承擔.</translation>
-    </message>
-    <message>
-        <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation>安裝或更新您的顯示卡驅動程式可能可以解決這問題.</translation>
-    </message>
-    <message>
-        <source>Critical Performance Tip</source>
-        <translation>關鍵的性能提示</translation>
-    </message>
-    <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
         <translation>我們偵測到您的顯示卡可能未安裝驅動程式或版本太老舊.</translation>
     </message>
@@ -3914,6 +3902,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Important Performance Tip</source>
         <translation>重要的性能提示</translation>
+    </message>
+    <message>
+        <source>This could lead to client software malfunction including crash.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4005,14 +3997,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;影像無法讀取&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutTabBar</name>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1 的螢幕</translation>
     </message>
 </context>
 <context>
@@ -4483,10 +4467,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>密碼:</translation>
     </message>
     <message>
-        <source>Find System</source>
-        <translation>尋找系統</translation>
-    </message>
-    <message>
         <source>The new system will have password and name from the system:</source>
         <translation>新系統的帳號與密碼將套用主系統:</translation>
     </message>
@@ -4569,6 +4549,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
         <translation>遠端系統的伺服器將馬上顯示在您的系統中.</translation>
+    </message>
+    <message>
+        <source>Check</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5206,11 +5190,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Users</source>
         <translation>使用者</translation>
     </message>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1 的螢幕</translation>
-    </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
@@ -5421,12 +5400,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>是否要繼續?</translation>
     </message>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
-        <translation>儲存空間 %1 的錄影資料索引重建正進行中</translation>
+        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
-        <translation>儲存空間 %1 的錄影資料快速掃瞄正進行中</translation>
+        <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5808,6 +5787,18 @@ Short for &quot;seconds&quot;</extracomment>
         <source>This action CANNOT be undone!</source>
         <translation>本動作將 無法 還原!</translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation type="unfinished">FPS 數值太高</translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation type="unfinished">目前在排程表格為 %1 FPS. FPS 將降為攝影機的最大值 %2.</translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation type="unfinished">軟體位移偵測保留 2.FPS 給第二串流。目前在排程表格為 %1 FPS。FPS 將降為 %2. </translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -5906,10 +5897,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>帳號密碼有誤</translation>
     </message>
     <message>
-        <source>Please check authentication information&lt;br/&gt;in camera settings</source>
-        <translation>請確認攝影機設定中的帳號密碼認証資訊</translation>
-    </message>
-    <message>
         <source>Activate Video Wall license to remove this message</source>
         <translation>請啟動電視牆授權以移除此訊息</translation>
     </message>
@@ -5924,6 +5911,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Diagnose...</source>
         <translation>診斷...</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in camera settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6545,18 +6536,6 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation>伺服器 v%1 於 %2&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Server v%1&lt;br/&gt;</source>
-        <translation>伺服器 v%1&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>系統內有些元件未更新:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;請更新所有元件至最新版本 %2.</translation>
-    </message>
-    <message>
         <source>Update...</source>
         <translation>更新...</translation>
     </message>
@@ -6599,10 +6578,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>
             <numerusform>無法儲存變更至 %n 個資源。</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Client v%1&lt;br/&gt;</source>
-        <translation>客戶端 v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
@@ -6656,6 +6631,35 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Error while uploading picture.</source>
         <translation>上傳影像時發生錯誤.</translation>
     </message>
+    <message>
+        <source>Some components of the system are not updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server v%1 at %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update all components to the latest version %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous Usage Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
+If you would like to disable this feature you can do so in the System Settings dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6705,6 +6709,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Connect to Server...</source>
         <translation>連線至伺服器...</translation>
+    </message>
+    <message>
+        <source>Could not connect to server...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6917,6 +6925,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation>套用過濾器: 影像翻轉, 魚眼校正, 影像強化, 自定義長寬比 (須重新轉碼)</translation>
+    </message>
+    <message>
+        <source>exported</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7260,18 +7272,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>無法啟動電視牆控制進程.</translation>
     </message>
     <message>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
-    </message>
-    <message>
-        <source>New layout</source>
-        <translation>新佈局</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>新佈局 %1</translation>
-    </message>
-    <message>
         <source>To enable the feature please activate at least one Video Wall license</source>
         <translation>請啟動至少一個電視牆授權以啟用此功能</translation>
     </message>
@@ -7360,6 +7360,15 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You&apos;ll have to start it manually.</source>
         <translation>您必須手動開啟.</translation>
+    </message>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation type="unfinished">%1 的螢幕</translation>
+    </message>
+    <message>
+        <source>%n cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7636,10 +7645,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Start</source>
         <translation>開始</translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation>重建程序</translation>
     </message>
     <message>
         <source>Cancel</source>

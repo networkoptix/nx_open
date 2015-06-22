@@ -378,6 +378,10 @@
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
         <translation>Настройка &quot;Разрешить системе оптимизировать настройки камер&quot; отключена в диалоге &quot;Администрирование системы&quot;</translation>
     </message>
+    <message>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -400,16 +404,20 @@
 <context>
     <name>CameraManagementWidget</name>
     <message>
-        <source>Enable camera auto discovery</source>
-        <translation>Включить автоматическое обнаружение камер</translation>
-    </message>
-    <message>
         <source>Allow system to optimize camera settings (Recommended)</source>
         <translation>Разрешить системе оптимизировать настройки камер (рекомендуется)</translation>
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
         <translation>Внимание! Настройки &quot;Частота кадров&quot; и&quot;Качество&quot; в настройках записи камеры работать не будут!</translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -749,12 +757,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Открыть статистику всех серверов в одном окне</translation>
     </message>
     <message>
-        <source>Camera Management</source>
-        <translation>Управление камерой</translation>
-    </message>
-    <message>
         <source>System Configuration Backup and Restore</source>
         <translation>Резервное копирование и восстановление настроек системы</translation>
+    </message>
+    <message>
+        <source>System Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2524,6 +2532,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>File Settings...</source>
         <translation>Настройки...</translation>
     </message>
+    <message>
+        <source>Ask About Statistics Reporting</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -3298,18 +3310,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Вкл</translation>
     </message>
     <message>
-        <source>FPS value is too high</source>
-        <translation>Частота кадров слишком большая</translation>
-    </message>
-    <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>Текущее значение частоты кадров в расписании: %1. Частота кадров сброшена на максимальную частоту, поддерживаемую камерой: %2. {1.?}</translation>
-    </message>
-    <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>Для программной детекции движения 2. кадра/сек. зарезервированы для второго потока. Текущее значение частоты кадров в расписании: %1. Частота кадров сброшена на значение %2. {2 ?} {1.?}</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation>Внимание</translation>
     </message>
@@ -3946,18 +3946,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation>К сожалению, ваш видеоадаптер не поддерживается. Вы можете продолжить работу, но корректная работоспособность не будет гарантирована.</translation>
-    </message>
-    <message>
-        <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation>Установка или обновление драйверов видеоадаптера может помочь в решении проблемы.</translation>
-    </message>
-    <message>
-        <source>Critical Performance Tip</source>
-        <translation>Важный совет по увеличению производительности</translation>
-    </message>
-    <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
         <translation>Драйвера видеоадаптера не установлены, либо устарели.</translation>
     </message>
@@ -3968,6 +3956,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Important Performance Tip</source>
         <translation>Важный совет по увеличению производительности</translation>
+    </message>
+    <message>
+        <source>This could lead to client software malfunction including crash.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4059,14 +4051,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;Невозможно загрузить изображение&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutTabBar</name>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>Экран %1</translation>
     </message>
 </context>
 <context>
@@ -4543,10 +4527,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Пароль:</translation>
     </message>
     <message>
-        <source>Find System</source>
-        <translation>Найти систему</translation>
-    </message>
-    <message>
         <source>The new system will have password and name from the system:</source>
         <translation>Новая система будет иметь пароль и имя системы:</translation>
     </message>
@@ -4629,6 +4609,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
         <translation>Серверы удалённой системы должны появиться в вашей системе в ближайшее время.</translation>
+    </message>
+    <message>
+        <source>Check</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5277,11 +5261,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Users</source>
         <translation>Пользователи</translation>
     </message>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>Экран %1</translation>
-    </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
@@ -5494,12 +5473,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Вы уверены, что хотите продолжить?</translation>
     </message>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
-        <translation>Идёт восстановление индекса архива для хранилища &apos;%1&apos;</translation>
+        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
-        <translation>Идёт быстрое сканирование архива для хранилища &apos;%1&apos; </translation>
+        <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5889,6 +5868,18 @@ Short for &quot;seconds&quot;</extracomment>
         <source>This action CANNOT be undone!</source>
         <translation>Данное действие НЕОБРАТИМО!</translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation type="unfinished">Частота кадров слишком большая</translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation type="unfinished">Текущее значение частоты кадров в расписании: %1. Частота кадров сброшена на максимальную частоту, поддерживаемую камерой: %2. {1.?}</translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation type="unfinished">Для программной детекции движения 2. кадра/сек. зарезервированы для второго потока. Текущее значение частоты кадров в расписании: %1. Частота кадров сброшена на значение %2. {2 ?} {1.?}</translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -5987,10 +5978,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Не авторизован</translation>
     </message>
     <message>
-        <source>Please check authentication information&lt;br/&gt;in camera settings</source>
-        <translation>Пожалуйста, проверьте реквизиты&lt;br/&gt;доступа в настройках камеры</translation>
-    </message>
-    <message>
         <source>Activate Video Wall license to remove this message</source>
         <translation>Активируйти лицензию на видеостену для удаления данной надписи</translation>
     </message>
@@ -6005,6 +5992,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Diagnose...</source>
         <translation>Диагностика...</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in camera settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6642,18 +6633,6 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation>Сервер v%1 по адресу %2&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Server v%1&lt;br/&gt;</source>
-        <translation>Сервер v%1&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>Некоторые компоненты системы не обновлены&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Пожалуйста обновите все компоненты до последней версии %2.</translation>
-    </message>
-    <message>
         <source>Update...</source>
         <translation>Обновление...</translation>
     </message>
@@ -6704,10 +6683,6 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>Невозможно сохранить изменения для %n следующих ресурсов.</numerusform>
             <numerusform>Невозможно сохранить изменения для %n следующих ресурсов.</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Client v%1&lt;br/&gt;</source>
-        <translation>Клиент v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
@@ -6761,6 +6736,35 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Error while uploading picture.</source>
         <translation>Ошибка загрузки изображения.</translation>
     </message>
+    <message>
+        <source>Some components of the system are not updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server v%1 at %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update all components to the latest version %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous Usage Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
+If you would like to disable this feature you can do so in the System Settings dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6810,6 +6814,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Connect to Server...</source>
         <translation>Подключиться к серверу...</translation>
+    </message>
+    <message>
+        <source>Could not connect to server...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7024,6 +7032,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation>Применить фильтры: Переворот, Развертка, Коррекция изображения, Соотношение сторон (требуется транскодирование)</translation>
+    </message>
+    <message>
+        <source>exported</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7375,18 +7387,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Невозможно начать сессию управления видеостеной.</translation>
     </message>
     <message>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
-    </message>
-    <message>
-        <source>New layout</source>
-        <translation>Новая раскладка</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>Новая раскладка %1</translation>
-    </message>
-    <message>
         <source>To enable the feature please activate at least one Video Wall license</source>
         <translation>Для включения этой функции, пожалуйста, активируйте хотя бы одну лицензию на видеостену</translation>
     </message>
@@ -7481,6 +7481,15 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You&apos;ll have to start it manually.</source>
         <translation>Вам придётся запустить её вручную.</translation>
+    </message>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation type="unfinished">Экран %1</translation>
+    </message>
+    <message>
+        <source>%n cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7757,10 +7766,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Start</source>
         <translation>Начать</translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation>Процесс восстановления</translation>
     </message>
     <message>
         <source>Cancel</source>
