@@ -1,31 +1,20 @@
 #ifndef MOBILE_CLIENT_MESSAGE_PROCESSOR_H
 #define MOBILE_CLIENT_MESSAGE_PROCESSOR_H
 
-#include <api/common_message_processor.h>
+#include <client/client_message_processor.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
-class QnMobileClientMessageProcessor : public Connective<QnCommonMessageProcessor> {
+class QnMobileClientMessageProcessor : public QnClientMessageProcessor {
     Q_OBJECT
-    typedef Connective<QnCommonMessageProcessor> base_type;
+    typedef QnClientMessageProcessor base_type;
 
 public:
     QnMobileClientMessageProcessor();
-    virtual void init(const ec2::AbstractECConnectionPtr &connection) override;
-
-    virtual void updateResource(const QnResourcePtr &resource) override;
-
-    virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) override;
 
     bool isConnected() const;
 
-private slots:
-    void at_remotePeerFound(ec2::ApiPeerAliveData data);
-    void at_remotePeerLost(ec2::ApiPeerAliveData data);
-    void at_systemNameChangeRequested(const QString &systemName);
-
 private:
-    bool m_connected;
 };
 
 #endif // MOBILE_CLIENT_MESSAGE_PROCESSOR_H
