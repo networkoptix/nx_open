@@ -7,7 +7,7 @@ import "../controls"
 QnPage {
     id: resourcesPage
 
-    title: qsTr("Resources")
+    title: connectionManager.systemName
 
     leftToolBarComponent: QnMenuBackButton {
 
