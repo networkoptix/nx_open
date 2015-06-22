@@ -13,7 +13,7 @@ class QnArchiveSyncPlayWrapper: public QObject, public QnlTimeSource, public QnA
 {
     Q_OBJECT
 public:
-    QnArchiveSyncPlayWrapper();
+    QnArchiveSyncPlayWrapper(QObject *parent = NULL);
     virtual ~QnArchiveSyncPlayWrapper();
     void addArchiveReader(QnAbstractArchiveReader* reader, QnlTimeSource* cam);
     
