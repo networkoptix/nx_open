@@ -1,19 +1,23 @@
 import QtQuick 2.4
 
-MouseArea {
+Item {
     id: materialSurface
 
     property color color: "#20ffffff"
     property bool selected: false
 
-    clip: true
+    signal clicked(real x, real y)
+    signal pressAndHold(real x, real y)
 
-    readonly property bool _focused: pressed || selected
+    clip: true
+    anchors.fill: parent
+
+    readonly property bool _focused: mouseArea.pressed || selected
 
     Rectangle {
         id: focusBackground
         anchors.fill: parent
-        opacity: materialSurface._focused ? 1.0 : 0.0
+        opacity: 0.0
         color: materialSurface.color
         Behavior on opacity { OpacityAnimator { duration: 500; easing.type: Easing.OutCubic } }
     }
@@ -49,10 +53,12 @@ MouseArea {
 
         onOpacityChanged: {
             if (opacity == 1.0) {
-                if (!materialSurface._focused)
+                if (!materialSurface._focused) {
                     opacity = 0.0
-                else
+                    focusBackground.opacity = 0.0
+                } else {
                     opacityAnimation.duration = 500
+                }
             }
         }
 
@@ -70,6 +76,7 @@ MouseArea {
 
             radius = tapCircle.startRadius
             opacity = 1.0
+            focusBackground.opacity = 1.0
 
             radiusBehavior.enabled = true
 
@@ -82,8 +89,10 @@ MouseArea {
             if (tapCircle.opacity > 0.8) {
                 opacityAnimation.duration = 500
 
-                if (tapCircle.opacity == 1.0)
+                if (tapCircle.opacity == 1.0) {
                     tapCircle.opacity = 0.0
+                    focusBackground.opacity = 0.0
+                }
             }
         }
     }
@@ -92,21 +101,69 @@ MouseArea {
 
     onSelectedChanged: {
         if (selected) {
-            if (!pressed)
+            if (!mouseArea.pressed)
                 tapCircle.fadeIn(width / 2, height / 2)
         } else {
-            if (!pressed)
+            if (!mouseArea.pressed)
                 tapCircle.fadeOut()
         }
     }
 
-    onPressed: {
-        if (!selected)
-            tapCircle.fadeIn(mouse.x, mouse.y)
-    }
-    onReleased: {
-        if (!selected)
-            tapCircle.fadeOut()
+    MouseArea {
+        id: mouseArea
+
+        anchors.fill: parent
+
+        property real pressX
+        property real pressY
+
+        onPressed: {
+            pressX = mouse.x
+            pressY = mouse.y
+            fadeInTimer.restart()
+        }
+        onReleased: {
+            if (!selected) {
+                if (fadeInTimer.running)
+                    tapCircle.fadeIn(pressX, pressY)
+                else
+                    tapCircle.fadeOut()
+            }
+            fadeInTimer.stop()
+            clickDelayTimer.start()
+        }
+        onPressedChanged: {
+            if (!pressed) {
+                if (!fadeInTimer.running && !selected)
+                    tapCircle.fadeOut()
+                fadeInTimer.stop()
+            }
+        }
+
+        onPressAndHold: materialSurface.pressAndHold(mouse.x, mouse.y)
+
+        Timer {
+            id: fadeInTimer
+
+            repeat: false
+            running: false
+            interval: 100
+
+            onTriggered: {
+                if (!selected)
+                    tapCircle.fadeIn(mouseArea.pressX, mouseArea.pressY)
+            }
+        }
+
+        Timer {
+            id: clickDelayTimer
+
+            repeat: false
+            running: false
+            interval: opacityAnimation.duration
+
+            onTriggered: materialSurface.clicked(mouseArea.pressX, mouseArea.pressY)
+        }
     }
 }
 

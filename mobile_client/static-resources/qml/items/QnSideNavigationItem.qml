@@ -31,7 +31,6 @@ Item {
     }
 
     QnMaterialSurface {
-        anchors.fill: parent
         onClicked: sideNavigationItem.clicked()
     }
 }

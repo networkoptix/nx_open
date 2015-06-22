@@ -186,36 +186,10 @@ QnPage {
                     displayMode: QnLoginSessionsModel.ShowDiscovered
                 }
 
-                Rectangle {
-                    width: parent.width
-                    height: dp(72)
-                    color: QnTheme.sessionItemBackground
-                    radius: dp(2)
-
-                    Column {
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: dp(8)
-                        x: dp(16)
-                        width: parent.width - 2 * x
-
-                        Text {
-                            text: systemName
-                            color: QnTheme.listText
-                            font.pixelSize: sp(16)
-                            font.weight: Font.Bold
-                        }
-
-                        Text {
-                            text: address + ":" + port
-                            color: QnTheme.listSubText
-                            font.pixelSize: sp(14)
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: Main.openDiscoveredSession(address, port, systemName)
-                    }
+                QnDiscoveredSessionItem {
+                    systemName: model.systemName
+                    host: model.address
+                    port: model.port
                 }
             }
 
