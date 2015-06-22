@@ -104,7 +104,10 @@ QnNavigationDrawer {
                     icon: "qrc:///images/plus.png"
                     active: !activeSessionId
 
-                    onClicked: Main.gotoNewSession()
+                    onClicked: {
+                        panel.hide()
+                        Main.gotoNewSession()
+                    }
                 }
 
                 Text {
