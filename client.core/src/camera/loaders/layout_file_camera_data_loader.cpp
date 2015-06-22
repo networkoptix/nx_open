@@ -2,7 +2,6 @@
 
 #include <camera/data/abstract_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
-#include <camera/data/bookmark_camera_data.h>
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -16,65 +15,49 @@ namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 }
 
-QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
-    QnAbstractCameraDataLoader(resource, dataType, parent)
-{
-
-}
-
-QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent):
+QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::TimePeriodContent dataType, QObject *parent):
     QnAbstractCameraDataLoader(resource, dataType, parent),
-    m_data(data)
+    m_aviResource(resource)
 {
+    Q_ASSERT_X(m_aviResource, Q_FUNC_INFO, "Resource must exist");
 
-}
+    /* Preload recording data. */
+    if (dataType != Qn::RecordingContent)
+        return;
 
-
-QnLayoutFileCameraDataLoader::~QnLayoutFileCameraDataLoader()
-{
-    //qFreeAligned(m_motionData);
-}
-
-QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent)
-{
     QnLayoutFileStorageResourcePtr storage = resource->getStorage().dynamicCast<QnLayoutFileStorageResource>();
     if (!storage)
-        return NULL;
+        return;
 
-    switch (dataType) {
-    case Qn::RecordedTimePeriod: 
-        {
-            QnTimePeriodList chunks = storage->getTimePeriods(resource);
-            return new QnLayoutFileCameraDataLoader(resource, dataType, QnAbstractCameraDataPtr(new QnTimePeriodCameraData(chunks)), parent);
-        }
-    default:
-        return new QnLayoutFileCameraDataLoader(resource, dataType, parent);
-    }
-   
+    QnTimePeriodList chunks = storage->getTimePeriods(resource);
+    m_data = QnAbstractCameraDataPtr(new QnTimePeriodCameraData(chunks));
 }
 
-int QnLayoutFileCameraDataLoader::loadChunks()
-{
+QnLayoutFileCameraDataLoader::~QnLayoutFileCameraDataLoader()
+{}
+
+
+int QnLayoutFileCameraDataLoader::sendDataDelayed(const QnAbstractCameraDataPtr& data) {
     int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-    emit delayedReady(m_data, QnTimePeriod(0, QnTimePeriod::infiniteDuration()), handle);
+    emit delayedReady(data, QnTimePeriod(0, QnTimePeriod::infiniteDuration()), handle);
     return handle;
 }
 
 int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions)
 {
+    if (!m_aviResource)
+        return -1;
+
     QVector<char*> masks;
     for (int i = 0; i < motionRegions.size(); ++i) {
         masks << (char*) qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, CL_MEDIA_ALIGNMENT);
         QnMetaDataV1::createMask(motionRegions[i], masks.last());
     }
 
-    QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
-    if (!aviRes)
-        return -1;
     std::vector<QnTimePeriodList> periods;
     for (int channel = 0; channel < motionRegions.size(); ++channel)
     {
-        const QnMetaDataLightVector& m_motionData = aviRes->getMotionBuffer(channel);
+        const QnMetaDataLightVector& m_motionData = m_aviResource->getMotionBuffer(channel);
         if (!m_motionData.empty())
         {
             periods.push_back(QnTimePeriodList());
@@ -92,19 +75,18 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions
     for (int i = 0; i < masks.size(); ++i)
         qFreeAligned(masks[i]);
 
-
-    int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-    emit delayedReady(result, QnTimePeriod(0, QnTimePeriod::infiniteDuration()), handle);
-    return handle;
+    return sendDataDelayed(result);
 }
 
 int QnLayoutFileCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
     Q_UNUSED(resolutionMs)
 
     switch (m_dataType) {
-    case Qn::RecordedTimePeriod:
-        return loadChunks();
-    case Qn::MotionTimePeriod:
+    case Qn::RecordingContent:
+        return sendDataDelayed(m_data);
+    case Qn::BookmarksContent:
+        return sendDataDelayed(QnAbstractCameraDataPtr(new QnTimePeriodCameraData()));
+    case Qn::MotionContent:
         {
             QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
             for (const QRegion &region: motionRegions) 
@@ -114,10 +96,8 @@ int QnLayoutFileCameraDataLoader::load(const QString &filter, const qint64 resol
             }
             qWarning() << "empty motion region";
         }
-        //TODO: #GDM #Bookmarks intended fall-through to get assert, implement saving and loading bookmarks in layouts and files
     default:
-      ///  Q_ASSERT(false);
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         return 0;
     }
-    return -1; //should never get here
 }

@@ -57,7 +57,8 @@ QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
     m_target(target),
     m_stage(QnFullUpdateStage::Init),
     m_clientRequiresInstaller(true),
-    m_updateResult(QnUpdateResult::Cancelled)
+    m_updateResult(QnUpdateResult::Cancelled),
+    m_protocolChanged(false)
 {
     moveToThread(this);
 }
@@ -96,6 +97,7 @@ void QnUpdateProcess::run() {
     result.targetVersion = m_target.version;
     result.clientInstallerRequired = m_clientRequiresInstaller;
     result.failedPeers = m_failedPeerIds;
+    result.protocolChanged = m_protocolChanged;
 
     emit updateFinished(result);
 }
@@ -482,6 +484,7 @@ void QnUpdateProcess::installUpdatesToServers() {
         emit peerStageProgressChanged(peerId, QnPeerUpdateStage::Install, progress);
     });
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::finished,                   installUpdatesPeerTask,   &QObject::deleteLater);
+    connect(installUpdatesPeerTask, &QnInstallUpdatesPeerTask::protocolProblemDetected, this,   [this](){ m_protocolChanged = true; });
     setStage(QnFullUpdateStage::Servers);
     setCompatiblePeersStage(QnPeerUpdateStage::Install);
     installUpdatesPeerTask->start(m_targetPeerIds);

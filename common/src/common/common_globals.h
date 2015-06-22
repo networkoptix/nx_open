@@ -29,10 +29,11 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+            BookmarkSearchStrategy
             ServerFlag CameraStatusFlag)
     Q_FLAGS(Borders Corners
             ResourceFlags
@@ -359,15 +360,6 @@ public:
         TimePeriodContentCount
     };
 
-    enum CameraDataType {
-        RecordedTimePeriod,
-        MotionTimePeriod,
-        BookmarkTimePeriod, /// Used for retreiving general time periods of bookmarks
-        BookmarkData,       /// Used for retreiving bookmarks data
-
-        CameraDataTypeCount
-    };
-
     enum SystemComponent {
         ServerComponent,
         ClientComponent,
@@ -614,6 +606,13 @@ public:
         LC_Count
     };
 
+    /** Strategy of the bookmarks search. Used when we are limiting request result size by a fixed number. */
+    enum BookmarkSearchStrategy {
+        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
+        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
+        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
+    };
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -654,7 +653,7 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #endif
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType), 
+    (Qn::TimePeriodContent)(Qn::Corner), 
     (metatype)
 )
 
@@ -663,6 +662,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
+        (Qn::BookmarkSearchStrategy)
         (Qn::TTHeaderFlag),
     (metatype)(lexical)
 )

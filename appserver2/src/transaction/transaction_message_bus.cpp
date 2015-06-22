@@ -1530,18 +1530,41 @@ namespace ec2
             transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
             return;
         }
+
+        for( QnTransactionTransport* transport: m_connectingConnections )
+        {
+            if( transport->connectionGuid() != connectionGuid )
+                continue;
+            //mutex is unlocked if we go to wait
+            transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+            return;
+        }
+    }
+
+    void QnTransactionMessageBus::connectionFailure( const QnUuid& connectionGuid )
+    {
+        QnMutexLocker lock( &m_mutex );
+        for( QnTransactionTransport* transport : m_connections )
+        {
+            if( transport->connectionGuid() != connectionGuid )
+                continue;
+            //mutex is unlocked if we go to wait
+            transport->connectionFailure();
+            return;
+        }
     }
 
     void QnTransactionMessageBus::dropConnections()
     {
-        QnMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_remoteUrls.clear();
-        for(QnTransactionTransport* transport: m_connections) {
+        for( QnTransactionTransport* transport : m_connections )
+        {
             qWarning() << "Disconnected from peer" << transport->remoteAddr();
-            transport->setState(QnTransactionTransport::Error);
+            transport->setState( QnTransactionTransport::Error );
         }
-        for (auto transport: m_connectingConnections) 
-            transport->setState(ec2::QnTransactionTransport::Error);
+        for( auto transport : m_connectingConnections )
+            transport->setState( ec2::QnTransactionTransport::Error );
     }
 
     QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const
@@ -1616,33 +1639,35 @@ namespace ec2
         m_handler = handler;
     }
 
-    void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* handler) {
-        QnMutexLocker lock( &m_mutex );
-        Q_ASSERT(!m_thread->isRunning());
-        Q_ASSERT_X(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
-        if( m_handler == handler )
-            m_handler = nullptr;
-    }
+	void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* handler) {
+    	QnMutexLocker lock(&m_mutex);
+	    Q_ASSERT(!m_thread->isRunning());
+    	Q_ASSERT_X(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
+	    if( m_handler == handler )
+    	    m_handler = nullptr;
+	}
 
-    QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
-    {
-        QnMutexLocker lock( &m_mutex );
-        const auto itr = m_alivePeers.find(dstPeer);
-        if (itr == m_alivePeers.cend())
-            return QnUuid(); // route info not found
-        const AlivePeerInfo& peerInfo = itr.value();
-        int minDistance = INT_MAX;
-        QnUuid result;
-        for (auto itr2 = peerInfo.routingInfo.cbegin(); itr2 != peerInfo.routingInfo.cend(); ++itr2)
-        {
-            int distance = itr2.value().distance;
-            if (distance < minDistance) {
-                minDistance = distance;
-                result = itr2.key();
-            }
-        }
-        return result;
-    }
+	QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* peerDistance) const
+	{
+	    QnMutexLocker lock(&m_mutex);
+	    *peerDistance = INT_MAX;
+	    const auto itr = m_alivePeers.find(dstPeer);
+    	if (itr == m_alivePeers.cend())
+        	return QnUuid(); // route info not found
+	    const AlivePeerInfo& peerInfo = itr.value();
+    	int minDistance = INT_MAX;
+	    QnUuid result;
+    	for (auto itr2 = peerInfo.routingInfo.cbegin(); itr2 != peerInfo.routingInfo.cend(); ++itr2)
+	    {
+    	    int distance = itr2.value().distance;
+        	if (distance < minDistance) {
+	            minDistance = distance;
+    	        result = itr2.key();
+        	}
+	    }
+    	*peerDistance = minDistance;
+	    return result;
+	}
 
     int QnTransactionMessageBus::distanceToPeer(const QnUuid& dstPeer) const
     {

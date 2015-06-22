@@ -3,8 +3,8 @@
 
 #include <functional>
 
-#include <server_info.h>
-#include <models/types.h>
+#include <base/types.h>
+#include <base/server_info.h>
 #include <models/servers_selection_model.h>
 
 namespace
@@ -16,8 +16,10 @@ namespace
         , kAdapterNameRoleId
         , kIpAddressRoleId
         , kSubnetMaskRoleId
-        , kIsDHCP
-        , kReadableName
+        , kIsDHCPRoleId
+        , kReadableNameRoleId
+        , kDnsRoleId
+        , kGatewayRoleId
         
         , kLastCustomRoleId
     };
@@ -29,8 +31,10 @@ namespace
         result.insert(kAdapterNameRoleId, "adapterName");
         result.insert(kIpAddressRoleId, "address");
         result.insert(kSubnetMaskRoleId, "subnetMask");
-        result.insert(kIsDHCP, "useDHCP");
-        result.insert(kReadableName, "readableName");
+        result.insert(kIsDHCPRoleId, "useDHCP");
+        result.insert(kDnsRoleId, "dns");
+        result.insert(kGatewayRoleId, "gateway");
+        result.insert(kReadableNameRoleId, "readableName");
         return result;
     }();
     
@@ -52,7 +56,11 @@ namespace
         if (servers.size() == kSingleSelection)
             return (firstServerInfo.extraInfo().interfaces);
     
-        const Qt::CheckState initialUseDHCP = firstServerInfo.extraInfo().interfaces.begin()->useDHCP;
+        const rtu::InterfaceInfoList &interfaces = firstServerInfo.extraInfo().interfaces;
+        if (interfaces.empty())
+            return rtu::InterfaceInfoList();
+        
+        const Qt::CheckState initialUseDHCP = interfaces.begin()->useDHCP;
         
         const bool diffUseDHCP = (servers.end() == std::find_if(servers.begin(), servers.end()
             , [initialUseDHCP](const rtu::ServerInfo *info)
@@ -155,10 +163,14 @@ QVariant rtu::IpSettingsModel::Impl::data(const QModelIndex &index
         return info.ip;
     case kSubnetMaskRoleId:
         return info.mask;
-    case kIsDHCP:
+    case kIsDHCPRoleId:
         return info.useDHCP;
-    case kReadableName:
+    case kReadableNameRoleId:
         return QString("Interface #%1").arg(QString::number(row + 1));
+    case kDnsRoleId:
+        return info.dns;
+    case kGatewayRoleId:
+        return info.gateway;
     default:
         return QVariant();
     }

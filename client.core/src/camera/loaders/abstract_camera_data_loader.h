@@ -18,7 +18,7 @@ class QnAbstractCameraDataLoader: public QObject
 {
     Q_OBJECT
 public:
-    QnAbstractCameraDataLoader(const QnResourcePtr &resource, const Qn::CameraDataType dataType, QObject *parent);
+    QnAbstractCameraDataLoader(const QnResourcePtr &resource, const Qn::TimePeriodContent dataType, QObject *parent);
     virtual ~QnAbstractCameraDataLoader();
 
     /**
@@ -63,7 +63,7 @@ protected:
     /** Resource that this loader gets chunks for. */
     const QnResourcePtr m_resource;
 
-    const Qn::CameraDataType m_dataType;
+    const Qn::TimePeriodContent m_dataType;
 
 signals:
     void delayedReady(const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle);

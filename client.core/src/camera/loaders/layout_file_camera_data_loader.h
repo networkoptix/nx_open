@@ -17,15 +17,17 @@
 class QnLayoutFileCameraDataLoader: public QnAbstractCameraDataLoader
 {
 public:
-    QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent);
-    QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent);
+    QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::TimePeriodContent dataType, QObject *parent = NULL);
     virtual ~QnLayoutFileCameraDataLoader();
-    static QnLayoutFileCameraDataLoader* newInstance(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = 0);
     virtual int load(const QString &filter, const qint64 resolutionMs) override;
 private:
+    int sendDataDelayed(const QnAbstractCameraDataPtr& data);
+
+
     int loadChunks();
     int loadMotion(const QList<QRegion> &motionRegions);
 private:
+    const QnAviResourcePtr m_aviResource;
     QnAbstractCameraDataPtr m_data;
 };
 

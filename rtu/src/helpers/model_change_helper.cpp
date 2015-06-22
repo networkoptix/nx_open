@@ -4,15 +4,15 @@
 class rtu::ModelChangeHelper::ChangeGuard
 {
 public:
-    ChangeGuard(const EndActionFunction &endAction);
+    ChangeGuard(const ActionFunction &endAction);
     
     ~ChangeGuard();
     
 private:
-    const rtu::ModelChangeHelper::EndActionFunction m_endAction;
+    const rtu::ModelChangeHelper::ActionFunction m_endAction;
 };
 
-rtu::ModelChangeHelper::ChangeGuard::ChangeGuard(const EndActionFunction &endAction)
+rtu::ModelChangeHelper::ChangeGuard::ChangeGuard(const ActionFunction &endAction)
     : m_endAction(endAction)
 {
 }
@@ -26,9 +26,11 @@ rtu::ModelChangeHelper::ChangeGuard::~ChangeGuard()
 ///
 
 rtu::ModelChangeHelper::ModelChangeHelper(const RowsActionFunction &beginInsertRows
-    , const EndActionFunction &endInsertRows
+    , const ActionFunction &endInsertRows
     , const RowsActionFunction &beginRemoveRows
-    , const EndActionFunction &endRemoveRows
+    , const ActionFunction &endRemoveRows
+    , const ActionFunction &beginResetModel
+    , const ActionFunction &endResetModel
     , const RowsActionFunction &dataChangedFunction
     , QObject *parent)
     : QObject(parent)
@@ -36,6 +38,8 @@ rtu::ModelChangeHelper::ModelChangeHelper(const RowsActionFunction &beginInsertR
     , m_endInsertRows(endInsertRows)
     , m_beginRemoveRows(beginRemoveRows)
     , m_endRemoveRows(endRemoveRows)
+    , m_beginResetModel(beginResetModel)
+    , m_endResetModel(endResetModel)
     , m_dataChangedFunction(dataChangedFunction)
 {
 }
@@ -56,6 +60,12 @@ rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::removeRowsGuard(int startI
 {
     m_beginRemoveRows(startIndex, finishIndex);
     return Guard(new ChangeGuard(m_endRemoveRows));
+}
+
+rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::resetModelGuard()
+{
+    m_beginResetModel();
+    return Guard(new ChangeGuard(m_endResetModel));
 }
 
 void rtu::ModelChangeHelper::dataChanged(int startIndex

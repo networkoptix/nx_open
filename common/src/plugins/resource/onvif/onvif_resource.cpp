@@ -2688,7 +2688,8 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
         asyncPullMessagesCallWrapper->join();
     }
 
-    QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
+    if (QnSoapServer::instance() && QnSoapServer::instance()->getService())
+        QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
 }
 
 

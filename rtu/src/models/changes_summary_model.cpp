@@ -1,8 +1,7 @@
 
 #include "changes_summary_model.h"
 
-#include <server_info.h>
-#include <models/server_changes_model.h>
+#include <base/server_info.h>
 #include <helpers/model_change_helper.h>
 
 namespace
@@ -11,8 +10,12 @@ namespace
     {
         kFirstCustomRoleId = Qt::UserRole + 1
     
-        , kServerName = kFirstCustomRoleId
-        , kResultsModel
+        , kIdRoleId = kFirstCustomRoleId
+        
+        , kRequestNameRoleId
+        , kValueRoleId
+        , kErrorReasonRoleId
+        , kSuccessRoleId
         
         , kLastCustomRoleId        
     };
@@ -20,39 +23,49 @@ namespace
     const rtu::Roles kRoles = []() -> rtu::Roles
     {
         rtu::Roles roles;
-        roles.insert(kServerName, "serverName");
-        roles.insert(kResultsModel, "resultsModel");
+        roles.insert(kIdRoleId, "id");
+        roles.insert(kRequestNameRoleId, "name");
+        roles.insert(kValueRoleId, "value");
+        roles.insert(kErrorReasonRoleId, "reason");
+        roles.insert(kSuccessRoleId, "success");
         return roles;
     }();
 
-}
-
-namespace
-{
-    struct ServerRequestsInfo
+    struct RequestResultInfo
     {
-        rtu::ServerInfo info;
-        rtu::ServerChangesModel *changesModel;
-
-        ServerRequestsInfo();
-
-        ServerRequestsInfo(const rtu::ServerInfo &initInfo
-            , rtu::ServerChangesModel *initChangesModel);
+        QString id;
+        QString name;
+        QString value;
+        QString errorReason;
+        
+        RequestResultInfo();
+        
+        RequestResultInfo(const QString &initId
+            , const QString &initName
+            , const QString &initValue
+            , const QString &initErrorReason);
     };
-
-    ServerRequestsInfo::ServerRequestsInfo()
-        : info()
-        , changesModel(nullptr)
+    
+    RequestResultInfo::RequestResultInfo()
+        : id()
+        , name()
+        , value()
+        , errorReason()
     {}
-
-    ServerRequestsInfo::ServerRequestsInfo(const rtu::ServerInfo &initInfo
-        , rtu::ServerChangesModel *initChangesModel)
-        : info(initInfo)
-        , changesModel(initChangesModel) 
+    
+    RequestResultInfo::RequestResultInfo(const QString &initId
+        , const QString &initName
+        , const QString &initValue
+        , const QString &initErrorReason)
+        : id(initId)
+        , name(initName)
+        , value(initValue)
+        , errorReason(initErrorReason)
     {}
-
-    typedef QVector<ServerRequestsInfo> ServersRequests;
+    
+    typedef QVector<RequestResultInfo> RequestResults;
 }
+
 
 class rtu::ChangesSummaryModel::Impl : public QObject
 {
@@ -70,18 +83,19 @@ public:
         , const QString &errorReason);
     
 public:
+    bool isSuccessChangesModel() const;
+    
     int rowCount() const;
 
     QVariant data(const QModelIndex &index
         , int role) const;
-    
     
 private:
     const bool m_successfulChangesModel;
     rtu::ChangesSummaryModel * const m_owner;
     rtu::ModelChangeHelper * const m_changeHelper;
     
-    ServersRequests m_requests;
+    RequestResults m_results;
 };
 
 rtu::ChangesSummaryModel::Impl::Impl(bool successfulChangesModel
@@ -92,9 +106,8 @@ rtu::ChangesSummaryModel::Impl::Impl(bool successfulChangesModel
     , m_owner(owner)
     , m_changeHelper(changeHelper)
     
-    , m_requests()
-{
-    
+    , m_results()
+{   
 }
 
 rtu::ChangesSummaryModel::Impl::~Impl() 
@@ -106,27 +119,32 @@ void rtu::ChangesSummaryModel::Impl::addRequestResult(const ServerInfo &info
     , const QString &value
     , const QString &errorReason)
 {
-    auto it = std::find_if(m_requests.begin(), m_requests.end()
-        , [info](const ServerRequestsInfo &requestInfo) 
+    const QString &newId = (info.baseInfo().id.toString() + info.baseInfo().name);
+    const RequestResults::iterator it = std::upper_bound(m_results.begin(), m_results.end(), newId
+        , [](const QString &nId, const RequestResultInfo &resultInfo)
     {
-        return requestInfo.info.baseInfo().id == info.baseInfo().id;
+        return  (nId < resultInfo.id);
     });
     
-    if (it == m_requests.end())
-    {
-        int newIndex = rowCount();
-        const ModelChangeHelper::Guard modelChangeAction = m_changeHelper->insertRowsGuard(newIndex, newIndex);
-        it = m_requests.insert(m_requests.end(), ServerRequestsInfo(info, new ServerChangesModel(m_successfulChangesModel, this)));
-
-        Q_UNUSED(modelChangeAction);
-    }
+    const int newIndex = (it == m_results.end() 
+        ? m_results.size() : it - m_results.begin());
     
-    it->changesModel->addRequestResult(request, value, errorReason);
+    const ModelChangeHelper::Guard actionGuard 
+        = m_changeHelper->insertRowsGuard(newIndex, newIndex);
+    Q_UNUSED(actionGuard);
+    
+    m_results.insert(it, RequestResultInfo(newId, request, value, errorReason));
+    emit m_owner->changesCountChanged();
+}
+
+bool rtu::ChangesSummaryModel::Impl::isSuccessChangesModel() const
+{
+    return m_successfulChangesModel;
 }
 
 int rtu::ChangesSummaryModel::Impl::rowCount() const
 {
-    return m_requests.size();
+    return m_results.size();
 }
 
 QVariant rtu::ChangesSummaryModel::Impl::data(const QModelIndex &index
@@ -139,13 +157,19 @@ QVariant rtu::ChangesSummaryModel::Impl::data(const QModelIndex &index
         return QVariant();
     }
 
-    const ServerRequestsInfo &info = m_requests.at(row);
+    const RequestResultInfo &info = m_results.at(row);
     switch(role)    
     {
-    case kServerName:
-        return info.info.baseInfo().name;
-    case kResultsModel:
-        return QVariant::fromValue(info.changesModel);
+    case kIdRoleId:
+        return info.id;
+    case kRequestNameRoleId:
+        return info.name;
+    case kValueRoleId:
+        return info.value;
+    case kErrorReasonRoleId:
+        return info.errorReason;
+    case kSuccessRoleId:
+        return m_successfulChangesModel;
     default:
         return QVariant();
     }
@@ -172,6 +196,16 @@ void rtu::ChangesSummaryModel::addRequestResult(const ServerInfo &info
     , const QString &errorReason)
 {
     m_impl->addRequestResult(info, request, value, errorReason);
+}
+
+int rtu::ChangesSummaryModel::changesCount() const
+{
+    return m_impl->rowCount();
+}
+
+bool rtu::ChangesSummaryModel::isSuccessChangesModel() const
+{
+    return m_impl->isSuccessChangesModel();
 }
 
 int rtu::ChangesSummaryModel::rowCount(const QModelIndex &parent) const

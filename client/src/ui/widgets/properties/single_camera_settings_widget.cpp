@@ -624,14 +624,16 @@ void QnSingleCameraSettingsWidget::showMaxFpsWarningIfNeeded() {
     Q_D(QnCameraSettingsWidget);
     d->calculateMaxFps(&maxValidFps, &maxDualStreamingValidFps);
 
-    //TODO: #GDM #TR fix calling showWarning from other module, #StringFreeze
     if (maxValidFps < maxFps) {
-        ui->cameraScheduleWidget->showMaxFpsWarning(maxFps, maxValidFps);
+        QMessageBox::warning(this, tr("FPS value is too high"),
+            tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.").arg(maxFps).arg(maxValidFps));
         hasChanges = true;
     }
 
     if (maxDualStreamingValidFps < maxDualStreamFps) {
-        ui->cameraScheduleWidget->showMaxDualStreamingWarning(maxDualStreamFps, maxDualStreamingValidFps);
+        QMessageBox::warning(this, tr("FPS value is too high"),
+            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.")
+            .arg(maxDualStreamFps).arg(maxDualStreamingValidFps));
         hasChanges = true;
     }
 

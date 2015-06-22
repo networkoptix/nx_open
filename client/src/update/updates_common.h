@@ -58,6 +58,7 @@ struct QnUpdateResult {
     Value result;
     QnSoftwareVersion targetVersion;
     bool clientInstallerRequired;
+    bool protocolChanged;
     QSet<QnUuid> failedPeers;
 };
 Q_DECLARE_METATYPE(QnUpdateResult);

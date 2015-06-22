@@ -67,11 +67,4 @@ public:
 
 Q_DECLARE_METATYPE(QnAbstractCameraDataPtr)
 
-//TODO: #GDM #Bookmarks move these functions to more common place
-/** Convert Qn::TimePeriodContent value to the corresponding value of the Qn::CameraDataType. */
-Qn::CameraDataType timePeriodToDataType(const Qn::TimePeriodContent timePeriodType);
-
-/** Convert Qn::CameraDataType value to the corresponding value of the Qn::TimePeriodContent. */
-Qn::TimePeriodContent dataTypeToPeriod(const Qn::CameraDataType dataType);
-
 #endif // __QN_ABSTRACT_CAMERA_DATA_H__

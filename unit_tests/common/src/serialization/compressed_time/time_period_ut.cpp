@@ -146,3 +146,45 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPerio
     ASSERT_TRUE( success ); 
     ASSERT_TRUE( dstData == srcData );
 }
+
+TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPeriodDataListSignedMinimal)
+{
+    MultiServerPeriodDataList srcData;
+    MultiServerPeriodData data;
+
+    data.periods.push_back(QnTimePeriod(1429891331259, 1));
+    data.periods.push_back(QnTimePeriod(1433773026421, 1));
+    srcData.push_back(std::move(data));
+
+    QByteArray buffer = QnCompressedTime::serialized(srcData, true);
+
+    bool success = false;
+    MultiServerPeriodDataList dstData = QnCompressedTime::deserialized(buffer, MultiServerPeriodDataList(), &success);
+
+    ASSERT_TRUE( success ); 
+    ASSERT_TRUE( dstData == srcData );
+}
+
+TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPeriodDataListSigned)
+{
+    MultiServerPeriodDataList srcData;
+
+    MultiServerPeriodData data;
+    data.guid = QnUuid::createUuid();
+
+    data.periods.push_back(QnTimePeriod(1429889084026, 1353727));
+    data.periods.push_back(QnTimePeriod(1429891331259, 864863));
+    data.periods.push_back(QnTimePeriod(1433773026421, 12088254));
+    data.periods.push_back(QnTimePeriod(1433841105581, 13334769));
+    data.periods.push_back(QnTimePeriod(1434386547349, 5359406));
+    data.periods.push_back(QnTimePeriod(1434456216257, 587665));
+    srcData.push_back(std::move(data));
+
+    QByteArray buffer = QnCompressedTime::serialized(srcData, true);
+
+    bool success = false;
+    MultiServerPeriodDataList dstData = QnCompressedTime::deserialized(buffer, MultiServerPeriodDataList(), &success);
+
+    ASSERT_TRUE( success ); 
+    ASSERT_TRUE( dstData == srcData );
+}

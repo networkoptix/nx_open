@@ -5,10 +5,9 @@
 
 #include <QUuid>
 
-#include <server_info.h>
-#include <requests/requests.h>
+#include <base/server_info.h>
+#include <base/requests.h>
 #include <helpers/login_manager.h>
-#include <helpers/servers_finder.h>
 #include <helpers/model_change_helper.h>
 
 namespace
@@ -66,22 +65,26 @@ namespace
 
     typedef QVector<SystemModelInfo> SystemModelInfosVector;
     
-    struct ServerSearchInfo
+    template<typename SystemIterator
+        , typename ServerIterator>
+    struct ItemSearchInfoBase
     {
-        SystemModelInfosVector::iterator systemInfoIterator;
-        ServerModelInfosVector::iterator serverInfoIterator;
+        typedef SystemIterator SystemItType;
+
+        SystemIterator systemInfoIterator;
+        ServerIterator serverInfoIterator;
         int systemRowIndex;
         int serverRowIndex;
         
-        ServerSearchInfo()
+        ItemSearchInfoBase()
             : systemInfoIterator()
             , serverInfoIterator()
             , systemRowIndex()
             , serverRowIndex()
         {}
         
-        ServerSearchInfo(SystemModelInfosVector::iterator sysInfoIterator
-            , ServerModelInfosVector::iterator srvInfoIterator
+        ItemSearchInfoBase(SystemIterator sysInfoIterator
+            , ServerIterator srvInfoIterator
             , int sysRowIndex
             , int serverRowIndex)
             : systemInfoIterator(sysInfoIterator)
@@ -90,6 +93,12 @@ namespace
             , serverRowIndex(serverRowIndex)
         {}
     };
+
+    typedef ItemSearchInfoBase<SystemModelInfosVector::iterator
+        , ServerModelInfosVector::iterator> ItemSearchInfo;
+    typedef ItemSearchInfoBase<SystemModelInfosVector::const_iterator
+        , ServerModelInfosVector::const_iterator> ItemSearchInfoConst;
+
 }
 
 namespace
@@ -110,7 +119,7 @@ namespace
         /// System's specific roles
         , kSelectedServersCountRoleId
         , kServersCountRoleId
-        , kLoggedToAllServersRoleId
+        , kLoggedState
         
         /// Server's specific roles
         , kIdRoleId
@@ -130,10 +139,10 @@ namespace
         result.insert(kIsSystemRoleId, "isSystem");
         result.insert(kNameRoleId, "name");
         result.insert(kSelectedStateRoleId, "selectedState");
-            
+
         result.insert(kSelectedServersCountRoleId, "selectedServersCount");
         result.insert(kServersCountRoleId, "serversCount");
-        result.insert(kLoggedToAllServersRoleId, "loggedToAllServers");
+        result.insert(kLoggedState, "loggedState");
 
         result.insert(kIdRoleId, "id");
         result.insert(kSystemNameRoleId, "systemName");
@@ -149,46 +158,57 @@ namespace
     typedef std::function<void ()> UnindexedActionType;
     
     typedef std::function<void ()> SelectionChangedActionType;
-    typedef std::function<void (rtu::ServerInfo *info)> ServerInfoActionType;
+    typedef std::function<void (const rtu::ServerInfo &info)> ServerInfoActionType;
 }
 
 namespace
 {
-    template<typename SystemType, typename ServerType, typename SystemsContainer>
-    SystemType *findItemImpl(int rowIndex
-        , SystemsContainer &container
-        , ServerType *&serverInfo)
+    template<typename SystemContainerType
+        , typename SearchInfoType>
+    bool findItem(int rowIndex
+        , SystemContainerType &systems
+        , SearchInfoType &searchInfo)
     {
         int index = 0;
-        const int systemsCount = container.size();
+        int systemRowIndex = 0;
+        const int systemsCount = systems.size();
         for (int systemIndex = 0; systemIndex != systemsCount; ++systemIndex)
         {
-            SystemType &systemInfo = container[systemIndex];
+            typename SearchInfoType::SystemItType systemIt = systems.begin() + systemIndex;
             if (index == rowIndex)
-                return &systemInfo;
-            
+            {
+                enum { kInvalidServerRowIndex = -1 };
+                searchInfo.systemInfoIterator = systemIt;
+                searchInfo.systemRowIndex = rowIndex;
+                searchInfo.serverInfoIterator = systemIt->servers.end();
+                searchInfo.serverRowIndex = kInvalidServerRowIndex;
+                return true;
+            }
+
             enum { kSystemItemOffset = 1 };
             index += kSystemItemOffset;
-            
-            const int serversCount = systemInfo.servers.size();
+
+            const int serversCount = systemIt->servers.size();
             if ((index + serversCount) > rowIndex)
             {
-                serverInfo = &systemInfo.servers[rowIndex - index];
-                return &systemInfo;
+                searchInfo.systemInfoIterator = systemIt;
+                searchInfo.systemRowIndex = systemRowIndex;
+                searchInfo.serverInfoIterator = systemIt->servers.begin() + (rowIndex - index);
+                searchInfo.serverRowIndex = rowIndex;
+                return true;
             }
+
             index += serversCount;
+            systemRowIndex += serversCount + kSystemItemOffset;
         }
-        return nullptr;
+        return false;
     }
 }
-
 class rtu::ServersSelectionModel::Impl : public QObject
 {
 public:
-    Impl(QObject *parent
-         , rtu::ModelChangeHelper *changeHelper
-         , const SelectionChangedActionType &selectedServersChanged
-         , const ServerInfoActionType &updateServerInfo);
+    Impl(rtu::ServersSelectionModel *owner
+         , rtu::ModelChangeHelper *changeHelper);
     
     virtual ~Impl();
     
@@ -206,16 +226,15 @@ public:
     
     void tryLoginWith(const QString &password);
     
-   
-    void selectionPasswordChanged(const QString &password);
-    
     ///
     
     void updateTimeDateInfo(const QUuid &id
         , const QDateTime &dateTime
+        , const QTimeZone &timeZone
         , const QDateTime &timestamp);
     
     void updateInterfacesInfo(const QUuid &id
+        , const QString &host
         , const InterfaceInfoList &interfaces);
 
     void updateSystemNameInfo(const QUuid &id
@@ -224,27 +243,26 @@ public:
     void updatePortInfo(const QUuid &id
         , int port);
     
+    void updatePasswordInfo(const QUuid &id
+        , const QString &password);
+
+    void addServer(const rtu::ServerInfo &info
+        , Qt::CheckState selected);
+
+    void changeServer(const rtu::BaseServerInfo &info);
+
+    void removeServers(const rtu::IDsVector &removed);
+
 private:
-    SystemModelInfo *findItem(int rowIndex
-        , ServerModelInfo *&serverInfo);
-    
-    const SystemModelInfo *findItem(int rowIndex
-        , const ServerModelInfo *&serverInfo) const;
-    
     SystemModelInfo *findSystemModelInfo(const QString &systemName
         , int &row);
     
     bool findServer(const QUuid &id
-        , ServerSearchInfo &searchInfo);
+        , ItemSearchInfo &searchInfo);
     
     void setSystemSelectedStateImpl(SystemModelInfo &systemInfo
         , bool selected);
     
-    void onAddedServer(const rtu::BaseServerInfo &info);
-    
-    void onChangedServer(const rtu::BaseServerInfo &info);
-    
-    void onRemovedServers(const rtu::IDsVector &removed);
     
 private:
     /// return true if no selected servers
@@ -252,37 +270,25 @@ private:
         , bool removeEmptySystem);
     
 private:
+    rtu::ServersSelectionModel * const m_owner;
     rtu::ModelChangeHelper * const m_changeHelper;
-    const SelectionChangedActionType m_selectedServersChanged;
-    const ServerInfoActionType m_updateServerInfo;
     
     SystemModelInfosVector m_systems;
-    ServersFinder::Holder m_serversFinder;
     rtu::LoginManager *m_loginManager;
 };
 
-rtu::ServersSelectionModel::Impl::Impl(QObject *parent
-    , rtu::ModelChangeHelper *changeHelper
-    , const SelectionChangedActionType &selectedServersChanged
-    , const ServerInfoActionType &updateServerInfo)
-    : QObject(parent)
-
+rtu::ServersSelectionModel::Impl::Impl(rtu::ServersSelectionModel *owner
+    , rtu::ModelChangeHelper *changeHelper)
+    : QObject(owner)
+    , m_owner(owner)
     , m_changeHelper(changeHelper)
-    , m_selectedServersChanged(selectedServersChanged)
-    , m_updateServerInfo(updateServerInfo)
-    
     , m_systems()
-    , m_serversFinder(ServersFinder::create())
     , m_loginManager(new LoginManager(this))
 {
-    QObject::connect(m_serversFinder.data(), &ServersFinder::onAddedServer, this, &Impl::onAddedServer);
-    QObject::connect(m_serversFinder.data(), &ServersFinder::onChangedServer, this, &Impl::onChangedServer);
-    QObject::connect(m_serversFinder.data(), &ServersFinder::onRemovedServers, this, &Impl::onRemovedServers);
-    
     QObject::connect(m_loginManager, &LoginManager::loginOperationSuccessfull, this
         , [this](const QUuid &id, const ExtraServerInfo &extraInfo)
     {
-        ServerSearchInfo searchInfo;
+        ItemSearchInfo searchInfo;
         if (!findServer(id, searchInfo))
             return;
 
@@ -300,7 +306,7 @@ rtu::ServersSelectionModel::Impl::Impl(QObject *parent
     QObject::connect(m_loginManager, &LoginManager::loginOperationFailed, this
         , [this](const QUuid &id)
     {
-        ServerSearchInfo searchInfo;
+        ItemSearchInfo searchInfo;
         if (!findServer(id, searchInfo))
             return;
         
@@ -336,40 +342,41 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         || (rowIndex < 0) || (rowIndex >= rowCount()))
         return QVariant();
     
-    const ServerModelInfo *serverInfo = nullptr;
-    const SystemModelInfo *systemInfo = findItem(rowIndex, serverInfo);
-    
-    if (!systemInfo)
+    ItemSearchInfoConst searchInfo;
+    if (!findItem(rowIndex, m_systems, searchInfo))
         return QVariant();
-    
-    if (serverInfo)
+
+
+    const SystemModelInfo &systemInfo = *searchInfo.systemInfoIterator;
+    if (searchInfo.serverInfoIterator != searchInfo.systemInfoIterator->servers.end())
     {
         /// Returns values for server model item
         
-        const ServerInfo &info = serverInfo->serverInfo;
+        const ServerModelInfo &serverInfo = *searchInfo.serverInfoIterator;
+        const ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
         switch(role)
         {
         case kIsSystemRoleId:
             return false;
         case kSelectedStateRoleId:
-            return serverInfo->selectedState;
+            return serverInfo.selectedState;
         case kSystemNameRoleId:
-            return systemInfo->name;
+            return systemInfo.name;
         case kNameRoleId:
             return info.baseInfo().name;
         case kIdRoleId:
             return info.baseInfo().id;
         case kMacAddressRoleId:
-            return info.baseInfo().id.toString();
+            return (info.hasExtraInfo() && !info.extraInfo().interfaces.empty() ? 
+                info.extraInfo().interfaces.front().macAddress : "");//QString("--:--:--:--:--:--"));
         case kLogged:
             return info.hasExtraInfo();
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
-            return (info.hasExtraInfo() && info.extraInfo().password == rtu::defaultAdminPassword());
-            
+            return (info.hasExtraInfo() && rtu::defaultAdminPasswords().contains(info.extraInfo().password));
         case kIpAddressRoleId: 
-            return (!serverInfo->serverInfo.hasExtraInfo() || (info.extraInfo().interfaces.empty()) 
+            return (!serverInfo.serverInfo.hasExtraInfo() || (info.extraInfo().interfaces.empty())
                 ? QVariant() : QVariant::fromValue(info.extraInfo().interfaces));
         }
     }
@@ -382,33 +389,22 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
             return true;
         case kNameRoleId:
         case kSystemNameRoleId:
-            return systemInfo->name;
+            return systemInfo.name;
         case kSelectedStateRoleId:
-            return (systemInfo->servers.empty() || !systemInfo->selectedServers ? Qt::Unchecked : 
-                (systemInfo->selectedServers == systemInfo->servers.size() ? Qt::Checked : Qt::PartiallyChecked));
-            
-        case kLoggedToAllServersRoleId:
-            return (systemInfo->loggedServers == systemInfo->servers.size());
+            return (systemInfo.servers.empty() || !systemInfo.selectedServers ? Qt::Unchecked :
+                (systemInfo.selectedServers == systemInfo.servers.size() ? Qt::Checked : Qt::PartiallyChecked));
+        case kLoggedState:
+            return (!systemInfo.loggedServers ? Constants::NotLogged 
+                : (systemInfo.loggedServers == systemInfo.servers.size() ? Constants::LoggedToAllServers
+                : Constants::PartiallyLogged));
         case kSelectedServersCountRoleId:
-            return systemInfo->selectedServers;
+            return systemInfo.selectedServers;
         case kServersCountRoleId:
-            return systemInfo->servers.size();
+            return systemInfo.servers.size();
         }
     }
     
     return QVariant();
-}
-
-SystemModelInfo *rtu::ServersSelectionModel::Impl::findItem(int rowIndex
-    , ServerModelInfo *&serverInfo)
-{
-    return findItemImpl<SystemModelInfo>(rowIndex, m_systems, serverInfo);
-}
-
-const SystemModelInfo *rtu::ServersSelectionModel::Impl::findItem(int rowIndex
-    , const ServerModelInfo *&serverInfo) const
-{
-    return findItemImpl<const SystemModelInfo>(rowIndex, m_systems, serverInfo);
 }
 
 SystemModelInfo *rtu::ServersSelectionModel::Impl::findSystemModelInfo(const QString &systemName
@@ -451,82 +447,81 @@ void rtu::ServersSelectionModel::Impl::setSystemSelectedStateImpl(SystemModelInf
 void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
     , bool explicitSelection)
 {
-    ServerModelInfo *serverInfo = nullptr;
-    SystemModelInfo *systemInfo = findItem(rowIndex, serverInfo);
-    
-    if (!systemInfo)
+    ItemSearchInfo searchInfo;
+    if (!findItem(rowIndex, m_systems, searchInfo))
         return;
     
-    const bool explWasSelected = (explicitSelection ? systemInfo->selectedServers == 1 : true);
-    const bool wasSelected = (serverInfo ? 
-        (serverInfo->selectedState != Qt::Unchecked) && explWasSelected
-        : systemInfo->selectedServers);
-    if (!wasSelected)   /// going to be selected, unselect all other systems
+    if (searchInfo.serverInfoIterator != searchInfo.systemInfoIterator->servers.end())
     {
-        for(auto &system: m_systems)
+        const ServerModelInfo &serverInfo = *searchInfo.serverInfoIterator;
+        const bool wasSelected = (serverInfo.selectedState != Qt::Unchecked);
+
+        const int prevSelectedCount = selectedCount();
+        if (explicitSelection)
         {
-            if ((&system != systemInfo) || explicitSelection)
+            for(auto &system: m_systems)
+            {
                 setSystemSelectedStateImpl(system, false);
+            }
+            m_changeHelper->dataChanged(0, rowCount() - 1);
         }
-    }
-    
-    if (!serverInfo)
-    {
-        setSystemSelectedStateImpl(*systemInfo, explicitSelection || !wasSelected);
+
+        const bool selected = (!wasSelected || (explicitSelection && (prevSelectedCount > 1)));
+        searchInfo.serverInfoIterator->selectedState =
+            (selected ? Qt::Checked : Qt::Unchecked);
+
+        if (selected)
+        {
+            ++searchInfo.systemInfoIterator->selectedServers;
+        }
+        else if (!explicitSelection)
+        {
+            --searchInfo.systemInfoIterator->selectedServers;
+        }
+
+        m_changeHelper->dataChanged(rowIndex, rowIndex);
+        m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
     }
     else
     {
-        enum 
-        {
-            kIncOneSelectedValue = 1
-            , kDecOneSelectedValue = -1
-        };
-           
-        systemInfo->selectedServers += (wasSelected ? kDecOneSelectedValue : kIncOneSelectedValue);
-        serverInfo->selectedState = (wasSelected ? Qt::Unchecked : Qt::Checked);
+        SystemModelInfo &systemInfo = *searchInfo.systemInfoIterator;
+        const Qt::CheckState systemSelection = (!systemInfo.selectedServers ? Qt::Unchecked :
+            (systemInfo.selectedServers < systemInfo.servers.size() ? Qt::PartiallyChecked : Qt::Checked));
+
+        const bool newSelectedState = (systemSelection == Qt::Unchecked);
+        setSystemSelectedStateImpl(systemInfo, newSelectedState);
+
+        m_changeHelper->dataChanged(searchInfo.systemRowIndex
+            , searchInfo.systemInfoIterator->servers.size() + 1);
     }
 
-    m_selectedServersChanged();
+    emit m_owner->selectionChanged();
 }
 
 int rtu::ServersSelectionModel::Impl::selectedCount() const
 {
-    const SystemModelInfo *systemInfo = nullptr;
+    int count = 0;
     for(const SystemModelInfo &info: m_systems)
     {
-        if (info.selectedServers)
-        {
-            systemInfo = &info;
-            break;
-        }
+        count += info.selectedServers;
     }
-    if (!systemInfo)
-        return 0;
-    
-    return systemInfo->selectedServers;
+    return count;
 }
 
 rtu::ServerInfoList rtu::ServersSelectionModel::Impl::selectedServers() 
 {
-    SystemModelInfo *systemInfo = nullptr;
+    ServerInfoList result;
     for(SystemModelInfo &info: m_systems)
     {
         if (info.selectedServers)
         {
-            systemInfo = &info;
-            break;
+            for (ServerModelInfo &serverInfo: info.servers)
+            {
+                if (serverInfo.selectedState != Qt::Unchecked)
+                    result.push_back(&serverInfo.serverInfo);
+            }
         }
     }
-    if (!systemInfo)
-        return ServerInfoList();
-    
-    ServerInfoList result;
-    std::for_each(systemInfo->servers.begin(), systemInfo->servers.end(), [&result](ServerModelInfo &info)
-    {
-        if (info.selectedState != Qt::Unchecked)
-            result.push_back(&info.serverInfo);
-    });
-    
     return result;
 }
 
@@ -547,40 +542,12 @@ void rtu::ServersSelectionModel::Impl::tryLoginWith(const QString &password)
     }
 }
 
-void rtu::ServersSelectionModel::Impl::selectionPasswordChanged(const QString &password)
-{
-    SystemModelInfo *systemInfo = nullptr;
-    for (SystemModelInfo &system: m_systems)
-    {
-        if (system.selectedServers)
-        {
-            systemInfo = &system;
-            break;
-        }
-    }
-    
-    if (!systemInfo)
-        return;
-    
-    for (ServerModelInfo &info: systemInfo->servers)
-    {
-        if (info.selectedState == Qt::Unchecked)
-            continue;
-        
-        if (info.serverInfo.hasExtraInfo())
-        {
-            info.serverInfo.resetExtraInfo();
-            --systemInfo->loggedServers;
-        }
-        m_loginManager->loginToServer(info.serverInfo.baseInfo(), password);
-    }
-}
-
 void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
-    , const QDateTime &dateTime
+    , const QDateTime &utcDateTime
+    , const QTimeZone &timeZone
     , const QDateTime &timestamp)
 {
-    ServerSearchInfo searchInfo;
+    ItemSearchInfo searchInfo;
     if (!findServer(id, searchInfo))
         return;
     
@@ -589,54 +556,102 @@ void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
         info.setExtraInfo(ExtraServerInfo());
     
     ExtraServerInfo &extraInfo = info.writableExtraInfo();
-    extraInfo.dateTime = dateTime;
+    extraInfo.utcDateTime = utcDateTime;
+    extraInfo.timeZone = timeZone;
     extraInfo.timestamp = timestamp;
 }
 
 void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
+    , const QString &host
     , const InterfaceInfoList &interfaces)
 {
-    ServerSearchInfo searchInfo;
+    ItemSearchInfo searchInfo;
     if (!findServer(id, searchInfo))
         return;
     
     ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
+    info.writableBaseInfo().hostAddress = host;
     if (!info.hasExtraInfo())
         info.setExtraInfo(ExtraServerInfo());
     
-    info.writableExtraInfo().interfaces = interfaces;
+    ExtraServerInfo &extra = info.writableExtraInfo();
+    for (const InterfaceInfo &itf: interfaces)
+    {
+        InterfaceInfoList &oldItf = extra.interfaces;
+        const auto &it = std::find_if(oldItf.begin(), oldItf.end()
+            , [itf](const InterfaceInfo &param)
+        {
+            return (param.name == itf.name);
+        });
+        
+        if (it == oldItf.end())
+        {
+            oldItf.push_back(itf);
+            continue;
+        }    
+        *it = itf;
+    }
 }
 
 void rtu::ServersSelectionModel::Impl::updateSystemNameInfo(const QUuid &id
     , const QString &systemName)
 {
-    ServerSearchInfo searchInfo;
+    ItemSearchInfo searchInfo;
     if (!findServer(id, searchInfo))
         return;
     
-    BaseServerInfo &base = 
-        searchInfo.serverInfoIterator->serverInfo.writableBaseInfo();
+    BaseServerInfo base =
+        searchInfo.serverInfoIterator->serverInfo.baseInfo();
     base.systemName = systemName;
-    onChangedServer(base);
+    base.flags &= ~Constants::IsFactoryFlag;
+    changeServer(base);
 }
 
 void rtu::ServersSelectionModel::Impl::updatePortInfo(const QUuid &id
     , int port)
 {
-    ServerSearchInfo searchInfo;
+    ItemSearchInfo searchInfo;
     if (!findServer(id, searchInfo))
         return;
     
-    BaseServerInfo &base = 
-        searchInfo.serverInfoIterator->serverInfo.writableBaseInfo();
+    BaseServerInfo base =
+        searchInfo.serverInfoIterator->serverInfo.baseInfo();
     base.port = port;
-    onChangedServer(base);
+    changeServer(base);
 }
 
-void rtu::ServersSelectionModel::Impl::onAddedServer(const BaseServerInfo &baseInfo)
+void rtu::ServersSelectionModel::Impl::updatePasswordInfo(const QUuid &id
+    , const QString &password)
 {
-    const QString systemName = (baseInfo.flags & Constants::ServerFlag::kIsFactory 
-        ? QString() : baseInfo.systemName);
+    ItemSearchInfo searchInfo;
+    if (!findServer(id, searchInfo))
+        return;
+
+    ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
+    if (!info.hasExtraInfo())
+        info.setExtraInfo(ExtraServerInfo());
+
+    const QString oldPassword = info.extraInfo().password;
+    info.writableExtraInfo().password = password;
+    
+    for (ServerModelInfo &otherInfo: searchInfo.systemInfoIterator->servers)
+    {
+        if ((info.baseInfo().systemName == otherInfo.serverInfo.baseInfo().systemName)
+            && (oldPassword == otherInfo.serverInfo.extraInfo().password))
+        {
+            otherInfo.serverInfo.writableExtraInfo().password = password;
+        }
+    }
+        
+    m_changeHelper->dataChanged(searchInfo.systemRowIndex
+        , searchInfo.systemRowIndex + searchInfo.systemInfoIterator->servers.size());
+}
+
+void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
+    , Qt::CheckState selected)
+{
+    const QString systemName = (info.baseInfo().flags & Constants::IsFactoryFlag
+        ? QString() : info.baseInfo().systemName);
 
     int row = 0;
     bool exist = true;
@@ -650,52 +665,59 @@ void rtu::ServersSelectionModel::Impl::onAddedServer(const BaseServerInfo &baseI
         exist = false;
     }
     
-    systemModelInfo->servers.push_back(ServerModelInfo(Qt::Unchecked, ServerInfo(baseInfo)));   
-    
+    systemModelInfo->servers.push_back(ServerModelInfo(selected, info));
+    systemModelInfo->loggedServers += (info.hasExtraInfo() ? 1 : 0);
+
+    if (selected != Qt::Unchecked)
+    {
+        ++systemModelInfo->selectedServers;
+        m_changeHelper->dataChanged(row, row);
+    }
+
     const int rowStart = (exist ? row + systemModelInfo->servers.size() : row);
     const int rowFinish = (row + systemModelInfo->servers.size());
     
     const auto &modelChangeAction = m_changeHelper->insertRowsGuard(rowStart, rowFinish);
     
-    m_loginManager->loginToServer(baseInfo);
+    if (!info.hasExtraInfo())
+        m_loginManager->loginToServer(info.baseInfo());
 }
 
-void rtu::ServersSelectionModel::Impl::onChangedServer(const BaseServerInfo &baseInfo)
+void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseInfo)
 {
-    ServerSearchInfo searchInfo;
+    ItemSearchInfo searchInfo;
     if (!findServer(baseInfo.id, searchInfo))
         return;
     
-    const ServerInfo &foundServer = searchInfo.serverInfoIterator->serverInfo;
+    ServerInfo foundServer = searchInfo.serverInfoIterator->serverInfo;
     if (foundServer.baseInfo().systemName != baseInfo.systemName)
     {
+        const Qt::CheckState selected = searchInfo.serverInfoIterator->selectedState;
+
         int targetSystemRow = 0;
         const bool targetSystemExists = 
             (findSystemModelInfo(baseInfo.systemName, targetSystemRow) != nullptr);
         removeServerImpl(baseInfo.id, targetSystemExists);
         
         SystemModelInfo &system = *searchInfo.systemInfoIterator;
-        if (!targetSystemExists && system.servers.empty())
-        {
+        const bool inplaceRename = !targetSystemExists && system.servers.empty();
+        if (inplaceRename)
             system.name = baseInfo.systemName;
-            m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
-        }
-        onAddedServer(baseInfo);
+//            m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
+
+        foundServer.setBaseInfo(baseInfo);
+        addServer(foundServer, selected);
     }
     else
     {
         /// just updates information
         searchInfo.serverInfoIterator->serverInfo.setBaseInfo(baseInfo);
         m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
-        if (searchInfo.serverInfoIterator->selectedState != Qt::Unchecked)
-            m_updateServerInfo(&searchInfo.serverInfoIterator->serverInfo);
     }
-        
-        
 }
 
 bool rtu::ServersSelectionModel::Impl::findServer(const QUuid &id
-    , ServerSearchInfo &searchInfo)
+    , ItemSearchInfo &searchInfo)
 {
     int rowIndex = 0;
     for(auto itSystem = m_systems.begin(); itSystem != m_systems.end(); ++itSystem)
@@ -704,7 +726,7 @@ bool rtu::ServersSelectionModel::Impl::findServer(const QUuid &id
         {
             if (itServer->serverInfo.baseInfo().id == id)
             {
-                searchInfo = ServerSearchInfo(itSystem, itServer, rowIndex
+                searchInfo = ItemSearchInfo(itSystem, itServer, rowIndex
                     , rowIndex + kSystemItemCapacity + (itServer - itSystem->servers.begin()));
                 return true;
             }
@@ -714,18 +736,23 @@ bool rtu::ServersSelectionModel::Impl::findServer(const QUuid &id
     return false;
 }
 
-void rtu::ServersSelectionModel::Impl::onRemovedServers(const IDsVector &removed)
+void rtu::ServersSelectionModel::Impl::removeServers(const IDsVector &removed)
 {
+    const int wasSelected = selectedCount();
     for(auto &id: removed)
     {
         removeServerImpl(id, true);
     }
+    const int selectedNow = selectedCount();
+
+    if (wasSelected && !selectedNow)
+        emit m_owner->selectionChanged();
 }
 
 bool rtu::ServersSelectionModel::Impl::removeServerImpl(const QUuid &id
     , bool removeEmptySystem)
 {
-    ServerSearchInfo searchInfo;
+    ItemSearchInfo searchInfo;
     
     if (!findServer(id, searchInfo))
         return false;
@@ -765,10 +792,7 @@ bool rtu::ServersSelectionModel::Impl::removeServerImpl(const QUuid &id
 
 rtu::ServersSelectionModel::ServersSelectionModel(QObject *parent)
     : QAbstractListModel(parent)
-    , m_impl(new Impl(this, CREATE_MODEL_CHANGE_HELPER(this)
-        , [this]() { emit selectionChanged(); }
-        , [this](ServerInfo *info) { emit serverInfoChanged(info); }
-    )) 
+    , m_impl(new Impl(this, CREATE_MODEL_CHANGE_HELPER(this)))
 {}
 
 rtu::ServersSelectionModel::~ServersSelectionModel() {}
@@ -790,17 +814,34 @@ void rtu::ServersSelectionModel::tryLoginWith(const QString &password)
     m_impl->tryLoginWith(password);
 }
 
+void rtu::ServersSelectionModel::addServer(const BaseServerInfo &baseInfo)
+{
+    m_impl->addServer(ServerInfo(baseInfo), Qt::Unchecked);
+}
+
+void rtu::ServersSelectionModel::changeServer(const BaseServerInfo &baseInfo)
+{
+    m_impl->changeServer(baseInfo);
+}
+
+void rtu::ServersSelectionModel::removeServers(const IDsVector &removed)
+{
+    m_impl->removeServers(removed);
+}
+
 void rtu::ServersSelectionModel::updateTimeDateInfo(const QUuid &id
-    , const QDateTime &dateTime
+    , const QDateTime &utcDateTime
+    , const QTimeZone &timeZone
     , const QDateTime &timestamp)
 {
-    m_impl->updateTimeDateInfo(id, dateTime, timestamp);
+    m_impl->updateTimeDateInfo(id, utcDateTime, timeZone, timestamp);
 }
 
 void rtu::ServersSelectionModel::updateInterfacesInfo(const QUuid &id
+    , const QString &host                                                      
     , const InterfaceInfoList &interfaces)
 {
-    m_impl->updateInterfacesInfo(id, interfaces);
+    m_impl->updateInterfacesInfo(id, host, interfaces);
 }
 
 void rtu::ServersSelectionModel::updateSystemNameInfo(const QUuid &id
@@ -815,9 +856,10 @@ void rtu::ServersSelectionModel::updatePortInfo(const QUuid &id
     m_impl->updatePortInfo(id, port);
 }
 
-void rtu::ServersSelectionModel::selectionPasswordChanged(const QString &password)
+void rtu::ServersSelectionModel::updatePasswordInfo(const QUuid &id
+    , const QString &password)
 {
-    m_impl->selectionPasswordChanged(password);
+    m_impl->updatePasswordInfo(id, password);
 }
 
 int rtu::ServersSelectionModel::selectedCount() const
@@ -832,17 +874,21 @@ rtu::ServerInfoList rtu::ServersSelectionModel::selectedServers()
 
 int rtu::ServersSelectionModel::rowCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent);
-    return m_impl->rowCount();
+    if (!parent.isValid())
+        return m_impl->rowCount();
+    return 0;
 }
 
 QVariant rtu::ServersSelectionModel::data(const QModelIndex &index
     , int role) const
 {
+    if (!index.isValid())
+        return QVariant();
+
     return m_impl->data(index, role);
 }
 
 rtu::Roles rtu::ServersSelectionModel::roleNames() const
 {
     return kRolesDescription;
-}
+} 

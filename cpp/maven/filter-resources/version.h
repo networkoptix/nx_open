@@ -1,8 +1,7 @@
 //
 // This file is generated. Go to pom.xml.
 //
-#ifndef ${project.artifactId}_VERSION_H
-#define ${project.artifactId}_VERSION_H
+#pragma once
 
 /* 
  * Some defines from the build system. Using them directly strongly not recommended.
@@ -90,5 +89,3 @@
 #define IDI_ICON_APPLICATION            101
 #define IDI_ICON_VIDEOWALL              102
 /* Dear Developer. Please add new constants to the code block above (QN_* definitions). Thank you. */
-
-#endif // ${project.artifactId}_VERSION_H

@@ -5,7 +5,9 @@
 #include "recording/time_period.h"
 #include "recording/time_period_list.h"
 
-#include "chunks/chunks_request_helper.h"
+#include <api/helpers/chunks_request_data.h>
+#include <rest/helpers/chunks_request_helper.h>
+
 #include "common/common_module.h"
 
 #include "core/resource_management/resource_pool.h"

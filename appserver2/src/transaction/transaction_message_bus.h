@@ -71,6 +71,7 @@ namespace ec2
             const QByteArray& requestMsgBody );
         //!Blocks till connection \a connectionGuid is ready to accept new transactions
         void waitForNewTransactionsReady( const QnUuid& connectionGuid );
+        void connectionFailure( const QnUuid& connectionGuid );
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -142,7 +143,7 @@ namespace ec2
         * If can't find route info then return null value. 
         * Otherwise return route gateway.
         */
-        QnUuid routeToPeerVia(const QnUuid& dstPeer) const;
+        QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
 
     signals:
         void peerLost(ApiPeerAliveData data);

@@ -212,8 +212,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<QnModuleInformation>>();
     qRegisterMetaType<QList<QnModuleInformationWithAddresses>>();
 
-    qRegisterMetaType<Qn::CameraDataType>();
-
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();
 

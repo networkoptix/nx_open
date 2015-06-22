@@ -3,18 +3,13 @@
 
 #include <QStringList>
 
-#include <server_info.h>
-#include <requests/requests.h>
+#include <base/server_info.h>
+#include <base/requests.h>
 #include <helpers/http_client.h>
 
 namespace
 {
-    QStringList g_availablePasswords = []() -> QStringList
-    {
-        QStringList result;
-        result.push_back(rtu::defaultAdminPassword());
-        return result;
-    }();
+    QStringList g_availablePasswords = rtu::defaultAdminPasswords();
 }
 
 class rtu::LoginManager::Impl : public QObject
@@ -55,7 +50,7 @@ void rtu::LoginManager::Impl::primaryLoginToServer(const BaseServerInfo &info
         emit m_owner->loginOperationSuccessfull(id, extraInfo);
     };
     
-    const auto &failed = [this, info](const QUuid &id)
+    const auto &failed = [this, info](const QString &, int)
     {
         loginToServer(info, 0);
     };
@@ -78,7 +73,7 @@ void rtu::LoginManager::Impl::loginToServer(const BaseServerInfo &info
         emit m_owner->loginOperationSuccessfull(id, extraInfo);
     };
     
-    const auto &failed = [this, info, passwordIndex](const QUuid &id)
+    const auto &failed = [this, info, passwordIndex](const QString &,int)
     {
         loginToServer(info, passwordIndex + 1);
     };

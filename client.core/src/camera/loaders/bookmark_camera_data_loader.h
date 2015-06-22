@@ -1,12 +1,12 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtGui/QRegion>
+#include <array>
 
-#include <api/media_server_connection.h>
+#include <QtCore/QObject>
+#include <QtCore/QElapsedTimer>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/camera_bookmark_fwd.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <camera/data/camera_data_fwd.h>
 #include <camera/loaders/abstract_camera_data_loader.h>
@@ -16,10 +16,8 @@
 
 /**
  * Per-camera data loader that caches loaded data. 
- * Uses flat structure. Data is loaded with the most detailed level.
- * Source data period is solid, no spaces are allowed.
  */
-class QnBookmarkCameraDataLoader: public QnAbstractCameraDataLoader
+class QnBookmarksLoader: public QObject
 {
     Q_OBJECT
 public:
@@ -30,41 +28,39 @@ public:
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
-    QnBookmarkCameraDataLoader(const QnVirtualCameraResourcePtr &camera, QObject *parent = NULL);
+    QnBookmarksLoader(const QnVirtualCameraResourcePtr &camera, QObject *parent = NULL);
     
-    virtual int load(const QString &filter, const qint64 resolutionMs) override;
+    void load(const QnTimePeriod &period);
 
-    virtual void discardCachedData(const qint64 resolutionMs = 0) override;
+    QnCameraBookmarkList bookmarks() const;
 
-private slots:
-    void at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle);
+    void discardCachedData();
+
+signals:
+    /**
+     * This signal is emitted whenever bookmarks were successfully loaded.
+     *
+     * \param data                      Full data loaded.
+     * \param updatedPeriod             Source time period for the updated piece of data.
+     * \param handle                    Request handle.
+     */
+    void bookmarksChanged(const QnCameraBookmarkList &bookmarks);
 
 private:
-    int sendRequest(qint64 startTimeMs);
-    void handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle);
+    void queueToLoad(const QnTimePeriod &period);
+    void processLoadQueue();
+
+    void sendRequest(const QnTimePeriod &period);
+    Q_SLOT void handleDataLoaded(int status, const QnCameraBookmarkList &data, int requestHandle);
 private:
-    struct LoadingInfo 
-    {
-        /** Real loading handle, provided by the server connection object. */
-        int handle;
 
-        /** Starting time of the request. */
-        qint64 startTimeMs;
-
-        /** List of local (fake) handles for requests to this time period loader
-         * that are waiting for the same time period to be loaded. */
-        QList<int> waitingHandles;
-
-        LoadingInfo();
-
-        void clear();
-    };
-
-    QString m_filter;
+    const QnVirtualCameraResourcePtr m_camera;
     
-    LoadingInfo m_loading;
-
     /** Loaded data. */
-    QnAbstractCameraDataPtr m_loadedData;
+    //TODO: #GDM #Bookmarks replace structure with indexed tree
+    QnCameraBookmarkList m_loadedData;
 
+    QElapsedTimer m_timer;
+
+    QnTimePeriod m_queuedPeriod;
 };

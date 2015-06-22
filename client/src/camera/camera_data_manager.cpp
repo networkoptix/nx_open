@@ -27,18 +27,9 @@ QnCachingCameraDataLoader* QnCameraDataManager::loader(const QnMediaResourcePtr 
     connect(loader, &QnCachingCameraDataLoader::periodsChanged, this, [this, resource](Qn::TimePeriodContent type, qint64 startTimeMs) {
         emit periodsChanged(resource, type, startTimeMs);
     });
-    connect(loader, &QnCachingCameraDataLoader::bookmarksChanged, this, [this, resource]() {
-        emit bookmarksChanged(resource);
-    });
 
     m_loaderByResource[resource] = loader;
     return loader;
-}
-
-QnCameraBookmarkList QnCameraDataManager::bookmarks(const QnMediaResourcePtr &resource) const {
-    if (!m_loaderByResource.contains(resource))    
-        return QnCameraBookmarkList();
-    return m_loaderByResource[resource]->bookmarks();
 }
 
 void QnCameraDataManager::clearCache() {

@@ -443,11 +443,13 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         if( strlen(m_camInfo.defaultLogin) == 0 )
         {
             const QByteArray userName = getAuth().user().toLatin1();
+            memset( m_camInfo.defaultLogin, 0, sizeof( m_camInfo.defaultLogin ) );
             strncpy( m_camInfo.defaultLogin, userName.constData(), std::min<size_t>(userName.size(), sizeof(m_camInfo.defaultLogin)-1) );
         }
         if( strlen(m_camInfo.defaultPassword) == 0 )
         {
             const QByteArray userPassword = getAuth().password().toLatin1();
+            memset( m_camInfo.defaultPassword, 0, sizeof( m_camInfo.defaultPassword ) );
             strncpy( m_camInfo.defaultPassword, userPassword.constData(), std::min<size_t>(userPassword.size(), sizeof(m_camInfo.defaultPassword)-1) );
         }
 

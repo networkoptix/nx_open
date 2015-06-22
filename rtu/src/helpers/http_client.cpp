@@ -25,19 +25,19 @@ public:
     virtual ~Impl();
     
     void sendGet(const QUrl &url
-        , const OnSuccesfullReplyFunc &successfullCallback
-        , const OnErrorReplyFunc &errorCallback);
+        , const ReplyCallback &successfullCallback
+        , const ErrorCallback &errorCallback);
 
     void sendPost(const QUrl &url
         , const QByteArray &data
-        , const OnSuccesfullReplyFunc &sucessfullCallback
-        , const OnErrorReplyFunc &errorCallback);
+        , const ReplyCallback &sucessfullCallback
+        , const ErrorCallback &errorCallback);
     
 private:
     void onReply(QNetworkReply *reply);
     
 private:
-    typedef QPair<OnSuccesfullReplyFunc, OnErrorReplyFunc> CallbacksPair;
+    typedef QPair<ReplyCallback, ErrorCallback> CallbacksPair;
     typedef QMap<QNetworkReply *, CallbacksPair> RepliesMap;
     
     QNetworkAccessManager * const m_manager;
@@ -57,17 +57,19 @@ rtu::HttpClient::Impl::~Impl()
 }
 
 void rtu::HttpClient::Impl::sendGet(const QUrl &url
-    , const OnSuccesfullReplyFunc &successfullCallback
-    , const OnErrorReplyFunc &errorCallback)
+    , const ReplyCallback &successfullCallback
+    , const ErrorCallback &errorCallback)
 {
-    m_replies.insert(m_manager->get(QNetworkRequest(url))
+    QNetworkReply *reply = m_manager->get(QNetworkRequest(url));
+   // qDebug() << reply << " sending command: " << url; 
+    m_replies.insert(reply
         , CallbacksPair(successfullCallback, errorCallback));
 }
 
 void rtu::HttpClient::Impl::sendPost(const QUrl &url
     , const QByteArray &data
-    , const OnSuccesfullReplyFunc &successfullCallback
-    , const OnErrorReplyFunc &errorCallback)
+    , const ReplyCallback &successfullCallback
+    , const ErrorCallback &errorCallback)
 {
     m_replies.insert(m_manager->post(preparePostJsonReqiestRequest(url), data)
         , CallbacksPair(successfullCallback, errorCallback));
@@ -87,20 +89,31 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
         , kHttpSuccessCodeLast = 299
     };
     
+    const int errorCode = reply->error();
     const int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if ((httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast))
+    const bool isRequestError = (errorCode != QNetworkReply::NoError);
+    const bool isHttpError = ((httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast));
+    const QByteArray &data = reply->readAll();
+    
+//    qDebug() << reply << " netowrk reply: " << errorCode << " : " << httpCode;
+//    qDebug() << data;
+    if (isRequestError || isHttpError)
     { 
-        const OnErrorReplyFunc &errorCallback = it->second;
+        const ErrorCallback &errorCallback = it->second;
         if (errorCallback)
         {
-            const QString &errorReason = reply->attribute(
-                QNetworkRequest::HttpReasonPhraseAttribute).toString();
+            const QVariant &httpErrorVar = 
+                reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute);
+            const QString &httpError = (httpErrorVar.isValid() ? 
+                httpErrorVar.toString() : QString());
+            const QString &errorReason = (!httpError.isEmpty()? httpError 
+                : QString("Netowrk error #%1").arg(errorCode));
             errorCallback(errorReason, httpCode);
         }
     }
-    else if (const OnSuccesfullReplyFunc &successCallback = it->first)
+    else if (const ReplyCallback &successCallback = it->first)
     {
-        successCallback(reply->readAll());
+        successCallback(data);
     }
     m_replies.erase(it);
 }
@@ -118,16 +131,16 @@ rtu::HttpClient::~HttpClient()
 }
 
 void rtu::HttpClient::sendGet(const QUrl &url
-    , const OnSuccesfullReplyFunc &sucessfullCallback
-    , const OnErrorReplyFunc &errorCallback)
+    , const ReplyCallback &sucessfullCallback
+    , const ErrorCallback &errorCallback)
 {
     m_impl->sendGet(url, sucessfullCallback, errorCallback);    
 }
 
 void rtu::HttpClient::sendPost(const QUrl &url
     , const QByteArray &data
-    , const OnSuccesfullReplyFunc &successfullCallback
-    , const OnErrorReplyFunc &errorCallback)
+    , const ReplyCallback &successfullCallback
+    , const ErrorCallback &errorCallback)
 {
     m_impl->sendPost(url, data, successfullCallback, errorCallback);
 }

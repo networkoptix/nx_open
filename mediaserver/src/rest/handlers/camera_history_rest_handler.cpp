@@ -1,17 +1,10 @@
 #include <QUrlQuery>
 #include <QWaitCondition>
 
+#include <api/helpers/chunks_request_data.h>
+
 #include "camera_history_rest_handler.h"
 #include "core/resource/camera_resource.h"
-
-/*
-int findNextServerIdx(qint64 currentTime, const MultiServerPeriodDataList& chunks, std::vector<qint64>& scanPos) 
-{
-    for (int i = 0; i < scanPos.size(); ++i) {
-
-    }
-}
-*/
 
 ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(const MultiServerPeriodDataList& chunks)
 {
