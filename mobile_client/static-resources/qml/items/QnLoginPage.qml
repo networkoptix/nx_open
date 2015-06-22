@@ -236,6 +236,9 @@ QnPage {
         target: connectionManager
 
         onConnectionFailed: {
+            if (!activePage)
+                return
+
             warningText.text = statusMessage
             if (status == QnConnectionManager.Unauthorized)
                 _authError = true
