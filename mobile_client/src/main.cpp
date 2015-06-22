@@ -83,6 +83,7 @@ int runApplication(QGuiApplication *application) {
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
     QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true, false));
+    moduleFinder->start();
 
     int result = runUi(application);
 

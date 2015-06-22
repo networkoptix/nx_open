@@ -12,33 +12,14 @@ QnLoginSessionsModel::QnLoginSessionsModel(QObject *parent) :
 {
     loadFromSettings();
 
-    m_moduleFinder->start();
     connect(m_moduleFinder,     &QnModuleFinder::moduleAddressFound,    this,   &QnLoginSessionsModel::at_moduleFinder_moduleAddressFound);
     connect(m_moduleFinder,     &QnModuleFinder::moduleAddressLost,     this,   &QnLoginSessionsModel::at_moduleFinder_moduleAddressLost);
 
-//    QnLoginSession s;
-//    s.systemName = lit("DEMO_SYSTEM");
-//    s.address = lit("127.0.0.1");
-//    s.port = 7001;
-//    s.user = lit("admin");
-//    s.password = lit("123");
-//    m_savedSessions.append(s);
-
-//    s.systemName = lit("regress1");
-//    s.address = lit("192.168.11.23");
-//    s.port = 8012;
-//    s.user = lit("user");
-//    s.password = lit("123111");
-//    m_savedSessions.append(s);
-
-//    s.systemName = lit("regress123123");
-//    s.address = lit("192.168.11.211");
-//    s.port = 8042;
-//    s.user = lit("admin");
-//    s.password = lit("123111");
-//    m_savedSessions.append(s);
-
-
+    for (const QnModuleInformationWithAddresses &moduleInformation : m_moduleFinder->foundModulesWithAddresses()) {
+        for (const QString &address : moduleInformation.remoteAddresses) {
+            at_moduleFinder_moduleAddressFound(moduleInformation, SocketAddress(address, moduleInformation.port));
+        }
+    }
 }
 
 QnLoginSessionsModel::~QnLoginSessionsModel() {
