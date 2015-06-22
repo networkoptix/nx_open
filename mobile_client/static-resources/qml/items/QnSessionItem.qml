@@ -4,6 +4,7 @@ import com.networkoptix.qml 1.0
 
 import "QnLoginPage.js" as LoginDialog
 import "../main.js" as Main
+import "../controls"
 
 QnSideNavigationItem {
     id: sessionItem
@@ -31,23 +32,19 @@ QnSideNavigationItem {
             font.weight: Font.DemiBold
             color: QnTheme.listText
             elide: Text.ElideRight
-            width: parent.width - dp(16) - editButton.width
+            width: parent.width - editButton.width
 
-            Rectangle {
+            QnIconButton {
                 id: editButton
-                color: QnTheme.listSubText
-                width: dp(20)
-                height: dp(20)
+
+                icon: "qrc:///images/edit.png"
+
                 anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.right
-                    margins: dp(16)
                 }
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: Main.openSavedSession(sessionId, address, port, user, password, systemName)
-                }
+                onClicked: Main.openSavedSession(sessionId, address, port, user, password, systemName)
             }
         }
 
