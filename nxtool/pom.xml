@@ -11,15 +11,14 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nxtool</artifactId>
     <packaging>pom</packaging>
-    <name>${company.name} Server Configuration Tool</name>    
+    <name>NX Server Configuration Tool</name>    
     <dependencies/>
     <properties>
         <product.title>${nxtool.name}</product.title>  
         <product.display.title>${nxtool.display.name}</product.display.title>
         <!--Global libs-->      
         <qt.libs>qml quick core gui network</qt.libs>
-        <qt.dir>${env.ENVIRONMENT}/qt542/x86</qt.dir>
-        <arch>x86</arch>
+        <qt.dir>${env.ENVIRONMENT}/qt542/${arch}</qt.dir>
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs/>

@@ -149,29 +149,6 @@
                         <version>1.5.2</version>
                         <executions>
                             <execution>
-                                <id>fix-for QT-5.4.5-QMAKE-SUCKS!!!!!!!!!!</id>
-								<phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x86.vcxproj</file>
-                                    <!-- <excludes>
-                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
-                                    </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
-                                    <replacements>
-                                        <replacement>
-                                            <token>c:\Qt\5.4.2\qt-5.4.2-x86-msvc2012-opengl\lib\Qt</token>
-                                            <value>Qt</value>
-                                        </replacement>            
-                                    </replacements>
-                                <regex>false</regex>     
-                                <escape>false</escape>                                
-                                </configuration>                                
-                            </execution>
-                            <execution>
                                 <id>fix-arch-x64-QMAKE-SUCKS!!!!!!!!!!</id>
 								<phase>process-resources</phase>
                                 <goals>
