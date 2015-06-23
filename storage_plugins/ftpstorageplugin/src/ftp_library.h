@@ -98,7 +98,7 @@ namespace Qn
 
     private:
         int                 m_mode;
-        mutable uint64_t    m_pos;
+        mutable int64_t     m_pos;
         std::string         m_url;
         ftplib             &m_impl;
         std::string         m_localfile;

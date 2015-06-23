@@ -54,16 +54,6 @@
 #include <openssl/ssl.h>
 #endif
 
-//#ifdef _WIN32
-//#   ifdef WIN32_LEAN_AND_MEAN
-//        struct timeval 
-//        {
-//            long tv_sec;
-//            long tv_usec;
-//        };
-//#   endif
-//#endif
-
 using namespace std;
 
 /**
