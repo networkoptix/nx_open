@@ -186,6 +186,7 @@ Rectangle {
 
         Item {
             id: contentItem
+            enabled: panel.open
             anchors.fill: parent
             clip: true
         }

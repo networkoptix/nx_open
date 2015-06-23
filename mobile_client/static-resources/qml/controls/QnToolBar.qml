@@ -10,6 +10,7 @@ Item {
 
     width: parent.width
     height: dp(56)
+    clip: true
 
     Rectangle {
         id: backgroundRectangle

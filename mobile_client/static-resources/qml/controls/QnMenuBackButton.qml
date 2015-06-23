@@ -16,9 +16,11 @@ Item {
     height: dp(48)
 
     QnMaterialSurface {
+        anchors.margins: -4
         onClicked: button.clicked()
         centered: true
         backlight: false
+        clip: false
     }
 
     QnMenuBackIcon {

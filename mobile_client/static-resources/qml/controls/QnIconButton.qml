@@ -13,9 +13,11 @@ Item {
     onWidthChanged: console.log(width)
 
     QnMaterialSurface {
+        anchors.margins: -4
         onClicked: iconButton.clicked()
         centered: true
         backlight: false
+        clip: false
     }
 
     Image {

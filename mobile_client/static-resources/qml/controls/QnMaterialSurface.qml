@@ -70,7 +70,7 @@ Item {
         function getEndRadius(x, y) {
             var dx = Math.max(x, parent.width - x)
             var dy = Math.max(y, parent.height - y)
-            return Math.max(dx, dy)
+            return Math.sqrt(dx * dx + dy * dy)
         }
 
         function fadeIn(mouseX, mouseY) {
