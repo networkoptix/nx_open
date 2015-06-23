@@ -251,7 +251,7 @@ QnPage {
                 anchors.centerIn: timeline
                 anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
                 width: timeline.height - timeline.chunkBarHeight
-                height: timeLabel.width + dp(64)
+                height: timeLiveLabel.width + dp(64)
 
                 rotation: 90
                 gradient: Gradient {
@@ -268,7 +268,7 @@ QnPage {
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                     verticalCenter: timeline.verticalCenter
-                    verticalCenterOffset: -timeline.chunkBarHeight / 2 - timeLabel.height / 2
+                    verticalCenterOffset: -timeline.chunkBarHeight / 2 - timeLiveLabel.height / 2
                 }
 
                 font.pixelSize: dp(20)
@@ -281,22 +281,34 @@ QnPage {
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
-            Text {
-                id: timeLabel
+            Item {
+                id: timeLiveLabel
 
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                     verticalCenter: timeline.verticalCenter
                     verticalCenterOffset: -timeline.chunkBarHeight / 2 + (timeline.stickToEnd ? 0 : dateLabel.height / 2)
                 }
-
                 Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: 200 } }
 
-                font.pixelSize: dp(48)
-                font.weight: Font.Light
+                width: timeLabel.width
+                height: timeLabel.height
 
-                text: timeline.stickToEnd ? qsTr("LIVE") : timeline.positionDate.toTimeString()
-                color: "white"
+                QnTimeLabel {
+                    id: timeLabel
+                    dateTime: timeline.positionDate
+                    visible: !timeline.stickToEnd
+                }
+
+                Text {
+                    id: liveLabel
+                    anchors.centerIn: timeLabel
+                    font.pixelSize: sp(36)
+                    font.weight: Font.Light
+                    color: QnTheme.windowText
+                    text: qsTr("LIVE")
+                    visible: timeline.stickToEnd
+                }
             }
 
             QnPlaybackController {
