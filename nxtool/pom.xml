@@ -9,15 +9,17 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>2.3.2-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>rtu</artifactId>
+    <artifactId>nxtool</artifactId>
     <packaging>pom</packaging>
-    <name>Remote Tune Utility</name>    
+    <name>${company.name} Server Configuration Tool</name>    
     <dependencies/>
     <properties>
-        <product.title>${rtu.name}</product.title>  
-        <product.display.title>${rtu.display.name}</product.display.title>
+        <product.title>${nxtool.name}</product.title>  
+        <product.display.title>${nxtool.display.name}</product.display.title>
         <!--Global libs-->      
-        <qt.libs>qml quick</qt.libs>
+        <qt.libs>qml quick core gui network</qt.libs>
+        <qt.dir>${env.ENVIRONMENT}/qt542/x86</qt.dir>
+        <arch>x86</arch>
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs/>
