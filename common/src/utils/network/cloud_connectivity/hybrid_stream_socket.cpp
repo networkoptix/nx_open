@@ -111,14 +111,22 @@ namespace nx_cc
             case nx_cc::AddressType::cloud:
             case nx_cc::AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
             {
+                unsigned int sockSendTimeout = 0;
+                if( !getSendTimeout( &sockSendTimeout ) )
+                    return false;
+
                 //establishing cloud connect
                 auto tunnel = CloudTunnelPool::instance()->getTunnelToHost( dnsEntry.address );
                 return tunnel->connect(
-                    [this](
+                    sockSendTimeout,
+                    [this, tunnel](
                         nx_cc::ErrorDescription errorCode,
                         std::unique_ptr<AbstractStreamSocket> cloudConnection )
                     {
-                        cloudConnectDone( errorCode, std::move( cloudConnection ) );
+                        cloudConnectDone(
+                            std::move( tunnel ),
+                            errorCode,
+                            std::move( cloudConnection ) );
                     } );
             }
 
@@ -130,6 +138,7 @@ namespace nx_cc
     }
 
     void CloudStreamSocket::cloudConnectDone(
+        std::shared_ptr<CloudTunnel> /*tunnel*/,
         nx_cc::ErrorDescription errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection )
     {

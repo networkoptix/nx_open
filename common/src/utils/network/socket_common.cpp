@@ -109,6 +109,11 @@ QString HostAddress::toString() const
     return m_addrStr.get();
 }
 
+bool HostAddress::isResolved() const
+{
+    return m_addressResolved;
+}
+
 HostAddress& HostAddress::operator=( const HostAddress& rhs )
 {
     m_addrStr = rhs.m_addrStr;

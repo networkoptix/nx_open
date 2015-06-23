@@ -48,7 +48,10 @@ namespace nx_cc
         bool instanciateSocket( const nx_cc::DnsEntry& dnsEntry );
         void onResolveDone( std::vector<nx_cc::DnsEntry> dnsEntries );
         bool startAsyncConnect( std::vector<nx_cc::DnsEntry>&& dnsEntries );
-        void cloudConnectDone( nx_cc::ErrorDescription errorCode, std::unique_ptr<AbstractStreamSocket> cloudConnection );
+        void cloudConnectDone(
+            std::shared_ptr<CloudTunnel> tunnel,
+            nx_cc::ErrorDescription errorCode,
+            std::unique_ptr<AbstractStreamSocket> cloudConnection );
     };
 }
 

@@ -86,6 +86,7 @@ namespace nx_cc
         \note can create connection without mediator if tunnel is:\n
             - direct or backward tcp connection (no hole punching used)
             - udt tunnel (no matter hole punching is used or not)
+        \note Methods are thread-safe. I.e., different threads can use this tunnel to establish connection
     */
     class CloudTunnel
     :
@@ -116,11 +117,13 @@ namespace nx_cc
         }
         //!Establish new connection
         /*!
+            \param timeoutMillis
             \param handler. void(nx_cc::ErrorDescription, std::unique_ptr<AbstractStreamSocket>)
+            \note This method is re-enterable. So, it can be called in different threads simultaneously
             \note Request interleaving is allowed
         */
         template<class Handler>
-        bool connect( Handler&& completionHandler )
+        bool connect( unsigned int timeoutMillis, Handler&& completionHandler )
         {
             m_connectCompletionHandler = std::forward<Handler>( completionHandler );
             //TODO

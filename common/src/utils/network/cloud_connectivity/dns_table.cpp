@@ -33,13 +33,12 @@ namespace nx_cc
         std::vector<DnsEntry>* const dnsEntries,
         std::function<void( std::vector<DnsEntry> )> completionHandler )
     {
-        //TODO #ak
-        return ResolveResult::failed;
-    }
+        //TODO #ak implement local network resolve
 
-    std::vector<DnsEntry> DnsTable::resolveSync( const HostAddress& hostName )
-    {
-        //TODO #ak
-        return std::vector<DnsEntry>();
+        DnsEntry dnsEntry;
+        dnsEntry.addressType = hostName.isResolved() ? AddressType::regular : AddressType::cloud;
+        dnsEntry.address = hostName;
+        dnsEntries->push_back( std::move( dnsEntry ) );
+        return ResolveResult::done;
     }
 }

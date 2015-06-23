@@ -97,6 +97,7 @@ namespace nx_cc
 
             \param dnsEntries If \a hostName can be resolved immediately, it is done and result placed to \a dnsEntries. 
                 Otherwise, if completionHandler is specified, async resolve procedure is started
+            \param completionHandler Will be invoked on completion if resolve could not be performed immediately
 
             \return See \a DnsTable::ResolveResult
         */
@@ -104,8 +105,6 @@ namespace nx_cc
             const HostAddress& hostName,
             std::vector<DnsEntry>* const dnsEntries,
             std::function<void(std::vector<DnsEntry>)> completionHandler );
-        //!Calls \a DnsTable::resolveAsync and waits for completion
-        std::vector<DnsEntry> resolveSync( const HostAddress& hostName );
     };
 }
 

@@ -18,6 +18,7 @@ namespace nx_cc
 {
     //!Accepts connections made through mediator
     /*!
+        Implements server-side nat traversal logic
         Receives incoming \a connection_requested indications and creates cloud tunnel
         \note Uses MediatorConnection to talk to the mediator
     */

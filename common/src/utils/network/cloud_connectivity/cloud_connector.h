@@ -18,14 +18,15 @@
 
 namespace nx_cc
 {
-    //!Establishes connection to peer by using mediator or existing tunnel
+    //!Establishes connection to peer by using mediator
     /*!
+        Implements client-side nat traversal logic
         \note Uses MediatorConnection to talk to the mediator
     */
     class CloudConnector
     :
         public QnStoppableAsync,
-        public Singleton<CloudConnector>
+        public Singleton<CloudConnector>    //really singleton?
     {
     public:
         virtual ~CloudConnector();

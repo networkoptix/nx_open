@@ -41,8 +41,13 @@ public:
     HostAddress( const char* addrStr );
 
     //!Returns ip in local byte order
+    /*!
+        \note This method can trigger blocking address resolve. Check 
+    */
     uint32_t ipv4() const;
     QString toString() const;
+    //!Returns \a true if address is resolved. I.e., it's ip address is known
+    bool isResolved() const;
 
     HostAddress& operator=( const HostAddress& rhs );
     HostAddress& operator=( HostAddress&& rhs );
