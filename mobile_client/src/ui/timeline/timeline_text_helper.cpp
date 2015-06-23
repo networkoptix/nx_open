@@ -36,6 +36,9 @@ public:
     }
 
     void addString(const QString &string, QPainter *painter, int &x, int &y) {
+        if (strings.contains(string))
+            return;
+
         QSize size = fm.size(Qt::TextSingleLine, string);
         if (x > 0 && x + size.width() >= texture.width()) {
             x = 0;
