@@ -9,14 +9,12 @@
 
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>2.3.2-SNAPSHOT</version>
-    <artifactId>ftpstorageplugin</artifactId>
+    <artifactId>storage_plugin_test_client</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Ftp storage plugin</name>	
+    <name>HD Witness storage plugin testing client program</name>	
 
     <properties>
-        <product.title>${ftpstorageplugin.name}</product.title>	
-        <libtype>plugin</libtype>
-        <buildLib>sharedlib</buildLib>
+        <product.title>${storage_plugin_test_client.name}</product.title>	
         <!--Global libs-->
         <qt.libs>core</qt.libs>
         <global.libs/>
@@ -24,13 +22,14 @@
         <windows.oslibs/>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
+        <linux.oslibs/>
+        <mac.oslibs/>
         <!--Global defines-->
         <global.defines/>
-        <linux.defines/>
-        <mac.defines/>
         <!--Specific os defines-->
-        <windows.defines>WIN32_LEAN_AND_MEAN NOMINMAX _CRT_NON_CONFORMING_SWPRINTFS _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE</windows.defines>
-        <additional.defines>NOLFS NOSSL</additional.defines>
-    </properties>
+        <windows.defines>_CRT_NON_CONFORMING_SWPRINTFS _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE</windows.defines>
+        <linux.defines/>
+        <mac.defines/>    
+    </properties> 
     <dependencies/>
 </project>

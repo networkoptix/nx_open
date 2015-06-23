@@ -3,8 +3,8 @@
 #include <stdexcept>
 #include <cctype>
 #include <cstring>
+#include <plugins/storage/third_party/third_party_storage.h>
 #include "library.h"
-#include <third_party_storage.h>
 
 #define CPREF ">> "
 
@@ -635,7 +635,7 @@ namespace client
                 goto end;
             }
 
-            uint32_t written = fwrite(buf, 1, bCount, t);
+            size_t written = fwrite(buf, 1, bCount, t);
             free(buf);
             if (written < bCount)
             {
