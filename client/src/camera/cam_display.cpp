@@ -1208,11 +1208,13 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             m_lastAudioPacketTime = ad->timestamp;
             if (!m_resource->hasVideo()) 
             {
-                m_buffering = 0;
-                if (m_extTimeSrc)
-                    m_extTimeSrc->onBufferingFinished(this);
-                m_lastAudioPacketTime = AV_NOPTS_VALUE;
-                unblockTimeValue();
+                if (m_buffering) {
+                    m_buffering = 0;
+                    if (m_extTimeSrc)
+                        m_extTimeSrc->onBufferingFinished(this);
+                    m_lastAudioPacketTime = AV_NOPTS_VALUE;
+                    unblockTimeValue();
+                }
                 return false; // block data stream
             }
             return true; // ignore audio packet to prevent after jump detection
@@ -1339,15 +1341,17 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         {
             if (!m_playAudio || m_audioDisplay->isPlaying()) 
             {
-                m_buffering = 0;
-                unblockTimeValue();
-                if (m_extTimeSrc)
-                    m_extTimeSrc->onBufferingFinished(this);
+                if (m_buffering) {
+                    m_buffering = 0;
+                    unblockTimeValue();
+                    if (m_extTimeSrc)
+                        m_extTimeSrc->onBufferingFinished(this);
+                }
             }
 
             doDelayForAudio(ad, speed);
         }
-
+        
         // we synch video to the audio; so just put audio in player with out thinking
         if (m_playAudio && qAbs(speed-1.0) < FPS_EPS)
         {
