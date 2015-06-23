@@ -36,6 +36,7 @@ QtObject {
     property color sideNavigationSection
 
     property color attentionBackground
+    property color loadingText
 
     function loadColors() {
         windowBackground        = colorTheme.color("window.background")
@@ -63,6 +64,7 @@ QtObject {
         sideNavigationSplitter  = colorTheme.color("sideNavigation.splitter")
         sideNavigationSection   = colorTheme.color("sideNavigation.section")
         attentionBackground     = colorTheme.color("other.attentionBackground")
+        loadingText             = colorTheme.color("other.loadingText")
     }
 
     function transparent(color, opacity) {

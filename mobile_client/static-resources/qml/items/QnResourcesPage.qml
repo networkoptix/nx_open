@@ -21,12 +21,32 @@ QnPage {
         onVideoRequested: Main.openMediaResource(uuid)
     }
 
+    Rectangle {
+        id: loadingDummy
+        anchors.fill: parent
+        color: QnTheme.windowBackground
+        Behavior on opacity { NumberAnimation { duration: 200 } }
+
+        Text {
+            anchors.centerIn: parent
+            text: connectionManager.connected ? qsTr("Loading...") : qsTr("Connecting...")
+            font.pixelSize: sp(14)
+            color: QnTheme.loadingText
+        }
+    }
+
     onWidthChanged: updateLayout()
 
     Connections {
         target: connectionManager
         onInitialResourcesReceived: {
+            loadingDummy.opacity = 0.0
             updateLayout()
+        }
+        onConnectedChanged: {
+            if (!connectionManager.connected) {
+                loadingDummy.opacity = 1.0
+            }
         }
     }
 
