@@ -3,23 +3,11 @@
 
 #include <QtCore/QAbstractListModel>
 
+#include <context/login_session.h>
+
 class QnModuleFinder;
 class SocketAddress;
 struct QnModuleInformation;
-
-struct QnLoginSession {
-    QString sessionId;
-    QString systemName;
-    QString address;
-    int port;
-    QString user;
-    QString password;
-
-    QnLoginSession();
-
-    QVariantMap toVariant() const;
-    static QnLoginSession fromVariant(const QVariantMap &variant);
-};
 
 class QnLoginSessionsModel : public QAbstractListModel {
     Q_OBJECT

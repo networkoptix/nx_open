@@ -4,6 +4,7 @@
 
 #include "context/connection_manager.h"
 #include "context/context_settings.h"
+#include "context/login_session_manager.h"
 #include "ui/color_theme.h"
 #include "ui/timeline/timeline.h"
 #include "models/camera_list_model.h"
@@ -26,6 +27,7 @@ void QnMobileClientMetaTypes::registerMetaTypes() {
 
 void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0, "QnConnectionManager", lit("Cannot create an instance of QnConnectionManager."));
+    qmlRegisterUncreatableType<QnLoginSessionManager>("com.networkoptix.qml", 1, 0, "QnLoginSessionManager", lit("Cannot create an instance of QnLoginSessionManager."));
     qmlRegisterUncreatableType<QnColorTheme>("com.networkoptix.qml", 1, 0, "QnColorTheme", lit("Cannot create an instance of QnColorTheme."));
     qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");

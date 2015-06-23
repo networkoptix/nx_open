@@ -118,10 +118,24 @@ Window {
         onConnectedChanged: {
             if (connectionManager.connected) {
                 LoginFunctions.saveCurrentSession()
+                loginSessionManager.lastUsedSessionId = currentSessionId
                 Main.gotoResources()
             } else {
+                loginSessionManager.lastUsedSessionId = ""
                 Main.gotoNewSession()
             }
+        }
+
+        onConnectionFailed: {
+            if (stackView.depth > 1) /* we are in login page */
+                return
+
+            Main.openFailedSession(
+                        currentSessionId,
+                        currentHost, currentPort,
+                        currentLogin, currentPasswrod,
+                        loginSessionManager.lastUsedSessionSystemName(),
+                        status, statusMessage)
         }
     }
 
@@ -131,6 +145,15 @@ Window {
     }
 
     Component.onCompleted: {
-        stackView.push([resourcesPageComponent, loginPageComponent])
+        currentSessionId = loginSessionManager.lastUsedSessionId
+        if (currentSessionId) {
+            stackView.push(resourcesPageComponent)
+            LoginFunctions.connectToServer(
+                        currentSessionId,
+                        loginSessionManager.lastUsedSessionHost(), loginSessionManager.lastUsedSessionPort(),
+                        loginSessionManager.lastUsedSessionLogin(), loginSessionManager.lastUsedSessionPassword())
+        } else {
+            stackView.push([resourcesPageComponent, loginPageComponent])
+        }
     }
 }

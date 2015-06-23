@@ -5,6 +5,7 @@
 #include "utils/mobile_app_info.h"
 #include "camera/camera_thumbnail_cache.h"
 #include "ui/resolution_util.h"
+#include "login_session_manager.h"
 
 namespace {
 #if 1
@@ -17,6 +18,7 @@ namespace {
 QnContext::QnContext(QObject *parent):
     base_type(parent),
     m_connectionManager(new QnConnectionManager(this)),
+    m_loginSessionManager(new QnLoginSessionManager(this)),
     m_colorTheme(new QnColorTheme(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_resolutionUtil(custonDensityClass == -1 ? new QnResolutionUtil() : new QnResolutionUtil(static_cast<QnResolutionUtil::DensityClass>(custonDensityClass)))

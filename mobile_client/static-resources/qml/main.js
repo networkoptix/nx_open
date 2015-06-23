@@ -34,6 +34,28 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
     })
 }
 
+function openFailedSession(_sessionId, _host, _port, _login, _password, _systemName, status, statusMessage) {
+    mainWindow.currentSessionId = _sessionId
+    sideNavigation.hide()
+    sideNavigation.enabled = false
+    menuBackButton.animateToBack()
+
+    stackView.push({
+        item: Qt.resolvedUrl("items/QnLoginPage.qml"),
+        properties: {
+            title: _systemName,
+            host: _host,
+            port: _port,
+            login: _login,
+            password: _password,
+            state: "FailedSaved"
+        }
+    })
+
+    var item = stackView.get(stackView.depth - 1)
+    item.showWarning(status, statusMessage)
+}
+
 function gotoNewSession() {
     mainWindow.currentSessionId = ""
     sideNavigation.enabled = true

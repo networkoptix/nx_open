@@ -1,5 +1,4 @@
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
@@ -7,6 +6,7 @@
 #include <utils/common/instance_storage.h>
 
 class QnConnectionManager;
+class QnLoginSessionManager;
 class QnColorTheme;
 class QnMobileAppInfo;
 class QnResolutionUtil;
@@ -16,14 +16,20 @@ class QnContext: public QObject, public QnInstanceStorage {
     typedef QObject base_type;
 
     Q_PROPERTY(QnConnectionManager* connectionManager READ connectionManager NOTIFY connectionManagerChanged)
+    Q_PROPERTY(QnLoginSessionManager* loginSessionManager READ loginSessionManager NOTIFY loginSessionManagerChanged)
     Q_PROPERTY(QnColorTheme* colorTheme READ colorTheme NOTIFY colorThemeChanged)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo READ applicationInfo NOTIFY applicationInfoChanged)
+
 public:
     QnContext(QObject *parent = NULL);
     virtual ~QnContext();
 
     QnConnectionManager *connectionManager() const {
         return m_connectionManager;
+    }
+
+    QnLoginSessionManager *loginSessionManager() const {
+        return m_loginSessionManager;
     }
 
     QnColorTheme *colorTheme() const {
@@ -40,6 +46,7 @@ public:
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
     void connectionManagerChanged();
+    void loginSessionManagerChanged();
     void colorThemeChanged();
     void applicationInfoChanged();
 
@@ -48,6 +55,7 @@ private slots:
 
 private:
     QnConnectionManager *m_connectionManager;
+    QnLoginSessionManager *m_loginSessionManager;
     QnColorTheme *m_colorTheme;
     QnMobileAppInfo *m_appInfo;
 
@@ -55,5 +63,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnContext*)
-
-#endif // CONTEXT_H

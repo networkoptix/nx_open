@@ -225,6 +225,13 @@ QnPage {
                 target: connectButton
                 visible: false
             }
+        },
+        State {
+            name: "FailedSaved"
+            PropertyChanges {
+                target: editButtons
+                visible: true
+            }
         }
     ]
 
@@ -235,12 +242,7 @@ QnPage {
             if (!activePage)
                 return
 
-            warningText.text = statusMessage
-            if (status == QnConnectionManager.Unauthorized)
-                _authError = true
-            else
-                _serverError = true
-            _showWarning = true
+            showWarning(status, statusMessage)
         }
     }
 
@@ -252,12 +254,22 @@ QnPage {
         onTriggered: loginWithCurrentFields()
     }
 
+    function showWarning(status, message) {
+        warningText.text = message
+        if (status === QnConnectionManager.Unauthorized)
+            _authError = true
+        else
+            _serverError = true
+        _showWarning = true
+    }
+
     function removeWarnings() {
         _authError = false
         _serverError = false
     }
 
     function loginWithCurrentFields() {
-        LoginFunctions.connectToServer("", hostField.text, portField.text, loginField.text, passwordField.text)
+        var sessionId = (state == "FailedSaved" ? loginPage.sessionId : "")
+        LoginFunctions.connectToServer(sessionId, hostField.text, portField.text, loginField.text, passwordField.text)
     }
 }
