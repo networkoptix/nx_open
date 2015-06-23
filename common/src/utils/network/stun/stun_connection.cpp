@@ -147,39 +147,35 @@ namespace nx_stun
         std::function<void(SystemError::ErrorCode, nx_stun::Message&&)>&& completionHandler )
     {
         Q_ASSERT( request.header.messageClass == nx_stun::MessageClass::request );
+        enqueuePendingRequest(
+            std::move( request ),
+            std::move( completionHandler ) );
 
         switch(m_state.load(std::memory_order_acquire)) {
-        case NOT_CONNECTED:
-            {
-                m_state.store(CONNECTING,std::memory_order_relaxed);
-                bool ret = openConnection(
-                    std::bind(
-                    &StunClientConnection::onConnectionComplete,
-                        this,
-                        std::placeholders::_1,
-                        std::function<void(SystemError::ErrorCode)>() ) );
-                enqueuePendingRequest(
-                    std::move(request),
-                    std::move(completionHandler));
-                return ret;
-            }
-        case CONNECTING:
-            enqueuePendingRequest(
-                std::move(request),
-                std::move(completionHandler) );
-            return true;
-        case CONNECTED:
-            {
-                enqueuePendingRequest( std::move(request),std::move(completionHandler) );
+            case NOT_CONNECTED:
+                return openConnection( [ this ]( SystemError::ErrorCode code )
+                {
+                    if( code != SystemError::noError )
+                    {
+                        m_outstandingRequest->completion_handler( code, nx_stun::Message() );
+                        resetOutstandingRequest();
+                    }
+                } );
+
+            case CONNECTING:
+                return true;
+
+            case CONNECTED:
                 if( !dispatchPendingRequest( SystemError::noError ) ) {
-                    // The send error will be treated as an error happened locally so no user's 
+                    // The send error will be treated as an error happened locally so no user's
                     // handler is invoking , otherwise potentially recursive lock can happen .
                     resetOutstandingRequest();
                     return false;
                 }
                 return true;
-            }
-        default: Q_ASSERT(0); return false;
+
+            default: Q_ASSERT(0);
+                return false;
         }
     }
 

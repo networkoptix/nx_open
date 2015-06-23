@@ -17,7 +17,7 @@ StunServerConnection::StunServerConnection(
 :
     BaseType( socketServer, std::move( sock ) )
 {
-    peer_address_ = sock->getForeignAddress();
+    peer_address_ = BaseType::getForeignAddress();
     // No way to detect error here
     bool ret = startReadingConnection();
     Q_ASSERT(ret);

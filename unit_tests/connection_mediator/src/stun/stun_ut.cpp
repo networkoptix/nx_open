@@ -48,12 +48,15 @@ TEST( Stun, DISABLED_Simple )
     addrList.push_back( localhost );
     MultiAddressServer<StunStreamSocketServer> server(
                 addrList, true, SocketFactory::nttAuto );
+    ASSERT_TRUE( server.bind() );
+    ASSERT_TRUE( server.listen() );
 
     nx_stun::StunClientConnection client( localhost );
     {
         AsyncWaiter< SystemError::ErrorCode > waiter;
-        ASSERT_TRUE( client.openConnection( [ &waiter ]( SystemError::ErrorCode code )
-                                            { waiter.set( code ); } ) );
+        ASSERT_TRUE( client.openConnection(
+             [ &waiter ]( SystemError::ErrorCode code )
+             { waiter.set( code ); } ) );
         ASSERT_EQ( waiter.get(), SystemError::noError );
     }
     {
@@ -62,7 +65,8 @@ TEST( Stun, DISABLED_Simple )
 
         AsyncWaiter< nx_stun::Message > waiter;
         ASSERT_TRUE( client.sendRequest( std::move( request ),
-            [ &waiter ]( SystemError::ErrorCode code, nx_stun::Message&& message )
+            [ &waiter ]( SystemError::ErrorCode code,
+                         nx_stun::Message&& message )
         {
              ASSERT_EQ( code, SystemError::noError );
              waiter.set( std::move( message ) );

@@ -113,6 +113,12 @@ namespace nx_api
             m_connectionCloseHandlers.push_front( std::move(handler) );
         }
 
+    protected:
+        SocketAddress getForeignAddress()
+        {
+            return m_streamSocket->getForeignAddress();
+        }
+
     private:
         CustomConnectionManagerType* m_connectionManager;
         std::unique_ptr<AbstractCommunicatingSocket> m_streamSocket;
