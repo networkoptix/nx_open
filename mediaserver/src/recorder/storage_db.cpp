@@ -12,7 +12,7 @@
 
 static const int COMMIT_INTERVAL = 1000 * 60 * 1;
 
-QnStorageDb::QnStorageDb(QnStorageResourcePtr s, int storageIndex):
+QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
     QnDbHelper(),
     m_storage(s),
     m_storageIndex(storageIndex),
@@ -174,7 +174,7 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
 
 bool QnStorageDb::open(const QString& fileName)
 {
-    // TODO: If storage is DBReady, DB should work via Storage::IODevice.
+    // TODO: #akulikov If storage is DBReady, DB should work via Storage::IODevice.
     //       But this change requires DB implementation to be able to work via IODevice, and this is not the case right now.
     m_sdb = QSqlDatabase::addDatabase("QSQLITE", QString("QnStorageManager_%1").arg(fileName));
     m_sdb.setDatabaseName(fileName);

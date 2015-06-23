@@ -476,9 +476,6 @@ static const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
 static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
 {
-    if (!(storage->getCapabilities() & QnAbstractStorageResource::WriteFile))
-        return false;
-
     QString storagePath = storage->getPath();
     const QString dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
 
@@ -511,7 +508,10 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
         //So, for such storages creating DB in data dir
 
     if (!(storage->getCapabilities() & QnAbstractStorageResource::DBReady))
-    {
+    {   // we won't be able to create ref guid file if storage is not writable
+        if (!(storage->getCapabilities() & QnAbstractStorageResource::WriteFile))
+            return false;
+
         dbRefGuidStr = QUuid::createUuid().toString().toLatin1();
         if( dbRefGuidStr.size() < 2 )
             return false;   //bad guid, somehow

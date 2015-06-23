@@ -30,7 +30,7 @@ public:
         qint64 startTimeMs;
     };
 
-    QnStorageDb(QnStorageResourcePtr storage, int storageIndex);
+    QnStorageDb(const QnStorageResourcePtr& storage, int storageIndex);
     virtual ~QnStorageDb();
 
     bool open(const QString& fileName);

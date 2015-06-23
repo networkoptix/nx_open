@@ -8,8 +8,11 @@
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
-#include <platform/monitoring/global_monitor.h>
-#include <platform/platform_abstraction.h>
+
+#ifndef _WIN32
+#   include <platform/monitoring/global_monitor.h>
+#   include <platform/platform_abstraction.h>
+#endif
 
 #ifdef Q_OS_WIN
 #include "windows.h"
