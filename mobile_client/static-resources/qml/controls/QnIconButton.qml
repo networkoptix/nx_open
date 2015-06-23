@@ -10,8 +10,6 @@ Item {
     width: dp(48)
     height: dp(48)
 
-    onWidthChanged: console.log(width)
-
     QnMaterialSurface {
         anchors.margins: -4
         onClicked: iconButton.clicked()
