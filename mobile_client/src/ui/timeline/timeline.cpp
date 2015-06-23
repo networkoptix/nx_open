@@ -86,6 +86,7 @@ public:
     QColor chunkColor;
 
     int chunkBarHeight;
+    int textY;
 
     bool showLive;
     QSGTexture *stripesDarkTexture;
@@ -155,6 +156,7 @@ public:
     {
         dpMultiplier = 2;
         chunkBarHeight = 48;
+        textY = -1;
 
         const int sec = 1000;
         const int min = 60 * sec;
@@ -654,6 +656,20 @@ void QnTimeline::setChunkBarHeight(int chunkBarHeight) {
     emit chunkBarHeightChanged();
 
     d->updateStripesTextures();
+    update();
+}
+
+int QnTimeline::textY() const {
+    return d->textY;
+}
+
+void QnTimeline::setTextY(int textY) {
+    if (d->textY == textY)
+        return;
+
+    d->textY = textY;
+
+    emit textYChanged();
     update();
 }
 
@@ -1210,7 +1226,7 @@ int QnTimelinePrivate::placeText(const MarkInfo &textMark, int textLevel, QSGGeo
         tw += textHelper->spaceWidth() * 2;
 
     qreal x = qFloor(textMark.x - tw / 2);
-    qreal y = qFloor((parent->height() - chunkBarHeight - textHelper->lineHeight()) / 2);
+    qreal y = textY >= 0 ? textY : qFloor((parent->height() - chunkBarHeight - textHelper->lineHeight()) / 2);
     int shift = 0;
 
     for (int i = 0; i < baseValue.size(); ++i) {

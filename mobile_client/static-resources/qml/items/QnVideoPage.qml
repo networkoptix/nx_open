@@ -178,6 +178,7 @@ QnPage {
                 font.weight: Font.Bold
 
                 chunkBarHeight: dp(36)
+                textY: (height - chunkBarHeight) / 2
 
                 chunkProvider: chunkProvider
                 startBoundDate: chunkProvider.bottomBound

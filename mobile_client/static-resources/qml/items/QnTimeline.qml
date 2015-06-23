@@ -11,6 +11,7 @@ Item {
     property alias textColor: timeline.textColor
     property alias chunkColor: timeline.chunkColor
     property alias chunkBarHeight: timeline.chunkBarHeight
+    property alias textY: timeline.textY
     property alias stickToEnd: timeline.stickToEnd
     property alias font: timeline.font
     property alias chunkProvider: timeline.chunkProvider

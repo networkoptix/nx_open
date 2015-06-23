@@ -24,6 +24,7 @@ class QnTimeline : public QQuickItem {
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
 
     Q_PROPERTY(int chunkBarHeight READ chunkBarHeight WRITE setChunkBarHeight NOTIFY chunkBarHeightChanged)
+    Q_PROPERTY(int textY READ textY WRITE setTextY NOTIFY textYChanged)
 
     Q_PROPERTY(QnCameraChunkProvider* chunkProvider READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
 
@@ -44,6 +45,9 @@ public:
 
     int chunkBarHeight() const;
     void setChunkBarHeight(int chunkBarHeight);
+
+    int textY() const;
+    void setTextY(int textY);
 
     qint64 windowStart() const;
     void setWindowStart(qint64 windowStart);
@@ -113,6 +117,7 @@ signals:
     void fontChanged();
 
     void chunkBarHeightChanged();
+    void textYChanged();
 
     void chunkProviderChanged();
 
