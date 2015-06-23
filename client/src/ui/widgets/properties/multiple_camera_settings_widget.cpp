@@ -330,6 +330,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->cameraScheduleWidget->setChangesDisabled(true);
             ui->cameraScheduleWidget->setMotionAvailable(false);
             ui->analogGroupBox->setVisible(false);
+            ui->imageControlGroupBox->setEnabled(true);
         } else {
             /* Aggregate camera parameters first. */
             ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
@@ -355,15 +356,20 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             bool firstCamera = true; 
             QSet<QString> logins, passwords;
             bool audioSupported = false;
+            bool audioForced = false;
             bool sameArOverride = true;
             qreal arOverride;
             QString rotFirst;
             bool sameRotation = true;
-            for (const QnVirtualCameraResourcePtr &camera: m_cameras) {
+            bool hasVideo = true;
+            for (const QnVirtualCameraResourcePtr &camera: m_cameras) 
+            {
+                hasVideo &= camera->hasVideo();
                 logins.insert(camera->getAuth().user());
                 passwords.insert(camera->getAuth().password());
 
                 audioSupported |= camera->isAudioSupported();
+                audioForced |= camera->isAudioForced();
 
                 if (camera->isDtsBased()) {
                     ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
@@ -392,7 +398,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                 firstCamera = false;
             }
 
-            ui->enableAudioCheckBox->setEnabled(audioSupported);
+            ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);
             ui->arOverrideCheckBox->setTristate(!sameArOverride);
             if (sameArOverride) {
                 ui->arOverrideCheckBox->setChecked(!qFuzzyIsNull(arOverride));
@@ -509,6 +515,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                 ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
             }
             m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
+            ui->imageControlGroupBox->setEnabled(hasVideo);
         }
 
         ui->cameraScheduleWidget->setCameras(m_cameras);

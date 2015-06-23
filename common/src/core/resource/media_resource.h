@@ -41,6 +41,7 @@ public:
     // resource can use DataProvider for addition info (optional)
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
+    virtual bool hasVideo() const;
 
     virtual const QnResource* toResource() const = 0;
     virtual QnResource* toResource() = 0;

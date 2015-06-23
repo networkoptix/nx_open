@@ -55,7 +55,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="arGroupBox">
+        <widget class="QGroupBox" name="imageControlGroupBox">
          <property name="title">
           <string>Image Control</string>
          </property>
@@ -125,6 +125,16 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="fisheyeCheckBox">
+            <property name="text">
+             <string>This is a fish-eye lens camera</string>
+            </property>
+            <property name="tristate">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -178,16 +188,6 @@
         <widget class="QCheckBox" name="enableAudioCheckBox">
          <property name="text">
           <string>Enable audio</string>
-         </property>
-         <property name="tristate">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="fisheyeCheckBox">
-         <property name="text">
-          <string>This is a fish-eye lens camera</string>
          </property>
          <property name="tristate">
           <bool>true</bool>

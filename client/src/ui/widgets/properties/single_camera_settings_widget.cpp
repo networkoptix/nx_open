@@ -269,6 +269,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         if (!name.isEmpty())
             m_camera->setCameraName(name);  //TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
+
         //m_camera->setUrl(ui->ipAddressEdit->text());
         QAuthenticator loginEditAuth;
         loginEditAuth.setUser( ui->loginEdit->text().trimmed() );
@@ -364,14 +365,17 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
         ui->analogGroupBox->setVisible(false);
+        ui->imageControlGroupBox->setEnabled(true);
     } else {
+        ui->imageControlGroupBox->setEnabled(m_camera->hasVideo());
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
         ui->vendorEdit->setText(m_camera->getVendor());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
+
         ui->fisheyeCheckBox->setChecked(m_camera->getDewarpingParams().enabled);
-        ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
+        ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported() && !m_camera->isAudioForced());
 
         /* There are fisheye cameras on the market that report themselves as PTZ.
          * We still want to be able to toggle them as fisheye instead, 
@@ -645,7 +649,7 @@ void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
     if (!m_camera)
         return;
     
-    ui->cameraScheduleWidget->setRecordingParamsAvailability(!m_camera->hasParam(lit("noRecordingParams")));
+    ui->cameraScheduleWidget->setRecordingParamsAvailability(m_camera->hasVideo() && !m_camera->hasParam(lit("noRecordingParams")));
 }
 
 void QnSingleCameraSettingsWidget::updateMotionCapabilities() {

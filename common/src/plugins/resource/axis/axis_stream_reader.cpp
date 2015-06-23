@@ -85,153 +85,160 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         profileSufix = QString::number(res->getChannelNumAxis());
     }
 
-    static const QByteArray OLD_PRIMARY_STREAM_PROFILE_NAME = "netOptixPrimary";
-    static const QByteArray OLD_SECONDARY_STREAM_PROFILE_NAME = "netOptixSecondary";
-
-    QByteArray oldProfileName;
-
-    if (role == Qn::CR_LiveVideo)
+    if (res->hasVideo())
     {
-        profileName = lit("%1Primary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
-        profileDescription = QString(lit("%1 Primary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
-        oldProfileName = OLD_PRIMARY_STREAM_PROFILE_NAME;
-    }
-    else {
-        profileName = lit("%1Secondary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
-        profileDescription = QString(lit("%1 Secondary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
-        oldProfileName = OLD_SECONDARY_STREAM_PROFILE_NAME;
-    }
+        static const QByteArray OLD_PRIMARY_STREAM_PROFILE_NAME = "netOptixPrimary";
+        static const QByteArray OLD_SECONDARY_STREAM_PROFILE_NAME = "netOptixSecondary";
 
+        QByteArray oldProfileName;
 
-    //================ profile setup ======================== 
-    
-    // -------------- check if profile already exists
-    std::set<QByteArray> profilesToRemove;
-    for (int i = 0; i < 3; ++i)
-    {
-        CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
-        const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=list&group=StreamProfile");
-        CLHttpStatus status = http.doGET(requestPath);
-
-        if (status != CL_HTTP_SUCCESS)
+        if (role == Qn::CR_LiveVideo)
         {
+            profileName = lit("%1Primary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
+            profileDescription = QString(lit("%1 Primary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
+            oldProfileName = OLD_PRIMARY_STREAM_PROFILE_NAME;
+        }
+        else {
+            profileName = lit("%1Secondary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
+            profileDescription = QString(lit("%1 Secondary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
+            oldProfileName = OLD_SECONDARY_STREAM_PROFILE_NAME;
+        }
+
+
+        //================ profile setup ======================== 
+    
+        // -------------- check if profile already exists
+
+        std::set<QByteArray> profilesToRemove;
+        for (int i = 0; i < 3; ++i)
+        {
+            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
+            const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=list&group=StreamProfile");
+            CLHttpStatus status = http.doGET(requestPath);
+
+            if (status != CL_HTTP_SUCCESS)
+            {
+                if (status == CL_HTTP_AUTH_REQUIRED)
+                {
+                    getResource()->setStatus(Qn::Unauthorized);
+                    return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
+                }
+                else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
+                {
+                    NX_LOG( lit("Axis camera must be have old firmware!!!!  ip = %1").arg(res->getHostAddress()) , cl_logERROR);
+                    m_oldFirmwareWarned = true;
+                    return CameraDiagnostics::RequestFailedResult( requestPath, QLatin1String("old firmware") );
+                }
+
+                return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
+            }
+
+            QByteArray body;
+            http.readAll(body);
+            if (body.isEmpty()) {
+                msleep(rand() % 50);
+                continue; // sometime axis returns empty profiles list
+            }
+        
+            QList<QByteArray> lines = body.split('\n');
+            for (int i = 0; i < lines.size(); ++i)
+            {
+                if (lines[i].endsWith(QByteArray("Name=") +profileName))
+                {
+                    action = "update"; // profile already exists, so update instead of add
+                    QList<QByteArray> params = lines[i].split('.');
+                    if (params.size() >= 2)
+                        profileNumber = params[params.size()-2];
+                }
+                else if( lines[i].endsWith(QByteArray("Name=") + oldProfileName) )
+                {
+                    //removing this profile
+                    auto tokens = lines[i].split('.');
+                    if( tokens.size() > 3 )
+                        profilesToRemove.insert( tokens[2] );
+                }
+            }
+        }
+
+        //removing old profiles
+        for( const auto& profileToRemove: profilesToRemove )
+        {
+            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
+            const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=remove&group=root.StreamProfile."+profileToRemove);
+            const int httpStatus = http.doGET( requestPath );    //ignoring error code
+            if( httpStatus != CL_HTTP_SUCCESS )
+            {
+                NX_LOG( lit("Failed to remove old Axis profile %1 on camera %2").
+                    arg(QLatin1String(profileToRemove)).arg(res->getHostAddress()), cl_logDEBUG1 );
+            }
+        }
+
+        // ------------------- determine stream parameters ----------------------------
+        float fps = params.fps;
+        const QnPlAxisResource::AxisResolution& resolution = res->getResolution(
+            role == Qn::CR_LiveVideo
+                ? PRIMARY_ENCODER_INDEX
+                : SECONDARY_ENCODER_INDEX );
+
+        if (resolution.size.isEmpty()) 
+            qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
+        Qn::StreamQuality quality = params.quality;
+
+        QByteArray paramsStr;
+        paramsStr.append("videocodec=h264");
+        if (!resolution.size.isEmpty())
+            paramsStr.append("&resolution=").append(resolution.resolutionStr);
+        //paramsStr.append("&text=0"); // do not use onscreen text message (fps e.t.c)
+        paramsStr.append("&fps=").append(QByteArray::number(fps));
+        if (quality != Qn::QualityPreSet)
+            paramsStr.append("&compression=").append(QByteArray::number(toAxisQuality(quality)));
+        paramsStr.append("&audio=").append(res->isAudioEnabled() ? "1" : "0");
+
+        // --------------- update or insert new profile ----------------------
+    
+        if (action == QByteArray("add") || isCameraControlRequired)
+        {
+            QString streamProfile;
+            QTextStream str(&streamProfile);
+
+            str << "/axis-cgi/param.cgi?action=" << action;
+            str << "&template=streamprofile";
+            str << "&group=StreamProfile";
+            str << "&StreamProfile." << profileNumber << ".Name=" << profileName;
+            str << "&StreamProfile." << profileNumber << ".Description=" << QUrl::toPercentEncoding(QLatin1String(profileDescription));
+            str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(QLatin1String(paramsStr));
+            str.flush();
+
+            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
+            CLHttpStatus status = http.doGET(streamProfile);
+
             if (status == CL_HTTP_AUTH_REQUIRED)
             {
                 getResource()->setStatus(Qn::Unauthorized);
                 return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
             }
-            else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
-            {
-                NX_LOG( lit("Axis camera must be have old firmware!!!!  ip = %1").arg(res->getHostAddress()) , cl_logERROR);
-                m_oldFirmwareWarned = true;
-                return CameraDiagnostics::RequestFailedResult( requestPath, QLatin1String("old firmware") );
-            }
+            else if (status != CL_HTTP_SUCCESS)
+                return CameraDiagnostics::RequestFailedResult(CameraDiagnostics::RequestFailedResult(streamProfile, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status))));
 
-            return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
-        }
-
-        QByteArray body;
-        http.readAll(body);
-        if (body.isEmpty()) {
-            msleep(rand() % 50);
-            continue; // sometime axis returns empty profiles list
-        }
-        
-        QList<QByteArray> lines = body.split('\n');
-        for (int i = 0; i < lines.size(); ++i)
-        {
-            if (lines[i].endsWith(QByteArray("Name=") +profileName))
+            if (role != Qn::CR_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
             {
-                action = "update"; // profile already exists, so update instead of add
-                QList<QByteArray> params = lines[i].split('.');
-                if (params.size() >= 2)
-                    profileNumber = params[params.size()-2];
-            }
-            else if( lines[i].endsWith(QByteArray("Name=") + oldProfileName) )
-            {
-                //removing this profile
-                auto tokens = lines[i].split('.');
-                if( tokens.size() > 3 )
-                    profilesToRemove.insert( tokens[2] );
+                res->setMotionMaskPhysical(0);
             }
         }
     }
-
-    //removing old profiles
-    for( const auto& profileToRemove: profilesToRemove )
-    {
-        CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
-        const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=remove&group=root.StreamProfile."+profileToRemove);
-        const int httpStatus = http.doGET( requestPath );    //ignoring error code
-        if( httpStatus != CL_HTTP_SUCCESS )
-        {
-            NX_LOG( lit("Failed to remove old Axis profile %1 on camera %2").
-                arg(QLatin1String(profileToRemove)).arg(res->getHostAddress()), cl_logDEBUG1 );
-        }
-    }
-
-    // ------------------- determine stream parameters ----------------------------
-    float fps = params.fps;
-    const QnPlAxisResource::AxisResolution& resolution = res->getResolution(
-        role == Qn::CR_LiveVideo
-            ? PRIMARY_ENCODER_INDEX
-            : SECONDARY_ENCODER_INDEX );
-
-    if (resolution.size.isEmpty()) 
-        qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
-    Qn::StreamQuality quality = params.quality;
-
-    QByteArray paramsStr;
-    paramsStr.append("videocodec=h264");
-    if (!resolution.size.isEmpty())
-        paramsStr.append("&resolution=").append(resolution.resolutionStr);
-    //paramsStr.append("&text=0"); // do not use onscreen text message (fps e.t.c)
-    paramsStr.append("&fps=").append(QByteArray::number(fps));
-    if (quality != Qn::QualityPreSet)
-        paramsStr.append("&compression=").append(QByteArray::number(toAxisQuality(quality)));
-    paramsStr.append("&audio=").append(res->isAudioEnabled() ? "1" : "0");
-
-    // --------------- update or insert new profile ----------------------
-    
-    if (action == QByteArray("add") || isCameraControlRequired)
-    {
-        QString streamProfile;
-        QTextStream str(&streamProfile);
-
-        str << "/axis-cgi/param.cgi?action=" << action;
-        str << "&template=streamprofile";
-        str << "&group=StreamProfile";
-        str << "&StreamProfile." << profileNumber << ".Name=" << profileName;
-        str << "&StreamProfile." << profileNumber << ".Description=" << QUrl::toPercentEncoding(QLatin1String(profileDescription));
-        str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(QLatin1String(paramsStr));
-        str.flush();
-
-        CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
-        CLHttpStatus status = http.doGET(streamProfile);
-
-        if (status == CL_HTTP_AUTH_REQUIRED)
-        {
-            getResource()->setStatus(Qn::Unauthorized);
-            return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
-        }
-        else if (status != CL_HTTP_SUCCESS)
-            return CameraDiagnostics::RequestFailedResult(CameraDiagnostics::RequestFailedResult(streamProfile, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status))));
-
-        if (role != Qn::CR_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
-        {
-            res->setMotionMaskPhysical(0);
-        }
-    }
-
     QString request;
     QTextStream stream(&request);
     //stream << "rtsp://" << QUrl(m_resource->getUrl()).host() << ":" << (QUrl(m_resource->getUrl()).port()+1) << "/"; // for port forwarding purpose
-    stream << "axis-media/media.amp?streamprofile=" << profileName;
-
+    stream << "axis-media/media.amp";
+    QByteArray paramsSeparator = "?";
+    if (!profileName.isEmpty()) {
+        stream << paramsSeparator << "streamprofile=" << profileName;
+        paramsSeparator = "&";
+    }
 
     if (channels > 1)
     {
-        stream << "&camera=" << res->getChannelNumAxis();
+        stream << paramsSeparator << "camera=" << res->getChannelNumAxis();
     }
 
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(request).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);

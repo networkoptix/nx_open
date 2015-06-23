@@ -44,6 +44,7 @@ private:
         UnauthorizedText,
         UnauthorizedSubText,
         LoadingText,
+        NoVideoStreamText,
         AnalogLicenseText,
         VideowallLicenseText,
         TextCount

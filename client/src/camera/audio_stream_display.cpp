@@ -50,6 +50,14 @@ int QnAudioStreamDisplay::msInBuffer() const
     return rez;
 }
 
+qint64 QnAudioStreamDisplay::getCurrentTime() const
+{
+    if (m_lastAudioTime == AV_NOPTS_VALUE)
+        return AV_NOPTS_VALUE;
+    else
+        return m_lastAudioTime - msInBuffer();
+}
+
 void QnAudioStreamDisplay::suspend()
 {
     QMutexLocker lock(&m_guiSync);
@@ -95,6 +103,7 @@ void QnAudioStreamDisplay::clearAudioBuffer()
 
     clearDeviceBuffer();
     m_tooFewDataDetected = true;
+    m_lastAudioTime = AV_NOPTS_VALUE;
 }
 
 void QnAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 minTime)
@@ -165,6 +174,7 @@ bool QnAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
 
 void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
 {
+    m_lastAudioTime = data->timestamp;
     static const int MAX_BUFFER_LEN = 3000;
     if (data == 0 && !m_audioSound) // do not need to check audio device in case of data=0 and no audio device
         return;
@@ -204,6 +214,11 @@ void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     //cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
     //cl_log.log("ms in ring buff = ", (int)ms_from_size(m_audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
     /**/
+}
+
+bool QnAudioStreamDisplay::isPlaying() const
+{
+    return !m_tooFewDataDetected;
 }
 
 void QnAudioStreamDisplay::playCurrentBuffer()

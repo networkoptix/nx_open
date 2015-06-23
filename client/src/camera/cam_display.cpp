@@ -1262,7 +1262,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         {
             if (m_audioDisplay->msInBuffer() > m_audioBufferSize)
             {
-                bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled();
+                bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && m_resource->hasVideo();
                 if (m_isRealTimeSource || useSync)
                     return true; // skip data
                 else
@@ -1270,6 +1270,12 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             }
 
             m_audioDisplay->putData(ad, nextVideoImageTime(0));
+            if (!m_resource->hasVideo() && m_audioDisplay->isPlaying()) 
+            {
+                m_buffering = 0;
+                if (m_extTimeSrc)
+                    m_extTimeSrc->onBufferingFinished(this);
+            }
             m_hadAudio = true;
         }
         else if (m_hadAudio)
@@ -1642,6 +1648,12 @@ qint64 QnCamDisplay::getDisplayedMin() const
 
 qint64 QnCamDisplay::getCurrentTime() const 
 {
+    if (!m_resource->hasVideo()) {
+        if (m_playAudio)
+            return m_audioDisplay->getCurrentTime();
+        else
+            return m_lastAudioPacketTime;
+    }
     if (m_display[0] && m_display[0]->isTimeBlocked())
         return m_display[0]->getTimestampOfNextFrameToRender();
     else if (m_speed >= 0)

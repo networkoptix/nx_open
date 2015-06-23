@@ -1071,7 +1071,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
             return Qn::NoDataOverlay;
         QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
-            return base_type::calculateStatusOverlay(Qn::Online);
+            return base_type::calculateStatusOverlay(Qn::Online, m_resource && m_resource->hasVideo());
         else
             return Qn::NoDataOverlay;
     } else if (m_display->isPaused()) {
@@ -1080,7 +1080,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         else
             return Qn::EmptyOverlay;
     } else {
-        return base_type::calculateStatusOverlay(Qn::Online);
+        return base_type::calculateStatusOverlay(Qn::Online, m_resource && m_resource->hasVideo());
     }
 }
 

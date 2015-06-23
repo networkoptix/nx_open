@@ -63,7 +63,8 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
     m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
     m_staticTexts[LoadingText] = tr("Loading...");
-
+    m_staticTexts[NoVideoStreamText] = tr("No video stream");
+    
     for(int i = 0; i < m_staticTexts.size(); i++) {
         m_staticTexts[i].setPerformanceHint(QStaticText::AggressiveCaching);
         m_staticTexts[i].setTextOption(QTextOption(Qt::AlignCenter));
@@ -235,6 +236,9 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
                 paintFlashingText(painter, m_staticTexts[VideowallLicenseText], 0.035, QPointF(0.0, 0.06 * i));
             break;
         }
+    case Qn::NoVideoDataOverlay:
+        paintFlashingText(painter, m_staticTexts[NoVideoStreamText], 0.125);
+        break;
     default:
         break;
     }

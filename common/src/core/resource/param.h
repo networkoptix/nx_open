@@ -40,6 +40,8 @@ namespace Qn
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
     static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
+    static const QString IS_AUDIO_FORCED_PARAM_NAME = lit("forcedAudioStream");
+	static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
 
     /* Whether statistics gathering is allowed on the current server. */
     static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");

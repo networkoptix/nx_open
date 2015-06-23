@@ -135,6 +135,12 @@ QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractSt
     return audioLayout;
 }
 
+bool QnMediaResource::hasVideo() const
+{
+    return toResource()->getProperty(Qn::VIDEO_DISABLED_PARAM_NAME).toInt() == 0;
+}
+
+
 void QnMediaResource::initMediaResource()
 {
     toResource()->addFlags(Qn::media);

@@ -157,6 +157,7 @@ public:
     bool isScheduleDisabled() const;
 
     bool isAudioEnabled() const;
+    bool isAudioForced() const;
     void setAudioEnabled(bool value);
 
     bool isAdvancedWorking() const;

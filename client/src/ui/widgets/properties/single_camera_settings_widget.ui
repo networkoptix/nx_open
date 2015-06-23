@@ -271,6 +271,13 @@
             </item>
            </layout>
           </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="fisheyeCheckBox">
+            <property name="text">
+             <string>This is a fish-eye lens camera</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -321,13 +328,6 @@
         <widget class="QCheckBox" name="enableAudioCheckBox">
          <property name="text">
           <string>Enable audio</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="fisheyeCheckBox">
-         <property name="text">
-          <string>This is a fish-eye lens camera</string>
          </property>
         </widget>
        </item>

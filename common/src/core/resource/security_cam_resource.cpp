@@ -673,7 +673,15 @@ void QnSecurityCamResource::setAudioEnabled(bool enabled) {
     (*userAttributesLock)->audioEnabled = enabled;
 }
 
-bool QnSecurityCamResource::isAudioEnabled() const {
+bool QnSecurityCamResource::isAudioForced() const
+{
+    return getProperty(Qn::IS_AUDIO_FORCED_PARAM_NAME).toInt() > 0;
+}
+
+bool QnSecurityCamResource::isAudioEnabled() const 
+{
+    if (isAudioForced())
+        return true;
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     return (*userAttributesLock)->audioEnabled;
 }
