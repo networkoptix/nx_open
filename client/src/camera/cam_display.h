@@ -65,6 +65,8 @@ public:
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
     bool display(QnCompressedVideoDataPtr vd, bool sleep, float speed);
+    bool doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed);
+    bool isAudioBuffering() const;
     void playAudio(bool play);
     void setSpeed(float speed);
     float getSpeed() const;
@@ -151,7 +153,7 @@ protected:
     bool isAudioHoleDetected(QnCompressedVideoDataPtr vd);
     void afterJump(QnAbstractMediaDataPtr media);
     void processNewSpeed(float speed);
-    bool useSync(QnCompressedVideoDataPtr vd);
+    bool useSync(QnConstAbstractMediaDataPtr md);
     int getBufferingMask();
     void pauseAudio();
 private:
