@@ -8,7 +8,6 @@
 
 #include "abstract_accurate_time_fetcher.h"
 
-#include <atomic>
 #include <memory>
 #include <vector>
 
@@ -60,7 +59,7 @@ private:
     qint64 m_maxDeviationMillis;
     std::vector<std::unique_ptr<TimeFetcherContext>> m_timeFetchers;
     mutable QMutex m_mutex;
-    std::atomic<size_t> m_awaitedAnswers;
+    size_t m_awaitedAnswers;
     bool m_terminated;
     std::function<void(qint64, SystemError::ErrorCode)> m_handlerFunc;
 
