@@ -9,6 +9,7 @@
 #include "utils/common/util.h"
 #include "utils/media/externaltimesource.h"
 #include "utils/common/synctime.h"
+#include "core/resource/media_resource.h"
 
 
 // used in reverse mode.
@@ -752,8 +753,17 @@ begin_label:
     if (videoData && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && m_ignoreSkippingFrame)
         goto begin_label;
 
-    if (videoData && videoData->context) 
-        m_codecContext = videoData->context;
+    auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
+    if (mediaRes && !mediaRes->hasVideo()) 
+    {
+        if (m_currentData && m_currentData->channelNumber == 0)
+            m_codecContext = m_currentData->context;
+    }
+    else {
+        if (videoData && videoData->context) 
+            m_codecContext = videoData->context;
+    }
+    
 
 
     if (reverseMode && !delegateForNegativeSpeed)

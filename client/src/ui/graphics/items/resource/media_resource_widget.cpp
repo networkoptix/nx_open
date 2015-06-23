@@ -929,7 +929,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
-    if (!(m_resource->toResource()->flags() & Qn::local))
+    if (m_resource->hasVideo() && !(m_resource->toResource()->flags() & Qn::local))
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
 #endif
 
@@ -941,8 +941,12 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
         if (channel >= channelCount())
             channel = 0;
-
-        qint64 utcTime = m_renderer->getTimestampOfNextFrameToRender(channel) / 1000;
+        
+        qint64 utcTime;
+        if (m_resource->hasVideo())
+            utcTime = m_renderer->getTimestampOfNextFrameToRender(channel) / 1000;
+        else
+            utcTime = display()->camDisplay()->getCurrentTime() / 1000;
         if(qnSettings->timeMode() == Qn::ServerTimeMode)
             utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
 
@@ -951,11 +955,17 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             : QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"));
         
     }
-
-    return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
-        .arg(size.width())
-        .arg(size.height())
-        .arg(fps, 0, 'f', 2)
+    if (m_resource->hasVideo())
+        return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
+            .arg(size.width())
+            .arg(size.height())
+            .arg(fps, 0, 'f', 2)
+            .arg(mbps, 0, 'f', 2)
+            .arg(codecString)
+            .arg(hqLqString)
+            .arg(timeString);
+    else
+        return lit("@ %1Mbps%2 %3\t%4")
         .arg(mbps, 0, 'f', 2)
         .arg(codecString)
         .arg(hqLqString)
