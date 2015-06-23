@@ -169,13 +169,13 @@ QnPage {
                 endDate: new Date(Date.now() + 5 * 60 * 1000)
                 startDate: new Date(Date.now() - 5 * 60 * 1000)
 
-                textColor: "#484848"
+                textColor: "#8091A7B2"
                 chunkColor: "#589900"
 
                 stickToEnd: true
 
                 font.pixelSize: dp(18)
-                font.weight: Font.Bold
+                font.weight: Font.Light
 
                 chunkBarHeight: dp(36)
                 textY: (height - chunkBarHeight) / 2
@@ -186,6 +186,18 @@ QnPage {
                 autoPlay: !stickToEnd && video.__playing
 
                 onMoveFinished: videoPlayer.alignToChunk(positionDate)
+
+                Rectangle {
+                    z: -1
+                    anchors.fill: parent
+                    anchors.bottomMargin: timeline.chunkBarHeight
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: QnTheme.transparent(QnTheme.windowBackground, 0.0) }
+                        GradientStop { position: 0.1; color: QnTheme.transparent(QnTheme.windowBackground, 0.0) }
+                        GradientStop { position: 0.5; color: QnTheme.transparent(QnTheme.windowBackground, 0.1) }
+                        GradientStop { position: 1.0; color: QnTheme.transparent(QnTheme.windowBackground, 0.3) }
+                    }
+                }
             }
 
             Rectangle {
@@ -244,24 +256,24 @@ QnPage {
                 }
             }
 
-            Rectangle {
-                id: timeLabelBackground
+//            Rectangle {
+//                id: timeLabelBackground
 
-                property color baseColor: QnTheme.windowBackground
+//                property color baseColor: QnTheme.windowBackground
 
-                anchors.centerIn: timeline
-                anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
-                width: timeline.height - timeline.chunkBarHeight
-                height: timeLiveLabel.width + dp(64)
+//                anchors.centerIn: timeline
+//                anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
+//                width: timeline.height - timeline.chunkBarHeight
+//                height: timeLiveLabel.width + dp(64)
 
-                rotation: 90
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: QnTheme.transparent(timeLabelBackground.baseColor, 0) }
-                    GradientStop { position: 0.2; color: timeLabelBackground.baseColor }
-                    GradientStop { position: 0.8; color: timeLabelBackground.baseColor }
-                    GradientStop { position: 1.0; color: QnTheme.transparent(timeLabelBackground.baseColor, 0) }
-                }
-            }
+//                rotation: 90
+//                gradient: Gradient {
+//                    GradientStop { position: 0.0; color: QnTheme.transparent(timeLabelBackground.baseColor, 0) }
+//                    GradientStop { position: 0.2; color: timeLabelBackground.baseColor }
+//                    GradientStop { position: 0.8; color: timeLabelBackground.baseColor }
+//                    GradientStop { position: 1.0; color: QnTheme.transparent(timeLabelBackground.baseColor, 0) }
+//                }
+//            }
 
             Text {
                 id: dateLabel
