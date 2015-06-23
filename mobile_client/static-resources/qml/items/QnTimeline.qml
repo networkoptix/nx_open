@@ -59,15 +59,19 @@ Item {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton
 
-            onPressed: pressX = mouseX
+            onPressed: {
+                pressX = mouseX
+            }
             onPositionChanged: {
                 if (pressX != -1 && Math.abs(pressX - mouseX) > drag.threshold) {
+                    preventStealing = true
                     timeline.startDrag(pressX)
                     pressX = -1
                 }
                 timeline.updateDrag(mouse.x)
             }
             onReleased: {
+                preventStealing = false
                 pressX = -1
                 timeline.finishDrag(mouse.x)
                 root.dragFinished()
