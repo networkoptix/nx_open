@@ -122,7 +122,7 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
-    QSGGeometryNode *updateTextNode(QSGGeometryNode *ticksNode);
+    QSGNode *updateTextNode(QSGNode *textRootNode);
     QSGGeometryNode *updateChunksNode(QSGGeometryNode *chunksNode);
 
 private:

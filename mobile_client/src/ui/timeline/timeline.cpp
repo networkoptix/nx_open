@@ -573,7 +573,7 @@ QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeD
         node->appendChildNode(updateTextNode(nullptr));
         node->appendChildNode(updateChunksNode(nullptr));
     } else {
-        updateTextNode(static_cast<QSGGeometryNode*>(node->childAtIndex(0)));
+        updateTextNode(node->childAtIndex(0));
         updateChunksNode(static_cast<QSGGeometryNode*>(node->childAtIndex(1)));
     }
 
@@ -643,7 +643,7 @@ void QnTimeline::setChunkBarHeight(int chunkBarHeight) {
     update();
 }
 
-QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
+QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
     int zoomIndex = cFloor(d->zoomLevel);
     const QnTimelineZoomLevel &zoomLevel = d->zoomLevels[zoomIndex];
 
@@ -664,7 +664,9 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
     qint64 tick = windowStartAligned;
     qreal xStart = d->timeToPixelPos(tick + (windowStart() - d->adjustTime(windowStart())));
 
+    QSGGeometryNode *textNode;
     QSGGeometry *textGeometry;
+    QSGOpacityNode *textOpacityNode;
     QSGGeometryNode *lowerTextNode;
     QSGGeometry *lowerTextGeometry;
     QSGOpacityNode *lowerTextOpacityNode;
@@ -672,7 +674,11 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
     QSGGeometry *ticksGeometry = nullptr;
     QSGGeometryNode *ticksNode = nullptr;
 
-    if (!textNode) {
+    if (!rootNode) {
+        rootNode = new QSGNode();
+
+        textOpacityNode = new QSGOpacityNode();
+
         textNode = new QSGGeometryNode();
 
         textGeometry = new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 0);
@@ -696,8 +702,11 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
         lowerTextNode->setGeometry(lowerTextGeometry);
         lowerTextNode->setFlag(QSGNode::OwnsGeometry);
         lowerTextNode->setMaterial(textMaterial);
+
+        textOpacityNode->appendChildNode(textNode);
         lowerTextOpacityNode->appendChildNode(lowerTextNode);
-        textNode->appendChildNode(lowerTextOpacityNode);
+        rootNode->appendChildNode(textOpacityNode);
+        rootNode->appendChildNode(lowerTextOpacityNode);
 
         if (drawDebugTicks) {
             ticksNode = new QSGGeometryNode();
@@ -712,14 +721,16 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
             ticksNode->setFlag(QSGNode::OwnsMaterial);
             ticksNode->setMaterial(ticksMaterial);
             ticksNode->setFlag(QSGNode::OwnsMaterial);
-            textNode->appendChildNode(ticksNode);
+            rootNode->appendChildNode(ticksNode);
         }
     } else {
         d->prevZoomIndex = zoomIndex;
-        textNode = static_cast<QSGGeometryNode*>(textNode);
-        textGeometry = textNode->geometry();
-        lowerTextOpacityNode = static_cast<QSGOpacityNode*>(textNode->childAtIndex(0));
+        textOpacityNode = static_cast<QSGOpacityNode*>(rootNode->childAtIndex(0));
+        lowerTextOpacityNode = static_cast<QSGOpacityNode*>(rootNode->childAtIndex(1));
+        textNode = static_cast<QSGGeometryNode*>(textOpacityNode->childAtIndex(0));
         lowerTextNode = static_cast<QSGGeometryNode*>(lowerTextOpacityNode->childAtIndex(0));
+
+        textGeometry = textNode->geometry();
         lowerTextGeometry = lowerTextNode->geometry();
 
         QSGTextureMaterial *textMaterial = static_cast<QSGTextureMaterial*>(textNode->material());
@@ -729,7 +740,7 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
         }
 
         if (drawDebugTicks) {
-            ticksNode = static_cast<QSGGeometryNode*>(textNode->childAtIndex(1));
+            ticksNode = static_cast<QSGGeometryNode*>(rootNode->childAtIndex(2));
             ticksGeometry = ticksNode->geometry();
             ticksGeometry->allocate(tickCount * 2);
             QSGFlatColorMaterial *ticksMaterial = static_cast<QSGFlatColorMaterial*>(ticksNode->material());
@@ -763,8 +774,8 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
 
     textMarkLevel = cFloor(d->textLevel);
 
-    qreal lowerTextOpacity = 1.0 - (d->textLevel - textMarkLevel);
-    lowerTextOpacityNode->setOpacity(lowerTextOpacity);
+    textOpacityNode->setOpacity(d->textLevel - textMarkLevel);
+    lowerTextOpacityNode->setOpacity(1.0 - textOpacityNode->opacity());
 
     int textCount = 0;
     int lowerTextCount = 0;
@@ -777,7 +788,6 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
 
     for (int i = 0; i < tickCount; ++i) {
         int tickLevel = d->tickLevel(tick);
-        int *count = textMarkLevel == tickLevel ? &lowerTextCount : &textCount;
 
         qreal x;
         if (zoomLevel.isMonotonic())
@@ -791,10 +801,18 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
             info.x = x;
             info.zoomIndex = tickLevel;
             markedTicks.append(info);
-            QString baseValue = d->zoomLevels[tickLevel].baseValue(tick);
-            *count += (!baseValue.isEmpty() && !baseValue[0].isDigit()) ? 1 : baseValue.size();
+
+            QString baseValue = d->zoomLevels[textMarkLevel].baseValue(tick);
+            lowerTextCount += (!baseValue.isEmpty() && !baseValue[0].isDigit()) ? 1 : baseValue.size();
             if (!d->zoomLevels[tickLevel].suffix().isEmpty())
-                ++(*count);
+                ++(lowerTextCount);
+
+            if (tickLevel > textMarkLevel) {
+                QString baseValue = d->zoomLevels[textMarkLevel + 1].baseValue(tick);
+                textCount += (!baseValue.isEmpty() && !baseValue[0].isDigit()) ? 1 : baseValue.size();
+                if (!d->zoomLevels[tickLevel].suffix().isEmpty())
+                    ++(textCount);
+            }
         }
 
         if (drawDebugTicks) {
@@ -882,7 +900,7 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
     textNode->markDirty(QSGNode::DirtyGeometry);
     lowerTextNode->markDirty(QSGNode::DirtyGeometry);
 
-    return textNode;
+    return rootNode;
 }
 
 QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
