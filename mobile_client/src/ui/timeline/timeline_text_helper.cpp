@@ -5,7 +5,7 @@
 #include <QtCore/QDebug>
 
 namespace {
-    const int textureSize = 512;
+    const int charsPerLine = 12;
 }
 
 class QnTimelineTextHelperPrivate {
@@ -15,11 +15,15 @@ public:
     int lineHeight;
     int digitWidth;
     QHash<QString, QRect> strings;
+    int maxCharWidth;
+    int spaceWidth;
 
     QnTimelineTextHelperPrivate(const QFont &font) :
         fm(font),
         lineHeight(fm.height()),
-        digitWidth(fm.size(Qt::TextSingleLine, lit("0")).width())
+        digitWidth(fm.size(Qt::TextSingleLine, lit("0")).width()),
+        maxCharWidth(fm.size(Qt::TextSingleLine, lit("m")).width()),
+        spaceWidth(fm.size(Qt::TextSingleLine, lit(" ")).width())
     {}
 
     void drawNumbers(QPainter *painter) {
@@ -49,6 +53,11 @@ public:
 QnTimelineTextHelper::QnTimelineTextHelper(const QFont &font, const QColor &color, const QStringList &strings) :
     d(new QnTimelineTextHelperPrivate(font))
 {
+    int textureSize = 128;
+    int desiredSize = charsPerLine * maxCharWidth();
+    while (textureSize < desiredSize)
+        textureSize *= 2;
+
     d->texture = QImage(textureSize, textureSize, QImage::Format_RGBA8888);
     d->texture.fill(Qt::transparent);
 
@@ -103,9 +112,13 @@ QImage QnTimelineTextHelper::texture() const {
 }
 
 int QnTimelineTextHelper::maxCharWidth() const {
-    return d->fm.size(Qt::TextSingleLine, lit("m")).width();
+    return d->maxCharWidth;
 }
 
 int QnTimelineTextHelper::lineHeight() const {
     return d->lineHeight;
+}
+
+int QnTimelineTextHelper::spaceWidth() const {
+    return d->spaceWidth;
 }

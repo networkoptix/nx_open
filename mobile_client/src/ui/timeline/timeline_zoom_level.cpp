@@ -1,6 +1,7 @@
 #include "timeline_zoom_level.h"
 
 QVector<QString> QnTimelineZoomLevel::monthsNames;
+int QnTimelineZoomLevel::maxMonthLength = 0;
 
 bool QnTimelineZoomLevel::testTick(qint64 tick) const {
     if (isMonotonic())
@@ -51,23 +52,6 @@ qint64 QnTimelineZoomLevel::alignTick(qint64 tick) const {
     }
 }
 
-QString QnTimelineZoomLevel::suffix() const {
-    if (!suffixOverride.isEmpty())
-        return suffixOverride;
-    switch (type) {
-    case Milliseconds:
-        return lit("ms");
-    case Seconds:
-        return lit("s");
-    case Minutes:
-        return lit("m");
-    case Hours:
-        return lit("h");
-    default:
-        return QString();
-    }
-}
-
 int QnTimelineZoomLevel::tickCount(qint64 start, qint64 end) const {
     if (start >= end)
         return 1;
@@ -93,57 +77,72 @@ QString QnTimelineZoomLevel::baseValue(qint64 tick) const {
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
     switch (type) {
     case Milliseconds:
-        return dateTime.toString(lit("zzz"));
+        return dateTime.toString(lit("z"));
     case Seconds:
-        return dateTime.toString(lit("ss"));
+        return dateTime.toString(lit("s"));
     case Minutes:
-        return dateTime.toString(lit("mm"));
+        return dateTime.toString(lit("h"));
     case Hours:
         return dateTime.toString(lit("h"));
     case Days:
         return dateTime.toString(lit("d"));
     case Months:
-        return monthsNames[dateTime.date().month() - 1];
+        return QString();
     case Years:
         return dateTime.toString(lit("yyyy"));
     }
     return QString();
 }
 
-int QnTimelineZoomLevel::rectCount() const {
+QString QnTimelineZoomLevel::subValue(qint64 tick) const {
+    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
     switch (type) {
-    case Milliseconds:
-        return 3;
-    case Seconds:
-        return 2;
     case Minutes:
-        return 2;
+        return dateTime.toString(lit("mm"));
     case Hours:
-        return 2;
-    case Days:
-        return 2;
-    case Months:
-        return 2;
-    case Years:
-        return 4;
+        return dateTime.toString(lit("mm"));
+    default:
+        return QString();
     }
-    return 0;
+    return QString();
+}
+
+QString QnTimelineZoomLevel::suffix(qint64 tick) const {
+    if (!suffixOverride.isEmpty())
+        return suffixOverride;
+
+    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
+    switch (type) {
+    case Days:
+        return dateTime.toString(lit("MMMM"));
+    case Months:
+        return monthsNames[dateTime.date().month() - 1];
+    case Milliseconds:
+        return lit("ms");
+    case Seconds:
+        return lit("s");
+    case Minutes:
+    case Hours:
+        return lit(":");
+    default:
+        return QString();
+    }
 }
 
 int QnTimelineZoomLevel::maxTextWidth() const {
     switch (type) {
     case Milliseconds:
-        return 5;
+        return 6;
     case Seconds:
-        return 3;
+        return 4;
     case Minutes:
-        return 3;
+        return 5;
     case Hours:
-        return 3;
+        return 5;
     case Days:
-        return 2;
+        return 3 + maxMonthLength;
     case Months:
-        return 3;
+        return maxMonthLength;
     case Years:
         return 4;
     }

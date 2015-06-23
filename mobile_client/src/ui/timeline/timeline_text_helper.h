@@ -19,6 +19,7 @@ public:
     QImage texture() const;
     int maxCharWidth() const;
     int lineHeight() const;
+    int spaceWidth() const;
 
 private:
     QScopedPointer<QnTimelineTextHelperPrivate> d;

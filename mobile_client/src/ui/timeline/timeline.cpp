@@ -298,6 +298,7 @@ public:
 
     void setStickToEnd(bool stickToEnd);
 
+    void placeDigit(qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D *points);
     int placeText(const MarkInfo &textMark, int textLevel, QSGGeometry::TexturedPoint2D *points);
 };
 
@@ -309,14 +310,25 @@ QnTimeline::QnTimeline(QQuickItem *parent) :
     setAcceptedMouseButtons(Qt::LeftButton);
     connect(this, &QnTimeline::widthChanged, this, [this](){ d->updateZoomLevel(); });
 
-    QnTimelineZoomLevel::monthsNames << tr("Jan") << tr("Feb") << tr("Mar")
-                                     << tr("Apr") << tr("May") << tr("Jun")
-                                     << tr("Jul") << tr("Aug") << tr("Sep")
-                                     << tr("Oct") << tr("Nov") << tr("Dec");
+    QnTimelineZoomLevel::monthsNames << tr("January")   << tr("February")   << tr("March")
+                                     << tr("April")     << tr("May")        << tr("June")
+                                     << tr("July")      << tr("August")     << tr("September")
+                                     << tr("October")   << tr("November")   << tr("December");
 
-    d->suffixList << lit("ms") << lit("s") << lit("m") << lit("h") << lit(":00");
+    QnTimelineZoomLevel::maxMonthLength = 0;
+    for (const QString &month : QnTimelineZoomLevel::monthsNames)
+        QnTimelineZoomLevel::maxMonthLength = qMax(QnTimelineZoomLevel::maxMonthLength, month.size());
+
+    d->suffixList << lit("ms") << lit("s") << lit(":");
     for (const QString &month : QnTimelineZoomLevel::monthsNames)
         d->suffixList.append(month);
+
+    QDate date(2015, 1, 1);
+    for (int i = 0; i < 12; ++i) {
+        d->suffixList.append(date.toString(lit("MMMM")));
+        date = date.addMonths(1);
+    }
+
     d->updateTextHelper();
 }
 
@@ -804,16 +816,14 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
             info.zoomIndex = tickLevel;
             markedTicks.append(info);
 
-            QString baseValue = d->zoomLevels[textMarkLevel].baseValue(tick);
-            lowerTextCount += (!baseValue.isEmpty() && !baseValue[0].isDigit()) ? 1 : baseValue.size();
-            if (!d->zoomLevels[textMarkLevel].suffix().isEmpty())
-                ++lowerTextCount;
+            lowerTextCount += d->zoomLevels[textMarkLevel].baseValue(tick).size();
+            lowerTextCount += d->zoomLevels[textMarkLevel].subValue(tick).size();
+            lowerTextCount += d->zoomLevels[textMarkLevel].suffix(tick).isEmpty() ? 0 : 1;
 
             if (tickLevel > textMarkLevel) {
-                QString baseValue = d->zoomLevels[textMarkLevel + 1].baseValue(tick);
-                textCount += (!baseValue.isEmpty() && !baseValue[0].isDigit()) ? 1 : baseValue.size();
-                if (!d->zoomLevels[textMarkLevel + 1].suffix().isEmpty())
-                    ++textCount;
+                textCount += d->zoomLevels[textMarkLevel + 1].baseValue(tick).size();
+                textCount += d->zoomLevels[textMarkLevel + 1].subValue(tick).size();
+                textCount += d->zoomLevels[textMarkLevel + 1].suffix(tick).isEmpty() ? 0 : 1;
             }
         }
 
@@ -1175,54 +1185,43 @@ void QnTimelinePrivate::setStickToEnd(bool stickToEnd) {
     parent->update();
 }
 
+void QnTimelinePrivate::placeDigit(qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D *points) {
+    QSize digitSize = textHelper->digitSize();
+
+    QRectF texCoord = textHelper->digitCoordinates(digit);
+    points[0].set(x, y, texCoord.left(), texCoord.top());
+    points[1].set(x + digitSize.width(), y, texCoord.right(), texCoord.top());
+    points[2].set(x + digitSize.width(), y + digitSize.height(), texCoord.right(), texCoord.bottom());
+    points[3] = points[0];
+    points[4] = points[2];
+    points[5].set(x, y + digitSize.height(), texCoord.left(), texCoord.bottom());
+}
+
 int QnTimelinePrivate::placeText(const MarkInfo &textMark, int textLevel, QSGGeometry::TexturedPoint2D *points) {
     QString baseValue = zoomLevels[textLevel].baseValue(textMark.tick);
-    QString suffix = zoomLevels[textLevel].suffix();
+    QString subValue = zoomLevels[textLevel].subValue(textMark.tick);
+    QString suffix = zoomLevels[textLevel].suffix(textMark.tick);
     QSize suffixSize = textHelper->stringSize(suffix);
-    QSize valueSize;
-
-    bool isNum = baseValue.isEmpty() || baseValue[0].isDigit();
 
     QSize digitSize = textHelper->digitSize();
 
-    qreal tw = suffixSize.width();
-    if (isNum) {
-        valueSize = digitSize;
-        tw += valueSize.width() * baseValue.size();
-    } else {
-        valueSize = textHelper->stringSize(baseValue);
-        tw += valueSize.width();
-    }
+    qreal tw = digitSize.width() * (baseValue.size() + subValue.size()) + suffixSize.width();
+    if (baseValue.isEmpty())
+        tw += textHelper->spaceWidth() * 2;
 
     qreal x = qFloor(textMark.x - tw / 2);
     qreal y = qFloor((parent->height() - chunkBarHeight - textHelper->lineHeight()) / 2);
     int shift = 0;
 
-    if (isNum) {
-        for (int i = 0; i < baseValue.size(); ++i) {
-            int digit = baseValue.mid(i, 1).toInt();
-            QRectF texCoord = textHelper->digitCoordinates(digit);
-            points[0].set(x, y, texCoord.left(), texCoord.top());
-            points[1].set(x + digitSize.width(), y, texCoord.right(), texCoord.top());
-            points[2].set(x + digitSize.width(), y + digitSize.height(), texCoord.right(), texCoord.bottom());
-            points[3] = points[0];
-            points[4] = points[2];
-            points[5].set(x, y + digitSize.height(), texCoord.left(), texCoord.bottom());
-            points += 6;
-            shift += 6;
-            x += digitSize.width();
-        }
-    } else {
-        QRectF texCoord = textHelper->stringCoordinates(baseValue);
-        points[0].set(x, y, texCoord.left(), texCoord.top());
-        points[1].set(x + valueSize.width(), y, texCoord.right(), texCoord.top());
-        points[2].set(x + valueSize.width(), y + valueSize.height(), texCoord.right(), texCoord.bottom());
-        points[3] = points[0];
-        points[4] = points[2];
-        points[5].set(x, y + valueSize.height(), texCoord.left(), texCoord.bottom());
+    for (int i = 0; i < baseValue.size(); ++i) {
+        placeDigit(x, y, baseValue.mid(i, 1).toInt(), points);
         points += 6;
         shift += 6;
+        x += digitSize.width();
     }
+
+    if (subValue.isEmpty())
+        x += textHelper->spaceWidth();
 
     if (!suffix.isEmpty()) {
         QRectF texCoord = textHelper->stringCoordinates(suffix);
@@ -1232,7 +1231,16 @@ int QnTimelinePrivate::placeText(const MarkInfo &textMark, int textLevel, QSGGeo
         points[3] = points[0];
         points[4] = points[2];
         points[5].set(x, y + suffixSize.height(), texCoord.left(), texCoord.bottom());
+        points += 6;
         shift += 6;
+        x += suffixSize.width();
+    }
+
+    for (int i = 0; i < subValue.size(); ++i) {
+        placeDigit(x, y, subValue.mid(i, 1).toInt(), points);
+        points += 6;
+        shift += 6;
+        x += digitSize.width();
     }
 
     return shift;
