@@ -9,6 +9,8 @@ Item {
     property bool circular: false
     property bool backlight: true
 
+    readonly property alias pressed: mouseArea.pressed
+
     signal clicked(real x, real y)
     signal pressAndHold(real x, real y)
 

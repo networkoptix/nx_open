@@ -193,41 +193,42 @@ QnPage {
                 height: dp(56)
                 anchors.top: timeline.bottom
                 color: "#0d0d0d"
+                clip: true
 
-                Button {
+                QnButton {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-    //                backgroundColor: parent.color
                     text: qsTr("LIVE")
+                    flat: true
+                    iconic: true
                     onClicked: timeline.stickToEnd = true
                     opacity: timeline.stickToEnd ? 0.0 : 1.0
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                 }
-    /*
-                IconButton {
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: "white"
-                    iconName: "action/today"
-                }
 
-                IconButton {
+//                QnIconButton {
+//                    anchors.left: parent.left
+//                    anchors.verticalCenter: parent.verticalCenter
+//                    color: "white"
+//                    iconName: "action/today"
+//                }
+
+                QnIconButton {
                     id: zoomOutButton
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.horizontalCenterOffset: -width / 2
                     anchors.verticalCenter: parent.verticalCenter
-                    color: "white"
-                    iconName: "content/remove"
+                    icon: "qrc:///images/minus.png"
                 }
 
-                IconButton {
+                QnIconButton {
                     id: zoomInButton
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.horizontalCenterOffset: width / 2
                     anchors.verticalCenter: parent.verticalCenter
-                    color: "white"
-                    iconName: "content/add"
+                    icon: "qrc:///images/plus.png"
                 }
+
                 Timer {
                     interval: 100
                     repeat: true
@@ -240,7 +241,6 @@ QnPage {
                             timeline.zoomOut()
                     }
                 }
-    */
             }
 
             Rectangle {

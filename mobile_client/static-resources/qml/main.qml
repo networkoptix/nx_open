@@ -33,6 +33,8 @@ Window {
     QnToolBar {
         id: toolBar
 
+        z: 5.0
+
         QnMenuBackButton {
             id: menuBackButton
 

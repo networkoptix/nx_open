@@ -5,12 +5,16 @@ Item {
 
     property alias icon: image.source
 
+    readonly property alias pressed: materialSurface.pressed
+
     signal clicked()
 
     width: dp(48)
     height: dp(48)
 
     QnMaterialSurface {
+        id: materialSurface
+
         anchors.margins: -4
         onClicked: iconButton.clicked()
         centered: true

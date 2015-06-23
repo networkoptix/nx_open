@@ -7,8 +7,12 @@ Item {
 
     property color color: QnTheme.buttonBackground
     property color textColor: QnTheme.buttonText
+    property bool flat: false
+    property bool iconic: false
 
     property alias text: label.text
+
+    readonly property alias pressed: materialSurface.pressed
 
     signal clicked()
 
@@ -16,6 +20,8 @@ Item {
     width: label.width + dp(24)
 
     Rectangle {
+        id: background
+
         anchors {
             fill: parent
             leftMargin: dp(4)
@@ -24,11 +30,17 @@ Item {
             bottomMargin: dp(6)
         }
 
-        color: button.color
-        radius: dp(2)
+        color: flat ? "transparent" : button.color
+        radius: flat ? 0 : dp(2)
         border.width: 0
 
         QnMaterialSurface {
+            id: materialSurface
+
+            circular: button.iconic
+            clip: !iconic
+            backlight: !iconic
+            centered: iconic
             onClicked: button.clicked()
         }
     }
