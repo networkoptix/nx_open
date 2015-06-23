@@ -1248,10 +1248,12 @@ void QnMain::syncLocalHostRootPasswordWithAdminIfNeeded( const QnUserResourcePtr
                 QnPlatformMonitor::LocalDiskPartition );
 
         //always adding storage in data dir
-        const QString& dataDirStorage = getDataDirectory();
+        if( QnAppServerConnectionFactory::url().scheme() != "file" )
+            return; //not changing password if not in cluster mode
+        const QString& dbPath = QnAppServerConnectionFactory::url().path();
         for( int i = 0; i < partitions.size(); ++i )
         {
-            if( dataDirStorage.startsWith( partitions[i].path ) )
+            if( dbPath.startsWith( partitions[i].path ) )
             {
                 if( partitions[i].devName.indexOf( lit("rootfs") ) != -1 ||
                     partitions[i].devName == lit("/dev/root") )
