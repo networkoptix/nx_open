@@ -37,7 +37,7 @@ private:
 
     bool m_h264;
     bool m_mpeg4;
-
+    QSize m_resolution;
 };
 
 #endif // ENABLE_DLINK
