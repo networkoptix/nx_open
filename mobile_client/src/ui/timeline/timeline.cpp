@@ -297,6 +297,8 @@ public:
     void zoomWindow(qreal factor, int x, qint64 stickyTime = -1);
 
     void setStickToEnd(bool stickToEnd);
+
+    int placeText(const MarkInfo &textMark, int textLevel, QSGGeometry::TexturedPoint2D *points);
 };
 
 QnTimeline::QnTimeline(QQuickItem *parent) :
@@ -804,14 +806,14 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
 
             QString baseValue = d->zoomLevels[textMarkLevel].baseValue(tick);
             lowerTextCount += (!baseValue.isEmpty() && !baseValue[0].isDigit()) ? 1 : baseValue.size();
-            if (!d->zoomLevels[tickLevel].suffix().isEmpty())
-                ++(lowerTextCount);
+            if (!d->zoomLevels[textMarkLevel].suffix().isEmpty())
+                ++lowerTextCount;
 
             if (tickLevel > textMarkLevel) {
                 QString baseValue = d->zoomLevels[textMarkLevel + 1].baseValue(tick);
                 textCount += (!baseValue.isEmpty() && !baseValue[0].isDigit()) ? 1 : baseValue.size();
-                if (!d->zoomLevels[tickLevel].suffix().isEmpty())
-                    ++(textCount);
+                if (!d->zoomLevels[textMarkLevel + 1].suffix().isEmpty())
+                    ++textCount;
             }
         }
 
@@ -830,71 +832,10 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
     lowerTextGeometry->allocate(lowerTextCount * 6);
     QSGGeometry::TexturedPoint2D *lowerTextPoints = lowerTextGeometry->vertexDataAsTexturedPoint2D();
 
-    QSize digitSize = d->textHelper->digitSize();
     for (const MarkInfo &info: markedTicks) {
-        QSGGeometry::TexturedPoint2D *points = (info.zoomIndex == textMarkLevel) ? lowerTextPoints : textPoints;
-
-        QString baseValue = d->zoomLevels[info.zoomIndex].baseValue(info.tick);
-        QString suffix = d->zoomLevels[info.zoomIndex].suffix();
-        QSize suffixSize = d->textHelper->stringSize(suffix);
-        QSize valueSize;
-
-        bool isNum = baseValue.isEmpty() || baseValue[0].isDigit();
-
-        qreal tw = suffixSize.width();
-        if (isNum) {
-            valueSize = d->textHelper->digitSize();
-            tw += valueSize.width() * baseValue.size();
-        } else {
-            valueSize = d->textHelper->stringSize(baseValue);
-            tw += valueSize.width();
-        }
-
-        qreal x = qFloor(info.x - tw / 2);
-        qreal y = qFloor((height() - d->chunkBarHeight - d->textHelper->lineHeight()) / 2);
-        int shift = 0;
-
-        if (isNum) {
-            for (int i = 0; i < baseValue.size(); ++i) {
-                int digit = baseValue.mid(i, 1).toInt();
-                QRectF texCoord = d->textHelper->digitCoordinates(digit);
-                points[0].set(x, y, texCoord.left(), texCoord.top());
-                points[1].set(x + digitSize.width(), y, texCoord.right(), texCoord.top());
-                points[2].set(x + digitSize.width(), y + digitSize.height(), texCoord.right(), texCoord.bottom());
-                points[3] = points[0];
-                points[4] = points[2];
-                points[5].set(x, y + digitSize.height(), texCoord.left(), texCoord.bottom());
-                points += 6;
-                shift += 6;
-                x += digitSize.width();
-            }
-        } else {
-            QRectF texCoord = d->textHelper->stringCoordinates(baseValue);
-            points[0].set(x, y, texCoord.left(), texCoord.top());
-            points[1].set(x + valueSize.width(), y, texCoord.right(), texCoord.top());
-            points[2].set(x + valueSize.width(), y + valueSize.height(), texCoord.right(), texCoord.bottom());
-            points[3] = points[0];
-            points[4] = points[2];
-            points[5].set(x, y + valueSize.height(), texCoord.left(), texCoord.bottom());
-            points += 6;
-            shift += 6;
-        }
-
-        if (!suffix.isEmpty()) {
-            QRectF texCoord = d->textHelper->stringCoordinates(suffix);
-            points[0].set(x, y, texCoord.left(), texCoord.top());
-            points[1].set(x + suffixSize.width(), y, texCoord.right(), texCoord.top());
-            points[2].set(x + suffixSize.width(), y + suffixSize.height(), texCoord.right(), texCoord.bottom());
-            points[3] = points[0];
-            points[4] = points[2];
-            points[5].set(x, y + suffixSize.height(), texCoord.left(), texCoord.bottom());
-            shift += 6;
-        }
-
-        if (info.zoomIndex == textMarkLevel)
-            lowerTextPoints += shift;
-        else
-            textPoints += shift;
+        lowerTextPoints += d->placeText(info, textMarkLevel, lowerTextPoints);
+        if (info.zoomIndex > textMarkLevel)
+            textPoints += d->placeText(info, textMarkLevel + 1, textPoints);
     }
 
     textNode->markDirty(QSGNode::DirtyGeometry);
@@ -1232,4 +1173,67 @@ void QnTimelinePrivate::setStickToEnd(bool stickToEnd) {
 
     parent->stickToEndChanged();
     parent->update();
+}
+
+int QnTimelinePrivate::placeText(const MarkInfo &textMark, int textLevel, QSGGeometry::TexturedPoint2D *points) {
+    QString baseValue = zoomLevels[textLevel].baseValue(textMark.tick);
+    QString suffix = zoomLevels[textLevel].suffix();
+    QSize suffixSize = textHelper->stringSize(suffix);
+    QSize valueSize;
+
+    bool isNum = baseValue.isEmpty() || baseValue[0].isDigit();
+
+    QSize digitSize = textHelper->digitSize();
+
+    qreal tw = suffixSize.width();
+    if (isNum) {
+        valueSize = digitSize;
+        tw += valueSize.width() * baseValue.size();
+    } else {
+        valueSize = textHelper->stringSize(baseValue);
+        tw += valueSize.width();
+    }
+
+    qreal x = qFloor(textMark.x - tw / 2);
+    qreal y = qFloor((parent->height() - chunkBarHeight - textHelper->lineHeight()) / 2);
+    int shift = 0;
+
+    if (isNum) {
+        for (int i = 0; i < baseValue.size(); ++i) {
+            int digit = baseValue.mid(i, 1).toInt();
+            QRectF texCoord = textHelper->digitCoordinates(digit);
+            points[0].set(x, y, texCoord.left(), texCoord.top());
+            points[1].set(x + digitSize.width(), y, texCoord.right(), texCoord.top());
+            points[2].set(x + digitSize.width(), y + digitSize.height(), texCoord.right(), texCoord.bottom());
+            points[3] = points[0];
+            points[4] = points[2];
+            points[5].set(x, y + digitSize.height(), texCoord.left(), texCoord.bottom());
+            points += 6;
+            shift += 6;
+            x += digitSize.width();
+        }
+    } else {
+        QRectF texCoord = textHelper->stringCoordinates(baseValue);
+        points[0].set(x, y, texCoord.left(), texCoord.top());
+        points[1].set(x + valueSize.width(), y, texCoord.right(), texCoord.top());
+        points[2].set(x + valueSize.width(), y + valueSize.height(), texCoord.right(), texCoord.bottom());
+        points[3] = points[0];
+        points[4] = points[2];
+        points[5].set(x, y + valueSize.height(), texCoord.left(), texCoord.bottom());
+        points += 6;
+        shift += 6;
+    }
+
+    if (!suffix.isEmpty()) {
+        QRectF texCoord = textHelper->stringCoordinates(suffix);
+        points[0].set(x, y, texCoord.left(), texCoord.top());
+        points[1].set(x + suffixSize.width(), y, texCoord.right(), texCoord.top());
+        points[2].set(x + suffixSize.width(), y + suffixSize.height(), texCoord.right(), texCoord.bottom());
+        points[3] = points[0];
+        points[4] = points[2];
+        points[5].set(x, y + suffixSize.height(), texCoord.left(), texCoord.bottom());
+        shift += 6;
+    }
+
+    return shift;
 }
