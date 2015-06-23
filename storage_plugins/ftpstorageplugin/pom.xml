@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>storage_plugins</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.3.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.3.2-SNAPSHOT</version>
+    <artifactId>ftpstorageplugin</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness Ftp storage plugin</name>	
+
+    <properties>
+        <product.title>${ftpstorageplugin.name}</product.title>	
+        <!--Global libs-->
+        <qt.libs>core</qt.libs>
+        <global.libs>-lcommon</global.libs>
+        <!--Specific os libs used-->
+        <windows.oslibs/>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>
+        <!--Global defines-->
+        <global.defines/>
+        <linux.defines/>
+        <mac.defines/>
+        <!--Specific os defines-->
+        <windows.defines>WIN32_LEAN_AND_MEAN NOMINMAX _CRT_NON_CONFORMING_SWPRINTFS _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE</windows.defines>
+<!--         <windows.defines>NOMINMAX</windows.defines>
+        <windows.defines>_CRT_NON_CONFORMING_SWPRINTFS</windows.defines>
+        <windows.defines>_CRT_SECURE_NO_WARNINGS</windows.defines>
+        <windows.defines>_CRT_NONSTDC_NO_DEPRECATE</windows.defines>        
+ -->        <additional.defines>NOLFS NOSSL</additional.defines>
+        <!-- <additional.defines>NOSSL</additional.defines> -->
+    </properties> 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>build_variables</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>            
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>        
+    </dependencies>  
+    <profiles>
+        <profile>
+            <id>linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
+        </profile>	      
+    </profiles>	
+</project>

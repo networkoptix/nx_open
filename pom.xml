@@ -30,6 +30,7 @@
         <applauncher.display.name>${display.product.name} Launcher</applauncher.display.name>
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
+        <ftpstorageplugin.name>${company.name} Ftp storage plugin</ftpstorageplugin.name>
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
         <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
@@ -316,6 +317,7 @@
                 <!--<module>plugins/axiscamplugin</module>-->
                 <module>nx_sdk</module>
                 <module>plugins/genericrtspplugin</module>
+                <module>storage_plugins/ftpstorageplugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>
