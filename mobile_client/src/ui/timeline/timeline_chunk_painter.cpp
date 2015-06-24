@@ -30,7 +30,7 @@ void QnTimelineChunkPainter::start(qint64 startPos, qint64 centralPos, const QRe
     m_centralPosition = centralPos;
     m_centralCoordinate = xFromValue(m_centralPosition);
     m_minChunkLength = (windowEnd - windowStart) / rect.width();
-    m_geometry->allocate(chunkCount * 6);
+    m_geometry->allocate((chunkCount + 2) * 6);
     m_points = m_geometry->vertexDataAsColoredPoint2D();
     m_index = 0;
 
