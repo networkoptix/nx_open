@@ -15,14 +15,14 @@ FocusScope {
     property int leftPadding: dp(6)
     property int rightPadding: dp(6)
     property alias passwordCharacter: textInput.passwordCharacter
-    property bool warning: false
+    property bool showError: false
 
     property int textPadding: 0
 
-    property color inactiveColor: warning ? QnTheme.inputBorderError : QnTheme.inputBorder
-    property color activeColor: warning ? QnTheme.inputBorderActiveError : QnTheme.inputBorderActive
-    property color textColor: warning ? QnTheme.inputTextError : QnTheme.inputText
-    property color placeholderColor: warning ? QnTheme.inputPlaceholderError : QnTheme.inputPlaceholder
+    property color inactiveColor: showError ? QnTheme.inputBorderError : QnTheme.inputBorder
+    property color activeColor: showError ? QnTheme.inputBorderActiveError : QnTheme.inputBorderActive
+    property color textColor: showError ? QnTheme.inputTextError : QnTheme.inputText
+    property color placeholderColor: showError ? QnTheme.inputPlaceholderError : QnTheme.inputPlaceholder
 
     signal accepted()
     signal editingFinished()

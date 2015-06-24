@@ -79,7 +79,7 @@ QnPage {
                     id: hostField
                     width: parent.width * 3 / 5
                     placeholderText: qsTr("Host")
-                    warning: _serverError
+                    showError: _serverError
                     onTextChanged: loginPage.removeWarnings()
                 }
 
@@ -87,7 +87,7 @@ QnPage {
                     id: portField
                     width: parent.width * 2 / 5 - parent.spacing
                     placeholderText: qsTr("Port")
-                    warning: _serverError
+                    showError: _serverError
                     onTextChanged: loginPage.removeWarnings()
                 }
             }
@@ -96,7 +96,7 @@ QnPage {
                 id: loginField
                 width: parent.width
                 placeholderText: qsTr("Login")
-                warning: _authError
+                showError: _authError
                 onTextChanged: loginPage.removeWarnings()
             }
 
@@ -105,7 +105,7 @@ QnPage {
                 width: parent.width
                 placeholderText: qsTr("Password")
                 echoMode: TextInput.Password
-                warning: _authError
+                showError: _authError
                 onTextChanged: loginPage.removeWarnings()
             }
 
