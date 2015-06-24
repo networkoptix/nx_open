@@ -72,7 +72,7 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
         statusMessage = tr("Incompatible server");
     } else if (connectionInfo.version < minimalSupportedVersion) {
         status = InvalidVersion;
-        statusMessage = tr("Server version %1 is too old").arg(connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat));
+        statusMessage = tr("Server version %1 is too low").arg(connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat));
     }
 
     if (status != Success) {
