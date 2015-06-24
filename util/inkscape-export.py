@@ -3,6 +3,7 @@
 import argparse
 import re
 import os
+import shutil
 from subprocess import call
 
 base_dpi = 90
@@ -98,5 +99,7 @@ for res in resolutions:
     if identifier:
         call_args += ['-i', identifier]
     call(call_args)
+    if res == 'mdpi':
+        shutil.copyfile(name, os.path.join(output_dir, exportName))
 
 print('Export finished!')
