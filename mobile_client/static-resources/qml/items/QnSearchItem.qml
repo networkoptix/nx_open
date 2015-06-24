@@ -8,22 +8,12 @@ Item {
     id: searchItem
 
     property alias text: searchField.text
+    readonly property bool opened: searchPanel.opacity == 1.0
 
     height: toolBar.height
     width: searchPanel.visible ? searchPanel.width : searchButton.width
-
-    Connections {
-        target: menuBackButton
-        onClicked: {
-            if (!menuBackButton.menuOpened)
-                return
-
-            searchPanel.opacity = 0.0
-            menuBackButton.animateToMenu()
-            sideNavigation.enabled = true
-            searchField.text = ""
-        }
-    }
+    anchors.right: parent.right
+    anchors.rightMargin: dp(8)
 
     QnIconButton {
         id: searchButton
@@ -32,12 +22,7 @@ Item {
         explicitRadius: dp(18)
         icon: "qrc:///images/search.png"
 
-        onClicked: {
-            searchPanel.opacity = 1.0
-            menuBackButton.animateToBack()
-            sideNavigation.enabled = false
-            searchField.forceActiveFocus()
-        }
+        onClicked: open()
     }
 
     Rectangle {
@@ -73,7 +58,21 @@ Item {
             explicitRadius: dp(18)
             icon: "qrc:///images/clear.png"
 
-            onClicked: searchField.text = ""
+            onClicked: clear()
         }
+    }
+
+    function open() {
+        searchPanel.opacity = 1.0
+        searchField.forceActiveFocus()
+    }
+
+    function close() {
+        searchPanel.opacity = 0.0
+        clear()
+    }
+
+    function clear() {
+        searchField.text = ""
     }
 }

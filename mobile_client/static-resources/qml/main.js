@@ -76,8 +76,12 @@ function gotoNewSession() {
 }
 
 function gotoResources() {
-    menuBackButton.animateToMenu()
-    sideNavigation.enabled = true
+    var item = stackView.get(0)
+
+    if (!item.searchActive) {
+        menuBackButton.animateToMenu()
+        sideNavigation.enabled = true
+    }
     stackView.pop(stackView.get(0))
 }
 

@@ -22,7 +22,9 @@ namespace {
     public:
         QnFilteredCameraListModel(QObject *parent = 0) :
             base_type(parent)
-        {}
+        {
+            resetResourcesInternal();
+        }
 
         void setServerId(const QnUuid &id) {
             m_serverId = id;

@@ -27,7 +27,7 @@ private slots:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
 
-private:
+protected:
     void resetResourcesInternal();
 
 private:

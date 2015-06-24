@@ -1,13 +1,21 @@
-import QtQuick 2.2
-import Material 0.1
+import QtQuick 2.4
+import com.networkoptix.qml 1.0
 
-import Material.ListItems 0.1 as ListItem
+import "../main.js" as Main
 
 ListView {
-    id: listView
+    id: camerasList
 
-    delegate: ListItem.Subtitled {
-        text: resourceName
-        subText: ipAddress
+    leftMargin: dp(16)
+    rightMargin: dp(16)
+    bottomMargin: dp(16)
+    spacing: dp(8)
+
+    delegate: QnCameraListItem {
+        text: model.resourceName
+        status: model.resourceStatus
+        thumbnail: model.thumbnail
+
+        onClicked: Main.openMediaResource(model.uuid)
     }
 }

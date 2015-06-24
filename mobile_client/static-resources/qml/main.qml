@@ -84,7 +84,6 @@ Window {
         onCurrentItemChanged: {
             if (currentItem) {
                 toolBar.title = currentItem.title
-                toolBar.rightComponent = currentItem.rightToolBarComponent
             }
         }
     }

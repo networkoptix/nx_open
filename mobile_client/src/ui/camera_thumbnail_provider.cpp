@@ -18,7 +18,13 @@ QPixmap QnCameraThumbnailProvider::requestPixmap(const QString &id, QSize *size,
         return QPixmap();
 
     QPixmap thumbnail = m_thumbnailCache->thumbnail(id);
-    *size = thumbnail.size();
+    if (requestedSize.isEmpty()) {
+        *size = thumbnail.size();
+    } else {
+        thumbnail = thumbnail.scaled(requestedSize, Qt::KeepAspectRatio);
+        *size = thumbnail.size();
+    }
+
     return thumbnail;
 }
 

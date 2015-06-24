@@ -9,7 +9,9 @@ namespace {
     public:
         QnFilteredServerListModel(QObject *parent = 0) :
             QnFilteredResourceListModel(parent)
-        {}
+        {
+            resetResourcesInternal();
+        }
 
     protected:
         virtual bool filterAcceptsResource(const QnResourcePtr &resource) const override {

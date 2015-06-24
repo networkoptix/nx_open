@@ -9,15 +9,32 @@ QnPage {
 
     title: connectionManager.systemName
 
-    rightToolBarComponent: rightComponent
+    property alias searchActive: searchItem.opened
 
-    Component {
-        id: rightComponent
+    Connections {
+        target: menuBackButton
+        onClicked: {
+            if (!resourcesPage.activePage || !menuBackButton.menuOpened)
+                return
 
-        QnSearchItem {
-            id: searchItem
-            onTextChanged: camerasModel.setFilterFixedString(text)
+            searchItem.close()
         }
+    }
+
+    QnSearchItem {
+        id: searchItem
+        parent: toolBar
+        onOpenedChanged: {
+            searchListLoader.sourceComponent = opened ? searchListComponent : undefined
+            if (opened) {
+                menuBackButton.animateToBack()
+                sideNavigation.enabled = false
+            } else {
+                menuBackButton.animateToMenu()
+                sideNavigation.enabled = true
+            }
+        }
+        visible: activePage
     }
 
     QnCameraListModel {
@@ -41,6 +58,36 @@ QnPage {
             text: connectionManager.connected ? qsTr("Loading...") : qsTr("Connecting...")
             font.pixelSize: sp(14)
             color: QnTheme.loadingText
+        }
+    }
+
+    Rectangle {
+        id: searchList
+
+        anchors.fill: parent
+        color: QnTheme.windowBackground
+
+        visible: searchListLoader.status == Loader.Ready && searchItem.text
+
+        Loader {
+            id: searchListLoader
+            anchors.fill: parent
+        }
+    }
+
+    Component {
+        id: searchListComponent
+
+        QnCameraList {
+            id: cameraListItem
+            model: QnCameraListModel {
+                id: searchModel
+            }
+
+            Connections {
+                target: searchItem
+                onTextChanged: searchModel.setFilterFixedString(searchItem.text)
+            }
         }
     }
 

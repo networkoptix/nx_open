@@ -6,7 +6,6 @@
 QnFilteredResourceListModel::QnFilteredResourceListModel(QObject *parent) :
     QAbstractListModel(parent)
 {
-    resetResourcesInternal();
 }
 
 QnFilteredResourceListModel::~QnFilteredResourceListModel() {
