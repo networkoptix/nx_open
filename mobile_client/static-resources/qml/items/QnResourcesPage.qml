@@ -1,4 +1,5 @@
 import QtQuick 2.4
+import QtQuick.Controls 1.3
 import com.networkoptix.qml 1.0
 
 import "../main.js" as Main
@@ -34,7 +35,7 @@ QnPage {
                 sideNavigation.enabled = true
             }
         }
-        visible: activePage
+        visible: pageStatus == Stack.Active || pageStatus == Stack.Activating
     }
 
     QnCameraListModel {

@@ -5,4 +5,5 @@ FocusScope {
     property string title
 
     property bool activePage: Stack.status === Stack.Active
+    property int pageStatus: Stack.status
 }
