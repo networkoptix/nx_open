@@ -367,7 +367,8 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->analogGroupBox->setVisible(false);
         ui->imageControlGroupBox->setEnabled(true);
     } else {
-        ui->imageControlGroupBox->setEnabled(m_camera->hasVideo(0));
+        bool hasVideo = m_camera->hasVideo(0);
+        ui->imageControlGroupBox->setEnabled(hasVideo);
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
@@ -388,9 +389,9 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
 
         bool dtsBased = m_camera->isDtsBased();
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !dtsBased);
-        ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
-        ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased);
-        ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased);
+        ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased && hasVideo);
+        ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased && hasVideo);
+        ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
 
         ui->analogGroupBox->setVisible(m_camera->isDtsBased());
         ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());

@@ -335,7 +335,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             /* Aggregate camera parameters first. */
             ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
             ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
-            ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, true);
             ui->analogGroupBox->setVisible(false);
 
             
@@ -362,6 +361,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             QString rotFirst;
             bool sameRotation = true;
             bool hasVideo = true;
+            bool isDtsBased = false;
             for (const QnVirtualCameraResourcePtr &camera: m_cameras) 
             {
                 hasVideo &= camera->hasVideo(0);
@@ -371,11 +371,8 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                 audioSupported |= camera->isAudioSupported();
                 audioForced |= camera->isAudioForced();
 
-                if (camera->isDtsBased()) {
-                    ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
-                    ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, false);
-                    ui->analogGroupBox->setVisible(true);
-                }
+                if (camera->isDtsBased())
+                    isDtsBased = true;
 
                 setupCheckbox(ui->analogViewCheckBox,   firstCamera, !camera->isScheduleDisabled());
                 setupCheckbox(ui->enableAudioCheckBox,  firstCamera, camera->isAudioEnabled());
@@ -397,6 +394,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
                 firstCamera = false;
             }
+            ui->analogGroupBox->setVisible(isDtsBased);
 
             ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);
             ui->arOverrideCheckBox->setTristate(!sameArOverride);
@@ -516,6 +514,10 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             }
             m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
             ui->imageControlGroupBox->setEnabled(hasVideo);
+            
+            ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !isDtsBased);
+            ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
+            ui->expertTab->setEnabled(!isDtsBased && hasVideo);
         }
 
         ui->cameraScheduleWidget->setCameras(m_cameras);
