@@ -13,12 +13,12 @@ QnPage {
         id: camerasModel
     }
 
-    QnCameraGrid {
+    QnCameraFlow {
         id: listView
         anchors.fill: parent
         model: camerasModel
 
-        onVideoRequested: Main.openMediaResource(uuid)
+//        onVideoRequested: Main.openMediaResource(uuid)
     }
 
     Rectangle {

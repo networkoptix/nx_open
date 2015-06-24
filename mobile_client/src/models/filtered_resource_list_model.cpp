@@ -32,6 +32,8 @@ QVariant QnFilteredResourceListModel::data(const QModelIndex &index, int role) c
     switch (role) {
     case Qn::ResourceNameRole:
         return resource->getName();
+    case Qn::ResourceStatusRole:
+        return resource->getStatus();
     case Qn::UuidRole:
         return resource->getId().toString();
     case Qn::IpAddressRole:
@@ -45,6 +47,7 @@ QHash<int, QByteArray> QnFilteredResourceListModel::roleNames() const {
     roleNames[Qn::ResourceNameRole] = Qn::roleName(Qn::ResourceNameRole);
     roleNames[Qn::UuidRole] = Qn::roleName(Qn::UuidRole);
     roleNames[Qn::IpAddressRole] = Qn::roleName(Qn::IpAddressRole);
+    roleNames[Qn::ResourceStatusRole] = Qn::roleName(Qn::ResourceStatusRole);
     return roleNames;
 }
 

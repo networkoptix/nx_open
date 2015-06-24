@@ -35,6 +35,11 @@ QtObject {
     property color sideNavigationSplitter
     property color sideNavigationSection
 
+    property color cameraText
+    property color cameraOfflineText
+    property color cameraRecordingIndicator
+    property color cameraBorder
+
     property color attentionBackground
     property color loadingText
 
@@ -63,6 +68,10 @@ QtObject {
         sideNavigationCopyright = colorTheme.color("sideNavigation.copyright")
         sideNavigationSplitter  = colorTheme.color("sideNavigation.splitter")
         sideNavigationSection   = colorTheme.color("sideNavigation.section")
+        cameraText              = colorTheme.color("cameras.text")
+        cameraOfflineText       = colorTheme.color("cameras.offlineText")
+        cameraRecordingIndicator = colorTheme.color("cameras.recordingIndicator")
+        cameraBorder            = colorTheme.color("cameras.border")
         attentionBackground     = colorTheme.color("other.attentionBackground")
         loadingText             = colorTheme.color("other.loadingText")
     }
