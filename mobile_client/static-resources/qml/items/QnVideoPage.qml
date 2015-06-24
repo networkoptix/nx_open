@@ -179,9 +179,6 @@ QnPage {
 
                 stickToEnd: true
 
-                font.pixelSize: dp(18)
-                font.weight: Font.Light
-
                 chunkBarHeight: dp(36)
                 textY: (height - chunkBarHeight) / 2
 

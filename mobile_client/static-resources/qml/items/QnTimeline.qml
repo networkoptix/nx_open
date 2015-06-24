@@ -11,7 +11,6 @@ Item {
     property alias chunkBarHeight: timeline.chunkBarHeight
     property alias textY: timeline.textY
     property alias stickToEnd: timeline.stickToEnd
-    property alias font: timeline.font
     property alias chunkProvider: timeline.chunkProvider
     property alias startBoundDate: timeline.startBoundDate
     property alias autoPlay: timeline.autoPlay
@@ -34,6 +33,8 @@ Item {
 
         textColor: QnTheme.timelineText
         chunkColor: QnTheme.timelineChunk
+
+        font.pixelSize: sp(16)
 
         onMoveFinished: root.moveFinished()
     }
