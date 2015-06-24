@@ -85,6 +85,7 @@ QnCameraListModel::QnCameraListModel(QObject *parent) :
     setSourceModel(m_model);
     setDynamicSortFilter(true);
     sort(0);
+    setFilterCaseSensitivity(Qt::CaseInsensitive);
 
     if (QnCameraThumbnailCache::instance())
         connect(QnCameraThumbnailCache::instance(), &QnCameraThumbnailCache::thumbnailUpdated, this, &QnCameraListModel::at_thumbnailUpdated);
@@ -180,6 +181,12 @@ bool QnCameraListModel::lessThan(const QModelIndex &left, const QModelIndex &rig
     QString rightAddress = right.data(Qn::IpAddressRole).toString();
 
     return naturalStringLess(leftAddress, rightAddress);
+}
+
+bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
+    QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
+    QString name = index.data(Qn::ResourceNameRole).toString();
+    return name.contains(filterRegExp());
 }
 
 void QnCameraListModel::at_thumbnailUpdated(const QnUuid &resourceId, const QString &thumbnailId) {

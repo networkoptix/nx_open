@@ -16,6 +16,7 @@ QnPage {
 
         QnSearchItem {
             id: searchItem
+            onTextChanged: camerasModel.setFilterFixedString(text)
         }
     }
 

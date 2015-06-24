@@ -5,8 +5,11 @@ import com.networkoptix.qml 1.0
 import "../controls"
 
 Item {
-    height: toolBar.height
+    id: searchItem
 
+    property alias text: searchField.text
+
+    height: toolBar.height
     width: searchPanel.visible ? searchPanel.width : searchButton.width
 
     Connections {
