@@ -90,7 +90,8 @@ namespace
             }
             else
             {
-                callback(QString(), rtu::kNoEntitiesAffected);
+                //TODO: #ynikitenkov #High Describe why no entities are affected here?
+                callback(QString(), affected /*rtu::kNoEntitiesAffected*/ );
             }
         };
         
@@ -504,6 +505,10 @@ void rtu::sendChangeItfRequest(HttpClient *client
     , const ItfUpdateInfoContainer &updateInfos
     , const OperationCallback &callback)
 {
+    ItfUpdateInfo test;
+    ItfUpdateInfo test2;
+    test2 = test;
+
     QJsonArray jsonInfoChanges;
     AffectedEntities affected = 0;
     for (const ItfUpdateInfo &change: updateInfos)
@@ -573,7 +578,7 @@ rtu::ItfUpdateInfo::ItfUpdateInfo()
 
 rtu::ItfUpdateInfo::ItfUpdateInfo(const ItfUpdateInfo &other)
     : name(other.name)
-    , useDHCP(other.useDHCP)
+    , useDHCP(other.useDHCP) //TODO: #ynikitenkov what's this? 
     , ip(other.ip ? new QString(*other.ip) : nullptr)
     , mask(other.mask ? new QString(*other.mask) : nullptr)
     , dns(other.dns ? new QString(*other.dns) : nullptr)
@@ -593,8 +598,13 @@ rtu::ItfUpdateInfo::ItfUpdateInfo(const QString &initName)
 
 rtu::ItfUpdateInfo &rtu::ItfUpdateInfo::operator =(const ItfUpdateInfo &other)
 {
-    ItfUpdateInfo tmp(other);
-    std::swap(tmp, *this);
+    //TODO: #ynikitenkov what's this? 
+    name = other.name;
+    useDHCP = other.useDHCP;
+    ip = StringPointer(other.ip ? new QString(*other.ip) : nullptr);
+    mask = StringPointer(other.mask ? new QString(*other.mask) : nullptr);
+    dns = StringPointer(other.dns ? new QString(*other.dns) : nullptr);
+    gateway = StringPointer(other.gateway ? new QString(*other.gateway) : nullptr);
     return *this;
 }
 
