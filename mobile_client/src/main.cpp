@@ -31,6 +31,10 @@ int runUi(QGuiApplication *application) {
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
     thumbnailProvider->setThumbnailCache(thumbnailsCache.data());
 
+    QFont font;
+    font.setFamily(lit("Roboto"));
+    QGuiApplication::setFont(font);
+
     QnContext context;
 
     QnResolutionUtil::DensityClass densityClass = QnResolutionUtil::instance()->densityClass();
