@@ -41,7 +41,7 @@ public:
     // resource can use DataProvider for addition info (optional)
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
-    virtual bool hasVideo() const;
+    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const;
 
     virtual const QnResource* toResource() const = 0;
     virtual QnResource* toResource() = 0;
@@ -79,6 +79,7 @@ protected:
 private:
     mutable QString m_cachedLayout;
     mutable QMutex m_layoutMutex;
+    mutable boost::optional<bool> m_hasVideo;
 };
 
 #endif // QN_MEDIA_RESOURCE_H

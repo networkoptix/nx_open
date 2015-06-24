@@ -364,7 +364,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             bool hasVideo = true;
             for (const QnVirtualCameraResourcePtr &camera: m_cameras) 
             {
-                hasVideo &= camera->hasVideo();
+                hasVideo &= camera->hasVideo(0);
                 logins.insert(camera->getAuth().user());
                 passwords.insert(camera->getAuth().password());
 

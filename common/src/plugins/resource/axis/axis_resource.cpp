@@ -299,7 +299,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         }
     }
 
-    if (hasVideo())
+    if (hasVideo(0))
     {
         // enable send motion into H.264 stream
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
@@ -347,7 +347,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         
     QByteArray body;
     http.readAll(body);
-    if (hasVideo())
+    if (hasVideo(0))
     {
         QMutexLocker lock(&m_mutex);
 
@@ -398,7 +398,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         }
     }   //releasing mutex so that not to make other threads using the resource to wait for completion of heavy-wait io & pts initialization,
             //m_initMutex is locked up the stack
-    if (hasVideo()) 
+    if (hasVideo(0)) 
     {
         qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
 

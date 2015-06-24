@@ -287,20 +287,24 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         if (!qnRuntime->isActiveXMode())
             delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
-        QComboBox* comboBox = new QComboBox(dialog.data());
-        comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
-        comboBox->addItem(tr("Top left corner (requires transcoding)"), Qn::TopLeftCorner);
-        comboBox->addItem(tr("Top right corner (requires transcoding)"), Qn::TopRightCorner);
-        comboBox->addItem(tr("Bottom left corner (requires transcoding)"), Qn::BottomLeftCorner);
-        comboBox->addItem(tr("Bottom right corner (requires transcoding)"), Qn::BottomRightCorner);
+        QComboBox* comboBox = 0;
+        bool doTranscode = false;
+        const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
+        if (widget->resource()->hasVideo(archive)) {
+            comboBox = new QComboBox(dialog.data());
+            comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
+            comboBox->addItem(tr("Top left corner (requires transcoding)"), Qn::TopLeftCorner);
+            comboBox->addItem(tr("Top right corner (requires transcoding)"), Qn::TopRightCorner);
+            comboBox->addItem(tr("Bottom left corner (requires transcoding)"), Qn::BottomLeftCorner);
+            comboBox->addItem(tr("Bottom right corner (requires transcoding)"), Qn::BottomRightCorner);
 
-        dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
+            dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
-
-        bool doTranscode = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
-        if (doTranscode) 
-        {
-            dialog->addCheckBox(tr("Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)"), &doTranscode, delegate);
+            doTranscode = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
+            if (doTranscode) 
+            {
+                dialog->addCheckBox(tr("Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)"), &doTranscode, delegate);
+            }
         }
 
         if (!dialog->exec())
@@ -316,7 +320,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         if (fileName.isEmpty())
             return;
 
-        timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
+        if (comboBox)
+            timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
 
         if (!doTranscode) {
             contrastParams.enabled = false;

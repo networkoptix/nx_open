@@ -85,7 +85,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         profileSufix = QString::number(res->getChannelNumAxis());
     }
 
-    if (res->hasVideo())
+    if (res->hasVideo(this))
     {
         static const QByteArray OLD_PRIMARY_STREAM_PROFILE_NAME = "netOptixPrimary";
         static const QByteArray OLD_SECONDARY_STREAM_PROFILE_NAME = "netOptixSecondary";

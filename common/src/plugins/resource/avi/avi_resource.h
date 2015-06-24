@@ -36,6 +36,7 @@ public:
     /* Return item time zone offset in ms */
     qint64 timeZoneOffset() const;
     QnAviArchiveDelegate* createArchiveDelegate() const;
+    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const override;
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];

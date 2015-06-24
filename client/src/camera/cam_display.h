@@ -258,6 +258,7 @@ protected:
     qint64 m_lastQueuedVideoTime;
     int m_liveBufferSize;
     bool m_liveMaxLenReached;
+    bool m_hasVideo;
 };
 
 #endif //QN_CAM_DISPLAY_H

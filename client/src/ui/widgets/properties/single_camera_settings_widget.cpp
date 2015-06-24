@@ -367,7 +367,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->analogGroupBox->setVisible(false);
         ui->imageControlGroupBox->setEnabled(true);
     } else {
-        ui->imageControlGroupBox->setEnabled(m_camera->hasVideo());
+        ui->imageControlGroupBox->setEnabled(m_camera->hasVideo(0));
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
@@ -649,7 +649,7 @@ void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
     if (!m_camera)
         return;
     
-    ui->cameraScheduleWidget->setRecordingParamsAvailability(m_camera->hasVideo() && !m_camera->hasParam(lit("noRecordingParams")));
+    ui->cameraScheduleWidget->setRecordingParamsAvailability(m_camera->hasVideo(0) && !m_camera->hasParam(lit("noRecordingParams")));
 }
 
 void QnSingleCameraSettingsWidget::updateMotionCapabilities() {

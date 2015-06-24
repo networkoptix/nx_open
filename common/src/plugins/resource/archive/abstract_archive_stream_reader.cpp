@@ -147,9 +147,10 @@ void QnAbstractArchiveReader::run()
             data->dataProvider = this;
 
         auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
-        if (mediaRes && !mediaRes->hasVideo()) 
+        if (mediaRes && !mediaRes->hasVideo(this)) 
         {
-            m_stat[data->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
+            if (data)
+                m_stat[data->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
         }
         else {
             if (videoData)

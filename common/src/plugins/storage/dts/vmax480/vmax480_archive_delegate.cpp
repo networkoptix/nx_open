@@ -31,6 +31,7 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(const QnResourcePtr& res):
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanOfflineLayout;
+    m_flags |= Flag_CanOfflineHasVideo;
     m_flags |= Flag_UnsyncTime;
     //m_flags |= Flag_CanSeekImmediatly;
 }

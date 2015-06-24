@@ -135,7 +135,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_channelsCount(0),
     m_lastQueuedVideoTime(AV_NOPTS_VALUE),
     m_liveBufferSize (INITIAL_LIVE_MEDIA_LEN_THRESHOLD),
-    m_liveMaxLenReached(false)
+    m_liveMaxLenReached(false),
+    m_hasVideo(true)
 {
 
     if (resource && resource->toResource()->hasFlags(Qn::live_cam))
@@ -1128,6 +1129,8 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
     m_processedPackets++;
 
+    m_hasVideo = m_resource->hasVideo(data->dataProvider);
+
     if (media->dataType != QnAbstractMediaData::EMPTY_DATA)
     {
         bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
@@ -1206,7 +1209,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         if (speed < 0) 
         {
             m_lastAudioPacketTime = ad->timestamp;
-            if (!m_resource->hasVideo()) 
+            if (!m_hasVideo) 
             {
                 if (m_buffering) {
                     m_buffering = 0;
@@ -1337,8 +1340,11 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
         m_lastAudioPacketTime = ad->timestamp;
 
-        if (!m_resource->hasVideo()) 
+        if (!m_hasVideo) 
         {
+            if (m_singleShotMode && m_singleShotQuantProcessed)
+                return false;
+
             if (!m_playAudio || m_audioDisplay->isPlaying()) 
             {
                 if (m_buffering) {
@@ -1357,7 +1363,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         {
             if (m_audioDisplay->msInBuffer() > m_audioBufferSize)
             {
-                bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && m_resource->hasVideo();
+                bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && m_hasVideo;
                 if (m_isRealTimeSource || useSync)
                     return true; // skip data
                 else
@@ -1367,11 +1373,12 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             m_audioDisplay->putData(ad, nextVideoImageTime(0));
             m_hadAudio = true;
         }
-        else if (m_hadAudio || !m_resource->hasVideo())
+        else if (m_hadAudio || !m_hasVideo)
         {
             m_audioDisplay->enqueueData(ad, nextVideoImageTime(0));
         }
-
+        if (!m_hasVideo)
+            m_singleShotQuantProcessed = true;
     }
 
     if (vd || flushCurrentBuffer)
@@ -1738,7 +1745,7 @@ qint64 QnCamDisplay::getDisplayedMin() const
 
 qint64 QnCamDisplay::getCurrentTime() const 
 {
-    if (!m_resource->hasVideo()) {
+    if (!m_hasVideo) {
         if (m_speed < 0)
             return AV_NOPTS_VALUE;
         else if (m_playAudio)
@@ -1767,7 +1774,7 @@ qint64 QnCamDisplay::getMinReverseTime() const
 
 qint64 QnCamDisplay::getNextTime() const
 {
-    if (!m_resource->hasVideo()) {
+    if (!m_hasVideo) {
         if (m_speed < 0)
             return AV_NOPTS_VALUE;
         else
