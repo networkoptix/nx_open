@@ -40,6 +40,9 @@ QtObject {
     property color cameraRecordingIndicator
     property color cameraBorder
 
+    property color timelineText
+    property color timelineChunk
+
     property color attentionBackground
     property color loadingText
 
@@ -72,6 +75,8 @@ QtObject {
         cameraOfflineText       = colorTheme.color("cameras.offlineText")
         cameraRecordingIndicator = colorTheme.color("cameras.recordingIndicator")
         cameraBorder            = colorTheme.color("cameras.border")
+        timelineText            = colorTheme.color("timeline.text")
+        timelineChunk           = colorTheme.color("timeline.chunk")
         attentionBackground     = colorTheme.color("other.attentionBackground")
         loadingText             = colorTheme.color("other.loadingText")
     }

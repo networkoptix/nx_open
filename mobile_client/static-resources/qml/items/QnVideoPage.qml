@@ -141,7 +141,14 @@ QnPage {
         height: timeline.height + playbackController.height
 
         y: parent.height - height
-        Behavior on y { NumberAnimation { duration: 200 } }
+        Behavior on y {
+            id: navigatorYBehavior
+            enabled: false
+            NumberAnimation {
+                duration: 200
+                onStopped: navigatorYBehavior.enabled = false
+            }
+        }
 
         MouseArea {
             id: navigatorMouseArea
@@ -153,6 +160,7 @@ QnPage {
             drag.filterChildren: true
             onReleased: {
                 var mid = (drag.minimumY + drag.maximumY) / 2
+                navigatorYBehavior.enabled = true
                 if (navigator.y < mid)
                     navigator.y = drag.minimumY
                 else
@@ -169,9 +177,6 @@ QnPage {
                 endDate: new Date(Date.now() + 5 * 60 * 1000)
                 startDate: new Date(Date.now() - 5 * 60 * 1000)
 
-                textColor: "#8091A7B2"
-                chunkColor: "#589900"
-
                 stickToEnd: true
 
                 font.pixelSize: dp(18)
@@ -187,16 +192,13 @@ QnPage {
 
                 onMoveFinished: videoPlayer.alignToChunk(positionDate)
 
-                Rectangle {
+                Image {
                     z: -1
-                    anchors.fill: parent
+                    width: parent.width
+                    anchors.bottom: parent.bottom
                     anchors.bottomMargin: timeline.chunkBarHeight
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: QnTheme.transparent(QnTheme.windowBackground, 0.0) }
-                        GradientStop { position: 0.1; color: QnTheme.transparent(QnTheme.windowBackground, 0.0) }
-                        GradientStop { position: 0.5; color: QnTheme.transparent(QnTheme.windowBackground, 0.1) }
-                        GradientStop { position: 1.0; color: QnTheme.transparent(QnTheme.windowBackground, 0.3) }
-                    }
+                    sourceSize.height: timeline.height - timeline.chunkBarHeight + playbackController.height / 2
+                    source: "qrc:///images/timeline_gradient.png"
                 }
             }
 

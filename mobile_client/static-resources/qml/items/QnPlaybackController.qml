@@ -177,9 +177,19 @@ Item {
             drag.minimumX: 0
             drag.maximumX: rootItem.width - grip.width
 
-            onReleased: grip.x = grip.defaultX
+            onReleased: {
+                gripXBehavior.enabled = true
+                grip.x = grip.defaultX
+            }
         }
 
-        Behavior on x { NumberAnimation { duration: 200 } }
+        Behavior on x {
+            id: gripXBehavior
+            enabled: false
+            NumberAnimation {
+                duration: 200
+                onStopped: gripXBehavior.enabled = false
+            }
+        }
     }
 }

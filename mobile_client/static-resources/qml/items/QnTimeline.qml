@@ -8,8 +8,6 @@ Item {
     property alias startDate: timeline.windowStartDate
     property alias endDate: timeline.windowEndDate
     property alias positionDate: timeline.positionDate
-    property alias textColor: timeline.textColor
-    property alias chunkColor: timeline.chunkColor
     property alias chunkBarHeight: timeline.chunkBarHeight
     property alias textY: timeline.textY
     property alias stickToEnd: timeline.stickToEnd
@@ -33,6 +31,9 @@ Item {
     QnTimelineView {
         id: timeline
         anchors.fill: parent
+
+        textColor: QnTheme.timelineText
+        chunkColor: QnTheme.timelineChunk
 
         onMoveFinished: root.moveFinished()
     }
