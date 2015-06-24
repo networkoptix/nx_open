@@ -4,6 +4,8 @@ Item {
     id: iconButton
 
     property alias icon: image.source
+    property alias explicitRadius: materialSurface.explicitRadius
+    property alias backlight: materialSurface.backlight
 
     readonly property alias pressed: materialSurface.pressed
 
@@ -17,8 +19,9 @@ Item {
 
         anchors.margins: -4
         onClicked: iconButton.clicked()
-        centered: true
         backlight: false
+        circular: true
+        centered: true
         clip: false
     }
 

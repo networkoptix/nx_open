@@ -9,6 +9,16 @@ QnPage {
 
     title: connectionManager.systemName
 
+    rightToolBarComponent: rightComponent
+
+    Component {
+        id: rightComponent
+
+        QnSearchItem {
+            id: searchItem
+        }
+    }
+
     QnCameraListModel {
         id: camerasModel
     }
@@ -17,8 +27,6 @@ QnPage {
         id: listView
         anchors.fill: parent
         model: camerasModel
-
-//        onVideoRequested: Main.openMediaResource(uuid)
     }
 
     Rectangle {

@@ -8,6 +8,7 @@ Item {
     property bool centered: false
     property bool circular: false
     property bool backlight: true
+    property real explicitRadius: 0
 
     readonly property alias pressed: mouseArea.pressed
 
@@ -19,9 +20,17 @@ Item {
 
     readonly property bool _focused: mouseArea.pressed || selected
 
+    function _length(dx, dy) {
+        return Math.sqrt(dx * dx + dy * dy) - dp(4)
+    }
+
     Rectangle {
         id: focusBackground
-        anchors.fill: parent
+        width: explicitRadius > 0 ? explicitRadius * 2 :
+                                    circular ? _length(parent.width, parent.height) : parent.width
+        height: explicitRadius > 0 ? explicitRadius * 2 :
+                                     circular ? _length(parent.width, parent.height) : parent.height
+        anchors.centerIn: parent
         visible: backlight
         opacity: 0.0
         color: materialSurface.color
@@ -70,9 +79,10 @@ Item {
         }
 
         function getEndRadius(x, y) {
-            var dx = Math.max(x, parent.width - x)
-            var dy = Math.max(y, parent.height - y)
-            return Math.sqrt(dx * dx + dy * dy)
+            if (explicitRadius > 0)
+                return explicitRadius
+
+            return _length(Math.max(x, parent.width - x), Math.max(y, parent.height - y))
         }
 
         function fadeIn(mouseX, mouseY) {

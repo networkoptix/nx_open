@@ -27,8 +27,9 @@ FocusScope {
     signal accepted()
     signal editingFinished()
 
+    height: dp(36)
+
     implicitWidth: Math.round(textInput.contentHeight * 8)
-    implicitHeight: Math.max(25, Math.round(textInput.contentHeight * 1.2))
 
     activeFocusOnTab: true
 
@@ -116,7 +117,7 @@ FocusScope {
                 }
 
                 font.pixelSize: sp(16)
-                font.weight: Font.DemiBold
+                font.weight: Font.Normal
 
                 onEditingFinished: textField.editingFinished()
                 onCursorPositionChanged: {
