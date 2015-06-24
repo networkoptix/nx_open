@@ -342,6 +342,17 @@ public:
     Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
 
+    enum IOPortType {
+        PT_Disabled,
+        PT_Input,
+        PT_Output,
+    };
+    
+    enum IODefaultState {
+        IO_OpenCircut,
+        IO_CloseGround
+    };
+
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */
         EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
