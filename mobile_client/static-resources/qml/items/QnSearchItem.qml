@@ -15,7 +15,7 @@ Item {
             if (!menuBackButton.menuOpened)
                 return
 
-            searchPanel.visible = false
+            searchPanel.opacity = 0.0
             menuBackButton.animateToMenu()
             sideNavigation.enabled = true
             searchField.text = ""
@@ -30,7 +30,7 @@ Item {
         icon: "qrc:///images/search.png"
 
         onClicked: {
-            searchPanel.visible = true
+            searchPanel.opacity = 1.0
             menuBackButton.animateToBack()
             sideNavigation.enabled = false
             searchField.forceActiveFocus()
@@ -42,7 +42,10 @@ Item {
         color: QnTheme.windowBackground
         height: parent.height
         width: toolBar.width - dp(72)
-        visible: false
+
+        opacity: 0.0
+        visible: opacity > 0
+        Behavior on opacity { NumberAnimation { duration: 150 } }
 
         QnTextField {
             id: searchField
