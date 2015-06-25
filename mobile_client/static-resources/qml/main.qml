@@ -83,7 +83,7 @@ Window {
 
         onCurrentItemChanged: {
             if (currentItem) {
-                toolBar.title = currentItem.title
+                toolBar.title = Qt.binding(function() { return currentItem.title })
             }
         }
     }
