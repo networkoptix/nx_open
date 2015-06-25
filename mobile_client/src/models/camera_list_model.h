@@ -12,6 +12,7 @@ class QnCameraListModel : public QSortFilterProxyModel {
     Q_OBJECT
 
     Q_PROPERTY(QString serverIdString READ serverIdString WRITE setServerIdString NOTIFY serverIdStringChanged)
+    Q_PROPERTY(bool showOffline READ showOffline WRITE setShowOffline NOTIFY showOfflineChanged)
 public:
     QnCameraListModel(QObject *parent = 0);
 
@@ -24,12 +25,16 @@ public:
     virtual QHash<int, QByteArray> roleNames() const;
     virtual QVariant data(const QModelIndex &index, int role) const override;
 
+    bool showOffline() const;
+    void setShowOffline(bool showOffline);
+
 public slots:
     void refreshThumbnails(int from, int to);
     void updateLayout(int width, qreal desiredAspectRatio);
 
 signals:
     void serverIdStringChanged();
+    void showOfflineChanged();
 
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
@@ -42,6 +47,7 @@ private:
     QnFilteredCameraListModel *m_model;
     QHash<QnUuid, QSize> m_sizeById;
     int m_width;
+    bool m_showOffline;
 };
 
 

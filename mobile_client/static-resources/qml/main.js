@@ -99,3 +99,10 @@ function openMediaResource(uuid) {
     menuBackButton.animateToBack()
     stackView.push(videoPlayerComponent)
 }
+
+function openSettings() {
+    sideNavigation.hide()
+    sideNavigation.enabled = false
+    menuBackButton.animateToBack()
+    stackView.push(settingsPageComponent)
+}

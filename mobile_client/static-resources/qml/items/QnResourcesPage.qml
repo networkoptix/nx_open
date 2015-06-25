@@ -40,6 +40,7 @@ QnPage {
 
     QnCameraListModel {
         id: camerasModel
+        showOffline: settings.showOfflineCameras
     }
 
     QnCameraFlow {

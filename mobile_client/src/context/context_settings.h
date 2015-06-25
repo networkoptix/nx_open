@@ -5,13 +5,18 @@
 
 class QnContextSettings : public QObject {
     Q_OBJECT
+    Q_PROPERTY(bool showOfflineCameras READ showOfflineCameras WRITE setShowOfflineCameras NOTIFY showOfflineCamerasChanged)
 public:
     explicit QnContextSettings(QObject *parent = 0);
 
-public slots:
-    QVariantList savedSessions() const;
-    void saveSession(const QVariantMap &session, int index);
-    void removeSession(int index);
+    bool showOfflineCameras() const;
+    void setShowOfflineCameras(bool showOfflineCameras);
+
+signals:
+    void showOfflineCamerasChanged();
+
+private:
+    void at_valueChanged(int valueId);
 };
 
 #endif // CONTEXT_SETTINGS_H

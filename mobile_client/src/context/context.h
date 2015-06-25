@@ -10,6 +10,7 @@ class QnLoginSessionManager;
 class QnColorTheme;
 class QnMobileAppInfo;
 class QnResolutionUtil;
+class QnContextSettings;
 
 class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
@@ -19,6 +20,7 @@ class QnContext: public QObject, public QnInstanceStorage {
     Q_PROPERTY(QnLoginSessionManager* loginSessionManager READ loginSessionManager NOTIFY loginSessionManagerChanged)
     Q_PROPERTY(QnColorTheme* colorTheme READ colorTheme NOTIFY colorThemeChanged)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo READ applicationInfo NOTIFY applicationInfoChanged)
+    Q_PROPERTY(QnContextSettings* settings READ settings NOTIFY settingsChanged)
 
 public:
     QnContext(QObject *parent = NULL);
@@ -40,6 +42,10 @@ public:
         return m_appInfo;
     }
 
+    QnContextSettings *settings() const {
+        return m_settings;
+    }
+
     Q_INVOKABLE int dp(qreal dpix) const;
     Q_INVOKABLE int sp(qreal dpix) const;
 
@@ -49,6 +55,7 @@ signals:
     void loginSessionManagerChanged();
     void colorThemeChanged();
     void applicationInfoChanged();
+    void settingsChanged();
 
 private slots:
     void at_connectionManager_connectedChanged();
@@ -58,6 +65,7 @@ private:
     QnLoginSessionManager *m_loginSessionManager;
     QnColorTheme *m_colorTheme;
     QnMobileAppInfo *m_appInfo;
+    QnContextSettings *m_settings;
 
     QScopedPointer<QnResolutionUtil> m_resolutionUtil;
 };

@@ -113,6 +113,13 @@ Window {
         }
     }
 
+    Component {
+        id: settingsPageComponent
+
+        QnSettingsPage {
+        }
+    }
+
     Connections {
         target: connectionManager
 

@@ -5,27 +5,23 @@
 QnContextSettings::QnContextSettings(QObject *parent) :
     QObject(parent)
 {
+    connect(qnSettings, &QnMobileClientSettings::valueChanged, this, &QnContextSettings::at_valueChanged);
 }
 
-QVariantList QnContextSettings::savedSessions() const {
-    return qnSettings->savedSessions();
+bool QnContextSettings::showOfflineCameras() const {
+    return qnSettings->showOfflineCameras();
 }
 
-void QnContextSettings::saveSession(const QVariantMap &session, int index) {
-    QVariantList sessions = qnSettings->savedSessions();
-    if (index < 0 || index >= sessions.size()) {
-        sessions.prepend(session);
-    } else {
-        sessions.removeAt(index);
-        sessions.prepend(session);
+void QnContextSettings::setShowOfflineCameras(bool showOfflineCameras) {
+    qnSettings->setShowOfflineCameras(showOfflineCameras);
+}
+
+void QnContextSettings::at_valueChanged(int valueId) {
+    switch (valueId) {
+    case QnMobileClientSettings::ShowOfflineCameras:
+        emit showOfflineCamerasChanged();
+        break;
+    default:
+        break;
     }
-    qnSettings->setSavedSessions(sessions);
-}
-
-void QnContextSettings::removeSession(int index) {
-    QVariantList sessions = qnSettings->savedSessions();
-    if (index < 0 || index >= sessions.size())
-        return;
-    sessions.removeAt(index);
-    qnSettings->setSavedSessions(sessions);
 }

@@ -30,11 +30,11 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<QnLoginSessionManager>("com.networkoptix.qml", 1, 0, "QnLoginSessionManager", lit("Cannot create an instance of QnLoginSessionManager."));
     qmlRegisterUncreatableType<QnColorTheme>("com.networkoptix.qml", 1, 0, "QnColorTheme", lit("Cannot create an instance of QnColorTheme."));
     qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
+    qmlRegisterUncreatableType<QnContextSettings>("com.networkoptix.qml", 1, 0, "QnContextSettings", lit("Cannot create an instance of QnContextSettings."));
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnServerListModel>("com.networkoptix.qml", 1, 0, "QnServerListModel");
     qmlRegisterType<QnLoginSessionsModel>("com.networkoptix.qml", 1, 0, "QnLoginSessionsModel");
     qmlRegisterType<QnMediaResourceHelper>("com.networkoptix.qml", 1, 0, "QnMediaResourceHelper");
-    qmlRegisterType<QnContextSettings>("com.networkoptix.qml", 1, 0, "QnContextSettings");
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
 

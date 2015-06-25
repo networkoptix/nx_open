@@ -82,7 +82,8 @@ namespace {
 
 QnCameraListModel::QnCameraListModel(QObject *parent) :
     QSortFilterProxyModel(parent),
-    m_model(new QnFilteredCameraListModel(this))
+    m_model(new QnFilteredCameraListModel(this)),
+    m_showOffline(true)
 {
     setSourceModel(m_model);
     setDynamicSortFilter(true);
@@ -114,6 +115,20 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
     }
 
     return QSortFilterProxyModel::data(index, role);
+}
+
+bool QnCameraListModel::showOffline() const {
+    return m_showOffline;
+}
+
+void QnCameraListModel::setShowOffline(bool showOffline) {
+    if (m_showOffline == showOffline)
+        return;
+
+    m_showOffline = showOffline;
+    emit showOfflineChanged();
+
+    invalidateFilter();
 }
 
 void QnCameraListModel::setServerId(const QnUuid &id) {
@@ -187,6 +202,13 @@ bool QnCameraListModel::lessThan(const QModelIndex &left, const QModelIndex &rig
 
 bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
+
+    if (!m_showOffline) {
+        Qn::ResourceStatus status = static_cast<Qn::ResourceStatus>(index.data(Qn::ResourceStatusRole).toInt());
+        if (status == Qn::Offline || status == Qn::NotDefined)
+            return false;
+    }
+
     QString name = index.data(Qn::ResourceNameRole).toString();
     return name.contains(filterRegExp());
 }

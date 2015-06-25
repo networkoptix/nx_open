@@ -110,6 +110,14 @@ QnNavigationDrawer {
                     }
                 }
 
+                QnSideNavigationButtonItem {
+                    id: settingsButton
+                    text: qsTr("Settings")
+                    icon: "qrc:///images/settings.png"
+
+                    onClicked: Main.openSettings()
+                }
+
                 Text {
                     x: dp(16)
                     height: dp(48)

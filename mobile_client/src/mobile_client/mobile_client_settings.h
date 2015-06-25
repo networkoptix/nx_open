@@ -14,6 +14,7 @@ public:
         SavedSessions,
         LastUsedSessionId,
         CamerasAspectRatios,
+        ShowOfflineCameras,
         VariableCount
     };
 
@@ -37,6 +38,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QVariantList,                savedSessions,              setSavedSessions,           SavedSessions,              QVariantList())
         QN_DECLARE_RW_PROPERTY(QString,                     lastUsedSessionId,          setLastUsedSessionId,       LastUsedSessionId,          QString())
         QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           camerasAspectRatios,        setCamerasAspectRatios,     CamerasAspectRatios,        QnAspectRatioHash())
+        QN_DECLARE_RW_PROPERTY(bool,                        showOfflineCameras,         setShowOfflineCameras,      ShowOfflineCameras,         true)
     QN_END_PROPERTY_STORAGE()
 
 private:
