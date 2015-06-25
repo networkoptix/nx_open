@@ -12,17 +12,85 @@ namespace
     
     const QByteArray utcIanaTemplate = "UTC";
     const QByteArray gmtIanaTemplate = "GMT";
+    
+    bool isDeprecatedTimeZone(const QByteArray &zoneIanaId) {
+        return 
+               zoneIanaId.contains(utcIanaTemplate)     // UTC+03:00
+            || zoneIanaId.contains(gmtIanaTemplate)     // Etc/GMT+3
+            ;
+    }
+
+    QString timeZoneNameWithOffset(const QTimeZone &timeZone, const QDateTime &atDateTime) {
+        if (!timeZone.comment().isEmpty()) {
+            Q_ASSERT_X(timeZone.comment().contains(utcIanaTemplate), Q_FUNC_INFO, "We are waiting for the (UTC+03:00) format");
+            return timeZone.comment();
+        }
+        
+        // Constructing format manually
+        QString tzTemplate("(%1) %2");
+        QString baseName(timeZone.id());      
+        return tzTemplate.arg(timeZone.displayName(atDateTime, QTimeZone::OffsetName), baseName);
+    }
+
+    /** Some timezones have the same seconds offset but different UTC offset in
+     *  their description (due to DST). So we have to adjust the order manually.
+     *  Examples:
+     *		(UTC-06:00) Central America
+     *		(UTC-07:00) Mountain Time (US & Canada)
+     *  both of these timezones have offset -21600 seconds now.
+     */
+    int timeZoneOrderKey(const QString &timeZoneName) {
+
+        /* (UTC) timezones will always have zero key. */
+        int key = 0;
+
+        if (timeZoneName.contains(utcIanaTemplate)) {
+
+            /* Parsing (UTC-06:00) part manually - that is much faster than regexp here. */
+            int utcIdx = timeZoneName.indexOf(utcIanaTemplate);
+            QString offsetHours = timeZoneName.mid(utcIdx + utcIanaTemplate.length(), 3);
+            QString offsetMinutes = timeZoneName.mid(utcIdx + utcIanaTemplate.length() + 4, 2);
+
+            if (offsetHours.startsWith(L'+')) {
+                offsetHours.remove(0, 1);
+                key += 60 * offsetHours.toInt();
+                key += offsetMinutes.toInt();
+
+            } else if (offsetHours.startsWith(L'-')) {
+                offsetHours.remove(0, 1);
+                key -= 60 * offsetHours.toInt();
+                key -= offsetMinutes.toInt();
+            }  
+        }
+
+        return key;
+    }
+
     QStringList getBaseTimeZones()
     {
         const QList<QByteArray> timeZones = QTimeZone::availableTimeZoneIds();
             
-        QStringList result;
-        for(const auto &zoneIanaId: timeZones)
-        {
-            if (!zoneIanaId.contains(utcIanaTemplate) && !zoneIanaId.contains(gmtIanaTemplate))
-                result.push_back(zoneIanaId);
+        auto now = QDateTime::currentDateTime();
+        QMultiMap<int, QString> tzByOffset;
+        for(const auto &zoneIanaId: timeZones) {
+            if (isDeprecatedTimeZone(zoneIanaId))
+                continue;
+            
+            QTimeZone tz(zoneIanaId);
+            QString displayName = timeZoneNameWithOffset(tz, now);
+
+            tzByOffset.insert(  timeZoneOrderKey(displayName),
+                                displayName);
         };
     
+        QStringList result;
+        for (auto &iter = tzByOffset.cbegin(); iter != tzByOffset.cend(); ++iter) {
+            QString tzName(*iter);
+            if (result.contains(tzName))
+                continue;
+            result.append(tzName);
+        }
+        
         return result;
     }
     
