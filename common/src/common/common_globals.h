@@ -86,7 +86,8 @@ public:
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        ShareIpCapability                   = 0x020 
+        ShareIpCapability                   = 0x020,
+        IOModuleCapability                  = 0x040,
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)

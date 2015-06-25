@@ -18,6 +18,9 @@
 #include "camera_user_attribute_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "resource_data.h"
+#include "api/model/api_ioport_data.h"
+#include "utils/serialization/json.h"
+#include <utils/common/model_functions.h>
 
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
@@ -361,11 +364,26 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
 }
 
 QStringList QnSecurityCamResource::getRelayOutputList() const {
-    return QStringList();
+    QStringList result;
+    QnIOPortDataList ports = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+    for (const auto& port: ports) {
+        if (port.portType == Qn::PT_Output)
+            result << port.outputName;
+    }
+    qSort(result);
+    return result;
 }
 
-QStringList QnSecurityCamResource::getInputPortList() const {
-    return QStringList();
+QStringList QnSecurityCamResource::getInputPortList() const 
+{
+    QStringList result;
+    QnIOPortDataList ports = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+    for (const auto& port: ports) {
+        if (port.portType == Qn::PT_Input)
+            result << port.inputName;
+    }
+    qSort(result);
+    return result;
 }
 
 bool QnSecurityCamResource::setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeout) {

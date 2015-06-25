@@ -692,7 +692,7 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceS
 
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay() const {
     const auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
-    return calculateStatusOverlay(m_resource->getStatus(), mediaRes && mediaRes->hasVideo());
+    return calculateStatusOverlay(m_resource->getStatus(), mediaRes && mediaRes->hasVideo(0));
 }
 
 void QnResourceWidget::updateStatusOverlay() {

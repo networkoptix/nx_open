@@ -12,6 +12,7 @@
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/network/simple_http_client.h"
 #include <utils/network/http/multipartcontentparser.h>
+#include "api/model/api_ioport_data.h"
 
 class QnAxisPtzController;
 
@@ -58,11 +59,6 @@ public:
 
     int getChannelNumAxis() const; // depracated
 
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QStringList getRelayOutputList() const override;
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QStringList getInputPortList() const override;
-    //!Implementation of QnSecurityCamResource::setRelayOutputState
     virtual bool setRelayOutputState(
         const QString& ouputID,
         bool activate,
@@ -103,8 +99,9 @@ private:
     QMap<int, QRect> m_motionMask;
     qint64 m_lastMotionReadTime;
     //!map<name, index based on 1>
-    std::map<QString, unsigned int> m_inputPortNameToIndex;
-    std::map<QString, unsigned int> m_outputPortNameToIndex;
+    //std::map<QString, unsigned int> m_inputPortNameToIndex;
+    //std::map<QString, unsigned int> m_outputPortNameToIndex;
+    QnIOPortDataList m_ioPorts;
     mutable QMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
     std::shared_ptr<nx_http::AsyncHttpClient> m_inputPortHttpMonitor;
@@ -125,8 +122,11 @@ private:
         CLSimpleHTTPClient* const httpClient,
         const QString& paramName,
         unsigned int* paramValue );
-    void initializeIOPorts( CLSimpleHTTPClient* const http );
+    CLHttpStatus readAxisParameters(const QString& rootPath, CLSimpleHTTPClient* const httpClient, QList<QPair<QByteArray,QByteArray>>& params);
+    bool initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
+    bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& result);
+    QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
 
     friend class QnAxisPtzController;
 };

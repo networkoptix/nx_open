@@ -6,18 +6,19 @@
 
 struct QnIOPortData
 {
-    QnIOPortData(): portType(Qn::PT_Disabled), defaultState(Qn::IO_OpenCircut), autoResetTimeoutMs(0) {}
+    QnIOPortData(): portType(Qn::PT_Disabled), iDefaultState(Qn::IO_OpenCircut), oDefaultState(Qn::IO_OpenCircut), autoResetTimeoutMs(0) {}
 
     QString id;
     Qn::IOPortType portType;
     Qn::IOPortTypes supportedPortTypes;
     QString inputName;
     QString outputName;
-    Qn::IODefaultState defaultState;   // for output only
+    Qn::IODefaultState iDefaultState;
+    Qn::IODefaultState oDefaultState;
     int autoResetTimeoutMs; // for output only. Keep output state on during timeout if non zero
 };
 typedef std::vector<QnIOPortData> QnIOPortDataList;
-#define QnIOPortData_Fields (id)(portType)(supportedPortTypes)(inputName)(outputName)(defaultState)(autoResetTimeoutMs)
+#define QnIOPortData_Fields (id)(portType)(supportedPortTypes)(inputName)(outputName)(iDefaultState)(oDefaultState)(autoResetTimeoutMs)
 
 struct QnCameraPortsData
 {

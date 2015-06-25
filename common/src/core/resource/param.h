@@ -42,6 +42,7 @@ namespace Qn
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
     static const QString IS_AUDIO_FORCED_PARAM_NAME = lit("forcedAudioStream");
 	static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
+    static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
 
     /* Whether statistics gathering is allowed on the current server. */
     static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
