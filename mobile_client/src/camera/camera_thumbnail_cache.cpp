@@ -139,7 +139,7 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id) {
         return;
 
     QnNetworkResourcePtr camera = qnResPool->getResourceById(id).dynamicCast<QnNetworkResource>();
-    if (!camera || camera->getStatus() != Qn::Online)
+    if (!camera)
         return;
 
     QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
