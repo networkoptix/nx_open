@@ -284,7 +284,7 @@ QnPage {
                 }
 
                 font.pixelSize: dp(20)
-                font.weight: Font.Light
+                font.weight: Font.Normal
 
                 text: timeline.positionDate.toLocaleDateString(__locale, qsTr("d MMMM yyyy"))
                 color: "white"
@@ -316,7 +316,7 @@ QnPage {
                     id: liveLabel
                     anchors.centerIn: timeLabel
                     font.pixelSize: sp(36)
-                    font.weight: Font.Light
+                    font.weight: Font.Normal
                     color: QnTheme.windowText
                     text: qsTr("LIVE")
                     visible: timeline.stickToEnd

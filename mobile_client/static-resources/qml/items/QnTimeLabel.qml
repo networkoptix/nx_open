@@ -15,23 +15,15 @@ Item {
     property int _fontPixelSize: sp(36)
 
     Text {
-        id: minutesIndicator
-        text: dateTime.toLocaleTimeString(_locale, "mm")
-        anchors.centerIn: parent
-        font.pixelSize: sp(_fontPixelSize)
-        color: QnTheme.windowText
-        font.weight: Font.Normal
-    }
-
-    Text {
-        id: secondsSplitter
-        text: ":"
-        anchors.centerIn: parent
-        anchors.horizontalCenterOffset: dp(36)
+        id: hoursIndicator
+        text: dateTime.toLocaleTimeString(_locale, "hh")
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: minutesSplitter.left
+        anchors.rightMargin: dp(16)
 
         font.pixelSize: sp(_fontPixelSize)
         color: QnTheme.windowText
-        font.weight: Font.Light
+        font.weight: Font.Bold
     }
 
     Text {
@@ -40,9 +32,27 @@ Item {
         anchors.centerIn: parent
         anchors.horizontalCenterOffset: dp(-36)
 
+        font: minutesIndicator.font
+        color: QnTheme.windowText
+    }
+
+    Text {
+        id: minutesIndicator
+        text: dateTime.toLocaleTimeString(_locale, "mm")
+        anchors.centerIn: parent
         font.pixelSize: sp(_fontPixelSize)
         color: QnTheme.windowText
-        font.weight: Font.Normal
+        font.weight: Font.DemiBold
+    }
+
+    Text {
+        id: secondsSplitter
+        text: ":"
+        anchors.centerIn: parent
+        anchors.horizontalCenterOffset: dp(36)
+
+        font: secondsIndicator.font
+        color: QnTheme.windowText
     }
 
     Text {
@@ -54,19 +64,7 @@ Item {
 
         font.pixelSize: sp(_fontPixelSize)
         color: QnTheme.windowText
-        font.weight: Font.Light
-    }
-
-    Text {
-        id: hoursIndicator
-        text: dateTime.toLocaleTimeString(_locale, "hh")
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.right: minutesSplitter.left
-        anchors.rightMargin: dp(16)
-
-        font.pixelSize: sp(_fontPixelSize)
-        color: QnTheme.windowText
-        font.weight: Font.DemiBold
+        font.weight: Font.Normal
     }
 }
 
