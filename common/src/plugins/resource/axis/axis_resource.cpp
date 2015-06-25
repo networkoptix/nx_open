@@ -897,6 +897,55 @@ bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPor
     return true;
 }
 
+bool QnPlAxisResource::savePortSettings( CLSimpleHTTPClient* const http, const QnIOPortDataList& newPorts)
+{
+    QMap<QString,QString> changedParams;
+
+    for(auto& currentValue: m_ioPorts)
+    {
+        QString paramNamePrefix = lit("root.IOPort.%1.").arg(currentValue.id);
+        for (const QnIOPortData& newValue: newPorts)
+        {
+            if (newValue.id != currentValue.id)
+                continue;
+            
+            if (newValue.portType != Qn::PT_Disabled && newValue.portType != currentValue.portType)
+                changedParams.insert(paramNamePrefix + lit("Direction"), newValue.portType == Qn::PT_Output ? lit("output") : lit("input"));
+
+            if (newValue.inputName != currentValue.inputName)
+                changedParams.insert(paramNamePrefix + lit("Input.Name"), newValue.inputName);
+            if (newValue.iDefaultState != currentValue.iDefaultState)
+                changedParams.insert(paramNamePrefix + lit("Input.Trig"), newValue.iDefaultState == Qn::IO_OpenCircut ? lit("closed") : lit("open"));
+
+            if (newValue.outputName != currentValue.outputName)
+                changedParams.insert(paramNamePrefix + lit("Output.Name"), newValue.outputName);
+            if (newValue.oDefaultState != currentValue.oDefaultState)
+                changedParams.insert(paramNamePrefix + lit("Output.Trig"), newValue.oDefaultState == Qn::IO_OpenCircut ? lit("closed") : lit("open"));
+
+            if (newValue.autoResetTimeoutMs != currentValue.autoResetTimeoutMs)
+                changedParams.insert(paramNamePrefix + lit("Output.PulseTime"), QString::number(newValue.autoResetTimeoutMs));
+        }
+    }
+
+    static const QByteArray UPD_PATH_PREFIX("axis-cgi/param.cgi?action=update");
+    static const int MAX_PATH_SIZE = 128;
+    QByteArray path = UPD_PATH_PREFIX;
+    for (auto itr = changedParams.begin(); itr != changedParams.end();)
+    {
+        path.append(lit("&%1=%2").arg(itr.key()).arg(itr.value()).toUtf8());
+        ++itr;
+        if (path.size() >= MAX_PATH_SIZE || itr == changedParams.end()) {
+            CLHttpStatus status = http->doGET(path);
+            if (status != CL_HTTP_SUCCESS) {
+                qWarning() << "Failed to update IO params for camera " << getHostAddress() << "rejected value:" << path;
+                return false;
+            }
+            path = UPD_PATH_PREFIX;
+        }
+    }
+    return true;
+}
+
 QnIOPortDataList QnPlAxisResource::mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO)
 {
     QnIOPortDataList result = cameraIO;
