@@ -16,6 +16,7 @@ Item {
 
     signal clicked
     signal pressAndHold
+    signal swyped
 
     width: content.width
     height: content.height
@@ -82,11 +83,29 @@ Item {
                 color: _offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
             }
         }
+
+        Behavior on x { NumberAnimation { duration: 200 } }
     }
 
     QnMaterialSurface {
         onClicked: cameraItem.clicked()
         onPressAndHold: cameraItem.pressAndHold()
+
+        drag.axis: Drag.XAxis
+        drag.target: content
+        drag.onActiveChanged: {
+            if (drag.active)
+                return
+
+            if (Math.abs(content.x) > content.width / 2) {
+                content.x = content.x > 0 ? content.width : -content.width
+                cameraItem.swyped()
+            } else {
+                content.x = 0
+            }
+        }
     }
+
+    opacity: Math.max(0.0, 1.0 - Math.abs(content.x) / content.width)
 }
 

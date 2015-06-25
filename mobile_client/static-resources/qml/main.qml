@@ -83,7 +83,7 @@ Window {
 
         onCurrentItemChanged: {
             if (currentItem) {
-                toolBar.title = Qt.binding(function() { return currentItem.title })
+                toolBar.title = Qt.binding(function() { return currentItem ? currentItem.title : "" })
             }
         }
     }
@@ -127,9 +127,11 @@ Window {
             if (connectionManager.connected) {
                 LoginFunctions.saveCurrentSession()
                 loginSessionManager.lastUsedSessionId = currentSessionId
+                settings.sessionId = currentSessionId
                 Main.gotoResources()
             } else {
                 loginSessionManager.lastUsedSessionId = ""
+                settings.sessionId = ""
                 Main.gotoNewSession()
             }
         }

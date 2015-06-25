@@ -83,7 +83,8 @@ namespace {
 QnCameraListModel::QnCameraListModel(QObject *parent) :
     QSortFilterProxyModel(parent),
     m_model(new QnFilteredCameraListModel(this)),
-    m_showOffline(true)
+    m_showOffline(true),
+    m_hiddenCamerasOnly(false)
 {
     setSourceModel(m_model);
     setDynamicSortFilter(true);
@@ -128,6 +129,33 @@ void QnCameraListModel::setShowOffline(bool showOffline) {
     m_showOffline = showOffline;
     emit showOfflineChanged();
 
+    invalidateFilter();
+}
+
+QStringList QnCameraListModel::hiddenCameras() const {
+    return m_hiddenCameras.toList();
+}
+
+void QnCameraListModel::setHiddenCameras(const QStringList &hiddenCameras) {
+    QSet<QString> hiddenCamerasSet = QSet<QString>::fromList(hiddenCameras);
+    if (m_hiddenCameras == hiddenCamerasSet)
+        return;
+
+    m_hiddenCameras = hiddenCamerasSet;
+    emit hiddenCamerasChanged();
+    invalidateFilter();
+}
+
+bool QnCameraListModel::hiddenCamerasOnly() const {
+    return m_hiddenCamerasOnly;
+}
+
+void QnCameraListModel::setHiddenCamerasOnly(bool hiddenCamerasOnly) {
+    if (m_hiddenCamerasOnly == hiddenCamerasOnly)
+        return;
+
+    m_hiddenCamerasOnly = hiddenCamerasOnly;
+    emit hiddenCamerasOnlyChanged();
     invalidateFilter();
 }
 
@@ -208,6 +236,12 @@ bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourc
         if (status == Qn::Offline || status == Qn::NotDefined)
             return false;
     }
+
+    QString id = index.data(Qn::UuidRole).toUuid().toString();
+    if (m_hiddenCameras.contains(id))
+        return m_hiddenCamerasOnly;
+    else if (m_hiddenCamerasOnly)
+        return false;
 
     QString name = index.data(Qn::ResourceNameRole).toString();
     return name.contains(filterRegExp());

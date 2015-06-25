@@ -38,15 +38,9 @@ QnPage {
         visible: pageStatus == Stack.Active || pageStatus == Stack.Activating
     }
 
-    QnCameraListModel {
-        id: camerasModel
-        showOffline: settings.showOfflineCameras
-    }
-
     QnCameraFlow {
-        id: listView
+        id: camerasList
         anchors.fill: parent
-        model: camerasModel
     }
 
     Rectangle {
@@ -93,22 +87,16 @@ QnPage {
         }
     }
 
-    onWidthChanged: updateLayout()
-
     Connections {
         target: connectionManager
         onInitialResourcesReceived: {
             loadingDummy.opacity = 0.0
-            updateLayout()
+            camerasList.updateLayout()
         }
         onConnectedChanged: {
             if (!connectionManager.connected) {
                 loadingDummy.opacity = 1.0
             }
         }
-    }
-
-    function updateLayout() {
-        camerasModel.updateLayout(resourcesPage.width, 3.0)
     }
 }

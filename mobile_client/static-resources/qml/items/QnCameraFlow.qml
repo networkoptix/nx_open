@@ -1,7 +1,10 @@
-import QtQuick 2.2
-import Material 0.1
+import QtQuick 2.4
+
+import com.networkoptix.qml 1.0
 
 import "../main.js" as Main
+
+import "../controls"
 
 Flickable {
     id: cameraFlow
@@ -9,27 +12,122 @@ Flickable {
     property alias model: repeater.model
 
     contentWidth: width
-    contentHeight: flow.height
+    contentHeight: content.height
     leftMargin: dp(16)
     rightMargin: dp(16)
     bottomMargin: dp(16)
 
-    Flow {
-        id: flow
+    Column {
+        id: content
 
-        spacing: dp(16)
-        width: cameraFlow.width - cameraFlow.leftMargin - cameraFlow.rightMargin
+        Flow {
+            id: flow
 
-        Repeater {
-            id: repeater
+            spacing: dp(16)
+            width: cameraFlow.width - cameraFlow.leftMargin - cameraFlow.rightMargin
 
-            QnCameraItem {
-                text: model.resourceName
-                status: model.resourceStatus
-                thumbnail: model.thumbnail
-                thumbnailWidth: flow.width / 2 - flow.spacing / 2
+            Repeater {
+                id: repeater
 
-                onClicked: Main.openMediaResource(model.uuid)
+                model: QnCameraListModel {
+                    id: camerasModel
+                    showOffline: settings.showOfflineCameras
+                    hiddenCameras: settings.hiddenCameras
+                }
+
+                QnCameraItem {
+                    text: model.resourceName
+                    status: model.resourceStatus
+                    thumbnail: model.thumbnail
+                    thumbnailWidth: flow.width / 2 - flow.spacing / 2
+
+                    onClicked: Main.openMediaResource(model.uuid)
+                    onSwyped: {
+                        settings.hiddenCameras.push(model.uuid)
+                    }
+                }
+            }
+        }
+
+        Column {
+            id: hiddenCamerasContent
+            width: cameraFlow.width
+            x: -cameraFlow.leftMargin
+
+            visible: hiddenCamerasList.count > 0
+
+            Item {
+                height: dp(24)
+                width: parent.width
+
+                Rectangle {
+                    anchors.verticalCenter: parent.bottom
+                    anchors.verticalCenterOffset: -dp(8)
+                    width: parent.width
+                    height: dp(1)
+                    color: QnTheme.listSeparator
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: dp(48)
+
+                Image {
+                    source: "qrc:///images/section_open.png"
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: dp(16)
+                    rotation: settings.hiddenCamerasCollapsed ? 180 : 0
+                    Behavior on rotation { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: dp(48)
+                    text: qsTr("Hidden cameras")
+                    font.pixelSize: sp(15)
+                    font.weight: Font.DemiBold
+                    color: QnTheme.listSectionText
+                }
+
+                QnMaterialSurface {
+                    onClicked: settings.hiddenCamerasCollapsed = !settings.hiddenCamerasCollapsed
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: settings.hiddenCamerasCollapsed ? 0 : hiddenCamerasColumn.height
+                clip: true
+
+                Behavior on height { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+
+                Column {
+                    id: hiddenCamerasColumn
+                    width: parent.width
+
+                    Repeater {
+                        id: hiddenCamerasList
+                        model: QnCameraListModel {
+                            id: hiddenCamerasModel
+                            showOffline: settings.showOfflineCameras
+                            hiddenCameras: settings.hiddenCameras
+                            hiddenCamerasOnly: true
+                        }
+
+                        QnHiddenCameraItem {
+                            text: model.resourceName
+                            status: model.resourceStatus
+
+                            onClicked: Main.openMediaResource(model.uuid)
+                            onShowClicked: {
+                                var index = settings.hiddenCameras.indexOf(model.uuid)
+                                if (index >= 0)
+                                    settings.hiddenCameras.splice(index, 1)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -48,5 +146,11 @@ Flickable {
         onTriggered: {
             model.refreshThumbnails(0, repeater.count)
         }
+    }
+
+    onWidthChanged: updateLayout()
+
+    function updateLayout() {
+        model.updateLayout(resourcesPage.width, 3.0)
     }
 }

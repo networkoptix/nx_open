@@ -11,6 +11,7 @@ Item {
     property real explicitRadius: 0
 
     readonly property alias pressed: mouseArea.pressed
+    property alias drag: mouseArea.drag
 
     signal clicked(real x, real y)
     signal pressAndHold(real x, real y)
@@ -152,7 +153,8 @@ Item {
                     tapCircle.fadeOut()
             }
             fadeInTimer.stop()
-            clickDelayTimer.start()
+            if (!drag.active)
+                clickDelayTimer.start()
         }
         onPressedChanged: {
             if (!pressed) {
@@ -160,6 +162,15 @@ Item {
                     tapCircle.fadeOut()
                 fadeInTimer.stop()
             }
+        }
+
+        drag.onActiveChanged: {
+            if (!drag.active)
+                return
+
+            if (!fadeInTimer.running && !selected)
+                tapCircle.fadeOut()
+            fadeInTimer.stop()
         }
 
         onPressAndHold: materialSurface.pressAndHold(mouse.x, mouse.y)

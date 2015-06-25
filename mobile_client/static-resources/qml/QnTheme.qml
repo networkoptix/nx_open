@@ -25,6 +25,7 @@ QtObject {
     property color listSectionText
     property color listText
     property color listSubText
+    property color listSeparator
 
     property color sessionItemBackground
     property color sessionItemBackgroundActive
@@ -64,6 +65,7 @@ QtObject {
         listSectionText         = colorTheme.color("list.sectionText")
         listText                = colorTheme.color("list.text")
         listSubText             = colorTheme.color("list.subText")
+        listSeparator           = colorTheme.color("list.separator")
         sessionItemBackground   = colorTheme.color("sessionItem.background")
         sessionItemBackgroundActive = colorTheme.color("sessionItem.backgroundActive")
         sessionItemActiveMark   = colorTheme.color("sessionItem.activeMark")
