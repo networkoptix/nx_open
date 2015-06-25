@@ -20,33 +20,52 @@ Flickable {
     Column {
         id: content
 
-        Flow {
-            id: flow
+        width: parent.width
 
-            spacing: dp(16)
-            width: cameraFlow.width - cameraFlow.leftMargin - cameraFlow.rightMargin
+        Item {
+            id: flowContent
+            width: parent.width
+            height: flow.height
+            clip: true
 
-            Repeater {
-                id: repeater
+            Flow {
+                id: flow
 
-                model: QnCameraListModel {
-                    id: camerasModel
-                    showOffline: settings.showOfflineCameras
-                    hiddenCameras: settings.hiddenCameras
-                }
+                spacing: dp(16)
+                width: cameraFlow.width - cameraFlow.leftMargin - cameraFlow.rightMargin
 
-                QnCameraItem {
-                    text: model.resourceName
-                    status: model.resourceStatus
-                    thumbnail: model.thumbnail
-                    thumbnailWidth: flow.width / 2 - flow.spacing / 2
+                Repeater {
+                    id: repeater
 
-                    onClicked: Main.openMediaResource(model.uuid)
-                    onSwyped: {
-                        settings.hiddenCameras.push(model.uuid)
+                    model: QnCameraListModel {
+                        id: camerasModel
+                        showOffline: settings.showOfflineCameras
+                        hiddenCameras: settings.hiddenCameras
+                    }
+
+                    QnCameraItem {
+                        text: model.resourceName
+                        status: model.resourceStatus
+                        thumbnail: model.thumbnail
+                        thumbnailWidth: flow.width / 2 - flow.spacing / 2
+
+                        onClicked: Main.openMediaResource(model.uuid)
+                        onSwyped: {
+                            settings.hiddenCameras.push(model.uuid)
+                        }
                     }
                 }
+
+                move: Transition {
+                    NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutCubic }
+                }
+                add: Transition {
+                    NumberAnimation { properties: "opacity"; duration: 500; easing.type: Easing.OutCubic }
+                }
+
             }
+
+            Behavior on height { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
         }
 
         Column {
@@ -121,11 +140,23 @@ Flickable {
 
                             onClicked: Main.openMediaResource(model.uuid)
                             onShowClicked: {
-                                var index = settings.hiddenCameras.indexOf(model.uuid)
-                                if (index >= 0)
-                                    settings.hiddenCameras.splice(index, 1)
+                                var originalList = settings.hiddenCameras
+
+                                var hiddenCameras = []
+                                for (var i = 0; i < originalList.length; i++) {
+                                    if (originalList[i] !== model.uuid)
+                                        hiddenCameras.push(originalList[i])
+                                }
+
+                                settings.hiddenCameras = hiddenCameras
                             }
                         }
+                    }
+                    move: Transition {
+                        NumberAnimation { properties: "x"; duration: 500; easing.type: Easing.OutCubic }
+                    }
+                    add: Transition {
+                        NumberAnimation { properties: "opacity"; duration: 500; easing.type: Easing.OutCubic }
                     }
                 }
             }
