@@ -1,0 +1,48 @@
+#ifndef __IOPORT_DATA_H_
+#define __IOPORT_DATA_H_
+
+#include <utils/common/uuid.h>
+#include <utils/common/model_functions_fwd.h>
+
+struct QnIOPortData
+{
+    QnIOPortData(): portType(Qn::PT_Disabled), defaultState(Qn::IO_OpenCircut), autoResetTimeoutMs(0) {}
+
+    QString id;
+    Qn::IOPortType portType;
+    Qn::IOPortTypes supportedPortTypes;
+    QString inputName;
+    QString outputName;
+    Qn::IODefaultState defaultState;   // for output only
+    int autoResetTimeoutMs; // for output only. Keep output state on during timeout if non zero
+};
+typedef std::vector<QnIOPortData> QnIOPortDataList;
+#define QnIOPortData_Fields (id)(portType)(supportedPortTypes)(inputName)(outputName)(defaultState)(autoResetTimeoutMs)
+
+struct QnCameraPortsData
+{
+    QnUuid id;
+    QnIOPortDataList ports;
+};
+#define QnCameraPortsData_Fields (id)(ports)
+    
+struct QnIOStateData
+{
+    QnIOStateData(): isActive(false) {}
+    QString id;
+    bool isActive;
+};
+typedef std::vector<QnIOStateData> QnIOStateDataList;
+#define QnIOStateData_Fields (id)(isActive)
+
+struct QnCameraIOStateData
+{
+    QnUuid id;
+    QnIOStateDataList state;
+};
+typedef std::vector<QnCameraIOStateData> QnCameraIOStateDataList;
+#define QnCameraIOStateData_Fields (id)(state)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnIOPortData)(QnCameraPortsData)(QnIOStateData)(QnCameraIOStateData), (json)(ubjson)(eq))
+
+#endif  //__IOPORT_DATA_H_

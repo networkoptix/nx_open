@@ -33,13 +33,13 @@ namespace Qn
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            ServerFlag CameraStatusFlag)
+            ServerFlag CameraStatusFlag IOPortType IODefaultState)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
             PtzDataFields PtzCapabilities PtzTraits 
             MotionTypes TimePeriodTypes 
-            ServerFlags CameraStatusFlags)
+            ServerFlags CameraStatusFlags IOPortTypes)
 public:
 #else
     Q_NAMESPACE
@@ -343,15 +343,21 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
 
     enum IOPortType {
-        PT_Disabled,
-        PT_Input,
-        PT_Output,
+        PT_Unknown  = 0x0,
+        PT_Disabled = 0x1,
+        PT_Input    = 0x2,
+        PT_Output   = 0x4
     };
+    Q_DECLARE_FLAGS(IOPortTypes, IOPortType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(IOPortTypes)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IOPortType)
+
     
     enum IODefaultState {
         IO_OpenCircut,
         IO_CloseGround
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IODefaultState)
 
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */
@@ -671,7 +677,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
-        (Qn::TTHeaderFlag),
+        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState),
     (metatype)(lexical)
 )
 
@@ -688,6 +694,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TTHeaderFlags),
     (metatype)(numeric)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::IOPortTypes),
+    (metatype)(numeric)(lexical)
 )
 
 #endif // QN_COMMON_GLOBALS_H
