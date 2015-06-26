@@ -75,11 +75,11 @@ namespace
         if (servers.empty())
             return kDiffTimeZonesId;
         
-        const QByteArray timeZoneId = servers.first()->extraInfo().timeZone.id();
+        const QByteArray timeZoneId = servers.first()->extraInfo().timeZoneId;
         for (rtu::ServerInfo *info: servers)
         {
             //TODO: #ynikitenkov make sure extraInfo exists here
-            if (timeZoneId != info->extraInfo().timeZone.id())
+            if (timeZoneId != info->extraInfo().timeZoneId)
                 return kDiffTimeZonesId;
         }
         return timeZoneId;

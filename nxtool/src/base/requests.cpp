@@ -209,18 +209,17 @@ bool parseGetTimeCmd(const QJsonObject &object
         || (!timeData.contains(kTimeZoneIdTag) && !timeData.contains(kTimeZoneOffsetTag)))
         return false;
     
-    const QTimeZone &timeZone = (containsTimeZoneId 
-        ? QTimeZone(timeData.value(kTimeZoneIdTag).toString().toStdString().c_str())
-        : QTimeZone(timeData.value(kTimeZoneOffsetTag).toInt()));
+    const QByteArray &timeZoneId = containsTimeZoneId 
+        ? timeData.value(kTimeZoneIdTag).toString().toUtf8()
+        : QTimeZone(timeData.value(kTimeZoneOffsetTag).toInt()).id();
 
     const qint64 msecs = timeData.value(kUtcTimeTag).toString().toLongLong();
     
-    extraInfo.timeZone = timeZone;
-    extraInfo.utcDateTime = QDateTime::fromMSecsSinceEpoch(msecs, Qt::UTC);
+    extraInfo.timeZoneId = timeZoneId;
+    extraInfo.utcDateTimeMs = msecs;
+    extraInfo.timestampMs = QDateTime::currentMSecsSinceEpoch();
 
-    extraInfo.timestamp = QDateTime::currentDateTime();
-
-    return true;    
+    return true;
 }
 
 ///
@@ -355,13 +354,14 @@ bool rtu::getServerExtraInfo(HttpClient *client
 
 bool rtu::sendSetTimeRequest(HttpClient *client
     , const ServerInfo &info
-    , const QDateTime &utcDateTime
-    , const QTimeZone &timeZone
+    , qint64 utcDateTimeMs
+    , const QByteArray &timeZoneId
     , const OperationCallback &callback)
 {
-    if (!info.hasExtraInfo() || !utcDateTime.isValid() 
-        || !timeZone.isValid() || !client)
+    if (!info.hasExtraInfo() || utcDateTimeMs <= 0
+        || !QTimeZone(timeZoneId).isValid() || !client)
     {
+        qDebug() << timeZoneId << QTimeZone(timeZoneId).isValid();
         return false;
     }
     
@@ -371,8 +371,8 @@ bool rtu::sendSetTimeRequest(HttpClient *client
     QUrl url = makeUrl(info, kSetTimeCommand);
     
     QUrlQuery query;
-    query.addQueryItem(kDateTimeTag, QString::number(utcDateTime.toMSecsSinceEpoch()));
-    query.addQueryItem(kTimeZoneTag, timeZone.id());
+    query.addQueryItem(kDateTimeTag, QString::number(utcDateTimeMs));
+    query.addQueryItem(kTimeZoneTag, timeZoneId);
     url.setQuery(query);
     
     const AffectedEntities affected = (kDateTimeAffected | kTimeZoneAffected);
@@ -505,10 +505,6 @@ void rtu::sendChangeItfRequest(HttpClient *client
     , const ItfUpdateInfoContainer &updateInfos
     , const OperationCallback &callback)
 {
-    ItfUpdateInfo test;
-    ItfUpdateInfo test2;
-    test2 = test;
-
     QJsonArray jsonInfoChanges;
     AffectedEntities affected = 0;
     for (const ItfUpdateInfo &change: updateInfos)

@@ -83,8 +83,9 @@ Expandable.MaskedSettingsPanel
                             newDate = now;
                             newTime = now;
                         }
-                        rtuContext.changesManager().addDateTimeChange(
-                            newDate, newTime, timeZonePicker.currentText);
+
+                        var timeZoneId = timeZonePicker.model.timeZoneIdByIndex(timeZonePicker.currentIndex)
+                        rtuContext.changesManager().addDateTimeChange(newDate, newTime, timeZoneId);
                         return true;
                     }
 

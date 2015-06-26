@@ -20,19 +20,14 @@ namespace
 {
     struct DateTime
     {
-        QDateTime utcDateTime;
-        QTimeZone timeZone;
+        qint64 utcDateTimeMs;
+        QByteArray timeZoneId;
 
-        DateTime(const QDateTime &initUtcDateTime
-            , const QTimeZone &initTimeZone);
+        DateTime(qint64 utcDateTimeMs, const QByteArray &timeZoneId)
+            : utcDateTimeMs(utcDateTimeMs)
+            , timeZoneId(timeZoneId)
+            {}
     };
-
-    DateTime::DateTime(const QDateTime &initUtcDateTime
-        , const QTimeZone &initTimeZone)
-        : utcDateTime(initUtcDateTime)
-        , timeZone(initTimeZone)
-    {}
-
 
     struct Changeset
     {
@@ -446,39 +441,41 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
     if (!m_changeset || !m_changeset->dateTime)
         return;
 
-    const QDateTime timestamp = QDateTime::currentDateTimeUtc();
+    const qint64 timestampMs = QDateTime::currentMSecsSinceEpoch();
     const DateTime &change = *m_changeset->dateTime;
     for (ServerInfo *info: m_targetServers)
     {
-        const auto request = [this, info, change, timestamp]()
+        const auto request = [this, info, change, timestampMs]()
         {
             const auto &callback = 
-                [this, info, change, timestamp](const QString &errorReason, AffectedEntities affected)
+                [this, info, change, timestampMs](const QString &errorReason, AffectedEntities affected)
             {
                 static const QString kDateTimeDescription = "date / time";
                 static const QString kTimeZoneDescription = "time zone";
                 
-                const QString &value= convertUtcToTimeZone(change.utcDateTime, change.timeZone).toString();
+                const QString &value= convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId)).toString();
                 const bool dateTimeOk = addSummaryItem(*info, kDateTimeDescription
                     , value, errorReason, kDateTimeAffected, affected);
                 const bool timeZoneOk = addSummaryItem(*info, kTimeZoneDescription
-                    , QString(change.timeZone.id()), errorReason, kTimeZoneAffected, affected);
+                    , QString(change.timeZoneId), errorReason, kTimeZoneAffected, affected);
                 
                 if (dateTimeOk && timeZoneOk)
                 {
-                    m_model->updateTimeDateInfo(info->baseInfo().id, change.utcDateTime
-                        , change.timeZone, timestamp);
+                    m_model->updateTimeDateInfo(info->baseInfo().id, change.utcDateTimeMs
+                        , change.timeZoneId, timestampMs);
                     
                     ExtraServerInfo &extraInfo = info->writableExtraInfo();
-                    extraInfo.timestamp = timestamp;
-                    extraInfo.timeZone = change.timeZone;
-                    extraInfo.utcDateTime = change.utcDateTime;
+                    extraInfo.timestampMs = timestampMs;
+                    extraInfo.timeZoneId = change.timeZoneId;
+                    extraInfo.utcDateTimeMs = change.utcDateTimeMs;
                 }
                 
                 onChangeApplied();
             };
 
-            sendSetTimeRequest(m_client, *info, change.utcDateTime, change.timeZone, callback);
+            if (!sendSetTimeRequest(m_client, *info, change.utcDateTimeMs, change.timeZoneId, callback)) {
+                callback("Invalid request", rtu::kNoEntitiesAffected);
+            }
         };
 
         m_requests.push_back(RequestData(kNonBlockingRequest, request));
@@ -794,13 +791,13 @@ void rtu::ChangesManager::addDateTimeChange(const QDate &date
     , const QTime &time
     , const QByteArray &timeZoneId)
 {
-    const QDateTime &utcTime = utcFromTimeZone(date, time, QTimeZone(timeZoneId));
-    m_impl->getChangeset().dateTime.reset(new DateTime(utcTime, QTimeZone(timeZoneId)));
+    qint64 utcTimeMs = utcMsFromTimeZone(date, time, QTimeZone(timeZoneId));
+    m_impl->getChangeset().dateTime.reset(new DateTime(utcTimeMs, timeZoneId));
 }
 
 void rtu::ChangesManager::turnOnDhcp()
 {
-    static const QString &kAnyName = "blah blah";
+    static const QString &kAnyName = "turnOnDhcp";
     /// In this case it is multiple selection. Just add empty interface
     /// change information to indicate that we should force dhcp on
     m_impl->getItfUpdateInfo(kAnyName);

@@ -234,9 +234,9 @@ public:
     ///
     
     void updateTimeDateInfo(const QUuid &id
-        , const QDateTime &dateTime
-        , const QTimeZone &timeZone
-        , const QDateTime &timestamp);
+        , qint64 utcDateTimeMs
+        , const QByteArray &timeZoneId
+        , qint64 timestampMs);
     
     void updateInterfacesInfo(const QUuid &id
         , const QString &host
@@ -591,9 +591,9 @@ void rtu::ServersSelectionModel::Impl::tryLoginWith(const QString &password)
 }
 
 void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
-    , const QDateTime &utcDateTime
-    , const QTimeZone &timeZone
-    , const QDateTime &timestamp)
+    , qint64 utcDateTimeMs
+    , const QByteArray &timeZoneId
+    , qint64 timestampMs)
 {
     ItemSearchInfo searchInfo;
     if (!findServer(id, searchInfo))
@@ -604,9 +604,9 @@ void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
         info.setExtraInfo(ExtraServerInfo());
     
     ExtraServerInfo &extraInfo = info.writableExtraInfo();
-    extraInfo.utcDateTime = utcDateTime;
-    extraInfo.timeZone = timeZone;
-    extraInfo.timestamp = timestamp;
+    extraInfo.utcDateTimeMs = utcDateTimeMs;
+    extraInfo.timeZoneId = timeZoneId;
+    extraInfo.timestampMs = timestampMs;
 }
 
 void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
@@ -888,11 +888,11 @@ void rtu::ServersSelectionModel::removeServers(const IDsVector &removed)
 }
 
 void rtu::ServersSelectionModel::updateTimeDateInfo(const QUuid &id
-    , const QDateTime &utcDateTime
-    , const QTimeZone &timeZone
-    , const QDateTime &timestamp)
+                                                    , qint64 utcDateTimeMs
+                                                    , const QByteArray &timeZoneId
+                                                    , qint64 timestampMs)
 {
-    m_impl->updateTimeDateInfo(id, utcDateTime, timeZone, timestamp);
+    m_impl->updateTimeDateInfo(id, utcDateTimeMs, timeZoneId, timestampMs);
 }
 
 void rtu::ServersSelectionModel::updateInterfacesInfo(const QUuid &id

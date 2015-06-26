@@ -105,45 +105,44 @@ namespace
             return QDateTime();
         
         const qint64 now = QDateTime::currentMSecsSinceEpoch();
-        const auto &getter = [now](const rtu::ServerInfo &info) -> QDateTime
+        const auto &getter = [now](const rtu::ServerInfo &info) -> qint64
         {
             if (!info.hasExtraInfo())
-                return QDateTime();
+                return 0;
 
-            const qint64 dateMsecs = info.extraInfo().utcDateTime.toMSecsSinceEpoch();
-            const qint64 timestamp = info.extraInfo().timestamp.toMSecsSinceEpoch();
-            return QDateTime::fromMSecsSinceEpoch(dateMsecs + (now - timestamp));
+            const qint64 dateMsecs = info.extraInfo().utcDateTimeMs;
+            const qint64 timestamp = info.extraInfo().timestampMs;
+            return dateMsecs + (now - timestamp);
         };
 
         const int selectedCount = servers.size();
         if (selectedCount == kSingleServerSelectionCount)
         {
             const rtu::ServerInfo &firstInfo = **servers.begin();
-            const QDateTime time = getter(firstInfo);
-            if (!time.isValid() || time.isNull())
+            qint64 utcTimeMs = getter(firstInfo);
+            if (utcTimeMs <= 0)
                 return QDateTime();
 
-            return rtu::convertUtcToTimeZone(time, firstInfo.extraInfo().timeZone);
+            return rtu::convertUtcToTimeZone(utcTimeMs, QTimeZone(firstInfo.extraInfo().timeZoneId));
         }
     
-        static const auto &eq = [](const QDateTime &first, const QDateTime &second) -> bool
+        static const auto &eq = [](qint64 first, qint64 second) -> bool
         {
-            enum { kEps = 130 * 1000};    /// 30 seconds
-            return (std::abs(first.toMSecsSinceEpoch() - second.toMSecsSinceEpoch()) < kEps);
+            enum { kEps = 30 * 1000};    /// 30 seconds
+            return (std::abs(first - second) < kEps);
         };
     
-    
-        const QDateTime result = getSelectionValue<QDateTime>(
-            servers, QDateTime(), QDateTime(), eq, getter);
+        const qint64 utcTimeMs = getSelectionValue<qint64>(
+            servers, 0, 0, eq, getter);
 
         const QByteArray tz = getSelectionValue<QByteArray>(servers, QByteArray(), QByteArray()
             , std::equal_to<QByteArray>(), [](const rtu::ServerInfo &info) -> QByteArray
         {
-            return (info.hasExtraInfo() ? info.extraInfo().timeZone.id() : QByteArray());
+            return (info.hasExtraInfo() ? info.extraInfo().timeZoneId : QByteArray());
         });
 
-        return (result.isNull() || !result.isValid() || tz.isEmpty() ?
-            QDateTime() : rtu::convertUtcToTimeZone(result, QTimeZone(tz)));
+        return (utcTimeMs <= 0  || tz.isEmpty() ?
+            QDateTime() : rtu::convertUtcToTimeZone(utcTimeMs, QTimeZone(tz)));
     }
 
     

@@ -62,17 +62,17 @@ namespace rtu
     struct ExtraServerInfo
     {
         QString password;
-        QDateTime timestamp;
-        QDateTime utcDateTime;
-        QTimeZone timeZone;
+        qint64 timestampMs;
+        qint64 utcDateTimeMs;
+        QByteArray timeZoneId;
         InterfaceInfoList interfaces;
         
         ExtraServerInfo();
         
         ExtraServerInfo(const QString &initPassword
-            , const QDateTime &initTimestamp
-            , const QDateTime &initUtcDateTime
-            , const QTimeZone &initTimeZone
+            , const qint64 &initTimestampMs
+            , const qint64 &initUtcDateTimeMs
+            , const QByteArray &initTimeZoneId
             , const InterfaceInfoList initInterfaces);
     };
     
