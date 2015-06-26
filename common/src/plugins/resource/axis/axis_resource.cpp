@@ -877,18 +877,18 @@ bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPor
         }
         else if (paramName == "Input.Trig") {
             if (paramValue == "closed")
-                portData.iDefaultState = Qn::IO_OpenCircut;
+                portData.iDefaultState = Qn::IO_OpenCircuit;
             else
-                portData.iDefaultState = Qn::IO_CloseGround;
+                portData.iDefaultState = Qn::IO_GroundedCircuit;
         }
         else if (paramName == "Output.Name") {
             portData.outputName = QString::fromUtf8(paramValue);
         }
         else if (paramName == "Output.Active") {
             if (paramValue == "closed")
-                portData.oDefaultState = Qn::IO_OpenCircut;
+                portData.oDefaultState = Qn::IO_OpenCircuit;
             else
-                portData.oDefaultState = Qn::IO_CloseGround;
+                portData.oDefaultState = Qn::IO_GroundedCircuit;
         }
         else if (paramName == "Output.PulseTime") {
             portData.autoResetTimeoutMs = paramValue.toInt();
@@ -919,12 +919,12 @@ bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts)
             if (newValue.inputName != currentValue.inputName)
                 changedParams.insert(paramNamePrefix + lit("Input.Name"), newValue.inputName);
             if (newValue.iDefaultState != currentValue.iDefaultState)
-                changedParams.insert(paramNamePrefix + lit("Input.Trig"), newValue.iDefaultState == Qn::IO_OpenCircut ? lit("closed") : lit("open"));
+                changedParams.insert(paramNamePrefix + lit("Input.Trig"), newValue.iDefaultState == Qn::IO_OpenCircuit ? lit("closed") : lit("open"));
 
             if (newValue.outputName != currentValue.outputName)
                 changedParams.insert(paramNamePrefix + lit("Output.Name"), newValue.outputName);
             if (newValue.oDefaultState != currentValue.oDefaultState)
-                changedParams.insert(paramNamePrefix + lit("Output.Trig"), newValue.oDefaultState == Qn::IO_OpenCircut ? lit("closed") : lit("open"));
+                changedParams.insert(paramNamePrefix + lit("Output.Trig"), newValue.oDefaultState == Qn::IO_OpenCircuit ? lit("closed") : lit("open"));
 
             if (newValue.autoResetTimeoutMs != currentValue.autoResetTimeoutMs)
                 changedParams.insert(paramNamePrefix + lit("Output.PulseTime"), QString::number(newValue.autoResetTimeoutMs));
@@ -977,11 +977,14 @@ bool QnPlAxisResource::ioPortErrorOccured()
 
 bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
 {
+    if (getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0)
+        setCameraCapability(Qn::IOModuleCapability, true);
+
     QnIOPortDataList cameraPorts;
     if (!readPortSettings(http, cameraPorts))
         return ioPortErrorOccured();
     
-    QnIOPortDataList savedPorts = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+    QnIOPortDataList savedPorts = getIOPorts();
     if (savedPorts.empty() && !cameraPorts.empty()) {
         m_ioPorts = cameraPorts;
     }
@@ -991,7 +994,7 @@ bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
             return ioPortErrorOccured();
     }
     if (m_ioPorts != savedPorts)
-        setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(m_ioPorts)));
+        setIOPorts(m_ioPorts);
 
     Qn::CameraCapabilities caps = Qn::NoCapabilities;
     for (const auto& port: m_ioPorts) {
@@ -1123,9 +1126,14 @@ int QnPlAxisResource::getChannel() const
 
 void QnPlAxisResource::asyncUpdateIOSettings(const QString & key)
 {
-    stopInputPortMonitoringAsync();
-
     const auto newValue = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+    {
+        QMutexLocker lock(&m_mutex);
+        if (newValue == m_ioPorts)
+            return;
+    }
+
+    stopInputPortMonitoringAsync();
     {
         QMutexLocker lock(&m_mutex);
         m_ioPorts = newValue;

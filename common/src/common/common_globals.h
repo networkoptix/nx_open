@@ -355,8 +355,8 @@ public:
 
     
     enum IODefaultState {
-        IO_OpenCircut,
-        IO_CloseGround
+        IO_OpenCircuit,
+        IO_GroundedCircuit
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IODefaultState)
 

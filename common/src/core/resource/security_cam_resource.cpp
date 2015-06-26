@@ -365,7 +365,7 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
 
 QStringList QnSecurityCamResource::getRelayOutputList() const {
     QStringList result;
-    QnIOPortDataList ports = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+    QnIOPortDataList ports = getIOPorts();
     for (const auto& port: ports) {
         if (port.portType == Qn::PT_Output)
             result << port.outputName;
@@ -377,13 +377,23 @@ QStringList QnSecurityCamResource::getRelayOutputList() const {
 QStringList QnSecurityCamResource::getInputPortList() const 
 {
     QStringList result;
-    QnIOPortDataList ports = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+    QnIOPortDataList ports = getIOPorts();
     for (const auto& port: ports) {
         if (port.portType == Qn::PT_Input)
             result << port.inputName;
     }
     qSort(result);
     return result;
+}
+
+void QnSecurityCamResource::setIOPorts(const QnIOPortDataList& ports)
+{
+    setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(ports)));
+}
+
+QnIOPortDataList QnSecurityCamResource::getIOPorts() const
+{
+    return QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
 }
 
 bool QnSecurityCamResource::setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeout) {

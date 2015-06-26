@@ -126,7 +126,7 @@
 
         <resource name = "AXISP8221" public = "AXIS_COMMON">
             <params>
-                <param name = "ioModule" default_value ="1"/>
+                <param name = "ioConfigCapability" default_value ="1"/>
                 <param name = "noVideoSupport" default_value ="1"/>
                 <param name = "forcedAudioStream" default_value ="1"/>
 		<param name = "hasDualStreaming" default_value ="0"/>

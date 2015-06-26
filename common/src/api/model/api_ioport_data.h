@@ -6,7 +6,7 @@
 
 struct QnIOPortData
 {
-    QnIOPortData(): portType(Qn::PT_Disabled), iDefaultState(Qn::IO_OpenCircut), oDefaultState(Qn::IO_OpenCircut), autoResetTimeoutMs(0) {}
+    QnIOPortData(): portType(Qn::PT_Disabled), iDefaultState(Qn::IO_OpenCircuit), oDefaultState(Qn::IO_OpenCircuit), autoResetTimeoutMs(0) {}
 
     QString id;
     Qn::IOPortType portType;

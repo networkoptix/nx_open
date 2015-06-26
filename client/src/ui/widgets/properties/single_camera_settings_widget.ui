@@ -368,6 +368,16 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="ioSettingsTab">
+      <attribute name="title">
+       <string>IO ports</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_28" stretch="0">
+       <item>
+        <widget class="QnIOPortSettingsWidget" name="ioPortSettingsWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="motionTab">
       <attribute name="title">
        <string>Motion</string>
@@ -646,6 +656,12 @@
    <class>QnCameraExpertSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/expert_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnIOPortSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/properties/ioport_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

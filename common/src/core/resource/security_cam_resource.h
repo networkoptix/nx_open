@@ -12,6 +12,7 @@
 #include "network_resource.h"
 #include "common/common_globals.h"
 #include "business/business_fwd.h"
+#include "api/model/api_ioport_data.h"
 
 
 class QnAbstractArchiveDelegate;
@@ -234,6 +235,10 @@ public:
      * Implemented in QnDesktopCameraResource.
      */
     virtual bool isReadyToDetach() const {return true;}
+
+    void setIOPorts(const QnIOPortDataList& ports);
+    QnIOPortDataList getIOPorts() const;
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

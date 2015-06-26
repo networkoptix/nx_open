@@ -92,6 +92,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->recordingTab,                                          Qn::CameraSettings_Recording_Help);
     setHelpTopic(ui->motionTab,                                             Qn::CameraSettings_Motion_Help);
     setHelpTopic(ui->advancedTab,                                           Qn::CameraSettings_Properties_Help);
+    setHelpTopic(ui->ioSettingsTab,                                         Qn::CameraSettings_Properties_Help);
     setHelpTopic(ui->fisheyeTab,                                            Qn::CameraSettings_Dewarping_Help);
     setHelpTopic(ui->forceArCheckBox, ui->forceArComboBox,                  Qn::CameraSettings_AspectRatio_Help);
     setHelpTopic(ui->forceRotationCheckBox, ui->forceRotationComboBox,      Qn::CameraSettings_Rotation_Help);
@@ -210,6 +211,8 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
         return Qn::GeneralSettingsTab;
     } else if(tab == ui->recordingTab) {
         return Qn::RecordingSettingsTab;
+    } else if(tab == ui->ioSettingsTab) {
+        return Qn::IOSettingsSettingsTab;
     } else if(tab == ui->motionTab) {
         return Qn::MotionSettingsTab;
     } else if(tab == ui->advancedTab) {
@@ -242,6 +245,9 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
         break;
     case Qn::AdvancedCameraSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->advancedTab);
+        break;
+    case Qn::IOSettingsSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->ioSettingsTab);
         break;
     case Qn::ExpertCameraSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->expertTab);
@@ -316,6 +322,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
             m_camera->setProperty(QnMediaResource::rotationKey(), QString());
 
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
+        ui->ioPortSettingsWidget->submitToResource(m_camera);
 
         QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
@@ -392,6 +399,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
+        ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->getCameraCapabilities() & Qn::IOModuleCapability);
 
         ui->analogGroupBox->setVisible(m_camera->isDtsBased());
         ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
@@ -481,6 +489,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
     updateIpAddressText();
     updateWebPageText();
     ui->advancedSettingsWidget->updateFromResource();
+    ui->ioPortSettingsWidget->updateFromResource(m_camera);
     
     updateRecordingParamsAvailability();
 
@@ -559,6 +568,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     if(m_motionWidget)
         setReadOnly(m_motionWidget, readOnly);
     setReadOnly(ui->advancedSettingsWidget, readOnly);
+    setReadOnly(ui->ioPortSettingsWidget, readOnly);
     m_readOnly = readOnly;
 }
 
