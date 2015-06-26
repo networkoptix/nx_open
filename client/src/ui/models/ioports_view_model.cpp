@@ -226,7 +226,7 @@ Qt::ItemFlags QnIOPortsViewModel::flags(const QModelIndex &index) const
             break;
         case AutoResetColumn:
             if (value.portType == Qn::PT_Output)
-                flags |= Qt::ItemIsUserCheckable;
+                flags |= Qt::ItemIsEditable;
             else
                 flags &= ~Qt::ItemIsEnabled;
             break;

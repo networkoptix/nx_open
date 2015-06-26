@@ -54,25 +54,30 @@ QWidget* QnIOPortItemDelegate::createEditor(QWidget *parent, const QStyleOptionV
 
     switch (index.column()) 
     {
-    case QnIOPortsViewModel::TypeColumn:
-    {
-        QComboBox* comboBox = new QComboBox(parent);
-        if (ioPort.supportedPortTypes & Qn::PT_Disabled)
-            comboBox->addItem(tr("Disabled"), Qn::PT_Disabled);
-        if (ioPort.supportedPortTypes & Qn::PT_Input)
-            comboBox->addItem(tr("Input"), Qn::PT_Input);
-        if (ioPort.supportedPortTypes & Qn::PT_Output)
-            comboBox->addItem(tr("Output"), Qn::PT_Output);
-        return comboBox;
-    }
-    case QnIOPortsViewModel::DefaultStateColumn:
+        case QnIOPortsViewModel::TypeColumn:
+        {
+            QComboBox* comboBox = new QComboBox(parent);
+            if (ioPort.supportedPortTypes & Qn::PT_Disabled)
+                comboBox->addItem(tr("Disabled"), Qn::PT_Disabled);
+            if (ioPort.supportedPortTypes & Qn::PT_Input)
+                comboBox->addItem(tr("Input"), Qn::PT_Input);
+            if (ioPort.supportedPortTypes & Qn::PT_Output)
+                comboBox->addItem(tr("Output"), Qn::PT_Output);
+            return comboBox;
+        }
+        case QnIOPortsViewModel::DefaultStateColumn:
         {
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->addItem(tr("Open circuit"), Qn::IO_OpenCircuit);
             comboBox->addItem(tr("Grounded circuit"), Qn::IO_GroundedCircuit);
             return comboBox;
         }
-    case QnIOPortsViewModel::AutoResetColumn:
+        case QnIOPortsViewModel::NameColumn:
+            {
+                QLineEdit* lineEdit = new QLineEdit(parent);
+                return lineEdit;
+            }
+        case QnIOPortsViewModel::AutoResetColumn:
         {
             QSpinBox* spinBox = new QSpinBox(parent);
             spinBox->setMinimum(0);
@@ -89,25 +94,33 @@ QWidget* QnIOPortItemDelegate::createEditor(QWidget *parent, const QStyleOptionV
 
 void QnIOPortItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
     switch (index.column()) {
-    case QnIOPortsViewModel::TypeColumn:
-    case QnIOPortsViewModel::DefaultStateColumn:
-    {
-        if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-            comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
-            connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
+        case QnIOPortsViewModel::TypeColumn:
+        case QnIOPortsViewModel::DefaultStateColumn:
+        {
+            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+                comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
+                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
+            }
+            return;
         }
-        return;
-    }
-    case QnIOPortsViewModel::AutoResetColumn:
-    {
-        if (QSpinBox* spinBox = dynamic_cast<QSpinBox *>(editor)) {
-            spinBox->setValue(index.data(Qt::EditRole).toInt());
-            connect(spinBox, SIGNAL(valueChanged(int)), this, SLOT(at_editor_commit()));
+        case QnIOPortsViewModel::NameColumn:
+        {
+            if (QLineEdit* lineEdit = dynamic_cast<QLineEdit *>(editor)) {
+                lineEdit->setText(index.data(Qt::EditRole).toString());
+                connect(lineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_editor_commit()));
+            }
+            return;
         }
-        return;
-    }
-    default:
-        break;
+        case QnIOPortsViewModel::AutoResetColumn:
+        {
+            if (QSpinBox* spinBox = dynamic_cast<QSpinBox *>(editor)) {
+                spinBox->setValue(index.data(Qt::EditRole).toInt());
+                connect(spinBox, SIGNAL(valueChanged(int)), this, SLOT(at_editor_commit()));
+            }
+            return;
+        }
+        default:
+            break;
     }
 
     base_type::setEditorData(editor, index);
