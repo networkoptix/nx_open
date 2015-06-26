@@ -65,58 +65,24 @@ namespace
 
         return key;
     }
-
-    QStringList getBaseTimeZones()
-    {
-        const QList<QByteArray> timeZones = QTimeZone::availableTimeZoneIds();
-            
-        auto now = QDateTime::currentDateTime();
-        QMultiMap<int, QString> tzByOffset;
-        for(const auto &zoneIanaId: timeZones) {
-            if (isDeprecatedTimeZone(zoneIanaId))
-                continue;
-            
-            QTimeZone tz(zoneIanaId);
-            QString displayName = timeZoneNameWithOffset(tz, now);
-
-            tzByOffset.insert(  timeZoneOrderKey(displayName),
-                                displayName);
-        };
     
-        QStringList result;
-        for (auto &iter = tzByOffset.cbegin(); iter != tzByOffset.cend(); ++iter) {
-            QString tzName(*iter);
-            if (result.contains(tzName))
-                continue;
-            result.append(tzName);
-        }
-        
-        return result;
-    }
+    const QByteArray kDiffTimeZonesId = "<Different>";
+    const QByteArray kUnknownTimeZoneId = "<Unknown>";
+  
     
-    const QString kDiffTimeZonesTag = QT_TR_NOOP("<Different>");
-    const QString kUnknownTimeZoneTag = QT_TR_NOOP("<Unknown>");
-    const QStringList baseTimeZonesInfo = getBaseTimeZones();
-    const QStringList timeZonesInfoWithDiff = []() -> QStringList
-    {
-        QStringList result = getBaseTimeZones();
-        result.push_back(kDiffTimeZonesTag);
-        return result;
-    }();
-    
-    
-    QString selectionTimeZone(const rtu::ServerInfoList &servers)
+    QByteArray selectionTimeZoneId(const rtu::ServerInfoList &servers)
     {
         if (servers.empty())
-            return kDiffTimeZonesTag;
+            return kDiffTimeZonesId;
         
-        const QString timeZone = (**servers.begin()).extraInfo().timeZone.id();
+        const QByteArray timeZoneId = servers.first()->extraInfo().timeZone.id();
         for (rtu::ServerInfo *info: servers)
         {
-            if (timeZone != info->extraInfo().timeZone.id())
-                return kDiffTimeZonesTag;
+            //TODO: #ynikitenkov make sure extraInfo exists here
+            if (timeZoneId != info->extraInfo().timeZone.id())
+                return kDiffTimeZonesId;
         }
-        return timeZone;
+        return timeZoneId;
     }
 }
 
@@ -135,10 +101,29 @@ public:
     
     int currentTimeZoneIndex() const;
 
+    int rowCount() const;
+
+    QVariant data(const QModelIndex &index, int role) const;
+
+    QByteArray timeZoneIdByIndex(int index) const;
+    int timeZoneIndexById(const QByteArray &id) const;
+
 private:
+    void initTimeZones();  
+
+private:
+    struct TzInfo {
+        TzInfo(const QByteArray &id, const QString &displayName):
+            id(id), displayName(displayName) {}
+
+        const QByteArray id;
+        const QString displayName;
+    };
+
     rtu::TimeZonesModel * const m_owner;
-    QString m_initSelectionTimeZone;
-    bool m_withDiffTimeZoneItem;
+    QList<TzInfo> m_timeZones;
+
+    QByteArray m_initTimeZoneId;
     int m_initIndex;
 };
 
@@ -146,18 +131,25 @@ rtu::TimeZonesModel::Impl::Impl(rtu::TimeZonesModel *owner
     , const rtu::ServerInfoList &selectedServers)
     : QObject(owner)
     , m_owner(owner)
-    , m_initSelectionTimeZone(selectionTimeZone(selectedServers))
-    , m_withDiffTimeZoneItem(m_initSelectionTimeZone == kDiffTimeZonesTag)
-    , m_initIndex(m_withDiffTimeZoneItem ? timeZonesInfoWithDiff.indexOf(kDiffTimeZonesTag) 
-        : baseTimeZonesInfo.indexOf(m_initSelectionTimeZone))
+    , m_timeZones()
+    , m_initTimeZoneId(selectionTimeZoneId(selectedServers))
+    , m_initIndex(0)
 {
-    QStringList zones = (m_withDiffTimeZoneItem ? timeZonesInfoWithDiff : baseTimeZonesInfo);
+
+    initTimeZones();
+
+    if (m_initTimeZoneId == kDiffTimeZonesId) {
+        //TODO: #ynikitenkov #tr
+        m_timeZones.prepend(TzInfo(kDiffTimeZonesId, "<Different>"));
+    }
+    m_initIndex = timeZoneIndexById(m_initTimeZoneId);
     if (m_initIndex == kInvalidIndex)
     {
-        zones.push_back(kUnknownTimeZoneTag);
-        m_initIndex = zones.size() - 1;
+        //TODO: #ynikitenkov #tr
+        m_timeZones.prepend(TzInfo(kUnknownTimeZoneId, "<Unknown>"));
+        m_initIndex = 0;
     }
-    m_owner->setStringList(zones);
+    //m_owner->dataChanged()
 }
 
 rtu::TimeZonesModel::Impl::~Impl()
@@ -166,12 +158,11 @@ rtu::TimeZonesModel::Impl::~Impl()
 
 bool rtu::TimeZonesModel::Impl::isValidValue(int index)
 {
-    const QStringList &zones = m_owner->stringList();
-    if ((index >= zones.size()) || (index < 0))
+    if ((index >= m_timeZones.size()) || (index < 0))
         return false;
     
-    const QString &value = zones.at(index);
-    return ((value != kUnknownTimeZoneTag) && (value != kDiffTimeZonesTag));
+    const auto &value = m_timeZones[index];
+    return ((value.id != kUnknownTimeZoneId) && (value.id != kDiffTimeZonesId));
 }
 
 int rtu::TimeZonesModel::Impl::initIndex() const
@@ -181,18 +172,89 @@ int rtu::TimeZonesModel::Impl::initIndex() const
 
 int rtu::TimeZonesModel::Impl::currentTimeZoneIndex() const
 {
-    QStringList zones = m_owner->stringList();
-    const QString currentTimeZoneId =  QDateTime::currentDateTime().timeZone().id();
-    const int result = zones.indexOf(currentTimeZoneId);
+    const QByteArray currentTimeZoneId = QDateTime::currentDateTime().timeZone().id();
+    return timeZoneIndexById(currentTimeZoneId);
+}
 
-    return result;
+int rtu::TimeZonesModel::Impl::rowCount() const {
+    return m_timeZones.size();
+}
+
+QVariant rtu::TimeZonesModel::Impl::data(const QModelIndex &index, int role) const {
+    if (!index.isValid() || index.row() < 0 || index.row() >= rowCount())
+        return QVariant();
+
+    const auto tzInfo = m_timeZones[index.row()];
+
+    switch(role) {
+    case Qt::DisplayRole:
+    case Qt::StatusTipRole:
+    case Qt::WhatsThisRole:
+    case Qt::AccessibleTextRole:
+    case Qt::AccessibleDescriptionRole:
+    case Qt::ToolTipRole:
+    case Qt::EditRole:
+        return tzInfo.displayName;
+    case Qt::UserRole:
+        return tzInfo.id;
+    default:
+        break;
+    }
+    return QVariant();
+}
+
+void rtu::TimeZonesModel::Impl::initTimeZones() {
+    const QList<QByteArray> timeZones = QTimeZone::availableTimeZoneIds();
+
+    auto now = QDateTime::currentDateTime();
+    QMultiMap<int, TzInfo> tzByOffset;
+    for(const auto &zoneIanaId: timeZones) {
+        if (isDeprecatedTimeZone(zoneIanaId))
+            continue;
+
+        QTimeZone tz(zoneIanaId);
+        QString displayName = timeZoneNameWithOffset(tz, now);
+
+        tzByOffset.insert(  timeZoneOrderKey(displayName),
+                            TzInfo(zoneIanaId, displayName));
+    };
+
+   
+    auto exists = [this](const QString &displayName) {
+        return std::any_of(m_timeZones.cbegin(), m_timeZones.cend(), [displayName](const TzInfo &info) {
+            return info.displayName == displayName;
+        });
+    };
+
+    for (auto &iter = tzByOffset.cbegin(); iter != tzByOffset.cend(); ++iter) {
+        TzInfo tzInfo(*iter);
+        if (exists(tzInfo.displayName))
+            continue;
+        m_timeZones.append(tzInfo);
+    }
+}
+
+int rtu::TimeZonesModel::Impl::timeZoneIndexById(const QByteArray &id) const {
+    auto iter = std::find_if(m_timeZones.cbegin(), m_timeZones.cend(), [id](const TzInfo &info) {
+        return info.id == id;
+    });
+    if (iter == m_timeZones.cend())
+        return -1;
+    return std::distance(m_timeZones.cbegin(), iter);
+}
+
+QByteArray rtu::TimeZonesModel::Impl::timeZoneIdByIndex(int index) const {
+    if (index < 0 || index >= m_timeZones.size())
+        return QByteArray();
+
+    return m_timeZones[index].id;
 }
 
 ///
 
 rtu::TimeZonesModel::TimeZonesModel(const ServerInfoList &selectedServers
     , QObject *parent)
-    : QStringListModel(parent)
+    : QAbstractListModel(parent)
     , m_impl(new Impl(this, selectedServers))
 {
     
@@ -217,5 +279,18 @@ bool rtu::TimeZonesModel::isValidValue(int index)
     return m_impl->isValidValue(index);
 }
 
+int rtu::TimeZonesModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const {
+    /* This model do not have sub-rows. */
+    Q_ASSERT_X(!parent.isValid(), Q_FUNC_INFO, "Only null index should come here.");
+    if (parent.isValid())
+        return 0;
+    return m_impl->rowCount();
+}
 
+QVariant rtu::TimeZonesModel::data(const QModelIndex &index , int role /*= Qt::DisplayRole*/) const {
+    return m_impl->data(index, role);
+}
 
+QByteArray rtu::TimeZonesModel::timeZoneIdByIndex(int index) const {
+    return m_impl->timeZoneIdByIndex(index);
+}

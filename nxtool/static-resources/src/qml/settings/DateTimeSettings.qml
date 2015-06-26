@@ -65,7 +65,7 @@ Expandable.MaskedSettingsPanel
                         
                         if (!useCurrentTimeCheckbox.checked && !timePicker.acceptableInput)
                         {
-                            timeZonePicker.focus = true;
+                            timePicker.focus = true;
                             return false;
                         }
                         
@@ -79,12 +79,9 @@ Expandable.MaskedSettingsPanel
                         var newTime = timePicker.time;
                         if (useCurrentTimeCheckbox.checked)
                         {
-                            if (useCurrentTimeCheckbox.checked)
-                            {
-                                var now = new Date();
-                                newDate = now;
-                                newTime = now;
-                            }
+                            var now = new Date();
+                            newDate = now;
+                            newTime = now;
                         }
                         rtuContext.changesManager().addDateTimeChange(
                             newDate, newTime, timeZonePicker.currentText);
@@ -138,7 +135,10 @@ Expandable.MaskedSettingsPanel
                             if (useCurrentTimeCheckbox.checked)
                                 return;
                             
-                            var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, from, to);
+                            var prevZoneId = timeZonePicker.model.timeZoneIdByIndex(from);
+                            var curZoneId = timeZonePicker.model.timeZoneIdByIndex(to);
+                            console.log("Chaning timezone from " + prevZoneId + " to " + curZoneId);
+                            var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, prevZoneId, curZoneId);
                             datePicker.setDate(dateTime);
                             timePicker.setTime(dateTime);
                         }
