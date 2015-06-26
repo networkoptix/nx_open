@@ -18,6 +18,7 @@
 #include "api/model/api_ioport_data.h"
 #include "utils/serialization/json.h"
 #include <utils/common/model_functions.h>
+#include "utils/common/concurrent.h"
 
 using namespace std;
 
@@ -39,6 +40,7 @@ QnPlAxisResource::QnPlAxisResource()
     setVendor(lit("Axis"));
     setDefaultAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
+    connect( this, &QnResource::propertyChanged, this, &QnPlAxisResource::at_propertyChanged, Qt::DirectConnection );
 }
 
 QnPlAxisResource::~QnPlAxisResource()
@@ -897,8 +899,10 @@ bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPor
     return true;
 }
 
-bool QnPlAxisResource::savePortSettings( CLSimpleHTTPClient* const http, const QnIOPortDataList& newPorts)
+bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts)
 {
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+
     QMap<QString,QString> changedParams;
 
     for(auto& currentValue: m_ioPorts)
@@ -935,7 +939,7 @@ bool QnPlAxisResource::savePortSettings( CLSimpleHTTPClient* const http, const Q
         path.append(lit("&%1=%2").arg(itr.key()).arg(itr.value()).toUtf8());
         ++itr;
         if (path.size() >= MAX_PATH_SIZE || itr == changedParams.end()) {
-            CLHttpStatus status = http->doGET(path);
+            CLHttpStatus status = http.doGET(path);
             if (status != CL_HTTP_SUCCESS) {
                 qWarning() << "Failed to update IO params for camera " << getHostAddress() << "rejected value:" << path;
                 return false;
@@ -953,31 +957,39 @@ QnIOPortDataList QnPlAxisResource::mergeIOSettings(const QnIOPortDataList& camer
     {
         for (int j = 0; j < savedIO.size(); ++j) {
             if (savedIO[j].id == result[i].id) 
-            {
-                if (savedIO[j].portType == Qn::PT_Disabled)
-                    result[j].portType = Qn::PT_Disabled;
-            }
+                result[i] = savedIO[i];
         }
     }
     return result;
 }
 
+bool QnPlAxisResource::ioPortErrorOccured()
+{
+    if (getCameraCapabilities() & Qn::IOModuleCapability) {
+        return false; // it's error if can't read IO state for IO module
+    }
+    else {
+        hasCameraCapabilities(getCameraCapabilities() &  ~Qn::RelayInputCapability);
+        hasCameraCapabilities(getCameraCapabilities() &  ~Qn::RelayOutputCapability);
+        return true;
+    }
+};
+
 bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
 {
     QnIOPortDataList cameraPorts;
     if (!readPortSettings(http, cameraPorts))
-    {
-        if (getCameraCapabilities() & Qn::IOModuleCapability) {
-            return false; // it's error if can't read IO state for IO module
-        }
-        else {
-            hasCameraCapabilities(getCameraCapabilities() &  ~Qn::RelayInputCapability);
-            hasCameraCapabilities(getCameraCapabilities() &  ~Qn::RelayOutputCapability);
-            return true;
-        }
-    }
+        return ioPortErrorOccured();
+    
     QnIOPortDataList savedPorts = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
-    m_ioPorts = mergeIOSettings(cameraPorts, savedPorts);
+    if (savedPorts.empty() && !cameraPorts.empty()) {
+        m_ioPorts = cameraPorts;
+    }
+    else {
+        m_ioPorts = mergeIOSettings(cameraPorts, savedPorts);
+        if (!savePortSettings(m_ioPorts))
+            return ioPortErrorOccured();
+    }
     if (m_ioPorts != savedPorts)
         setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(m_ioPorts)));
 
@@ -1107,6 +1119,27 @@ QnPlAxisResource::AxisResolution QnPlAxisResource::getResolution( int encoderInd
 int QnPlAxisResource::getChannel() const
 {
     return getChannelNumAxis() - 1;
+}
+
+void QnPlAxisResource::asyncUpdateIOSettings(const QString & key)
+{
+    stopInputPortMonitoringAsync();
+
+    const auto newValue = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+    {
+        QMutexLocker lock(&m_mutex);
+        m_ioPorts = newValue;
+    }
+    if (savePortSettings(m_ioPorts))
+        startInputPortMonitoringAsync( std::function<void(bool)>() );
+    else
+        setStatus(Qn::Offline); // reinit
+}
+
+void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
+{
+    if (key == Qn::IO_SETTINGS_PARAM_NAME)
+        QnConcurrent::run(QThreadPool::globalInstance(), std::bind(&QnPlAxisResource::asyncUpdateIOSettings, this, key));
 }
 
 #endif // #ifdef ENABLE_AXIS

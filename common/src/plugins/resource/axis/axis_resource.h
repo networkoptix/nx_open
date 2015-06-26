@@ -72,7 +72,7 @@ public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
     void onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
-
+    void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
@@ -91,7 +91,7 @@ private:
     int addMotionWindow();
     bool updateMotionWindow(int wndNum, int sensitivity, const QRect& rect);
     int toAxisMotionSensitivity(int sensitivity);
-
+    void asyncUpdateIOSettings(const QString & key);
 private:
     QList<AxisResolution> m_resolutionList;
 
@@ -126,9 +126,9 @@ private:
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
     bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& result);
-    bool savePortSettings( CLSimpleHTTPClient* const http, const QnIOPortDataList& data);
+    bool savePortSettings(const QnIOPortDataList& data);
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
-
+    bool ioPortErrorOccured();
     friend class QnAxisPtzController;
 };
 
