@@ -91,7 +91,7 @@ QnPage {
         target: connectionManager
         onInitialResourcesReceived: {
             loadingDummy.opacity = 0.0
-            camerasList.updateLayout()
+            camerasList.setLoaded()
         }
         onConnectedChanged: {
             if (!connectionManager.connected) {

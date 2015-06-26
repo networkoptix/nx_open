@@ -34,6 +34,8 @@ Flickable {
             Flow {
                 id: flow
 
+                property bool loaded: false
+
                 spacing: dp(16)
                 width: parent.width - cameraFlow.leftMargin - cameraFlow.rightMargin
                 x: cameraFlow.leftMargin
@@ -65,9 +67,12 @@ Flickable {
                 }
                 add: Transition {
                     id: addTransition
+                    enabled: flow.loaded
                     SequentialAnimation {
                         ScriptAction {
                             script: {
+                                console.log("depacited")
+                                console.log(addTransition.ViewTransition.targetIndexes)
                                 addTransition.ViewTransition.item.opacity = 0.0
                             }
                         }
@@ -80,6 +85,7 @@ Flickable {
                         }
                         ScriptAction {
                             script: {
+                                console.log("opacited")
                                 addTransition.ViewTransition.item.opacity = 1.0
                             }
                         }
@@ -89,15 +95,8 @@ Flickable {
 
             Behavior on height {
                 id: flowHeightBehavior
-                enabled: false
+                enabled: flow.loaded
                 NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
-            }
-
-            Timer {
-                interval: 500
-                onTriggered: flowHeightBehavior.enabled = true
-                repeat: false
-                running: true
             }
         }
 
@@ -232,6 +231,19 @@ Flickable {
     }
 
     onWidthChanged: updateLayout()
+
+    Timer {
+        id: loadedTimer
+        interval: 500
+        onTriggered: flow.loaded = true
+        repeat: false
+        running: false
+    }
+
+    function setLoaded() {
+        loadedTimer.running = true
+        updateLayout()
+    }
 
     function updateLayout() {
         model.updateLayout(resourcesPage.width, 3.0)

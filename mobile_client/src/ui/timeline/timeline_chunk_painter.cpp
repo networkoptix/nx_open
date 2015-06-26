@@ -40,6 +40,9 @@ void QnTimelineChunkPainter::start(qint64 startPos, qint64 centralPos, const QRe
 void QnTimelineChunkPainter::paintChunk(qint64 length, Qn::TimePeriodContent content) {
     Q_ASSERT(length >= 0);
 
+    if (length < 0)
+        return;
+
     if (m_index >= m_geometry->vertexCount() - 4)
         return;
 

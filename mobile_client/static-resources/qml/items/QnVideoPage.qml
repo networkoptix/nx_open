@@ -93,7 +93,7 @@ QnPage {
         property bool __playing
 
         width: parent.width
-        height: parent.height
+        height: parent.height - timeline.height
         source: resourceHelper.mediaUrl
 
         autoPlay: !playbackController.paused
