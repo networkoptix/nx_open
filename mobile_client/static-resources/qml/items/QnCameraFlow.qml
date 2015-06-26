@@ -13,6 +13,7 @@ Flickable {
 
     contentWidth: width
     contentHeight: content.height
+    topMargin: dp(16)
     leftMargin: dp(16)
     rightMargin: dp(16)
     bottomMargin: dp(16)
@@ -21,11 +22,12 @@ Flickable {
         id: content
 
         width: parent.width
+        x: -cameraFlow.leftMargin
 
         Item {
             id: flowContent
-            x: -cameraFlow.leftMargin
-            width: parent.width + cameraFlow.leftMargin + cameraFlow.rightMargin
+
+            width: parent.width
             height: flow.height
             clip: true
 
@@ -33,7 +35,7 @@ Flickable {
                 id: flow
 
                 spacing: dp(16)
-                width: cameraFlow.width - cameraFlow.leftMargin - cameraFlow.rightMargin
+                width: parent.width - cameraFlow.leftMargin - cameraFlow.rightMargin
                 x: cameraFlow.leftMargin
 
                 Repeater {
@@ -101,9 +103,8 @@ Flickable {
 
         Column {
             id: hiddenCamerasContent
-            width: cameraFlow.width
-            x: -cameraFlow.leftMargin
 
+            width: cameraFlow.width
             visible: hiddenCamerasList.count > 0
 
             Item {
@@ -154,7 +155,8 @@ Flickable {
 
                 Column {
                     id: hiddenCamerasColumn
-                    width: parent.width
+                    width: parent.width - cameraFlow.leftMargin - cameraFlow.rightMargin
+                    x: cameraFlow.leftMargin
 
                     Repeater {
                         id: hiddenCamerasList

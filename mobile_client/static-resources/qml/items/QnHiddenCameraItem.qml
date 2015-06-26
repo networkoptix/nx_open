@@ -23,7 +23,6 @@ Item {
         id: showButton
         text: qsTr("Show")
         anchors.right: parent.right
-        anchors.rightMargin: dp(16)
         anchors.verticalCenter: parent.verticalCenter
         z: 1
 
@@ -34,7 +33,6 @@ Item {
         spacing: dp(8)
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
-        anchors.leftMargin: dp(16)
         anchors.right: showButton.left
         anchors.rightMargin: dp(16)
         height: label.height
@@ -56,6 +54,9 @@ Item {
     }
 
     QnMaterialSurface {
+        anchors.fill: parent
+        anchors.leftMargin: -dp(16)
+        anchors.rightMargin: -dp(16)
         onClicked: cameraItem.clicked()
         onPressAndHold: cameraItem.pressAndHold()
     }

@@ -39,8 +39,10 @@ QnPage {
     Flickable {
         id: flickable
         anchors.fill: parent
+        topMargin: dp(16)
         leftMargin: dp(16)
         rightMargin: dp(16)
+        bottomMargin: dp(16)
         contentWidth: width
         contentHeight: content.height
         clip: true
@@ -187,12 +189,6 @@ QnPage {
                     host: model.address
                     port: model.port
                 }
-            }
-
-            Item {
-                /*padding*/
-                width: parent.width
-                height: dp(16)
             }
         }
     }

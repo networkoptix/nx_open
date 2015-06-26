@@ -15,6 +15,13 @@ Item {
         id: backgroundRectangle
         anchors.fill: parent
         color: QnTheme.windowBackground
+
+        Rectangle {
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: dp(1)
+            color: QnTheme.listSeparator
+        }
     }
 
     Text {
