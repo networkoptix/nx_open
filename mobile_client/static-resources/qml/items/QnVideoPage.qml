@@ -50,7 +50,6 @@ QnPage {
                 resourceHelper.setDateTime(pos)
                 video.setPositionDate(pos)
                 video.stop()
-                video.source = resourceHelper.mediaUrl
                 if (!playbackController.paused)
                     video.play()
                 timeline.positionDate = pos
@@ -59,14 +58,15 @@ QnPage {
 
         if (timeline.stickToEnd) {
             resourceHelper.setLive()
-            video.source = resourceHelper.mediaUrl
+            if (!playbackController.paused)
+                video.play()
         }
     }
 
     QnMediaResourceHelper {
         id: resourceHelper
-        resourceId: videoPlayer.resourceId
         screenSize: Qt.size(videoPlayer.width, videoPlayer.height)
+        resourceId: videoPlayer.resourceId
     }
 
     QnCameraChunkProvider {
@@ -187,7 +187,10 @@ QnPage {
 
                 autoPlay: !stickToEnd && video.__playing
 
-                onMoveFinished: videoPlayer.alignToChunk(positionDate)
+                onMoveFinished: {
+                    if (!playbackController.paused)
+                        videoPlayer.alignToChunk(positionDate)
+                }
 
                 Image {
                     z: -1
@@ -338,10 +341,12 @@ QnPage {
                 speedEnabled: false
 
                 onPausedChanged: {
-                    if (paused)
+                    if (paused) {
                         video.pause()
-                    else
+                    } else {
+                        alignToChunk(timeline.positionDate)
                         video.play()
+                    }
                 }
             }
 
