@@ -216,7 +216,7 @@ public:
         {
             if (needToStop())
                 break;
-            QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+            QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
             Qn::ResourceStatus status = fileStorage->isAvailable() ? Qn::Online : Qn::Offline;
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
@@ -397,13 +397,13 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
     ArchiveScanPosition scanPos;
     scanPos.load(); // load from persistent storage
 
-    QFileInfoList list = 
+    QnAbstractStorageResource::FileInfoList list = 
         storage->getFileList(
             closeDirPath(
                 storage->getPath()) + DeviceFileCatalog::prefixByCatalog(catalog)
             );
 
-    for(const QFileInfo& fi: list)
+    for(const QnAbstractStorageResource::FileInfo& fi: list)
     {
         if (m_rebuildCancelled)
             return; // cancel rebuild
@@ -539,6 +539,9 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
 QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 {
     QMutexLocker lock(&m_sdbMutex);
+    if (!(storage->getCapabilities() & QnAbstractStorageResource::DBReady))
+        return false;
+
     QnStorageDbPtr sdb = m_chunksDB[storage->getPath()];
     if (!sdb) 
     {
@@ -1047,7 +1050,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     qint64 bigStorageThreshold = 0;
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
+        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (itr.value());
         if (fileStorage && fileStorage->getStatus() != Qn::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
@@ -1058,7 +1061,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
+        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (itr.value());
         if (fileStorage && fileStorage->getStatus() != Qn::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
@@ -1132,7 +1135,7 @@ void QnStorageManager::updateStorageStatistics()
     m_isWritableStorageAvail = !storages.isEmpty();
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
         minSpace = qMin(minSpace, storageSpace);
@@ -1140,7 +1143,7 @@ void QnStorageManager::updateStorageStatistics()
 
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(storageSpace / (double) minSpace);

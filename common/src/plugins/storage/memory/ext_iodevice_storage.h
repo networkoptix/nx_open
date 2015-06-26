@@ -47,7 +47,7 @@ public:
     //!Implementation of QnStorageResource::renameFile
     virtual bool renameFile( const QString& oldName, const QString& newName ) override { Q_UNUSED(oldName) Q_UNUSED(newName) return false; }
     //!Implementation of QnStorageResource::getFileList
-    virtual QFileInfoList getFileList( const QString& dirName );
+    virtual QnAbstractStorageResource::FileInfoList getFileList( const QString& dirName );
     //!Implementation of QnStorageResource::isFileExists
     virtual bool isFileExists( const QString& path );
     //!Implementation of QnStorageResource::isDirExists

@@ -3,6 +3,7 @@
 
 #include "resource.h"
 #include <QtCore/QtCore>
+#include <memory>
 
 class QnAbstractStorageResource 
     : public QnResource 
@@ -18,6 +19,99 @@ public:
     };
 
     static const int chunkLen = 60;
+
+    class FileInfo
+    {
+        typedef std::shared_ptr<QFileInfo> QFileInfoPtr;
+
+    public: // ctors
+        explicit 
+        FileInfo(const QString& uri, qint64 size, bool isDir = false)
+            : m_fpath(uri),
+              m_size(size),
+              m_isDir(isDir)
+        {
+            parseUri();
+        }
+
+        explicit
+        FileInfo(const QFileInfo& qfi)
+            : m_qfi(new QFileInfo(qfi))
+        {}
+
+    public:
+        static FileInfo fromQFileInfo(const QFileInfo &fi)
+        {
+            return FileInfo(fi);
+        }
+
+        bool isDir() const
+        {
+            return m_qfi ? m_qfi->isDir() : m_isDir;
+        }
+
+        QString absoluteFilePath() const
+        {
+            return m_qfi ? m_qfi->absoluteFilePath() : m_fpath;
+        }
+
+        QString fileName() const
+        {
+            return m_qfi ? m_qfi->fileName() : m_fname;
+        }
+
+        QString baseName() const
+        {
+            return m_qfi ? m_qfi->baseName() : m_basename;
+        }
+
+        qint64 size() const
+        {
+            return m_qfi ? m_qfi->size() : m_size;
+        }
+
+        QDateTime created() const
+        {
+            return m_qfi ? m_qfi->created() : m_created;
+        }
+
+    private:
+        void parseUri()
+        {   
+            // base name
+            int lastSep = m_fpath.lastIndexOf(QDir::separator());
+            int startIndex = lastSep == -1 ? 0 : lastSep + 1;
+            
+            if (startIndex != m_fpath.size())
+            {
+                QStringRef bn(&m_fpath, startIndex, m_fpath.size() - startIndex);
+                m_fname = bn.toString();
+                startIndex = bn.indexOf(QChar::fromLatin1('.'));
+                if (startIndex != -1)
+                    m_basename = bn.left(startIndex).toString();
+            }
+        }
+
+    private:
+        QString         m_fpath;
+        QString         m_basename;
+        QString         m_fname;
+        qint64          m_size;
+        bool            m_isDir;
+        QFileInfoPtr    m_qfi;
+        QDateTime       m_created;
+    };
+
+    typedef QList<FileInfo> FileInfoList;
+
+    static FileInfoList FIListFromQFIList(const QFileInfoList& l)
+    {
+        FileInfoList ret;
+        for (const auto& fi: l)
+            ret.append(FileInfo(fi));
+        return ret;
+    }
+
 public:
     static const qint64 UnknownSize = 0x0000FFFFFFFFFFFFll; // TODO: #Elric replace with -1.
 
@@ -86,7 +180,7 @@ public:
      * 
      * \note QFileInfo structure MUST contains valid fields for full file name and file size.
      */
-    virtual QFileInfoList getFileList(const QString& dirName) = 0;
+    virtual FileInfoList getFileList(const QString& dirName) = 0;
 
     /**
      * \param url                       Url of a file to check.

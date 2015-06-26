@@ -14,13 +14,13 @@ public:
     QnFileStorageResource();
     ~QnFileStorageResource();
 
-    static QnStorageResource* instance();
+    static QnStorageResource* instance(const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual float getAvarageWritingUsage() const override;
 
-    virtual QFileInfoList getFileList(const QString& dirName) override;
+    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     virtual qint64 getFileSize(const QString& url) const override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
@@ -33,7 +33,6 @@ public:
     virtual int getCapabilities() const override;
     virtual bool isAvailable() const override;
 
-    void setStorageBitrateCoeff(float value);
     virtual float getStorageBitrateCoeff() const override;
 
     virtual void setUrl(const QString& url) override;

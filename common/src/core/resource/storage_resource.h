@@ -19,6 +19,7 @@ public:
 
     virtual QString getUniqueId() const;
 
+    void setStorageBitrateCoeff(float value);
     void setSpaceLimit(qint64 value);
     qint64 getSpaceLimit() const;
 
@@ -68,6 +69,7 @@ private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds
     bool m_usedForWriting;
+    float m_storageBitrateCoeff;
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;

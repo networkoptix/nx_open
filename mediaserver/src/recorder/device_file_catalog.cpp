@@ -381,8 +381,8 @@ bool DeviceFileCatalog::needRebuildPause()
 
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
-    QList<QFileInfo> files;
-    for(const QFileInfo& fi: storage->getFileList(folder))
+    QnAbstractStorageResource::FileInfoList files;
+    for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
     {
         while (!qnStorageMan->needToStopMediaScan() && needRebuildPause())
             QnLongRunnable::msleep(100);
@@ -436,7 +436,11 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             }
             else {
                 //qnFileDeletor->deleteFile(fi.absoluteFilePath());
-                emptyFileList << EmptyFileInfo(fi.created().toMSecsSinceEpoch(), fi.absoluteFilePath());
+                emptyFileList 
+                    << EmptyFileInfo(/*fi.created().toMSecsSinceEpoch()*/
+                           chunk.startTimeMs, 
+                           fi.absoluteFilePath()
+                       );
             }
         }
         );

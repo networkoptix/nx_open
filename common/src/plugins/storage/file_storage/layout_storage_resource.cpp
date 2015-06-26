@@ -313,11 +313,11 @@ qint64 QnLayoutFileStorageResource::getTotalSpace()
     return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
 }
 
-QFileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
+QnAbstractStorageResource::FileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
 {
     QDir dir;
     dir.cd(dirName);
-    return dir.entryInfoList(QDir::Files);
+    return QnAbstractStorageResource::FIListFromQFIList(dir.entryInfoList(QDir::Files));
 }
 
 qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
@@ -353,7 +353,7 @@ QString QnLayoutFileStorageResource::removeProtocolPrefix(const QString& url)
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
 
-QnStorageResource* QnLayoutFileStorageResource::instance()
+QnStorageResource* QnLayoutFileStorageResource::instance(const QString&)
 {
     return new QnLayoutFileStorageResource();
 }

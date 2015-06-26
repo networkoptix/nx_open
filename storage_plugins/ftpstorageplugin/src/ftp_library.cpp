@@ -119,7 +119,7 @@ namespace Qn
                     port
                 } ps = scheme;
 
-                const int schemeSize = 10; // "storage://" size
+                const int schemeSize = 6; // "ftp://" size
                 int start = 0, cur = 0;
                 char c;
                 Url u;
@@ -132,7 +132,7 @@ namespace Qn
                     switch (ps)
                     {
                     case scheme:
-                        if (s.substr(0, schemeSize) != "storage://")
+                        if (s.substr(0, schemeSize) != "ftp://")
                             throw std::logic_error("Url parse failed. Wrong scheme.");
                         start = schemeSize;
                         cur = schemeSize;
@@ -241,36 +241,36 @@ namespace Qn
 
             void urlParserTest()
             {
-                REQUIRE_THROW(Url::fromString("storage://:pupkin@127.0.0.1:765"));
-                REQUIRE_THROW(Url::fromString("storage://vasya:@127.0.0.1:765"));
-                REQUIRE_THROW(Url::fromString("stor://vasya:pupkin@127.0.0.1:765"));
-                REQUIRE_THROW(Url::fromString("storage://vasya:pupkin@127.0.0.1:a765"));
-                REQUIRE_THROW(Url::fromString("storage://@127.0.0.1:765"));
-                REQUIRE_THROW(Url::fromString("storage://:127.0.0.1:765"));
-                REQUIRE_THROW(Url::fromString("storage://"));
+                REQUIRE_THROW(Url::fromString("ftp://:pupkin@127.0.0.1:765"));
+                REQUIRE_THROW(Url::fromString("ftp://vasya:@127.0.0.1:765"));
+                REQUIRE_THROW(Url::fromString("fp://vasya:pupkin@127.0.0.1:765"));
+                REQUIRE_THROW(Url::fromString("ftp://vasya:pupkin@127.0.0.1:a765"));
+                REQUIRE_THROW(Url::fromString("ftp://@127.0.0.1:765"));
+                REQUIRE_THROW(Url::fromString("ftp://:127.0.0.1:765"));
+                REQUIRE_THROW(Url::fromString("ftp://"));
                 REQUIRE_THROW(Url::fromString("127.0.0.1"));
                 REQUIRE_THROW(Url::fromString("127.0.0.1:567"));
 
                 Url u ;
-                u = Url::fromString("storage://vasya:pupkin@127.0.0.1:765");
+                u = Url::fromString("ftp://vasya:pupkin@127.0.0.1:765");
                 REQUIRE(u.host == "127.0.0.1");
                 REQUIRE(u.port == "765");
                 REQUIRE(u.uname == "vasya");
                 REQUIRE(u.upasswd == "pupkin");
 
-                u = Url::fromString("storage://vasya:pupkin@127.0.0.1");
+                u = Url::fromString("ftp://vasya:pupkin@127.0.0.1");
                 REQUIRE(u.host == "127.0.0.1");
                 REQUIRE(u.port.empty());
                 REQUIRE(u.uname == "vasya");
                 REQUIRE(u.upasswd == "pupkin");
 
-                u = Url::fromString("storage://127.0.0.1:765");
+                u = Url::fromString("ftp://127.0.0.1:765");
                 REQUIRE(u.host == "127.0.0.1");
                 REQUIRE(u.port == "765");
                 REQUIRE(u.uname.empty());
                 REQUIRE(u.upasswd.empty());
 
-                u = Url::fromString("storage://127.0.0.1");
+                u = Url::fromString("ftp://127.0.0.1");
                 REQUIRE(u.host == "127.0.0.1");
                 REQUIRE(u.port.empty());
                 REQUIRE(u.uname.empty());
@@ -498,7 +498,7 @@ namespace Qn
                         sizeof(nxpl::NX_GUID)) == 0) 
         {
             addRef();
-            return this;
+            return static_cast<Qn::FileInfoIterator*>(this);
         } 
         else if (std::memcmp(&interfaceID, 
                              &nxpl::IID_PluginInterface, 
@@ -587,16 +587,24 @@ namespace Qn
 
     uint64_t STORAGE_METHOD_CALL FtpStorage::getFreeSpace(int* ecode) const
     {   // In general there is no reliable way to determine FTP server free disk space
+        //if (ecode)
+        //    *ecode = error::SpaceInfoNotAvailable;
+        //return unknown_size;
         if (ecode)
-            *ecode = error::SpaceInfoNotAvailable;
-        return unknown_size;
+            *ecode = error::NoError;
+
+        return 10000000000; // for tests
     }
 
     uint64_t STORAGE_METHOD_CALL FtpStorage::getTotalSpace(int* ecode) const
     {   // In general there is no reliable way to determine FTP server total disk space
+        //if (ecode)
+        //    *ecode = error::SpaceInfoNotAvailable;
+        //return unknown_size;
         if (ecode)
-            *ecode = error::SpaceInfoNotAvailable;
-        return unknown_size;
+            *ecode = error::NoError;
+
+        return 10000000000; // for tests
     }
 
     int STORAGE_METHOD_CALL FtpStorage::getCapabilities() const
@@ -823,7 +831,7 @@ namespace Qn
                         sizeof(nxpl::NX_GUID)) == 0) 
         {
             addRef();
-            return this;
+            return static_cast<Qn::Storage*>(this);
         } 
         else if (std::memcmp(&interfaceID, 
                              &nxpl::IID_PluginInterface, 
@@ -1119,7 +1127,7 @@ namespace Qn
                         sizeof(nxpl::NX_GUID)) == 0) 
         {
             addRef();
-            return this;
+            return static_cast<Qn::IODevice*>(this);
         } 
         else if (std::memcmp(&interfaceID, 
                              &nxpl::IID_PluginInterface, 

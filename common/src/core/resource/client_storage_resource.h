@@ -24,7 +24,7 @@ public:
 
     virtual int getCapabilities() const override;
     virtual bool isAvailable() const override;
-    virtual QFileInfoList getFileList(const QString& dirName) override;
+    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;

@@ -29,13 +29,13 @@ public:
     QnLayoutFileStorageResource();
     virtual ~QnLayoutFileStorageResource();
 
-    static QnStorageResource* instance();
+    static QnStorageResource* instance(const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual int getCapabilities() const override;
     virtual bool isAvailable() const override;
-    virtual QFileInfoList getFileList(const QString& dirName) override;
+    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;

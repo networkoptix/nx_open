@@ -86,6 +86,7 @@
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
+#include <plugins/storage/third_party/third_party_storage_resource/third_party_storage_resource.h>
 
 #include <recorder/file_deletor.h>
 #include <recorder/recording_manager.h>
@@ -756,6 +757,11 @@ int serverMain(int argc, char *argv[])
     qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     ffmpegInit();
+    QnStoragePluginFactory::instance()->registerStoragePlugin(
+        "ftp", 
+        QnThirdPartyStorageResource::instance, 
+        false
+    );
 
     // ------------------------------------------
 #ifdef TEST_RTSP_SERVER

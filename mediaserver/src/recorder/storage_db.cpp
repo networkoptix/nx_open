@@ -259,9 +259,9 @@ void QnStorageDb::addCatalogFromMediaFolder(
 )
 {
     QString root = closeDirPath(QFileInfo(m_sdb.databaseName()).absoluteDir().path()) + postfix;
-    QFileInfoList files = m_storage->getFileList(root);
+    QnAbstractStorageResource::FileInfoList files = m_storage->getFileList(root);
 
-    for (const QFileInfo& fi: files)
+    for (const QnAbstractStorageResource::FileInfo& fi: files)
     {
         QString uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId)) {

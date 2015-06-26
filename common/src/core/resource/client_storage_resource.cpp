@@ -19,10 +19,10 @@ bool QnClientStorageResource::isAvailable() const
     return 0;
 }
 
-QFileInfoList QnClientStorageResource::getFileList(const QString&)
+QnAbstractStorageResource::FileInfoList QnClientStorageResource::getFileList(const QString&)
 {
     assert(false);
-    return QFileInfoList();
+    return QnAbstractStorageResource::FileInfoList();
 }
 
 qint64 QnClientStorageResource::getFileSize(const QString&) const

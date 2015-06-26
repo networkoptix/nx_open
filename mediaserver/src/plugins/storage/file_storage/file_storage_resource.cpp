@@ -204,11 +204,11 @@ qint64 QnFileStorageResource::getTotalSpace()
     return getDiskTotalSpace(getPath());
 }
 
-QFileInfoList QnFileStorageResource::getFileList(const QString& dirName)
+QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const QString& dirName)
 {
     updatePermissions();
     QDir dir(dirName);
-    return dir.entryInfoList(QDir::Files);
+    return QnAbstractStorageResource::FIListFromQFIList(dir.entryInfoList(QDir::Files));
 }
 
 qint64 QnFileStorageResource::getFileSize(const QString& url) const
@@ -258,7 +258,7 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
 
-QnStorageResource* QnFileStorageResource::instance()
+QnStorageResource* QnFileStorageResource::instance(const QString&)
 {
     QnStorageResource* storage = new QnFileStorageResource();
     storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
@@ -269,12 +269,6 @@ float QnFileStorageResource::getAvarageWritingUsage() const
 {
     QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getPath());
     return writer ? writer->getAvarageUsage() : 0;
-}
-
-void QnFileStorageResource::setStorageBitrateCoeff(float value)
-{
-    NX_LOG(lit("QnFileStorageResource %1 coeff %2").arg(getPath()).arg(value), cl_logDEBUG2);
-    m_storageBitrateCoeff = value;
 }
 
 float QnFileStorageResource::getStorageBitrateCoeff() const

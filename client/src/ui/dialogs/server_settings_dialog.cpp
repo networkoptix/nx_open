@@ -296,10 +296,15 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
     if (login.isEmpty())
         result.url = pathItem->text();
     else {
-        QUrl url = QString(lit("file:///%1")).arg(pathItem->text());
-        url.setUserName(login);
-        url.setPassword(password);
-        result.url = url.toString();
+        if (pathItem->text().indexOf(lit("://")) != -1)
+            result.url = pathItem->text();
+        else
+        {
+            QUrl url = QString(lit("file:///%1")).arg(pathItem->text());
+            url.setUserName(login);
+            url.setPassword(password);
+            result.url = url.toString();
+        }
     }
 
     result.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();

@@ -34,14 +34,14 @@ QnStorageResource *QnStoragePluginFactory::createStorage(const QString &url, boo
 {
     int index = url.indexOf(lit("://"));
     if (index == -1) 
-        return m_defaultFactory ? m_defaultFactory() : NULL;
+        return m_defaultFactory ? m_defaultFactory(url) : NULL;
     
     QString protocol = url.left(index);
     if (m_factoryByProtocol.contains(protocol)) {
-        return m_factoryByProtocol.value(protocol)();
+        return m_factoryByProtocol.value(protocol)(url);
     } else {
         if (useDefaultForUnknownPrefix)
-            return m_defaultFactory ? m_defaultFactory() : NULL;
+            return m_defaultFactory ? m_defaultFactory(url) : NULL;
         else
             return NULL;
     }

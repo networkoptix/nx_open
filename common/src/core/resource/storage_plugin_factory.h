@@ -6,7 +6,7 @@
 class QnStoragePluginFactory
 {
 public:
-    typedef QnStorageResource *(*StorageFactory)();
+    typedef QnStorageResource *(*StorageFactory)(const QString&);
 
     QnStoragePluginFactory();
     virtual ~QnStoragePluginFactory();

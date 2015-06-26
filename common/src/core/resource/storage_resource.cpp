@@ -1,5 +1,6 @@
 #include "storage_resource.h"
 #include "core/dataprovider/media_streamdataprovider.h"
+#include "utils/common/log.h"
 
 QnStorageResource::QnStorageResource():
     m_spaceLimit(0),
@@ -94,12 +95,19 @@ QString QnStorageResource::getPath() const
     return urlToPath(getUrl());
 }
 
+void QnStorageResource::setStorageBitrateCoeff(float value)
+{
+    NX_LOG(lit("QnFileStorageResource %1 coeff %2").arg(getPath()).arg(value), cl_logDEBUG2);
+    m_storageBitrateCoeff = value;
+}
+
 QString QnStorageResource::urlToPath(const QString& url)
 {
-    if (!url.contains(lit("://")))
-        return url;
-    else
-        return QUrl(url).path().mid(1);
+    return url;
+    //if (!url.contains(lit("://")))
+    //    return url;
+    //else
+    //    return QUrl(url).path().mid(1);
 }
 
 float QnStorageResource::getAvarageWritingUsage() const
@@ -136,7 +144,10 @@ QnUuid QnStorageResource::fillID(const QnUuid& mserverId, const QString& url)
 bool QnStorageResource::isExternal() const
 {
     QString storageUrl = getUrl();
-    return storageUrl.trimmed().startsWith(lit("\\\\")) || QUrl(storageUrl).path().mid(1).startsWith(lit("\\\\"));
+    return 
+        storageUrl.trimmed().startsWith(lit("\\\\"))            || 
+        QUrl(storageUrl).path().mid(1).startsWith(lit("\\\\"))  ||
+        storageUrl.indexOf(lit("://")) != -1;
 }
 
 QString QnStorageResource::toNativeDirPath(const QString &dirPath)
