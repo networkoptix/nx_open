@@ -22,7 +22,7 @@ Expandable.MaskedSettingsPanel
     }
 
     propertiesGroupName: qsTr("Set Device Date & Time");
-    propertiesDelegate: Item
+    propertiesDelegate: FocusScope
     {
         property bool changed: (!flagged.showFirst ? false 
             : flagged.currentItem.changed);
