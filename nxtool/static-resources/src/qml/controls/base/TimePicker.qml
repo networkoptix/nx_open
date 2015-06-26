@@ -59,7 +59,7 @@ QtControls.TextField
     onTextChanged: 
     {
         time = Date.fromLocaleTimeString(Qt.locale(), text, impl.timeFormat);
-        if (!initTime && (text === impl.emptyMaskValue))
+        if (!impl.textIsValid())
             return;
         
         thisComponent.changed = (initTime && time 
@@ -72,6 +72,10 @@ QtControls.TextField
         readonly property string mask: (timeFormat.replace(new RegExp(/[a-zA-Z0-9]/g), "9") + ";-");
         readonly property string emptyMaskValue: "::";  
     
+        function textIsValid() {
+            return (text !== impl.emptyMaskValue);
+        }
+
         function stringFromTime(timeValue)
         {
             return (timeValue ? timeValue.toLocaleTimeString(Qt.locale(), timeFormat) : "");
@@ -82,11 +86,7 @@ QtControls.TextField
             if (initTime)
                 initTime.setSeconds(initTime.getSeconds() + 1);
 
-            console.log("focus:" + focus)
-            if (focus || !enabled)
-                return;
-
-            if (text.indexOf("-") >= 0)
+            if (activeFocus || !enabled || !textIsValid())
                 return;
 
             if (changed) {

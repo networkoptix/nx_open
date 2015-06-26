@@ -5,7 +5,7 @@ import "../common" as Common
 import "../settings" as Settings;
 import "../controls/base" as Base;
 
-Item
+FocusScope
 {
     id: thisComponent;
     
@@ -45,58 +45,45 @@ Item
     
     ScrollView
     {
+        width: parent.width;
         anchors
         {
-            left: parent.left;
-            right: parent.right;
             top: parent.top;
             bottom: buttonsPanel.top;
         }
         
+        clip: true;
+
         Flickable
         {
-            clip: true;
-    
-            anchors.fill: parent;
             flickableDirection: Flickable.VerticalFlick;
-            contentHeight: settingsColumn.height + settingsColumn.anchors.topMargin
-                + settingsColumn.anchors.bottomMargin;
-    
+            contentHeight: settingsColumn.height;
+
+            topMargin: Common.SizeManager.fontSizes.base;
+            bottomMargin: Common.SizeManager.spacing.base;
+            leftMargin: Common.SizeManager.spacing.medium;
+            rightMargin: Common.SizeManager.spacing.medium;
+
             Column
             {
                 id: settingsColumn;
-    
+                width: parent.width;
+
                 spacing: Common.SizeManager.spacing.large;
-                anchors
-                {
-                    left: parent.left;
-                    right: parent.right;
-                    top: parent.top;
-    
-                    topMargin: Common.SizeManager.fontSizes.base;
-                    leftMargin: Common.SizeManager.spacing.medium;
-                    rightMargin: Common.SizeManager.spacing.medium;
-                }
-    
+
                 Settings.IpPortSettings
                 {
                     id: ipPortSettings;
                 }
-    
+
                 Settings.DateTimeSettings
                 {
                     id: dateTimeSettings;
                 }
-    
+
                 Settings.SystemAndPasswordSetting
                 {
                     id: systemAndPasswordSettings;
-                }
-                
-                Item
-                {
-                    width: 1;
-                    height: Common.SizeManager.spacing.base;
                 }
             }
         }
