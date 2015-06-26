@@ -5,6 +5,7 @@
 #include <QTimeZone>
 
 #include <base/server_info.h>
+#include <helpers/time_helper.h>
 
 namespace
 {
@@ -18,19 +19,7 @@ namespace
                zoneIanaId.contains(utcIanaTemplate)     // UTC+03:00
             || zoneIanaId.contains(gmtIanaTemplate)     // Etc/GMT+3
             ;
-    }
-
-    QString timeZoneNameWithOffset(const QTimeZone &timeZone, const QDateTime &atDateTime) {
-        if (!timeZone.comment().isEmpty()) {
-            Q_ASSERT_X(timeZone.comment().contains(utcIanaTemplate), Q_FUNC_INFO, "We are waiting for the (UTC+03:00) format");
-            return timeZone.comment();
-        }
-        
-        // Constructing format manually
-        QString tzTemplate("(%1) %2");
-        QString baseName(timeZone.id());      
-        return tzTemplate.arg(timeZone.displayName(atDateTime, QTimeZone::OffsetName), baseName);
-    }
+    }  
 
     /** Some timezones have the same seconds offset but different UTC offset in
      *  their description (due to DST). So we have to adjust the order manually.

@@ -21,4 +21,6 @@ namespace rtu
     qint64 msecondsFromEpoch(const QDate &date
         , const QTime &time
         , const QTimeZone &timeZone);
+
+    QString timeZoneNameWithOffset(const QTimeZone &timeZone, const QDateTime &atDateTime);
 }

@@ -51,3 +51,15 @@ qint64 rtu::msecondsFromEpoch(const QDate &date
     qDebug() << "target: " << result << "\n";
     return result;
 }
+
+QString rtu::timeZoneNameWithOffset(const QTimeZone &timeZone, const QDateTime &atDateTime) {
+    if (!timeZone.comment().isEmpty()) {
+        Q_ASSERT_X(timeZone.comment().contains("UTC"), Q_FUNC_INFO, "We are waiting for the (UTC+03:00) format");
+        return timeZone.comment();
+    }
+
+    // Constructing format manually
+    QString tzTemplate("(%1) %2");
+    QString baseName(timeZone.id());      
+    return tzTemplate.arg(timeZone.displayName(atDateTime, QTimeZone::OffsetName), baseName);
+}

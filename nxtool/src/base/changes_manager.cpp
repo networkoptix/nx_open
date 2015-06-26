@@ -453,11 +453,14 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
                 static const QString kDateTimeDescription = "date / time";
                 static const QString kTimeZoneDescription = "time zone";
                 
+
+                QString timeZoneName = timeZoneNameWithOffset(QTimeZone(change.timeZoneId), QDateTime::currentDateTime());
+
                 const QString &value= convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId)).toString();
                 const bool dateTimeOk = addSummaryItem(*info, kDateTimeDescription
                     , value, errorReason, kDateTimeAffected, affected);
                 const bool timeZoneOk = addSummaryItem(*info, kTimeZoneDescription
-                    , QString(change.timeZoneId), errorReason, kTimeZoneAffected, affected);
+                    , timeZoneName, errorReason, kTimeZoneAffected, affected);
                 
                 if (dateTimeOk && timeZoneOk)
                 {
