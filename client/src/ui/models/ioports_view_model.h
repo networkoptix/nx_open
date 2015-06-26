@@ -50,6 +50,7 @@ public:
     QnIOPortDataList modelData() const;
 private:
     QString textData(const QModelIndex &index) const;
+    QVariant editData(const QModelIndex &index) const;
 private:
     QnIOPortDataList m_data;
 };

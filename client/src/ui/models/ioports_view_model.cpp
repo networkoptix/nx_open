@@ -77,15 +77,59 @@ QString QnIOPortsViewModel::textData(const QModelIndex &index) const
     }
 }
 
+QVariant QnIOPortsViewModel::editData(const QModelIndex &index) const
+{
+    const QnIOPortData& value = m_data.at(index.row());
+
+    switch(index.column())
+    {
+    case IdColumn:
+        return value.id;
+    case TypeColumn:
+        return value.portType;
+    case DefaultStateColumn:
+        switch (value.portType) 
+        {
+        case Qn::PT_Input:
+            return value.iDefaultState;
+        case Qn::PT_Output:
+            return value.oDefaultState;
+        default:
+            return QString();
+        }
+    case NameColumn:
+        switch (value.portType) 
+        {
+        case Qn::PT_Input:
+            return value.inputName;
+        case Qn::PT_Output:
+            return value.outputName;
+        default:
+            return QString();
+        }
+    case AutoResetColumn:
+        return value.autoResetTimeoutMs;
+    default:
+        return QVariant();
+    }
+}
+
 QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const 
 {
     /* Check invalid indices. */
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
+    if (index.row() >= m_data.size())
+        return false;
+
 
     switch(role) {
+    case Qn::IOPortDataRole:
+        return QVariant::fromValue<QnIOPortData>(m_data.at(index.row()));
     case Qt::DisplayRole:
         return QVariant(textData(index));
+    case Qt::EditRole:
+        return editData(index);
     default:
         return QVariant();
     }
@@ -98,7 +142,7 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
     if (index.row() >= m_data.size())
         return false;
 
-    if (role != Qt::DisplayRole)
+    if (role != Qt::EditRole)
         return false;
 
     QnIOPortData& ioPort = m_data.at(index.row());
@@ -107,16 +151,16 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
     case IdColumn:
         return false; // doesn't allowed
     case TypeColumn:
-        ioPort.portType= QnLexical::deserialized<Qn::IOPortType>(value.toString());
+        ioPort.portType= (Qn::IOPortType) value.toInt();
         break;
     case DefaultStateColumn:
         switch (ioPort.portType)
         {
         case Qn::PT_Input:
-            ioPort.iDefaultState = QnLexical::deserialized<Qn::IODefaultState>(value.toString());
+            ioPort.iDefaultState = (Qn::IODefaultState) value.toInt();
             break;
         case Qn::PT_Output:
-            ioPort.oDefaultState = QnLexical::deserialized<Qn::IODefaultState>(value.toString());
+            ioPort.oDefaultState = (Qn::IODefaultState) value.toInt();
             break;
         default:
             break;
@@ -151,7 +195,7 @@ QVariant QnIOPortsViewModel::headerData(int section, Qt::Orientation orientation
         case TypeColumn:         return tr("Type");
         case DefaultStateColumn: return tr("Default state");
         case NameColumn:         return tr("Name");
-        case AutoResetColumn:    return tr("Auto reset time(ms)");
+        case AutoResetColumn:    return tr("Active time(ms)");
         default:
             break;
         }

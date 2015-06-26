@@ -20,6 +20,8 @@ struct QnIOPortData
 typedef std::vector<QnIOPortData> QnIOPortDataList;
 #define QnIOPortData_Fields (id)(portType)(supportedPortTypes)(inputName)(outputName)(iDefaultState)(oDefaultState)(autoResetTimeoutMs)
 
+Q_DECLARE_METATYPE(QnIOPortData)
+
 struct QnCameraPortsData
 {
     QnUuid id;
