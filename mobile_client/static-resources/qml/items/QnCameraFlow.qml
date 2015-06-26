@@ -24,7 +24,8 @@ Flickable {
 
         Item {
             id: flowContent
-            width: parent.width
+            x: -cameraFlow.leftMargin
+            width: parent.width + cameraFlow.leftMargin + cameraFlow.rightMargin
             height: flow.height
             clip: true
 
@@ -33,6 +34,7 @@ Flickable {
 
                 spacing: dp(16)
                 width: cameraFlow.width - cameraFlow.leftMargin - cameraFlow.rightMargin
+                x: cameraFlow.leftMargin
 
                 Repeater {
                     id: repeater
@@ -60,12 +62,41 @@ Flickable {
                     NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutCubic }
                 }
                 add: Transition {
-                    NumberAnimation { properties: "opacity"; duration: 500; easing.type: Easing.OutCubic }
+                    id: addTransition
+                    SequentialAnimation {
+                        ScriptAction {
+                            script: {
+                                addTransition.ViewTransition.item.opacity = 0.0
+                            }
+                        }
+                        PauseAnimation {
+                            duration: 100
+                        }
+                        ParallelAnimation {
+                            NumberAnimation { property: "opacity"; to: 1.0; duration: 500; easing.type: Easing.OutCubic }
+                            NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
+                        }
+                        ScriptAction {
+                            script: {
+                                addTransition.ViewTransition.item.opacity = 1.0
+                            }
+                        }
+                    }
                 }
-
             }
 
-            Behavior on height { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+            Behavior on height {
+                id: flowHeightBehavior
+                enabled: false
+                NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+            }
+
+            Timer {
+                interval: 500
+                onTriggered: flowHeightBehavior.enabled = true
+                repeat: false
+                running: true
+            }
         }
 
         Column {
@@ -153,10 +184,29 @@ Flickable {
                         }
                     }
                     move: Transition {
-                        NumberAnimation { properties: "x"; duration: 500; easing.type: Easing.OutCubic }
+                        NumberAnimation { properties: "y"; duration: 500; easing.type: Easing.OutCubic }
                     }
                     add: Transition {
-                        NumberAnimation { properties: "opacity"; duration: 500; easing.type: Easing.OutCubic }
+                        id: hiddenIntemAddTransition
+                        SequentialAnimation {
+                            ScriptAction {
+                                script: {
+                                    hiddenIntemAddTransition.ViewTransition.item.opacity = 0.0
+                                }
+                            }
+                            PauseAnimation {
+                                duration: 100
+                            }
+                            ParallelAnimation {
+                                NumberAnimation { property: "opacity"; to: 1.0; duration: 500; easing.type: Easing.OutCubic }
+                                NumberAnimation { property: "y"; from: hiddenIntemAddTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
+                            }
+                            ScriptAction {
+                                script: {
+                                    hiddenIntemAddTransition.ViewTransition.item.opacity = 1.0
+                                }
+                            }
+                        }
                     }
                 }
             }

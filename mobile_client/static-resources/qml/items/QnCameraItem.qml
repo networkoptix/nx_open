@@ -24,6 +24,12 @@ Item {
     property bool _offline: status == 0 || status == 4 || status == 1
     property bool _unauthorized: status == 1
 
+    Rectangle {
+        anchors.fill: content
+        color: QnTheme.windowBackground
+        anchors.margins: -dp(8)
+    }
+
     Column {
         id: content
         spacing: dp(8)
@@ -88,6 +94,11 @@ Item {
     }
 
     QnMaterialSurface {
+        id: materialSurface
+
+        anchors.fill: content
+        anchors.margins: -dp(8)
+
         onClicked: cameraItem.clicked()
         onPressAndHold: cameraItem.pressAndHold()
 
@@ -105,6 +116,8 @@ Item {
             }
         }
     }
+
+    z: materialSurface.drag.active ? 5 : 0
 
     opacity: Math.max(0.0, 1.0 - Math.abs(content.x) / content.width)
 }
