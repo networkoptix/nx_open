@@ -48,7 +48,7 @@ Item {
             placeholderText: qsTr("Search")
 
             rightPadding: dp(48)
-
+            showDecoration: false
         }
 
         QnIconButton {

@@ -16,6 +16,7 @@ FocusScope {
     property int rightPadding: dp(6)
     property alias passwordCharacter: textInput.passwordCharacter
     property bool showError: false
+    property alias showDecoration: decoration.visible
 
     property int textPadding: 0
 
@@ -33,37 +34,42 @@ FocusScope {
 
     activeFocusOnTab: true
 
-    Rectangle {
-        anchors {
-            left: parent.left
-            right: parent.right
-        }
-        y: parent.height
-        border.width: 0
-        height: textInput.activeFocus ? CommonFunctions.dp(1) : CommonFunctions.dp(1)
-        color: textInput.activeFocus ? activeColor : inactiveColor
-    }
+    Item {
+        id: decoration
+        anchors.fill: parent
 
-    Rectangle {
-        anchors {
-            left: parent.left
-            bottom: parent.bottom
+        Rectangle {
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            y: parent.height
+            border.width: 0
+            height: textInput.activeFocus ? CommonFunctions.dp(1) : CommonFunctions.dp(1)
+            color: textInput.activeFocus ? activeColor : inactiveColor
         }
-        border.width: 0
-        height: dp(6)
-        width: dp(1)
-        color: textInput.activeFocus ? activeColor : inactiveColor
-    }
 
-    Rectangle {
-        anchors {
-            right: parent.right
-            bottom: parent.bottom
+        Rectangle {
+            anchors {
+                left: parent.left
+                bottom: parent.bottom
+            }
+            border.width: 0
+            height: dp(6)
+            width: dp(1)
+            color: textInput.activeFocus ? activeColor : inactiveColor
         }
-        border.width: 0
-        height: dp(6)
-        width: dp(1)
-        color: textInput.activeFocus ? activeColor : inactiveColor
+
+        Rectangle {
+            anchors {
+                right: parent.right
+                bottom: parent.bottom
+            }
+            border.width: 0
+            height: dp(6)
+            width: dp(1)
+            color: textInput.activeFocus ? activeColor : inactiveColor
+        }
     }
 
     Item {
