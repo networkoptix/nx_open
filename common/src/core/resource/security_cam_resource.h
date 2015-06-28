@@ -236,9 +236,15 @@ public:
      */
     virtual bool isReadyToDetach() const {return true;}
 
+    //!Set list of IO ports
     void setIOPorts(const QnIOPortDataList& ports);
+    
+    //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;
-
+    
+    //!Returns list of IO ports's states
+    virtual QnIOStateDataList ioStates() const { return QnIOStateDataList(); }
+    
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

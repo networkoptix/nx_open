@@ -67,7 +67,7 @@ public:
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
     AxisResolution getResolution( int encoderIndex ) const;
-
+    virtual QnIOStateDataList ioStates() const override;
 public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
@@ -102,6 +102,7 @@ private:
     //std::map<QString, unsigned int> m_inputPortNameToIndex;
     //std::map<QString, unsigned int> m_outputPortNameToIndex;
     QnIOPortDataList m_ioPorts;
+    QnIOStateDataList m_ioStates;
     mutable QMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
     std::shared_ptr<nx_http::AsyncHttpClient> m_inputPortHttpMonitor;
@@ -125,10 +126,12 @@ private:
     CLHttpStatus readAxisParameters(const QString& rootPath, CLSimpleHTTPClient* const httpClient, QList<QPair<QByteArray,QByteArray>>& params);
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
-    bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& result);
+    bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPorts, QnIOStateDataList ioStateList);
     bool savePortSettings(const QnIOPortDataList& newPorts, const QnIOPortDataList& oldPorts);
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
     bool ioPortErrorOccured();
+    void updateIOState(const QString& portId, bool isActive, qint64 timestamp);
+
     friend class QnAxisPtzController;
 };
 

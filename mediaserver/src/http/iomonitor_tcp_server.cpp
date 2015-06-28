@@ -51,6 +51,11 @@ void QnIOMonitorConnectionProcessor::run()
         connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraInput);
         connect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraOutput);
 
+        {
+            QMutexLocker lock(&d->waitMutex);
+            d->dataToSend = camera->ioStates();
+        }
+
         while (d->socket->isConnected()) 
         {
             QMutexLocker lock(&d->waitMutex);
@@ -67,7 +72,10 @@ void QnIOMonitorConnectionProcessor::at_cameraInput(
     bool value,
     qint64 timestamp )
 {
-    // todo: implement me
+    Q_D(QnIOMonitorConnectionProcessor);
+    QMutexLocker lock(&d->waitMutex);
+    d->dataToSend.push_back(QnIOStateData(inputPortID, value, timestamp));
+    d->waitCond.wakeAll();
 }
 
 void QnIOMonitorConnectionProcessor::at_cameraOutput(
@@ -76,7 +84,10 @@ void QnIOMonitorConnectionProcessor::at_cameraOutput(
     bool value,
     qint64 timestamp )
 {
-    // todo: implement me
+    Q_D(QnIOMonitorConnectionProcessor);
+    QMutexLocker lock(&d->waitMutex);
+    d->dataToSend.push_back(QnIOStateData(inputPortID, value, timestamp));
+    d->waitCond.wakeAll();
 }
 
 void QnIOMonitorConnectionProcessor::sendMultipartData()

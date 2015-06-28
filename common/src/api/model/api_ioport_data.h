@@ -32,6 +32,8 @@ struct QnCameraPortsData
 struct QnIOStateData
 {
     QnIOStateData(): isActive(false), timestamp(0) {}
+    QnIOStateData(const QString& id, bool isActive, qint64 timestamp): id(id), isActive(isActive), timestamp(timestamp) {}
+
     QString id;
     bool isActive;
     qint64 timestamp;
