@@ -428,7 +428,8 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
     //root.Properties.Motion.MaxNbrOfWindows=10
 
-    initializeIOPorts( &http );
+    if (!initializeIOPorts( &http ))
+        return CameraDiagnostics::CameraInvalidParams(tr("Can't initialize IO port settings"));
 
     /* Ptz capabilities will be initialized by PTZ controller pool. */
 
@@ -899,13 +900,13 @@ bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPor
     return true;
 }
 
-bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts)
+bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts, const QnIOPortDataList& oldPorts)
 {
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
 
     QMap<QString,QString> changedParams;
 
-    for(auto& currentValue: m_ioPorts)
+    for(auto& currentValue: oldPorts)
     {
         QString paramNamePrefix = lit("root.IOPort.%1.").arg(currentValue.id);
         for (const QnIOPortData& newValue: newPorts)
@@ -931,20 +932,23 @@ bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts)
         }
     }
 
-    static const QByteArray UPD_PATH_PREFIX("axis-cgi/param.cgi?action=update");
+    QUrl updateUrl;
+    updateUrl.setPath(lit("axis-cgi/param.cgi"));
+    QUrlQuery urlQuery;
     static const int MAX_PATH_SIZE = 128;
-    QByteArray path = UPD_PATH_PREFIX;
     for (auto itr = changedParams.begin(); itr != changedParams.end();)
     {
-        path.append(lit("&%1=%2").arg(itr.key()).arg(itr.value()).toUtf8());
+        urlQuery.addQueryItem(itr.key(), itr.value());
         ++itr;
-        if (path.size() >= MAX_PATH_SIZE || itr == changedParams.end()) {
+        QString path = lit("axis-cgi/param.cgi?action=update&").append(urlQuery.toString(QUrl::FullyEncoded));
+        if (path.size() >= MAX_PATH_SIZE || itr == changedParams.end()) 
+        {
             CLHttpStatus status = http.doGET(path);
             if (status != CL_HTTP_SUCCESS) {
                 qWarning() << "Failed to update IO params for camera " << getHostAddress() << "rejected value:" << path;
                 return false;
             }
-            path = UPD_PATH_PREFIX;
+            urlQuery.clear();
         }
     }
     return true;
@@ -990,7 +994,7 @@ bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     }
     else {
         m_ioPorts = mergeIOSettings(cameraPorts, savedPorts);
-        if (!savePortSettings(m_ioPorts))
+        if (!savePortSettings(m_ioPorts, cameraPorts))
             return ioPortErrorOccured();
     }
     if (m_ioPorts != savedPorts)
@@ -1127,19 +1131,23 @@ int QnPlAxisResource::getChannel() const
 void QnPlAxisResource::asyncUpdateIOSettings(const QString & key)
 {
     const auto newValue = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+    QnIOPortDataList prevValue;
     {
         QMutexLocker lock(&m_mutex);
         if (newValue == m_ioPorts)
             return;
+        prevValue = m_ioPorts;
     }
 
     stopInputPortMonitoringAsync();
+    if (savePortSettings(newValue, prevValue)) 
     {
-        QMutexLocker lock(&m_mutex);
-        m_ioPorts = newValue;
-    }
-    if (savePortSettings(m_ioPorts))
+        {
+            QMutexLocker lock(&m_mutex);
+            m_ioPorts = newValue;
+        }
         startInputPortMonitoringAsync( std::function<void(bool)>() );
+    }
     else
         setStatus(Qn::Offline); // reinit
 }

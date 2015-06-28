@@ -120,6 +120,13 @@ QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const
         break;
     case Qn::DisabledRole:
         return isDisabledData(index);
+    case Qt::FontRole:
+        if (index.column() == IdColumn) {
+            QFont boldFont;
+            boldFont.setBold(true);
+            return boldFont;
+        }
+        break;
     default:
         break;
     }
@@ -154,8 +161,9 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
             ioPort.oDefaultState = (Qn::IODefaultState) value.toInt();
             break;
         default:
-            break;
+            return false;
         }
+        break;
     case NameColumn:
         switch (ioPort.portType) 
         {
@@ -166,15 +174,16 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
             ioPort.outputName = value.toString();
             break;
         default:
-            break;
+            return false;
         }
+        break;
     case AutoResetColumn:
         ioPort.autoResetTimeoutMs = value.toInt();
         break;
     default:
         return false;
     }
-
+    emit dataChanged(index, index);
     return true;
 }
 
@@ -186,7 +195,7 @@ QVariant QnIOPortsViewModel::headerData(int section, Qt::Orientation orientation
         case TypeColumn:         return tr("Type");
         case DefaultStateColumn: return tr("Default state");
         case NameColumn:         return tr("Name");
-        case AutoResetColumn:    return tr("Active time(ms)");
+        case AutoResetColumn:    return tr("Pulse time(ms)");
         default:
             break;
         }

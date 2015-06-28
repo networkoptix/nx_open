@@ -130,22 +130,27 @@ void QnIOPortItemDelegate::setEditorData(QWidget *editor, const QModelIndex &ind
 
 void QnIOPortItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const 
 {
-    switch (index.column()) {
-    case QnIOPortsViewModel::TypeColumn:
-    case QnIOPortsViewModel::DefaultStateColumn:
+    switch (index.column()) 
     {
-        if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
-            model->setData(index, comboBox->itemData(comboBox->currentIndex()));
-        return;
-    }
-    case QnIOPortsViewModel::AutoResetColumn:
+        case QnIOPortsViewModel::TypeColumn:
+        case QnIOPortsViewModel::DefaultStateColumn:
         {
-            if (QSpinBox* spinBox = dynamic_cast<QSpinBox *>(editor))
-                model->setData(index, spinBox->value());
+            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
+                model->setData(index, comboBox->itemData(comboBox->currentIndex()));
             return;
         }
-    default:
-        break;
+        case QnIOPortsViewModel::NameColumn:
+            if (QLineEdit* lineEdit = dynamic_cast<QLineEdit *>(editor))
+                model->setData(index, lineEdit->text());
+            return;
+        case QnIOPortsViewModel::AutoResetColumn:
+            {
+                if (QSpinBox* spinBox = dynamic_cast<QSpinBox *>(editor))
+                    model->setData(index, spinBox->value());
+                return;
+            }
+        default:
+            break;
     }
     base_type::setModelData(editor, model, index);
 }

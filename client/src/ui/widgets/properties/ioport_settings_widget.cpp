@@ -13,9 +13,10 @@ QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent /*= 0*/):
     ui->tableView->setItemDelegate(new QnIOPortItemDelegate(this));  
     ui->tableView->horizontalHeader()->setVisible(true);
     ui->tableView->horizontalHeader()->setStretchLastSection(false);
-    //ui->tableView->resizeColumnsToContents();
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnIOPortsViewModel::NameColumn, QHeaderView::Stretch);
+
+    connect(m_model, &QAbstractItemModel::dataChanged, this, &QnIOPortSettingsWidget::dataChanged);
 }
 
 QnIOPortSettingsWidget::~QnIOPortSettingsWidget() {

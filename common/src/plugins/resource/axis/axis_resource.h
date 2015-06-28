@@ -126,7 +126,7 @@ private:
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
     bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& result);
-    bool savePortSettings(const QnIOPortDataList& data);
+    bool savePortSettings(const QnIOPortDataList& newPorts, const QnIOPortDataList& oldPorts);
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
     bool ioPortErrorOccured();
     friend class QnAxisPtzController;

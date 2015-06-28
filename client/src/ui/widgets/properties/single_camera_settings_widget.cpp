@@ -139,6 +139,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   [this](int state){ ui->forceArComboBox->setEnabled(state == Qt::Checked);} );
     connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
+    connect(ui->ioPortSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+
     ui->forceArComboBox->addItem(tr("4:3"),  4.0f / 3);
     ui->forceArComboBox->addItem(tr("16:9"), 16.0f / 9);
     ui->forceArComboBox->addItem(tr("1:1"),  1.0f);

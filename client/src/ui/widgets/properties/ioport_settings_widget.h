@@ -26,6 +26,8 @@ public:
     const QnVirtualCameraResourcePtr &camera() const;
     void updateFromResource(const QnVirtualCameraResourcePtr &camera);
     void submitToResource(const QnVirtualCameraResourcePtr &camera);
+signals:
+    void dataChanged();
 private:
     void updateHeaderWidth();
 private:
