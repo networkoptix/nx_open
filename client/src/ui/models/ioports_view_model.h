@@ -28,8 +28,7 @@ public:
         DefaultStateColumn,
         NameColumn,
         AutoResetColumn,
-        ColumnCount,
-        SupportedTypesColumn
+        ColumnCount
     };
 
 

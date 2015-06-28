@@ -12,18 +12,42 @@ QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent /*= 0*/):
     ui->tableView->setModel(m_model);
     ui->tableView->setItemDelegate(new QnIOPortItemDelegate(this));  
     ui->tableView->horizontalHeader()->setVisible(true);
-    //ui->tableView->horizontalHeader()->setStretchLastSection(false);
-
+    ui->tableView->horizontalHeader()->setStretchLastSection(false);
     //ui->tableView->resizeColumnsToContents();
-    //ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnIOPortsViewModel::NameColumn, QHeaderView::Stretch);
 }
 
 QnIOPortSettingsWidget::~QnIOPortSettingsWidget() {
 }
 
+void QnIOPortSettingsWidget::updateHeaderWidth()
+{
+    if (m_model->rowCount() == 0)
+        return;
+    
+    QFontMetrics fm(ui->tableView->font());
+    for (int j = 0; j <= QnIOPortsViewModel::DefaultStateColumn; ++j)
+    {
+        if (j == QnIOPortsViewModel::NameColumn)
+            continue;
+        int width = 0;
+        for (int i = 0; i < m_model->rowCount(); ++i)
+        {
+            QModelIndex idx = m_model->index(i, j);
+            QString text = m_model->data(idx).toString();
+            width = qMax(width, fm.width(text));
+        }
+        ui->tableView->horizontalHeader()->resizeSection(j, width + 32);
+    }
+    QString text = m_model->headerData(QnIOPortsViewModel::AutoResetColumn, Qt::Horizontal).toString();
+    ui->tableView->horizontalHeader()->resizeSection(QnIOPortsViewModel::AutoResetColumn, fm.width(text));
+}
+
 void QnIOPortSettingsWidget::updateFromResource(const QnVirtualCameraResourcePtr &camera)
 {
     m_model->setModelData(camera ? camera->getIOPorts() : QnIOPortDataList());
+    updateHeaderWidth();
 }
 
 void QnIOPortSettingsWidget::submitToResource(const QnVirtualCameraResourcePtr &camera)

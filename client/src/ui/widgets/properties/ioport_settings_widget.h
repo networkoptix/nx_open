@@ -27,6 +27,8 @@ public:
     void updateFromResource(const QnVirtualCameraResourcePtr &camera);
     void submitToResource(const QnVirtualCameraResourcePtr &camera);
 private:
+    void updateHeaderWidth();
+private:
     QScopedPointer<Ui::QnIOPortSettingsWidget> ui;
     QnIOPortsActualModel* m_model;
 };

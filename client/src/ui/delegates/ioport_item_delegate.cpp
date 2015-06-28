@@ -48,10 +48,12 @@ void QnIOPortItemDelegate::initStyleOption(QStyleOptionViewItem *option, const Q
     }
 }
 
-QWidget* QnIOPortItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  
+QWidget* QnIOPortItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex &index) const  
 {
-    QnIOPortData ioPort = index.data(Qn::IOPortDataRole).value<QnIOPortData>();
+    Q_UNUSED(option)
+    Q_UNUSED(parent)
 
+        QnIOPortData ioPort = index.data(Qn::IOPortDataRole).value<QnIOPortData>();
     switch (index.column()) 
     {
         case QnIOPortsViewModel::TypeColumn:
