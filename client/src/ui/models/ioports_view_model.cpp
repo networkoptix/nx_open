@@ -51,25 +51,9 @@ QString QnIOPortsViewModel::textData(const QModelIndex &index) const
     case TypeColumn:
         return QnLexical::serialized(value.portType);
     case DefaultStateColumn:
-        switch (value.portType) 
-        {
-        case Qn::PT_Input:
-            return QnLexical::serialized(value.iDefaultState);
-        case Qn::PT_Output:
-            return QnLexical::serialized(value.oDefaultState);
-        default:
-            return QString();
-        }
+        return value.portType == Qn::PT_Output ? QnLexical::serialized<Qn::IODefaultState>(value.oDefaultState) : QnLexical::serialized<Qn::IODefaultState>(value.iDefaultState);
     case NameColumn:
-        switch (value.portType) 
-        {
-        case Qn::PT_Input:
-            return value.inputName;
-        case Qn::PT_Output:
-            return value.outputName;
-        default:
-            return QString();
-        }
+        return value.portType == Qn::PT_Output ? value.outputName : value.inputName;
     case AutoResetColumn:
         return QString::number(value.autoResetTimeoutMs);
     default:
@@ -130,9 +114,16 @@ QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const
         return QVariant(textData(index));
     case Qt::EditRole:
         return editData(index);
+    case Qt::TextColorRole:
+        break;
+    case Qt::BackgroundRole:
+        break;
+    case Qn::DisabledRole:
+        return isDisabledData(index);
     default:
-        return QVariant();
+        break;
     }
+    return QVariant();
 }
 
 bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value, int role) {
@@ -221,17 +212,33 @@ Qt::ItemFlags QnIOPortsViewModel::flags(const QModelIndex &index) const
         case NameColumn:
             if (value.portType != Qn::PT_Disabled)
                 flags |= Qt::ItemIsEditable;
-            else
-                flags &= ~Qt::ItemIsEnabled;
             break;
         case AutoResetColumn:
             if (value.portType == Qn::PT_Output)
                 flags |= Qt::ItemIsEditable;
-            else
-                flags &= ~Qt::ItemIsEnabled;
             break;
     }
     return flags;
+}
+
+bool QnIOPortsViewModel::isDisabledData(const QModelIndex &index) const 
+{
+    Qt::ItemFlags flags = base_type::flags(index);
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+        return false;
+    const QnIOPortData& value = m_data.at(index.row());
+
+    switch (index.column()) 
+    {
+    case IdColumn:
+    case TypeColumn:
+    case DefaultStateColumn:
+    case NameColumn:
+        return value.portType == Qn::PT_Disabled;
+    case AutoResetColumn:
+        return value.portType != Qn::PT_Output;
+    }
+    return false;
 }
 
 void QnIOPortsViewModel::clear() {
