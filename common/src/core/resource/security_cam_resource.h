@@ -269,6 +269,12 @@ signals:
         const QString& inputPortID,
         bool value,
         qint64 timestamp );
+    
+    void cameraOutput(
+        const QnResourcePtr& resource,
+        const QString& inputPortID,
+        bool value,
+        qint64 timestamp );
 
 protected slots:
     virtual void at_initializedChanged();

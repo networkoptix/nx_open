@@ -1088,27 +1088,44 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
         NX_LOG( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
     }
-    const unsigned int portNumber = notification.mid( 0, portTypePos ).toUInt();
+    QString portId = QString::fromLatin1(notification.mid(0, sepPos));
     const char portType = notification[portTypePos];
     NX_LOG( lit("%1 port %2 changed its state to %3. Camera %4").
-        arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portNumber).arg(QLatin1String(eventType == '/' ? "active" : "inactive")).arg(getUrl()), cl_logDEBUG1 );
+        arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portId).arg(QLatin1String(eventType == '/' ? "active" : "inactive")).arg(getUrl()), cl_logDEBUG1 );
 
-    if( portType != 'I' )
-        return;
-
-    switch( eventType )
+    bool isOnState = (eventType == '/');
+    if( portType == 'I' )
     {
+        switch( eventType )
+        {
+            case '/':
+            case '\\':
+                emit cameraInput(
+                    toSharedPointer(),
+                    portId,
+                    isOnState,
+                    QDateTime::currentMSecsSinceEpoch() );
+                break;
+
+            default:
+                break;
+        }
+    }
+    else {
+        switch( eventType )
+        {
         case '/':
         case '\\':
-            emit cameraInput(
+            emit cameraOutput(
                 toSharedPointer(),
-                QString::number(portNumber),
-                eventType == '/' ? true : false,
+                portId,
+                isOnState,
                 QDateTime::currentMSecsSinceEpoch() );
             break;
 
         default:
             break;
+        }
     }
 }
 

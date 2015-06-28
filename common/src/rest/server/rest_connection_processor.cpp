@@ -80,7 +80,7 @@ void QnRestConnectionProcessor::run()
     parseRequest();
 
 
-    d->responseBody.clear();
+    d->response.messageBody.clear();
 
     QUrl url = getDecodedUrl();
     QString path = url.path();
@@ -91,16 +91,16 @@ void QnRestConnectionProcessor::run()
     if (handler) 
     {
         if (d->request.requestLine.method.toUpper() == "GET") {
-            rez = handler->executeGet(url.path(), params, d->responseBody, contentType, this);
+            rez = handler->executeGet(url.path(), params, d->response.messageBody, contentType, this);
         }
         else if (d->request.requestLine.method.toUpper() == "POST" || 
                  d->request.requestLine.method.toUpper() == "PUT") {
-            rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->responseBody, contentType, this);
+            rez = handler->executePost(url.path(), params, d->response.messageBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->response.messageBody, contentType, this);
         }
         else {
             qWarning() << "Unknown REST method " << d->request.requestLine.method;
             contentType = "text/plain";
-            d->responseBody = "Invalid HTTP method";
+            d->response.messageBody = "Invalid HTTP method";
             rez = CODE_NOT_FOUND;
         }
     }
@@ -108,11 +108,11 @@ void QnRestConnectionProcessor::run()
         rez = redirectTo(QnTcpListener::defaultPage(), contentType);
     }
     QByteArray contentEncoding;
-    QByteArray uncompressedResponse = d->responseBody;
-    if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty() && rez == CODE_OK) 
+    QByteArray uncompressedResponse = d->response.messageBody;
+    if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty() && rez == CODE_OK) 
     {
         if (!contentType.contains("image")) {
-            d->responseBody = GZipCompressor::compressData(d->responseBody);
+            d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
             contentEncoding = "gzip";
         }
     }

@@ -31,12 +31,13 @@ struct QnCameraPortsData
     
 struct QnIOStateData
 {
-    QnIOStateData(): isActive(false) {}
+    QnIOStateData(): isActive(false), timestamp(0) {}
     QString id;
     bool isActive;
+    qint64 timestamp;
 };
 typedef std::vector<QnIOStateData> QnIOStateDataList;
-#define QnIOStateData_Fields (id)(isActive)
+#define QnIOStateData_Fields (id)(isActive)(timestamp)
 
 struct QnCameraIOStateData
 {
