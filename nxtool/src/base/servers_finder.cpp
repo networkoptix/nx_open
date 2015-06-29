@@ -218,7 +218,7 @@ void rtu::ServersFinder::Impl::updateServers()
         {
             qDebug() << address;
             SocketPtr socket(new QUdpSocket());
-            if (socket->bind(address, kMulticastGroupPort))
+            if (socket->bind(address))
             {
                 QObject::connect(socket.data(), &QUdpSocket::readyRead, [this, socket]()
                 {
@@ -235,7 +235,7 @@ void rtu::ServersFinder::Impl::updateServers()
         {
             const SocketPtr &socket = *it;
             socket->close();
-            socket->bind(address, kMulticastGroupPort);
+            socket->bind(address);
         }
         
         for(const auto &socket: m_sockets)
