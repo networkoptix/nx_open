@@ -5,233 +5,141 @@ angular.module('webadminApp')
         return {
             restrict: 'E',
             scope: {
-                records: '=',
-                ngClick: '&',
+                recordsProvider: '=',
                 positionProvider: '=',
+
+                ngClick: '&',
                 handler: '='
             },
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
                     initialInterval: 1000*60*60*24*365, // no records - show last hour
-                    futureInterval: 1000*60*60*24, // 24 hour to future - for timeline
-                    zoomStep: 1.5, // Zoom speed
-                    maxTimeLineWidth: 30000000, // maximum width for timeline, which browser can handle
-                    // TODO: support changing boundaries on huge detailization
-                    initialZoom: 0, // Initial zoom step 0 - to see whole timeline without scroll.
-                    updateInterval: 20, // Animation interval
+                    minMsPerPixel: 1,
+
+                    zoomBase: 2, // Parameter for log
+                    zoomSpeed: 0.05, // Zoom speed 0 -> 1 = full zoom
                     animationDuration: 300, // 200-400 for smooth animation
-                    rulerColor:[0,0,0], //Color for ruler marks and labels
-                    rulerFontSize: 9, // Smallest font size for labels
-                    rulerFontStep: 1, // Step for increasing font size
-                    rulerBasicSize: 6, // Size for smallest mark on ruler
-                    rulerStepSize: 3,// Step for increasing marks
-                    labelsPadding: 0.3, // Padding between marks and labels (according to font size)
-                    minimumMarkWidth: 5, // Minimum available width for smallest marks on ruler
-                    increasedMarkWidth: 10,// Minimum width for encreasing marks size
-                    maximumScrollScale: 20,// Maximum scale for scroll frame inside viewport - according to viewport width
-                    colorLevels: 6, // Number of different color levels
-                    scrollingSpeed: 0.25,// One click to scroll buttons - scroll timeline by half of the screen
-                    maxVerticalScrollForZoom: 5000, // value for adjusting zoom
-                    scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
-                    dblClckZoomSpeed:2,// Zoom speed for dbl click
-                    topLabelBorderColor: 'silver', // Color for borders for top labels
-                    topLabelTextColor: 'rgb(128,128,128)', // Color for text for top labels
-                    topLabelHeight: 12, // Size for top label text
-                    topLabelPadding: 2, // Padding around top label
 
+                    timelineBgColor: [28,35,39], //Color for ruler marks and labels
                     font:'sans-serif',
-                    evenColor: 'rgb(200,200,255)',
-                    oddColor: 'white',
 
-                    chunkTopMargin:5,
-                    chunkHeight:20,
-                    exactChunkColor:'rgba(192,192,192,0.65)',
-                    hightlightChunkColor:'rgb(192,192,192)',
-                    loadingChunkColor:'rgba(192,192,192,0.4)',
+                    topLabelHeight: 20/100, //% // Size for top label text
+                    topLabelFontSize: 12, //px // Font size
+                    topLabelTextColor: [255,255,255], // Color for text for top labels
 
-                    timeMarkerColor:'blue',
-                    dateFormat:'dd.mm.yyyy',
-                    timeFormat:'HH:MM:ss'
+                    labelHeight:20/100, // %
+                    labelFontSize: 12, // px
+                    labelTextColor: [128,128,128],
+
+                    chunkHeight:40/100, // %    //Height for event line
+                    minChunkWidth: 1,
+                    chunksBgColor:[34,57,37],
+                    exactChunkColor: [58,145,30],
+                    loadingChunkColor: [58,145,30,0.5],
+
+                    scrollBarHeight: 20/100, // %
+                    minScrollBarWidth: 50, // px
+                    scrollBarBgColor: [0,0,0],
+                    scrollBarColor: [128,128,128],
+                    scrollBarHighlightColor: [200,200,200],
+
+                    timeMarkerColor:[128,128,255], // Timemarker color
+                    dateFormat:'dd.mm.yyyy', // Timemarker format for date
+                    timeFormat:'HH:MM:ss', // Timemarker format for time
+
+                    scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
+                    scrollingSpeed: 0.25,// Scrolling speed for scroll buttons right-left
+
+
+                    end: 0
                 };
-                function positionMarker(){
-                    var lastCoord = scope.positionCoordinate;
-                    if(!scope.positionProvider){
-                        timeMarker.addClass("hiddenTimemarker");
-                        return;
-                    }
-                    var playedPosition = scope.positionProvider.playedPosition;
 
-                    scope.positionCoordinate = dateToScreenPosition(playedPosition).toFixed(1);
+                /**
+                 * This is main timeline module.
+                 *
+                 * Architecture:
+                 *
+                 * 1. There are three models, used for data exchange: positionProvider, recordsProvider, Boundaries&Zoom
+                 * 2. There are four interface modules: Labels (Top and lower lines), Events, ScrollBar, TimeMarker
+                 *
+                 * positionProvider shows current playing position (interracts with video-player, can be changed with clicking on the timeline)
+                 *      positionProvider also jumps between small chunks while playing.
+                 *
+                 * recordsProvider requests records from server with required detailization.
+                 *      We ask recrodsProvider to create splices within boundaries
+                 *
+                 * ScaleManager represents current viewport of the timeline: which time interval is visible and current zoomlevel.
+                 *      Also provides methods to convert screen position to time and time to position.
+                 *      Also manages total boundaries of the timeline, including live view
+                 *
+                 *
+                 *
+                 * Labels - are two lines with dates above events line. Not interactive, just gets boundaries and draws labels
+                 *
+                 * Events shows chunks on the timeline, using splice from recordsProvider
+                 *
+                 * ScrollBar - manages boundaries. If we scroll - we change boundaries. Also scroll moves automatically while playing.
+                 *
+                 * TimeMarker just renders timemarker with playing position above timeline. Uses data from positionProvider
+                 *
+                 *
+                 *
+                 * animateScope - special code which calls drawing and supports smooth animations
+                 */
 
-                    if(scope.positionCoordinate != lastCoord){
-                        //console.log("positionCoordinate ",new Date(playedPosition),scope.positionCoordinate);
-                        if(scope.positionCoordinate > 0 && scope.positionCoordinate < viewportWidth) {
-                            timeMarker.removeClass("hiddenTimemarker");
-                            timeMarker.css("left", scope.positionCoordinate + "px");
-                        }else{
-                            timeMarker.addClass("hiddenTimemarker");
-                        }
-                    }
-
-                    var date = new Date(playedPosition);
-                    scope.playingDate = dateFormat(date, timelineConfig.dateFormat);
-                    scope.playingTime = dateFormat(date, timelineConfig.timeFormat);
-                }
-
-                scope.$watch('position',positionMarker);
-                var chunksVertStart = timelineConfig.topLabelHeight +
-                    5 * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize
-                    + timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * 3
-                    + timelineConfig.chunkTopMargin;
-
-                animateScope.setDuration(timelineConfig.animationDuration);
-                animateScope.setScope(scope);
-
-                var viewportWidth = element.find('.viewport').width();
-                var containerHeight = element.find('.viewport').height();
-
-
+                // !!! Read basic parameters, DOM elements and global objects for module
                 var frame = element.find('.frame');
-                var scroll = element.find('.scroll');
                 var timeMarker = element.find(".timeMarker");
-
                 var canvas = element.find('canvas').get(0);
-                canvas.width  = viewportWidth;
+                scope.scaleManager = new ScaleManager(timelineConfig.zoomBase, timelineConfig.minMsPerPixel, timelineConfig.initialInterval, 100); //Init boundariesProvider
 
-                var scrollBarWidth = getScrollbarWidth();
-                canvas.height = containerHeight - scrollBarWidth;
-                element.find('canvas').height(containerHeight - scrollBarWidth);
-
-                // set up scroll up-down for zoom
-                function getScrollbarWidth() {
-                    var outer = document.createElement('div');
-                    outer.style.visibility = 'hidden';
-                    outer.style.width = '100px';
-                    outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
-
-                    document.body.appendChild(outer);
-
-                    var widthNoScroll = outer.offsetWidth;
-                    // force scrollbars
-                    outer.style.overflow = 'scroll';
-
-                    // add innerdiv
-                    var inner = document.createElement('div');
-                    inner.style.width = '100%';
-                    outer.appendChild(inner);
-
-                    var widthWithScroll = inner.offsetWidth;
-
-                    // remove divs
-                    outer.parentNode.removeChild(outer);
-
-                    return widthNoScroll - widthWithScroll;
+                // !!! Initialization functions
+                function updateTimelineHeight(){
+                    scope.viewportHeight = element.find("canvas").height();
+                    canvas.height = scope.viewportHeight;
+                }
+                function updateTimelineWidth(){
+                    scope.viewportWidth = element.find("canvas").width();
+                    canvas.width  = scope.viewportWidth;
+                    scope.scaleManager.setViewportWidth(scope.viewportWidth);
+                }
+                function initTimeline(){
+                    var now = (new Date()).getTime();
+                    scope.scaleManager.setStart(scope.recordsProvider ? scope.recordsProvider.start : (now - timelineConfig.initialInterval));
+                    scope.scaleManager.setEnd(now);
+                    scope.scaleManager.fullZoomOut();
                 }
 
-                function bound(min,value,max){
-                    return Math.max(min,Math.min(value,max));
+                // !!! Drawing and redrawing functions
+                function drawAll(){
+                    var context = clearTimeline();
+                    drawTopLabels(context);
+                    drawLowerLabels(context);
+                    drawEvents(context);
+                    drawScrollBar(context);
+                    drawTimeMarker(context);
                 }
-
-                var userScroll = true;
-                var scrollLeftRelativeValue = 0;
-                function viewPortScrollRelative(value){
-                    var availableWidth = scope.scrollWidth - viewportWidth;
-                    if(typeof(value) === 'undefined') {
-                        if(availableWidth < 1){
-                            scrollLeftRelativeValue = 0.5;
-                        }
-                        return scrollLeftRelativeValue;
-                    } else {
-                        scrollLeftRelativeValue = value;
-                        var scrollValue = Math.round(value * availableWidth);
-                        userScroll = false;
-                        scroll.scrollLeft(scrollValue);
-                        userScroll = true;
-                    }
-                }
-
-                scroll.scroll(function(){
-                    if(!userScroll) {
-                        return;
-                    }
-                    var scrollPos = scroll.scrollLeft();
-                    var availableWidth = scope.scrollWidth - viewportWidth;
-                    viewPortScrollRelative(scrollPos/availableWidth);
-                });
-
-                var targetZoomLevel = 1;
-
-                scroll.mousewheel(function(event){
-                    event.preventDefault();
-
-                    if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
-                        if (scope.zooming === 1) { // if zoom animation is not going yet
-                            scope.positionToKeep = event.offsetX/viewportWidth;
-
-                            var actualZoomLevel = (scope.scrollZooming === 1)?scope.actualZoomLevel:targetZoomLevel;
-                            var actualVerticalScrollForZoom = actualZoomLevel / scope.maxZoomLevel;
-                            actualVerticalScrollForZoom -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
-
-                            actualVerticalScrollForZoom = bound(0,actualVerticalScrollForZoom,1);
-
-                            targetZoomLevel = scope.maxZoomLevel * actualVerticalScrollForZoom;
-
-                            // If user uses touchpad - do not animate, just set value
-                            // scope.actualZoomLevel = targetZoomLevel;
-                            animateScope.animate(scope,'actualZoomLevel',targetZoomLevel);
-                            animateScope.progress(scope,'scrollZooming');
-                        }
-                    }else {
-                        var horScroll = viewPortScrollRelative();
-                        horScroll += event.deltaX / scope.actualWidth;
-                        viewPortScrollRelative(horScroll);
-                    }
-
-                    scope.$apply();
-
-                });
-
-                var mouseDate = null;
-                var mouseCoordinate = null;
-                var highlightchunk = false;
-                scroll.mousemove(function(event){
-                    //Check if we are in the events row
-                    mouseCoordinate = (event.offsetX - scroll.scrollLeft());
-                    mouseDate = screenRelativePositionToDate(mouseCoordinate / viewportWidth);
-                    highlightchunk = (event.offsetY >= chunksVertStart && event.offsetY <= chunksVertStart + timelineConfig.chunkHeight);
-                });
-                scroll.mouseout(function(event){
-                    mouseDate = null;
-                    mouseCoordinate = null;
-                    highlightchunk = false;
-                });
-
-                scroll.click(function(event){
-                    mouseCoordinate = (event.offsetX - scroll.scrollLeft());
-                    mouseDate = screenRelativePositionToDate(mouseCoordinate / viewportWidth);
-                    scope.handler(mouseDate);
-                });
-
-                function maxZoomLevel(){
-                    var maxLevel = RulerModel.levels[RulerModel.levels.length-1];
-                    var targetSecPerPixel =  maxLevel.interval.getSeconds()/maxLevel.width;
-                    var totalSeconds = (scope.end - scope.start) / 1000;
-                    var maxLevelValue = totalSeconds / targetSecPerPixel / viewportWidth;
-                    var maxZoomLevelResult = Math.ceil(Math.log(maxLevelValue) / Math.log(timelineConfig.zoomStep));
-                    return maxZoomLevelResult;
-                }
-
-                function blurColor(color,alpha){
+                function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
                     /*
-                    var colorString =  'rgba(' +
-                        Math.round(color[0]) + ',' +
-                        Math.round(color[1]) + ',' +
-                        Math.round(color[2]) + ',' +
-                        alpha + ')';
-                    */
+                     var colorString =  'rgba(' +
+                     Math.round(color[0]) + ',' +
+                     Math.round(color[1]) + ',' +
+                     Math.round(color[2]) + ',' +
+                     alpha + ')';
+                     */
+                    if(typeof(color)=="string"){ // do not try to change strings
+                        return color;
+                    }
+                    if(typeof(alpha) == 'undefined'){
+                        alpha = 1;
+                    }
                     if(alpha > 1) { // Not so good. It's hack. Somewhere
                         console.error('bad value', alpha);
+                    }
+
+                    if(color.length > 3){ //Array already has alpha channel
+                        alpha = alpha * color[3];
                     }
                     var colorString =  'rgb(' +
                         Math.round(color[0] * alpha + 255 * (1 - alpha)) + ',' +
@@ -240,397 +148,211 @@ angular.module('webadminApp')
 
                     return colorString;
                 }
-
-                function zoomLevel(){
-                    return Math.pow(timelineConfig.zoomStep,scope.actualZoomLevel);
-                }
-
-                function secondsPerPixel () {
-                    return (scope.end - scope.start) / scope.actualWidth / 1000;
-                }
-
-                function updateActualLevel(){
-
-                    var oldLevel = scope.actualLevel;
-                    var oldLabelLevel = scope.visibleLabelsLevel;
-                    var oldEncreasedLevel = scope.increasedLevel;
-
-                    //3. Select actual level
-                    var secsPerPixel = secondsPerPixel();
-                    for(var i=1; i < RulerModel.levels.length ; i ++ ){
-                        var level = RulerModel.levels[i];
-
-                        var secondsPerLevel = (level.interval.getSeconds() / secsPerPixel);
-
-                        if(typeof(level.topWidth)!=='undefined' &&
-                            secondsPerLevel >= level.topWidth){
-                            scope.topLabelsLevel = i;
-                        }
-
-                        if(secondsPerLevel >= level.width){
-                            scope.visibleLabelsLevel = i;
-                        }
-
-                        if(secondsPerLevel > timelineConfig.increasedMarkWidth){
-                            scope.increasedLevel = i;
-                        }
-
-                        if(secondsPerLevel > timelineConfig.minimumMarkWidth){
-                            scope.actualLevel = i;
-                        }
-
-                        if(secondsPerLevel >= 1) {
-                            scope.chunksLevel = i;
-                        }
-
-                        if(secondsPerLevel <= 1) {
-                            break;
-                        }
-                    }
-
-                    scope.chunksLevel ++;
-                    if(scope.chunksLevel >= RulerModel.levels.length){
-                        scope.chunksLevel = RulerModel.levels.length - 1;
-                    }
-
-                    scope.disableZoomIn  = Math.ceil(scope.actualZoomLevel) >= scope.maxZoomLevel;//scope.actualLevel >= RulerModel.levels.length-1;
-                    scope.disableZoomOut = scope.actualZoomLevel <= 0;
-
-
-                    if(oldLevel < scope.actualLevel){ // Level up - run animation for appearance of new level
-                        animateScope.progress(scope,'levelAppearance');
-                    }else if(oldLevel > scope.actualLevel){
-                        animateScope.progress(scope,'levelDisappearance');
-                    }
-
-                    if(oldEncreasedLevel < scope.increasedLevel){
-                        animateScope.progress(scope,'levelEncreasing');
-                    }else if(oldEncreasedLevel > scope.increasedLevel){
-                        animateScope.progress(scope,'levelDecreasing');
-                    }
-
-                    if(oldLabelLevel < scope.visibleLabelsLevel){ //Visible label level changed
-                        animateScope.progress(scope,'labelAppearance');
-                    }else if(oldLabelLevel > scope.visibleLabelsLevel){
-                        animateScope.progress(scope,'labelDisappearance');
-                    }
-                }
-
-                function screenStartPosition(){
-                    return viewPortScrollRelative() * (scope.frameWidth - viewportWidth);
-                }
-
-                function dateToScreenPosition(date){
-                    var position = scope.frameWidth * (date - scope.start) / (scope.frameEnd - scope.start);
-                    return position - screenStartPosition();
-                }
-
-                function screenRelativePositionToDate(position){
-                    var globalPosition = screenStartPosition() + position*viewportWidth;
-                    var toret = Math.round(scope.start + (scope.frameEnd - scope.start)*globalPosition/scope.frameWidth);
-                    return toret;
-                }
-
-                function screenRelativePositionAndDateToRelativePositionForScroll(date,screenRelativePosition){
-                    if(scope.frameWidth === viewportWidth){
-                        return 0;
-                    }
-                    var dateRelativePosition = (date - scope.start)/(scope.frameEnd - scope.start);
-                    var datePosition = dateRelativePosition * scope.frameWidth;
-                    var startPosition = datePosition - viewportWidth * screenRelativePosition;
-                    var screenStartRelativePos = startPosition / (scope.frameWidth-viewportWidth);
-                    return screenStartRelativePos;
-                }
-                function drawChunk(context, startCoordinate, endCoordinate, exactChunk){
-                    context.fillStyle = exactChunk? timelineConfig.exactChunkColor:timelineConfig.loadingChunkColor;
-
-                    if(highlightchunk && startCoordinate <= mouseCoordinate && endCoordinate >= mouseCoordinate){
-                        //context.fillStyle = timelineConfig.hightlightChunkColor;
-                    }
-
-                    context.fillRect(startCoordinate, chunksVertStart , Math.max(1,endCoordinate - startCoordinate), timelineConfig.chunkHeight);
-                    context.stroke();
-                }
-
-                function drawEvents(){
-                    //4. Set interval for events
-                    //TODO: Set interval for events
-
+                function clearTimeline(){
                     var context = canvas.getContext('2d');
+                    context.fillStyle = blurColor(timelineConfig.timelineBgColor,1);
+                    context.fillRect(0, 0, scope.viewportWidth, scope.viewportHeight);
+                    return context;
+                }
 
-                    /*if( scope.positionProvider) { // Draw cached video. Disabled, because seeking doesn't work
-                        var startCoordinate = dateToScreenPosition(scope.positionProvider.start);
-                        var endCoordinate = dateToScreenPosition(scope.positionProvider.lastPlayedDate);
-                        drawChunk(context, startCoordinate, endCoordinate, false);
-                    }*/
+                // !!! Labels logic
+                function drawTopLabels(context){
+                    var level = scope.scaleManager.levels.topLabels.level;
+                    var start = scope.scaleManager.alignStart(level);
+                    var end = scope.scaleManager.visibleEnd;
 
-                    var level = RulerModel.levels[scope.actualLevel];
-                    var start = level.interval.alignToFuture(screenRelativePositionToDate(0));
-                    var end = level.interval.alignToFuture(screenRelativePositionToDate(1));
+                    while(start <= end){
+                        drawTopLabel(context,start,level);
+                        start = level.interval.addToDate(start);
+                    }
+                }
+                function drawTopLabel(context, date, level){
+                    var coordinate = scope.scaleManager.dateToScreenCoordinate(date);
+                    var label = dateFormat(new Date(date), level.topFormat);
 
-                    if(scope.records && scope.records.chunksTree) {
+                    context.font = timelineConfig.topLabelFontSize  + 'px ' + timelineConfig.font;
+                    context.fillStyle = blurColor(timelineConfig.topLabelTextColor,1);
+
+                    var textWidth = context.measureText(label).width;
+
+                    var textStart = 0 * scope.viewportHeight // Top border
+                        + (timelineConfig.topLabelHeight * scope.viewportHeight  - timelineConfig.topLabelFontSize) / 2 // Top padding
+                        + timelineConfig.topLabelFontSize; // Font size
+
+                    context.fillText(label, coordinate - textWidth/2, textStart);
+                }
+                function drawLowerLabels(context){
+                    var level = scope.scaleManager.levels.labels.level;
+                    var start = scope.scaleManager.alignStart(level);
+                    var end = scope.scaleManager.visibleEnd;
+
+                    while(start <= end){
+                        drawLowerLabel(context,start,level);
+                        start = level.interval.addToDate(start);
+                    }
+                }
+                function drawLowerLabel(context,date,level){
+                    var coordinate = scope.scaleManager.dateToScreenCoordinate(date);
+                    var label = dateFormat(new Date(date), level.format);
+                    context.font = timelineConfig.labelFontSize  + 'px ' + timelineConfig.font;
+                    context.fillStyle = blurColor(timelineConfig.labelTextColor,1);
+
+                    var textWidth = context.measureText(label).width;
+
+                    var textStart = timelineConfig.topLabelHeight * scope.viewportHeight  // Top border
+                        + (timelineConfig.labelHeight * scope.viewportHeight  - timelineConfig.labelFontSize) / 2 // Top padding
+                        + timelineConfig.labelFontSize; // Font size
+
+                    context.fillText(label, coordinate - textWidth/2, textStart);
+
+
+                }
+
+                // !!! Draw events
+                function drawEvents(context){
+                    context.fillStyle =   blurColor(timelineConfig.chunksBgColor,1);
+                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
+                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+
+
+                    var level = scope.scaleManager.levels.events.level;
+                    var levelIndex = scope.scaleManager.levels.events.index;
+                    var start = scope.scaleManager.alignStart(level);
+                    var end = scope.scaleManager.alignEnd(level);
+
+                    if(scope.recordsProvider && scope.recordsProvider.chunksTree) {
                         // 1. Splice events
-                        var events = scope.records.getIntervalRecords(start, end, scope.chunksLevel);
+                        var events = scope.recordsProvider.getIntervalRecords(start, end, levelIndex);
 
                         // 2. Draw em!
                         for(var i=0;i<events.length;i++){
-                            var chunk = events[i];
-                            var startCoordinate = dateToScreenPosition(chunk.start);
-                            var endCoordinate = dateToScreenPosition(chunk.end);
-                            drawChunk(context,startCoordinate, endCoordinate,chunk.level === scope.chunksLevel);
+                            drawEvent(context,events[i],levelIndex);
                         }
                     }
                 }
+                function drawEvent(context,chunk, levelIndex){
+                    var startCoordinate = scope.scaleManager.dateToScreenCoordinate(chunk.start);
+                    var endCoordinate = scope.scaleManager.dateToScreenCoordinate(chunk.end);
 
-                function drawMark(context, coordinate, level, labelLevel, label){
-                    if(coordinate<0) {
+                    var exactChunk = levelIndex == chunk.level;
+
+                    context.fillStyle = exactChunk? blurColor(timelineConfig.exactChunkColor,1):blurColor(timelineConfig.loadingChunkColor,1);
+
+                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
+
+                    context.fillRect(startCoordinate, top , Math.max(timelineConfig.minChunkWidth,endCoordinate - startCoordinate), timelineConfig.chunkHeight * scope.viewportHeight);
+                    context.stroke();
+                }
+
+                // !!! Draw ScrollBar
+                function drawScrollBar(context){
+                    //1. DrawBG
+                    context.fillStyle =   blurColor(timelineConfig.scrollBarBgColor,1);
+
+                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight + timelineConfig.chunkHeight) * scope.viewportHeight; // Top border
+
+                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.scrollBarHeight * scope.viewportHeight);
+
+                    //2.
+                    var relativeStart =  scope.scaleManager.getRelativeStart();
+                    var relativeWidth =  scope.scaleManager.getRelativeWidth();
+
+                    var width = Math.max(scope.viewportWidth * relativeWidth, timelineConfig.minScrollBarWidth);
+                    var startCoordinate = (scope.viewportWidth - width) * relativeStart;
+
+                    context.fillStyle =  blurColor(timelineConfig.scrollBarColor,1);
+                    context.fillRect(startCoordinate, top, width , timelineConfig.scrollBarHeight * scope.viewportHeight);
+                }
+
+                // !!! Draw and position for timeMarker
+                function drawTimeMarker(context){
+                    var lastCoord = scope.positionCoordinate;
+                    if(!scope.positionProvider){
+                        timeMarker.addClass("hiddenTimemarker");
                         return;
                     }
+                    var date = scope.positionProvider.playedPosition;
+                    scope.positionCoordinate =  scope.scaleManager.dateToScreenCoordinate(date);
 
-                    var size = timelineConfig.rulerBasicSize;
-                    var colorBlur = 0;
-
-                    if(level === 0){
-                        size = timelineConfig.rulerBasicSize * scope.levelAppearance;
-                        colorBlur = scope.levelAppearance / timelineConfig.colorLevels;
-                    }else if(level<0){
-                        size = timelineConfig.rulerBasicSize * (1 - scope.levelDisappearance);
-                        colorBlur =  (1 - scope.levelDisappearance) / timelineConfig.colorLevels;
-                    }else {
-                        var animationModifier = 1;
-                        if(scope.levelAppearance < 1 ){
-                            animationModifier = scope.levelAppearance;
-                        }else if( scope.levelDisappearance < 1){
-                            animationModifier = 2 - scope.levelDisappearance;
+                    if(scope.positionCoordinate != lastCoord){
+                        if(scope.positionCoordinate > 0 && scope.positionCoordinate < scope.viewportWidth) {
+                            timeMarker.removeClass("hiddenTimemarker");
+                            timeMarker.css("left", scope.positionCoordinate + "px");
+                        }else{
+                            timeMarker.addClass("hiddenTimemarker");
                         }
-                        colorBlur = (Math.min(level, timelineConfig.colorLevels - 1) + animationModifier) / timelineConfig.colorLevels;
-                        size = (Math.min(level, 4) + animationModifier ) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize;
                     }
 
-                    if(size <= 0){
-                        return;
-                    }
+                    date = new Date(scope.positionProvider.playedPosition);
+                    scope.playingDate = dateFormat(date, timelineConfig.dateFormat);
+                    scope.playingTime = dateFormat(date, timelineConfig.timeFormat);
 
-                    var color = blurColor(timelineConfig.rulerColor,colorBlur);
-                    context.strokeStyle = color;
-                    context.beginPath();
-                    context.moveTo(coordinate, timelineConfig.topLabelHeight);
-                    context.lineTo(coordinate, size + timelineConfig.topLabelHeight);
-                    context.stroke();
-
-                    if(typeof(label)!=='undefined'){
-                        var fontSize = timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * Math.min(level,3);
-
-                        if(scope.labelAppearance < 1 && labelLevel === 0) {
-                            color = blurColor(timelineConfig.rulerColor, scope.labelAppearance * colorBlur);
-                        }else if(scope.labelDisappearance < 1 && labelLevel < 0){
-                            color = blurColor(timelineConfig.rulerColor, (1 - scope.labelDisappearance) * colorBlur);
-                        }
-
-                        context.font = fontSize  + 'px ' + timelineConfig.font;
-                        context.fillStyle = color;
-
-                        var width =  context.measureText(label).width;
-                        context.fillText(label,coordinate - width/2, size + fontSize*(1 + timelineConfig.labelsPadding) + timelineConfig.topLabelHeight);
-                    }
-                }
-
-                function drawTopLabel(context, startCoordinate, endCoordinate, label, odd){
-
-                    startCoordinate = Math.max(startCoordinate,0);
-                    endCoordinate = Math.min(endCoordinate,viewportWidth);
-
-                    context.fillStyle = odd? timelineConfig.oddColor:timelineConfig.evenColor;
-
-                    context.fillRect(startCoordinate, 0 , endCoordinate - startCoordinate, timelineConfig.topLabelHeight);
-                    context.stroke();
-
-
-                    var textSize = timelineConfig.topLabelHeight - timelineConfig.topLabelPadding;
-
-                    context.font = textSize  + 'px ' + timelineConfig.font;
-                    context.fillStyle = timelineConfig.topLabelTextColor;
-                    var width =  context.measureText(label).width;
-
-                    var coordinate = (startCoordinate + endCoordinate - width) / 2 ;
-
-                    if(coordinate < 0){
-                        coordinate = 0;
-                    }
-                    if(coordinate + width > endCoordinate - timelineConfig.topLabelPadding && endCoordinate < viewportWidth){
-                        coordinate = endCoordinate - width - timelineConfig.topLabelPadding;
-                    }
-
-                    if(coordinate < startCoordinate + timelineConfig.topLabelPadding && startCoordinate > 0){
-                        coordinate = startCoordinate + timelineConfig.topLabelPadding;
-                    }
-
-                    context.fillText(label, coordinate, timelineConfig.topLabelHeight - timelineConfig.topLabelPadding );
-
-                }
-
-                function drawMarker(){
-                    positionMarker();
-                    var context = canvas.getContext('2d');
-
-                    context.strokeStyle = timelineConfig.timeMarkerColor;
-                    context.fillStyle = timelineConfig.timeMarkerColor;
+                    context.strokeStyle = blurColor(timelineConfig.timeMarkerColor,1);
+                    context.fillStyle = blurColor(timelineConfig.timeMarkerColor,1);
 
                     context.beginPath();
                     context.moveTo(scope.positionCoordinate, 0);
                     context.lineTo(scope.positionCoordinate, canvas.height);
                     context.stroke();
                 }
-                function drawRuler(){
-                    //1. Create context for drawing
-                    var context = canvas.getContext('2d');
-                    context.fillStyle = blurColor(timelineConfig.rulerColor,1);
 
-                    context.clearRect(0, 0, canvas.width, canvas.height);
+                // !!! Subscribe for different events which affect timeline
+                $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
 
-
-                    //1. Drow top labels
-
-
-                    context.strokeStyle = timelineConfig.topLabelBorderColor;
-
-                    context.beginPath();
-                    context.moveTo(0, timelineConfig.topLabelHeight);
-                    context.lineTo(viewportWidth, timelineConfig.topLabelHeight);
-                    context.stroke();
-
-                    var level = RulerModel.levels[scope.topLabelsLevel];
-                    var end = level.interval.alignToFuture(screenRelativePositionToDate(1));
-                    var position = level.interval.alignToPast(screenRelativePositionToDate(0));
-
-
-                    while(position<end){ // Draw labels above marks
-                        var endPosition = level.interval.addToDate(position);
-                        var screenStartPosition = dateToScreenPosition(position);
-                        var screenEndPosition = dateToScreenPosition(endPosition);
-                        var label = dateFormat(new Date(position), level.topFormat);
-                        drawTopLabel(context, screenStartPosition, screenEndPosition, label, Math.round((position / 1000 / level.interval.getSeconds())) % 2 === 1);
-                        position = endPosition;
+                scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
+                    if(scope.recordsProvider) {
+                        scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
                     }
+                });
 
-                    //2. Align visible interval to current level (start to past, end to future)
 
-                    level = RulerModel.levels[scope.actualLevel];
-                    end = level.interval.alignToFuture(screenRelativePositionToDate(1));
-                    position = level.interval.alignToFuture(screenRelativePositionToDate(0));
+                // !!! Mouse events
+                var mouseDate = null;
+                var mouseCoordinate = null;
 
-                    var findLevel = function(level){
-                        return level.interval.checkDate(position);
-                    };
-
-                    while(position<end){ // Draw marks
-                        var screenPosition = dateToScreenPosition(position);
-
-                        //Detect the best level for this position
-                        var markLevel = _.find(RulerModel.levels,findLevel);
-
-                        var markLevelIndex = RulerModel.levels.indexOf(markLevel);
-
-                        var label = (markLevelIndex > scope.visibleLabelsLevel && !(scope.labelDisappearance<1 && markLevelIndex === scope.visibleLabelsLevel + 1))?
-                            '' : dateFormat(new Date(position), markLevel.format);
-
-                        //3. Draw a mark
-                        drawMark(context, screenPosition, scope.actualLevel - markLevelIndex, scope.visibleLabelsLevel - markLevelIndex,label);
-
-                        if(scope.levelDisappearance<1){
-                            var smallposition = position;
-                            var nextposition =level.interval.addToDate(position );
-                            var smallLevel = RulerModel.levels[scope.actualLevel+1];
-                            while(smallposition < nextposition ){
-                                smallposition = smallLevel.interval.addToDate(smallposition);
-                                screenPosition = dateToScreenPosition(smallposition);
-                                drawMark(context, screenPosition, -1); // Draw hiding position
-                            }
-                        }
-                        position = level.interval.addToDate(position);
+                function updateMouseCoordinate( event){
+                    if(!event){
+                        mouseCoordinate = null;
+                        mouseDate = null;
+                        return;
                     }
+                    mouseCoordinate = event.offsetX;
+                    mouseDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
                 }
-                function updateBoundariesAndScroller(){
-                    var keepDate = screenRelativePositionToDate(scope.positionToKeep); // Keep current timeposition for scrolling
+                scope.mouseUp = function(event){
+                    updateMouseCoordinate(event);
+                    console.log("set timer for dblclick here");
+                    console.log("move playing position");
+                };
+                scope.mouseLeave = function(event){
+                    updateMouseCoordinate(null);
+                    console.log("mouse leave - stop drag and drop");
+                };
+                scope.mouseMove = function(event){
+                    updateMouseCoordinate(event);
+                };
+                scope.dblClick = function(event){
+                    updateMouseCoordinate(event);
+                    console.log("dblclick - Zoom in to point");
+                };
+                scope.mouseDown = function(event){
+                    updateMouseCoordinate(event);
+                };
 
-                    scope.actualWidth = viewportWidth * zoomLevel();
 
-                    // Update boundaries to current moment
-                    scope.frameEnd = /*scope.end;//*/(new Date()).getTime();
-                    scope.frameWidth = Math.round(scope.actualWidth * (scope.frameEnd -  scope.start)/(scope.end - scope.start));
+                // !!! Scrolling functions
 
-                    //1. Update scroller width
-                    var oldframe = scope.scrollWidth;
-                    scope.scrollWidth = Math.round(Math.min( scope.frameWidth, timelineConfig.maximumScrollScale * viewportWidth));
-                    if(oldframe !== scope.scrollWidth) { // Do not affect DOM if it is not neccessary
-                        frame.width(scope.scrollWidth);
-                    }
+                var scrollingNow = false;
 
-
-                    var newPosition = 0;
-                    if(scope.scrolling < 1){ // animating scroll at the moment- should scroll
-                        newPosition = scope.targetScrollPosition/ (scope.frameWidth - viewportWidth);
-
-                    }else { // Otherwise - keep current position in case of changing width
-                        newPosition = screenRelativePositionAndDateToRelativePositionForScroll(keepDate, scope.positionToKeep);
-
-                        // TODO: In live mode - scroll right
-                        // TODO: disable live if view was scrolled
-
-                    }
-                    newPosition = bound(0,newPosition,1);
-                    viewPortScrollRelative(newPosition);
-                    scope.checkRightLeftVisibility();
-                }
-
-                function updateView(){
-                    updateBoundariesAndScroller();
-                    updateActualLevel();
-                    drawRuler();
-                    drawEvents();
-                    drawMarker();
-                }
-
-                function initTimeline(){
-                    var now = (new Date()).getTime();
-                    scope.start = scope.records? scope.records.start : (now - timelineConfig.initialInterval);
-                    scope.end = now;
-                    scope.maxZoomLevel = maxZoomLevel();
-
-                    updateView();
-                }
-
-                scope.positionToKeep = 0.5;//Position on screen to keep while zooming
-                scope.levels = RulerModel.levels;
-                scope.actualZoomLevel = timelineConfig.initialZoom;
-                scope.disableZoomOut = true;
-                scope.disableZoomIn = false;
-                scope.disableScrollRight = true;
-                scope.disableScrollLeft = true;
-
-                //animation parameters
-                scope.actualWidth = viewportWidth;
-                scope.scrollWidth = viewportWidth;
-                scope.levelAppearance   = 1; // Appearing new marks level
-                scope.levelDisappearance = 1;// Hiding mark from oldlevel
-                scope.levelEncreasing = 1; // Encreasing existing mark level
-                scope.levelDecreasing = 1; // Encreasing existing mark level
-                scope.labelAppearance = 1; // Labels become visible smoothly
-                scope.labelDisappearance = 1; // Labels become visible smoothly
-                scope.zooming = 1; //zoom animation progress
-                scope.scrolling = 1;//Scrolling to some position
-                scope.targetScrollPosition = 0;
-                scope.scrollZooming = 1; //Animate zoom while scroll
-
-                scope.scroll = function(right,value){
+                function scrollScreen (right,value){ //
                     if(scope.scrolling >= 1){
-                        scope.targetScrollPosition = screenStartPosition();// Set up initial scroll position
+                        scope.targetScrollPosition = scope.scaleManager.getRelativeStart();// Set up initial scroll position
                     }
 
-                    var newPosition = scope.targetScrollPosition + (right ? 1 : -1) * value * viewportWidth;
+                    var newPosition = scope.targetScrollPosition + (right ? 1 : -1) * value * scope.viewportWidth;
                     // Here we have a problem:we should scroll left a bit if it is not .
 
-                    newPosition = bound(0,newPosition,scope.frameWidth - viewportWidth);
+                    newPosition = bound(0,newPosition,scope.frameWidth - scope.viewportWidth);
 
                     animateScope.animate(scope,'targetScrollPosition',newPosition);
                     var animation = animateScope.progress(scope,'scrolling');
@@ -638,29 +360,10 @@ angular.module('webadminApp')
                         scope.checkRightLeftVisibility(right);
                     });
                     return animation;
-                };
-                scope.scrollToEnd = function(right){
-                    animateScope.animate(scope,'targetScrollPosition',right?scope.frameWidth:-scope.frameWidth);
-                    var animation = animateScope.progress(scope,'scrolling');
-                    animation.then(function(){
-                        scope.checkRightLeftVisibility(right);
-                    });
-                    return animation;
-                };
+                }
 
-                scope.checkRightLeftVisibility = function(right){
-                    var scroll = viewPortScrollRelative();
-                    if(right || typeof(right) === 'undefined') {
-                        scope.disableScrollRight = scroll > 1 - timelineConfig.scrollBoundariesPrecision || scope.frameWidth === viewportWidth;
-                    }
-                    if(!right){
-                        scope.disableScrollLeft = scroll < timelineConfig.scrollBoundariesPrecision || scope.frameWidth === viewportWidth;
-                    }
-                };
-
-                var scrollingNow = false;
                 function scrollingProcess(right){
-                    scope.scroll(right,timelineConfig.scrollingSpeed).then(function(){
+                    scrollScreen(right,timelineConfig.scrollingSpeed).then(function(){
                         if(scrollingNow) {
                             scrollingProcess(right);
                         }
@@ -675,69 +378,42 @@ angular.module('webadminApp')
                     scrollingNow = false;
                 };
 
-                scope.zoom = function(zoomIn,speed,keep){
-                    scope.positionToKeep = keep || 0.5;
-                    speed = speed || 1;
+                scope.scrollToEnd = function(right){
+                    animateScope.animate(scope,'targetScrollPosition',right?scope.frameWidth:-scope.frameWidth);
+                    var animation = animateScope.progress(scope,'scrolling');
+                    animation.then(function(){
+                        scope.checkRightLeftVisibility(right);
+                    });
+                    return animation;
+                };
 
-                    var targetZoomLevel = scope.actualZoomLevel;
-                    if(zoomIn && !scope.disableZoomIn) {
-                        targetZoomLevel += speed;
+                scope.checkRightLeftVisibility = function(right){
+                    var scroll = scope.scaleManager.getRelativeStart();
+                    if(right || typeof(right) === 'undefined') {
+                        scope.disableScrollRight = scroll > 1 - timelineConfig.scrollBoundariesPrecision || scope.frameWidth === scope.viewportWidth;
                     }
-
-                    if(!zoomIn && !scope.disableZoomOut ) {
-                        targetZoomLevel -= speed;
+                    if(!right){
+                        scope.disableScrollLeft = scroll < timelineConfig.scrollBoundariesPrecision || scope.frameWidth === scope.viewportWidth;
                     }
-
-                    targetZoomLevel = bound(0,targetZoomLevel,scope.maxZoomLevel);
-                    animateScope.animate(scope,'actualZoomLevel',targetZoomLevel);
-                    animateScope.progress(scope,'zooming');
-
                 };
 
-                scope.zoomToPoint = function(offsetX){
-                    scope.zoom(true,timelineConfig.dblClckZoomSpeed,(offsetX - scroll.scrollLeft())/ viewportWidth);
+
+                // !!! Fucntions for buttons on view
+                scope.zoom = function(zoomIn){
+                    scope.scaleManager.zoomIn((zoomIn?1:-1) * timelineConfig.zoomSpeed);
                 };
 
-                var draggingPosition = null;
-                scope.dragStart = function(offsetX) {
-                    var screenRelativePosition = (offsetX - scroll.scrollLeft())/ viewportWidth;
-                    draggingPosition  = screenRelativePositionToDate(screenRelativePosition);
-                };
-                scope.drag = function(offsetX) {
-                    if(draggingPosition === null){
-                        return;
-                    }
-                    var screenRelativePosition = (offsetX - scroll.scrollLeft())/ viewportWidth;
-                    var newPosition = screenRelativePositionAndDateToRelativePositionForScroll(draggingPosition, screenRelativePosition);
-                    newPosition = bound(0,newPosition,1);
-                    viewPortScrollRelative(newPosition);
-                    scope.checkRightLeftVisibility();
-                };
-                scope.dragEnd = function() {
-                    draggingPosition = null;
-                };
 
-                scope.$watch('records',function(){
-                    if(scope.records) {
-                        scope.records.ready.then(initTimeline);
-                    }
-                });
+                // !!! Finally run required functions to initialize timeline
+                updateTimelineHeight();
+                updateTimelineWidth(); // Adjust width
+                initTimeline(); // Setup boundaries and scale
 
-                initTimeline();
-
-                animateScope.start(updateView);
+                // !!! Start drawing
+                animateScope.setDuration(timelineConfig.animationDuration);
+                animateScope.setScope(scope);
+                animateScope.start(drawAll);
                 scope.$on('$destroy', function() { animateScope.stop(); });
-
-                scope.log = function(data){
-                    console.log(data);
-                };
-
-                scope.goToLive = function(){
-                    console.log("gotolive");
-                    scope.liveMode = true;
-                    scope.handler(null);
-                }
             }
-
         };
     }]);

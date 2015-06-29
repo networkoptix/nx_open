@@ -19,7 +19,7 @@ function Chunk(boundaries,start,end,level,title,extension){
 }
 
 Chunk.prototype.debug = function(){
-    console.log(Array(this.level + 1).join(" "), this.title, this.level,  this.children.length);
+    console.log(new Array(this.level + 1).join(" "), this.title, this.level,  this.children.length);
 };
 
 // Additional mini-library for declaring and using settings for ruler levels
@@ -69,7 +69,7 @@ Interval.prototype.getSeconds = function(){
 
 Interval.prototype.detailization = function(){
     return this.getSeconds()*1000;
-}
+};
 /**
  * Align to past. Can't work with intervals like "1 month and 3 days"
  * @param dateToAlign
@@ -152,13 +152,15 @@ var RulerModel = {
             topFormat:'yyyy'//Format string for label above timeline
         },
         { name:'Month'      , format:'mmmm'     , interval:  new Interval( 0, 0, 0, 0, 1, 0)  , width: 50, topWidth: 140, topFormat:'mmmm yyyy'},
-        { name:'Day'        , format:'dd mmmm'  , interval:  new Interval( 0, 0, 0, 1, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy' },
+        { name:'Day'        , format:'dd'       , interval:  new Interval( 0, 0, 0, 1, 0, 0)  , width: 50, topWidth: 140, topFormat:'dd mmmm yyyy' },
         { name:'6 hours'    , format:'HH"h"'    , interval:  new Interval( 0, 0, 6, 0, 0, 0)  , width: 60 },
         { name:'Hour'       , format:'HH"h"'    , interval:  new Interval( 0, 0, 1, 0, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
         { name:'10 minutes' , format:'MM"m"'    , interval:  new Interval( 0,10, 0, 0, 0, 0)  , width: 60 },
         { name:'1 minute'   , format:'MM"m"'    , interval:  new Interval( 0, 1, 0, 0, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
         { name:'10 seconds' , format:'ss"s"'    , interval:  new Interval(10, 0, 0, 0, 0, 0)  , width: 30 },
-        { name:'1 second'   , format:'ss"s"'    , interval:  new Interval( 1, 0, 0, 0, 0, 0)  , width: 30 }
+        { name:'1 second'   , format:'ss"s"'    , interval:  new Interval( 1, 0, 0, 0, 0, 0)  , width: 30, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM:ss' },
+        { name:'500 ms'     , format:'ll"ms"'   , interval:  new Interval( 0.5, 0, 0, 0, 0, 0)  , width: 30 },
+        { name:'100 ms'     , format:'ll"ms"'   , interval:  new Interval( 0.1, 0, 0, 0, 0, 0)  , width: 30 }
     ],
 
     getLevelIndex: function(searchdetailization,width){
@@ -274,7 +276,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                         endChunk = (new Date()).getTime() + 100000;// some date in future
                     }
                     var addchunk = new Chunk(null, data.data[i][0], endChunk, level);
-                    self.addChunk(addchunk);
+                    self.addChunk(addchunk,null);
                 }
 
                 deferred.resolve(self.chunksTree);
@@ -294,7 +296,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
  * @param start
  * @param end
  * @param level
- * @return Promise
+ * @return Array
  */
 CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
 
@@ -309,9 +311,9 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
 
     // Splice existing intervals and check, if we need an update from server
     var result = [];
-    this.selectRecords(result,start,end,level);
+    this.selectRecords(result,start,end,level,null);
 
-    this.logcounter = this.logcounter||0;
+    /*this.logcounter = this.logcounter||0;
     this.logcounter ++;
     if(this.logcounter % 1000 === 0) {
         console.log("splice: ============================================================");
@@ -319,7 +321,7 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
             result[i].debug();
         }
         this.debug();
-    }
+    }*/
 
 
     var noNeedUpdate = this.checkRequestedIntervalCache(start,end,level);
@@ -368,7 +370,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
     }
 
     if(parent.level === chunk.level - 1){ //We are on good level here - find position and add
-        for (var i = 0; i < parent.children.length; i++) {
+        for (i = 0; i < parent.children.length; i++) {
             if(parent.children[i].start == chunk.start && parent.children[i].end == chunk.end){//dublicate
                 return;
             }
@@ -503,10 +505,11 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
 
 /**
  * ShortCache - special collection for short chunks with best detailization for calculating playing position and date
- * @param start
  * @constructor
  */
 function ShortCache(cameras,mediaserver,$q){
+
+    this.$q = $q;
 
     this.mediaserver = mediaserver;
     this.cameras = cameras;
@@ -525,7 +528,7 @@ function ShortCache(cameras,mediaserver,$q){
     this.updateInterval = 60 * 1000;//every 60 seconds update
     this.requestDetailization = 1;//the deepest detailization possible
     this.limitChunks = 10; // limit for number of chunks
-    this.checkpointsFrequency = 1 * 60 * 1000;//Checkpoints - not often that 5 once in minutes
+    this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
 }
 ShortCache.prototype.init = function(start){
     this.start = start;
@@ -549,7 +552,7 @@ ShortCache.prototype.update = function(requestPosition,position){
     if(this.updating && !requestPosition){ //Do not send request twice
         return;
     }
-    console.log("update detailization",this.updating, requestPosition);
+    // console.log("update detailization",this.updating, requestPosition);
 
     requestPosition = requestPosition || this.playedPosition;
 
@@ -558,7 +561,7 @@ ShortCache.prototype.update = function(requestPosition,position){
     this.lastRequestDate = requestPosition;
     this.lastRequestPosition = position || this.played;
 
-    console.log("lastRequestPosition ",position, this.played, new Date(this.lastRequestDate));
+    // console.log("lastRequestPosition ",position, this.played, new Date(this.lastRequestDate));
 
     this.mediaserver.getRecords('/',
             this.cameras[0],
@@ -576,7 +579,6 @@ ShortCache.prototype.update = function(requestPosition,position){
                 data.data[0][0] = requestPosition;
             }
             self.currentDetailization = data.data;
-
 
             var lastCheckPointDate = self.lastRequestDate;
             var lastCheckPointPosition = self.lastRequestPosition;
@@ -607,10 +609,12 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
 
     var lastPosition;
     for (var key in  this.checkPoints) {
-        if ( this.checkPoints[key] > positionDate) {
-            break;
+        if(this.checkPoints.hasOwnProperty(key)) {
+            if (this.checkPoints[key] > positionDate) {
+                break;
+            }
+            lastPosition = key;
         }
-        lastPosition = key;
     }
 
     if(typeof(lastPosition)=='undefined'){// No checkpoints - go to live
@@ -680,3 +684,149 @@ ShortCache.prototype.setPlayingPosition = function(position){
     return this.playedPosition;
 };
 
+
+
+
+
+function ScaleManager (zoomBase, minmsPerPixel,defaultIntervalInMS,initialWidth){
+    this.minMsPerPixel = minmsPerPixel;
+    this.zoomBase = zoomBase;
+    this.levels = {
+        topLabels:{index:0,level:RulerModel.levels[0]},
+        labels: {index:0,level:RulerModel.levels[0]},
+        events: {index:0,level:RulerModel.levels[0]}
+    };
+
+// Setup total boundaries
+    this.viewportWidth = initialWidth;
+    this.end = (new Date()).getTime();
+    this.start = this.end - defaultIntervalInMS;
+    this.updateTotalInterval();
+
+// Setup default scroll window
+    this.msPerPixel = this.maxMsPerPixel;
+    this.anchorPoint = 1;
+    this.anchorDate = this.end;
+    this.updateCurrentInterval();
+}
+
+
+ScaleManager.prototype.updateTotalInterval = function(){
+    //Calculate maxmxPerPixel
+    this.maxMsPerPixel = (this.end - this.start) / this.viewportWidth;
+    this.msPerPixel = Math.min(this.msPerPixel,this.maxMsPerPixel);
+};
+ScaleManager.prototype.setViewportWidth = function(width){ // For initialization and window resize
+    this.viewportWidth = width;
+    this.updateTotalInterval();
+};
+ScaleManager.prototype.setStart = function(start){// Update the begining end of the timeline. Live mode must be supported here
+    this.start = start;
+    console.log("setStart",start,new Date(start));
+    this.updateTotalInterval();
+};
+ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
+    this.end = end;
+    this.updateTotalInterval();
+};
+
+
+ScaleManager.prototype.updateCurrentInterval = function(){
+    //Calculate visibleEnd and visibleStart
+    this.msPerPixel = Math.min(this.maxMsPerPixel,this.msPerPixel);
+    this.msPerPixel = Math.max(this.minMsPerPixel,this.msPerPixel);
+    this.visibleEnd = this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint);
+    this.visibleStart = this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint;
+    this.updateLevels();
+};
+ScaleManager.prototype.setAnchorDate = function(date){ // Set anchor date
+    this.anchorDate = date;
+    this.updateCurrentInterval();
+};
+ScaleManager.prototype.setAnchorPoint = function(point){ // Set anchor point
+    this.anchorPoint = point;
+    this.updateCurrentInterval();
+};
+ScaleManager.prototype.fullZoomOut = function(){ // Reset zoom level to show all timeline
+    this.msPerPixel = this.maxMsPerPixel;
+    this.updateCurrentInterval();
+};
+
+ScaleManager.prototype.updateLevels = function() {
+    //3. Select actual level
+    var secsPerPixel =  this.msPerPixel / 1000;
+
+    var levels = this.levels;
+    for (var i = 0; i < RulerModel.levels.length; i++) {
+        var level = RulerModel.levels[i];
+
+        var pixelsPerLevel = (level.interval.getSeconds() / secsPerPixel);
+
+        if (typeof(level.topWidth) !== 'undefined' &&
+            pixelsPerLevel >= level.topWidth) {
+            levels.topLabels = {index:i,level:level};
+        }
+
+        if (pixelsPerLevel >= level.width) {
+            levels.labels = {index:i,level:level};
+        }
+
+        if (pixelsPerLevel >= 1) {
+            levels.events = {index:i,level:level};
+        }
+
+        if (pixelsPerLevel <= 1) {
+            console.log("break update levels", secsPerPixel, pixelsPerLevel, i, level, levels);
+            break;
+        }
+    }
+    return levels;
+};
+
+ScaleManager.prototype.alignStart = function(level){ // Align start by the grid using level
+    return level.interval.alignToPast(this.visibleStart);
+};
+ScaleManager.prototype.alignEnd = function(level){ // Align end by the grid using level
+    return level.interval.alignToFuture(this.visibleEnd);
+};
+ScaleManager.prototype.dateToScreenCoordinate = function(date){
+    return this.viewportWidth * (date - this.visibleStart) / (this.visibleEnd - this.visibleStart);
+};
+ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
+    return this.visibleStart + coordinate / this.viewportWidth * (this.visibleEnd - this.visibleStart);
+};
+
+
+// Some function for scroll support
+// Actually, scroll is based on some AnchorDate and AnchorPosition (on the screen 0 - 1). And anchor may be "live", which means live-scrolling
+// So there is absolute scroll position in percents
+// If we move scroll right or left - we are loosing old anchor and setting new.
+// If we are zooming - we are zooming around anchor.
+
+ScaleManager.prototype.getRelativeStart = function(){
+    return (this.visibleEnd - this.start) / (this.end - this.start);
+};
+ScaleManager.prototype.getRelativeWidth = function(){
+    return (this.visibleEnd - this.visibleStart) / (this.end - this.start);
+};
+
+// These two function implements logarifmic scale for zoom
+ScaleManager.prototype.zoomToPixels= function(zoom){
+    var relPixels = (Math.exp(this.zoomBase * zoom) -1) / (Math.exp(this.zoomBase) - 1) ;
+    return this.minMsPerPixel + relPixels * (this.maxMsPerPixel -  this.minMsPerPixel);
+};
+ScaleManager.prototype.pixelsToZoom  = function(pixels){
+    var relPixels = (pixels - this.minMsPerPixel)/(this.maxMsPerPixel -  this.minMsPerPixel);
+    return Math.log(relPixels * (Math.exp(this.zoomBase) - 1) + 1) / this.zoomBase;
+};
+ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
+    if(typeof(zoomValue)=="undefined"){
+        return this.pixelsToZoom(this.msPerPixel);
+    }
+    this.msPerPixel = this.zoomToPixels(zoomValue);
+    this.updateCurrentInterval();
+};
+ScaleManager.prototype.zoomIn = function(relativeValue){ // Change zoom value: zoomIn for positive and zoomout for negative
+    console.log("zoomIn",this.zoom(), relativeValue);
+    this.zoom(this.zoom() - relativeValue);
+};
