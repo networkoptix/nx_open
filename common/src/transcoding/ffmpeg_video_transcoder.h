@@ -42,6 +42,11 @@ private:
 
     qint64 m_firstEncodedPts;
     bool m_mtMode;
+
+    qint64 m_lastEncodedTime;
+    qint64 m_totalSpentTime;
+    qint64 m_totalDecodedFrames;
+    qint64 m_totalEncodedFrames;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
