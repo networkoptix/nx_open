@@ -1,21 +1,18 @@
-import QtQuick 2.2
-
-import "../common_functions.js" as CommonFunctions
+import QtQuick 2.4
 
 Item {
     property int position
 
-    readonly property int __orientation:
+    readonly property int _orientation:
         position == Qt.TopEdge || position == Qt.BottomEdge ? Qt.Horizontal : Qt.Vertical
 
-    readonly property real shadowSize: CommonFunctions.dp(8)
+    readonly property real shadowSize: dp(8)
 
-    clip: false
     z: -1.0
 
     Rectangle {
-        width: __orientation == Qt.Horizontal ? parent.width : shadowSize
-        height: __orientation == Qt.Vertical ? parent.height : shadowSize
+        width: _orientation == Qt.Horizontal ? parent.width : parent.height
+        height: shadowSize
 
         anchors {
             top: position == Qt.BottomEdge ? parent.bottom : undefined
@@ -24,7 +21,16 @@ Item {
             right: position == Qt.LeftEdge ? parent.left : undefined
         }
 
-        rotation: position == Qt.TopEdge || position == Qt.LeftEdge ? 180 : 0
+        rotation: {
+            if (position == Qt.TopEdge)
+                return 180
+            else if (position == Qt.LeftEdge)
+                return -90
+            else if (position == Qt.RightEdge)
+                return 90
+            else
+                return 0
+        }
 
         gradient: Gradient {
             GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.15) }

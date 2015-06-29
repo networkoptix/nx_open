@@ -363,25 +363,47 @@ QnPage {
     Item {
         id: calendarPanel
 
-        visible: opacity > 0.0
         width: parent.width
-        height: calendarContent.height
-        y: parent.height - height
+        height: parent.height
+        z: 100.0
+
+        visible: opacity > 0.0
         opacity: 0.0
 
-        MouseArea {
-            anchors.fill: parent
-            /* To block mouse events under calendar */
+        Rectangle {
+            parent: Main.findRootItem(calendarPanel)
+            width: parent.width
+            height: calendarContent.y + toolBar.height
+            opacity: calendarPanel.opacity
+            color: "#60000000"
+            z: 10.0
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: calendarPanel.hide()
+            }
         }
 
         Rectangle {
-            anchors.fill: parent
+            anchors.fill: calendarContent
             color: QnTheme.calendarBackground
+
+            QnSideShadow {
+                anchors.fill: parent
+                position: Qt.TopEdge
+                z: 10
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                /* To block mouse events under calendar */
+            }
         }
 
         Column {
             id: calendarContent
             width: parent.width
+            y: parent.height - height
 
             QnChunkedCalendar {
                 id: calendar
@@ -424,12 +446,12 @@ QnPage {
                 }
 
                 NumberAnimation {
-                    target: calendarPanel
+                    target: calendarContent
                     property: "y"
                     duration: 150
                     easing.type: Easing.OutCubic
-                    from: videoPlayer.height - calendarPanel.height + dp(56)
-                    to: videoPlayer.height - calendarPanel.height
+                    from: calendarPanel.height - calendarContent.height + dp(56)
+                    to: calendarPanel.height - calendarContent.height
                 }
             }
         }
@@ -447,11 +469,11 @@ QnPage {
                 }
 
                 NumberAnimation {
-                    target: calendarPanel
+                    target: calendarContent
                     property: "y"
                     duration: 150
                     easing.type: Easing.OutCubic
-                    to: videoPlayer.height - calendarPanel.height + dp(56)
+                    to: calendarPanel.height - calendarContent.height + dp(56)
                 }
             }
         }

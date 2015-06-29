@@ -1,3 +1,10 @@
+function findRootItem(item) {
+    var parent = item
+    while (parent.parent)
+        parent = parent.parent
+    return parent
+}
+
 function openDiscoveredSession(_host, _port, _systemName) {
     mainWindow.currentSessionId = ""
     sideNavigation.hide()
