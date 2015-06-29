@@ -44,6 +44,15 @@ QtObject {
     property color timelineText
     property color timelineChunk
 
+    property color calendarBackground
+    property color calendarText
+    property color calendarArchiveIndicator
+    property color calendarDayName
+    property color calendarHolidayName
+    property color calendarDisabledText
+    property color calendarSelectedBackground
+    property color calendarSelectedText
+
     property color attentionBackground
     property color loadingText
 
@@ -79,6 +88,14 @@ QtObject {
         cameraBorder            = colorTheme.color("cameras.border")
         timelineText            = colorTheme.color("timeline.text")
         timelineChunk           = colorTheme.color("timeline.chunk")
+        calendarBackground      = colorTheme.color("calendar.background")
+        calendarText            = colorTheme.color("calendar.text")
+        calendarArchiveIndicator = colorTheme.color("calendar.archiveIndicator")
+        calendarDayName         = colorTheme.color("calendar.dayName")
+        calendarHolidayName     = colorTheme.color("calendar.holidayName")
+        calendarDisabledText    = colorTheme.color("calendar.disabledText")
+        calendarSelectedBackground = colorTheme.color("calendar.selectedBackground")
+        calendarSelectedText    = colorTheme.color("calendar.selectedText")
         attentionBackground     = colorTheme.color("other.attentionBackground")
         loadingText             = colorTheme.color("other.loadingText")
     }

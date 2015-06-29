@@ -221,12 +221,12 @@ QnPage {
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                 }
 
-//                QnIconButton {
-//                    anchors.left: parent.left
-//                    anchors.verticalCenter: parent.verticalCenter
-//                    color: "white"
-//                    iconName: "action/today"
-//                }
+                QnIconButton {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon: "qrc:///images/calendar.png"
+                    onClicked: calendarPanel.show()
+                }
 
                 QnIconButton {
                     id: zoomOutButton
@@ -357,6 +357,113 @@ QnPage {
                 width: cursorWidth
                 height: timeline.chunkBarHeight + cursorTickMargin
             }
+        }
+    }
+
+    Item {
+        id: calendarPanel
+
+        visible: opacity > 0.0
+        width: parent.width
+        height: calendarContent.height
+        y: parent.height - height
+        opacity: 0.0
+
+        MouseArea {
+            anchors.fill: parent
+            /* To block mouse events under calendar */
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            color: QnTheme.calendarBackground
+        }
+
+        Column {
+            id: calendarContent
+            width: parent.width
+
+            QnChunkedCalendar {
+                id: calendar
+
+                width: parent.width
+                chunkProvider: chunkProvider
+
+                onDatePicked: {
+                    calendarPanel.hide()
+                    if (playbackController.paused)
+                        timeline.positionDate = date
+                    else
+                        alignToChunk(date)
+                }
+
+                onVisibleChanged: {
+                    if (visible)
+                        date = timeline.positionDate
+                }
+            }
+
+            QnButton {
+                anchors.right: parent.right
+                text: qsTr("Close")
+                flat: true
+                onClicked: calendarPanel.hide()
+            }
+        }
+
+        SequentialAnimation {
+            id: showAnimation
+
+            ParallelAnimation {
+                NumberAnimation {
+                    target: calendarPanel
+                    property: "opacity"
+                    duration: 150
+                    easing.type: Easing.OutCubic
+                    to: 1.0
+                }
+
+                NumberAnimation {
+                    target: calendarPanel
+                    property: "y"
+                    duration: 150
+                    easing.type: Easing.OutCubic
+                    from: videoPlayer.height - calendarPanel.height + dp(56)
+                    to: videoPlayer.height - calendarPanel.height
+                }
+            }
+        }
+
+        SequentialAnimation {
+            id: hideAnimation
+
+            ParallelAnimation {
+                NumberAnimation {
+                    target: calendarPanel
+                    property: "opacity"
+                    duration: 150
+                    easing.type: Easing.OutCubic
+                    to: 0.0
+                }
+
+                NumberAnimation {
+                    target: calendarPanel
+                    property: "y"
+                    duration: 150
+                    easing.type: Easing.OutCubic
+                    to: videoPlayer.height - calendarPanel.height + dp(56)
+                }
+            }
+        }
+
+        function show() {
+            hideAnimation.stop()
+            showAnimation.start()
+        }
+
+        function hide() {
+            showAnimation.stop()
+            hideAnimation.start()
         }
     }
 }
