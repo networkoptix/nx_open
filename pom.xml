@@ -361,7 +361,7 @@
                 <module>clientexe</module>
                 <module>wixsetup</module>
                 <module>plugins/nxinterface</module>
-                <module>plugins/nxcontrol</module>
+                <!--<module>plugins/nxcontrol</module>-->
                 <module>plugins/acs/paxton</module>
                 <module>plugins/acs/paxton-installer</module>
             </modules>
