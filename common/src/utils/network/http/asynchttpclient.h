@@ -127,6 +127,9 @@ namespace nx_http
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
+
+        //!Set socket send timeout
+        void setSendTimeoutMs( unsigned int sendTimeoutMs );
         /*!
             \param responseReadTimeoutMs 0 means infinity
             By default, 3000 ms.
@@ -224,6 +227,7 @@ namespace nx_http
         mutable QMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
+        unsigned int m_sendTimeoutMs;
         unsigned int m_responseReadTimeoutMs;
         unsigned int m_msgBodyReadTimeoutMs;
         AuthType m_authType;

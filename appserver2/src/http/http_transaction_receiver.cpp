@@ -119,7 +119,15 @@ namespace ec2
             }
 
             if( !readSingleRequest() )
+            {
+                if( d->prevSocketError == SystemError::timedOut )
+                {
+                    NX_LOG( lit("QnHttpTransactionReceiver. Keep-alive timeout on transaction connection %1 from peer %2").
+                        arg(connectionGuid.toString()).arg(d->socket->getForeignAddress().toString()),
+                        cl_logDEBUG1 );
+                }
                 break;
+            }
             
             if( d->request.requestLine.method != nx_http::Method::POST &&
                 d->request.requestLine.method != nx_http::Method::PUT )

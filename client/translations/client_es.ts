@@ -377,6 +377,10 @@
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
         <translation>&quot;Permitir el sistema optimizar la configuración de la cámara&quot; está deshabilitado en la administración del sistema.</translation>
     </message>
+    <message>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -399,16 +403,20 @@
 <context>
     <name>CameraManagementWidget</name>
     <message>
-        <source>Enable camera auto discovery</source>
-        <translation>Habilitar el descubrimiento automático de cámara</translation>
-    </message>
-    <message>
         <source>Allow system to optimize camera settings (Recommended)</source>
         <translation>Permite el sistema optimizar la configuración de la cámara (Recomendado)</translation>
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
         <translation>ADVERTENCIA! Configuración de FPS y calidad en horario de grabación no funcionará!</translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -748,12 +756,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Abra todas las estadísticas de los servidores en una presentación</translation>
     </message>
     <message>
-        <source>Camera Management</source>
-        <translation>Manejo de cámara</translation>
-    </message>
-    <message>
         <source>System Configuration Backup and Restore</source>
         <translation>Copia de seguridad y restauración de Configuración del Sistema</translation>
+    </message>
+    <message>
+        <source>System Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2514,6 +2522,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>File Settings...</source>
         <translation>Ajustes del archivo...</translation>
     </message>
+    <message>
+        <source>Ask About Statistics Reporting</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -3268,18 +3280,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Encendido</translation>
     </message>
     <message>
-        <source>FPS value is too high</source>
-        <translation>FPS valor es demasiado alto</translation>
-    </message>
-    <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>Fps actuales en cuadrícula de programación es %1. Fps se bajó a fps máxima de la cámara %2.</translation>
-    </message>
-    <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>Para el movimiento de software fps 2 está reservada para la corriente secundaria. Actual fps en cuadrícula de horario es de %1. FPS fue bajado a %2.</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation>Advertencia</translation>
     </message>
@@ -3911,18 +3911,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation>Hemos detectado que tu tarjeta de video no es compatible. Puede proceder a su propio riesgo.</translation>
-    </message>
-    <message>
-        <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation>Instalar y/o actualizar los controladores de vídeo puede resolver el problema.</translation>
-    </message>
-    <message>
-        <source>Critical Performance Tip</source>
-        <translation>Consejos de rendimiento crítico</translation>
-    </message>
-    <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
         <translation>Hemos detectado que los controladores de la tarjeta de vídeo puede que no esté instalada o están fuera de fecha.</translation>
     </message>
@@ -3933,6 +3921,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Important Performance Tip</source>
         <translation>Consejos de rendimiento importante</translation>
+    </message>
+    <message>
+        <source>This could lead to client software malfunction including crash.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4024,14 +4016,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;Imagen no puede ser cargada&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutTabBar</name>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>Pantalla de%1</translation>
     </message>
 </context>
 <context>
@@ -4505,10 +4489,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Contraseña:</translation>
     </message>
     <message>
-        <source>Find System</source>
-        <translation>Buscar Sistema</translation>
-    </message>
-    <message>
         <source>The new system will have password and name from the system:</source>
         <translation>El nuevo sistema tendrá nombre y contraseña del sistema:</translation>
     </message>
@@ -4591,6 +4571,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
         <translation>Los servidores del sistema remoto deben aparecer pronto en tu sistema.</translation>
+    </message>
+    <message>
+        <source>Check</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5233,11 +5217,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Users</source>
         <translation>Usuarios</translation>
     </message>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>Pantalla de%1</translation>
-    </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
@@ -5449,13 +5428,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>¿Está seguro de que desea continuar?</translation>
     </message>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
-        <translation>Reconstruir índice de archivo de almacenamiento &apos;%1&apos; en progreso</translation>
+        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
-        <translation>Escaneo rápido archivo de almacenamiento &apos;%1&apos; en el progreso
-</translation>
+        <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5841,6 +5819,18 @@ Short for &quot;seconds&quot;</extracomment>
         <source>This action CANNOT be undone!</source>
         <translation>¡Esta acción NO PUEDE ser deshecha!</translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation type="unfinished">FPS valor es demasiado alto</translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation type="unfinished">Fps actuales en cuadrícula de programación es %1. Fps se bajó a fps máxima de la cámara %2.</translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation type="unfinished">Para el movimiento de software fps 2 está reservada para la corriente secundaria. Actual fps en cuadrícula de horario es de %1. FPS fue bajado a %2.</translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -5939,10 +5929,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>No autorizado</translation>
     </message>
     <message>
-        <source>Please check authentication information&lt;br/&gt;in camera settings</source>
-        <translation>Por favor, consulte autenticación &lt;br/&gt; información en ajustes de la cámara</translation>
-    </message>
-    <message>
         <source>Activate Video Wall license to remove this message</source>
         <translation>Activar la licencia del panel de vídeo  para eliminar este mensaje</translation>
     </message>
@@ -5957,6 +5943,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Diagnose...</source>
         <translation>diagnostico...</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in camera settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6586,18 +6576,6 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation>Servidor v%1 en %2&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Server v%1&lt;br/&gt;</source>
-        <translation>Servidor v%1&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>Algunos de los componentes del sistema no se actualizaron:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Favor de actualizar todos los componentes de la última versión %2.</translation>
-    </message>
-    <message>
         <source>Update...</source>
         <translation>Actualizar...</translation>
     </message>
@@ -6642,10 +6620,6 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>No se pudo guardar los cambios realizados en el siguiente recurso %n.</numerusform>
             <numerusform>No se pudo guardar los cambios realizados en el siguientes recursos %n.</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Client v%1&lt;br/&gt;</source>
-        <translation>Cliente  v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
@@ -6701,6 +6675,35 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Error while uploading picture.</source>
         <translation>Error cargando imagen.</translation>
     </message>
+    <message>
+        <source>Some components of the system are not updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server v%1 at %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update all components to the latest version %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous Usage Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
+If you would like to disable this feature you can do so in the System Settings dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6750,6 +6753,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Connect to Server...</source>
         <translation>Conectar al servidor...</translation>
+    </message>
+    <message>
+        <source>Could not connect to server...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6963,6 +6970,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation>Aplicar filtros: Rotación, Deformacion, mejora de la imagen, relación de aspecto personalizada (requiere transcodificación)</translation>
+    </message>
+    <message>
+        <source>exported</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7310,18 +7321,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>No se puede iniciar sesión de control Pared de vídeo.</translation>
     </message>
     <message>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
-    </message>
-    <message>
-        <source>New layout</source>
-        <translation>Nuevo Diseño</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>Nuevo Diseño %1</translation>
-    </message>
-    <message>
         <source>To enable the feature please activate at least one Video Wall license</source>
         <translation>Para activar la función active por lo menos una licensia de  pared de video</translation>
     </message>
@@ -7413,6 +7412,15 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You&apos;ll have to start it manually.</source>
         <translation>Usted tendrá que iniciar manualmente.</translation>
+    </message>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation type="unfinished">Pantalla de%1</translation>
+    </message>
+    <message>
+        <source>%n cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7689,10 +7697,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Start</source>
         <translation>Comienzo</translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation>Progreso de la reconstrucción</translation>
     </message>
     <message>
         <source>Cancel</source>

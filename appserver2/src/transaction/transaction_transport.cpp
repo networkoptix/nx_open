@@ -132,6 +132,14 @@ QnTransactionTransport::QnTransactionTransport(
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
 
+    if( !m_outgoingDataSocket->setSendTimeout( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE ) )
+    {
+        const auto osErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOG( lit("Error setting socket write timeout for transaction connection %1 received from %2").
+            arg(connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
+            arg(SystemError::toString(osErrorCode)), cl_logWARNING );
+    }
+
     //TODO #ak use binary filter stream for serializing transactions
     m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
         request.headers, Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true";
@@ -175,9 +183,15 @@ QnTransactionTransport::QnTransactionTransport(
 
     //monitoring m_outgoingDataSocket for connection close
     m_dummyReadBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
-    m_outgoingDataSocket->readSomeAsync(
-        &m_dummyReadBuffer,
-        std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) );
+    if( !m_outgoingDataSocket->readSomeAsync(
+            &m_dummyReadBuffer,
+            std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) ) )
+    {
+        const auto osErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOG( lit("Error scheduling async read on transaction connection %1 received from %2. %3").
+            arg(connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
+            arg(SystemError::toString(osErrorCode)), cl_logWARNING );
+    }
 }
 
 QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
@@ -444,6 +458,8 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     setState(ConnectingStage1);
 
     m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    m_httpClient->setSendTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
+    m_httpClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
     connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
         this, &QnTransactionTransport::at_responseReceived,
@@ -811,9 +827,18 @@ void QnTransactionTransport::monitorConnectionForClosure(
 {
     QMutexLocker lock(&m_mutex);
 
-    if( (errorCode != SystemError::noError && errorCode != SystemError::timedOut) ||
-        (bytesRead == 0) )   //error or connection closed
+    if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
+        NX_LOG( lit("transaction connection %1 received from %2 has been closed by remote peer").
+            arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()), cl_logWARNING );
+        return setStateNoLock( State::Error );
+    }
+
+    if( bytesRead == 0 )
+    {
+        NX_LOG( lit("Error reading transaction connection %1 received from %2. %3").
+            arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
+            arg(SystemError::toString(errorCode)), cl_logWARNING );
         return setStateNoLock( State::Error );
     }
 
@@ -821,9 +846,15 @@ void QnTransactionTransport::monitorConnectionForClosure(
 
     using namespace std::placeholders;
     m_dummyReadBuffer.resize( 0 );
-    m_outgoingDataSocket->readSomeAsync(
-        &m_dummyReadBuffer,
-        std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) );
+    if( !m_outgoingDataSocket->readSomeAsync(
+            &m_dummyReadBuffer,
+            std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) ) )
+    {
+        const auto osErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOG( lit("Error scheduling async read on transaction connection %1 received from %2. %3").
+            arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
+            arg(SystemError::toString(osErrorCode)), cl_logWARNING );
+    }
 }
 
 QUrl QnTransactionTransport::generatePostTranUrl()
@@ -960,6 +991,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         if( !m_outgoingTranClient )
         {
             m_outgoingTranClient = std::make_shared<nx_http::AsyncHttpClient>();
+            m_outgoingTranClient->setSendTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
             m_outgoingTranClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
             m_outgoingTranClient->addAdditionalHeader(
                 Qn::EC2_CONNECTION_GUID_HEADER_NAME,

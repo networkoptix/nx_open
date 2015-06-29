@@ -300,9 +300,6 @@ void QnNetworkResource::initializationDone()
 {
     QnResource::initializationDone();
 
-    if (hasFlags(Qn::desktop_camera))
-        return;
-    
     if (getStatus() == Qn::Offline || getStatus() == Qn::Unauthorized || getStatus() == Qn::NotDefined)
         setStatus(Qn::Online);
 }

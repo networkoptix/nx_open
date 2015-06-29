@@ -25,7 +25,7 @@ namespace rpi_cam
         // nxcip::CameraDiscoveryManager
 
         virtual void getVendorName( char* buf ) const override;
-        virtual int findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr ) override;
+        virtual int findCameras( nxcip::CameraInfo* cameras, const char* serverURL ) override;
         virtual int checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password ) override;
         virtual int fromMDNSData(
             const char* discoveredAddress,

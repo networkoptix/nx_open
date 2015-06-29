@@ -152,7 +152,7 @@
                                         </exec>
                                         <chmod file="${environment.dir}/${buildenv.script}" perm="755"/>
                                         <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
-                                            <arg line="${arch} ${toolchain.version} noqt4 noqt5"/>
+                                            <arg line="${arch} ${toolchain.version} noqt4 qt542"/>
                                         </exec>
                                     </target>
                                     <skip>${rsync.skip}</skip>
