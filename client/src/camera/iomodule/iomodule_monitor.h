@@ -6,6 +6,8 @@
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/network/http/multipart_content_parser.h"
 
+class AbstractByteStreamFilter;
+
 class QnIOModuleMonitor: public QObject
 {
     Q_OBJECT
@@ -19,11 +21,11 @@ private slots:
     void at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
     void at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
 private:
-    void reopen();
+    bool reopen();
 private:
     mutable QMutex m_mutex;
     QnSecurityCamResourcePtr m_camera;
-    nx_http::AsyncHttpClientPtr m_connection;
+    nx_http::AsyncHttpClientPtr m_httpClient;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
 };
 
