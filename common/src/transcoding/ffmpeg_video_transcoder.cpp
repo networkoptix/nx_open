@@ -8,14 +8,21 @@
 #include "filters/abstract_image_filter.h"
 #include "filters/crop_image_filter.h"
 
+#include "QElapsedTimer"
+
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
+const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
 
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),
-    m_mtMode(false)
+    m_mtMode(false),
+    m_lastEncodedTime(AV_NOPTS_VALUE),
+    m_totalSpentTime(0),
+    m_totalDecodedFrames(0),
+    m_totalEncodedFrames(0)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
     {
@@ -97,7 +104,6 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         }
     }
 
-
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
         m_lastErrMessage = tr("Could not initialize video encoder.");
@@ -124,8 +130,23 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     if (!decoder)
         decoder = m_videoDecoders[video->channelNumber] = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
 
+
+    auto configGuardFn = [this](QElapsedTimer* timer)
+    {
+        if (m_totalSpentTime == AV_NOPTS_VALUE)
+            m_totalSpentTime = m_lastEncodedTime;
+        else
+            m_totalSpentTime = timer->elapsed();
+        delete timer;
+    };
+
+    std::unique_ptr<QElapsedTimer, decltype(configGuardFn)>
+            codingGuard(new QElapsedTimer(), configGuardFn);
+
     if (decoder->decode(video, &m_decodedVideoFrame)) 
     {
+        ++m_totalDecodedFrames;
+
         m_decodedVideoFrame->channel = video->channelNumber;
         CLVideoDecoderOutputPtr decodedFrame = m_decodedVideoFrame;
 
@@ -143,19 +164,41 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         if( !result )
             return 0;
 
+        // Hack to improve performance by ommiting frames to encode in case
+        // if encoding goes way too slow..
+        // TODO: #mu make mediaserver's config option to disable feature
+        if (m_totalEncodedFrames > OPTIMIZATION_BEGIN_FRAME)
+        {
+            // in case if we already heve some encoding delay
+            auto encodingDelay = m_totalSpentTime - m_lastEncodedTime;
+            if( encodingDelay > 0 )
+            {
+                // calculate approved frames rateably to delay
+                auto framesToEncode = m_totalDecodedFrames *
+                        encodingDelay / m_totalSpentTime;
+
+                // do not encode current frames if current frame is not approved
+                if (m_totalEncodedFrames > framesToEncode)
+                    return 0;
+            }
+        }
+
         //TODO: #vasilenko avoid using deprecated methods
         int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
-
         if (encoded < 0)
         {
             return -3;
         }
+
         QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded);
         resultVideoData->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
         if(m_encoderCtx->coded_frame->key_frame)
             resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
         *result = QnCompressedVideoDataPtr(resultVideoData);
+
+        m_lastEncodedTime = video->timestamp;
+        ++m_totalEncodedFrames;
         return 0;
     }
     else {
