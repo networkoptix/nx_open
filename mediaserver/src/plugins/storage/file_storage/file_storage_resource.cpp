@@ -40,7 +40,13 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
-    std::unique_ptr<QBufferedFile> rez( new QBufferedFile(fileName, ioBlockSize, ffmpegBufferSize) );
+    std::unique_ptr<QBufferedFile> rez(
+        new QBufferedFile(
+            std::shared_ptr<IQnFile>(new QnFile(fileName)), 
+            ioBlockSize, 
+            ffmpegBufferSize
+        ) 
+    );
     rez->setSystemFlags(systemFlags);
     if (!rez->open(openMode))
         return 0;

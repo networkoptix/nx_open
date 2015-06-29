@@ -1,5 +1,9 @@
 #include <stdexcept>
+#include <memory>
 #include "third_party_storage_resource.h"
+#include "media_server/settings.h"
+#include "utils/common/buffered_file.h"
+#include "utils/fs/file.h"
 
 namespace aux
 {
@@ -20,7 +24,7 @@ namespace aux
 
         ~ThirdPartyIODevice() 
         {
-            (void)(1+1);
+            QIODevice::close();
         }
 
     public: // overriding IODevice functions
@@ -81,11 +85,75 @@ namespace aux
         void close() override
         {
             QIODevice::close();
-            delete this;
+            m_io.reset();
         }
     private:
         QnThirdPartyStorageResource::IODevicePtrType m_io;
     }; // class ThirdPartyIODevice
+
+    class ThirdPartyFile : public IQnFile
+    {
+        typedef std::shared_ptr<ThirdPartyIODevice> TPIODevicePtr;
+    public:
+        ThirdPartyFile(const QString &fname, const TPIODevicePtr impl)
+            : m_filename(fname),
+              m_impl(impl)
+        {}
+
+        virtual QString getFileName() const override
+        {
+            return m_filename;
+        }
+
+        virtual bool open(
+            const QIODevice::OpenMode   &mode, 
+            unsigned int                systemDependentFlags = 0
+        ) override
+        {
+            return m_impl->open(mode);
+        }
+    
+        virtual void close() override
+        {
+            m_impl->close();
+        }
+
+        virtual qint64 read(char* buffer, qint64 count) override
+        {
+            return m_impl->read(buffer, count);
+        }
+
+        virtual qint64 write(const char* buffer, qint64 count) override
+        {
+            return m_impl->write(buffer, count);
+        }
+
+        virtual bool isOpen() const override
+        {
+            return m_impl->isOpen();
+        }
+
+        virtual qint64 size() const override
+        {
+            return m_impl->size();
+        }
+
+        virtual bool seek( qint64 offset) override
+        {
+            return m_impl->seek(offset);
+        }
+
+        virtual bool truncate( qint64 newFileSize) override
+        {
+            assert(false);
+            return false;
+        }
+
+        virtual bool realFile() const override {return false;}
+    private:
+        QString         m_filename;
+        TPIODevicePtr   m_impl;
+    };
 } //namespace aux
 
 QnStorageResource* QnThirdPartyStorageResource::instance(const QString& url)
@@ -240,16 +308,48 @@ QIODevice *QnThirdPartyStorageResource::open(
     else
     {
         ioRaw->releaseRef();
-        return new aux::ThirdPartyIODevice(
-            IODevicePtrType(
-                static_cast<Qn::IODevice*>(queryResult),
-                [](Qn::IODevice *p)
-                {
-                    p->releaseRef();
-                }
-            ),
-            openMode
+
+        int ioBlockSize = 0;
+        int ffmpegBufferSize = 0;
+
+        if (openMode & QIODevice::WriteOnly) 
+        {
+            ioBlockSize = MSSettings::roSettings()->value(
+                nx_ms_conf::IO_BLOCK_SIZE, 
+                nx_ms_conf::DEFAULT_IO_BLOCK_SIZE 
+            ).toInt();
+
+            ffmpegBufferSize = MSSettings::roSettings()->value(
+                nx_ms_conf::FFMPEG_BUFFER_SIZE, 
+                nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE 
+            ).toInt();
+        }
+        std::unique_ptr<QBufferedFile> rez(
+            new QBufferedFile(
+                std::shared_ptr<IQnFile>(
+                    new aux::ThirdPartyFile(
+                        fileName, 
+                        std::shared_ptr<aux::ThirdPartyIODevice>(
+                            new aux::ThirdPartyIODevice(
+                                IODevicePtrType(
+                                    static_cast<Qn::IODevice*>(queryResult),
+                                    [](Qn::IODevice *p)
+                                    {
+                                        p->releaseRef();
+                                    }
+                                ), 
+                                openMode
+                            )
+                        )        
+                    )
+                ),
+                ioBlockSize, 
+                ffmpegBufferSize
+            ) 
         );
+        if (!rez->open(openMode))
+            return nullptr;
+        return rez.release();
     }
 }
 
