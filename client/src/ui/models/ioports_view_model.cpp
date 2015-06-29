@@ -143,6 +143,9 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
     if (role != Qt::EditRole)
         return false;
 
+    if (data(index, role) == value)
+        return false;
+
     QnIOPortData& ioPort = m_data.at(index.row());
     switch(index.column())
     {

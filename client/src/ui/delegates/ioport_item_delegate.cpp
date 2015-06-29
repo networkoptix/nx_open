@@ -3,24 +3,8 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QComboBox>
-
-#include <business/business_action_parameters.h>
-#include <business/business_strings_helper.h>
-#include <business/business_resource_validation.h>
-
 #include <core/resource/resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource_management/resource_criterion.h>
-
-#include <ui/delegates/resource_selection_dialog_delegate.h>
-#include <ui/models/business_rules_view_model.h>
-#include <ui/models/notification_sound_model.h>
 #include <ui/style/globals.h>
-#include <ui/widgets/business/aggregation_widget.h>
-#include <ui/workbench/workbench_context.h>
-
-#include <utils/app_server_notification_cache.h>
 #include "ui/models/ioports_view_model.h"
 
 
