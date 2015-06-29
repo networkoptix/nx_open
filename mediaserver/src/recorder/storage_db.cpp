@@ -259,7 +259,16 @@ void QnStorageDb::addCatalogFromMediaFolder(
 )
 {
     QString root = closeDirPath(QFileInfo(m_sdb.databaseName()).absoluteDir().path()) + postfix;
-    QnAbstractStorageResource::FileInfoList files = m_storage->getFileList(root);
+    QnAbstractStorageResource::FileInfoList files;
+    if (m_storage)
+        files = m_storage->getFileList(root);
+    else
+        files = QnAbstractStorageResource::FIListFromQFIList(
+            QDir(root).entryInfoList(
+                QDir::Dirs | QDir::NoDotAndDotDot, 
+                QDir::Name
+            )
+        );
 
     for (const QnAbstractStorageResource::FileInfo& fi: files)
     {

@@ -989,7 +989,7 @@ namespace Qn
         }
 
         // calc local file size
-        if (m_localsize = aux::getFileSize(m_localfile.c_str()) == -1)
+        if ((m_localsize = aux::getFileSize(m_localfile.c_str())) == -1)
             throw aux::InternalErrorException("local file calc size failed");
     }
 

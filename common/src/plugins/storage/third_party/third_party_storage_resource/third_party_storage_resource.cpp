@@ -18,7 +18,10 @@ namespace aux
             open(mode);
         }
 
-        ~ThirdPartyIODevice() {}
+        ~ThirdPartyIODevice() 
+        {
+            (void)(1+1);
+        }
 
     public: // overriding IODevice functions
         qint64 readData(char *data, qint64 maxlen) override
@@ -75,6 +78,11 @@ namespace aux
             return true;
         }
 
+        void close() override
+        {
+            QIODevice::close();
+            delete this;
+        }
     private:
         QnThirdPartyStorageResource::IODevicePtrType m_io;
     }; // class ThirdPartyIODevice
@@ -240,7 +248,7 @@ QIODevice *QnThirdPartyStorageResource::open(
                     p->releaseRef();
                 }
             ),
-            QIODevice::OpenMode(ioFlags)
+            openMode
         );
     }
 }
@@ -297,7 +305,10 @@ bool QnThirdPartyStorageResource::removeDir(const QString& url)
     return true;
 }
 
-bool QnThirdPartyStorageResource::renameFile(const QString& oldName, const QString& newName)
+bool QnThirdPartyStorageResource::renameFile(
+    const QString   &oldName, 
+    const QString   &newName
+)
 {
     QMutexLocker lock(&m_mutex);
     int ecode;
@@ -317,7 +328,10 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
 {
     QMutexLocker lock(&m_mutex);
     int ecode;
-    Qn::FileInfoIterator* fitRaw = m_storage->getFileIterator(dirName.toLatin1().data(), &ecode);
+    Qn::FileInfoIterator* fitRaw = m_storage->getFileIterator(
+        dirName.toLatin1().data(), 
+        &ecode
+    );
     if (fitRaw == nullptr)
         return QnAbstractStorageResource::FileInfoList();
 

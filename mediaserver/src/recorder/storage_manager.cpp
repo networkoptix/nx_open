@@ -477,7 +477,12 @@ static const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
 {
     QString storagePath = storage->getPath();
-    const QString dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
+    QString dbRefFilePath;
+    
+    if (storagePath.indexOf(lit("://")) != -1)
+        dbRefFilePath = dbRefFileName.arg(getLocalGuid());
+    else
+        dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
 
     QByteArray dbRefGuidStr;
     //checking for file db_ref.guid existence
@@ -499,15 +504,12 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
         return true;
     }
 
-#ifdef _WIN32
-    //on windows always placing db to a storage directory
-    *dbDirectory = storagePath;
-    return true;
-#else
-    //On linux, sqlite db cannot be safely placed on a network partition due to lock problem
-        //So, for such storages creating DB in data dir
-
-    if (!(storage->getCapabilities() & QnAbstractStorageResource::DBReady))
+    if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
+    {
+        *dbDirectory = storagePath;
+        return true;
+    }
+    else
     {   // we won't be able to create ref guid file if storage is not writable
         if (!(storage->getCapabilities() & QnAbstractStorageResource::WriteFile))
             return false;
@@ -519,7 +521,10 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
         dbRefGuidStr.remove( dbRefGuidStr.size()-1, 1 );
         dbRefGuidStr.remove( 0, 1 );
         //saving db ref guid to file on storage
-        QIODevice *dbGuidFile = storage->open( QIODevice::WriteOnly | QIODevice::Truncate );
+        QIODevice *dbGuidFile = storage->open(
+            dbRefFilePath, 
+            QIODevice::WriteOnly | QIODevice::Truncate 
+        );
         if (dbGuidFile == nullptr)
             return false;
         if( dbGuidFile->write( dbRefGuidStr ) != dbRefGuidStr.size() )
@@ -530,17 +535,13 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
         if( !QDir().mkpath( storagePath ) )
             return false;
     }
-
     *dbDirectory = storagePath;
     return true;
-#endif
 }
 
 QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 {
     QMutexLocker lock(&m_sdbMutex);
-    if (!(storage->getCapabilities() & QnAbstractStorageResource::DBReady))
-        return false;
 
     QnStorageDbPtr sdb = m_chunksDB[storage->getPath()];
     if (!sdb) 
@@ -555,12 +556,21 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
         QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
         QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
         
-        //if (QFile::exists(oldFileName) && !QFile::exists(fileName))
-        //    QFile::rename(oldFileName, fileName);
-        if (storage->isFileExists(oldFileName) && !storage->isFileExists(fileName))
-            storage->renameFile(oldFileName, fileName);
+        if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
+        {
+            if (storage->isFileExists(oldFileName) && !storage->isFileExists(fileName))
+                storage->renameFile(oldFileName, fileName);
 
-        sdb = m_chunksDB[storage->getPath()] = QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
+            sdb = m_chunksDB[storage->getPath()] = 
+                QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
+        }
+        else
+        {
+            if (QFile::exists(oldFileName) && !QFile::exists(fileName))
+                QFile::rename(oldFileName, fileName);
+            sdb = m_chunksDB[storage->getPath()] = 
+                QnStorageDbPtr(new QnStorageDb(QnStorageResourcePtr(), getStorageIndex(storage)));
+        }
 
         if (!sdb->open(fileName))
         {

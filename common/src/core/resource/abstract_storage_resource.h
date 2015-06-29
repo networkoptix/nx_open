@@ -11,11 +11,11 @@ class QnAbstractStorageResource
 public:
     enum cap
     {
-        ListFile        = 0x0000,                   // capable of listing files
-        RemoveFile      = 0x0001,                   // capable of removing files
-        ReadFile        = 0x0002,                   // capable of reading files
-        WriteFile       = 0x0004,                   // capable of writing files
-        DBReady         = 0x0008,                   // capable of DB hosting
+        ListFile        = 0x0001,                   // capable of listing files
+        RemoveFile      = 0x0002,                   // capable of removing files
+        ReadFile        = 0x0004,                   // capable of reading files
+        WriteFile       = 0x0008,                   // capable of writing files
+        DBReady         = 0x0010                    // capable of DB hosting
     };
 
     static const int chunkLen = 60;
