@@ -63,8 +63,9 @@
 
 #include <plugins/resource/server_camera/server_camera_factory.h>
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
-#include <utils/common/log.h>
 
+#include <utils/common/log.h>
+#include <utils/common/synctime.h>
 
 
 #include "ui/workbench/workbench_item.h"

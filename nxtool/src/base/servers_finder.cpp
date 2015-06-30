@@ -36,8 +36,8 @@ namespace
       
     enum 
     {
-        kUpdateServersInfoInterval = 500
-        , kServerAliveTimeout = 1000 * 1000
+        kUpdateServersInfoInterval = 1000
+        , kServerAliveTimeout = 20 * 1000
     };
 }
 
@@ -216,10 +216,17 @@ void rtu::ServersFinder::Impl::updateServers()
         const auto it = m_sockets.find(address);
         if (it == m_sockets.end())
         {
+            qDebug() << address;
             SocketPtr socket(new QUdpSocket());
             if (socket->bind(address))
             {
-                QObject::connect(socket.data(), &QUdpSocket::readyRead, [this, socket](){ readData(socket); });
+                QObject::connect(socket.data(), &QUdpSocket::readyRead, [this, socket]()
+                {
+                    while(socket->hasPendingDatagrams())
+                    {
+                        readData(socket);
+                    }
+                });
                 m_sockets.insert(address, socket);
                 
             }
@@ -239,6 +246,7 @@ void rtu::ServersFinder::Impl::updateServers()
                 written += socket->writeDatagram(kSearchRequestBody.data() + written, kSearchRequestSize - written
                     , kMulticastGroupAddress, kMulticastGroupPort);
             }
+
             if (written != kSearchRequestSize)
                 socket->close();
         }
@@ -259,7 +267,7 @@ void rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     {
         readBytes += socket->readDatagram(data.data() + readBytes, pendingDataSize - readBytes, &sender, &senderPort);
     }
-    
+
     if (readBytes != pendingDataSize)
     {
         socket->close();
@@ -267,6 +275,7 @@ void rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     }
     
     BaseServerInfo info;
+
     if (!parseUdpPacket(data, info) )
         return;
 
@@ -276,6 +285,7 @@ void rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
 
     const auto it = m_infos.find(info.id);
     const int timestamp = QDateTime::currentMSecsSinceEpoch();
+
     if (it == m_infos.end()) /// If new server multicast arrived
     {
         m_infos.insert(info.id, ServerInfoData(timestamp, info));
@@ -291,6 +301,7 @@ void rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     const auto itWaited = std::find(m_waitedServers.begin(), m_waitedServers.end(), info.id);
     if (itWaited == m_waitedServers.end())
         return;
+
     emit m_owner->serverAppeared(*itWaited);
     m_waitedServers.erase(itWaited);
 }
