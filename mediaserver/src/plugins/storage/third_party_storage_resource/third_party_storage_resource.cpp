@@ -106,7 +106,7 @@ namespace aux
         }
 
         virtual bool open(
-            const QIODevice::OpenMode   &mode, 
+            const QIODevice::OpenMode  &mode, 
             unsigned int                systemDependentFlags = 0
         ) override
         {

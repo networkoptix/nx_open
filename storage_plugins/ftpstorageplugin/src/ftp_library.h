@@ -6,6 +6,7 @@
 #include <memory>
 #include <stdexcept>
 #include <cstdint>
+#include <mutex>
 #include "plugins/storage/third_party/third_party_storage.h"
 #include "impl/ftplib.h"
 
@@ -58,10 +59,11 @@ namespace Qn
         friend class aux::PluginRefCounter<FtpIODevice>;
     public:
         FtpIODevice(
-            ftplib              &impl, 
-            const char          *uri,
+            ftplib             &impl, 
+            const char         *uri,
             int                 mode,
-            const Storage       *stor
+            const Storage      *stor,
+            std::mutex         &mut
         );
 
         virtual uint32_t STORAGE_METHOD_CALL write(
@@ -105,6 +107,8 @@ namespace Qn
         bool                m_altered;
         long long           m_localsize;
         const Storage      *m_stor;
+        mutable
+        std::mutex         &m_mutex;
     }; // class FtpIODevice
 
     // Fileinfo list is obtained from the server at construction phase.
@@ -230,6 +234,8 @@ namespace Qn
         std::string         m_implurl;
         std::string         m_user;
         std::string         m_passwd;
+        mutable
+        std::mutex          m_mutex;
     }; // class Ftpstorage
 
     class FtpStorageFactory 

@@ -545,16 +545,28 @@ namespace Qn
             throw aux::BadUrlException(e.what());
         }
 
-        m_implurl = u.host + ':' + (u.port.empty() ? std::string("21") : u.port);
+        try 
+        {
+            m_implurl = u.host + ':' + (u.port.empty() ? std::string("21") : u.port);
 
-        if (m_impl->Connect(m_implurl.c_str()) == 0)
-            throw aux::BadUrlException("Bad url");
+            if (m_impl->Connect(m_implurl.c_str()) == 0)
+                throw aux::BadUrlException("Bad url");
 
-        m_user = u.uname.empty() ? "anonymous" : u.uname.c_str();
-        m_passwd = u.upasswd.empty() ? "" : u.upasswd.c_str();
+            m_user = u.uname.empty() ? "anonymous" : u.uname.c_str();
+            m_passwd = u.upasswd.empty() ? "" : u.upasswd.c_str();
 
-        if (m_impl->Login(m_user.c_str(), m_passwd.c_str()) == 0)
-            throw aux::BadUrlException("Bad url");
+            if (m_impl->Login(m_user.c_str(), m_passwd.c_str()) == 0)
+            {
+                m_impl->Quit();
+                throw aux::BadUrlException("Bad url");
+            }
+        } 
+        catch (const std::exception&) 
+        {
+            if (m_impl)
+                m_impl->Quit();
+            throw;
+        }
     }
 
     FtpStorage::~FtpStorage()
@@ -564,11 +576,15 @@ namespace Qn
 
     int FtpStorage::tryReconnect(int *ecode) const
     {
+        m_impl->Quit();
         if (m_impl->Connect(m_implurl.c_str()) == 0)
             return 0;
 
         if (m_impl->Login(m_user.c_str(), m_passwd.c_str()) == 0)
+        {
+            m_impl->Quit();
             return 0;
+        }
 
         if(ecode)
             *ecode = error::NoError;
@@ -579,6 +595,8 @@ namespace Qn
     {   // If PASV failed it means that either there are some network problems
         // or just we've been idle too long and server has closed control session.
         // In the latter case we can try to reestablish connection.
+        return true;
+        std::lock_guard<std::mutex> lock(m_mutex);
         return
             m_impl->TestControlConnection() == 1 ? 
             true : 
@@ -803,7 +821,8 @@ namespace Qn
                 *m_impl, 
                 url, 
                 flags,
-                this
+                this,
+                m_mutex
             );
         }
         catch (const aux::BadUrlException&)
@@ -929,10 +948,11 @@ namespace Qn
 
     // Ftp IO Device
     FtpIODevice::FtpIODevice(
-        ftplib              &impl, 
-        const char          *url,
+        ftplib             &impl, 
+        const char         *url,
         int                 mode,
-        const Storage       *stor
+        const Storage      *stor,
+        std::mutex         &mut
     )
         : m_mode(mode),
           m_pos(0),
@@ -940,10 +960,12 @@ namespace Qn
           m_impl(impl),   
           m_altered(false),
           m_localsize(0),
-          m_stor(stor)
+          m_stor(stor),
+          m_mutex(mut)
     {
         //  If file opened for read-only and no such file uri in storage throw BadUrl
         //  If file opened for write and no such file uri in stor - create it.
+        std::lock_guard<std::mutex> lock(m_mutex);
         std::string remoteDir, remoteFile;
         aux::dirFromUri(url, &remoteDir, &remoteFile);
         m_localfile = aux::getRandomFileName() + "_" + remoteFile;
@@ -1006,7 +1028,10 @@ namespace Qn
     void FtpIODevice::flush()
     {
         if(m_stor->isAvailable() && m_altered)
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
             m_impl.Put(m_localfile.c_str(), m_url.c_str(), ftplib::image);
+        }
     }
 
     uint32_t STORAGE_METHOD_CALL FtpIODevice::write(
@@ -1017,6 +1042,7 @@ namespace Qn
     {
         if(aux::checkECode(ecode, m_stor->isAvailable()) != error::NoError)
             return 0;
+        std::lock_guard<std::mutex> lock(m_mutex);
 
         if (!(m_mode & io::WriteOnly))
         {
@@ -1053,6 +1079,7 @@ namespace Qn
     {
         if(aux::checkECode(ecode, m_stor->isAvailable()) != error::NoError)
             return 0;
+        std::lock_guard<std::mutex> lock(m_mutex);
 
         if (!(m_mode & io::ReadOnly))
         {
@@ -1089,6 +1116,7 @@ namespace Qn
     {
         if(aux::checkECode(ecode, m_stor->isAvailable()) != error::NoError)
             return 0;
+        std::lock_guard<std::mutex> lock(m_mutex);
 
         if (pos > m_localsize)
         {
@@ -1109,7 +1137,8 @@ namespace Qn
     {
         if(aux::checkECode(ecode, m_stor->isAvailable()) != Qn::error::NoError)
             return 0;
-        
+        std::lock_guard<std::mutex> lock(m_mutex);
+
         long long ret;
         if ((ret = aux::getFileSize(m_localfile.c_str())) == -1)
         {

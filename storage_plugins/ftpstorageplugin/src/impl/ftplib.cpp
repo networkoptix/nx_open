@@ -511,8 +511,10 @@ int ftplib::Login(const char *user, const char *pass)
 	sprintf(tempbuf, "USER %s", user);
 	if (!FtpSendCmd(tempbuf,'3',mp_ftphandle))
 	{
-		if (mp_ftphandle->ctrl != NULL) return 1;
-		if (*LastResponse() == '2') return 1;
+		//if (mp_ftphandle->ctrl != NULL) 
+  //          return 1;
+		//if (*LastResponse() == '2') 
+  //          return 1;
 		return 0;
 	}
 	sprintf(tempbuf,"PASS %s",pass);
