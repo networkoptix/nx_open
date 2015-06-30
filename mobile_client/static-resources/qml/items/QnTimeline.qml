@@ -15,6 +15,7 @@ Item {
     property alias startBoundDate: timeline.startBoundDate
     property alias autoPlay: timeline.autoPlay
     readonly property bool dragging: mouseArea.pressed || pinchArea.pinch.active
+    readonly property var timelineView: timeline
 
     signal dragFinished()
     signal moveFinished()

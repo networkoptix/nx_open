@@ -1,6 +1,7 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
+import QtGraphicalEffects 1.0
 import QtMultimedia 5.0
 
 import com.networkoptix.qml 1.0
@@ -167,6 +168,14 @@ QnPage {
                     navigator.y = drag.maximumY
             }
 
+            Image {
+                width: timeline.width
+                height: sourceSize.height
+                y: -playbackController.height / 2
+                sourceSize.height: timeline.height - timeline.chunkBarHeight + playbackController.height / 2
+                source: "qrc:///images/timeline_gradient.png"
+            }
+
             QnTimeline {
                 id: timeline
 
@@ -191,15 +200,50 @@ QnPage {
                     if (!playbackController.paused)
                         videoPlayer.alignToChunk(positionDate)
                 }
+            }
 
-                Image {
-                    z: -1
-                    width: parent.width
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: timeline.chunkBarHeight
-                    sourceSize.height: timeline.height - timeline.chunkBarHeight + playbackController.height / 2
-                    source: "qrc:///images/timeline_gradient.png"
+            Item {
+                id: timelineMask
+
+                anchors.fill: timeline
+                visible: false
+
+                Rectangle {
+                    id: blurRectangle
+
+                    readonly property real blurWidth: dp(36)
+                    readonly property real margin: dp(18)
+
+                    width: timeline.height - timeline.chunkBarHeight
+                    height: timeline.width
+                    rotation: 90
+                    anchors.centerIn: parent
+                    anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                        GradientStop { position: (timeLiveLabel.x - blurRectangle.blurWidth - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                        GradientStop { position: (timeLiveLabel.x - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                        GradientStop { position: 0.5; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                        GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                        GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.blurWidth + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                        GradientStop { position: 1.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                    }
                 }
+
+                Rectangle {
+                    width: timeline.width
+                    height: timeline.chunkBarHeight
+                    anchors.bottom: parent.bottom
+                    color: "#ffffffff"
+                }
+            }
+
+            OpacityMask {
+                anchors.fill: timeline
+                source: timeline.timelineView
+                maskSource: timelineMask
+
+                Component.onCompleted: timeline.timelineView.visible = false
             }
 
             Rectangle {
