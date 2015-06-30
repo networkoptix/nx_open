@@ -190,6 +190,7 @@
 #include "core/resource_management/status_dictionary.h"
 #include "network/universal_request_processor.h"
 #include "utils/network/nettools.h"
+#include "http/iomonitor_tcp_server.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1414,6 +1415,7 @@ bool QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     m_universalTcpListener->addHandler<QnFileConnectionProcessor>("HTTP", "static");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
+    m_universalTcpListener->addHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
     //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     //m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("HTTP", "*");

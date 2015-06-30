@@ -13,20 +13,21 @@ class QnIOModuleMonitor: public QObject
     Q_OBJECT
 public:
     QnIOModuleMonitor(const QnSecurityCamResourcePtr camera);
-
+    bool open();
 signals:
+    void connectionClosed();
+    void connectionOpened();
     void ioStateChanged(const QnIOStateData& value);
 private slots:
     void at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
     void at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
     void at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
 private:
-    bool reopen();
-private:
     mutable QMutex m_mutex;
     QnSecurityCamResourcePtr m_camera;
     nx_http::AsyncHttpClientPtr m_httpClient;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
+    bool m_opened;
 };
 
 typedef QSharedPointer<QnIOModuleMonitor> QnIOModuleMonitorPtr;

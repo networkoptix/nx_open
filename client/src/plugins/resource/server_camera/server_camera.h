@@ -28,7 +28,7 @@ public:
     virtual void setParentId(const QnUuid& parent) override;
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
     
-    QnIOModuleMonitorPtr openIOModuleMonitor();
+    QnIOModuleMonitorPtr createIOModuleMonitor();
 
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;

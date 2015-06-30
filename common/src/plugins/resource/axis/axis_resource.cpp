@@ -824,7 +824,7 @@ void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr /*
     //TODO/IMPL reconnect
 }
 
-bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPortList, QnIOStateDataList ioStateList)
+bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPortList, QnIOStateDataList& ioStateList)
 {
     QList<QPair<QByteArray,QByteArray>> params;
     CLHttpStatus status = readAxisParameters( QLatin1String("root.IOPort"), http, params );

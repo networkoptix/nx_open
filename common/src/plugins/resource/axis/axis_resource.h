@@ -126,7 +126,7 @@ private:
     CLHttpStatus readAxisParameters(const QString& rootPath, CLSimpleHTTPClient* const httpClient, QList<QPair<QByteArray,QByteArray>>& params);
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
-    bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPorts, QnIOStateDataList ioStateList);
+    bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPorts, QnIOStateDataList& ioStateList);
     bool savePortSettings(const QnIOPortDataList& newPorts, const QnIOPortDataList& oldPorts);
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
     bool ioPortErrorOccured();

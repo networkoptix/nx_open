@@ -15,6 +15,7 @@ public:
     QMutex waitMutex;
     QWaitCondition waitCond;
     QnIOStateDataList dataToSend;
+    QByteArray requestBuffer;
 };
 
 QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
@@ -39,7 +40,7 @@ void QnIOMonitorConnectionProcessor::run()
     if (ready)
     {
         parseRequest();
-        QString uniqueId = QUrlQuery(getDecodedUrl().query()).queryItemValue(lit("id"));
+        QString uniqueId = QUrlQuery(getDecodedUrl().query()).queryItemValue(lit("physicalId"));
         QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(uniqueId);
         if (!camera) {
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
@@ -51,19 +52,37 @@ void QnIOMonitorConnectionProcessor::run()
         connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraInput);
         connect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraOutput);
 
-        {
-            QMutexLocker lock(&d->waitMutex);
-            d->dataToSend = camera->ioStates();
-        }
+        static const int KEEPALIVE_INTERVAL = 1000 * 5;
 
+        using namespace std::placeholders;
+        static const int REQUEST_BUFFER_SIZE = 1024;
+        d->requestBuffer.reserve(REQUEST_BUFFER_SIZE);
+        d->socket->setRecvTimeout(KEEPALIVE_INTERVAL);
+        d->socket->readSomeAsync( &d->requestBuffer, std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
+
+        QMutexLocker lock(&d->waitMutex);
+        d->dataToSend = camera->ioStates();
+        sendMultipartData();
         while (d->socket->isConnected()) 
         {
-            QMutexLocker lock(&d->waitMutex);
-            while (d->dataToSend.empty() && d->socket->isConnected())
-                d->waitCond.wait(&d->waitMutex);
-            sendMultipartData();
+            d->waitCond.wait(&d->waitMutex);
+            if (d->socket->isConnected())
+                sendMultipartData();
         }
+        d->socket->terminateAsyncIO(true);
     }
+}
+
+void QnIOMonitorConnectionProcessor::onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead )
+{
+    Q_D(QnIOMonitorConnectionProcessor);
+    QMutexLocker lock(&d->waitMutex);
+
+    using namespace std::placeholders;
+    d->requestBuffer.resize(0);
+    if(errorCode == SystemError::timedOut)
+        d->socket->readSomeAsync( &d->requestBuffer, std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
+    d->waitCond.wakeAll();
 }
 
 void QnIOMonitorConnectionProcessor::at_cameraInput(
@@ -96,11 +115,6 @@ void QnIOMonitorConnectionProcessor::sendMultipartData()
     d->response.messageBody = QJson::serialized<QnIOStateDataList>(d->dataToSend);
     d->dataToSend.clear();
     sendResponse(CODE_OK, "application/json", QByteArray(), "--ioboundary");
-
-        //lit("--ioboundary\r\nContent-Type: application/json\r\n\r\n%1\r\n").arg(payloadData);
-    //d->response.clear
-    //QMutexLocker lock(&d->sockMutex);
-    //sendData(response.data(), response.size());
 }
 
 void QnIOMonitorConnectionProcessor::pleaseStop()

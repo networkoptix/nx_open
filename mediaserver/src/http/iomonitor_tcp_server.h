@@ -28,6 +28,8 @@ private slots:
         bool value,
         qint64 timestamp );
 private:
+    void onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead );
+private:
     Q_DECLARE_PRIVATE(QnIOMonitorConnectionProcessor);
 
     void sendMultipartData();
