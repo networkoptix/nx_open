@@ -36,7 +36,7 @@ namespace
       
     enum 
     {
-        kUpdateServersInfoInterval = 500
+        kUpdateServersInfoInterval = 2
         , kServerAliveTimeout = 10 * 1000
     };
 
@@ -302,7 +302,12 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     {
         it.value().first = timestamp; /// Update alive info
         if (info != it->second)
+        {
+            it.value().second.name = info.name;
+            it.value().second.systemName = info.systemName;
+            it.value().second.port = info.port;
             emit m_owner->serverChanged(info);
+        }
     }
 
     const auto itWaited = std::find(m_waitedServers.begin(), m_waitedServers.end(), info.id);
