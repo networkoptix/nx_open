@@ -62,7 +62,7 @@ mv -f debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUN
 mv -f usr/share/applications/icon.desktop usr/share/applications/${installer.name}.desktop
 
 # Copy client binary, old version libs
-cp -r $CLIENT_BIN_PATH/client $BINSTAGE/client-bin
+cp -r $CLIENT_BIN_PATH/clientexe $BINSTAGE/client-bin
 cp -r $CLIENT_BIN_PATH/applauncher $BINSTAGE/applauncher-bin
 cp -r bin/applauncher $BINSTAGE
 
