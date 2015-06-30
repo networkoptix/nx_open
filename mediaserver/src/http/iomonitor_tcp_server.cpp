@@ -49,8 +49,8 @@ void QnIOMonitorConnectionProcessor::run()
         
         sendResponse(CODE_OK, "multipart/x-mixed-replace; boundary=ioboundary");
 
-        connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraInput);
-        connect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraOutput);
+        connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraInput, Qt::DirectConnection);
+        connect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraOutput, Qt::DirectConnection);
 
         static const int KEEPALIVE_INTERVAL = 1000 * 5;
 
@@ -60,14 +60,15 @@ void QnIOMonitorConnectionProcessor::run()
         d->socket->setRecvTimeout(KEEPALIVE_INTERVAL);
         d->socket->readSomeAsync( &d->requestBuffer, std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
 
+        auto iostates = camera->ioStates();
         QMutexLocker lock(&d->waitMutex);
-        d->dataToSend = camera->ioStates();
-        sendMultipartData();
+        d->dataToSend = std::move(iostates);
+        sendMultipartData(lock);
         while (d->socket->isConnected()) 
         {
             d->waitCond.wait(&d->waitMutex);
             if (d->socket->isConnected())
-                sendMultipartData();
+                sendMultipartData(lock);
         }
         d->socket->terminateAsyncIO(true);
     }
@@ -109,12 +110,14 @@ void QnIOMonitorConnectionProcessor::at_cameraOutput(
     d->waitCond.wakeAll();
 }
 
-void QnIOMonitorConnectionProcessor::sendMultipartData()
+void QnIOMonitorConnectionProcessor::sendMultipartData(QMutexLocker& lock)
 {
     Q_D(QnIOMonitorConnectionProcessor);
     d->response.messageBody = QJson::serialized<QnIOStateDataList>(d->dataToSend);
     d->dataToSend.clear();
+    lock.unlock();
     sendResponse(CODE_OK, "application/json", QByteArray(), "--ioboundary");
+    lock.relock();
 }
 
 void QnIOMonitorConnectionProcessor::pleaseStop()

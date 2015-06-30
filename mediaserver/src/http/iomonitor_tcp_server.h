@@ -32,7 +32,7 @@ private:
 private:
     Q_DECLARE_PRIVATE(QnIOMonitorConnectionProcessor);
 
-    void sendMultipartData();
+    void sendMultipartData(QMutexLocker& lock);
 };
 
 #endif // QN_IOMONITOR_REST_HANDLER_H
