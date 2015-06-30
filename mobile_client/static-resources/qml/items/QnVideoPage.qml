@@ -375,8 +375,9 @@ QnPage {
             width: parent.width
             height: calendarContent.y + toolBar.height
             opacity: calendarPanel.opacity
-            color: "#60000000"
+            color: "#66171c1f"
             z: 10.0
+            visible: opacity > 0.0
 
             MouseArea {
                 anchors.fill: parent
