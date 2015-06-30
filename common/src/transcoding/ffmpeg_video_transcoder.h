@@ -33,7 +33,7 @@ public:
     virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList) override;
 
 private:
-    int transcodePacketImpl(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result);
+    int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
 
 private:
     QVector<CLFFmpegVideoDecoder*> m_videoDecoders;
@@ -54,6 +54,7 @@ private:
     qint64 m_totalEncodedTime;
     qint64 m_totalDecodedFrames;
     qint64 m_totalEncodedFrames;
+    qint64 m_droppedFrames;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
