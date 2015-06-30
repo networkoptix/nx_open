@@ -36,9 +36,12 @@ namespace
       
     enum 
     {
-        kUpdateServersInfoInterval = 1000
-        , kServerAliveTimeout = 20 * 1000
+        kUpdateServersInfoInterval = 500
+        , kServerAliveTimeout = 10 * 1000
     };
+
+    enum { kInvalidOpSize = -1 };
+
 }
 
 namespace
@@ -142,12 +145,11 @@ private:
     void updateServers();
     
     typedef QSharedPointer<QUdpSocket> SocketPtr;
-    void readData(const SocketPtr &socket);
-    
+    bool readData(const SocketPtr &socket);
 
 private:
     typedef QHash<QHostAddress, SocketPtr> SocketsContainer;
-    typedef QPair<int, rtu::BaseServerInfo> ServerInfoData;
+    typedef QPair<qint64, rtu::BaseServerInfo> ServerInfoData;
     typedef QHash<QUuid, ServerInfoData> ServerDataContainer;
 
     rtu::ServersFinder *m_owner;
@@ -182,12 +184,12 @@ rtu::ServersFinder::Impl::~Impl()
 
 void rtu::ServersFinder::Impl::checkOutdatedServers()
 {
-    const int currentTime = QDateTime::currentMSecsSinceEpoch();
+    const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     
     IDsVector forRemove;
     for(const auto &infoData: m_infos)
     {
-        const int lastUpdateTime = infoData.first;
+        const qint64 lastUpdateTime = infoData.first;
         const BaseServerInfo &info = infoData.second;
         if ((currentTime - lastUpdateTime) > kServerAliveTimeout)
             forRemove.push_back(info.id);
@@ -216,20 +218,9 @@ void rtu::ServersFinder::Impl::updateServers()
         const auto it = m_sockets.find(address);
         if (it == m_sockets.end())
         {
-            qDebug() << address;
             SocketPtr socket(new QUdpSocket());
             if (socket->bind(address))
-            {
-                QObject::connect(socket.data(), &QUdpSocket::readyRead, [this, socket]()
-                {
-                    while(socket->hasPendingDatagrams())
-                    {
-                        readData(socket);
-                    }
-                });
                 m_sockets.insert(address, socket);
-                
-            }
         }
         else if ((*it)->state() != QAbstractSocket::BoundState)
         {
@@ -237,14 +228,23 @@ void rtu::ServersFinder::Impl::updateServers()
             socket->close();
             socket->bind(address);
         }
-        
+
         for(const auto &socket: m_sockets)
         {
+            while(socket->hasPendingDatagrams() && readData(socket))
+            {
+            }
+
             int written = 0;
             while((socket->state() == QAbstractSocket::BoundState) && (written != kSearchRequestBody.size()))
             {
-                written += socket->writeDatagram(kSearchRequestBody.data() + written, kSearchRequestSize - written
-                    , kMulticastGroupAddress, kMulticastGroupPort);
+                const int currentWritten = socket->writeDatagram(kSearchRequestBody.data() + written
+                    , kSearchRequestSize - written, kMulticastGroupAddress, kMulticastGroupPort);
+
+                if (currentWritten == kInvalidOpSize)
+                    break;
+
+                written += currentWritten;
             }
 
             if (written != kSearchRequestSize)
@@ -253,7 +253,7 @@ void rtu::ServersFinder::Impl::updateServers()
     }
 }
 
-void rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPtr &socket)
+bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPtr &socket)
 {
     const int pendingDataSize = socket->pendingDatagramSize();
     QHostAddress sender;
@@ -265,26 +265,33 @@ void rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     int readBytes = 0;
     while ((socket->state() == QAbstractSocket::BoundState) && (readBytes != pendingDataSize))
     {
-        readBytes += socket->readDatagram(data.data() + readBytes, pendingDataSize - readBytes, &sender, &senderPort);
+        const int read = socket->readDatagram(data.data() + readBytes
+            , pendingDataSize - readBytes, &sender, &senderPort);
+
+        if (read == kInvalidOpSize)
+            return false;
+
+        readBytes += read;
     }
 
     if (readBytes != pendingDataSize)
     {
         socket->close();
-        return;
+        return false;
     }
     
     BaseServerInfo info;
 
     if (!parseUdpPacket(data, info) )
-        return;
+        return true;
+
 
     info.hostAddress = sender.toString();
 
     emit m_owner->serverDiscovered(info);
 
     const auto it = m_infos.find(info.id);
-    const int timestamp = QDateTime::currentMSecsSinceEpoch();
+    const qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
 
     if (it == m_infos.end()) /// If new server multicast arrived
     {
@@ -293,17 +300,18 @@ void rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     }
     else
     {
-        it.value().first = QDateTime::currentMSecsSinceEpoch(); /// Update alive info
+        it.value().first = timestamp; /// Update alive info
         if (info != it->second)
             emit m_owner->serverChanged(info);
     }
 
     const auto itWaited = std::find(m_waitedServers.begin(), m_waitedServers.end(), info.id);
     if (itWaited == m_waitedServers.end())
-        return;
+        return true;
 
     emit m_owner->serverAppeared(*itWaited);
     m_waitedServers.erase(itWaited);
+    return true;
 }
 
 void rtu::ServersFinder::Impl::waitForServer(const QUuid &id)
