@@ -30,7 +30,6 @@ unix: !mac {
 }
 
 mac {
-    OBJECTIVE_SOURCES += ${basedir}/src/ui/workaround/mac_utils.mm
     LIBS += -lobjc -framework Foundation -framework AudioUnit -framework AppKit
 }
 
