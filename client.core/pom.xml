@@ -52,6 +52,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>
+        <android.defines/>
     </properties>
     
     <profiles>
@@ -77,5 +78,18 @@
                 <buildLib>sharedlib</buildLib>
             </properties>
         </profile>	
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
     </profiles>	
 </project>

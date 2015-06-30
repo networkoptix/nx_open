@@ -12,6 +12,10 @@
 
 #include "security_cam_resource.h"
 
+#ifdef Q_OS_ANDROID
+#define AVCodecID int
+#define CODEC_ID_NONE 0
+#endif
 
 class QnAbstractDTSFactory;
 
@@ -24,12 +28,10 @@ class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
 public:
     QnVirtualCameraResource();
 
-#ifdef ENABLE_DATA_PROVIDERS
     QnAbstractDTSFactory* getDTSFactory();
     void setDTSFactory(QnAbstractDTSFactory* factory);
     void lockDTSFactory();
     void unLockDTSFactory();
-#endif
 
     virtual QString getUniqueId() const override;
 
@@ -57,8 +59,6 @@ private:
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
 const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
 const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
-
-#ifdef ENABLE_DATA_PROVIDERS
 
 class CameraMediaStreams;
 class CameraMediaStreamInfo;
@@ -205,8 +205,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( \
         (CameraMediaStreamInfo)(CameraMediaStreams) \
         (CameraBitrateInfo)(CameraBitrates), \
         (json) )
-
-#endif // ENABLE_DATA_PROVIDERS
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
 Q_DECLARE_METATYPE(QnVirtualCameraResourceList);

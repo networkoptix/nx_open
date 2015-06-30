@@ -1,6 +1,8 @@
 #ifndef QN_LAYOUT_FILE_CAMERA_DATA_LOADER_H
 #define QN_LAYOUT_FILE_CAMERA_DATA_LOADER_H
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QMap>
 #include <utils/thread/mutex.h>
 
@@ -30,5 +32,7 @@ private:
     const QnAviResourcePtr m_aviResource;
     QnAbstractCameraDataPtr m_data;
 };
+
+#endif
 
 #endif // QN_LAYOUT_FILE_CAMERA_DATA_LOADER_H

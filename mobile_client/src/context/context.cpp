@@ -9,10 +9,10 @@
 #include "context_settings.h"
 
 namespace {
-#if 1
-    const int custonDensityClass = QnResolutionUtil::Mdpi;
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+    const int customDensityClass = QnResolutionUtil::Mdpi;
 #else
-    const int custonDensityClass = -1;
+    const int customDensityClass = -1;
 #endif
 }
 
@@ -23,7 +23,7 @@ QnContext::QnContext(QObject *parent):
     m_colorTheme(new QnColorTheme(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_settings(new QnContextSettings(this)),
-    m_resolutionUtil(custonDensityClass == -1 ? new QnResolutionUtil() : new QnResolutionUtil(static_cast<QnResolutionUtil::DensityClass>(custonDensityClass)))
+    m_resolutionUtil(customDensityClass == -1 ? new QnResolutionUtil() : new QnResolutionUtil(static_cast<QnResolutionUtil::DensityClass>(customDensityClass)))
 {
     connect(m_connectionManager, &QnConnectionManager::connectedChanged, this, &QnContext::at_connectionManager_connectedChanged);
 }

@@ -126,6 +126,8 @@
                                 <argument>-Dmaven.repo.local=${environment.dir}/maven/repository</argument>		
                                 <argument>-Drsync.skip=${rsync.skip}</argument>
                                 <argument>-Ddonotrebuild=${donotrebuild}</argument>
+                                <argument>-Dmobile=${mobile}</argument>
+                                <argument>-Dcompile.options=${compile.options}</argument>
                             </arguments>
 			    <skip>buildenv.skip</skip>
                             <workingDirectory>${root.dir}/build_environment</workingDirectory>		

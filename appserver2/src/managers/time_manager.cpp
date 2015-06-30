@@ -11,7 +11,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
 #include <utils/thread/mutex.h>
-#ifdef Q_OS_MACX
+#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID)
 #include <zlib.h>
 #else
 #include <QtZlib/zlib.h>

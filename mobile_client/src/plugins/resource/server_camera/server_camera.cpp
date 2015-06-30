@@ -15,16 +15,6 @@ QnServerCamera::QnServerCamera(const QnUuid& resourceTypeId): QnVirtualCameraRes
     m_tmpStatus = Qn::NotDefined;
 }
 
-bool QnServerCamera::isResourceAccessible()
-{
-    return true;
-}
-
-bool QnServerCamera::updateMACAddress()
-{
-    return true;
-}
-
 QString QnServerCamera::getDriverName() const
 {
     return QLatin1String("Server camera"); //all other manufacture are also untranslated and should not be translated

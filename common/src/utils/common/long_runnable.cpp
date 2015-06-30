@@ -235,7 +235,7 @@ void QnLongRunnable::at_started() {
     win32_exception::installThreadSpecificUnhandledExceptionHandler();
 #endif
 
-#ifdef __linux__
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     linux_exception::installQuitThreadBacktracer();
 #endif
 
@@ -244,7 +244,7 @@ void QnLongRunnable::at_started() {
 }
 
 void QnLongRunnable::at_finished() {
-#ifdef __linux__
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     linux_exception::uninstallQuitThreadBacktracer();
 #endif
 

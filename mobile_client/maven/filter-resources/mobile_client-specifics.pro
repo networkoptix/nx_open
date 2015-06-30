@@ -17,7 +17,7 @@ INCLUDEPATH += \
 QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 
 android {
-    Qt += androidextras
+    QT += androidextras
 
 # TODO: #dklychkov make this not hardcoded
     PRE_TARGETDEPS += \

@@ -6,7 +6,7 @@
 #ifndef GZIP_UNCOMPRESSOR_H
 #define GZIP_UNCOMPRESSOR_H
 
-#ifdef Q_OS_MACX
+#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID)
 #include <zlib.h>
 #else
 #include <QtZlib/zlib.h>

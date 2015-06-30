@@ -35,16 +35,12 @@ QnResolutionUtil::DensityClass QnResolutionUtil::currentDensityClass() const {
 
     qreal multiplier = ppi / referencePpi;
 
-    auto it = qLowerBound(standardMultipliers, multiplier);
-    if (it == standardMultipliers.begin())
-        return Ldpi;
-    if (it == standardMultipliers.end())
-        return Xxxhdpi;
-
-    if (qAbs(multiplier - *it) < qAbs(multiplier - *(it - 1)))
-        return static_cast<DensityClass>(it - standardMultipliers.begin());
-    else
-        return static_cast<DensityClass>(it - 1 - standardMultipliers.begin());
+    int best = 0;
+    for (int i = best + 1; i < standardMultipliers.size(); ++i) {
+        if (qAbs(multiplier - standardMultipliers[i]) <= qAbs(multiplier - standardMultipliers[best]))
+            best = i;
+    }
+    return static_cast<DensityClass>(best);
 }
 
 qreal QnResolutionUtil::densityMultiplier(QnResolutionUtil::DensityClass densityClass) {

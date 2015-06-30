@@ -741,6 +741,7 @@
                 </property>
             </activation>
             <modules>
+                <module>client.core</module>
                 <module>mobile_client</module>
             </modules>
         </profile>

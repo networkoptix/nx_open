@@ -14,8 +14,6 @@ class QnServerCamera: public QnVirtualCameraResource {
 public:
     QnServerCamera(const QnUuid& resourceTypeId);
 
-    virtual bool isResourceAccessible() override;
-    virtual bool updateMACAddress() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override;
 

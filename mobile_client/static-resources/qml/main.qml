@@ -14,8 +14,6 @@ Window {
     id: mainWindow
 
     visible: true
-    width: dp(480)
-    height: dp(800)
 
     property string activeResourceId
 
