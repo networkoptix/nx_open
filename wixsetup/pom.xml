@@ -43,7 +43,7 @@
         
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>client</artifactId>
+            <artifactId>clientexe</artifactId>
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
