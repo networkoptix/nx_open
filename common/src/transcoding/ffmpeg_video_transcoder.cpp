@@ -7,8 +7,7 @@
 #include "decoders/video/ffmpeg.h"
 #include "filters/abstract_image_filter.h"
 #include "filters/crop_image_filter.h"
-
-#include "QElapsedTimer"
+#include "utils/common/util.h"
 
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
@@ -21,6 +20,7 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     m_mtMode(false),
     m_lastEncodedTime(AV_NOPTS_VALUE),
     m_totalSpentTime(0),
+    m_totalEncodedTime(0),
     m_totalDecodedFrames(0),
     m_totalEncodedFrames(0)
 {
@@ -110,11 +110,19 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         return false;
     }
 
-
+    m_encodeTimer.start();
     return true;
 }
 
 int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
+{
+    m_encodeTimer.restart();
+    const auto ret = transcodePacketImpl(media, result);
+    m_totalSpentTime += m_encodeTimer.elapsed() * 1000; // mks
+    return ret;
+}
+
+int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
     if( result )
         result->reset();
@@ -124,24 +132,10 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     if (!m_lastErrMessage.isEmpty())
         return -3;
 
-
     QnConstCompressedVideoDataPtr video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
     CLFFmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)
         decoder = m_videoDecoders[video->channelNumber] = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
-
-
-    auto configGuardFn = [this](QElapsedTimer* timer)
-    {
-        if (m_totalSpentTime == AV_NOPTS_VALUE)
-            m_totalSpentTime = m_lastEncodedTime;
-        else
-            m_totalSpentTime = timer->elapsed();
-        delete timer;
-    };
-
-    std::unique_ptr<QElapsedTimer, decltype(configGuardFn)>
-            codingGuard(new QElapsedTimer(), configGuardFn);
 
     if (decoder->decode(video, &m_decodedVideoFrame)) 
     {
@@ -164,23 +158,19 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         if( !result )
             return 0;
 
-        // Hack to improve performance by ommiting frames to encode in case
-        // if encoding goes way too slow..
-        // TODO: #mu make mediaserver's config option to disable feature
-        if (m_totalEncodedFrames > OPTIMIZATION_BEGIN_FRAME)
+        // Improve performance by omitting frames to encode in case if encoding goes way too slow..
+        // TODO: #mu make mediaserver's config option and HTTP query option to disable feature
+        if (m_totalEncodedFrames > OPTIMIZATION_BEGIN_FRAME &&
+            m_lastEncodedTime != AV_NOPTS_VALUE &&
+            m_totalSpentTime > m_totalEncodedTime)
         {
-            // in case if we already heve some encoding delay
-            auto encodingDelay = m_totalSpentTime - m_lastEncodedTime;
-            if( encodingDelay > 0 )
-            {
-                // calculate approved frames rateably to delay
-                auto framesToEncode = m_totalDecodedFrames *
-                        encodingDelay / m_totalSpentTime;
+            // calculate approved frames rateable to delay
+            const auto framesToEncode = m_totalEncodedFrames *
+                    m_totalEncodedTime / m_totalSpentTime;
 
-                // do not encode current frames if current frame is not approved
-                if (m_totalEncodedFrames > framesToEncode)
-                    return 0;
-            }
+            // do not encode current frames if current frame is not approved
+            if (m_totalEncodedFrames >= framesToEncode)
+                return 0;
         }
 
         //TODO: #vasilenko avoid using deprecated methods
@@ -196,7 +186,10 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
             resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
         *result = QnCompressedVideoDataPtr(resultVideoData);
-
+        
+        m_totalEncodedTime += (m_lastEncodedTime == AV_NOPTS_VALUE) 
+            ? (MAX_FRAME_DURATION * 1000)
+            : qMin(video->timestamp - m_lastEncodedTime, MAX_FRAME_DURATION * 1000);
         m_lastEncodedTime = video->timestamp;
         ++m_totalEncodedFrames;
         return 0;

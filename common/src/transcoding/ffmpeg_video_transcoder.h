@@ -4,6 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QCoreApplication>
+#include <QElapsedTimer>
 
 #include "transcoder.h"
 
@@ -30,6 +31,10 @@ public:
     /* Allow multithread transcoding */
     void setMTMode(bool value);
     virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList) override;
+
+private:
+    int transcodePacketImpl(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result);
+
 private:
     QVector<CLFFmpegVideoDecoder*> m_videoDecoders;
     CLVideoDecoderOutputPtr m_decodedVideoFrame;
@@ -43,8 +48,10 @@ private:
     qint64 m_firstEncodedPts;
     bool m_mtMode;
 
+    QElapsedTimer m_encodeTimer;
     qint64 m_lastEncodedTime;
     qint64 m_totalSpentTime;
+    qint64 m_totalEncodedTime;
     qint64 m_totalDecodedFrames;
     qint64 m_totalEncodedFrames;
 };
