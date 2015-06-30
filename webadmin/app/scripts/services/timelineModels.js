@@ -710,7 +710,6 @@ function ScaleManager (zoomBase, minmsPerPixel,defaultIntervalInMS,initialWidth)
     this.updateCurrentInterval();
 }
 
-
 ScaleManager.prototype.updateTotalInterval = function(){
     //Calculate maxmxPerPixel
     this.maxMsPerPixel = (this.end - this.start) / this.viewportWidth;
@@ -722,7 +721,6 @@ ScaleManager.prototype.setViewportWidth = function(width){ // For initialization
 };
 ScaleManager.prototype.setStart = function(start){// Update the begining end of the timeline. Live mode must be supported here
     this.start = start;
-    console.log("setStart",start,new Date(start));
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
@@ -730,14 +728,48 @@ ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeli
     this.updateTotalInterval();
 };
 
-
 ScaleManager.prototype.updateCurrentInterval = function(){
     //Calculate visibleEnd and visibleStart
-    this.msPerPixel = Math.min(this.maxMsPerPixel,this.msPerPixel);
-    this.msPerPixel = Math.max(this.minMsPerPixel,this.msPerPixel);
-    this.visibleEnd = this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint);
-    this.visibleStart = this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint;
+    function bound(min,val,max){
+        if(min > max){
+            var i = max;
+            max = min;
+            min = i;
+        }
+        val = Math.min(val,max);
+        return Math.max(val,min);
+    }
+    this.msPerPixel = bound(this.minMsPerPixel, this.msPerPixel, this.maxMsPerPixel);
+    this.anchorPoint = bound(0, this.anchorPoint, 1);
+    this.anchorDate = bound(this.start,  Math.round(this.anchorDate), this.end);
+
+    this.visibleStart = Math.round(this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint);
+    this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));
+
+    if(this.visibleStart < this.start){
+        //Move end
+        this.visibleEnd += this.start - this.visibleStart;
+        this.visibleStart = this.start;
+    }
+
+    if(this.visibleEnd > this.end){
+        //Move end
+        this.visibleStart += this.end - this.visibleEnd;
+        this.visibleEnd = this.end;
+    }
+
+    if(this.visibleStart > this.visibleEnd){
+        console.error ("wtf! visibleStart > visibleEnd ?",new Date(this.visibleStart),new Date(this.visibleEnd));
+    }
+
+    // Adjust here with msPerPixel again!
     this.updateLevels();
+};
+
+ScaleManager.prototype.setAnchorDateAndPoint = function(date,point){ // Set anchor date
+    this.anchorDate = date;
+    this.anchorPoint = point;
+    this.updateCurrentInterval();
 };
 ScaleManager.prototype.setAnchorDate = function(date){ // Set anchor date
     this.anchorDate = date;
@@ -776,7 +808,6 @@ ScaleManager.prototype.updateLevels = function() {
         }
 
         if (pixelsPerLevel <= 1) {
-            console.log("break update levels", secsPerPixel, pixelsPerLevel, i, level, levels);
             break;
         }
     }
@@ -796,7 +827,6 @@ ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
     return this.visibleStart + coordinate / this.viewportWidth * (this.visibleEnd - this.visibleStart);
 };
 
-
 // Some function for scroll support
 // Actually, scroll is based on some AnchorDate and AnchorPosition (on the screen 0 - 1). And anchor may be "live", which means live-scrolling
 // So there is absolute scroll position in percents
@@ -810,20 +840,29 @@ ScaleManager.prototype.getRelativeWidth = function(){
     return (this.visibleEnd - this.visibleStart) / (this.end - this.start);
 };
 
+ScaleManager.prototype.scroll = function(relativeValue){
+    //scroll right or left by relative value - move anchor date
+    this.setAnchorDate(this.anchorDate + relativeValue * (this.end-this.start));
+};
+ScaleManager.prototype.scrollByPixels = function(pixels){
+    //scroll right or left by relative value - move anchor date
+    this.scroll( pixels / this.viewportWidth / this.getRelativeWidth() );
+};
+
 // These two function implements logarifmic scale for zoom
-ScaleManager.prototype.zoomToPixels= function(zoom){
+ScaleManager.prototype.zoomToMs= function(zoom){
     var relPixels = (Math.exp(this.zoomBase * zoom) -1) / (Math.exp(this.zoomBase) - 1) ;
     return this.minMsPerPixel + relPixels * (this.maxMsPerPixel -  this.minMsPerPixel);
 };
-ScaleManager.prototype.pixelsToZoom  = function(pixels){
+ScaleManager.prototype.msToZoom  = function(pixels){
     var relPixels = (pixels - this.minMsPerPixel)/(this.maxMsPerPixel -  this.minMsPerPixel);
     return Math.log(relPixels * (Math.exp(this.zoomBase) - 1) + 1) / this.zoomBase;
 };
 ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
     if(typeof(zoomValue)=="undefined"){
-        return this.pixelsToZoom(this.msPerPixel);
+        return this.msToZoom(this.msPerPixel);
     }
-    this.msPerPixel = this.zoomToPixels(zoomValue);
+    this.msPerPixel = this.zoomToMs(zoomValue);
     this.updateCurrentInterval();
 };
 ScaleManager.prototype.zoomIn = function(relativeValue){ // Change zoom value: zoomIn for positive and zoomout for negative

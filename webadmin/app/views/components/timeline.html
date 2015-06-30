@@ -2,6 +2,24 @@
 
 <div class="timeline">
 
+
+
+    <div class="popover fade top timeMarker" >
+        <div class="arrow" style="left: 50%;"></div>
+        <div class="popover-content">{{playingDate}}<br>{{playingTime}}</div>
+    </div>
+
+    <div class="viewport"
+         ng-mouseup="mouseUp($event)"
+         ng-mouseleave="mouseLeave($event)"
+         ng-mousemove="mouseMove($event)"
+         ng-dblclick="dblClick($event)"
+         ng-click="click($event)"
+         ng-mousedown="mouseDown($event)">
+        <canvas ></canvas>
+    </div>
+
+
     <div class="timeline-info">
         <div class="btn-group">
             <button type="button" class="btn btn-xs"
@@ -15,20 +33,6 @@
                 ng-class="{'btn-success':liveMode}"
                 ng-disabled="liveMode"
                 ng-click="goToLive()">Live</button>
-    </div>
-
-    <div class="popover fade top timeMarker" >
-        <div class="arrow" style="left: 50%;"></div>
-        <div class="popover-content">{{playingDate}}<br>{{playingTime}}</div>
-    </div>
-
-    <div class="viewport"
-         ng-mouseup="mouseUp($event)"
-         ng-mouseleave="mouseLeave($event)"
-         ng-mousemove="mouseMove($event)"
-         ng-dblclick="dblClick($event)"
-         ng-mousedown="mouseDown($event)">
-        <canvas ></canvas>
     </div>
 
 <!--

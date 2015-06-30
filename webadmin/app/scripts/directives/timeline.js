@@ -19,6 +19,8 @@ angular.module('webadminApp')
 
                     zoomBase: 2, // Parameter for log
                     zoomSpeed: 0.05, // Zoom speed 0 -> 1 = full zoom
+                    maxVerticalScrollForZoom: 5000, // value for adjusting zoom
+                    horizontalScrollSpeed: 1/10,  // value for adjusting scroll from touchpad
                     animationDuration: 300, // 200-400 for smooth animation
 
                     timelineBgColor: [28,35,39], //Color for ruler marks and labels
@@ -89,7 +91,7 @@ angular.module('webadminApp')
                  */
 
                 // !!! Read basic parameters, DOM elements and global objects for module
-                var frame = element.find('.frame');
+                var viewport = element.find('.viewport');
                 var timeMarker = element.find(".timeMarker");
                 var canvas = element.find('canvas').get(0);
                 scope.scaleManager = new ScaleManager(timelineConfig.zoomBase, timelineConfig.minMsPerPixel, timelineConfig.initialInterval, 100); //Init boundariesProvider
@@ -159,8 +161,7 @@ angular.module('webadminApp')
                 function drawTopLabels(context){
                     var level = scope.scaleManager.levels.topLabels.level;
                     var start = scope.scaleManager.alignStart(level);
-                    var end = scope.scaleManager.visibleEnd;
-
+                    var end = scope.scaleManager.alignEnd(level);
                     while(start <= end){
                         drawTopLabel(context,start,level);
                         start = level.interval.addToDate(start);
@@ -179,12 +180,14 @@ angular.module('webadminApp')
                         + (timelineConfig.topLabelHeight * scope.viewportHeight  - timelineConfig.topLabelFontSize) / 2 // Top padding
                         + timelineConfig.topLabelFontSize; // Font size
 
-                    context.fillText(label, coordinate - textWidth/2, textStart);
+                    var x = Math.max(0,coordinate - textWidth/2);
+
+                    context.fillText(label, x, textStart);
                 }
                 function drawLowerLabels(context){
                     var level = scope.scaleManager.levels.labels.level;
                     var start = scope.scaleManager.alignStart(level);
-                    var end = scope.scaleManager.visibleEnd;
+                    var end = scope.scaleManager.alignEnd(level);
 
                     while(start <= end){
                         drawLowerLabel(context,start,level);
@@ -203,9 +206,13 @@ angular.module('webadminApp')
                         + (timelineConfig.labelHeight * scope.viewportHeight  - timelineConfig.labelFontSize) / 2 // Top padding
                         + timelineConfig.labelFontSize; // Font size
 
-                    context.fillText(label, coordinate - textWidth/2, textStart);
 
+                    var x = coordinate - textWidth/2;
 
+                    if(coordinate < 0)
+                        return;
+
+                    context.fillText(label, x, textStart);
                 }
 
                 // !!! Draw events
@@ -296,19 +303,12 @@ angular.module('webadminApp')
                     context.stroke();
                 }
 
-                // !!! Subscribe for different events which affect timeline
-                $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
-
-                scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
-                    if(scope.recordsProvider) {
-                        scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
-                    }
-                });
 
 
                 // !!! Mouse events
                 var mouseDate = null;
                 var mouseCoordinate = null;
+
 
                 function updateMouseCoordinate( event){
                     if(!event){
@@ -319,6 +319,33 @@ angular.module('webadminApp')
                     mouseCoordinate = event.offsetX;
                     mouseDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
                 }
+
+                function mouseWheel(event){
+                    updateMouseCoordinate(event);
+                    event.preventDefault();
+                    console.log("mouseWheel",event.deltaY,event.deltaX);
+                    if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
+                        scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate/scope.viewportWidth);// Set position to keep
+                        scope.scaleManager.zoomIn(event.deltaY / timelineConfig.maxVerticalScrollForZoom);
+                    } else {
+                        scope.scaleManager.scrollByPixels(event.deltaX * timelineConfig.horizontalScrollSpeed);
+                    }
+                    scope.$apply();
+                }
+
+                scope.dblClick = function(event){
+                    updateMouseCoordinate(event);
+                    event.preventDefault();
+                    scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate/scope.viewportWidth);// Set position to keep
+                    scope.zoom(true);
+                };
+                scope.click = function(event){
+                    updateMouseCoordinate(event);
+                    scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate/scope.viewportWidth);// Set position to keep
+                    scope.handler(mouseDate);
+                };
+
+
                 scope.mouseUp = function(event){
                     updateMouseCoordinate(event);
                     console.log("set timer for dblclick here");
@@ -331,77 +358,28 @@ angular.module('webadminApp')
                 scope.mouseMove = function(event){
                     updateMouseCoordinate(event);
                 };
-                scope.dblClick = function(event){
-                    updateMouseCoordinate(event);
-                    console.log("dblclick - Zoom in to point");
-                };
+
                 scope.mouseDown = function(event){
                     updateMouseCoordinate(event);
                 };
 
-
                 // !!! Scrolling functions
 
-                var scrollingNow = false;
 
-                function scrollScreen (right,value){ //
-                    if(scope.scrolling >= 1){
-                        scope.targetScrollPosition = scope.scaleManager.getRelativeStart();// Set up initial scroll position
-                    }
-
-                    var newPosition = scope.targetScrollPosition + (right ? 1 : -1) * value * scope.viewportWidth;
-                    // Here we have a problem:we should scroll left a bit if it is not .
-
-                    newPosition = bound(0,newPosition,scope.frameWidth - scope.viewportWidth);
-
-                    animateScope.animate(scope,'targetScrollPosition',newPosition);
-                    var animation = animateScope.progress(scope,'scrolling');
-                    animation.then(function(){
-                        scope.checkRightLeftVisibility(right);
-                    });
-                    return animation;
-                }
-
-                function scrollingProcess(right){
-                    scrollScreen(right,timelineConfig.scrollingSpeed).then(function(){
-                        if(scrollingNow) {
-                            scrollingProcess(right);
-                        }
-                    });
-                }
-                scope.scrollStart = function(right){
-                    // Run animation by animation.
-                    scrollingNow = true;
-                    scrollingProcess(right);
-                };
-                scope.scrollEnd = function(right){
-                    scrollingNow = false;
-                };
-
-                scope.scrollToEnd = function(right){
-                    animateScope.animate(scope,'targetScrollPosition',right?scope.frameWidth:-scope.frameWidth);
-                    var animation = animateScope.progress(scope,'scrolling');
-                    animation.then(function(){
-                        scope.checkRightLeftVisibility(right);
-                    });
-                    return animation;
-                };
-
-                scope.checkRightLeftVisibility = function(right){
-                    var scroll = scope.scaleManager.getRelativeStart();
-                    if(right || typeof(right) === 'undefined') {
-                        scope.disableScrollRight = scroll > 1 - timelineConfig.scrollBoundariesPrecision || scope.frameWidth === scope.viewportWidth;
-                    }
-                    if(!right){
-                        scope.disableScrollLeft = scroll < timelineConfig.scrollBoundariesPrecision || scope.frameWidth === scope.viewportWidth;
-                    }
-                };
-
-
-                // !!! Fucntions for buttons on view
+                // !!! Functions for buttons on view
                 scope.zoom = function(zoomIn){
                     scope.scaleManager.zoomIn((zoomIn?1:-1) * timelineConfig.zoomSpeed);
                 };
+
+
+                // !!! Subscribe for different events which affect timeline
+                $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
+                scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
+                    if(scope.recordsProvider) {
+                        scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
+                    }
+                });
+                viewport.mousewheel(mouseWheel);
 
 
                 // !!! Finally run required functions to initialize timeline
