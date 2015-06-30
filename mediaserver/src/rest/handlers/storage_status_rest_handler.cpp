@@ -40,6 +40,8 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
             const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
             storage->setStorageType(QnLexical::serialized(storageType));
         }
+        else
+            return CODE_INVALID_PARAMETER;
     }
     
     QnStorageStatusReply reply;

@@ -39,13 +39,12 @@ namespace aux
             if (ecode != Qn::error::NoError)
                 return -1;
 
-            qint64 readSize = maxlen > fsize ? fsize : maxlen;
-            m_io->read(data, readSize, &ecode);
+            uint32_t bytesRead = m_io->read(data, maxlen, &ecode);
 
             if (ecode != Qn::error::NoError)
                 return -1;
             
-            return readSize;
+            return bytesRead;
         }
 
         qint64 writeData(const char *data, qint64 len) override
@@ -107,7 +106,7 @@ namespace aux
 
         virtual bool open(
             const QIODevice::OpenMode  &mode, 
-            unsigned int                systemDependentFlags = 0
+            unsigned int                /*systemDependentFlags*/
         ) override
         {
             return m_impl->open(mode);

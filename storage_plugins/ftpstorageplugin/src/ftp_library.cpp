@@ -175,12 +175,21 @@ namespace Qn
                             ++cur;
                         else
                         {
-                            if (cur - start == 0)
-                                throw std::logic_error("Url parse failed. Password is empty");
+                            //if (cur - start == 0)
+                            //{
+                            //    /*throw std::logic_error("Url parse failed. Password is empty");*/
+                            //    ++cur;
+                            //    start = cur;
+                            //    ps = host;
+                            //}
+                            //else
+                            //{
+                            //    
                             u.upasswd.assign(s.begin() + start, s.begin() + cur);
                             ++cur;
                             start = cur;
                             ps = host;
+                            //}
                         }
                         break;
                     case host:
@@ -242,7 +251,7 @@ namespace Qn
             void urlParserTest()
             {
                 REQUIRE_THROW(Url::fromString("ftp://:pupkin@127.0.0.1:765"));
-                REQUIRE_THROW(Url::fromString("ftp://vasya:@127.0.0.1:765"));
+                //REQUIRE_THROW(Url::fromString("ftp://vasya:@127.0.0.1:765"));
                 REQUIRE_THROW(Url::fromString("fp://vasya:pupkin@127.0.0.1:765"));
                 REQUIRE_THROW(Url::fromString("ftp://vasya:pupkin@127.0.0.1:a765"));
                 REQUIRE_THROW(Url::fromString("ftp://@127.0.0.1:765"));
@@ -1091,16 +1100,15 @@ namespace Qn
         if (f == NULL)
             goto bad_end;
 
-        if (m_pos + size > m_localsize)
-            goto bad_end;
+        uint32_t readSize = m_pos + size > m_localsize ? m_localsize - m_pos : size;
 
         if (fseek(f, (int)m_pos, SEEK_SET) != 0)
             goto bad_end;
 
-        fread(dst, 1, size, f);
-        m_pos += size;
+        fread(dst, 1, readSize, f);
+        m_pos += readSize;
         fclose(f);
-        return size;
+        return readSize;
 
     bad_end:
         if (f != NULL)

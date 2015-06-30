@@ -103,11 +103,10 @@ void QnStorageResource::setStorageBitrateCoeff(float value)
 
 QString QnStorageResource::urlToPath(const QString& url)
 {
-    return url;
-    //if (!url.contains(lit("://")))
-    //    return url;
-    //else
-    //    return QUrl(url).path().mid(1);
+    if (!url.contains(lit("://")))
+        return url;
+    else
+        return QUrl(url).path().mid(1);
 }
 
 float QnStorageResource::getAvarageWritingUsage() const

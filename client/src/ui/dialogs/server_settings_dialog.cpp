@@ -358,7 +358,7 @@ void QnServerSettingsDialog::updateFromResources()
     updateFailoverLabel();
 }
 
-void QnServerSettingsDialog::submitToResources() 
+void QnServerSettingsDialog::submitToResources()
 {
     if(m_hasStorageChanges) {
         QnStorageResourceList newStorages;
