@@ -404,8 +404,9 @@
             <modules>
                 <module>plugins/nxinterface</module>
                 <module>plugins/nxcontrol</module>
-                <module>plugins/acs/paxton</module>
-                <module>plugins/acs/paxton-installer</module>
+                <!-- Uncomment this when 2.3.1_paxton is merged -->
+                <!-- <module>plugins/acs/paxton</module>
+                <module>plugins/acs/paxton-installer</module> -->
             </modules>            
         </profile>
 
