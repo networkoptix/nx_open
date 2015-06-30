@@ -134,7 +134,7 @@ int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 
         if( !isdPluginGlobalData.audioCapabilityTested )
         {
-            isdPluginGlobalData.isAudioAvailable = m_audioStreamReader->initializeIfNeeded();
+            isdPluginGlobalData.isAudioAvailable = m_audioStreamReader->isAudioAvailable();
             isdPluginGlobalData.audioCapabilityTested = true;
         }
 
