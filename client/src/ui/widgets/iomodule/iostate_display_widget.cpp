@@ -13,7 +13,7 @@ QnIOStateDisplayWidget::QnIOStateDisplayWidget(QWidget *parent):
     ui(new Ui::IOStateDisplayWidget())
 {
     ui->setupUi(this);
-
+    setEnabled(false);
 }
 
 void QnIOStateDisplayWidget::setCamera(const QnServerCameraPtr& camera)
@@ -130,12 +130,13 @@ void QnIOStateDisplayWidget::at_ioStateChanged(const QnIOStateData& value)
 
 void QnIOStateDisplayWidget::at_connectionOpened()
 {
-
+    setEnabled(true);
 }
 
 void QnIOStateDisplayWidget::at_connectionClosed()
 {
-    QTimer::singleShot(RECONNECT_DELAY, this, SLOT(QnIOStateDisplayWidget::openConnection()));
+    setEnabled(false);
+    QTimer::singleShot(RECONNECT_DELAY, this, SLOT(openConnection()));
 }
 
 
