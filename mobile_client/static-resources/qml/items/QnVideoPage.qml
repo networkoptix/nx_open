@@ -302,25 +302,6 @@ QnPage {
                 }
             }
 
-//            Rectangle {
-//                id: timeLabelBackground
-
-//                property color baseColor: QnTheme.windowBackground
-
-//                anchors.centerIn: timeline
-//                anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
-//                width: timeline.height - timeline.chunkBarHeight
-//                height: timeLiveLabel.width + dp(64)
-
-//                rotation: 90
-//                gradient: Gradient {
-//                    GradientStop { position: 0.0; color: QnTheme.transparent(timeLabelBackground.baseColor, 0) }
-//                    GradientStop { position: 0.2; color: timeLabelBackground.baseColor }
-//                    GradientStop { position: 0.8; color: timeLabelBackground.baseColor }
-//                    GradientStop { position: 1.0; color: QnTheme.transparent(timeLabelBackground.baseColor, 0) }
-//                }
-//            }
-
             Text {
                 id: dateLabel
 
