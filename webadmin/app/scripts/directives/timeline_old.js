@@ -215,9 +215,9 @@ angular.module('webadminApp')
 
                 function maxZoomLevel(){
                     var maxLevel = RulerModel.levels[RulerModel.levels.length-1];
-                    var targetSecPerPixel =  maxLevel.interval.getSeconds()/maxLevel.width;
-                    var totalSeconds = (scope.end - scope.start) / 1000;
-                    var maxLevelValue = totalSeconds / targetSecPerPixel / viewportWidth;
+                    var targetmsPerPixel =  maxLevel.interval.getMilliseconds()/maxLevel.width;
+                    var totalMs = (scope.end - scope.start) ;
+                    var maxLevelValue = totalMs / targetmsPerPixel / viewportWidth;
                     var maxZoomLevelResult = Math.ceil(Math.log(maxLevelValue) / Math.log(timelineConfig.zoomStep));
                     return maxZoomLevelResult;
                 }
@@ -249,8 +249,8 @@ angular.module('webadminApp')
                     return Math.pow(timelineConfig.zoomStep,scope.actualZoomLevel);
                 }
 
-                function secondsPerPixel () {
-                    return (scope.end - scope.start) / scope.actualWidth / 1000;
+                function getMsPerPixel () {
+                    return (scope.end - scope.start) / scope.actualWidth;
                 }
 
                 function updateActualLevel(){
@@ -260,11 +260,11 @@ angular.module('webadminApp')
                     var oldEncreasedLevel = scope.increasedLevel;
 
                     //3. Select actual level
-                    var secsPerPixel = secondsPerPixel();
+                    var msPerPixel = getMsPerPixel();
                     for(var i=1; i < RulerModel.levels.length ; i ++ ){
                         var level = RulerModel.levels[i];
 
-                        var secondsPerLevel = (level.interval.getSeconds() / secsPerPixel);
+                        var secondsPerLevel = (level.interval.getMilliseconds() / msPerPixel);
 
                         if(typeof(level.topWidth)!=='undefined' &&
                             secondsPerLevel >= level.topWidth){
@@ -502,6 +502,9 @@ angular.module('webadminApp')
                     context.lineTo(viewportWidth, timelineConfig.topLabelHeight);
                     context.stroke();
 
+                    console.log("scope.topLabelsLevel", scope.topLabelsLevel);
+                    if(! scope.topLabelsLevel)
+                        return;
                     var level = RulerModel.levels[scope.topLabelsLevel];
                     var end = level.interval.alignToFuture(screenRelativePositionToDate(1));
                     var position = level.interval.alignToPast(screenRelativePositionToDate(0));
@@ -512,7 +515,7 @@ angular.module('webadminApp')
                         var screenStartPosition = dateToScreenPosition(position);
                         var screenEndPosition = dateToScreenPosition(endPosition);
                         var label = dateFormat(new Date(position), level.topFormat);
-                        drawTopLabel(context, screenStartPosition, screenEndPosition, label, Math.round((position / 1000 / level.interval.getSeconds())) % 2 === 1);
+                        drawTopLabel(context, screenStartPosition, screenEndPosition, label, Math.round((position / level.interval.getMilliseconds())) % 2 === 1);
                         position = endPosition;
                     }
 

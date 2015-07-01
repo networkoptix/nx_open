@@ -23,13 +23,14 @@ Chunk.prototype.debug = function(){
 };
 
 // Additional mini-library for declaring and using settings for ruler levels
-function Interval (seconds,minutes,hours,days,months,years){
+function Interval (ms,seconds,minutes,hours,days,months,years){
     this.seconds = seconds;
     this.minutes = minutes;
     this.hours = hours;
     this.days = days;
     this.months = months;
     this.years = years;
+    this.milliseconds = ms
 }
 
 Interval.prototype.addToDate = function(date, count){
@@ -45,31 +46,26 @@ Interval.prototype.addToDate = function(date, count){
                 date.getDate() + count * this.days,
                 date.getHours() + count * this.hours,
                 date.getMinutes() + count * this.minutes,
-                date.getSeconds() + count * this.seconds);
+                date.getSeconds() + count * this.seconds,
+                date.getMilliseconds() + count * this.milliseconds);
     }catch(error){
         console.log(date);
         throw error;
     }
 };
 
-Interval.secondsBetweenDates = function(date1,date2){
-    return (date2.getTime() - date1.getTime())/1000;
-};
 
 /**
  * How many seconds are there in the interval.
  * Fucntion may return not exact value, it doesn't count leap years (difference doesn't matter in that case)
  * @returns {*}
  */
-Interval.prototype.getSeconds = function(){
+Interval.prototype.getMilliseconds = function(){
     var date1 = new Date(1971,11,1,0,0,0,0);//The first of december before the leap year. We need to count maximum interval (month -> 31 day, year -> 366 days)
     var date2 = this.addToDate(date1);
-    return Interval.secondsBetweenDates(date1,date2);
+    return date2.getTime() - date1.getTime();
 };
 
-Interval.prototype.detailization = function(){
-    return this.getSeconds()*1000;
-};
 /**
  * Align to past. Can't work with intervals like "1 month and 3 days"
  * @param dateToAlign
@@ -78,7 +74,13 @@ Interval.prototype.detailization = function(){
 Interval.prototype.alignToPast = function(dateToAlign){
     var date = new Date(dateToAlign);
 
-    date.setMilliseconds(0);
+    if(this.milliseconds === 0){
+        date.setMilliseconds(0);
+    }else{
+        date.setMilliseconds( Math.floor(date.getMilliseconds() / this.milliseconds) * this.milliseconds );
+        return date;
+    }
+
     if(this.seconds === 0){
         date.setSeconds(0);
     }else{
@@ -116,8 +118,6 @@ Interval.prototype.alignToPast = function(dateToAlign){
 
 //Check if current date aligned by interval
 Interval.prototype.checkDate = function(date){
-
-
     if(Number.isInteger(date)) {
         date = new Date(date);
     }
@@ -141,32 +141,35 @@ var RulerModel = {
      * @type {{detailization: number}[]}
      */
     levels: [
-        { name:'Age'        , format:'yyyy'     , interval:  new Interval( 0, 0, 0, 0, 0, 100), width: 25, topWidth: 0, topFormat:'' }, // root
-        { name:'Decade'     , format:'yyyy'     , interval:  new Interval( 0, 0, 0, 0, 0, 10) , width: 25 },
+        { name:'Age'        , interval:  new Interval( 0, 0, 0, 0, 0, 0, 100), format:'yyyy'     , width: 25, topWidth: 0, topFormat:'' }, // root
+        { name:'Decade'     , interval:  new Interval( 0, 0, 0, 0, 0, 0, 10), format:'yyyy'      , width: 25 },
         {
             name:'Year', //Years
             format:'yyyy',//Format string for date
-            interval:  new Interval(0,0,0,0,0,1),// Interval for marks
+            interval:  new Interval(0,0,0,0,0,0,1),// Interval for marks
             width: 25, // Minimal width for label. We should choose minimal width in order to not intresect labels on timeline
             topWidth: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
-        { name:'Month'      , format:'mmmm'     , interval:  new Interval( 0, 0, 0, 0, 1, 0)  , width: 50, topWidth: 140, topFormat:'mmmm yyyy'},
-        { name:'Day'        , format:'dd'       , interval:  new Interval( 0, 0, 0, 1, 0, 0)  , width: 50, topWidth: 140, topFormat:'dd mmmm yyyy' },
-        { name:'6 hours'    , format:'HH"h"'    , interval:  new Interval( 0, 0, 6, 0, 0, 0)  , width: 60 },
-        { name:'Hour'       , format:'HH"h"'    , interval:  new Interval( 0, 0, 1, 0, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
-        { name:'10 minutes' , format:'MM"m"'    , interval:  new Interval( 0,10, 0, 0, 0, 0)  , width: 60 },
-        { name:'1 minute'   , format:'MM"m"'    , interval:  new Interval( 0, 1, 0, 0, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
-        { name:'10 seconds' , format:'ss"s"'    , interval:  new Interval(10, 0, 0, 0, 0, 0)  , width: 30 },
-        { name:'1 second'   , format:'ss"s"'    , interval:  new Interval( 1, 0, 0, 0, 0, 0)  , width: 30, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM:ss' },
-        { name:'500 ms'     , format:'ll"ms"'   , interval:  new Interval( 0.5, 0, 0, 0, 0, 0)  , width: 30 },
-        { name:'100 ms'     , format:'ll"ms"'   , interval:  new Interval( 0.1, 0, 0, 0, 0, 0)  , width: 30 }
+        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm'       , width: 70, topWidth: 140, topFormat:'mmmm yyyy'},
+        { name:'7 Days'     , interval:  new Interval(  0, 0, 0, 0, 7, 0, 0), format:'dd'         , width: 30 },
+        { name:'4 Days'     , interval:  new Interval(  0, 0, 0, 0, 2, 0, 0), format:'dd'         , width: 30 },
+        { name:'2 Days'     , interval:  new Interval(  0, 0, 0, 0, 2, 0, 0), format:'dd'         , width: 30 },
+        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'         , width: 30, topWidth: 140, topFormat:'dd mmmm yyyy' },
+        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH"h"'      , width: 60 },
+        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH"h"'      , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
+        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'MM"m"'      , width: 60 },
+        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'MM"m"'      , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
+        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 30 },
+        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 30, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM:ss' },
+        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"'     , width: 50 },
+        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"'     , width: 50 }
     ],
 
     getLevelIndex: function(searchdetailization,width){
         width = width || 1;
         var targetLevel = _.find(RulerModel.levels, function(level){
-            return level.interval.getSeconds()*1000 < searchdetailization/width;
+            return level.interval.getMilliseconds() < searchdetailization/width;
         }) ;
 
         return typeof(targetLevel)!=='undefined' ? RulerModel.levels.indexOf(targetLevel) : RulerModel.levels.length-1;
@@ -252,7 +255,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     this.start = start;
     this.end = end;
     this.level = level;
-    var detailization = RulerModel.levels[level].interval.detailization();
+    var detailization = RulerModel.levels[level].interval.getMilliseconds();
 
     var self = this;
     //1. Request records for interval
@@ -402,7 +405,9 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
         parent.children.splice(i, 0, chunk);//Just add chunk here and return
         return;
     }
-    var currentDetailization =  (parent.level<RulerModel.levels.length-1)? RulerModel.levels[parent.level + 1].interval.detailization(): RulerModel.levels[RulerModel.length - 1].interval.detailization();
+    var currentDetailization =  (parent.level<RulerModel.levels.length-1)?
+        RulerModel.levels[parent.level + 1].interval.getMilliseconds():
+        RulerModel.levels[RulerModel.length - 1].interval.getMilliseconds();
     for (var i = 0; i < parent.children.length; i++) {
         var currentChunk = parent.children[i];
         if (currentChunk.end < chunk.start) { //no intersection - no way we need this chunk now
@@ -688,8 +693,9 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (zoomBase, minmsPerPixel,defaultIntervalInMS,initialWidth){
+function ScaleManager (zoomBase, minmsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth){
     this.minMsPerPixel = minmsPerPixel;
+    this.absMaxMsPerPixel = maxMsPerPixel;
     this.zoomBase = zoomBase;
     this.levels = {
         topLabels:{index:0,level:RulerModel.levels[0]},
@@ -728,20 +734,20 @@ ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeli
     this.updateTotalInterval();
 };
 
+ScaleManager.prototype.bound = function (min,val,max){
+    if(min > max){
+        var i = max;
+        max = min;
+        min = i;
+    }
+    val = Math.min(val,max);
+    return Math.max(val,min);
+};
 ScaleManager.prototype.updateCurrentInterval = function(){
     //Calculate visibleEnd and visibleStart
-    function bound(min,val,max){
-        if(min > max){
-            var i = max;
-            max = min;
-            min = i;
-        }
-        val = Math.min(val,max);
-        return Math.max(val,min);
-    }
-    this.msPerPixel = bound(this.minMsPerPixel, this.msPerPixel, this.maxMsPerPixel);
-    this.anchorPoint = bound(0, this.anchorPoint, 1);
-    this.anchorDate = bound(this.start,  Math.round(this.anchorDate), this.end);
+    this.msPerPixel = this.bound(this.minMsPerPixel, this.msPerPixel, this.maxMsPerPixel);
+    this.anchorPoint = this.bound(0, this.anchorPoint, 1);
+    this.anchorDate = this.bound(this.start,  Math.round(this.anchorDate), this.end);
 
     this.visibleStart = Math.round(this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint);
     this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));
@@ -786,13 +792,12 @@ ScaleManager.prototype.fullZoomOut = function(){ // Reset zoom level to show all
 
 ScaleManager.prototype.updateLevels = function() {
     //3. Select actual level
-    var secsPerPixel =  this.msPerPixel / 1000;
 
     var levels = this.levels;
     for (var i = 0; i < RulerModel.levels.length; i++) {
         var level = RulerModel.levels[i];
 
-        var pixelsPerLevel = (level.interval.getSeconds() / secsPerPixel);
+        var pixelsPerLevel = (level.interval.getMilliseconds() / this.msPerPixel );
 
         if (typeof(level.topWidth) !== 'undefined' &&
             pixelsPerLevel >= level.topWidth) {
@@ -833,31 +838,40 @@ ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
 // If we move scroll right or left - we are loosing old anchor and setting new.
 // If we are zooming - we are zooming around anchor.
 
-ScaleManager.prototype.getRelativeStart = function(){
-    return (this.visibleEnd - this.start) / (this.end - this.start);
+ScaleManager.prototype.getRelativeCenter = function(){
+    return ((this.visibleStart + this.visibleEnd) / 2 - this.start) / (this.end - this.start);
 };
 ScaleManager.prototype.getRelativeWidth = function(){
     return (this.visibleEnd - this.visibleStart) / (this.end - this.start);
 };
 
 ScaleManager.prototype.scroll = function(relativeValue){
-    //scroll right or left by relative value - move anchor date
+    //scroll right or left by relative value - move anchor
     this.setAnchorDate(this.anchorDate + relativeValue * (this.end-this.start));
 };
 ScaleManager.prototype.scrollByPixels = function(pixels){
     //scroll right or left by relative value - move anchor date
-    this.scroll( pixels / this.viewportWidth / this.getRelativeWidth() );
+    this.scroll( pixels / this.viewportWidth * this.getRelativeWidth() );
 };
 
+
 // These two function implements logarifmic scale for zoom
+ScaleManager.prototype.logRelative = function(val){
+    return Math.log(val)/this.zoomBase + 1;
+};
+ScaleManager.prototype.expRelative = function(val){
+    return Math.exp(this.zoomBase * (val-1) );
+};
+
 ScaleManager.prototype.zoomToMs= function(zoom){
-    var relPixels = (Math.exp(this.zoomBase * zoom) -1) / (Math.exp(this.zoomBase) - 1) ;
-    return this.minMsPerPixel + relPixels * (this.maxMsPerPixel -  this.minMsPerPixel);
+    var relPixels = this.expRelative(zoom);
+    return this.minMsPerPixel + relPixels * (this.absMaxMsPerPixel -  this.minMsPerPixel);
 };
 ScaleManager.prototype.msToZoom  = function(pixels){
-    var relPixels = (pixels - this.minMsPerPixel)/(this.maxMsPerPixel -  this.minMsPerPixel);
-    return Math.log(relPixels * (Math.exp(this.zoomBase) - 1) + 1) / this.zoomBase;
+    var relPixels = (pixels - this.minMsPerPixel)/(this.absMaxMsPerPixel -  this.minMsPerPixel);
+    return this.logRelative(relPixels);
 };
+
 ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
     if(typeof(zoomValue)=="undefined"){
         return this.msToZoom(this.msPerPixel);
@@ -866,6 +880,5 @@ ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (fro
     this.updateCurrentInterval();
 };
 ScaleManager.prototype.zoomIn = function(relativeValue){ // Change zoom value: zoomIn for positive and zoomout for negative
-    console.log("zoomIn",this.zoom(), relativeValue);
     this.zoom(this.zoom() - relativeValue);
 };

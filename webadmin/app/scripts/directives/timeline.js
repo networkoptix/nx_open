@@ -14,13 +14,14 @@ angular.module('webadminApp')
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
-                    initialInterval: 1000*60*60*24*365, // no records - show last hour
-                    minMsPerPixel: 1,
+                    initialInterval: 1000*60*60 /* *24*365*/, // no records - show last hour
+                    minMsPerPixel: 1, // 1ms per pixel - best detailization
+                    maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
 
-                    zoomBase: 2, // Parameter for log
+                    zoomBase: Math.log(10), // Base for exponential function for zooming
                     zoomSpeed: 0.05, // Zoom speed 0 -> 1 = full zoom
                     maxVerticalScrollForZoom: 5000, // value for adjusting zoom
-                    horizontalScrollSpeed: 1/10,  // value for adjusting scroll from touchpad
+                    horizontalScrollSpeed: 1,  // value for adjusting scroll from touchpad
                     animationDuration: 300, // 200-400 for smooth animation
 
                     timelineBgColor: [28,35,39], //Color for ruler marks and labels
@@ -94,7 +95,7 @@ angular.module('webadminApp')
                 var viewport = element.find('.viewport');
                 var timeMarker = element.find(".timeMarker");
                 var canvas = element.find('canvas').get(0);
-                scope.scaleManager = new ScaleManager(timelineConfig.zoomBase, timelineConfig.minMsPerPixel, timelineConfig.initialInterval, 100); //Init boundariesProvider
+                scope.scaleManager = new ScaleManager(timelineConfig.zoomBase, timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100); //Init boundariesProvider
 
                 // !!! Initialization functions
                 function updateTimelineHeight(){
@@ -261,11 +262,12 @@ angular.module('webadminApp')
                     context.fillRect(0, top, scope.viewportWidth , timelineConfig.scrollBarHeight * scope.viewportHeight);
 
                     //2.
-                    var relativeStart =  scope.scaleManager.getRelativeStart();
+                    var relativeCenter =  scope.scaleManager.getRelativeCenter();
                     var relativeWidth =  scope.scaleManager.getRelativeWidth();
 
                     var width = Math.max(scope.viewportWidth * relativeWidth, timelineConfig.minScrollBarWidth);
-                    var startCoordinate = (scope.viewportWidth - width) * relativeStart;
+                    // Correction for width if it has minimum width
+                    var startCoordinate = scope.scaleManager.bound( 0, (scope.viewportWidth * relativeCenter - width/2), scope.viewportWidth - width) ;
 
                     context.fillStyle =  blurColor(timelineConfig.scrollBarColor,1);
                     context.fillRect(startCoordinate, top, width , timelineConfig.scrollBarHeight * scope.viewportHeight);
@@ -323,7 +325,6 @@ angular.module('webadminApp')
                 function mouseWheel(event){
                     updateMouseCoordinate(event);
                     event.preventDefault();
-                    console.log("mouseWheel",event.deltaY,event.deltaX);
                     if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
                         scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate/scope.viewportWidth);// Set position to keep
                         scope.scaleManager.zoomIn(event.deltaY / timelineConfig.maxVerticalScrollForZoom);
