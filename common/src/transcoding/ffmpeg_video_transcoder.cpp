@@ -9,8 +9,12 @@
 #include "filters/crop_image_filter.h"
 #include "utils/common/util.h"
 
+#include <QDebug>
+
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
+
+bool QnFfmpegVideoTranscoder::isOptimizationDisabled(true);
 
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     QnVideoTranscoder(codecId),
@@ -21,7 +25,6 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     m_lastEncodedTime(AV_NOPTS_VALUE),
     m_totalSpentTime(0),
     m_totalEncodedTime(0),
-    m_totalDecodedFrames(0),
     m_totalEncodedFrames(0),
     m_droppedFrames(0)
 {
@@ -152,8 +155,6 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
     if (decoder->decode(video, &m_decodedVideoFrame)) 
     {
-        ++m_totalDecodedFrames;
-
         m_decodedVideoFrame->channel = video->channelNumber;
         CLVideoDecoderOutputPtr decodedFrame = m_decodedVideoFrame;
 
@@ -173,20 +174,15 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
         // Improve performance by omitting frames to encode in case if encoding goes way too slow..
         // TODO: #mu make mediaserver's config option and HTTP query option to disable feature
-        if (m_totalEncodedFrames > OPTIMIZATION_BEGIN_FRAME)
+        if (!isOptimizationDisabled && m_totalEncodedFrames > OPTIMIZATION_BEGIN_FRAME)
         {   
             // the more frames are dropped the lower limit is gonna be set
             // (Xi + (Xi >> 2)) is faster and more precise then (Xi * 1.25f
             const auto spentTime = m_totalSpentTime + (m_totalSpentTime >> m_droppedFrames);
             if (spentTime > m_totalEncodedTime)
             {
-                // calculate approved frames rateable to delay
-                const auto framesToEncode = m_totalEncodedFrames * m_totalEncodedTime / spentTime;
-                if (m_totalEncodedFrames > framesToEncode)
-                {
-                    ++m_droppedFrames;
-                    return 0;
-                }
+                ++m_droppedFrames;
+                return 0;
             }
         }
 
