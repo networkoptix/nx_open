@@ -72,10 +72,9 @@ if __name__ == '__main__':
                     else:
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))
         
-        print(join(qtbasedir, 'qml'))
         print(join(target_dir, 'qml'))
-        #if not os.path.exists(join(target_dir, 'qml')):
-            #mkdir_p(join(target_dir, 'qml'))
+        if os.path.exists(join(target_dir, 'qml')):
+            shutil.rmtree(join(target_dir, 'qml'))
         shutil.copytree(join(qtbasedir, 'qml'),join(target_dir, 'qml'))
         
         #copyDirectory(join(qtbasedir, 'qml'),join(target_dir))
