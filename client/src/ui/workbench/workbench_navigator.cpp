@@ -1001,7 +1001,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
             && (quint64)endTimeUSec != AV_NOPTS_VALUE;
 
         /* This can also be true if the current widget has no archive at all and all other synced widgets still have not received rtsp response. */
-        bool noRecordedPeriodsFound = startTimeUSec == DATETIME_NOW || endTimeUSec == DATETIME_NOW;
+        bool noRecordedPeriodsFound = startTimeUSec == DATETIME_NOW;
 
         if (!widgetLoaded) {
             startTimeMSec = m_timeSlider->minimum();
@@ -1028,7 +1028,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         } else {
             /* Both values are valid. */
             startTimeMSec = startTimeUSec / 1000;
-            endTimeMSec = endTimeUSec / 1000;
+            endTimeMSec = endTimeUSec == DATETIME_NOW
+                ? qnSyncTime->currentMSecsSinceEpoch()
+                : endTimeUSec / 1000;
         }
     }
     
