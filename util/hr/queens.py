@@ -1,12 +1,18 @@
 import argparse
 import time
 
+maharajah = False
 results = 0
 
 def can_put(board, col, row):
     for i in xrange(col):
         j = board[i]
         if (j == row) or (abs(col - i) == abs(row - j)):
+            return False
+    if maharajah:
+        if col > 0 and (abs(board[col - 1] - row) == 2):
+            return False
+        if col > 1 and abs(board[col - 2] - row) == 1:
             return False
     return True
 
@@ -30,13 +36,20 @@ def calculate(size):
     put_queen(board, 0, size)
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--num', type=int, required=True)
+    parser.add_argument('-m', '--maharajah', action='store_true', help="Maharajah mode")
     args = parser.parse_args()
 
+    global maharajah
+    maharajah = args.maharajah
+    
     start = time.clock()
     calculate(args.num)
     spent = time.clock() - start
     print results
     print 'Seconds: ' + str(spent)
+    
+if __name__ == '__main__':
+    main()
