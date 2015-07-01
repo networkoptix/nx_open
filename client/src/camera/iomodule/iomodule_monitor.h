@@ -27,7 +27,6 @@ private:
     QnSecurityCamResourcePtr m_camera;
     nx_http::AsyncHttpClientPtr m_httpClient;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
-    bool m_opened;
 };
 
 typedef QSharedPointer<QnIOModuleMonitor> QnIOModuleMonitorPtr;

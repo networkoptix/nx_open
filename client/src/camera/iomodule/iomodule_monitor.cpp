@@ -34,17 +34,13 @@ private:
 };
 
 QnIOModuleMonitor::QnIOModuleMonitor(const QnSecurityCamResourcePtr camera):
-        m_camera(camera),
-        m_opened(false)
+        m_camera(camera)
 {
 }
 
 bool QnIOModuleMonitor::open()
 {
     QMutexLocker lk( &m_mutex );
-    if (m_opened)
-        emit connectionClosed();
-    m_opened = false;
     m_httpClient.reset();
 
     auto httpClient = std::make_shared<nx_http::AsyncHttpClient>();
@@ -108,7 +104,6 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr 
             arg(m_camera->getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)), cl_logWARNING );
         return;
     }
-    m_opened = true;
     emit connectionOpened();
 }
 
@@ -127,7 +122,6 @@ void QnIOModuleMonitor::at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr 
     QMutexLocker lk( &m_mutex );
     if (httpClient == m_httpClient) {
         m_httpClient.reset();
-        m_opened = false;
         emit connectionClosed();
     }
 }
