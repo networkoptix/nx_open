@@ -675,6 +675,16 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     return Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnOpenIOMonitorActionCondition::check(const QnResourceList &resources) {
+    foreach (const QnResourcePtr &resource, resources) 
+    {
+        QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
+        if (!camRes || !camRes->hasCameraCapabilities(Qn::IOModuleCapability))
+            return Qn::InvisibleAction;
+    }
+    return resources.isEmpty() ? Qn::InvisibleAction : Qn::EnabledAction;
+}
+
 Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources) {
         if (resource->hasFlags(Qn::desktop_camera))

@@ -1,5 +1,6 @@
-#include "iostate_widget.h"
+#include "iostate_display_widget.h"
 #include "camera/iomodule/iomodule_monitor.h"
+#include "ui_iostate_display_widget.h"
 
 namespace
 {
@@ -7,12 +8,16 @@ namespace
 }
 
 QnIOStateDisplayWidget::QnIOStateDisplayWidget(QWidget *parent):
-    base_type(parent)
+    base_type(parent),
+    ui(new Ui::IOStateDisplayWidget())
 {
+    ui->setupUi(this);
+
 }
 
 void QnIOStateDisplayWidget::setCamera(const QnServerCameraPtr& camera)
 {
+
     m_camera = camera;
     m_monitor = camera->createIOModuleMonitor();
     connect(m_monitor.data(), &QnIOModuleMonitor::connectionOpened, this, &QnIOStateDisplayWidget::at_connectionOpened );
@@ -49,18 +54,36 @@ void QnIOStateDisplayWidget::updateControls()
             QLabel* inputTextLabel = new QLabel(this);
             inputTextLabel->setText(value.inputName);
             layout->addWidget(inputTextLabel);
+            
+            QSpacerItem* spacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+            layout->addSpacerItem(spacer);
+
+            ui->inputLayout->addLayout(layout);
         }
         else {
             QPushButton* button = new QPushButton(this);
             button->setText(value.outputName);
             layout->addWidget(button);
+
+            QSpacerItem* spacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+            layout->addSpacerItem(spacer);
+
+            ui->outputLayout->addLayout(layout);
         }
+
+        QSpacerItem* spacer1 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        ui->verticalLayout->addSpacerItem(spacer1);
     }
 
     openConnection();
 }
 
 void QnIOStateDisplayWidget::at_ioStateChanged(const QnIOStateData& value)
+{
+
+}
+
+void QnIOStateDisplayWidget::at_connectionOpened()
 {
 
 }

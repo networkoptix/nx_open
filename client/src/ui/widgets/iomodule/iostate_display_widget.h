@@ -4,6 +4,11 @@
 
 #include "plugins/resource/server_camera/server_camera.h"
 
+namespace Ui
+{
+    class IOStateDisplayWidget;
+}
+
 class QnIOStateDisplayWidget: public QWidget 
 {
     Q_OBJECT
@@ -22,6 +27,8 @@ private slots:
 private:
     void updateControls();
 private:
+    QScopedPointer<Ui::IOStateDisplayWidget> ui;
+
     QnServerCameraPtr m_camera;
     QnIOModuleMonitorPtr m_monitor;
 };

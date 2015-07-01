@@ -152,6 +152,7 @@
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
 #include "network/authenticate_helper.h"
+#include "ui/widgets/iomodule/iostate_display_widget.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -313,6 +314,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
+    connect(action(Qn::OpenIOMonitorAction),              SIGNAL(triggered()),    this,   SLOT(at_openIOMonitorAction_triggered()));
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -797,6 +799,18 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
         layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QnUuid()));
 
         workbench()->setCurrentLayout(layout);
+    }
+}
+
+void QnWorkbenchActionHandler::at_openIOMonitorAction_triggered() 
+{
+    foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
+        QnServerCameraPtr cameraResource = resource.dynamicCast<QnServerCamera>();
+        if(cameraResource) {
+            QnIOStateDisplayWidget* ioStateDisplay = new QnIOStateDisplayWidget();
+            ioStateDisplay->setCamera(cameraResource);
+            ioStateDisplay->show();
+        }
     }
 }
 
