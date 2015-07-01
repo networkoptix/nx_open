@@ -187,7 +187,8 @@ Rectangle {
         Item {
             id: contentItem
             enabled: panel.open
-            anchors.fill: parent
+            width: panel.width
+            height: panel.height
             clip: true
         }
     }
@@ -198,6 +199,7 @@ Rectangle {
         anchors.fill: parent
         opacity: 0.5 * Math.min(1, Math.abs(panel.x - _collapsedX) / _rootItem.width/2)
         color: "black"
+        z: 9.0
     }
 
     Item {
