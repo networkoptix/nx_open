@@ -14,14 +14,20 @@ Item {
 
     property int _fontPixelSize: sp(36)
 
+    TextMetrics {
+        id: spaceMetrics
+        text: "9"
+        font: minutesIndicator.font
+    }
+
     Text {
         id: hoursIndicator
         text: dateTime.toLocaleTimeString(_locale, "hh")
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: minutesSplitter.left
-        anchors.rightMargin: dp(16)
+        anchors.rightMargin: spaceMetrics.width
 
-        font.pixelSize: sp(_fontPixelSize)
+        font.pixelSize: _fontPixelSize
         color: QnTheme.windowText
         font.weight: Font.Bold
     }
@@ -30,7 +36,7 @@ Item {
         id: minutesSplitter
         text: ":"
         anchors.centerIn: parent
-        anchors.horizontalCenterOffset: dp(-36)
+        anchors.horizontalCenterOffset: -spaceMetrics.width * 2 - width / 2
 
         font: minutesIndicator.font
         color: QnTheme.windowText
@@ -40,7 +46,7 @@ Item {
         id: minutesIndicator
         text: dateTime.toLocaleTimeString(_locale, "mm")
         anchors.centerIn: parent
-        font.pixelSize: sp(_fontPixelSize)
+        font.pixelSize: _fontPixelSize
         color: QnTheme.windowText
         font.weight: Font.DemiBold
     }
@@ -49,7 +55,7 @@ Item {
         id: secondsSplitter
         text: ":"
         anchors.centerIn: parent
-        anchors.horizontalCenterOffset: dp(36)
+        anchors.horizontalCenterOffset: spaceMetrics.width * 2 + width / 2
 
         font: secondsIndicator.font
         color: QnTheme.windowText
@@ -60,9 +66,9 @@ Item {
         text: dateTime.toLocaleTimeString(_locale, "ss")
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: secondsSplitter.right
-        anchors.leftMargin: dp(16)
+        anchors.leftMargin: spaceMetrics.width
 
-        font.pixelSize: sp(_fontPixelSize)
+        font.pixelSize: _fontPixelSize
         color: QnTheme.windowText
         font.weight: Font.Normal
     }
