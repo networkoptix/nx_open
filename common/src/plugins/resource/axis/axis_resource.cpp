@@ -1076,59 +1076,6 @@ bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     setCameraCapabilities(getCameraCapabilities() | caps);
     return true;
 
-    /*
-    unsigned int inputPortCount = 0;
-    CLHttpStatus status = readAxisParameter( http, QLatin1String("Input.NbrOfInputs"), &inputPortCount );
-    if( status != CL_HTTP_SUCCESS )
-    {
-        NX_LOG( lit("Failed to read number of input ports of camera %1. Result: %2").
-            arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
-    }
-    else if( inputPortCount > 0 )
-    {
-        setCameraCapability(Qn::RelayInputCapability, true);
-    }
-
-    unsigned int outputPortCount = 0;
-    status = readAxisParameter( http, QLatin1String("Output.NbrOfOutputs"), &outputPortCount );
-    if( status != CL_HTTP_SUCCESS )
-    {
-        NX_LOG( lit("Failed to read number of output ports of camera %1. Result: %2").
-            arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
-    }
-    else if( outputPortCount > 0 )
-    {
-        setCameraCapability(Qn::RelayOutputCapability, true);
-    }
-
-    //reading port direction and names
-    for( unsigned int i = 0; i < inputPortCount+outputPortCount; ++i )
-    {
-        QString portDirection;
-        status = readAxisParameter( http, lit("IOPort.I%1.Direction").arg(i), &portDirection );
-        if( status != CL_HTTP_SUCCESS )
-        {
-            NX_LOG( lit("Failed to read name of port %1 of camera %2. Result: %3").
-                arg(i).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
-            continue;
-        }
-
-        QString portName;
-        status = readAxisParameter( http, lit("IOPort.I%1.%2.Name").arg(i).arg(portDirection), &portName );
-        if( status != CL_HTTP_SUCCESS )
-        {
-            NX_LOG( lit("Failed to read name of input port %1 of camera %2. Result: %3").
-                arg(i).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
-            continue;
-        }
-
-        if( portDirection == QLatin1String("input") )
-            m_inputPortNameToIndex[portName] = i;
-        else if( portDirection == QLatin1String("output") )
-            m_outputPortNameToIndex[portName] = i;
-    }
-    */
-
     //TODO/IMPL periodically update port names in case some one changes it via camera's webpage
     //startInputPortMonitoring();
 }
@@ -1174,7 +1121,7 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
         NX_LOG( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
     }
-    QString portId = QString::fromLatin1(notification.mid(0, sepPos));
+    QString portId = QString(lit("I")) + QString::fromLatin1(notification.mid(0, sepPos - 1));
     const char portType = notification[portTypePos];
     NX_LOG( lit("%1 port %2 changed its state to %3. Camera %4").
         arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portId).arg(QLatin1String(eventType == '/' ? "active" : "inactive")).arg(getUrl()), cl_logDEBUG1 );
