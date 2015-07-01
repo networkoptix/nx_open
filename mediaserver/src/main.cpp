@@ -209,6 +209,7 @@ static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QByteArray SYSTEM_NAME_KEY("systemName");
 static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
+static const QByteArray DISABLE_FFMPEG_OPTIMIZATION("disableFfmpegOptimization");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -387,6 +388,9 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 void ffmpegInit()
 {
+    if (MSSettings::roSettings()->value(DISABLE_FFMPEG_OPTIMIZATION, false).toBool())
+        QnFfmpegVideoTranscoder::isOptimizationDisabled = true;
+
     //avcodec_init();
     av_register_all();
 

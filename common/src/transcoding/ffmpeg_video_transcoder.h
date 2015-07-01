@@ -20,6 +20,8 @@ class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
+    static bool isOptimizationDisabled;
+
     QnFfmpegVideoTranscoder(AVCodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
@@ -52,7 +54,6 @@ private:
     qint64 m_lastEncodedTime;
     qint64 m_totalSpentTime;
     qint64 m_totalEncodedTime;
-    qint64 m_totalDecodedFrames;
     qint64 m_totalEncodedFrames;
     qint64 m_droppedFrames;
 };
