@@ -17,7 +17,6 @@ Item {
     QnMaterialSurface {
         id: materialSurface
 
-        anchors.margins: -4
         onClicked: iconButton.clicked()
         backlight: false
         circular: true

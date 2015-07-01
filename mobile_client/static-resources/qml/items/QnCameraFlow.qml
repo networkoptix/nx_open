@@ -124,7 +124,7 @@ Flickable {
                 height: dp(48)
 
                 Image {
-                    source: "qrc:///images/section_open.png"
+                    source: "image://icon/section_open.png"
                     anchors.verticalCenter: parent.verticalCenter
                     x: dp(16)
                     rotation: settings.hiddenCamerasCollapsed ? 180 : 0
@@ -133,7 +133,7 @@ Flickable {
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    x: dp(48)
+                    x: dp(72)
                     text: qsTr("Hidden cameras")
                     font.pixelSize: sp(15)
                     font.weight: Font.DemiBold

@@ -12,8 +12,6 @@ QnCameraThumbnailProvider::QnCameraThumbnailProvider() :
 }
 
 QPixmap QnCameraThumbnailProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) {
-    Q_UNUSED(requestedSize)
-
     if (!m_thumbnailCache)
         return QPixmap();
 

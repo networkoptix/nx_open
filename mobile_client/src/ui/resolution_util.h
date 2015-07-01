@@ -29,13 +29,12 @@ public:
 
     int dp(qreal dpix) const;
     int sp(qreal dpix) const;
-
-private:
-    DensityClass currentDensityClass() const;
+    qreal classScale() const;
 
 private:
     DensityClass m_densityClass;
     qreal m_multiplier;
+    qreal m_classScale;
 };
 
 #endif // RESOLUTION_UTIL_H

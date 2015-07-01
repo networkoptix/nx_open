@@ -22,6 +22,7 @@
 #include "ui/color_theme.h"
 #include "ui/resolution_util.h"
 #include "ui/camera_thumbnail_provider.h"
+#include "ui/icon_provider.h"
 #include "camera/camera_thumbnail_cache.h"
 
 #include "version.h"
@@ -43,6 +44,8 @@ int runUi(QGuiApplication *application) {
     QFileSelector fileSelector;
     fileSelector.setExtraSelectors(QStringList() << QnResolutionUtil::densityName(densityClass));
 
+    QnIconProvider *iconProvider = new QnIconProvider(&fileSelector);
+
     context.colorTheme()->readFromFile(fileSelector.select(lit(":/color_theme.json")));
     qApp->setPalette(context.colorTheme()->palette());
 
@@ -51,6 +54,7 @@ int runUi(QGuiApplication *application) {
     qmlFileSelector.setSelector(&fileSelector);
 
     engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
+    engine.addImageProvider(lit("icon"), iconProvider);
     engine.rootContext()->setContextObject(&context);
     engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::instance()->densityMultiplier());
 

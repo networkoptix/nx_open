@@ -12,7 +12,7 @@ base_dpi = 90
 parser = argparse.ArgumentParser()
 parser.add_argument('fileName', type=str, help='Inkscape SVG file.')
 parser.add_argument('-o', '--output-dir', help='Output dir where the resulting icons will be placed.')
-parser.add_argument('-s', '--single-base', help='Base dpi if svg does not have dpi marks.')
+parser.add_argument('-s', '--single-base', help='Base dpi (for mdpi) if svg does not have dpi marks.')
 
 args = parser.parse_args()
 
@@ -27,7 +27,7 @@ if output_dir:
 else:
     output_dir = os.getcwd()
 
-sdpi = int(args.single_base)
+mdpi = int(args.single_base)
 
 svg = open(args.fileName, 'r')
 file_data = svg.read()
@@ -40,7 +40,7 @@ mandatory = ['ldpi', 'mdpi']
 
 found_resolutions = []
 
-if sdpi == 0:
+if mdpi == 0:
     for res in resolutions:
         if file_data.find('id="{0}"'.format(res)) == -1:
             if res in mandatory:
@@ -59,25 +59,29 @@ for res in resolutions:
     dpi = base_dpi
     identifier = res
 
-    if sdpi != 0:
+    if mdpi != 0:
         identifier = ""
         if res == 'ldpi':
-            dpi = sdpi
+            dpi = mdpi * 0.75
         elif res == 'mdpi':
-            dpi = float(sdpi) * 1.5
+            dpi = mdpi
         elif res == 'hdpi':
-            dpi = sdpi * 2
+            dpi = mdpi * 1.5
         elif res == 'xhdpi':
-            dpi = sdpi * 3
+            dpi = mdpi * 2
         elif res == 'xxhdpi':
-            dpi = sdpi * 6
+            dpi = mdpi * 3
         elif res == 'xxxhdpi':
-            dpi = sdpi * 9
+            dpi = mdpi * 4
     else:
         if res not in found_resolutions:
             if res == 'hdpi':
-                identifier = 'ldpi'
-                dpi = base_dpi * 2
+                if 'ldpi' in found_resolutions:
+                    identifier = 'ldpi'
+                    dpi = base_dpi * 2
+                else:
+                    identifier = 'mdpi'
+                    dpi = base_dpi * 1.5
             elif res == 'xhdpi':
                 identifier = 'mdpi'
                 dpi = base_dpi * 2

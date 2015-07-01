@@ -173,7 +173,7 @@ QnPage {
                 height: sourceSize.height
                 y: -playbackController.height / 2
                 sourceSize.height: timeline.height - timeline.chunkBarHeight + playbackController.height / 2
-                source: "qrc:///images/timeline_gradient.png"
+                source: "image://icon/timeline_gradient.png"
             }
 
             QnTimeline {
@@ -268,7 +268,7 @@ QnPage {
                 QnIconButton {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
-                    icon: "qrc:///images/calendar.png"
+                    icon: "image://icon/calendar.png"
                     onClicked: calendarPanel.show()
                 }
 
@@ -277,7 +277,7 @@ QnPage {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.horizontalCenterOffset: -width / 2
                     anchors.verticalCenter: parent.verticalCenter
-                    icon: "qrc:///images/minus.png"
+                    icon: "image://icon/minus.png"
                 }
 
                 QnIconButton {
@@ -285,7 +285,7 @@ QnPage {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.horizontalCenterOffset: width / 2
                     anchors.verticalCenter: parent.verticalCenter
-                    icon: "qrc:///images/plus.png"
+                    icon: "image://icon/plus.png"
                 }
 
                 Timer {

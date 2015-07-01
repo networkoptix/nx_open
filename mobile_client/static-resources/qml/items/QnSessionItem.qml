@@ -37,7 +37,7 @@ QnSideNavigationItem {
             QnIconButton {
                 id: editButton
 
-                icon: "qrc:///images/edit.png"
+                icon: "image://icon/edit.png"
 
                 anchors {
                     verticalCenter: parent.verticalCenter

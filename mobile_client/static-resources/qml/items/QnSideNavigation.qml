@@ -101,7 +101,7 @@ QnNavigationDrawer {
                 QnSideNavigationButtonItem {
                     id: newConnectionButton
                     text: qsTr("New connection")
-                    icon: "qrc:///images/plus.png"
+                    icon: "image://icon/plus.png"
                     active: !activeSessionId
 
                     onClicked: {
@@ -113,7 +113,7 @@ QnNavigationDrawer {
                 QnSideNavigationButtonItem {
                     id: settingsButton
                     text: qsTr("Settings")
-                    icon: "qrc:///images/settings.png"
+                    icon: "image://icon/settings.png"
 
                     onClicked: Main.openSettings()
                 }

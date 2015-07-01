@@ -9,39 +9,41 @@
 
 namespace {
     const qreal referencePpi = 160.0;
-}
 
-QnResolutionUtil::DensityClass QnResolutionUtil::currentDensityClass() const {
-    static QList<qreal> standardMultipliers;
-    if (standardMultipliers.isEmpty()) {
-        standardMultipliers << densityMultiplier(Ldpi)
-                            << densityMultiplier(Mdpi)
-                            << densityMultiplier(Hdpi)
-                            << densityMultiplier(Xhdpi)
-                            << densityMultiplier(Xxhdpi)
-                            << densityMultiplier(Xxxhdpi);
-    }
-
+    qreal densityMultiplier() {
 #if defined(Q_OS_ANDROID)
-    QAndroidJniObject qtActivity = QAndroidJniObject::callStaticObjectMethod("org/qtproject/qt5/android/QtNative", "activity", "()Landroid/app/Activity;");
-    QAndroidJniObject resources = qtActivity.callObjectMethod("getResources", "()Landroid/content/res/Resources;");
-    QAndroidJniObject displayMetrics = resources.callObjectMethod("getDisplayMetrics", "()Landroid/util/DisplayMetrics;");
-    qreal ppi = displayMetrics.getField<int>("densityDpi");
+        QAndroidJniObject qtActivity = QAndroidJniObject::callStaticObjectMethod("org/qtproject/qt5/android/QtNative", "activity", "()Landroid/app/Activity;");
+        QAndroidJniObject resources = qtActivity.callObjectMethod("getResources", "()Landroid/content/res/Resources;");
+        QAndroidJniObject displayMetrics = resources.callObjectMethod("getDisplayMetrics", "()Landroid/util/DisplayMetrics;");
+        qreal ppi = displayMetrics.getField<int>("densityDpi");
 #elif defined(Q_OS_IOS)
-    qreal ppi = QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio();
+        qreal ppi = QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio();
 #else
-    qreal ppi = QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio();
+        qreal ppi = QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio();
 #endif
-
-    qreal multiplier = ppi / referencePpi;
-
-    int best = 0;
-    for (int i = best + 1; i < standardMultipliers.size(); ++i) {
-        if (qAbs(multiplier - standardMultipliers[i]) <= qAbs(multiplier - standardMultipliers[best]))
-            best = i;
+        return ppi / referencePpi;
     }
-    return static_cast<DensityClass>(best);
+
+    QnResolutionUtil::DensityClass densityClass(qreal multiplier) {
+        static QList<qreal> standardMultipliers;
+        if (standardMultipliers.isEmpty()) {
+            standardMultipliers << QnResolutionUtil::densityMultiplier(QnResolutionUtil::Ldpi)
+                                << QnResolutionUtil::densityMultiplier(QnResolutionUtil::Mdpi)
+                                << QnResolutionUtil::densityMultiplier(QnResolutionUtil::Hdpi)
+                                << QnResolutionUtil::densityMultiplier(QnResolutionUtil::Xhdpi)
+                                << QnResolutionUtil::densityMultiplier(QnResolutionUtil::Xxhdpi)
+                                << QnResolutionUtil::densityMultiplier(QnResolutionUtil::Xxxhdpi);
+        }
+
+        int best = 0;
+        for (int i = best + 1; i < standardMultipliers.size(); ++i) {
+            if (qAbs(multiplier - standardMultipliers[i]) <= qAbs(multiplier - standardMultipliers[best]))
+                best = i;
+        }
+        return static_cast<QnResolutionUtil::DensityClass>(best);
+    }
 }
+
 
 qreal QnResolutionUtil::densityMultiplier(QnResolutionUtil::DensityClass densityClass) {
     switch (densityClass) {
@@ -67,15 +69,16 @@ QString QnResolutionUtil::densityName(QnResolutionUtil::DensityClass densityClas
     return QString();
 }
 
-QnResolutionUtil::QnResolutionUtil():
-    m_densityClass(currentDensityClass()),
-    m_multiplier(densityMultiplier(m_densityClass))
-{
+QnResolutionUtil::QnResolutionUtil() {
+    m_multiplier = ::densityMultiplier();
+    m_densityClass = ::densityClass(m_multiplier);
+    m_classScale = m_multiplier / densityMultiplier(m_densityClass);
 }
 
 QnResolutionUtil::QnResolutionUtil(QnResolutionUtil::DensityClass customDensityClass):
     m_densityClass(customDensityClass),
-    m_multiplier(densityMultiplier(m_densityClass))
+    m_multiplier(densityMultiplier(m_densityClass)),
+    m_classScale(1.0)
 {
 }
 
@@ -97,4 +100,8 @@ int QnResolutionUtil::dp(qreal dpix) const {
 
 int QnResolutionUtil::sp(qreal dpix) const {
     return dp(dpix);
+}
+
+qreal QnResolutionUtil::classScale() const {
+    return m_classScale;
 }

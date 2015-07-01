@@ -18,7 +18,7 @@ QnSideNavigationItem {
         id: label
 
         anchors.verticalCenter: parent.verticalCenter
-        x: dp(72)
+        x: dp(56)
 
         color: QnTheme.listText
         font.pixelSize: sp(14)

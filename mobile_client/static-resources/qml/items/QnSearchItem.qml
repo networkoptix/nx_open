@@ -19,8 +19,7 @@ Item {
         id: searchButton
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        explicitRadius: dp(18)
-        icon: "qrc:///images/search.png"
+        icon: "image://icon/search.png"
 
         onClicked: open()
     }
@@ -56,7 +55,7 @@ Item {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             explicitRadius: dp(18)
-            icon: "qrc:///images/clear.png"
+            icon: "image://icon/clear.png"
 
             onClicked: clear()
         }

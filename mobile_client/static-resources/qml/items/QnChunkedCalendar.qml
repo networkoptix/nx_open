@@ -45,7 +45,7 @@ Item {
             QnIconButton {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
-                icon: "qrc:///images/arrow_left.png"
+                icon: "image://icon/arrow_left.png"
                 explicitRadius: dp(24)
                 onClicked: {
                     contentYAnimation.complete()
@@ -59,7 +59,7 @@ Item {
             QnIconButton {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
-                icon: "qrc:///images/arrow_right.png"
+                icon: "image://icon/arrow_right.png"
                 explicitRadius: dp(24)
                 onClicked: {
                     contentYAnimation.complete()
