@@ -38,8 +38,11 @@ struct QnIOStateData
     bool isActive;
     qint64 timestamp;
 };
+
 typedef std::vector<QnIOStateData> QnIOStateDataList;
 #define QnIOStateData_Fields (id)(isActive)(timestamp)
+
+Q_DECLARE_METATYPE(QnIOStateData)
 
 struct QnCameraIOStateData
 {

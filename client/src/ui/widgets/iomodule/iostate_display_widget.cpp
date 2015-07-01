@@ -38,7 +38,8 @@ void QnIOStateDisplayWidget::at_cameraPropertyChanged(const QnResourcePtr & /*re
 void QnIOStateDisplayWidget::updateControls()
 {
 
-    auto ioSettings = m_camera->getIOPorts();
+    m_ioSettings = m_camera->getIOPorts();
+    m_widgetsByPort.clear();
 
     //QGridLayout* mainLayout = new QGridLayout(this);
     //setLayout(mainLayout);
@@ -47,7 +48,7 @@ void QnIOStateDisplayWidget::updateControls()
     labelFont.setBold(true);
 
     int row = 0;
-    for (const QnIOPortData& value: ioSettings)
+    for (const QnIOPortData& value: m_ioSettings)
     {
         if (value.portType != Qn::PT_Input)
             continue;
@@ -60,10 +61,11 @@ void QnIOStateDisplayWidget::updateControls()
         ui->gridLayout->addWidget(idLabel, row, 0);
 
         QLabel* inputStateLabel = new QLabel(this);
-        QPixmap pixmap = qnSkin->pixmap("item/io_indicator_on.png");
+        QPixmap pixmap = qnSkin->pixmap("item/io_indicator_off.png");
         inputStateLabel->setPixmap(pixmap);
         inputStateLabel->setFixedSize(pixmap.size());
         ui->gridLayout->addWidget(inputStateLabel, row, 1);
+        m_widgetsByPort.insert(value.id, inputStateLabel);
 
         QLabel* inputTextLabel = new QLabel(this);
         inputTextLabel->setText(value.inputName);
@@ -78,7 +80,7 @@ void QnIOStateDisplayWidget::updateControls()
     }
 
     row = 0;
-    for (const QnIOPortData& value: ioSettings)
+    for (const QnIOPortData& value: m_ioSettings)
     {
         if (value.portType != Qn::PT_Output)
             continue;
@@ -102,73 +104,28 @@ void QnIOStateDisplayWidget::updateControls()
         QPushButton* button = new QPushButton(this);
         button->setText(value.outputName);
         ui->gridLayout->addWidget(button, row, 6);
+        m_widgetsByPort.insert(value.id, button);
 
         row++;
     }
-
-    /*
-    for (const QnIOPortData& value: ioSettings) 
-    {
-        if (value.portType == Qn::PT_Disabled)
-            continue;
-
-        //QHBoxLayout* layout = new QHBoxLayout(this);
-        //layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-        //layout->setSpacing(6.0);
-
-        QFont idLabelFont = font();
-        idLabelFont.setBold(true);
-
-        QLabel* idLabel = new QLabel(this);
-        idLabel->setText(value.id);
-        idLabel->setFont(idLabelFont);
-        idLabel->setStyleSheet(lit("QLabel { color : #80ffffff; }"));
-        layout->addWidget(idLabel);
-
-        if (value.portType == Qn::PT_Input) 
-        {
-            QFont labelFont = font();
-            labelFont.setBold(true);
-
-            QLabel* inputStateLabel = new QLabel(this);
-            inputStateLabel->setFont(labelFont);
-            QPixmap pixmap = qnSkin->pixmap("item/io_indicator_on.png");
-            inputStateLabel->setPixmap(pixmap);
-            inputStateLabel->setFixedSize(pixmap.size());
-            layout->addWidget(inputStateLabel);
-
-            QLabel* inputTextLabel = new QLabel(this);
-            inputTextLabel->setText(value.inputName);
-            inputTextLabel->setFont(labelFont);
-            layout->addWidget(inputTextLabel);
-            
-            //QSpacerItem* spacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-            //layout->addSpacerItem(spacer);
-
-            ui->inputLayout->addLayout(layout);
-        }
-        else {
-            QPushButton* button = new QPushButton(this);
-            button->setText(value.outputName);
-            layout->addWidget(button);
-
-            //QSpacerItem* spacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-            //layout->addSpacerItem(spacer);
-
-            ui->outputLayout->addLayout(layout);
-        }
-
-        //QSpacerItem* spacer1 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
-        //ui->verticalLayout->addSpacerItem(spacer1);
-    }
-    */
 
     openConnection();
 }
 
 void QnIOStateDisplayWidget::at_ioStateChanged(const QnIOStateData& value)
 {
-
+    if (QWidget* widget = m_widgetsByPort.value(value.id))
+    {
+        if (QLabel* label = dynamic_cast<QLabel*> (widget))
+        {
+            QPixmap pixmap;
+            if (value.isActive)
+                pixmap = qnSkin->pixmap("item/io_indicator_on.png");
+            else
+                pixmap = qnSkin->pixmap("item/io_indicator_off.png");
+            label->setPixmap(pixmap);
+        }
+    }
 }
 
 void QnIOStateDisplayWidget::at_connectionOpened()

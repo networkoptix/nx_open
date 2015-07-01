@@ -72,6 +72,9 @@ public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
     void onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
+
+    void onCurrentIOStateResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
+
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
@@ -92,6 +95,7 @@ private:
     bool updateMotionWindow(int wndNum, int sensitivity, const QRect& rect);
     int toAxisMotionSensitivity(int sensitivity);
     void asyncUpdateIOSettings(const QString & key);
+    bool readCurrentIOStateAsync();
 private:
     QList<AxisResolution> m_resolutionList;
 
@@ -106,6 +110,7 @@ private:
     mutable QMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
     std::shared_ptr<nx_http::AsyncHttpClient> m_inputPortHttpMonitor;
+    std::shared_ptr<nx_http::AsyncHttpClient> m_inputPortStateReader;
     nx_http::MultipartContentParserHelper m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
@@ -126,11 +131,11 @@ private:
     CLHttpStatus readAxisParameters(const QString& rootPath, CLSimpleHTTPClient* const httpClient, QList<QPair<QByteArray,QByteArray>>& params);
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
-    bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPorts, QnIOStateDataList& ioStateList);
+    bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPorts);
     bool savePortSettings(const QnIOPortDataList& newPorts, const QnIOPortDataList& oldPorts);
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
     bool ioPortErrorOccured();
-    void updateIOState(const QString& portId, bool isActive, qint64 timestamp);
+    void updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist);
 
     friend class QnAxisPtzController;
 };

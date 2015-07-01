@@ -197,7 +197,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::PtzCommand>();
     qRegisterMetaType<Qn::PtzTraits>();
     qRegisterMetaType<Qn::PtzCapabilities>();
+
     qRegisterMetaType<QnIOPortData>();
+    qRegisterMetaType<QnIOStateData>();
 
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();

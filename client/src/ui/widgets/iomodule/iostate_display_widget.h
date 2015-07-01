@@ -31,6 +31,9 @@ private:
 
     QnServerCameraPtr m_camera;
     QnIOModuleMonitorPtr m_monitor;
+    
+    QMap<QString, QWidget*> m_widgetsByPort;
+    QnIOPortDataList m_ioSettings;
 };
 
 
