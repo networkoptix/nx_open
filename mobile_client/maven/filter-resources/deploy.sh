@@ -1,4 +1,4 @@
-#!/bin/ssh
+#!/bin/bash
 
 BUILD_TARGET=apk
 ANDROID_NDK_ROOT=${env.environment}/android/android-ndk
