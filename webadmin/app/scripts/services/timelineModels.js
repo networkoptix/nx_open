@@ -151,19 +151,25 @@ var RulerModel = {
             topWidth: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
-        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm'       , width: 70, topWidth: 140, topFormat:'mmmm yyyy'},
+        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm'       , width: 70 , topWidth: 140, topFormat:'mmmm yyyy'},
         { name:'7 Days'     , interval:  new Interval(  0, 0, 0, 0, 7, 0, 0), format:'dd'         , width: 30 },
         { name:'4 Days'     , interval:  new Interval(  0, 0, 0, 0, 2, 0, 0), format:'dd'         , width: 30 },
         { name:'2 Days'     , interval:  new Interval(  0, 0, 0, 0, 2, 0, 0), format:'dd'         , width: 30 },
-        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'         , width: 30, topWidth: 140, topFormat:'dd mmmm yyyy' },
-        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH"h"'      , width: 60 },
-        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH"h"'      , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
-        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'MM"m"'      , width: 60 },
-        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'MM"m"'      , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
-        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 30 },
-        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 30, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM:ss' },
-        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"'     , width: 50 },
-        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"'     , width: 50 }
+        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'         , width: 30 , topWidth: 140, topFormat:'dd mmmm yyyy' },
+        { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM'      , width: 60 },
+        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH:MM'      , width: 60 },
+        { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH:MM'      , width: 60 },
+        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH:MM'      , width: 60 },
+        { name:'30 minutes' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM'      , width: 60 },
+        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM'      , width: 60 },
+        { name:'5 minutes'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM'      , width: 60 },
+        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM'      , width: 60 , topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
+        { name:'30 seconds' , interval:  new Interval(  0,20, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 40 },
+        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 40 },
+        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 40 },
+        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 40 , topWidth: 140, topFormat:'dd mmmm yyyy HH:MM:ss' },
+        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"'      , width: 60 },
+        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"'      , width: 50 }
     ],
 
     getLevelIndex: function(searchdetailization,width){
@@ -815,6 +821,12 @@ ScaleManager.prototype.updateLevels = function() {
         if (pixelsPerLevel <= 1) {
             break;
         }
+    }
+    if(levels.topLabels.index == levels.labels.index){
+        do{
+            levels.topLabels.index --;
+            levels.topLabels.level = RulerModel.levels[levels.topLabels.index];
+        }while(!levels.topLabels.level.topWidth && levels.topLabels.index);
     }
     return levels;
 };

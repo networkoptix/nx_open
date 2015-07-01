@@ -27,9 +27,12 @@ angular.module('webadminApp')
                     timelineBgColor: [28,35,39], //Color for ruler marks and labels
                     font:'sans-serif',
 
+                    labelPadding: 2,
+
                     topLabelHeight: 20/100, //% // Size for top label text
                     topLabelFontSize: 12, //px // Font size
                     topLabelTextColor: [255,255,255], // Color for text for top labels
+                    topLabelMarkerColor: [255,255,255], // Color for mark for top label
 
                     labelHeight:20/100, // %
                     labelFontSize: 12, // px
@@ -170,19 +173,29 @@ angular.module('webadminApp')
                 }
                 function drawTopLabel(context, date, level){
                     var coordinate = scope.scaleManager.dateToScreenCoordinate(date);
+
+                    var nextDate = level.interval.addToDate(date);
+                    var stopcoordinate = scope.scaleManager.dateToScreenCoordinate(nextDate);
+
                     var label = dateFormat(new Date(date), level.topFormat);
 
                     context.font = timelineConfig.topLabelFontSize  + 'px ' + timelineConfig.font;
-                    context.fillStyle = blurColor(timelineConfig.topLabelTextColor,1);
 
                     var textWidth = context.measureText(label).width;
-
                     var textStart = 0 * scope.viewportHeight // Top border
                         + (timelineConfig.topLabelHeight * scope.viewportHeight  - timelineConfig.topLabelFontSize) / 2 // Top padding
                         + timelineConfig.topLabelFontSize; // Font size
 
-                    var x = Math.max(0,coordinate - textWidth/2);
+                    var x = Math.max(timelineConfig.labelPadding, coordinate + timelineConfig.labelPadding /* - textWidth/2*/);
+                    x = Math.min(x,stopcoordinate - textWidth - 2 * timelineConfig.labelPadding);
 
+                    context.strokeStyle = blurColor(timelineConfig.topLabelMarkerColor,1);
+                    context.beginPath();
+                    context.moveTo(coordinate, 0);
+                    context.lineTo(coordinate, (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight);
+                    context.stroke();
+
+                    context.fillStyle = blurColor(timelineConfig.topLabelTextColor,1);
                     context.fillText(label, x, textStart);
                 }
                 function drawLowerLabels(context){
@@ -199,7 +212,6 @@ angular.module('webadminApp')
                     var coordinate = scope.scaleManager.dateToScreenCoordinate(date);
                     var label = dateFormat(new Date(date), level.format);
                     context.font = timelineConfig.labelFontSize  + 'px ' + timelineConfig.font;
-                    context.fillStyle = blurColor(timelineConfig.labelTextColor,1);
 
                     var textWidth = context.measureText(label).width;
 
@@ -213,6 +225,10 @@ angular.module('webadminApp')
                     if(coordinate < 0)
                         return;
 
+                    context.fillStyle = blurColor(timelineConfig.timelineBgColor,1);
+                    context.fillRect(x - timelineConfig.labelPadding, textStart - timelineConfig.labelFontSize - timelineConfig.labelPadding, textWidth + 2 * timelineConfig.labelPadding, timelineConfig.labelFontSize + 2 * timelineConfig.labelPadding);
+
+                    context.fillStyle = blurColor(timelineConfig.labelTextColor,1);
                     context.fillText(label, x, textStart);
                 }
 
@@ -249,7 +265,6 @@ angular.module('webadminApp')
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
 
                     context.fillRect(startCoordinate, top , Math.max(timelineConfig.minChunkWidth,endCoordinate - startCoordinate), timelineConfig.chunkHeight * scope.viewportHeight);
-                    context.stroke();
                 }
 
                 // !!! Draw ScrollBar
