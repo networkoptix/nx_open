@@ -63,6 +63,9 @@ extern "C"
 namespace {
     const int discardCacheIntervalMs = 10 * 60 * 1000;
 
+    /** Size of timeline window near live when there is no recorded periods on cameras. */
+    const int timelineWindowNearLive = 10 * 1000;
+
     QAtomicInt qn_threadedMergeHandle(1);
 }
 
@@ -621,7 +624,7 @@ void QnWorkbenchNavigator::updateSliderFromItemData(QnResourceWidget *widget, bo
         /* Just skip window initialization. */
     } else {
         if(window.isEmpty())
-            window = QnTimePeriod(0, -1);
+            window = QnTimePeriod(0, QnTimePeriod::infiniteDuration());
 
         qint64 windowStart = window.startTimeMs;
         qint64 windowEnd = window.isInfinite() ? m_timeSlider->maximum() : window.startTimeMs + window.durationMs;
@@ -985,24 +988,53 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     bool isSearch = searchState.step > 0;
 
-    qint64 startTimeUSec, endTimeUSec;
     qint64 endTimeMSec, startTimeMSec;
+
+    bool widgetLoaded = false;
     if(isSearch) {
         endTimeMSec = searchState.period.endTimeMs();
-        endTimeUSec = endTimeMSec * 1000;
         startTimeMSec = searchState.period.startTimeMs;
-        startTimeUSec = startTimeMSec * 1000;
+        widgetLoaded = true;
     } else {
-        endTimeUSec = reader->endTime();
-        endTimeMSec = endTimeUSec == DATETIME_NOW ? qnSyncTime->currentMSecsSinceEpoch() : ((quint64)endTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->maximum() : endTimeUSec / 1000);
+        const qint64 startTimeUSec = reader->startTime();
+        const qint64 endTimeUSec = reader->endTime();
+        widgetLoaded = (quint64)startTimeUSec != AV_NOPTS_VALUE 
+            && (quint64)endTimeUSec != AV_NOPTS_VALUE;
 
-        startTimeUSec = reader->startTime();                       
-        startTimeMSec = startTimeUSec == DATETIME_NOW 
-            ? endTimeMSec - 10000                               /* If nothing is recorded, set minimum to end - 10s. */        
-            : (quint64)startTimeUSec == AV_NOPTS_VALUE 
-            ? m_timeSlider->minimum() 
-            : startTimeUSec / 1000;
+        /* This can also be true if the current widget has no archive at all and all other synced widgets still have not received rtsp response. */
+        bool noRecordedPeriodsFound = startTimeUSec == DATETIME_NOW;
+
+        if (!widgetLoaded) {
+            startTimeMSec = m_timeSlider->minimum();
+            endTimeMSec = m_timeSlider->maximum();
+
+        } else if (noRecordedPeriodsFound) {  
+            /* Set to default value. */
+            endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();            
+            startTimeMSec =  endTimeMSec - timelineWindowNearLive;
+
+            /* And then try to read saved value - it was valid someday. */
+            if (qnSettings->isActiveXMode()) { //TODO: #gdm refactor this safety check sometime
+                if (QnWorkbenchItem *item = m_currentMediaWidget->item()) {
+                    QnTimePeriod window = item->data(Qn::ItemSliderWindowRole).value<QnTimePeriod>();
+                    if (window.isValid()) {
+                        startTimeMSec = window.startTimeMs;
+                        endTimeMSec = window.isInfinite()
+                            ? qnSyncTime->currentMSecsSinceEpoch()
+                            : window.endTimeMs();
+                    }
+                }
+            }
+
+        } else {
+            /* Both values are valid. */
+            startTimeMSec = startTimeUSec / 1000;
+            endTimeMSec = endTimeUSec == DATETIME_NOW
+                ? qnSyncTime->currentMSecsSinceEpoch()
+                : endTimeUSec / 1000;
+        }
     }
+    
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
     if(m_calendar)
@@ -1040,7 +1072,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         }
     }
 
-    if(!m_currentWidgetLoaded && ((quint64)startTimeUSec != AV_NOPTS_VALUE && (quint64)endTimeUSec != AV_NOPTS_VALUE)) {
+    if(!m_currentWidgetLoaded && widgetLoaded) {
         m_currentWidgetLoaded = true;
         updateTargetPeriod();
 
