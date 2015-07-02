@@ -27,6 +27,16 @@ def mkdir_p(path):
             pass
         else: raise
 
+def copyDirectory(src, dest):
+    try:
+        shutil.copytree(src, dest)
+    # Directories are the same
+    except shutil.Error as e:
+        print('Directory not copied. Error: %s' % e)
+    # Any error saying that the directory doesn't exist
+    except OSError as e:
+        print('Directory not copied. Error: %s' % e)        
+        
 if __name__ == '__main__':        
 
     print '+++++++++++++++++++++ COPYING QT LIBS +++++++++++++++++++++'
@@ -61,7 +71,13 @@ if __name__ == '__main__':
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'debug', qtplugin))
                     else:
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))
-
+        
+        print(join(target_dir, 'qml'))
+        if os.path.exists(join(target_dir, 'qml')):
+            shutil.rmtree(join(target_dir, 'qml'))
+        shutil.copytree(join(qtbasedir, 'qml'),join(target_dir, 'qml'))
+        
+        #copyDirectory(join(qtbasedir, 'qml'),join(target_dir))
     else:     
         lib_source_dir = '${qt.dir}/lib'
         lib_target_dir = join('${project.build.directory}', 'lib')

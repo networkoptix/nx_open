@@ -31,7 +31,7 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(bool i
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
 
         QString userId = m_resource->getUniqueId();
-        m_socket = QnDesktopCameraResourceSearcher::instance()->getConnectionByUserId(userId);
+        m_socket = QnDesktopCameraResourceSearcher::instance()->acquireConnection(userId);
         if (!m_socket)
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
         quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
