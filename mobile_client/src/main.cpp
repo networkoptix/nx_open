@@ -61,6 +61,11 @@ int runUi(QGuiApplication *application) {
     QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
     QScopedPointer<QObject> mainWindow(mainComponent.create());
 
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+    mainWindow->setProperty("width", 480);
+    mainWindow->setProperty("height", 800);
+#endif
+
     if (!mainComponent.errors().isEmpty())
         qWarning() << mainComponent.errorString();
 
