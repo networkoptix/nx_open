@@ -16,6 +16,7 @@ ListView
     
     property bool askForSelectionChange: false;
 
+    cacheBuffer: 65535;
     clip: true;
     spacing: 1
 
