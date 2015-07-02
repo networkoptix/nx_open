@@ -9,12 +9,23 @@
 #include "filters/crop_image_filter.h"
 #include "utils/common/util.h"
 
-#include <QDebug>
-
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
+const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
 
-bool QnFfmpegVideoTranscoder::isOptimizationDisabled(true);
+
+static qint64& movigAverage(qint64& accumulator, qint64 value)
+{
+    static_assert(OPTIMIZATION_MOVING_AVERAGE_RATE < 100, "Moving average K should be below 100%");
+    static const auto movingAvg = static_cast<double>(OPTIMIZATION_MOVING_AVERAGE_RATE) / 100.0;
+
+    if (accumulator == 0)
+        return accumulator = value;
+
+    return accumulator = accumulator * movingAvg + value * (1.0 - movingAvg);
+}
+
+bool QnFfmpegVideoTranscoder::isOptimizationDisabled(false);
 
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     QnVideoTranscoder(codecId),
@@ -23,12 +34,12 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     m_firstEncodedPts(AV_NOPTS_VALUE),
     m_mtMode(false),
     m_lastEncodedTime(AV_NOPTS_VALUE),
-    m_totalSpentTime(0),
-    m_totalEncodedTime(0),
-    m_totalEncodedFrames(0),
+    m_averageCodingTimePerFrame(0),
+    m_averageVideoTimePerFrame(0),
+    m_encodedFrames(0),
     m_droppedFrames(0)
 {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
         m_lastSrcWidth[i] = -1;
         m_lastSrcHeight[i] = -1;
@@ -135,14 +146,10 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         return ret;
     
     if (m_lastEncodedTime != AV_NOPTS_VALUE)
-    {
-        const auto thisFrameTime = video->timestamp - m_lastEncodedTime;
-        m_totalEncodedTime += (thisFrameTime > MAX_FRAME_DURATION * 1000) ?
-            (m_totalEncodedTime / m_totalEncodedFrames) : thisFrameTime;
-    }
-    
+        movigAverage(m_averageVideoTimePerFrame, video->timestamp - m_lastEncodedTime);
     m_lastEncodedTime = video->timestamp;
-    m_totalSpentTime += m_encodeTimer.elapsed() * 1000; // mks
+
+    movigAverage(m_averageCodingTimePerFrame, m_encodeTimer.elapsed() * 1000 /*mks*/);
     return 0;
 }
 
@@ -174,12 +181,12 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
         // Improve performance by omitting frames to encode in case if encoding goes way too slow..
         // TODO: #mu make mediaserver's config option and HTTP query option to disable feature
-        if (!isOptimizationDisabled && m_totalEncodedFrames > OPTIMIZATION_BEGIN_FRAME)
+        if (!isOptimizationDisabled && m_encodedFrames > OPTIMIZATION_BEGIN_FRAME)
         {   
             // the more frames are dropped the lower limit is gonna be set
-            // (Xi + (Xi >> 2)) is faster and more precise then (Xi * 1.25f
-            const auto spentTime = m_totalSpentTime + (m_totalSpentTime >> m_droppedFrames);
-            if (spentTime > m_totalEncodedTime)
+            // (x + (x >> k)) is faster and more precise then (x * (1 + 0.5^k))
+            const auto& codingTime = m_averageCodingTimePerFrame;
+            if (codingTime + (codingTime >> m_droppedFrames) > m_averageVideoTimePerFrame)
             {
                 ++m_droppedFrames;
                 return 0;
@@ -198,7 +205,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
         *result = QnCompressedVideoDataPtr(resultVideoData);
         
-        ++m_totalEncodedFrames;
+        ++m_encodedFrames;
         m_droppedFrames = 0;
         return 0;
     }
