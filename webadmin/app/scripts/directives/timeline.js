@@ -28,22 +28,24 @@ angular.module('webadminApp')
 
                     labelPadding: 2,
 
-                    topLabelHeight: 20/100, //% // Size for top label text
+                    topLabelAlign: "center", // center, left, above
+                    topLabelHeight: 20/110, //% // Size for top label text
                     topLabelFontSize: 12, //px // Font size
                     topLabelTextColor: [255,255,255], // Color for text for top labels
                     topLabelMarkerColor: [255,255,255], // Color for mark for top label
 
-                    labelHeight:20/100, // %
+                    labelHeight:35/110, // %
                     labelFontSize: 12, // px
                     labelTextColor: [128,128,128],
 
-                    chunkHeight:40/100, // %    //Height for event line
+                    chunkHeight:35/110, // %    //Height for event line
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
                     loadingChunkColor: [58,145,30,0.5],
 
-                    scrollBarHeight: 20/100, // %
+                    scrollBarSpeed: 0.1, // By default - scroll by 10%
+                    scrollBarHeight: 20/110, // %
                     minScrollBarWidth: 50, // px
                     scrollBarBgColor: [0,0,0],
                     scrollBarColor: [128,128,128],
@@ -51,7 +53,7 @@ angular.module('webadminApp')
 
                     timeMarkerColor: [255,255,255], // Timemarker color
                     pointerMarkerColor: [0,0,0], // Mouse pointer marker color
-                    dateFormat:'dd.mm.yyyy', // Timemarker format for date
+                    dateFormat:'dd mmmm yyyy', // Timemarker format for date
                     timeFormat:'HH:MM:ss', // Timemarker format for time
 
                     scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
@@ -124,7 +126,7 @@ angular.module('webadminApp')
                     drawTopLabels(context);
                     drawLowerLabels(context);
                     drawEvents(context);
-                    drawScrollBar(context);
+                    drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
                     drawPointerMarker(context);
                 }
@@ -188,8 +190,42 @@ angular.module('webadminApp')
                         + (timelineConfig.topLabelHeight * scope.viewportHeight  - timelineConfig.topLabelFontSize) / 2 // Top padding
                         + timelineConfig.topLabelFontSize; // Font size
 
-                    var x = Math.max(timelineConfig.labelPadding, coordinate + timelineConfig.labelPadding /* - textWidth/2*/);
-                    x = Math.min(x,stopcoordinate - textWidth - 2 * timelineConfig.labelPadding);
+                    var x = 0;
+                    switch(timelineConfig.topLabelAlign){
+                        case "center":
+                            var leftbound = Math.max(0,coordinate);
+                            var rightbound = Math.min(stopcoordinate, scope.viewportWidth);
+                            var center = (leftbound + rightbound) / 2;
+
+                            x = center - textWidth / 2;
+
+                            if(x < coordinate + timelineConfig.labelPadding){
+                                x = coordinate + timelineConfig.labelPadding;
+                            }
+
+                            if(x > stopcoordinate - textWidth - timelineConfig.labelPadding){
+                                x = stopcoordinate - textWidth - timelineConfig.labelPadding;
+                            }
+
+
+                            break;
+                        case "middle":
+                            x = scope.scaleManager.bound(
+                                timelineConfig.labelPadding,
+                                coordinate - textWidth / 2,
+                                stopcoordinate - textWidth / 2 - 2 * timelineConfig.labelPadding
+                            );
+                            break;
+                        case "left":
+                            x = scope.scaleManager.bound(
+                                timelineConfig.labelPadding,
+                                coordinate + timelineConfig.labelPadding,
+                                stopcoordinate - textWidth - 2 * timelineConfig.labelPadding
+                            );
+                            break;
+
+                    }
+
 
                     context.strokeStyle = blurColor(timelineConfig.topLabelMarkerColor,1);
                     context.beginPath();
@@ -271,7 +307,7 @@ angular.module('webadminApp')
 
                 var scrollBarWidth = 0;
                 // !!! Draw ScrollBar
-                function drawScrollBar(context){
+                function drawOrCheckScrollBar(context){
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight + timelineConfig.chunkHeight) * scope.viewportHeight; // Top border
 
                     //2.
@@ -282,33 +318,26 @@ angular.module('webadminApp')
                     // Correction for width if it has minimum width
                     var startCoordinate = scope.scaleManager.bound( 0, (scope.viewportWidth * relativeCenter - scrollBarWidth/2), scope.viewportWidth - scrollBarWidth) ;
 
+                    mouseInScrollbarRow = mouseRow >= top;
                     mouseInScrollbar = mouseCoordinate >= startCoordinate && mouseCoordinate <= startCoordinate + scrollBarWidth && mouseRow >= top;
                     if(context) {
                         //1. DrawBG
                         context.fillStyle = blurColor(timelineConfig.scrollBarBgColor, 1);
                         context.fillRect(0, top, scope.viewportWidth, timelineConfig.scrollBarHeight * scope.viewportHeight);
 
-                        //2. DrawScrollBar
+                        //2. drawOrCheckScrollBar
                         context.fillStyle = mouseInScrollbar ? blurColor(timelineConfig.scrollBarHighlightColor, 1) : blurColor(timelineConfig.scrollBarColor, 1);
                         context.fillRect(startCoordinate, top, scrollBarWidth, timelineConfig.scrollBarHeight * scope.viewportHeight);
                     }else{
                         if(mouseInScrollbar){
                             mouseInScrollbar = mouseCoordinate - startCoordinate;
                         }
+                        if(mouseInScrollbarRow){
+                            mouseInScrollbarRow = mouseCoordinate - startCoordinate;
+                        }
                         return mouseInScrollbar;
                     }
                 }
-
-
-                function checkMouseInScrollBar(){
-                    var relativeCenter =  scope.scaleManager.getRelativeCenter();
-                    var relativeWidth =  scope.scaleManager.getRelativeWidth();
-                    var width = Math.max(scope.viewportWidth * relativeWidth, timelineConfig.minScrollBarWidth);
-                    var startCoordinate = scope.scaleManager.bound( 0, (scope.viewportWidth * relativeCenter - width/2), scope.viewportWidth - width) ;
-
-
-                }
-
 
                 // !!! Draw and position for timeMarker
                 var positionCoordinate = 0;
@@ -342,8 +371,6 @@ angular.module('webadminApp')
                     context.moveTo(positionCoordinate, 0);
                     context.lineTo(positionCoordinate, scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight);
                     context.stroke();
-
-                    // console.log("playedPosition",date,positionCoordinate);
                 }
 
                 function drawPointerMarker(context){
@@ -372,6 +399,7 @@ angular.module('webadminApp')
                 var mouseCoordinate = null;
                 var mouseRow = 0;
                 var mouseInScrollbar = false;
+                var mouseInScrollbarRow = false;
                 var catchScrollBar = false;
 
 
@@ -381,6 +409,7 @@ angular.module('webadminApp')
                         mouseCoordinate = null;
                         mouseDate = null;
                         mouseInScrollbar = false;
+                        mouseInScrollbarRow = false;
                         catchScrollBar = false;
                         return;
                     }
@@ -396,7 +425,7 @@ angular.module('webadminApp')
                     mouseRow = event.offsetY;
                     mouseDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
 
-                    mouseInScrollbar = drawScrollBar();
+                    drawOrCheckScrollBar();
                 }
 
                 function mouseWheel(event){
@@ -413,19 +442,31 @@ angular.module('webadminApp')
 
                 scope.dblClick = function(event){
                     updateMouseCoordinate(event);
-                    event.preventDefault();
-                    scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate/scope.viewportWidth);// Set position to keep
-                    scope.zoom(true);
+                    if(!mouseInScrollbarRow) {
+                        scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate / scope.viewportWidth);// Set position to keep
+                        scope.zoom(true);
+                    }else{
+                        if(!mouseInScrollbar){
+                            scope.scaleManager.scroll(mouseInScrollbarRow);
+                        }
+                    }
                 };
                 scope.click = function(event){
                     updateMouseCoordinate(event);
-                    scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate/scope.viewportWidth);// Set position to keep
-                    //scope.handler(mouseDate);
+                    if(!mouseInScrollbarRow) {
+                        scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate / scope.viewportWidth);// Set position to keep
+                        scope.handler(mouseDate);
+                    }else{
+                        if(!mouseInScrollbar){
+                            scope.scaleManager.scroll((mouseInScrollbarRow>0?1:-1)*timelineConfig.scrollBarSpeed);
+                        }
+                    }
                 };
 
 
                 scope.mouseUp = function(event){
                     updateMouseCoordinate(event);
+                    catchScrollBar = false;
                     console.log("set timer for dblclick here");
                     console.log("move playing position");
                 };
