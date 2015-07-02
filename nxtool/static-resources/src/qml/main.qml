@@ -54,7 +54,8 @@ Window
         
         Pages.ProgressPage 
         {
-            caption: qsTr("Applying changes...");
+            caption: (!changesCount ? qsTr("Applying changes...")
+                : qsTr("Applying changes (%1/%2)").arg(currentCount.toString()).arg(changesCount.toString()));
             changesCount: rtuContext.changesManager().totalChangesCount;
             currentCount: rtuContext.changesManager().appliedChangesCount;
         }

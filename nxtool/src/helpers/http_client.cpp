@@ -33,7 +33,7 @@ namespace
         return L'#'+QString::number(errorCode);
     }
 
-    const qint64 defaultRequestTimeoutMs = 10*1000;
+    const qint64 defaultRequestTimeoutMs = 10 * 1000;
     const qint64 timerPrecisionMs = 500;
 }
 
