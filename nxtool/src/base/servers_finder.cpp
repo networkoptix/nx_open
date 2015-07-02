@@ -231,7 +231,7 @@ void rtu::ServersFinder::Impl::updateServers()
         }
 
         int written = 0;
-        while((socket->state() == QAbstractSocket::BoundState) && (written != kSearchRequestBody.size()))
+        while(written < kSearchRequestBody.size())
         {
             const int currentWritten = socket->writeDatagram(kSearchRequestBody.data() + written
                 , kSearchRequestSize - written, kMulticastGroupAddress, kMulticastGroupPort);
@@ -242,7 +242,7 @@ void rtu::ServersFinder::Impl::updateServers()
             written += currentWritten;
         }
 
-        if (written != kSearchRequestSize)
+        if (written < kSearchRequestSize)
             socket->close();
     }
 }
@@ -257,7 +257,7 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     QByteArray data(pendingDataSize, kZeroSymbol);
 
     int readBytes = 0;
-    while ((socket->state() == QAbstractSocket::BoundState) && (readBytes != pendingDataSize))
+    while ((socket->state() == QAbstractSocket::BoundState) && (readBytes < pendingDataSize))
     {
         const int read = socket->readDatagram(data.data() + readBytes
             , pendingDataSize - readBytes, &sender, &senderPort);
@@ -268,7 +268,7 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
         readBytes += read;
     }
 
-    if (readBytes != pendingDataSize)
+    if (readBytes < pendingDataSize)
     {
         socket->close();
         return false;
