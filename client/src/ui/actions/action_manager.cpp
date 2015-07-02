@@ -657,6 +657,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory.beginSubMenu(); {
         factory(Qn::OpenFileAction).
             flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+            mode(QnActionTypes::DesktopMode).
             requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("File(s)...")).
             shortcut(tr("Ctrl+O")).
