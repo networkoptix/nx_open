@@ -175,21 +175,10 @@ namespace Qn
                             ++cur;
                         else
                         {
-                            //if (cur - start == 0)
-                            //{
-                            //    /*throw std::logic_error("Url parse failed. Password is empty");*/
-                            //    ++cur;
-                            //    start = cur;
-                            //    ps = host;
-                            //}
-                            //else
-                            //{
-                            //    
                             u.upasswd.assign(s.begin() + start, s.begin() + cur);
                             ++cur;
                             start = cur;
                             ps = host;
-                            //}
                         }
                         break;
                     case host:
@@ -364,8 +353,8 @@ namespace Qn
 
         // set error code to initial state (NoError generally if storage is available)
         error::code_t checkECode(
-            int            *checked,               // ecode to set
-            const int       avail,                  // pass result of isAvailable here
+            int            *checked,                // ecode to set
+            const int       avail,                  // pass result of getAvail here
             error::code_t   toSet = error::NoError  // default ecode
         )
         {
@@ -532,6 +521,7 @@ namespace Qn
 
     // Ftp Storage
     FtpStorage::FtpStorage(const std::string& url)
+        : m_available(false)
     {
         // catch these in StorageFactory::createStorage()
         try 
@@ -569,6 +559,7 @@ namespace Qn
                 m_impl->Quit();
                 throw aux::BadUrlException("Bad url");
             }
+            m_available = true;
         } 
         catch (const std::exception&) 
         {
@@ -602,14 +593,14 @@ namespace Qn
 
     int STORAGE_METHOD_CALL FtpStorage::isAvailable() const
     {   // If PASV failed it means that either there are some network problems
-        // or just we've been idle too long and server has closed control session.
+        // or just we've been idle for too long and server has closed control session.
         // In the latter case we can try to reestablish connection.
-        return true;
+
         std::lock_guard<std::mutex> lock(m_mutex);
-        return
-            m_impl->TestControlConnection() == 1 ? 
-            true : 
-            tryReconnect() ? true : false;
+        m_available = m_impl->TestControlConnection();
+        if (!m_available)
+            m_available = tryReconnect();
+        return m_available;
     }
 
     uint64_t STORAGE_METHOD_CALL FtpStorage::getFreeSpace(int* ecode) const
@@ -636,7 +627,8 @@ namespace Qn
 
     int STORAGE_METHOD_CALL FtpStorage::getCapabilities() const
     {
-        if (!isAvailable())
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (!getAvail())
             return 0;
 
         std::string fileName(aux::getRandomFileName());
@@ -679,11 +671,12 @@ namespace Qn
     }
 
     void STORAGE_METHOD_CALL FtpStorage::removeFile(
-        const char* url,
-        int*        ecode
+        const char  *url,
+        int         *ecode
     )
     {
-        if(aux::checkECode(ecode, isAvailable()) != Qn::error::NoError)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
             return;
 
         if (m_impl->Delete(url) == 0 && ecode)
@@ -695,7 +688,8 @@ namespace Qn
         int*        ecode
     )
     {
-        if(aux::checkECode(ecode, isAvailable()) != Qn::error::NoError)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
             return;
 
         if (m_impl->Rmdir(url) == 0 && ecode)
@@ -708,7 +702,8 @@ namespace Qn
         int*            ecode
     )
     {
-        if(aux::checkECode(ecode, isAvailable()) != Qn::error::NoError)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
             return;
 
         if (m_impl->Rename(oldUrl, newUrl) == 0 && ecode)
@@ -720,7 +715,8 @@ namespace Qn
         int*            ecode
     ) const
     {
-        if(aux::checkECode(ecode, isAvailable()) != Qn::error::NoError)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
             return nullptr;
 
         std::string fileName(aux::getRandomFileName());
@@ -757,7 +753,8 @@ namespace Qn
         int         *ecode
     ) const
     {
-        if(aux::checkECode(ecode, isAvailable()) != Qn::error::NoError)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
             return 0;
 
         try
@@ -775,11 +772,12 @@ namespace Qn
     }
 
     int STORAGE_METHOD_CALL FtpStorage::dirExists(
-        const char*     url,
-        int*            ecode
+        const char  *url,
+        int         *ecode
     ) const
     {
-        if(aux::checkECode(ecode, isAvailable()) != Qn::error::NoError)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
             return 0;
 
         std::string fileName(aux::getRandomFileName());
@@ -796,7 +794,8 @@ namespace Qn
         int*            ecode
     ) const
     {
-        if(aux::checkECode(ecode, isAvailable()) != Qn::error::NoError)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
             return 0;
 
         int size;
@@ -818,7 +817,7 @@ namespace Qn
     {
         *ecode = error::NoError;
         IODevice *ret = nullptr;
-        if (!isAvailable())
+        if (!getAvail())
         {
             *ecode = error::StorageUnavailable;
             return nullptr;
@@ -914,6 +913,8 @@ namespace Qn
 
     const char** STORAGE_METHOD_CALL FtpStorageFactory::findAvailable() const
     {
+        // TODO: #akulikov. Implement this?
+        assert(false);
         return nullptr;
     }
 
@@ -960,7 +961,7 @@ namespace Qn
         ftplib             &impl, 
         const char         *url,
         int                 mode,
-        const Storage      *stor,
+        const FtpStorage   *stor,
         std::mutex         &mut
     )
         : m_mode(mode),
@@ -1036,7 +1037,7 @@ namespace Qn
     // That's why all possible errors are discarded.
     void FtpIODevice::flush()
     {
-        if(m_stor->isAvailable() && m_altered)
+        if(m_stor->getAvail() && m_altered)
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             m_impl.Put(m_localfile.c_str(), m_url.c_str(), ftplib::image);
@@ -1049,7 +1050,7 @@ namespace Qn
         int*            ecode
     )
     {
-        if(aux::checkECode(ecode, m_stor->isAvailable()) != error::NoError)
+        if(aux::checkECode(ecode, m_stor->getAvail()) != error::NoError)
             return 0;
         std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -1086,7 +1087,7 @@ namespace Qn
         int*            ecode
     ) const
     {
-        if(aux::checkECode(ecode, m_stor->isAvailable()) != error::NoError)
+        if(aux::checkECode(ecode, m_stor->getAvail()) != error::NoError)
             return 0;
         std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -1122,7 +1123,7 @@ namespace Qn
         int*        ecode
     )
     {
-        if(aux::checkECode(ecode, m_stor->isAvailable()) != error::NoError)
+        if(aux::checkECode(ecode, m_stor->getAvail()) != error::NoError)
             return 0;
         std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -1143,7 +1144,7 @@ namespace Qn
 
     uint32_t STORAGE_METHOD_CALL FtpIODevice::size(int* ecode) const
     {
-        if(aux::checkECode(ecode, m_stor->isAvailable()) != Qn::error::NoError)
+        if(aux::checkECode(ecode, m_stor->getAvail()) != Qn::error::NoError)
             return 0;
         std::lock_guard<std::mutex> lock(m_mutex);
 

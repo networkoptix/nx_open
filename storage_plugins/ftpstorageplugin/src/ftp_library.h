@@ -48,6 +48,7 @@ namespace Qn
         }; // class NonCopyable
     } //namespace aux
 
+    class FtpStorage;
     // At construction phase we synchronise remote file with local one.
     // During destruction synchronisation attempt is repeated.
     // All intermediate actions (read/write/seek) are made with the local copy.
@@ -62,7 +63,7 @@ namespace Qn
             ftplib             &impl, 
             const char         *uri,
             int                 mode,
-            const Storage      *stor,
+            const FtpStorage   *stor,
             std::mutex         &mut
         );
 
@@ -106,7 +107,7 @@ namespace Qn
         std::string         m_localfile;
         bool                m_altered;
         long long           m_localsize;
-        const Storage      *m_stor;
+        const FtpStorage   *m_stor;
         mutable
         std::mutex         &m_mutex;
     }; // class FtpIODevice
@@ -166,9 +167,11 @@ namespace Qn
         // and we want to handle it explicitely.
         typedef std::shared_ptr<ftplib> implPtrType; 
 
-    public:
+    public: // ctors, helper functions
         FtpStorage(const std::string& url);
+        int getAvail() const {return m_available;}
 
+    public: // Storage interface implementation
         virtual int STORAGE_METHOD_CALL isAvailable() const override;
 
         virtual IODevice* STORAGE_METHOD_CALL open(
@@ -234,8 +237,8 @@ namespace Qn
         std::string         m_implurl;
         std::string         m_user;
         std::string         m_passwd;
-        mutable
-        std::mutex          m_mutex;
+        mutable std::mutex  m_mutex;
+        mutable int         m_available;
     }; // class Ftpstorage
 
     class FtpStorageFactory 

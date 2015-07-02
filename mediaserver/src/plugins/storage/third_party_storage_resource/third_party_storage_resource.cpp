@@ -144,6 +144,8 @@ namespace aux
 
         virtual bool truncate( qint64 newFileSize) override
         {
+            // Generally, third-party storages aren't supposed to
+            // support truncating.
             assert(false);
             return false;
         }
@@ -165,7 +167,7 @@ QnStorageResource* QnThirdPartyStorageResource::instance(const QString& url)
     QDir pluginDir(lit("plugins"));
 
     for (const auto& fi : pluginDir.entryInfoList(QDir::Files))
-    {
+    {   // TODO: #akulikov. Maybe another plugin finder algorithm is needed here
         if (fi.fileName().indexOf(proto) != -1)
         {
             try
@@ -272,7 +274,6 @@ QIODevice *QnThirdPartyStorageResource::open(
     QIODevice::OpenMode  openMode
 )
 {
-    QMutexLocker lock(&m_mutex);
     if (fileName.isEmpty())
         return nullptr;
 
@@ -354,13 +355,11 @@ QIODevice *QnThirdPartyStorageResource::open(
 
 int QnThirdPartyStorageResource::getCapabilities() const
 {
-    QMutexLocker lock(&m_mutex);
     return m_storage->getCapabilities();
 }
     
 qint64 QnThirdPartyStorageResource::getFreeSpace()
 {
-    QMutexLocker lock(&m_mutex);
     int ecode;
     qint64 freeSpace = m_storage->getFreeSpace(&ecode);
     if (ecode != Qn::error::NoError)
@@ -370,7 +369,6 @@ qint64 QnThirdPartyStorageResource::getFreeSpace()
 
 qint64 QnThirdPartyStorageResource::getTotalSpace()
 {
-    QMutexLocker lock(&m_mutex);
     int ecode;
     qint64 totalSpace = m_storage->getTotalSpace(&ecode);
     if (ecode != Qn::error::NoError)
@@ -380,13 +378,11 @@ qint64 QnThirdPartyStorageResource::getTotalSpace()
 
 bool QnThirdPartyStorageResource::isAvailable() const
 {
-    QMutexLocker lock(&m_mutex);
     return m_storage->isAvailable();
 }
 
 bool QnThirdPartyStorageResource::removeFile(const QString& url)
 {
-    QMutexLocker lock(&m_mutex);
     int ecode;
     m_storage->removeFile(url.toLatin1().data(), &ecode);
     if (ecode != Qn::error::NoError)
@@ -396,7 +392,6 @@ bool QnThirdPartyStorageResource::removeFile(const QString& url)
 
 bool QnThirdPartyStorageResource::removeDir(const QString& url)
 {
-    QMutexLocker lock(&m_mutex);
     int ecode;
     m_storage->removeDir(url.toLatin1().data(), &ecode);
     if (ecode != Qn::error::NoError)
@@ -409,7 +404,6 @@ bool QnThirdPartyStorageResource::renameFile(
     const QString   &newName
 )
 {
-    QMutexLocker lock(&m_mutex);
     int ecode;
     m_storage->renameFile(
         oldName.toLatin1().data(), 

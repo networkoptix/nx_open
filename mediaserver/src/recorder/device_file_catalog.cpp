@@ -337,7 +337,12 @@ QnTimePeriod DeviceFileCatalog::timePeriodFromDir(const QnStorageResourcePtr &st
 {
     QnTimePeriod timePeriod;
     QString sUrl = storage->getPath();
-    QStringList folders = dirName.mid(sUrl.size()).split('/').mid(3);
+    QStringList folders;
+    
+    if (dirName.indexOf(lit("/")) != -1)
+        folders = dirName.mid(sUrl.size()).split('/').mid(3);
+    else
+        folders.append(dirName);
 
     QString timestamp(lit("%1/%2/%3T%4:00:00"));
     for (int i = 0; i < folders.size(); ++i)
