@@ -22,11 +22,6 @@ Column
 
     Base.EmptyCell {}
 
-    Base.LineDelimiter
-    {
-        color: "#e4e4e4";
-    }
-
     Base.StyledButton
     {
         id: selectAllButton;
