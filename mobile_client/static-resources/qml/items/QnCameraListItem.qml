@@ -16,8 +16,8 @@ Item {
     width: parent.width
     height: dp(56)
 
-    property bool _offline: status == 0 || status == 4 || status == 1
-    property bool _unauthorized: status == 1
+    property bool _offline: status == QnCameraListModel.Offline || status == QnCameraListModel.NotDefined || status == QnCameraListModel.Unauthorized
+    property bool _unauthorized: status == QnCameraListModel.Unauthorized
 
     Item {
         id: thumbnailContainer

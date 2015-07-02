@@ -21,8 +21,8 @@ Item {
     width: content.width
     height: content.height
 
-    property bool _offline: status == 0 || status == 4 || status == 1
-    property bool _unauthorized: status == 1
+    property bool _offline: status == QnCameraListModel.Offline || status == QnCameraListModel.NotDefined || status == QnCameraListModel.Unauthorized
+    property bool _unauthorized: status == QnCameraListModel.Unauthorized
 
     Rectangle {
         anchors.fill: content

@@ -16,6 +16,8 @@ class QnCameraListModel : public QSortFilterProxyModel {
     Q_PROPERTY(QStringList hiddenCameras READ hiddenCameras WRITE setHiddenCameras NOTIFY hiddenCamerasChanged)
     Q_PROPERTY(bool hiddenCamerasOnly READ hiddenCamerasOnly WRITE setHiddenCamerasOnly NOTIFY hiddenCamerasOnlyChanged)
 
+    Q_ENUMS(Qn::ResourceStatus)
+
 public:
     QnCameraListModel(QObject *parent = 0);
 

@@ -10,9 +10,9 @@ Item {
     width: dp(12)
     height: width
 
-    property bool _offline: status == 0 || status == 4
-    property bool _unauthorized: status == 1
-    property bool _recording: status == 3
+    property bool _offline: status == QnCameraListModel.Offline || status == QnCameraListModel.NotDefined
+    property bool _unauthorized: status == QnCameraListModel.Unauthorized
+    property bool _recording: status == QnCameraListModel.Recording
 
     Rectangle {
         anchors.fill: parent
