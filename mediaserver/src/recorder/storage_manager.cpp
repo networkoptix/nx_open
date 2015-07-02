@@ -400,8 +400,9 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
     QnAbstractStorageResource::FileInfoList list = 
         storage->getFileList(
             closeDirPath(
-                storage->getPath()) + DeviceFileCatalog::prefixByCatalog(catalog)
-            );
+                storage->getPath()
+            ) + DeviceFileCatalog::prefixByCatalog(catalog)
+        );
 
     for(const QnAbstractStorageResource::FileInfo& fi: list)
     {

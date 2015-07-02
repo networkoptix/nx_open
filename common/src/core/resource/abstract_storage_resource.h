@@ -78,17 +78,33 @@ public:
     private:
         void parseUri()
         {   
-            // base name
-            int lastSep = m_fpath.lastIndexOf(QDir::separator());
-            int startIndex = lastSep == -1 ? 0 : lastSep + 1;
+            QStringList pathEntries = m_fpath.split(lit("/"));
+            bool found = false;
             
-            if (startIndex != m_fpath.size())
+            auto assignBN = [this]()
             {
-                QStringRef bn(&m_fpath, startIndex, m_fpath.size() - startIndex);
-                m_fname = bn.toString();
-                startIndex = bn.indexOf(QChar::fromLatin1('.'));
-                if (startIndex != -1)
-                    m_basename = bn.left(startIndex).toString();
+                int dotIndex = m_fname.lastIndexOf(lit("."));
+                if (dotIndex != -1)
+                    m_basename = m_fname.left(dotIndex);
+                else
+                    m_basename = m_fname;
+            };
+
+            for (int i = pathEntries.size() - 1; i >= 0; --i)
+            {
+                if (!pathEntries[i].isEmpty())
+                {
+                    found = true;
+                    m_fname = pathEntries[i];
+                    assignBN();
+                    break;
+                }
+            }
+
+            if (!found && !m_fpath.isEmpty())
+            {
+                m_fname = m_fpath;
+                assignBN();
             }
         }
 

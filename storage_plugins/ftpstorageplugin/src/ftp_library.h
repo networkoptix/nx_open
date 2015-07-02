@@ -125,8 +125,9 @@ namespace Qn
         typedef FileListType::const_iterator    FileListIteratorType;
     public:
         FtpFileInfoIterator(
-            ftplib&         impl, 
-            FileListType&&  fileList // caller doesn't really need this list after Iterator is constructed
+            ftplib              &impl, 
+            FileListType       &&fileList, // caller doesn't really need this list after Iterator is constructed
+            const std::string   &baseDir
         );
 
         virtual FileInfo* STORAGE_METHOD_CALL next(int* ecode) const override;
@@ -155,6 +156,7 @@ namespace Qn
         FileListType                m_fileList;
         mutable
         FileListIteratorType        m_curFile;
+        int                         m_basedirsize;
     }; // class FtpFileListIterator
 
     class FtpStorage

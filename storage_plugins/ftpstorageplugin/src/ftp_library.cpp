@@ -411,13 +411,23 @@ namespace Qn
 
     // FileInfo Iterator
     FtpFileInfoIterator::FtpFileInfoIterator(
-        ftplib&         impl, 
-        FileListType&&  fileList
+        ftplib             &impl, 
+        FileListType      &&fileList,
+        const std::string  &baseDir
     ) 
         : m_impl(impl),
           m_fileList(std::move(fileList)),
           m_curFile(m_fileList.cbegin())
-    {}
+    {
+        m_urlData.assign(baseDir.cbegin(), baseDir.cend());
+        if (baseDir[baseDir.size()-1] != '/')
+        {
+            m_urlData.push_back('/');
+            m_basedirsize = baseDir.size() + 1;
+        }
+        else
+            m_basedirsize = baseDir.size();
+    }
 
     FtpFileInfoIterator::~FtpFileInfoIterator()
     {}
@@ -476,11 +486,11 @@ namespace Qn
 
         if (m_curFile != m_fileList.cend()) 
         {
-            m_urlData.resize(m_curFile->size());
+            m_urlData.resize(m_curFile->size() + m_urlData.size());
             fileInfoFromMLSDString(
                 m_curFile->c_str(),
                 &m_fileInfo,
-                m_urlData.data()
+                m_urlData.data() + m_basedirsize
             );
             m_fileInfo.url = m_urlData.data();
             ++m_curFile;
@@ -745,7 +755,11 @@ namespace Qn
                 urls.push_back(line);
         }
 
-        return new FtpFileInfoIterator(*m_impl, std::move(urls));
+        return new FtpFileInfoIterator(
+            *m_impl, 
+            std::move(urls), 
+            dirUrl
+        );
     }
 
     int STORAGE_METHOD_CALL FtpStorage::fileExists(
@@ -1101,7 +1115,7 @@ namespace Qn
         if (f == NULL)
             goto bad_end;
 
-        uint32_t readSize = m_pos + size > m_localsize ? m_localsize - m_pos : size;
+        uint32_t readSize = (uint32_t)(m_pos + size > m_localsize ? m_localsize - m_pos : size);
 
         if (fseek(f, (int)m_pos, SEEK_SET) != 0)
             goto bad_end;
@@ -1127,7 +1141,7 @@ namespace Qn
             return 0;
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        if (pos > m_localsize)
+        if ((long long)pos > m_localsize)
         {
             *ecode = error::UnknownError;
             return 0;
