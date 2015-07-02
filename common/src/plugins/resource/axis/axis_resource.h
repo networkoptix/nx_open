@@ -13,6 +13,7 @@
 #include "utils/network/simple_http_client.h"
 #include <utils/network/http/multipartcontentparser.h>
 #include "api/model/api_ioport_data.h"
+#include "utils/network/http/multipart_content_parser.h"
 
 class QnAxisPtzController;
 
@@ -116,8 +117,7 @@ private:
 
     struct IOMonitor {
         HttpClient httpClient;
-        nx_http::MultipartContentParserHelper contentParser;
-        nx_http::BufferType currentMonitorData;
+        std::shared_ptr<nx_http::MultipartContentParser> contentParser;
     };
 
     IOMonitor m_ioHttpMonitor[2];
@@ -151,6 +151,7 @@ private:
     void resetHttpClient(HttpClient& value);
 
     friend class QnAxisPtzController;
+    friend class AxisIOMessageBodyParser;
 };
 
 #endif // #ifdef ENABLE_AXIS

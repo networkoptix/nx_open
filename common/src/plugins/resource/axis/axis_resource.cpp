@@ -47,6 +47,21 @@ QString portDisplayNameToId(const QString& id)
     return QString(lit("I")) + QString::number(num - 1); // convert port1 to I1 e.t.c
 }
 
+
+class AxisIOMessageBodyParser: public AbstractByteStreamFilter
+{
+public:
+    AxisIOMessageBodyParser(QnPlAxisResource* owner): m_owner(owner) {}
+
+    virtual bool processData( const QnByteArrayConstRef& notification ) override
+    {
+        m_owner->notificationReceived(notification);
+        return true;
+    }
+private:
+    QnPlAxisResource* m_owner;
+};
+
 QnPlAxisResource::QnPlAxisResource()
 {
     setVendor(lit("Axis"));
@@ -171,8 +186,8 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
     httpClient->setUserPassword( auth.password() );
     httpClient->setMessageBodyReadTimeoutMs(AXIS_IO_KEEP_ALIVE_TIME * 2);
 
-    ioMonitor.contentParser = nx_http::MultipartContentParserHelper();
-    ioMonitor.currentMonitorData.clear();
+    ioMonitor.contentParser = std::make_shared<nx_http::MultipartContentParser>();
+    ioMonitor.contentParser->setNextFilter(std::make_shared<AxisIOMessageBodyParser>(this));
 
     if( !httpClient->doGet( requestUrl ) )
         return false;
@@ -803,7 +818,7 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
     }
 
     //analyzing response headers (if needed)
-    if( !m_ioHttpMonitor[index].contentParser.setContentType(httpClient->contentType()) )
+    if( !m_ioHttpMonitor[index].contentParser->setContentType(httpClient->contentType()) )
     {
         static const char* multipartContentType = "multipart/x-mixed-replace";
 
@@ -858,52 +873,9 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPt
         return;
 
     const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
-
-    //qWarning() << msgBodyBuf;
-
-    auto contentParser = m_ioHttpMonitor[index].contentParser;
-    auto currentMonitorData = m_ioHttpMonitor[index].currentMonitorData;
-    for( int offset = 0; offset < msgBodyBuf.size(); )
-    {
-        size_t bytesProcessed = 0;
-        nx_http::MultipartContentParserHelper::ResultCode resultCode = contentParser.parseBytes(
-            nx_http::ConstBufferRefType(msgBodyBuf, offset),
-            &bytesProcessed );
-        offset += (int) bytesProcessed;
-        switch( resultCode )
-        {
-            case nx_http::MultipartContentParserHelper::partDataDone:
-                if( currentMonitorData.isEmpty() )
-                {
-                    if( !contentParser.prevFoundData().isEmpty() )
-                        notificationReceived( contentParser.prevFoundData() );
-                }
-                else
-                {
-                    if( !contentParser.prevFoundData().isEmpty() )
-                        currentMonitorData.append(
-                            contentParser.prevFoundData().data(),
-                            (int) contentParser.prevFoundData().size() );
-                    notificationReceived( currentMonitorData );
-                    currentMonitorData.clear();
-                }
-                break;
-
-            case nx_http::MultipartContentParserHelper::someDataAvailable:
-                if( !contentParser.prevFoundData().isEmpty() )
-                    currentMonitorData.append(
-                        contentParser.prevFoundData().data(),
-                        (int) contentParser.prevFoundData().size() );
-                break;
-
-            case nx_http::MultipartContentParserHelper::eof:
-                //TODO/IMPL reconnect
-                break;
-
-            default:
-                continue;
-        }
-    }
+    auto parser = m_ioHttpMonitor[index].contentParser;
+    lk.unlock();
+    parser->processData(msgBodyBuf);
 }
 
 void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient )
