@@ -16,7 +16,7 @@
 
 namespace {
 
-    QnSoftwareVersion minimalSupportedVersion(2, 4, 0, 0);
+    const QnSoftwareVersion minimalSupportedVersion(2, 4, 0, 0);
 
 }
 
