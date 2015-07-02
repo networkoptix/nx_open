@@ -1,12 +1,9 @@
-
-
 <div class="timeline">
 
 
-
-    <div class="popover fade top timeMarker" >
+    <div class="popover top timeMarker playing small" >
         <div class="arrow" style="left: 50%;"></div>
-        <div class="popover-content">{{playingDate}}<br>{{playingTime}}</div>
+        <div>{{playingDate}}<br>{{playingTime}}</div>
     </div>
 
     <div class="viewport"
@@ -16,9 +13,12 @@
          ng-dblclick="dblClick($event)"
          ng-click="click($event)"
          ng-mousedown="mouseDown($event)">
+        <div class="popover top timeMarker pointer small" >
+            <div class="arrow" style="left: 50%;"></div>
+            <div>{{pointerDate}}<br>{{pointerTime}}</div>
+        </div>
         <canvas ></canvas>
     </div>
-
 
     <div class="timeline-info">
         <div class="btn-group">
@@ -34,7 +34,6 @@
                 ng-disabled="liveMode"
                 ng-click="goToLive()">Live</button>
     </div>
-
 <!--
 
         <div class="scroll-btn left"
@@ -57,6 +56,5 @@
             <span class="glyphicon glyphicon-chevron-right"></span>
         </div>
 -->
-
     </div>
 </div>

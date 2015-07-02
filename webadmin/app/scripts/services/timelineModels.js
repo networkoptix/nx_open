@@ -141,8 +141,8 @@ var RulerModel = {
      * @type {{detailization: number}[]}
      */
     levels: [
-        { name:'Age'        , interval:  new Interval( 0, 0, 0, 0, 0, 0, 100), format:'yyyy'     , width: 25, topWidth: 0, topFormat:'' }, // root
-        { name:'Decade'     , interval:  new Interval( 0, 0, 0, 0, 0, 0, 10), format:'yyyy'      , width: 25 },
+        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy'      , width: 25 , topWidth: 0, topFormat:'' }, // root
+        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy'      , width: 25 },
         {
             name:'Year', //Years
             format:'yyyy',//Format string for date
@@ -151,10 +151,11 @@ var RulerModel = {
             topWidth: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
+        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm'       , width: 70 },
+        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm'       , width: 70 },
         { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm'       , width: 70 , topWidth: 140, topFormat:'mmmm yyyy'},
-        { name:'7 Days'     , interval:  new Interval(  0, 0, 0, 0, 7, 0, 0), format:'dd'         , width: 30 },
-        { name:'4 Days'     , interval:  new Interval(  0, 0, 0, 0, 2, 0, 0), format:'dd'         , width: 30 },
-        { name:'2 Days'     , interval:  new Interval(  0, 0, 0, 0, 2, 0, 0), format:'dd'         , width: 30 },
+        { name:'15 Days'    , interval:  new Interval(  0, 0, 0, 0, 7, 0, 0), format:'dd'         , width: 30 },
+        { name:'5 Days'     , interval:  new Interval(  0, 0, 0, 0, 7, 0, 0), format:'dd'         , width: 30 },
         { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'         , width: 30 , topWidth: 140, topFormat:'dd mmmm yyyy' },
         { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM'      , width: 60 },
         { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH:MM'      , width: 60 },
@@ -398,7 +399,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
                 if(parent.children[i].start < chunk.end ){
                     //Mb Join two chunks?
 
-                    if(parent.children[i].end < chunk.start ){// One contains another
+                    if(parent.children[i].end <= chunk.start ){// One contains another
                         console.warn("skipped contained chunk 2",chunk,parent.children[i],i,parent);
                         return; //Skip it
                     }
@@ -838,7 +839,7 @@ ScaleManager.prototype.alignEnd = function(level){ // Align end by the grid usin
     return level.interval.alignToFuture(this.visibleEnd);
 };
 ScaleManager.prototype.dateToScreenCoordinate = function(date){
-    return this.viewportWidth * (date - this.visibleStart) / (this.visibleEnd - this.visibleStart);
+    return Math.round(this.viewportWidth * (date - this.visibleStart) / (this.visibleEnd - this.visibleStart));
 };
 ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
     return this.visibleStart + coordinate / this.viewportWidth * (this.visibleEnd - this.visibleStart);

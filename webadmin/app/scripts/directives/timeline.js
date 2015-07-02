@@ -50,7 +50,8 @@ angular.module('webadminApp')
                     scrollBarColor: [128,128,128],
                     scrollBarHighlightColor: [200,200,200],
 
-                    timeMarkerColor:[128,128,255], // Timemarker color
+                    timeMarkerColor: [255,255,255], // Timemarker color
+                    pointerMarkerColor: [0,0,0], // Mouse pointer marker color
                     dateFormat:'dd.mm.yyyy', // Timemarker format for date
                     timeFormat:'HH:MM:ss', // Timemarker format for time
 
@@ -96,7 +97,8 @@ angular.module('webadminApp')
 
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
-                var timeMarker = element.find(".timeMarker");
+                var timeMarker = element.find(".timeMarker.playing");
+                var pointerMarker = element.find(".timeMarker.pointer");
                 var canvas = element.find('canvas').get(0);
                 scope.scaleManager = new ScaleManager(timelineConfig.zoomBase, timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100); //Init boundariesProvider
 
@@ -125,6 +127,7 @@ angular.module('webadminApp')
                     drawEvents(context);
                     drawScrollBar(context);
                     drawTimeMarker(context);
+                    drawPointerMarker(context);
                 }
                 function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
                     /*
@@ -289,19 +292,21 @@ angular.module('webadminApp')
                 }
 
                 // !!! Draw and position for timeMarker
+                var positionCoordinate = 0;
                 function drawTimeMarker(context){
-                    var lastCoord = scope.positionCoordinate;
+                    var lastCoord = positionCoordinate;
                     if(!scope.positionProvider){
                         timeMarker.addClass("hiddenTimemarker");
                         return;
                     }
-                    var date = scope.positionProvider.playedPosition;
-                    scope.positionCoordinate =  scope.scaleManager.dateToScreenCoordinate(date);
 
-                    if(scope.positionCoordinate != lastCoord){
-                        if(scope.positionCoordinate > 0 && scope.positionCoordinate < scope.viewportWidth) {
+                    var date = scope.positionProvider.playedPosition;
+                    positionCoordinate =  scope.scaleManager.dateToScreenCoordinate(date);
+
+                    if(positionCoordinate != lastCoord){
+                        if(positionCoordinate > 0 && positionCoordinate < scope.viewportWidth) {
                             timeMarker.removeClass("hiddenTimemarker");
-                            timeMarker.css("left", scope.positionCoordinate + "px");
+                            timeMarker.css("left", positionCoordinate + "px");
                         }else{
                             timeMarker.addClass("hiddenTimemarker");
                         }
@@ -315,12 +320,33 @@ angular.module('webadminApp')
                     context.fillStyle = blurColor(timelineConfig.timeMarkerColor,1);
 
                     context.beginPath();
-                    context.moveTo(scope.positionCoordinate, 0);
-                    context.lineTo(scope.positionCoordinate, canvas.height);
+                    context.moveTo(positionCoordinate, 0);
+                    context.lineTo(positionCoordinate, scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight);
                     context.stroke();
+
+                    // console.log("playedPosition",date,positionCoordinate);
                 }
 
+                function drawPointerMarker(context){
+                    if(!mouseCoordinate){
+                        pointerMarker.addClass("hiddenTimemarker");
+                        return;
+                    }
+                    pointerMarker.removeClass("hiddenTimemarker");
+                    pointerMarker.css("left", mouseCoordinate + "px");
 
+                    var date = new Date(mouseDate);
+                    scope.pointerDate = dateFormat(date, timelineConfig.dateFormat);
+                    scope.pointerTime = dateFormat(date, timelineConfig.timeFormat);
+
+                    context.strokeStyle = blurColor(timelineConfig.pointerMarkerColor,1);
+                    context.fillStyle = blurColor(timelineConfig.pointerMarkerColor,1);
+
+                    context.beginPath();
+                    context.moveTo(mouseCoordinate, 0);
+                    context.lineTo(mouseCoordinate, scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight);
+                    context.stroke();
+                }
 
                 // !!! Mouse events
                 var mouseDate = null;
@@ -333,7 +359,15 @@ angular.module('webadminApp')
                         mouseDate = null;
                         return;
                     }
-                    mouseCoordinate = event.offsetX;
+
+                    if($(event.target).parent().hasClass("timeMarker") || $(event.target).hasClass("timeMarker")){ // Timemarker?
+                        mouseCoordinate += event.offsetX - $(event.target).outerWidth()/2;
+                    }else if($(event.target).is("canvas")){
+                        mouseCoordinate = event.offsetX;
+                    }else{
+                        console.warn ("unexpected node");
+                        return; //Something strange - ignore it
+                    }
                     mouseDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
                 }
 

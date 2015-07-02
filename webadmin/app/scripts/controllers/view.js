@@ -30,16 +30,13 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
         function updateVideoSource(playing) {
-
             console.log("init positionProvider ", playing);
-
             var live = !playing;
             if(live){
                 playing = (new Date()).getTime();
             }
 
             $scope.positionProvider.init(playing);
-
             var cameraId = $scope.activeCamera.physicalId;
             var server = getCamerasServer($scope.activeCamera);
             var serverUrl = '';

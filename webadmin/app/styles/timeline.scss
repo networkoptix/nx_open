@@ -102,24 +102,33 @@ ng-include{
 
 
 .timeMarker{
-  margin-top:-50px !important;
+  margin-top:0px !important;
   margin-left: -50px;
+  user-select: none;
+  cursor: default;
   width: 100px;
   text-align: center;
-  opacity:0;
-  display:none !important;
+  display: block;
+  border-radius:0;
+  border: none;
 }
 
-
-.timeline:hover .timeMarker{
-  opacity:1;
-  display:block !important;
+.timeMarker.pointer{
+  color:white;
+  background-color: black;
+  border-color:black;
+}
+.timeMarker.pointer .arrow:after {
+  border-top-color: black;
 }
 .timeline{
   position:relative;
 }
 
 
-.timeline:hover .timeMarker.hiddenTimemarker{
+.timeline:hover .timeMarker.pointer{
+  display:block;
+}
+.timeline .timeMarker.pointer.hiddenTimemarker{
   display:none !important;
 }
