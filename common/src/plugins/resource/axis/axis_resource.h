@@ -21,6 +21,8 @@ class QnPlAxisResource : public QnPhysicalCameraResource
     Q_OBJECT
 
 public:
+    typedef QnPhysicalCameraResource base_type;
+
     struct AxisResolution
     {
         AxisResolution() {}
@@ -111,11 +113,17 @@ private:
     //!http client used to monitor input port(s) state
     
     typedef std::shared_ptr<nx_http::AsyncHttpClient> HttpClient;
-    HttpClient m_ioHttpMonitor[2];
-    HttpClient m_inputPortStateReader;
-    nx_http::MultipartContentParserHelper m_multipartContentParser;
 
-    nx_http::BufferType m_currentMonitorData;
+    struct IOMonitor {
+        HttpClient httpClient;
+        nx_http::MultipartContentParserHelper contentParser;
+        nx_http::BufferType currentMonitorData;
+    };
+
+    IOMonitor m_ioHttpMonitor[2];
+    HttpClient m_inputPortStateReader;
+    
+
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
@@ -139,8 +147,8 @@ private:
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
     bool ioPortErrorOccured();
     void updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist);
-    bool startIOMonitor(Qn::IOPortType portType, HttpClient& result);
-    void resetHttpClient(HttpClient&& value, QMutexLocker& lk);
+    bool startIOMonitor(Qn::IOPortType portType, IOMonitor& result);
+    void resetHttpClient(HttpClient& value);
 
     friend class QnAxisPtzController;
 };

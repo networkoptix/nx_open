@@ -23,15 +23,29 @@ QnIOStateDisplayWidget::QnIOStateDisplayWidget(QWidget *parent):
 
 void QnIOStateDisplayWidget::setCamera(const QnServerCameraPtr& camera)
 {
-
     m_camera = camera;
+    if (!camera) {
+        m_monitor.reset();
+        setEnabled(false);
+        setWindowTitle(QString());
+        return;
+    }
+
     m_monitor = camera->createIOModuleMonitor();
     connect(m_monitor.data(), &QnIOModuleMonitor::connectionOpened, this, &QnIOStateDisplayWidget::at_connectionOpened );
     connect(m_monitor.data(), &QnIOModuleMonitor::connectionClosed, this, &QnIOStateDisplayWidget::at_connectionClosed );
     connect(m_monitor.data(), &QnIOModuleMonitor::ioStateChanged, this, &QnIOStateDisplayWidget::at_ioStateChanged );
     connect(camera.data(), &QnResource::propertyChanged, this, &QnIOStateDisplayWidget::at_cameraPropertyChanged );
+    connect(camera.data(), &QnResource::statusChanged, this, &QnIOStateDisplayWidget::at_cameraStatusChanged );
+    connect(camera.data(), &QnResource::nameChanged, this, [this]() {setWindowTitle(m_camera->getName());} );
 
     updateControls();
+}
+
+void QnIOStateDisplayWidget::at_cameraStatusChanged(const QnResourcePtr & res)
+{
+    if (res->getStatus() < Qn::Online)
+        at_connectionClosed();
 }
 
 void QnIOStateDisplayWidget::at_cameraPropertyChanged(const QnResourcePtr & /*res*/, const QString & key)
@@ -48,6 +62,7 @@ void QnIOStateDisplayWidget::updateControls()
         delete w;
     ui->setupUi(this);
     m_widgetsByPort.clear();
+    setWindowTitle(m_camera->getName());
 
     //QGridLayout* mainLayout = new QGridLayout(this);
     //setLayout(mainLayout);
@@ -115,6 +130,7 @@ void QnIOStateDisplayWidget::updateControls()
         button->setText(value.outputName);
         button->setIcon(qnSkin->icon("item/io_indicator_off.png"));
         connect(button, &QPushButton::clicked, this, &QnIOStateDisplayWidget::at_buttonClicked);
+        connect(button, &QPushButton::toggled, this, &QnIOStateDisplayWidget::at_buttonStateChanged);
         ui->gridLayout->addWidget(button, row, 6);
         m_widgetsByPort.insert(value.id, button);
 
@@ -122,6 +138,17 @@ void QnIOStateDisplayWidget::updateControls()
     }
 
     openConnection();
+}
+
+void QnIOStateDisplayWidget::at_buttonStateChanged(bool toggled)
+{
+    QPushButton* button = dynamic_cast<QPushButton*> (sender());
+    QIcon icon;
+    if (toggled)
+        icon = qnSkin->icon("item/io_indicator_on.png");
+    else
+        icon = qnSkin->icon("item/io_indicator_off.png");
+    button->setIcon(icon);
 }
 
 void QnIOStateDisplayWidget::at_buttonClicked()
@@ -147,7 +174,7 @@ void QnIOStateDisplayWidget::at_buttonClicked()
             QnBusinessActionParameters params;
             params.relayOutputId = setting.id;
             params.relayAutoResetTimeout = setting.autoResetTimeoutMs;
-            bool isInstant = setting.autoResetTimeoutMs != 0;
+            bool isInstant = true; //setting.autoResetTimeoutMs != 0;
             QnCameraOutputBusinessActionPtr action(new QnCameraOutputBusinessAction(isInstant, eventParams));
 
             action->setParams(params);
@@ -176,12 +203,6 @@ void QnIOStateDisplayWidget::at_ioStateChanged(const QnIOStateData& value)
         }
         else if (QPushButton* button = dynamic_cast<QPushButton*> (widget))
         {
-            QIcon icon;
-            if (value.isActive)
-                icon = qnSkin->icon("item/io_indicator_on.png");
-            else
-                icon = qnSkin->icon("item/io_indicator_off.png");
-            button->setIcon(icon);
             button->setChecked(value.isActive);
         }
     }
@@ -201,5 +222,6 @@ void QnIOStateDisplayWidget::at_connectionClosed()
 
 void QnIOStateDisplayWidget::openConnection()
 {
-    m_monitor->open();
+    if (!m_monitor->open())
+        at_connectionClosed();
 }

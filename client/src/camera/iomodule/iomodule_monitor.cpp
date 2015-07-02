@@ -55,6 +55,8 @@ bool QnIOModuleMonitor::open()
     QnMediaServerResourcePtr server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
     if (!server)
         return false;
+    if (m_camera->getStatus() < Qn::Online)
+        return false;
 
     httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     QUrl requestUrl(server->getApiUrl());

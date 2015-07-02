@@ -48,7 +48,6 @@ void QnIOMonitorConnectionProcessor::run()
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
             return;
         }
-        connect(camera.data(), &QnSecurityCamResource::parentIdChanged, this, [this]() {pleaseStop(); }, Qt::DirectConnection);
         connect(camera.data(), &QnSecurityCamResource::initializedChanged, this, &QnIOMonitorConnectionProcessor::at_cameraInitDone, Qt::DirectConnection);
         connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged, Qt::DirectConnection);
         connect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged, Qt::DirectConnection);
@@ -60,7 +59,7 @@ void QnIOMonitorConnectionProcessor::run()
         else {
             sendResponse(CODE_OK, "multipart/x-mixed-replace; boundary=ioboundary");
         }
-
+        camera->inputPortListenerAttached();
         static const int REQUEST_BUFFER_SIZE = 1024;
         static const int KEEPALIVE_INTERVAL = 1000 * 5;
         d->requestBuffer.reserve(REQUEST_BUFFER_SIZE);
@@ -71,7 +70,7 @@ void QnIOMonitorConnectionProcessor::run()
 
         setData(camera->ioStates());
         QMutexLocker lock(&d->waitMutex);
-        while (d->socket->isConnected()) 
+        while (d->socket->isConnected() && camera->getStatus() >= Qn::Online && camera->getParentId() == qnCommon->moduleGUID()) 
         {
             sendMultipartData();
             d->waitCond.wait(&d->waitMutex);
@@ -79,6 +78,7 @@ void QnIOMonitorConnectionProcessor::run()
 		// todo: it's still have minor race condition because of Qt::DirectConnection isn't safe
 		// qt calls unlock/relock signalSlot mutex before method invocation
         disconnect( camera.data(), nullptr, this, nullptr );
+        camera->inputPortListenerDetached();
         lock.unlock();
         d->socket->terminateAsyncIO(true);
     }

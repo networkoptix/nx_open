@@ -25,6 +25,8 @@ private slots:
     void at_ioStateChanged(const QnIOStateData& value);
     void openConnection();
     void at_buttonClicked();
+    void at_buttonStateChanged(bool toggled);
+    void at_cameraStatusChanged(const QnResourcePtr & res);
 private:
     void updateControls();
 private:

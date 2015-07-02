@@ -132,12 +132,11 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
 
     bool instant = action->actionType() == QnBusiness::CameraOutputOnceAction;
 
-    int autoResetTimeout = instant
-            ? ( action->getRelayAutoResetTimeout() ? action->getRelayAutoResetTimeout() : 30*1000)
-            : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
-    bool on = instant
-            ? true
-            : action->getToggleState() == QnBusiness::ActiveState;
+    //int autoResetTimeout = instant
+    //        ? ( action->getRelayAutoResetTimeout() ? action->getRelayAutoResetTimeout() : 30*1000)
+    //        : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
+    int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
+    bool on = action->getToggleState() != QnBusiness::InactiveState;
 
     return securityCam->setRelayOutputState(
                 relayOutputId,
