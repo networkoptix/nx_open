@@ -233,9 +233,10 @@ public:
     
     ///
     
-    rtu::ExtraServerInfo* getExtraInfo(const QUuid &id);
+    bool findAndMarkSelected(const QUuid &id
+        , ItemSearchInfo &searchInfo);
 
-    rtu::ExtraServerInfo* getExtraInfo(ItemSearchInfo &searchInfo);
+    rtu::ExtraServerInfo& getExtraInfo(ItemSearchInfo &searchInfo);
 
     void updateTimeDateInfo(const QUuid &id
         , qint64 utcDateTimeMs
@@ -594,16 +595,24 @@ void rtu::ServersSelectionModel::Impl::tryLoginWith(const QString &password)
     }
 }
 
-rtu::ExtraServerInfo* rtu::ServersSelectionModel::Impl::getExtraInfo(const QUuid &id)
+bool rtu::ServersSelectionModel::Impl::findAndMarkSelected(const QUuid &id
+    , ItemSearchInfo &searchInfo)
 {
-    ItemSearchInfo searchInfo;
     if (!findServer(id, searchInfo))
-        return nullptr;
+        return false;
 
-    return getExtraInfo(searchInfo);
+    ServerModelInfo &serverModelInfo = *searchInfo.serverInfoIterator;
+    if (serverModelInfo.selectedState != Qt::Checked)
+    {
+        serverModelInfo.selectedState = Qt::Checked;
+        ++searchInfo.systemInfoIterator->selectedServers;
+        m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
+        m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
+    }
+    return true;
 }
 
-rtu::ExtraServerInfo* rtu::ServersSelectionModel::Impl::getExtraInfo(ItemSearchInfo &searchInfo)
+rtu::ExtraServerInfo& rtu::ServersSelectionModel::Impl::getExtraInfo(ItemSearchInfo &searchInfo)
 {
     ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
     if (!info.hasExtraInfo())
@@ -613,7 +622,7 @@ rtu::ExtraServerInfo* rtu::ServersSelectionModel::Impl::getExtraInfo(ItemSearchI
         m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
     }
 
-    return &info.writableExtraInfo();
+    return info.writableExtraInfo();
 }
 
 void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
@@ -621,26 +630,28 @@ void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
     , const QByteArray &timeZoneId
     , qint64 timestampMs)
 {
-    ExtraServerInfo * const extra = getExtraInfo(id);
-    if (!extra)
+    ItemSearchInfo searchInfo;
+    if (!findAndMarkSelected(id, searchInfo))
         return;
 
-    extra->utcDateTimeMs = utcDateTimeMs;
-    extra->timeZoneId = timeZoneId;
-    extra->timestampMs = timestampMs;
+    ExtraServerInfo &extra = getExtraInfo(searchInfo);
+    extra.utcDateTimeMs = utcDateTimeMs;
+    extra.timeZoneId = timeZoneId;
+    extra.timestampMs = timestampMs;
 }
 
 void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
     , const QString &host
     , const InterfaceInfoList &interfaces)
 {
-    ExtraServerInfo * const extra = getExtraInfo(id);
-    if (!extra)
+    ItemSearchInfo searchInfo;
+    if (!findAndMarkSelected(id, searchInfo))
         return;
 
+    ExtraServerInfo &extra = getExtraInfo(searchInfo);
     for (const InterfaceInfo &itf: interfaces)
     {
-        InterfaceInfoList &oldItf = extra->interfaces;
+        InterfaceInfoList &oldItf = extra.interfaces;
         const auto &it = std::find_if(oldItf.begin(), oldItf.end()
             , [itf](const InterfaceInfo &param)
         {
@@ -660,15 +671,12 @@ void rtu::ServersSelectionModel::Impl::updatePasswordInfo(const QUuid &id
     , const QString &password)
 {
     ItemSearchInfo searchInfo;
-    if (!findServer(id, searchInfo))
+    if (!findAndMarkSelected(id, searchInfo))
         return;
 
-    ExtraServerInfo * const extra = getExtraInfo(searchInfo);
-    if (!extra)
-        return;
-
-    const QString oldPassword = extra->password;
-    extra->password = password;
+    ExtraServerInfo &extra = getExtraInfo(searchInfo);
+    const QString oldPassword = extra.password;
+    extra.password = password;
     
     const BaseServerInfo &info = searchInfo.serverInfoIterator->serverInfo.baseInfo();
     for (ServerModelInfo &otherInfo: searchInfo.systemInfoIterator->servers)
