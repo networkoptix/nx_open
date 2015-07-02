@@ -21,7 +21,6 @@ angular.module('webadminApp')
                     zoomBase: Math.log(10), // Base for exponential function for zooming
                     zoomSpeed: 0.05, // Zoom speed 0 -> 1 = full zoom
                     maxVerticalScrollForZoom: 5000, // value for adjusting zoom
-                    horizontalScrollSpeed: 1,  // value for adjusting scroll from touchpad
                     animationDuration: 300, // 200-400 for smooth animation
 
                     timelineBgColor: [28,35,39], //Color for ruler marks and labels
@@ -270,26 +269,46 @@ angular.module('webadminApp')
                     context.fillRect(startCoordinate, top , Math.max(timelineConfig.minChunkWidth,endCoordinate - startCoordinate), timelineConfig.chunkHeight * scope.viewportHeight);
                 }
 
+                var scrollBarWidth = 0;
                 // !!! Draw ScrollBar
                 function drawScrollBar(context){
-                    //1. DrawBG
-                    context.fillStyle =   blurColor(timelineConfig.scrollBarBgColor,1);
-
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight + timelineConfig.chunkHeight) * scope.viewportHeight; // Top border
-
-                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.scrollBarHeight * scope.viewportHeight);
 
                     //2.
                     var relativeCenter =  scope.scaleManager.getRelativeCenter();
                     var relativeWidth =  scope.scaleManager.getRelativeWidth();
 
-                    var width = Math.max(scope.viewportWidth * relativeWidth, timelineConfig.minScrollBarWidth);
+                    scrollBarWidth = Math.max(scope.viewportWidth * relativeWidth, timelineConfig.minScrollBarWidth);
                     // Correction for width if it has minimum width
+                    var startCoordinate = scope.scaleManager.bound( 0, (scope.viewportWidth * relativeCenter - scrollBarWidth/2), scope.viewportWidth - scrollBarWidth) ;
+
+                    mouseInScrollbar = mouseCoordinate >= startCoordinate && mouseCoordinate <= startCoordinate + scrollBarWidth && mouseRow >= top;
+                    if(context) {
+                        //1. DrawBG
+                        context.fillStyle = blurColor(timelineConfig.scrollBarBgColor, 1);
+                        context.fillRect(0, top, scope.viewportWidth, timelineConfig.scrollBarHeight * scope.viewportHeight);
+
+                        //2. DrawScrollBar
+                        context.fillStyle = mouseInScrollbar ? blurColor(timelineConfig.scrollBarHighlightColor, 1) : blurColor(timelineConfig.scrollBarColor, 1);
+                        context.fillRect(startCoordinate, top, scrollBarWidth, timelineConfig.scrollBarHeight * scope.viewportHeight);
+                    }else{
+                        if(mouseInScrollbar){
+                            mouseInScrollbar = mouseCoordinate - startCoordinate;
+                        }
+                        return mouseInScrollbar;
+                    }
+                }
+
+
+                function checkMouseInScrollBar(){
+                    var relativeCenter =  scope.scaleManager.getRelativeCenter();
+                    var relativeWidth =  scope.scaleManager.getRelativeWidth();
+                    var width = Math.max(scope.viewportWidth * relativeWidth, timelineConfig.minScrollBarWidth);
                     var startCoordinate = scope.scaleManager.bound( 0, (scope.viewportWidth * relativeCenter - width/2), scope.viewportWidth - width) ;
 
-                    context.fillStyle =  blurColor(timelineConfig.scrollBarColor,1);
-                    context.fillRect(startCoordinate, top, width , timelineConfig.scrollBarHeight * scope.viewportHeight);
+
                 }
+
 
                 // !!! Draw and position for timeMarker
                 var positionCoordinate = 0;
@@ -351,12 +370,18 @@ angular.module('webadminApp')
                 // !!! Mouse events
                 var mouseDate = null;
                 var mouseCoordinate = null;
+                var mouseRow = 0;
+                var mouseInScrollbar = false;
+                var catchScrollBar = false;
 
 
                 function updateMouseCoordinate( event){
                     if(!event){
+                        mouseRow = 0;
                         mouseCoordinate = null;
                         mouseDate = null;
+                        mouseInScrollbar = false;
+                        catchScrollBar = false;
                         return;
                     }
 
@@ -368,7 +393,10 @@ angular.module('webadminApp')
                         console.warn ("unexpected node");
                         return; //Something strange - ignore it
                     }
+                    mouseRow = event.offsetY;
                     mouseDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
+
+                    mouseInScrollbar = drawScrollBar();
                 }
 
                 function mouseWheel(event){
@@ -378,7 +406,7 @@ angular.module('webadminApp')
                         scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate/scope.viewportWidth);// Set position to keep
                         scope.scaleManager.zoomIn(event.deltaY / timelineConfig.maxVerticalScrollForZoom);
                     } else {
-                        scope.scaleManager.scrollByPixels(event.deltaX * timelineConfig.horizontalScrollSpeed);
+                        scope.scaleManager.scrollByPixels(event.deltaX);
                     }
                     scope.$apply();
                 }
@@ -392,7 +420,7 @@ angular.module('webadminApp')
                 scope.click = function(event){
                     updateMouseCoordinate(event);
                     scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate/scope.viewportWidth);// Set position to keep
-                    scope.handler(mouseDate);
+                    //scope.handler(mouseDate);
                 };
 
 
@@ -407,10 +435,15 @@ angular.module('webadminApp')
                 };
                 scope.mouseMove = function(event){
                     updateMouseCoordinate(event);
+                    if(mouseInScrollbar && catchScrollBar){
+                        var moveScroll = mouseInScrollbar - catchScrollBar;
+                        scope.scaleManager.scroll( moveScroll / scope.viewportWidth );
+                    }
                 };
 
                 scope.mouseDown = function(event){
                     updateMouseCoordinate(event);
+                    catchScrollBar = mouseInScrollbar;
                 };
 
                 // !!! Scrolling functions
