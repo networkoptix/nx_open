@@ -22,7 +22,7 @@ Item {
     readonly property bool _focused: mouseArea.pressed || selected
 
     function _length(dx, dy) {
-        return Math.sqrt(dx * dx + dy * dy) - dp(4)
+        return Math.sqrt(dx * dx + dy * dy)
     }
 
     Rectangle {
