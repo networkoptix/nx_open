@@ -1,6 +1,7 @@
 #ifndef QNICONPROVIDER_H
 #define QNICONPROVIDER_H
 
+#include <QtCore/QPointer>
 #include <QtQuick/QQuickImageProvider>
 
 class QFileSelector;
@@ -15,7 +16,7 @@ public:
     qreal scale() const;
 
 private:
-    QFileSelector *m_fileSelector;
+    QPointer<QFileSelector> m_fileSelector;
     qreal m_scale;
 };
 

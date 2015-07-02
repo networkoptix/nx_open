@@ -10,7 +10,10 @@ QnIconProvider::QnIconProvider(QFileSelector *fileSelector) :
 }
 
 QPixmap QnIconProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) {
-    QString fileName = m_fileSelector->select(lit(":/images/") + id);
+    QString fileName = lit(":/images/") + id;
+    if (m_fileSelector)
+        fileName = m_fileSelector->select(fileName);
+
     QPixmap pixmap(fileName);
     if (pixmap.isNull())
         return pixmap;
