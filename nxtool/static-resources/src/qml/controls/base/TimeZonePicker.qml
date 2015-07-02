@@ -9,6 +9,7 @@ ComboBox
 {
     id: thisComponent;
     
+    clip: true;
     signal timeZoneChanged(int from, int to);
     
     property bool changed: (currentIndex !== initIndex);
