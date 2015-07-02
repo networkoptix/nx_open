@@ -51,6 +51,7 @@ void QnIOMonitorConnectionProcessor::run()
         connect(camera.data(), &QnSecurityCamResource::parentIdChanged, this, [this]() {pleaseStop(); }, Qt::DirectConnection);
         connect(camera.data(), &QnSecurityCamResource::initializedChanged, this, &QnIOMonitorConnectionProcessor::at_cameraInitDone, Qt::DirectConnection);
         connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged, Qt::DirectConnection);
+        connect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged, Qt::DirectConnection);
 
         if (camera->getParentId() != qnCommon->moduleGUID()) {
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");

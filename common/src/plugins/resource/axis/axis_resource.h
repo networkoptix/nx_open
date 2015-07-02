@@ -109,9 +109,12 @@ private:
     QnIOStateDataList m_ioStates;
     mutable QMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
-    std::shared_ptr<nx_http::AsyncHttpClient> m_inputPortHttpMonitor;
-    std::shared_ptr<nx_http::AsyncHttpClient> m_inputPortStateReader;
+    
+    typedef std::shared_ptr<nx_http::AsyncHttpClient> HttpClient;
+    HttpClient m_ioHttpMonitor[2];
+    HttpClient m_inputPortStateReader;
     nx_http::MultipartContentParserHelper m_multipartContentParser;
+
     nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
 
@@ -136,6 +139,8 @@ private:
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
     bool ioPortErrorOccured();
     void updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist);
+    bool startIOMonitor(Qn::IOPortType portType, HttpClient& result);
+    void resetHttpClient(HttpClient&& value, QMutexLocker& lk);
 
     friend class QnAxisPtzController;
 };

@@ -133,7 +133,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     bool instant = action->actionType() == QnBusiness::CameraOutputOnceAction;
 
     int autoResetTimeout = instant
-            ? 30*1000
+            ? ( action->getRelayAutoResetTimeout() ? action->getRelayAutoResetTimeout() : 30*1000)
             : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     bool on = instant
             ? true

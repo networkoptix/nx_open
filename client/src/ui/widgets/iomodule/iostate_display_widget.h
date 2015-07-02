@@ -24,6 +24,7 @@ private slots:
     void at_cameraPropertyChanged(const QnResourcePtr & /*res*/, const QString & key);
     void at_ioStateChanged(const QnIOStateData& value);
     void openConnection();
+    void at_buttonClicked();
 private:
     void updateControls();
 private:

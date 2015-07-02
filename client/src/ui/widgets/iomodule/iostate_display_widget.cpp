@@ -2,6 +2,11 @@
 #include "camera/iomodule/iomodule_monitor.h"
 #include "ui_iostate_display_widget.h"
 #include "ui/style/skin.h"
+#include "business/business_event_parameters.h"
+#include "business/business_action_parameters.h"
+#include "utils/common/synctime.h"
+#include "business/actions/camera_output_business_action.h"
+#include "api/app_server_connection.h"
 
 namespace
 {
@@ -102,7 +107,11 @@ void QnIOStateDisplayWidget::updateControls()
         ui->gridLayout->addWidget(spacerLabel, row, 5);
 
         QPushButton* button = new QPushButton(this);
+        button->setCheckable(true);
+        button->setDefault(false);
         button->setText(value.outputName);
+        button->setIcon(qnSkin->icon("item/io_indicator_off.png"));
+        connect(button, &QPushButton::clicked, this, &QnIOStateDisplayWidget::at_buttonClicked);
         ui->gridLayout->addWidget(button, row, 6);
         m_widgetsByPort.insert(value.id, button);
 
@@ -110,6 +119,43 @@ void QnIOStateDisplayWidget::updateControls()
     }
 
     openConnection();
+}
+
+void QnIOStateDisplayWidget::at_buttonClicked()
+{
+    QPushButton* button = dynamic_cast<QPushButton*> (sender());
+    if (!button)
+        return;
+    QString portId;
+    for (auto itr = m_widgetsByPort.begin(); itr != m_widgetsByPort.end(); ++itr) {
+        if (itr.value() == button) {
+            portId = itr.key();
+            break;
+        }
+    }
+    if (portId.isEmpty())
+        return;
+    for (const auto& setting: m_ioSettings) {
+        if (setting.id == portId) 
+        {
+            QnBusinessEventParameters eventParams;
+            eventParams.setEventTimestamp(qnSyncTime->currentMSecsSinceEpoch());
+
+            QnBusinessActionParameters params;
+            params.relayOutputId = setting.id;
+            params.relayAutoResetTimeout = setting.autoResetTimeoutMs;
+            bool isInstant = setting.autoResetTimeoutMs != 0;
+            QnCameraOutputBusinessActionPtr action(new QnCameraOutputBusinessAction(isInstant, eventParams));
+
+            action->setParams(params);
+            action->setResources(QVector<QnUuid>() << m_camera->getId());
+            action->setToggleState(button->isChecked() ? QnBusiness::ActiveState : QnBusiness::InactiveState);
+
+            ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+            if (conn)
+                conn->getBusinessEventManager()->sendBusinessAction(action, m_camera->getParentId(), this, []{});
+        }
+    }
 }
 
 void QnIOStateDisplayWidget::at_ioStateChanged(const QnIOStateData& value)
@@ -124,6 +170,16 @@ void QnIOStateDisplayWidget::at_ioStateChanged(const QnIOStateData& value)
             else
                 pixmap = qnSkin->pixmap("item/io_indicator_off.png");
             label->setPixmap(pixmap);
+        }
+        else if (QPushButton* button = dynamic_cast<QPushButton*> (widget))
+        {
+            QIcon icon;
+            if (value.isActive)
+                icon = qnSkin->icon("item/io_indicator_on.png");
+            else
+                icon = qnSkin->icon("item/io_indicator_off.png");
+            button->setIcon(icon);
+            button->setChecked(value.isActive);
         }
     }
 }
