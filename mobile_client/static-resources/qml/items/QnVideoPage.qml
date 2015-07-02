@@ -452,7 +452,7 @@ QnPage {
             }
 
             QnButton {
-                anchors.right: parent.right
+                anchors.left: parent.left
                 text: qsTr("Close")
                 flat: true
                 onClicked: calendarPanel.hide()
