@@ -52,9 +52,9 @@ private:
 
     QElapsedTimer m_encodeTimer;
     qint64 m_lastEncodedTime;
-    qint64 m_totalSpentTime;
-    qint64 m_totalEncodedTime;
-    qint64 m_totalEncodedFrames;
+    qint64 m_averageCodingTimePerFrame;
+    qint64 m_averageVideoTimePerFrame;
+    qint64 m_encodedFrames;
     qint64 m_droppedFrames;
 };
 
