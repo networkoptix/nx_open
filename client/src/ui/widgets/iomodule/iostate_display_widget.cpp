@@ -39,6 +39,8 @@ void QnIOStateDisplayWidget::setCamera(const QnServerCameraPtr& camera)
     connect(camera.data(), &QnResource::statusChanged, this, &QnIOStateDisplayWidget::at_cameraStatusChanged );
     connect(camera.data(), &QnResource::nameChanged, this, [this]() {setWindowTitle(m_camera->getName());} );
 
+    connect(this, &QnIOStateDisplayWidget::close, this, [this]() {deleteLater();} );
+
     updateControls();
 }
 
