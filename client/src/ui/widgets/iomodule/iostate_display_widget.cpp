@@ -44,6 +44,9 @@ void QnIOStateDisplayWidget::updateControls()
 {
 
     m_ioSettings = m_camera->getIOPorts();
+    while ( QObject* w = findChild<QObject*>() )
+        delete w;
+    ui->setupUi(this);
     m_widgetsByPort.clear();
 
     //QGridLayout* mainLayout = new QGridLayout(this);
