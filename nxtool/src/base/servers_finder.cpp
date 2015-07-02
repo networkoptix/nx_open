@@ -242,7 +242,7 @@ void rtu::ServersFinder::Impl::updateServers()
             written += currentWritten;
         }
 
-        if (written < kSearchRequestSize)
+        if (written != kSearchRequestSize)
             socket->close();
     }
 }
@@ -268,7 +268,7 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
         readBytes += read;
     }
 
-    if (readBytes < pendingDataSize)
+    if (readBytes != pendingDataSize)
     {
         socket->close();
         return false;
