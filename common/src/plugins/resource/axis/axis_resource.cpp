@@ -39,12 +39,23 @@ QString portIdToIndex(const QString& id)
 
 QString portDisplayNameToId(const QString& id)
 {
-    int num;
+    QString cleanNum;
+    for (int i = 0; i < id.size(); ++i) {
+        if (id.at(i) >= L'0' && id.at(i) <= L'9')
+            cleanNum += id.at(i);
+    }
+    int num = cleanNum.toInt();
+    if (!id.contains(lit("IO")))
+        num--; // if we got string like IO<xxx> its based from zerro, otherwise its based from 1
+
+    return QString(lit("I")) + QString::number(num); // convert port1->I0, O2->I1, I2->I1, IO2->I1 e.t.c
+    /*
     if (id.startsWith(lit("port")))
         num = id.mid(lit("port").length()).toInt();
     else
         num = id.toInt();
     return QString(lit("I")) + QString::number(num - 1); // convert port1 to I1 e.t.c
+    */
 }
 
 
@@ -1157,39 +1168,18 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
         NX_LOG( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
     }
-    QString portId = QString::fromLatin1(notification.mid(0, sepPos - 1));
+    QString portId = QString::fromLatin1(notification.mid(0, sepPos));
     portId = portDisplayNameToId(portId);
     const char portType = notification[portTypePos];
     NX_LOG( lit("%1 port %2 changed its state to %3. Camera %4").
-        arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portId).arg(QLatin1String(eventType == '/' ? "active" : "inactive")).arg(getUrl()), cl_logDEBUG1 );
+        arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portId).arg(QLatin1String(eventType == '/' || eventType == 'H' ? "active" : "inactive")).arg(getUrl()), cl_logDEBUG1 );
 
-    bool isOnState = (eventType == '/');
+    if (eventType != '/' && eventType != '\\' /*&& eventType != 'H' && eventType != 'L'*/)
+        return; // skip unknown event
+
+    bool isOnState = (eventType == '/') || (eventType == 'H');
     qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    if( portType == 'I' )
-    {
-        switch( eventType )
-        {
-            case '/':
-            case '\\':
-                updateIOState(portId, isOnState, timestamp, true);
-                break;
-
-            default:
-                break;
-        }
-    }
-    else {
-        switch( eventType )
-        {
-        case '/':
-        case '\\':
-            updateIOState(portId, isOnState, timestamp, true);
-            break;
-
-        default:
-            break;
-        }
-    }
+    updateIOState(portId, isOnState, timestamp, true);
 }
 
 QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
