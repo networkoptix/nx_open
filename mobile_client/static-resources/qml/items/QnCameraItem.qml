@@ -115,6 +115,7 @@ Item {
                 content.x = 0
             }
         }
+        drag.threshold: dp(8)
     }
 
     z: materialSurface.drag.active ? 5 : 0
