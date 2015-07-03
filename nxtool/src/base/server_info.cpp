@@ -130,10 +130,6 @@ bool rtu::ServerInfo::hasExtraInfo() const
 
 const rtu::ExtraServerInfo &rtu::ServerInfo::extraInfo() const
 {
-    if (m_extra.isNull())
-    {
-        int i = 0;
-    }
     Q_ASSERT(!m_extra.isNull());
     return *m_extra;
 }
