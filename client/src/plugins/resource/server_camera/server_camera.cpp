@@ -23,6 +23,8 @@ Qn::ResourceFlags QnServerCamera::flags() const {
     Qn::ResourceFlags result = base_type::flags();
     if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
         result |= Qn::motion;
+    if (hasCameraCapabilities(Qn::IOModuleCapability))
+        result |= Qn::io_module;
     return result;
 }
 
