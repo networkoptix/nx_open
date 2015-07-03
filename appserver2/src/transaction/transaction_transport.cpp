@@ -293,7 +293,6 @@ void QnTransactionTransport::addData(QByteArray&& data)
             data.size() );
         data.clear();   //cause I can!
         m_dataToSend.push_back( std::move(dataWithSize) );
-        aggregateOutgoingTransactionsNonSafe();
     }
     else
     {
@@ -916,6 +915,10 @@ bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 void QnTransactionTransport::serializeAndSendNextDataBuffer()
 {
     assert( !m_dataToSend.empty() );
+    
+    if( m_base64EncodeOutgoingTransactions )
+        aggregateOutgoingTransactionsNonSafe();
+
     DataToSend& dataCtx = m_dataToSend.front();
 
     if( m_base64EncodeOutgoingTransactions )
