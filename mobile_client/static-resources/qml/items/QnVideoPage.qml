@@ -520,4 +520,17 @@ QnPage {
             hideAnimation.start()
         }
     }
+
+    focus: true
+
+    Keys.onReleased: {
+        if (event.key === Qt.Key_Back) {
+            if (calendarPanel.visible) {
+                calendarPanel.hide()
+                event.accepted = true
+            } else if (Main.backPressed()) {
+                event.accepted = true
+            }
+        }
+    }
 }

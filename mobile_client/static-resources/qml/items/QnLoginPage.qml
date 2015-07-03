@@ -272,4 +272,13 @@ QnPage {
         var sessionId = (state == "FailedSaved" ? loginPage.sessionId : "")
         LoginFunctions.connectToServer(sessionId, hostField.text, portField.text, loginField.text, passwordField.text)
     }
+
+    focus: true
+
+    Keys.onReleased: {
+        if (event.key === Qt.Key_Back) {
+            if (Main.backPressed())
+                event.accepted = true
+        }
+    }
 }

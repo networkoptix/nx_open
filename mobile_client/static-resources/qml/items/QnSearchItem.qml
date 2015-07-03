@@ -49,6 +49,8 @@ Item {
             rightPadding: dp(48)
             showDecoration: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+
+            Keys.forwardTo: searchItem
         }
 
         QnIconButton {

@@ -113,3 +113,14 @@ function openSettings() {
     menuBackButton.animateToBack()
     stackView.push(settingsPageComponent)
 }
+
+function backPressed() {
+    if (sideNavigation.open) {
+        sideNavigation.hide()
+        return true
+    } else if (stackView.depth > 1) {
+        gotoMainScreen()
+        return true
+    }
+    return false
+}

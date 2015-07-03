@@ -36,6 +36,7 @@ QnPage {
             }
         }
         visible: pageStatus == Stack.Active || pageStatus == Stack.Activating
+        Keys.forwardTo: resourcesPage
     }
 
     QnCameraFlow {
@@ -96,6 +97,19 @@ QnPage {
         onConnectedChanged: {
             if (!connectionManager.connected) {
                 loadingDummy.opacity = 1.0
+            }
+        }
+    }
+
+    focus: true
+
+    Keys.onReleased: {
+        if (event.key === Qt.Key_Back) {
+            if (searchItem.opened) {
+                searchItem.close()
+                event.accepted = true
+            } else if (Main.backPressed()) {
+                event.accepted = true
             }
         }
     }

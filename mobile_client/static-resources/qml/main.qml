@@ -1,5 +1,5 @@
-import QtQuick 2.2
-import QtQuick.Window 2.0
+import QtQuick 2.4
+import QtQuick.Window 2.2
 import QtQuick.Controls 1.2
 
 import com.networkoptix.qml 1.0
@@ -82,6 +82,7 @@ Window {
         onCurrentItemChanged: {
             if (currentItem) {
                 toolBar.title = Qt.binding(function() { return currentItem ? currentItem.title : "" })
+                currentItem.forceActiveFocus()
             }
         }
     }
