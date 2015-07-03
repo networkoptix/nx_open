@@ -29,15 +29,25 @@ static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 static const quint16 DEFAULT_AXIS_API_PORT = 80;
 static const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
 
-QString portIdToIndex(const QString& id)
+int QnPlAxisResource::portIdToIndex(const QString& id) const
 {
-    QString result = id;
-    if (result.startsWith(lit("I")))
-        result = QString::number(result.mid(1).toInt() + 1);
-    return result;
+    QMutexLocker lock(&m_mutex);
+    for (int i = 0; i < m_ioPortIdList.size(); ++i) {
+        if (m_ioPortIdList[i] == id)
+            return i;
+    }
+    return id.mid(1).toInt();
 }
 
-QString portDisplayNameToId(const QString& id)
+QString QnPlAxisResource::portIndexToId(int num) const
+{
+    QMutexLocker lock(&m_mutex);
+    if (num < m_ioPortIdList.size())
+        return m_ioPortIdList[num];
+    return QString(lit("I")) + QString::number(num);
+}
+
+int QnPlAxisResource::portDisplayNameToIndex(const QString& id) const
 {
     QString cleanNum;
     for (int i = 0; i < id.size(); ++i) {
@@ -47,17 +57,13 @@ QString portDisplayNameToId(const QString& id)
     int num = cleanNum.toInt();
     if (!id.contains(lit("IO")))
         num--; // if we got string like IO<xxx> its based from zerro, otherwise its based from 1
-
-    return QString(lit("I")) + QString::number(num); // convert port1->I0, O2->I1, I2->I1, IO2->I1 e.t.c
-    /*
-    if (id.startsWith(lit("port")))
-        num = id.mid(lit("port").length()).toInt();
-    else
-        num = id.toInt();
-    return QString(lit("I")) + QString::number(num - 1); // convert port1 to I1 e.t.c
-    */
+    return num;
 }
 
+QString QnPlAxisResource::portIndexToReqParam(int number) const
+{
+    return QString::number(number + 1);
+}
 
 class AxisIOMessageBodyParser: public AbstractByteStreamFilter
 {
@@ -178,7 +184,7 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
         if (port.portType == portType) {
             if (!portList.isEmpty())
                 portList += lit(",");
-            portList += portIdToIndex(port.id);
+            portList += portIndexToReqParam(portIdToIndex(port.id));
         }
     }
     if (portList.isEmpty())
@@ -703,7 +709,8 @@ bool QnPlAxisResource::setRelayOutputState(
     bool activate,
     unsigned int autoResetTimeoutMS )
 {
-    QString cmd = lit("axis-cgi/io/port.cgi?action=%1:%2").arg(portIdToIndex(outputID)).arg(QLatin1String(activate ? "/" : "\\"));
+    int portNum = portIdToIndex(outputID);
+    QString cmd = lit("axis-cgi/io/port.cgi?action=%1:%2").arg(portIndexToReqParam(portNum)).arg(QLatin1String(activate ? "/" : "\\"));
     if( autoResetTimeoutMS > 0 )
     {
         //adding auto-reset
@@ -858,7 +865,8 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClien
         for (const auto& line: result) {
             QList<QByteArray> params = line.trimmed().split('=');
             if (params.size() == 2) {
-                QString portId = portDisplayNameToId(QString::fromLatin1(params[0]));
+                int portIndex = portDisplayNameToIndex(QString::fromLatin1(params[0]));
+                QString portId = portIndexToId(portIndex);
                 qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
                 updateIOState(portId, params[1] == "active", timestamp, false);
             }
@@ -924,7 +932,8 @@ bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPor
         const auto nameParts = param.first.split(('.'));
         if (nameParts.size() < 3)
             continue; // bad data
-        QString portName = QString::fromLatin1(nameParts[2]);
+        int portIndex = QString::fromLatin1(nameParts[2]).mid(1).toInt();
+        QString portName = portIndexToId(portIndex);
         if (portName != portData.id) 
         {
             if(!portData.id.isEmpty())
@@ -990,7 +999,7 @@ bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts, const 
 
     for(auto& currentValue: oldPorts)
     {
-        QString paramNamePrefix = lit("root.IOPort.%1.").arg(currentValue.id);
+        QString paramNamePrefix = lit("root.IOPort.I%1.").arg(portIdToIndex(currentValue.id));
         for (const QnIOPortData& newValue: newPorts)
         {
             if (newValue.id != currentValue.id)
@@ -1061,8 +1070,20 @@ bool QnPlAxisResource::ioPortErrorOccured()
     }
 };
 
+void QnPlAxisResource::readPortIdLIst()
+{
+    QString value = getProperty(Qn::IO_PORT_DISPLAY_NAMES_PARAM_NAME);
+    QMutexLocker lock(&m_mutex);
+
+    m_ioPortIdList.clear();
+    for (const auto& portId: value.split(L','))
+        m_ioPortIdList << portId;
+}
+
 bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
 {
+    readPortIdLIst();
+
     if (getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0)
         setCameraCapability(Qn::IOModuleCapability, true);
 
@@ -1168,8 +1189,11 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
         NX_LOG( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
     }
-    QString portId = QString::fromLatin1(notification.mid(0, sepPos));
-    portId = portDisplayNameToId(portId);
+
+
+    QString portDisplayName = QString::fromLatin1(notification.mid(0, sepPos));
+    int portIndex = portDisplayNameToIndex(portDisplayName);
+    QString portId = portIndexToId(portIndex);
     const char portType = notification[portTypePos];
     NX_LOG( lit("%1 port %2 changed its state to %3. Camera %4").
         arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portId).arg(QLatin1String(eventType == '/' || eventType == 'H' ? "active" : "inactive")).arg(getUrl()), cl_logDEBUG1 );
@@ -1220,7 +1244,7 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
         if (port.portType != Qn::PT_Disabled) {
             if (!portList.isEmpty())
                 portList += lit(",");
-            portList += portIdToIndex(port.id);
+            portList += portIndexToReqParam(portIdToIndex(port.id));
         }
     }
     if (portList.isEmpty())

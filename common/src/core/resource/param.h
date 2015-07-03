@@ -44,6 +44,7 @@ namespace Qn
 	static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
     static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
     static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
+    static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
 
     /* Whether statistics gathering is allowed on the current server. */
     static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");

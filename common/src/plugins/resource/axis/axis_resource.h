@@ -122,6 +122,7 @@ private:
 
     IOMonitor m_ioHttpMonitor[2];
     HttpClient m_inputPortStateReader;
+    QVector<QString> m_ioPortIdList;
     
 
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
@@ -149,6 +150,28 @@ private:
     void updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist);
     bool startIOMonitor(Qn::IOPortType portType, IOMonitor& result);
     void resetHttpClient(HttpClient& value);
+
+    /*!
+        Convert port number to ID
+    */
+    QString portIndexToId(int num) const;
+
+    /*!
+        Convert port ID to relative num in range [0..N)
+    */
+    int portIdToIndex(const QString& id) const;
+
+    /*!
+        Convert strings like port1, IO1, I1, O1 to port num in range [0..)
+    */
+    int portDisplayNameToIndex(const QString& id) const;
+
+    /*!
+        Convert port number to request param. Request params are numbers in range [1..N]
+    */
+    QString portIndexToReqParam(int number) const;
+
+    void readPortIdLIst();
 
     friend class QnAxisPtzController;
     friend class AxisIOMessageBodyParser;
