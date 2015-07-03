@@ -21,48 +21,7 @@ namespace
             || zoneIanaId.contains(gmtIanaTemplate)     // Etc/GMT+3
             ;
     }  
-
-    /** Some timezones have the same seconds offset but different UTC offset in
-     *  their description (due to DST). So we have to adjust the order manually.
-     *  Examples:
-     *		(UTC-06:00) Central America
-     *		(UTC-07:00) Mountain Time (US & Canada)
-     *  both of these timezones have offset -21600 seconds now.
-     */
-    int timeZoneOrderKey(const QString &timeZoneName) {
-        /* (UTC) timezones will always have zero key. */
-        int key = 0;
-
-        if (timeZoneName.contains(utcIanaTemplate)) {
-
-            /* Parsing (UTC-06:00) part manually - that is much faster than regexp here. */
-            int utcIdx = timeZoneName.indexOf(utcIanaTemplate);
-            QString offsetHours = timeZoneName.mid(utcIdx + utcIanaTemplate.length(), 3);
-            QString offsetMinutes = timeZoneName.mid(utcIdx + utcIanaTemplate.length() + 4, 2);
-
-            if (offsetHours.startsWith(L'+')) {
-                offsetHours.remove(0, 1);
-                key += 60 * offsetHours.toInt();
-                key += offsetMinutes.toInt();
-
-            } else if (offsetHours.startsWith(L'-')) {
-                offsetHours.remove(0, 1);
-                key -= 60 * offsetHours.toInt();
-                key -= offsetMinutes.toInt();
-            }  
-        }
-
-        return key;
-    }
-
-    bool timeZoneLessThan(const QString &l, const QString &r) {
-        int leftKey = timeZoneOrderKey(l);
-        int rightKey = timeZoneOrderKey(r);
-        if (leftKey != rightKey)
-            return leftKey < rightKey;
-        return l < r;
-    }
-    
+  
     const QByteArray kDiffTimeZonesId = "<Different>";
     const QByteArray kUnknownTimeZoneId = "<Unknown>";
   
@@ -110,16 +69,21 @@ private:
 
 private:
     struct TzInfo {
-        TzInfo(const QByteArray &id, const QString &displayName, int offsetFromUtc):
-            primaryId(id),
+        TzInfo(const QByteArray &id, const QString &displayName, int standardTimeOffset):
             displayName(displayName),
-            offsetFromUtc(offsetFromUtc)
-        {}
+            standardTimeOffset(standardTimeOffset)
+        {
+            ids.append(id);
+            Q_ASSERT_X(!id.isEmpty(), Q_FUNC_INFO, "IANA id should not be empty here.");
+        }
 
-        QByteArray primaryId;
+        QByteArray primaryId() const {
+            return !ids.isEmpty() ? ids.first() : QByteArray();
+        }
+
         QString displayName;
-        int offsetFromUtc;        
-        QList<QByteArray> secondaryIds;
+        int standardTimeOffset;        
+        QList<QByteArray> ids;
     };
 
     rtu::TimeZonesModel * const m_owner;
@@ -160,7 +124,7 @@ bool rtu::TimeZonesModel::Impl::isValidValue(int index)
         return false;
     
     const auto &value = m_timeZones[index];
-    return ((value.primaryId != kUnknownTimeZoneId) && (value.primaryId != kDiffTimeZonesId));
+    return ((value.primaryId() != kUnknownTimeZoneId) && (value.primaryId() != kDiffTimeZonesId));
 }
 
 int rtu::TimeZonesModel::Impl::initIndex() const
@@ -194,7 +158,7 @@ QVariant rtu::TimeZonesModel::Impl::data(const QModelIndex &index, int role) con
     case Qt::EditRole:
         return tzInfo.displayName;
     case Qt::UserRole:
-        return tzInfo.primaryId;
+        return tzInfo.primaryId();
     default:
         break;
     }
@@ -218,15 +182,16 @@ void rtu::TimeZonesModel::Impl::initTimeZones() {
         });
 
         if (existing != m_timeZones.end())
-            existing->secondaryIds.append(zoneIanaId);
+            existing->ids.append(zoneIanaId);
         else
-            m_timeZones.append(TzInfo(zoneIanaId, displayName, tz.offsetFromUtc(now)));
+            m_timeZones.append(TzInfo(zoneIanaId, displayName, tz.standardTimeOffset(now)));
     };
 
-    std::sort(m_timeZones.begin(), m_timeZones.end(), [](const TzInfo &l, const TzInfo &r) {
-        return timeZoneLessThan(l.displayName, r.displayName);
+    std::sort(m_timeZones.begin(), m_timeZones.end(), [now](const TzInfo &l, const TzInfo &r) {
+        return l.standardTimeOffset == r.standardTimeOffset
+            ? l.displayName < r.displayName
+            : l.standardTimeOffset < r.standardTimeOffset;
     });
-
 
     /* Add deprecated time zones as secondary id's. */
     for(const auto &zoneIanaId: timeZones) {
@@ -234,26 +199,26 @@ void rtu::TimeZonesModel::Impl::initTimeZones() {
             continue;
 
         QTimeZone tz(zoneIanaId);
-        int offsetFromUts = tz.offsetFromUtc(now);
+        int standardTimeOffset = tz.standardTimeOffset(now);
 
         /* Try to find with keyword first, otherwise - any with the same offset. */
-        auto existingUtc = std::find_if(m_timeZones.begin(), m_timeZones.end(), [offsetFromUts](const TzInfo &info) {
-            return info.offsetFromUtc == offsetFromUts && info.displayName.contains(utcKeyword);
+        auto existingUtc = std::find_if(m_timeZones.begin(), m_timeZones.end(), [standardTimeOffset](const TzInfo &info) {
+            return info.standardTimeOffset == standardTimeOffset && info.displayName.contains(utcKeyword);
         });
         if (existingUtc == m_timeZones.end()) {
-            existingUtc = std::find_if(m_timeZones.begin(), m_timeZones.end(), [offsetFromUts](const TzInfo &info) {
-                return info.offsetFromUtc == offsetFromUts;
+            existingUtc = std::find_if(m_timeZones.begin(), m_timeZones.end(), [standardTimeOffset](const TzInfo &info) {
+                return info.standardTimeOffset == standardTimeOffset;
             });
         }
 
         if (existingUtc != m_timeZones.end())
-            existingUtc->secondaryIds.append(zoneIanaId);
+            existingUtc->ids.append(zoneIanaId);
     }
 }
 
 int rtu::TimeZonesModel::Impl::timeZoneIndexById(const QByteArray &id) const {
     auto iter = std::find_if(m_timeZones.cbegin(), m_timeZones.cend(), [id](const TzInfo &info) {
-        return info.primaryId == id || info.secondaryIds.contains(id);
+        return info.ids.contains(id);
     });
     if (iter == m_timeZones.cend())
         return -1;
@@ -264,7 +229,7 @@ QByteArray rtu::TimeZonesModel::Impl::timeZoneIdByIndex(int index) const {
     if (index < 0 || index >= m_timeZones.size())
         return QByteArray();
 
-    return m_timeZones[index].primaryId;
+    return m_timeZones[index].primaryId();
 }
 
 ///
