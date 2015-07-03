@@ -141,8 +141,8 @@ var RulerModel = {
      * @type {{detailization: number}[]}
      */
     levels: [
-        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy'      , width: 25 , topWidth: 0, topFormat:'' }, // root
-        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy'      , width: 25 },
+        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy' , width: 25 , topWidth: 0, topFormat:'yyyy' }, // root
+        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy' , width: 25 },
         {
             name:'Year', //Years
             format:'yyyy',//Format string for date
@@ -151,26 +151,26 @@ var RulerModel = {
             topWidth: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
-        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm'       , width: 70 },
-        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm'       , width: 70 },
-        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm'       , width: 70 , topWidth: 140, topFormat:'mmmm yyyy'},
-        { name:'15 Days'    , interval:  new Interval(  0, 0, 0, 0, 7, 0, 0), format:'dd'         , width: 30 },
-        { name:'5 Days'     , interval:  new Interval(  0, 0, 0, 0, 7, 0, 0), format:'dd'         , width: 30 },
-        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'         , width: 30 , topWidth: 140, topFormat:'dd mmmm yyyy' },
-        { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM'      , width: 60 },
-        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH:MM'      , width: 60 },
-        { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH:MM'      , width: 60 },
-        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH:MM'      , width: 60 },
-        { name:'30 minutes' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM'      , width: 60 },
-        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM'      , width: 60 },
-        { name:'5 minutes'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM'      , width: 60 },
-        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM'      , width: 60 , topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
-        { name:'30 seconds' , interval:  new Interval(  0,20, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 40 },
-        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 40 },
-        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 40 },
-        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"'      , width: 40 , topWidth: 140, topFormat:'dd mmmm yyyy HH:MM:ss' },
-        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"'      , width: 60 },
-        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"'      , width: 50 }
+        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , width: 70 },
+        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , width: 70 },
+        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , width: 70 , topWidth: 140, topFormat:'mmmm yyyy'},
+        //{ name:'15 Days'    , interval:  new Interval(  0, 0, 0, 0,15, 0, 0), format:'dd'   , width: 60 },
+        //{ name:'5 Days'     , interval:  new Interval(  0, 0, 0, 0, 5, 0, 0), format:'dd'   , width: 60 },
+        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , width: 30 , topWidth: 140, topFormat:'dd mmmm yyyy' },
+        { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH"h"', width: 60 },
+        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH"h"', width: 60 },
+        { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH"h"', width: 60 },
+        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH"h"', width: 60 },
+        { name:'30 minutes' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', width: 60 },
+        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', width: 60 },
+        { name:'5 minutes'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', width: 60 },
+        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', width: 60 , topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
+        { name:'30 seconds' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', width: 40 },
+        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', width: 40 },
+        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', width: 40 },
+        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', width: 40 , topWidth: 140, topFormat:'dd mmmm yyyy HH:MM:ss' },
+        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', width: 60 },
+        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', width: 50 }
     ],
 
     getLevelIndex: function(searchdetailization,width){
@@ -180,6 +180,19 @@ var RulerModel = {
         }) ;
 
         return typeof(targetLevel)!=='undefined' ? RulerModel.levels.indexOf(targetLevel) : RulerModel.levels.length-1;
+    },
+
+    findBestLevelIndex:function(date){
+        var idx = 0;
+        var findLevel = function(level,index){
+            if(level.interval.checkDate(date)) {
+                idx = index;
+                return true;
+            }
+            return false;
+        };
+        _.find(RulerModel.levels,findLevel);
+        return idx;
     }
 };
 
@@ -754,7 +767,7 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     //Calculate visibleEnd and visibleStart
     this.msPerPixel = this.bound(this.minMsPerPixel, this.msPerPixel, this.maxMsPerPixel);
     this.anchorPoint = this.bound(0, this.anchorPoint, 1);
-    this.anchorDate = this.bound(this.start,  Math.round(this.anchorDate), this.end);
+    this.anchorDate = this.bound(this.start, Math.round(this.anchorDate), this.end);
 
     this.visibleStart = Math.round(this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint);
     this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));
@@ -784,14 +797,7 @@ ScaleManager.prototype.setAnchorDateAndPoint = function(date,point){ // Set anch
     this.anchorPoint = point;
     this.updateCurrentInterval();
 };
-ScaleManager.prototype.setAnchorDate = function(date){ // Set anchor date
-    this.anchorDate = date;
-    this.updateCurrentInterval();
-};
-ScaleManager.prototype.setAnchorPoint = function(point){ // Set anchor point
-    this.anchorPoint = point;
-    this.updateCurrentInterval();
-};
+
 ScaleManager.prototype.fullZoomOut = function(){ // Reset zoom level to show all timeline
     this.msPerPixel = this.maxMsPerPixel;
     this.updateCurrentInterval();
@@ -858,13 +864,23 @@ ScaleManager.prototype.getRelativeWidth = function(){
     return (this.visibleEnd - this.visibleStart) / (this.end - this.start);
 };
 
-ScaleManager.prototype.scroll = function(relativeValue){
+
+ScaleManager.prototype.scroll = function(value){
+    if(typeof (value) == "undefined"){
+        return this.getRelativeCenter();
+    }
+    value = this.bound(0,value,1);
     //scroll right or left by relative value - move anchor
-    this.setAnchorDate(this.anchorDate + relativeValue * (this.end-this.start));
+    this.setAnchorDateAndPoint(this.start + value * (this.end-this.start),0.5);
+};
+
+ScaleManager.prototype.scrollBy = function(relativeValue){
+    //scroll right or left by relative value - move anchor
+    this.scroll(this.scroll() + relativeValue);
 };
 ScaleManager.prototype.scrollByPixels = function(pixels){
     //scroll right or left by relative value - move anchor date
-    this.scroll( pixels / this.viewportWidth * this.getRelativeWidth() );
+    this.scrollBy( pixels / this.viewportWidth * this.getRelativeWidth() );
 };
 
 

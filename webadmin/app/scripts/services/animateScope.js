@@ -137,7 +137,7 @@ angular.module('webadminApp')
                 var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
                     return anim.scope === scope && anim.value === value;
                 });
-                if(!!targetAnimation){
+                if(targetAnimation){
                     targetAnimation.break();
                 }
                 var animation = new Animation(scope,value,target,duration);

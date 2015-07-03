@@ -14,6 +14,10 @@ angular.module('webadminApp')
                 var pair = params[i].split("=");
                 if(pair[0] === 'proxy'){
                     proxy = '/proxy/' + pair[1];
+                    if(pair[1] == 'demo'){
+                        proxy = Config.demo;
+                    }
+
                     break;
                 }
             }
@@ -70,6 +74,15 @@ angular.module('webadminApp')
             return request;
         }
         return {
+            url:function(){
+                return proxy;
+            },
+            mdeiaUrl:function(){
+                if(proxy == Config.demo){
+                    return Config.demoMedia;
+                }
+                return '';
+            },
             logUrl:function(params){
                 return proxy + '/api/showLog' + (params||'');
             },
@@ -163,6 +176,9 @@ angular.module('webadminApp')
                 }
                 if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
                     serverUrl = '/proxy/'+ serverUrl + '/';
+                }
+                if( proxy == Config.demo){
+                    serverUrl = proxy + '/';
                 }
                 //RecordedTimePeriods
                 return  wrapRequest($http.get(serverUrl + 'api/RecordedTimePeriods' +

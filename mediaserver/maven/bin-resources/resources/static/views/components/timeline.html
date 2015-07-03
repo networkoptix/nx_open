@@ -1,1 +1,22 @@
-<div class="timeline"><div class="timeline-info"><div class="btn-group"><button type="button" class="btn btn-xs" ng-click="zoom(false)" ng-disabled="disableZoomOut"><span class="glyphicon glyphicon-minus"></span></button> <button type="button" class="btn btn-xs" ng-click="zoom(true)" ng-disabled="disableZoomIn"><span class="glyphicon glyphicon-plus"></span></button></div><button type="button" class="btn btn-xs" ng-class="{'btn-success':liveMode}" ng-disabled="liveMode" ng-click="goToLive()">Live</button></div><div class="popover fade top timeMarker"><div class="arrow" style="left: 50%"></div><div class="popover-content">{{playingDate}}<br>{{playingTime}}</div></div><div class="viewport" ng-mouseup="dragEnd()" ng-mouseleave="dragEnd();"><canvas></canvas><div class="scroll"><div class="frame" ng-dblclick="zoomToPoint($event.offsetX)" ng-mousedown="dragStart($event.offsetX)" ng-mousemove="drag($event.offsetX)">&nbsp;</div></div><div class="scroll-btn left" ng-mouseenter="checkRightLeftVisibility(false)" ng-dblclick="scrollToEnd(false)" ng-mousedown="scrollStart(false)" ng-mouseup="scrollEnd(false)" ng-mouseleave="scrollEnd(false)" ng-class="{hidden:disableScrollLeft}"><span class="glyphicon glyphicon-chevron-left"></span></div><div class="scroll-btn right" ng-mouseenter="checkRightLeftVisibility(true)" ng-dblclick="scrollToEnd(true)" ng-mousedown="scrollStart(true)" ng-mouseup="scrollEnd(true)" ng-mouseleave="scrollEnd(true)" ng-class="{hidden:disableScrollRight}"><span class="glyphicon glyphicon-chevron-right"></span></div></div></div>
+<div class="timeline"><div class="popover top timeMarker playing small"><div class="arrow" style="left: 50%"></div><div>{{playingDate}}<br>{{playingTime}}</div></div><div class="viewport" ng-mouseup="mouseUp($event)" ng-mouseleave="mouseLeave($event)" ng-mousemove="mouseMove($event)" ng-dblclick="dblClick($event)" ng-click="click($event)" ng-mousedown="mouseDown($event)"><div class="popover top timeMarker pointer small"><div class="arrow" style="left: 50%"></div><div>{{pointerDate}}<br>{{pointerTime}}</div></div><canvas></canvas></div><div class="timeline-info"><div class="btn-group"><button type="button" class="btn btn-xs" ng-click="zoom(false)" ng-disabled="disableZoomOut"><span class="glyphicon glyphicon-minus"></span></button> <button type="button" class="btn btn-xs" ng-click="zoom(true)" ng-disabled="disableZoomIn"><span class="glyphicon glyphicon-plus"></span></button></div><button type="button" class="btn btn-xs" ng-class="{'btn-success':liveMode}" ng-disabled="liveMode" ng-click="goToLive()">Live</button></div><!--
+
+        <div class="scroll-btn left"
+             ng-mouseenter="checkRightLeftVisibility(false)"
+             ng-mousedown="scrollStart(false)"
+             ng-dblclick="scrollToEnd(false)"
+             ng-mouseup="scrollEnd(false)"
+             ng-mouseleave="scrollEnd(false)"
+             ng-class="{hidden:disableScrollLeft}">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </div>
+
+        <div class="scroll-btn right"
+             ng-mouseenter="checkRightLeftVisibility(true)"
+             ng-mousedown="scrollStart(true)"
+             ng-dblclick="scrollToEnd(true)"
+             ng-mouseup="scrollEnd(true)"
+             ng-mouseleave="scrollEnd(true)"
+             ng-class="{hidden:disableScrollRight}">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </div>
+--></div>

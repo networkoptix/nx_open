@@ -1,0 +1,19 @@
+{
+    "options": {
+
+    },
+    "demo": {
+        "options": {
+            "host": "enk.me",
+            "username": "ebalashov",
+            "password": "e8Lp9jTsbgjk"
+        },
+        "files": [
+            {
+                "cwd": "dist",
+                "src": ["*.html", "*/.htaccess", "*/*.html", "*/*.png", "fonts/*", "*.js", "*/*.js",  "*.json", "*/*.json", "*.css", "*/*.css", "*.py", "*/*.py","*/*/*.py", "*/*/*.mustache", "*/*/*.html"],
+                "dest": "/home/ebalashov/public_html/webclient"
+            }
+        ]
+    }
+}

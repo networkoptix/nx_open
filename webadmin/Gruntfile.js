@@ -102,14 +102,14 @@ module.exports = function (grunt) {
                 //{context: '/',host: '192.168.56.101',port: 7002},
 
                 //Cube
-/*                {context: '/api/',   host: '192.168.0.25', port: 7001},
+                /*{context: '/api/',   host: '192.168.0.25', port: 7001},
                 {context: '/ec2/',   host: '192.168.0.25', port: 7001},
                 {context: '/hls/',   host: '192.168.0.25', port: 7001},
                 {context: '/media/', host: '192.168.0.25', port: 7001},
                 {context: '/proxy/', host: '192.168.0.25', port: 7001}/**/
 
                 //demo.networkoptix.com
-                {context: '/api/', host: 'demo.networkoptix.com', port: 7001},
+                /*{context: '/api/', host: 'demo.networkoptix.com', port: 7001},
                 {context: '/ec2/', host: 'demo.networkoptix.com', port: 7001},
                 {context: '/hls/', host: 'demo.networkoptix.com',port: 7001},
                 {context: '/media/', host: 'demo.networkoptix.com', port: 7001},
@@ -122,35 +122,20 @@ module.exports = function (grunt) {
                 {context: '/media/', host: '192.168.56.101', port: 9000},
                 {context: '/proxy/', host: '192.168.56.101',port: 9000}/**/
 
-                //Sergey Yuldashev
-               /* {context: '/api/',      host: '10.0.2.203', port: 7221},
-                {context: '/ec2/',      host: '10.0.2.203', port: 7221},
-                {context: '/hls/',      host: '10.0.2.203', port: 7221},
-                {context: '/media/',    host: '10.0.2.203', port: 7221},
-                {context: '/proxy/',    host: '10.0.2.203', port: 7221}*/
+                // Masha
+                {context: '/api/',      host: '10.0.2.186', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.186', port: 7001},
+                {context: '/hls/',      host: '10.0.2.186', port: 7001},
+                {context: '/media/',    host: '10.0.2.186', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.186', port: 7001}/**/
 
-                // Sasha
-                /*{context: '/api/',      host: '10.0.2.202', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.202', port: 7001},
-                {context: '/media/',    host: '10.0.2.202', port: 7001},
-                {context: '/hls/',      host: '10.0.2.202', port: 7001},
-                {context: '/proxy/',      host: '10.0.2.202', port: 7001}
-*/
                 //Roman Vasilenko  port: 7003,7004,7005,2006
-
                 /*{context: '/api/', host: '10.0.2.244', port: 7005},
                 {context: '/ec2/', host: '10.0.2.244', port: 7005},
                 {context: '/hls/', host: '10.0.2.244', port: 7005},
                 {context: '/media/', host: '10.0.2.244', port: 7005},
                 {context: '/proxy/', host: '10.0.2.244', port: 7005}*/
 
-                //Daria
-                //{context: '/api/', host: '10.0.2.229', port: 7039},
-                //{context: '/ec2/', host: '10.0.2.229', port: 7039}
-
-                //Denis
-                //{context: '/api/', host: '10.0.2.182', port: 7001},
-                //{context: '/ec2/', host: '10.0.2.182', port: 7001}
             ],
             livereload: {
                 options: {
@@ -546,7 +531,9 @@ module.exports = function (grunt) {
             default:{
 
             }
-        }
+        },
+
+        scp: grunt.file.readJSON('publish.json')
     });
 
 
@@ -625,5 +612,10 @@ module.exports = function (grunt) {
 
     grunt.registerTask('pub', [
         'publish'
+    ]);
+
+    grunt.registerTask('demo', [
+        'publish',
+        'scp:demo'
     ]);
 };

@@ -22,7 +22,8 @@
     "videogular-controls": "~1.0.0",
     "videogular-poster": "~1.0.0",
     "jquery-mousewheel": "~3.1.12",
-    "angular-cookie": "~4.0.6"
+    "angular-cookie": "~4.0.6",
+    "grunt-scp": "~0.1.8"
   },
   "devDependencies": {
     "angular-mocks": "1.2.6",

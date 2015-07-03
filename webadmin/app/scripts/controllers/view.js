@@ -39,8 +39,9 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.positionProvider.init(playing);
             var cameraId = $scope.activeCamera.physicalId;
             var server = getCamerasServer($scope.activeCamera);
-            var serverUrl = '';
-            if ($scope.settings.id !== server.id.replace('{', '').replace('}', '')) {
+            var serverUrl = mediaserver.mdeiaUrl();
+
+            if ($scope.settings.id && ($scope.settings.id.replace('{', '').replace('}', '') !== server.id.replace('{', '').replace('}', ''))) {
                 serverUrl = '/proxy/' + getServerUrl(server);
             }
             var positionMedia = !live ? "&pos=" + (playing) : "";
@@ -55,6 +56,8 @@ angular.module('webadminApp').controller('ViewCtrl',
                 { src: serverUrl + '/media/' + cameraId + '.3gp?resolution='    + $scope.activeResolution + positionMedia},
                 { src: serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia }
             ];
+
+            console.log($scope.acitveVideoSource);
         }
 
         $scope.activeVideoRecords = null;

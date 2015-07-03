@@ -14,14 +14,14 @@ angular.module('webadminApp')
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
-                    initialInterval: 1000*60*60 /* *24*365*/, // no records - show last hour
+                    initialInterval: 1000*60 /* *24*365*/, // no records - show small interval
                     minMsPerPixel: 1, // 1ms per pixel - best detailization
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
 
                     zoomBase: Math.log(10), // Base for exponential function for zooming
                     zoomSpeed: 0.05, // Zoom speed 0 -> 1 = full zoom
                     maxVerticalScrollForZoom: 5000, // value for adjusting zoom
-                    animationDuration: 300, // 200-400 for smooth animation
+                    animationDuration: 500, // 300, // 200-400 for smooth animation
 
                     timelineBgColor: [28,35,39], //Color for ruler marks and labels
                     font:'sans-serif',
@@ -58,7 +58,6 @@ angular.module('webadminApp')
 
                     scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
                     scrollingSpeed: 0.25,// Scrolling speed for scroll buttons right-left
-
 
                     end: 0
                 };
@@ -105,11 +104,11 @@ angular.module('webadminApp')
 
                 // !!! Initialization functions
                 function updateTimelineHeight(){
-                    scope.viewportHeight = element.find("canvas").height();
+                    scope.viewportHeight = element.find(".viewport").height();
                     canvas.height = scope.viewportHeight;
                 }
                 function updateTimelineWidth(){
-                    scope.viewportWidth = element.find("canvas").width();
+                    scope.viewportWidth = element.find(".viewport").width();
                     canvas.width  = scope.viewportWidth;
                     scope.scaleManager.setViewportWidth(scope.viewportWidth);
                 }
@@ -124,20 +123,15 @@ angular.module('webadminApp')
                 function drawAll(){
                     var context = clearTimeline();
                     drawTopLabels(context);
-                    drawLowerLabels(context);
+                    drawLabels(context);
                     drawEvents(context);
                     drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
                     drawPointerMarker(context);
                 }
+
                 function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
-                    /*
-                     var colorString =  'rgba(' +
-                     Math.round(color[0]) + ',' +
-                     Math.round(color[1]) + ',' +
-                     Math.round(color[2]) + ',' +
-                     alpha + ')';
-                     */
+
                     if(typeof(color)=="string"){ // do not try to change strings
                         return color;
                     }
@@ -151,10 +145,17 @@ angular.module('webadminApp')
                     if(color.length > 3){ //Array already has alpha channel
                         alpha = alpha * color[3];
                     }
-                    var colorString =  'rgb(' +
+
+                    var colorString =  'rgba(' +
+                        Math.round(color[0]) + ',' +
+                        Math.round(color[1]) + ',' +
+                        Math.round(color[2]) + ',' +
+                        alpha + ')';
+
+                    /*var colorString =  'rgb(' +
                         Math.round(color[0] * alpha + 255 * (1 - alpha)) + ',' +
                         Math.round(color[1] * alpha + 255 * (1 - alpha)) + ',' +
-                        Math.round(color[2] * alpha + 255 * (1 - alpha)) + ')';
+                        Math.round(color[2] * alpha + 255 * (1 - alpha)) + ')';*/
 
                     return colorString;
                 }
@@ -166,16 +167,38 @@ angular.module('webadminApp')
                 }
 
                 // !!! Labels logic
+                var currentTopLabelLevelIndex = 0;
+                var targetTopLabelLevelIndex = 0;
+                scope.changingTopLevel = 1;
+
                 function drawTopLabels(context){
-                    var level = scope.scaleManager.levels.topLabels.level;
+                    var instantLevelIndex = scope.scaleManager.levels.topLabels.index;
+                    if(instantLevelIndex != targetTopLabelLevelIndex){ // Start animation here
+                        targetTopLabelLevelIndex = instantLevelIndex;
+                        animateScope.progress(scope,'changingTopLevel').then(function(){
+                            currentTopLabelLevelIndex = targetTopLabelLevelIndex;
+                        });
+                    }
+
+                    var level = RulerModel.levels[Math.max(currentTopLabelLevelIndex,targetTopLabelLevelIndex)]; // Actual calculating level
+
                     var start = scope.scaleManager.alignStart(level);
                     var end = scope.scaleManager.alignEnd(level);
+
+
                     while(start <= end){
-                        drawTopLabel(context,start,level);
+                        var pointLevelIndex = RulerModel.findBestLevelIndex(start);
+                        var alpha = 1;
+                        if(pointLevelIndex > targetTopLabelLevelIndex){ //fade out
+                            alpha = 1 - scope.changingTopLevel;
+                        }else if(pointLevelIndex > currentTopLabelLevelIndex){ // fade in
+                            alpha = scope.changingTopLevel;
+                        }
+                        drawTopLabel(context,start,level,alpha);
                         start = level.interval.addToDate(start);
                     }
                 }
-                function drawTopLabel(context, date, level){
+                function drawTopLabel(context, date, level,alpha){
                     var coordinate = scope.scaleManager.dateToScreenCoordinate(date);
 
                     var nextDate = level.interval.addToDate(date);
@@ -227,26 +250,48 @@ angular.module('webadminApp')
                     }
 
 
-                    context.strokeStyle = blurColor(timelineConfig.topLabelMarkerColor,1);
+                    context.strokeStyle = blurColor(timelineConfig.topLabelMarkerColor,alpha);
                     context.beginPath();
                     context.moveTo(coordinate, 0);
                     context.lineTo(coordinate, (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight);
                     context.stroke();
 
-                    context.fillStyle = blurColor(timelineConfig.topLabelTextColor,1);
+                    context.fillStyle = blurColor(timelineConfig.topLabelTextColor,alpha);
                     context.fillText(label, x, textStart);
                 }
-                function drawLowerLabels(context){
-                    var level = scope.scaleManager.levels.labels.level;
+
+
+                var currentLabelLevelIndex = 0;
+                var targetLabelLevelIndex = 0;
+                scope.changingLevel = 1;
+                function drawLabels(context){
+
+                    var instantLevelIndex = scope.scaleManager.levels.labels.index;
+                    if(instantLevelIndex != targetLabelLevelIndex){ // Start animation here
+                        targetLabelLevelIndex = instantLevelIndex;
+                        animateScope.progress(scope,'changingLevel').then(function(){
+                            currentLabelLevelIndex = targetLabelLevelIndex;
+                        });
+                    }
+
+                    var level = RulerModel.levels[Math.max(currentLabelLevelIndex,targetLabelLevelIndex)]; // Actual calculating level
+
                     var start = scope.scaleManager.alignStart(level);
                     var end = scope.scaleManager.alignEnd(level);
 
                     while(start <= end){
-                        drawLowerLabel(context,start,level);
+                        var pointLevelIndex = RulerModel.findBestLevelIndex(start);
+                        var alpha = 1;
+                        if(pointLevelIndex > targetLabelLevelIndex){ //fade out
+                            alpha = 1 - scope.changingLevel;
+                        }else if(pointLevelIndex > currentLabelLevelIndex){ // fade in
+                            alpha = scope.changingLevel;
+                        }
+                        drawLabel(context,start,level,alpha);
                         start = level.interval.addToDate(start);
                     }
                 }
-                function drawLowerLabel(context,date,level){
+                function drawLabel(context,date,level,alpha){
                     var coordinate = scope.scaleManager.dateToScreenCoordinate(date);
                     var label = dateFormat(new Date(date), level.format);
                     context.font = timelineConfig.labelFontSize  + 'px ' + timelineConfig.font;
@@ -263,10 +308,10 @@ angular.module('webadminApp')
                     if(coordinate < 0)
                         return;
 
-                    context.fillStyle = blurColor(timelineConfig.timelineBgColor,1);
+                    context.fillStyle = blurColor(timelineConfig.timelineBgColor,alpha);
                     context.fillRect(x - timelineConfig.labelPadding, textStart - timelineConfig.labelFontSize - timelineConfig.labelPadding, textWidth + 2 * timelineConfig.labelPadding, timelineConfig.labelFontSize + 2 * timelineConfig.labelPadding);
 
-                    context.fillStyle = blurColor(timelineConfig.labelTextColor,1);
+                    context.fillStyle = blurColor(timelineConfig.labelTextColor,alpha);
                     context.fillText(label, x, textStart);
                 }
 
@@ -447,7 +492,14 @@ angular.module('webadminApp')
                         scope.zoom(true);
                     }else{
                         if(!mouseInScrollbar){
-                            scope.scaleManager.scroll(mouseInScrollbarRow);
+                            animateScope.animate(scope,"scrollPosition",(mouseInScrollbarRow>0?1:0)).
+                                then(
+                                    function(){},
+                                    function(){},
+                                    function(value){
+                                        scope.scaleManager.scroll(value);
+                                    }
+                                );
                         }
                     }
                 };
@@ -458,7 +510,16 @@ angular.module('webadminApp')
                         scope.handler(mouseDate);
                     }else{
                         if(!mouseInScrollbar){
-                            scope.scaleManager.scroll((mouseInScrollbarRow>0?1:-1)*timelineConfig.scrollBarSpeed);
+                            scope.scrollPosition = scope.scaleManager.scroll() ;
+
+                            animateScope.animate(scope,"scrollPosition", mouseCoordinate / scope.viewportWidth).
+                                then(
+                                    function(){},
+                                    function(){},
+                                    function(value){
+                                        scope.scaleManager.scroll(value);
+                                    }
+                                );
                         }
                     }
                 };
@@ -478,7 +539,7 @@ angular.module('webadminApp')
                     updateMouseCoordinate(event);
                     if(mouseInScrollbar && catchScrollBar){
                         var moveScroll = mouseInScrollbar - catchScrollBar;
-                        scope.scaleManager.scroll( moveScroll / scope.viewportWidth );
+                        scope.scaleManager.scrollBy( moveScroll / scope.viewportWidth );
                     }
                 };
 
