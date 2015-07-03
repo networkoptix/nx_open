@@ -21,12 +21,6 @@ Item
     signal selectionStateShouldBeChanged(int currentItemIndex);
   
     height: column.height + buttonSpacer.height;
-    anchors
-    {
-        left: parent.left;
-        right: parent.right;
-    }
-    
 
     Base.Column
     {

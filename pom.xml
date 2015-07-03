@@ -360,10 +360,6 @@
                 <module>nxtool</module>
                 <module>clientexe</module>
                 <module>wixsetup</module>
-                <!--<module>plugins/nxinterface</module>-->
-                <!--<module>plugins/nxcontrol</module>-->
-                <!--<module>plugins/acs/paxton</module>-->
-                <!--<module>plugins/acs/paxton-installer</module>-->
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
@@ -378,6 +374,7 @@
                 <compiler>msvc2012u3</compiler>
                 <arch>x64</arch>
                 <force_x86>false</force_x86>
+                <bespin.version>1.2-windows-SNAPSHOT</bespin.version>
                 <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
                 <!-- <qt.spec>win32-msvc2012</qt.spec>
                 <PlatformToolSet>v110</PlatformToolSet>
@@ -393,25 +390,28 @@
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
             </properties>
         </profile>
-        <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
-        <!--<profile>
-            <id>windows-xp</id>
+        <!-- Paxton stuff can be built only on Windows x86 -->
+        <profile>
+            <id>windows-x86</id>
             <activation>
                 <os>
                     <family>Windows</family>
                 </os>
                 <property>
-                    <name>box</name>
-                    <value>winxp</value>
+                    <name>arch</name>
+                    <value>x86</value>
                 </property>
             </activation>
-
-            <properties>
-                <qt.spec>win32-msvc2012xp</qt.spec>
-                <PlatformToolSet>v110_xp</PlatformToolSet>
-                <modification>winxp</modification>
-            </properties>
-        </profile> -->
+            <modules>
+                <module>plugins/nxinterface</module>     
+                <module>plugins/nxcontrol</module>     
+                <module>plugins/acs/paxton</module>     
+                <module>plugins/acs/paxton-installer</module>     
+                <!-- Uncomment this when 2.3.1_paxton is merged -->
+                <!-- <module>plugins/acs/paxton</module>
+                <module>plugins/acs/paxton-installer</module> -->
+            </modules>            
+        </profile>
 
         <profile>
             <!-- Common Profile for Linux, Mac, Arm -->

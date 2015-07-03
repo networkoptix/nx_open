@@ -74,8 +74,7 @@ private:
 
     qint64 minTime() const;
     qint64 endTime() const;
-    qint64 secondTime() const;
-    //void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
+
     void erase(QnAbstractArchiveDelegate* value);
     qint64 getDisplayedTimeInternal() const;
     qint64 findTimeAtPlaybackMask(qint64 timeUsec);

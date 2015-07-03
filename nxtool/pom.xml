@@ -12,7 +12,16 @@
     <artifactId>nxtool</artifactId>
     <packaging>pom</packaging>
     <name>NX Server Configuration Tool</name>    
-    <dependencies/>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>build_variables</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
+        </dependency>
+    </dependencies>   
     <properties>
         <product.title>${nxtool.name}</product.title>  
         <product.display.title>${nxtool.display.name}</product.display.title>
@@ -32,5 +41,5 @@
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>      
-    </properties>   
+    </properties>    
 </project>

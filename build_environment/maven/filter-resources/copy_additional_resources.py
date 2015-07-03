@@ -122,7 +122,10 @@ if __name__ == '__main__':
             for file in os.listdir(lib_source_dir):
                 if fnmatch.fnmatch(file, '*.pdb') or fnmatch.fnmatch(file, '*d.dll'):
                     print ('++++++ DELETING %s +++++++++++' % join(lib_source_dir, file))                    
-                    os.unlink(join(lib_source_dir, file))			
+                    os.unlink(join(lib_source_dir, file))	
+            
+            with cd(join('${project.build.directory}', arch)):
+                os.system('qtbinpatcher.exe')        
     else:     
         lib_source_dir = '${qt.dir}/lib'
         lib_target_dir = join('${project.build.directory}', 'lib')

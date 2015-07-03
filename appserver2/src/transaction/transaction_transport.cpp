@@ -293,7 +293,6 @@ void QnTransactionTransport::addData(QByteArray&& data)
             data.size() );
         data.clear();   //cause I can!
         m_dataToSend.push_back( std::move(dataWithSize) );
-        aggregateOutgoingTransactionsNonSafe();
     }
     else
     {
@@ -358,6 +357,12 @@ void QnTransactionTransport::setStateNoLock(State state)
         emit stateChanged(state);
     }
     m_cond.wakeAll();
+}
+
+QUrl QnTransactionTransport::remoteAddr() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_remoteAddr;
 }
 
 QnTransactionTransport::State QnTransactionTransport::getState() const
@@ -479,11 +484,14 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
             "true" );
 
-    m_remoteAddr = remotePeerUrl;
-    if (!m_remoteAddr.userName().isEmpty())
     {
-        m_remoteAddr.setUserName(QString());
-        m_remoteAddr.setPassword(QString());
+        QMutexLocker lk(&m_mutex);
+        m_remoteAddr = remotePeerUrl;
+        if (!m_remoteAddr.userName().isEmpty())
+        {
+            m_remoteAddr.setUserName(QString());
+            m_remoteAddr.setPassword(QString());
+        }
     }
 
     QUrlQuery q = QUrlQuery(m_remoteAddr.query());
@@ -505,12 +513,17 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
         setReadSync(true);
     }
 
-    m_remoteAddr.setQuery(q);
+    {
+        QMutexLocker lk(&m_mutex);
+        m_remoteAddr.setQuery(q);
+    }
+
     m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
     m_httpClient->addAdditionalHeader(
         Qn::EC2_CONNECTION_STATE_HEADER_NAME,
         toString(getState()).toLatin1() );
-    if (!m_httpClient->doGet(m_remoteAddr)) {
+
+    if (!m_httpClient->doGet(remoteAddr())) {
         qWarning() << Q_FUNC_INFO << "Failed to execute m_httpClient->doGet. Reconnect transaction transport";
         setState(Error);
     }
@@ -577,7 +590,7 @@ void QnTransactionTransport::repeatDoGet()
 {
     m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
     m_httpClient->addAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
-    if (!m_httpClient->doGet(m_remoteAddr))
+    if (!m_httpClient->doGet(remoteAddr()))
         cancelConnecting();
 }
 
@@ -902,6 +915,10 @@ bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 void QnTransactionTransport::serializeAndSendNextDataBuffer()
 {
     assert( !m_dataToSend.empty() );
+    
+    if( m_base64EncodeOutgoingTransactions )
+        aggregateOutgoingTransactionsNonSafe();
+
     DataToSend& dataCtx = m_dataToSend.front();
 
     if( m_base64EncodeOutgoingTransactions )
@@ -1066,7 +1083,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         else {
             QnUuid guid(nx_http::getHeaderValue( client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME ));
             if (!guid.isNull()) {
-                emit peerIdDiscovered(m_remoteAddr, guid);
+                emit peerIdDiscovered(remoteAddr(), guid);
                 emit remotePeerUnauthorized(guid);
             }
             cancelConnecting();
@@ -1101,18 +1118,20 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         cancelConnecting();
         return;
     }
-
+    
     m_remotePeer.id = QnUuid(itrGuid->second);
     if (itrRuntimeGuid != client->response()->headers.end())
         m_remotePeer.instanceId = QnUuid(itrRuntimeGuid->second);
+
     Q_ASSERT(!m_remotePeer.instanceId.isNull());
     m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
-#ifdef USE_JSON
-    m_remotePeer.dataFormat = Qn::JsonFormat;
-#else
-    m_remotePeer.dataFormat = Qn::UbjsonFormat;
-#endif
-    emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);
+    #ifdef USE_JSON
+        m_remotePeer.dataFormat = Qn::JsonFormat;
+    #else
+        m_remotePeer.dataFormat = Qn::UbjsonFormat;
+    #endif
+
+    emit peerIdDiscovered(remoteAddr(), m_remotePeer.id);
 
     if (statusCode != nx_http::StatusCode::ok)
     {
@@ -1168,6 +1187,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             assert( data.isEmpty() );
         }
         else {
+            QMutexLocker lk( &m_mutex );
             QUrlQuery query = QUrlQuery(m_remoteAddr);
             query.addQueryItem("canceled", QString());
             m_remoteAddr.setQuery(query);
