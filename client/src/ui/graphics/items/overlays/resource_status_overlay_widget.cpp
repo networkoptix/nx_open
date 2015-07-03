@@ -16,6 +16,7 @@
 #include <ui/workaround/gl_native_painting.h>
 #include "opengl_renderer.h"
 #include "ui/style/skin.h"
+#include "utils/math/color_transformations.h"
 
 /** @def QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
  *
@@ -161,7 +162,17 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     QRectF rect = this->rect();
 
-    painter->fillRect(rect, palette().color(QPalette::Window));
+    if (m_statusOverlay == Qn::NoVideoDataOverlay) 
+    {
+        auto color = palette().color(QPalette::Window);
+        QRadialGradient gradient(rect.center(), rect.width()/2);
+        gradient.setColorAt(0, shiftColor(color, 0x50, 0x50, 0x50));
+        gradient.setColorAt(1, color);
+        painter->fillRect(rect, gradient);
+    }
+    else {
+        painter->fillRect(rect, palette().color(QPalette::Window));
+    }
 
     if(m_statusOverlay == Qn::LoadingOverlay || m_statusOverlay == Qn::PausedOverlay || m_statusOverlay == Qn::EmptyOverlay) {
         qreal unit = qnGlobals->workbenchUnitSize();
