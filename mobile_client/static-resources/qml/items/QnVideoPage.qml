@@ -165,13 +165,27 @@ QnPage {
             drag.minimumY: videoPlayer.height - navigator.height - navigationPanel.height
             drag.maximumY: videoPlayer.height - navigator.height
             drag.filterChildren: true
+
+            property real _prevY
+
+            onPressed: _prevY = mouse.y
+            onMouseYChanged: _prevY = mouse.y
+
             onReleased: {
-                var mid = (drag.minimumY + drag.maximumY) / 2
+                var dir = mouse.y - _prevY
+
                 navigatorYBehavior.enabled = true
-                if (navigator.y < mid)
+                if (dir > dp(1)) {
                     navigator.y = drag.minimumY
-                else
+                } else if (dir < -dp(1)) {
                     navigator.y = drag.maximumY
+                } else {
+                    var mid = (drag.minimumY + drag.maximumY) / 2
+                    if (navigator.y < mid)
+                        navigator.y = drag.minimumY
+                    else
+                        navigator.y = drag.maximumY
+                }
             }
 
             Image {
