@@ -18,7 +18,7 @@ QnPage {
         onClicked: Main.gotoMainScreen()
     }
 
-    Flickable {
+    QnFlickable {
         id: flickable
 
         contentWidth: width

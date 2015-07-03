@@ -36,7 +36,7 @@ QnPage {
         }
     }
 
-    Flickable {
+    QnFlickable {
         id: flickable
         anchors.fill: parent
         topMargin: dp(16)

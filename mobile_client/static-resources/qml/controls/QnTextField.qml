@@ -87,7 +87,7 @@ FocusScope {
             onClicked: textField.forceActiveFocus()
         }
 
-        Flickable {
+        QnFlickable {
             id: flickable
             flickableDirection: Flickable.HorizontalFlick
             anchors.left: parent.left

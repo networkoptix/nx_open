@@ -115,7 +115,7 @@ Item {
             }
         }
 
-        ListView {
+        QnListView {
             id: calendarsList
 
             width: parent.width

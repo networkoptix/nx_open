@@ -6,7 +6,7 @@ import "../main.js" as Main
 
 import "../controls"
 
-Flickable {
+QnFlickable {
     id: cameraFlow
 
     property alias model: repeater.model

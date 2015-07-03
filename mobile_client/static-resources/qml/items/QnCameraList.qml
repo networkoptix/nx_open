@@ -3,7 +3,9 @@ import com.networkoptix.qml 1.0
 
 import "../main.js" as Main
 
-ListView {
+import "../controls"
+
+QnListView {
     id: camerasList
 
     leftMargin: dp(16)

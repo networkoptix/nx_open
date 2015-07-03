@@ -16,7 +16,7 @@ QnNavigationDrawer {
 
     color: QnTheme.sideNavigationBackground
 
-    Flickable {
+    QnFlickable {
         id: flickable
 
         width: panel.width

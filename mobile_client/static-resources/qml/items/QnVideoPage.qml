@@ -68,6 +68,8 @@ QnPage {
         id: resourceHelper
         screenSize: Qt.size(videoPlayer.width, videoPlayer.height)
         resourceId: videoPlayer.resourceId
+
+        onMediaUrlChanged: console.log("------> " + mediaUrl)
     }
 
     QnCameraChunkProvider {
@@ -122,6 +124,10 @@ QnPage {
 
         onPaused: timeline.stickToEnd = false
         onPlaying: videoPlayer.alignToChunk(timeline.positionDate)
+
+        onAvailabilityChanged: console.log("availability " + availability)
+        onErrorChanged: console.log("error" + error)
+        onErrorStringChanged: console.log("error string " + errorString)
 
         function setPositionDate(pos) {
             positionDate = pos
