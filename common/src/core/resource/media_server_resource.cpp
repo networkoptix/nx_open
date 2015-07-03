@@ -100,10 +100,12 @@ QString QnMediaServerResource::getName() const
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
-
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
-    if( !(*lk)->name.isEmpty() )
-        return (*lk)->name;
+    else
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if( !(*lk)->name.isEmpty() )
+            return (*lk)->name;
+    }
     return QnResource::getName();
 }
 
@@ -448,6 +450,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.sslAllowed = false;
     moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
+    moduleInformation.name = getName();
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
     
@@ -456,7 +459,6 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
-    moduleInformation.name = getName();
     moduleInformation.port = QUrl(m_apiUrl).port();
     moduleInformation.id = getId();
 
