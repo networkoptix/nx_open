@@ -32,24 +32,25 @@ angular.module('webadminApp')
                     topLabelHeight: 20/110, //% // Size for top label text
                     topLabelFontSize: 12, //px // Font size
                     topLabelTextColor: [255,255,255], // Color for text for top labels
-                    topLabelMarkerColor: [255,255,255], // Color for mark for top label
+                    topLabelMarkerColor: [105,135,150], // Color for mark for top label
 
                     labelHeight:35/110, // %
                     labelFontSize: 12, // px
-                    labelTextColor: [128,128,128],
+                    labelTextColor: [105,135,150],
+                    labelMarkerColor:[53,70,79],
 
                     chunkHeight:35/110, // %    //Height for event line
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
-                    loadingChunkColor: [58,145,30,0.5],
+                    loadingChunkColor: [58,145,30,0.8],
 
                     scrollBarSpeed: 0.1, // By default - scroll by 10%
                     scrollBarHeight: 20/110, // %
                     minScrollBarWidth: 50, // px
-                    scrollBarBgColor: [0,0,0],
-                    scrollBarColor: [128,128,128],
-                    scrollBarHighlightColor: [200,200,200],
+                    scrollBarBgColor: [28,35,39],
+                    scrollBarColor: [105,135,150],
+                    scrollBarHighlightColor: [105,135,150,0.8],
 
                     timeMarkerColor: [255,255,255], // Timemarker color
                     pointerMarkerColor: [0,0,0], // Mouse pointer marker color

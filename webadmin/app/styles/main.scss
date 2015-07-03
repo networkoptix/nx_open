@@ -14,6 +14,7 @@ $icon-font-path: "../fonts/";
 /* Space out content a bit */
 body {
     padding-bottom: 20px;
+    height:100%;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -378,20 +379,10 @@ $state-danger-border:            darken(adjust-hue($state-danger-bg, -10), 5%) !
 .offline {
   color:silver;
 }
-.viewport-vertical{
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100%;
-  width: 257px;
-  top: 0px;
-  padding-top: 60px;
-}
 
 html, body {height: 100%;}
 
-.viewport-container{
-  padding: 0px;
-}
+
 .tree li>a, .tree li>.span-element {
   white-space: nowrap;
   text-overflow: ellipsis;

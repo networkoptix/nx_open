@@ -1,45 +1,52 @@
-<div class="col-sm-4 viewport-container ">
-    <div class="small viewport-vertical fixed">
-        <ul class="tree nav nav-pills nav-stacked ">
-            <li ng-repeat="server in mediaServers">
-                <span  ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
-                       ng-click="server.collapsed = !server.collapsed" class="span-element" ng-class="{offline:server.status!='Online'}">
-                    <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="collapse" ></icon>
-                    <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-right" title-true="expand"  ></icon>
-                    <icon for="!cameras[server.id] || cameras[server.id].length < 1" on-true="empty"></icon>
-                    <span class="glyphicon glyphicon-align-justify" title="{{server.status}}"></span>
-                    <icon for="server.status=='Unauthorized'" on-true="lock" title="Unauthorized" ></icon>
-                    &nbsp;{{server.name}} ({{server.url}}) {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
-                </span>
-                <ul class="nav nav-pills nav-stacked"
-                    ng-class="{hidden:server.collapsed, edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy }">
-                    <li ng-repeat="camera in cameras[server.id]"
-                        ng-class="{active:activeCamera===camera}"
-                        ng-include="camera.isGroup?'views/components/camerasGroupNode.html':'views/components/cameraNode.html'" >
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-</div>
-<div class="col-sm-8">
-    <div style="width:640px;height:480px" class="videogular-container" ng-if="activeCamera!==null">
-        <videogular
-                vg-player-ready="playerReady($API)"
-                vg-update-time="updateTime($currentTime, $duration)"
-                vg-autoplay="true">
-            <vg-media vg-src="acitveVideoSource"></vg-media>
-            <vg-controls>
-                <vg-play-pause-button></vg-play-pause-button>
-                <vg-quality current="activeResolution" list="availableResolutions" ></vg-quality>
-            </vg-controls>
-            <vg-buffering></vg-buffering>
-        </videogular>
+<div class="container-fluid dark-theme row">
+    <table style="width:100%" class="webclient-window">
+        <tbody>
+            <tr>
+                <td rowspan="2" class="cameras-panel">
+                    <ul class="tree nav nav-pills nav-stacked  small" style="width:350px">
+                        <li ng-repeat="server in mediaServers">
+                            <span  ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
+                                   ng-click="server.collapsed = !server.collapsed" class="span-element" ng-class="{offline:server.status!='Online'}">
+                                <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="collapse" ></icon>
+                                <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-right" title-true="expand"  ></icon>
+                                <icon for="!cameras[server.id] || cameras[server.id].length < 1" on-true="empty"></icon>
+                                <span class="glyphicon glyphicon-align-justify" title="{{server.status}}"></span>
+                                <icon for="server.status=='Unauthorized'" on-true="lock" title="Unauthorized" ></icon>
+                                &nbsp;{{server.name}} ({{server.url}}) {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
+                            </span>
+                            <ul class="nav nav-pills nav-stacked"
+                                ng-class="{hidden:server.collapsed, edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy }">
+                                <li ng-repeat="camera in cameras[server.id]"
+                                    ng-class="{active:activeCamera===camera}"
+                                    ng-include="camera.isGroup?'views/components/camerasGroupNode.html':'views/components/cameraNode.html'" >
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
 
-        <timeline records-provider="activeVideoRecords" handler="switchPosition" position-provider="positionProvider" ></timeline>
+                <td width="100%" height="100%"  class="view-panel videogular-container">
+                    <videogular
+                            vg-player-ready="playerReady($API)"
+                            vg-update-time="updateTime($currentTime, $duration)"
+                            vg-autoplay="true">
+                        <vg-media vg-src="acitveVideoSource"></vg-media>
+                        <vg-controls>
+                            <vg-play-pause-button></vg-play-pause-button>
+                            <vg-quality current="activeResolution" list="availableResolutions" ></vg-quality>
+                        </vg-controls>
+                        <vg-buffering></vg-buffering>
+                    </videogular>
 
-        <!-- <timelineold records="activeVideoRecords" handler="switchPosition" position-provider="positionProvider" ></timelineold> -->
+                </td>
+            </tr>
 
-
-    </div>
+            <tr>
+                <td>
+                    <timeline records-provider="activeVideoRecords" handler="switchPosition" position-provider="positionProvider" ></timeline>
+                    <!-- <timelineold records="activeVideoRecords" handler="switchPosition" position-provider="positionProvider" ></timelineold> -->
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>

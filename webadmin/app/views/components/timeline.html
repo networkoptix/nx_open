@@ -1,5 +1,23 @@
 <div class="timeline">
 
+    <div class="timeline-info">
+        <div class="btn-group">
+            <button type="button" class="btn btn-xs"
+                    ng-click="zoom(false)"
+                    ng-disabled="disableZoomOut"><span class="glyphicon glyphicon-minus"></span></button>
+            <button type="button" class="btn btn-xs"
+                    ng-click="zoom(true)"
+                    ng-disabled="disableZoomIn"><span class="glyphicon glyphicon-plus"></span></button>
+        </div>
+        <button type="button" class="btn btn-xs"
+                ng-class="{'btn-success':liveMode}"
+                ng-disabled="liveMode"
+                ng-click="goToLive()">Live</button>
+    </div>
+
+
+
+
 
     <div class="popover top timeMarker playing small" >
         <div class="arrow" style="left: 50%;"></div>
@@ -20,20 +38,6 @@
         <canvas ></canvas>
     </div>
 
-    <div class="timeline-info">
-        <div class="btn-group">
-            <button type="button" class="btn btn-xs"
-                    ng-click="zoom(false)"
-                    ng-disabled="disableZoomOut"><span class="glyphicon glyphicon-minus"></span></button>
-            <button type="button" class="btn btn-xs"
-                    ng-click="zoom(true)"
-                    ng-disabled="disableZoomIn"><span class="glyphicon glyphicon-plus"></span></button>
-        </div>
-        <button type="button" class="btn btn-xs"
-                ng-class="{'btn-success':liveMode}"
-                ng-disabled="liveMode"
-                ng-click="goToLive()">Live</button>
-    </div>
 <!--
 
         <div class="scroll-btn left"
