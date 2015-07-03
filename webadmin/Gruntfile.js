@@ -109,7 +109,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/', host: '192.168.0.25', port: 7001}/**/
 
                 //demo.networkoptix.com
-                /*{context: '/api/', host: 'demo.networkoptix.com', port: 7001},
+                {context: '/api/', host: 'demo.networkoptix.com', port: 7001},
                 {context: '/ec2/', host: 'demo.networkoptix.com', port: 7001},
                 {context: '/hls/', host: 'demo.networkoptix.com',port: 7001},
                 {context: '/media/', host: 'demo.networkoptix.com', port: 7001},
@@ -123,7 +123,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/', host: '192.168.56.101',port: 9000}/**/
 
                 // Masha
-                {context: '/api/',      host: '10.0.2.186', port: 7001},
+                /*{context: '/api/',      host: '10.0.2.186', port: 7001},
                 {context: '/ec2/',      host: '10.0.2.186', port: 7001},
                 {context: '/hls/',      host: '10.0.2.186', port: 7001},
                 {context: '/media/',    host: '10.0.2.186', port: 7001},
@@ -615,7 +615,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('demo', [
-        'publish',
+        'build',
         'scp:demo'
     ]);
 };

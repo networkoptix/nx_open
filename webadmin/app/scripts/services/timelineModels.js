@@ -908,6 +908,3 @@ ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (fro
     this.msPerPixel = this.zoomToMs(zoomValue);
     this.updateCurrentInterval();
 };
-ScaleManager.prototype.zoomIn = function(relativeValue){ // Change zoom value: zoomIn for positive and zoomout for negative
-    this.zoom(this.zoom() - relativeValue);
-};

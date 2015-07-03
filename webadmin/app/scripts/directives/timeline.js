@@ -473,12 +473,25 @@ angular.module('webadminApp')
                     drawOrCheckScrollBar();
                 }
 
+                scope.zoomTarget = 1;
                 function mouseWheel(event){
                     updateMouseCoordinate(event);
                     event.preventDefault();
                     if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
-                        scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate/scope.viewportWidth);// Set position to keep
-                        scope.scaleManager.zoomIn(event.deltaY / timelineConfig.maxVerticalScrollForZoom);
+                        scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate / scope.viewportWidth);// Set position to keep
+                        if( window.jscd.touch ) {
+                            scope.scaleManager.zoom(scope.scaleManager.zoom() - event.deltaY / timelineConfig.maxVerticalScrollForZoom);
+
+                        }else{
+                            // We need to smooth zoom here
+                            scope.zoomTarget = scope.scaleManager.zoom();
+                            var zoomTarget = scope.zoomTarget - event.deltaY / timelineConfig.maxVerticalScrollForZoom;
+                            animateScope.animate(scope,"zoomTarget",zoomTarget).then(function(){},function(){},
+                                function(value){
+                                    scope.scaleManager.zoom(value);
+                                }
+                            );
+                        }
                     } else {
                         scope.scaleManager.scrollByPixels(event.deltaX);
                     }
@@ -553,7 +566,14 @@ angular.module('webadminApp')
 
                 // !!! Functions for buttons on view
                 scope.zoom = function(zoomIn){
-                    scope.scaleManager.zoomIn((zoomIn?1:-1) * timelineConfig.zoomSpeed);
+                    scope.zoomTarget = scope.scaleManager.zoom();
+                    var zoomTarget = scope.zoomTarget - (zoomIn?1:-1) * timelineConfig.zoomSpeed;
+                    animateScope.animate(scope,"zoomTarget",zoomTarget).then(function(){},function(){},
+                        function(value){
+                            scope.scaleManager.zoom(value);
+                        }
+                    );
+
                 };
 
 
