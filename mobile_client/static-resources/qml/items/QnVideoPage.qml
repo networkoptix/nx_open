@@ -280,7 +280,10 @@ QnPage {
                     text: qsTr("LIVE")
                     flat: true
                     iconic: true
-                    onClicked: timeline.stickToEnd = true
+                    onClicked: {
+                        timeline.stickToEnd = true
+                        playbackController.paused = false
+                    }
                     opacity: timeline.stickToEnd ? 0.0 : 1.0
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                 }
