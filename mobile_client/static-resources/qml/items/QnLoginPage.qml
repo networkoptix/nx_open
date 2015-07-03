@@ -83,6 +83,7 @@ QnPage {
                     placeholderText: qsTr("Host")
                     showError: _serverError
                     onTextChanged: loginPage.removeWarnings()
+                    inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                 }
 
                 QnTextField {
@@ -91,6 +92,7 @@ QnPage {
                     placeholderText: qsTr("Port")
                     showError: _serverError
                     onTextChanged: loginPage.removeWarnings()
+                    inputMethodHints: Qt.ImhDigitsOnly
                 }
             }
 
@@ -100,6 +102,7 @@ QnPage {
                 placeholderText: qsTr("Login")
                 showError: _authError
                 onTextChanged: loginPage.removeWarnings()
+                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
             }
 
             QnTextField {
@@ -109,6 +112,7 @@ QnPage {
                 echoMode: TextInput.Password
                 showError: _authError
                 onTextChanged: loginPage.removeWarnings()
+                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
             }
 
             Row {

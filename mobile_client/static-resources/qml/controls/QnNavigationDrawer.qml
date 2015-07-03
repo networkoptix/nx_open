@@ -100,9 +100,9 @@ Rectangle {
     function completeSlideDirection() {
         if (open) {
             panel.x = _expandedX;
+            Qt.inputMethod.hide();
         } else {
             panel.x = _collapsedX;
-            Qt.inputMethod.hide();
         }
     }
 

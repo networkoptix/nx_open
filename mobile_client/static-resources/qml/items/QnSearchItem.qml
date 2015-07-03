@@ -48,6 +48,7 @@ Item {
 
             rightPadding: dp(48)
             showDecoration: false
+            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
         }
 
         QnIconButton {
@@ -67,6 +68,8 @@ Item {
     }
 
     function close() {
+        searchField.focus = false
+        Qt.inputMethod.hide()
         searchPanel.opacity = 0.0
         clear()
     }
