@@ -337,7 +337,7 @@ QnPage {
                 }
                 Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: 200 } }
 
-                width: timeLabel.width
+                width: timeLabel.visible ? timeLabel.width : liveLabel.width
                 height: timeLabel.height
 
                 QnTimeLabel {
@@ -348,7 +348,7 @@ QnPage {
 
                 Text {
                     id: liveLabel
-                    anchors.centerIn: timeLabel
+                    anchors.verticalCenter: parent.verticalCenter
                     font.pixelSize: sp(36)
                     font.weight: Font.Normal
                     color: QnTheme.windowText
