@@ -10,6 +10,7 @@ QnListView {
 
     leftMargin: dp(16)
     rightMargin: dp(16)
+    topMargin: dp(16)
     bottomMargin: dp(16)
     spacing: dp(8)
 

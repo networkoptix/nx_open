@@ -10,7 +10,7 @@ Item {
     property alias text: searchField.text
     readonly property bool opened: searchPanel.opacity == 1.0
 
-    height: toolBar.height
+    height: toolBar.height - dp(2) // prevent painting over toolbar decorations
     width: searchPanel.visible ? searchPanel.width : searchButton.width
     anchors.right: parent.right
     anchors.rightMargin: dp(8)
