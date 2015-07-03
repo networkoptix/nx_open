@@ -164,7 +164,6 @@ Expandable.MaskedSettingsPanel
                             height: datePicker.height;
 
                             enabled: !useCurrentTimeCheckbox.checked;
-                            text: qsTr("...");
 
                             Dialogs.CalendarDialog
                             {
@@ -177,6 +176,13 @@ Expandable.MaskedSettingsPanel
                             {
                                 calendarDialog.initDate = datePicker.date;
                                 calendarDialog.show();
+                            }
+
+                            Image
+                            {
+                                id: name
+                                anchors.centerIn: parent;
+                                source: "qrc:/resources/calendar.png";
                             }
                         }
                     }
