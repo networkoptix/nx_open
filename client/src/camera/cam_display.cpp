@@ -676,7 +676,6 @@ bool QnCamDisplay::isAudioBuffering() const
 
 bool QnCamDisplay::doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed)
 {
-    qint64 realSleepTime = AV_NOPTS_VALUE;
     if (ad->flags & QnAbstractMediaData::MediaFlags_LIVE)
         return true; // no delay for audio live is required
     if (isAudioBuffering())
@@ -713,20 +712,14 @@ bool QnCamDisplay::doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed
                 else {
                     break;
                 }
-
-                m_isLongWaiting = false;
-                realSleepTime = (displayedTime - m_extTimeSrc->expectedTime());
             }
+            m_isLongWaiting = false;
         }
     }
     else 
     {
         qint32 needToSleep = qMin(MAX_FRAME_DURATION * 1000, ad->timestamp - m_previousVideoTime);
         needToSleep *= 1.0/qAbs(speed);
-        if (m_isRealTimeSource)
-            realSleepTime = m_delay.terminatedSleep(needToSleep);
-        else
-            realSleepTime = m_delay.sleep(needToSleep);
         m_previousVideoTime = ad->timestamp;
     }
     m_isLongWaiting = false;
