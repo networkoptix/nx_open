@@ -9,10 +9,10 @@ namespace Ui
     class IOStateDisplayWidget;
 }
 
-class QnIOStateDisplayWidget: public QWidget 
+class QnIOStateDisplayWidget: public QDialog 
 {
     Q_OBJECT
-    typedef QWidget base_type;
+    typedef QDialog base_type;
 
 public: 
     QnIOStateDisplayWidget(QWidget *parent = NULL);

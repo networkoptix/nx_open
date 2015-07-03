@@ -807,7 +807,7 @@ void QnWorkbenchActionHandler::at_openIOMonitorAction_triggered()
     foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
         QnServerCameraPtr cameraResource = resource.dynamicCast<QnServerCamera>();
         if(cameraResource) {
-            QnIOStateDisplayWidget* ioStateDisplay = new QnIOStateDisplayWidget();
+            QnIOStateDisplayWidget* ioStateDisplay = new QnIOStateDisplayWidget(mainWindow());
             ioStateDisplay->setCamera(cameraResource);
             ioStateDisplay->show();
         }
