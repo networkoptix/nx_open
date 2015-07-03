@@ -14,6 +14,22 @@ namespace
     const QByteArray utcIanaTemplate = "UTC";
     const QByteArray gmtIanaTemplate = "GMT";
     const QString utcKeyword = "Universal";
+
+    const QList<QByteArray> utcAliases = [] {
+        return QList<QByteArray>() 
+            << "Etc/GMT"
+            << "Etc/GMT+0"
+            << "Etc/UCT"
+            << "Etc/Universal"
+            << "Etc/UTC"
+            << "GMT"
+            << "GMT+0"
+            << "GMT0"
+            << "GMT-0"
+            << "Greenwich"
+            << "UCT"
+            << "Universal";
+    }();
     
     bool isDeprecatedTimeZone(const QByteArray &zoneIanaId) {
         return 
@@ -193,13 +209,15 @@ void rtu::TimeZonesModel::Impl::initTimeZones() {
             : l.standardTimeOffset < r.standardTimeOffset;
     });
 
-    /* Add deprecated time zones as secondary id's. */
-    for(const auto &zoneIanaId: timeZones) {
-        if (!isDeprecatedTimeZone(zoneIanaId))
-            continue;
 
-        QTimeZone tz(zoneIanaId);
-        int standardTimeOffset = tz.standardTimeOffset(now);
+    auto addCustomTimeZone = [this](const QByteArray &zoneIanaId, int standardTimeOffset) {
+
+        bool alreadyExists = std::any_of(m_timeZones.cbegin(), m_timeZones.cend(), [zoneIanaId](const TzInfo &info) {
+            return info.ids.contains(zoneIanaId);
+        });
+
+        if (alreadyExists)
+            return;
 
         /* Try to find with keyword first, otherwise - any with the same offset. */
         auto existingUtc = std::find_if(m_timeZones.begin(), m_timeZones.end(), [standardTimeOffset](const TzInfo &info) {
@@ -213,7 +231,16 @@ void rtu::TimeZonesModel::Impl::initTimeZones() {
 
         if (existingUtc != m_timeZones.end())
             existingUtc->ids.append(zoneIanaId);
-    }
+    };
+
+    /* Add deprecated time zones as secondary id's. */
+    for(const auto &zoneIanaId: timeZones)
+        if (isDeprecatedTimeZone(zoneIanaId))
+            addCustomTimeZone(zoneIanaId, QTimeZone(zoneIanaId).standardTimeOffset(now));
+
+    /* Manually register all IANA UTC links. */
+    for (const auto &utcAlias: utcAliases)
+        addCustomTimeZone(utcAlias, 0);
 }
 
 int rtu::TimeZonesModel::Impl::timeZoneIndexById(const QByteArray &id) const {
