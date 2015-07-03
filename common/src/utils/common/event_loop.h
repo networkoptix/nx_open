@@ -6,8 +6,8 @@
 #include <QtCore/5.2.1/QtCore/private/qthread_p.h>
 #elif QT_VERSION == 0x050401
 #include <QtCore/5.4.1/QtCore/private/qthread_p.h>
-#elif QT_VERSION == 0x050402
-#include <QtCore/5.4.2/QtCore/private/qthread_p.h>
+#elif QT_VERSION == 0x050500
+#include <QtCore/5.5.0/QtCore/private/qthread_p.h>
 #else
 #error "Include proper header here!"
 #endif
