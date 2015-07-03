@@ -476,9 +476,7 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
                 onChangeApplied();
             };
 
-            if (!sendSetTimeRequest(m_client, *info, change.utcDateTimeMs, change.timeZoneId, callback)) {
-                callback("Invalid request", rtu::kNoEntitiesAffected);
-            }
+            sendSetTimeRequest(m_client, *info, change.utcDateTimeMs, change.timeZoneId, callback);
         };
 
         m_requests.push_back(RequestData(kNonBlockingRequest, request));

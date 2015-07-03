@@ -79,13 +79,13 @@ namespace rtu
     typedef std::function<void (const QUuid &id
         , const rtu::ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
     
-    bool getServerExtraInfo(HttpClient *client
+    void getServerExtraInfo(HttpClient *client
         , const BaseServerInfo &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed);
 
-    bool sendIfListRequest(HttpClient *client
+    void sendIfListRequest(HttpClient *client
         , const BaseServerInfo &info
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
@@ -93,7 +93,7 @@ namespace rtu
 
     ///
 
-    bool sendSetTimeRequest(HttpClient *client
+    void sendSetTimeRequest(HttpClient *client
         , const ServerInfo &info
         , qint64 utcDateTimeMs
         , const QByteArray &timeZoneId
@@ -101,18 +101,18 @@ namespace rtu
 
     ///
 
-    bool sendSetSystemNameRequest(HttpClient *client
+    void sendSetSystemNameRequest(HttpClient *client
         , const ServerInfo &info
         , const QString &systemName
         , const OperationCallback &callback);
     
-    bool sendSetPasswordRequest(HttpClient *client
+    void sendSetPasswordRequest(HttpClient *client
         , const ServerInfo &info
         , const QString &password
         , bool useNewPassword
         , const OperationCallback &callback);
 
-    bool sendSetPortRequest(HttpClient *client
+    void sendSetPortRequest(HttpClient *client
         , const ServerInfo &info
         , int port
         , const OperationCallback &callback);

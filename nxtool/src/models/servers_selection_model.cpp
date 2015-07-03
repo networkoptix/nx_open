@@ -648,6 +648,7 @@ void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
     if (!findAndMarkSelected(id, searchInfo))
         return;
 
+    searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().hostAddress = host;
     ExtraServerInfo &extra = getExtraInfo(searchInfo);
     for (const InterfaceInfo &itf: interfaces)
     {
