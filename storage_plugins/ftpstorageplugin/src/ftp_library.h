@@ -48,6 +48,7 @@ namespace Qn
         }; // class NonCopyable
     } //namespace aux
 
+    typedef std::shared_ptr<ftplib> implPtrType;
     class FtpStorage;
     // At construction phase we synchronise remote file with local one.
     // During destruction synchronisation attempt is repeated.
@@ -60,11 +61,11 @@ namespace Qn
         friend class aux::PluginRefCounter<FtpIODevice>;
     public:
         FtpIODevice(
-            ftplib             &impl, 
             const char         *uri,
             int                 mode,
-            const FtpStorage   *stor,
-            std::mutex         &mut
+            const std::string  &storageUrl,
+            const std::string  &uname,
+            const std::string  &upasswd
         );
 
         virtual uint32_t STORAGE_METHOD_CALL write(
@@ -102,14 +103,16 @@ namespace Qn
     private:
         int                 m_mode;
         mutable int64_t     m_pos;
-        std::string         m_url;
-        ftplib             &m_impl;
+        std::string         m_uri; //file URI
+        implPtrType         m_impl;
         std::string         m_localfile;
         bool                m_altered;
         long long           m_localsize;
-        const FtpStorage   *m_stor;
         mutable
-        std::mutex         &m_mutex;
+        std::mutex          m_mutex;
+        std::string         m_implurl;
+        std::string         m_user;
+        std::string         m_passwd;
     }; // class FtpIODevice
 
     // Fileinfo list is obtained from the server at construction phase.
@@ -167,8 +170,6 @@ namespace Qn
         friend class aux::PluginRefCounter<FtpStorage>;
         // we need pointer because 'ftplib' default constructor can throw
         // and we want to handle it explicitely.
-        typedef std::shared_ptr<ftplib> implPtrType; 
-
     public: // ctors, helper functions
         FtpStorage(const std::string& url);
         int getAvail() const {return m_available;}
@@ -177,7 +178,7 @@ namespace Qn
         virtual int STORAGE_METHOD_CALL isAvailable() const override;
 
         virtual IODevice* STORAGE_METHOD_CALL open(
-            const char*     url,
+            const char*     uri,
             int             flags,
             int*            ecode
         ) const override;
@@ -229,8 +230,6 @@ namespace Qn
         virtual unsigned int releaseRef() override;
 
     private:
-        // attempt to reestablish lost (due to network error or just timeout) control FTP session
-        int tryReconnect(int *ecode = nullptr) const;
         // destroy only via releaseRef()
         ~FtpStorage();
         

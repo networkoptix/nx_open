@@ -225,7 +225,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    pathItem->setData(Qt::DisplayRole, QnStorageResource::urlToPath(item.url));
+    pathItem->setData(Qt::DisplayRole, item.url);
 
     QTableWidgetItem *capacityItem = new QTableWidgetItem();
     capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);

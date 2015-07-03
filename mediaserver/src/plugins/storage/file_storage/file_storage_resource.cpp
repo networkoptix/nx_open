@@ -214,7 +214,12 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
 {
     updatePermissions();
     QDir dir(dirName);
-    return QnAbstractStorageResource::FIListFromQFIList(dir.entryInfoList(QDir::Files));
+    return QnAbstractStorageResource::FIListFromQFIList(
+        dir.entryInfoList(
+            QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
+            QDir::DirsFirst
+        )
+    );
 }
 
 qint64 QnFileStorageResource::getFileSize(const QString& url) const
