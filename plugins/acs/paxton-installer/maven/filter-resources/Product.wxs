@@ -16,12 +16,12 @@
     <Icon Id="logo.ico" SourceFile="resources\logo.ico"/>
     <Property Id="ARPPRODUCTICON" Value="logo.ico" />
 
-    <Property Id="PAXTONINSTALLED">
-      <RegistrySearch Id="PaxtonInstalledSearch" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\{1C927CD7-BE59-4578-B990-50826AF7A762}" Name="Installed" Type="raw" />
+    <Property Id="PAXTONDIR">
+      <RegistrySearch Id="PaxtonDirSearch" Root="HKLM" Key="SOFTWARE\Paxton Access\Common" Name="MainPath" Type="directory" Win64="no"/>
     </Property>
 
     <Condition Message="You need to have Paxton Access installed">
-      <![CDATA[ PAXTONINSTALLED <> 1 ]]>
+      <![CDATA[ PAXTONDIR <> "" ]]>
     </Condition>
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" Schedule="afterInstallInitialize"/>
@@ -57,33 +57,42 @@
           </Directory>
         </Directory>
 
-        <Directory Id="PaxtonDir" Name="Paxton Access">
-          <Directory Id="PaxtonAccessDir" Name="Access Control">
-            <Directory Id="DvrMiniDriversDir" Name="DvrMiniDrivers"/>
-          </Directory>
+      <!-- Paxton looks for drivers in hardcoded default directory?! Oh... -->
+      <Directory Id="PaxtonAccessPfDir" Name="Paxton Access">
+        <Directory Id="AccessControPfDir" Name="Access Control">
+          <Directory Id="DvrMiniDriversDir" Name="DvrMiniDrivers"/>
         </Directory>
       </Directory>
+
+      </Directory>
+
+      <!-- Real paxton's directory for interop assemblies -->
+      <Directory Id="PAXTONDIR" Name="Real Paxton Directory">
+        <Directory Id="AccessControlDir" Name="Access Control"/>
+      </Directory>
     </Directory>
+
+
   </Fragment>
 
   <Fragment>
-    <ComponentGroup Id="RootComponents" Directory="PaxtonAccessDir">
-      <Component Id="InteropComponent">
+    <ComponentGroup Id="RootComponents" Directory="AccessControlDir">
+      <Component Id="InteropComponent" Guid="{B0E867A3-7B23-4317-8A05-AA6B83772292}">
         <File Id="Interop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\Interop.${ax.className}_${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
       </Component>
-      <Component Id="AxInteropComponent">
+      <Component Id="AxInteropComponent" Guid="{4237B629-3F2C-423F-9862-EB6CF63E7627}">
         <File Id="AxInterop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\AxInterop.${ax.className}_${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
       </Component>
-      <Component Id="NxControlComponent">
+      <Component Id="NxControlComponent" Guid="{8B6FF1C5-2890-410F-947D-5680B66DF25E}">
         <File Id="NxControl.${nxec.ec2ProtoVersion}.dll" Source="..\..\..\nxcontrol\x86\bin\release\${ax.className}Control.${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
       </Component>
-      <Component Id="NxInterfaceComponent">
+      <Component Id="NxInterfaceComponent" Guid="{2F8E6482-75C6-4B8B-8EFE-DD0158ACE7F6}">
         <File Id="NxInterface.1.dll" Source="..\..\..\nxinterface\x86\bin\release\${ax.className}Interface.1.dll" KeyPath="yes"/>
       </Component>
     </ComponentGroup>
 
     <ComponentGroup Id="OemDriverComponents" Directory="DvrMiniDriversDir">
-      <Component Id="OemMiniDriverComponent">
+      <Component Id="OemMiniDriverComponent" Guid="{149E7683-5F12-4AE0-A877-71634D704632}">
         <File Id="${ax.className}.OemDvrMiniDriver.dll" Source="..\..\paxton\x86\bin\Release\${ax.className}.OemDvrMiniDriver.Merged.dll" KeyPath="yes"/>
       </Component>
     </ComponentGroup>

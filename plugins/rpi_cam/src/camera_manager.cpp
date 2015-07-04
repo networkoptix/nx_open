@@ -20,7 +20,7 @@ namespace rpi_cam
 {
     static unsigned ENCODERS_COUNT = 2;
 
-    CameraManager::CameraManager(const std::string& serial)
+    CameraManager::CameraManager(const std::string& serial, const std::string& url)
     :   DefaultRefCounter( DiscoveryManager::refManager() )
     {
         debug_print("%s\n", __FUNCTION__);
@@ -32,7 +32,7 @@ namespace rpi_cam
             m_encoderLQ = std::shared_ptr<MediaEncoder>( new MediaEncoder(m_rpiCamera, 1), refDeleter );
         }
 
-        makeInfo(serial);
+        makeInfo(serial, url);
     }
 
     CameraManager::~CameraManager()
@@ -40,14 +40,13 @@ namespace rpi_cam
         debug_print("%s\n", __FUNCTION__);
     }
 
-    void CameraManager::makeInfo(const std::string& serial)
+    void CameraManager::makeInfo(const std::string& serial, const std::string& url)
     {
         std::string model = "NxPi";
-        std::string uid = model + "Camera_" + serial;
 
         memset( &m_info, 0, sizeof(nxcip::CameraInfo) );
-        strncpy( m_info.url, model.c_str(), std::min(model.size(), sizeof(nxcip::CameraInfo::url)-1) );
-        strncpy( m_info.uid, uid.c_str(), std::min(uid.size(), sizeof(nxcip::CameraInfo::uid)-1) );
+        strncpy( m_info.url, url.c_str(), std::min(url.size(), sizeof(nxcip::CameraInfo::url)-1) );
+        strncpy( m_info.uid, serial.c_str(), std::min(serial.size(), sizeof(nxcip::CameraInfo::uid)-1) );
         strncpy( m_info.modelName, model.c_str(), std::min(model.size(), sizeof(nxcip::CameraInfo::modelName)-1) );
     }
 

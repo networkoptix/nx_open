@@ -89,12 +89,12 @@ QnSecurityCamResource::QnSecurityCamResource():
 
 QString QnSecurityCamResource::getName() const
 {
-    if( getId().isNull() )
-        return QnResource::getName();
-
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    if( !(*userAttributesLock)->name.isEmpty() )
-        return (*userAttributesLock)->name;
+    if( !getId().isNull() )
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if( !(*userAttributesLock)->name.isEmpty() )
+            return (*userAttributesLock)->name;
+    }
     return QnResource::getName();
 }
 

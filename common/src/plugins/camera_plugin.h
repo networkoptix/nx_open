@@ -125,11 +125,10 @@ namespace nxcip
             It is recommended that this method works in asynchronous mode (only returning list of already found cameras).
             This method is called periodically.
             \param[out] cameras Array of size \a CAMERA_INFO_ARRAY_SIZE. Implementation filles this array with found camera(s) information
-            \param[in] localInterfaceIPAddr String representation of local interface ip (ipv4 or ipv6). 
-                If not NULL, camera search should be done on that interface only
+            \param[in] serverURL Server URL. If camera do not have own URL it should use this one
             \return > 0 - number of found cameras, < 0 - on error. 0 - nothing found
         */
-        virtual int findCameras( CameraInfo* cameras, const char* localInterfaceIPAddr ) = 0;
+        virtual int findCameras( CameraInfo* cameras, const char* serverURL ) = 0;
         //!Check host for camera presence
         /*!
             Plugin should investigate \a address for supported camera presence and fill \a cameras array with found camera(s) information

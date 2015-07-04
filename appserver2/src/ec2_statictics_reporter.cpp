@@ -239,10 +239,14 @@ namespace ec2
         
         const QDateTime now = qnSyncTime->currentDateTime().toUTC();
         const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), Qt::ISODate);
+        if (!lastTime.isValid())
+        {
+            m_admin->setProperty(SR_LAST_TIME, now.toString(Qt::ISODate));
+            propertyDictionary->saveParams(m_admin->getId());
+        }
 
         const uint timeCycle = secsWithPostfix(m_admin->getProperty(SR_TIME_CYCLE), DEFAULT_TIME_CYCLE);
         const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
-
         if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(timeCycle + maxDelay))
         {
             static std::once_flag flag;
@@ -250,7 +254,7 @@ namespace ec2
 
             const auto minDelay = timeCycle * MIN_DELAY_RATIO / 100;
             const auto rndDelay = timeCycle * (static_cast<uint>(qrand()) % RND_DELAY_RATIO) / 100;
-            m_plannedReportTime = lastTime.addSecs(timeCycle + minDelay + rndDelay);
+            m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(minDelay + rndDelay);
             
             NX_LOG(lit("Ec2StaticticsReporter: Last report was at %1, the next planned for %2")
                    .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))

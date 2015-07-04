@@ -132,6 +132,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 #endif
 
     setWarningStyle(ui->failoverWarningLabel);
+    setWarningStyle(ui->storagesWarningLabel);
+    ui->storagesWarningLabel->hide();
 
     /* Edge servers cannot be renamed. */
     ui->nameLineEdit->setReadOnly(QnMediaServerResource::isEdgeServer(server));
@@ -222,6 +224,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     checkBoxItem->setData(StorageIdRole, QVariant::fromValue<QnUuid>(item.storageId));
     checkBoxItem->setData(ExternalRole, item.isExternal);
     checkBoxItem->setData(StorageType, item.storageType);
+    m_initialStorageCheckStates[row] = checkBoxItem->checkState() == Qt::Checked;
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -265,6 +268,7 @@ void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &item
     QString bottomLabelText = this->bottomLabelText();
 
     ui->storagesTable->setRowCount(0);
+    m_initialStorageCheckStates.resize(items.count());
     foreach(const QnStorageSpaceData &item, items)
         addTableItem(item);
 
@@ -466,8 +470,13 @@ void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
 }
 
 void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
-    Q_UNUSED(column)
-    Q_UNUSED(row)
+    if (column == CheckBoxColumn) {
+        if (QTableWidgetItem *item = ui->storagesTable->item(row, column)) {
+            bool checked = item->checkState() == Qt::Checked;
+            if (!checked && m_initialStorageCheckStates[row])
+                ui->storagesWarningLabel->show();
+        }
+    }
 
     m_hasStorageChanges = true;
 }

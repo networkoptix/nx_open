@@ -71,7 +71,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     #else
         const QDir crashDir;
         const QString crashFilter;
-        return; // do nothing
+        return false; // do nothing. not implemented
     #endif
 
     const QString configApi = admin->getProperty(Ec2StaticticsReporter::SR_SERVER_API);

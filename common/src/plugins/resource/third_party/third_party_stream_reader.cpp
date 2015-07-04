@@ -14,6 +14,7 @@
 #include "utils/network/http/httptypes.h"
 #include "utils/network/multicodec_rtp_reader.h"
 #include "utils/common/log.h"
+#include "utils/media/ffmpeg_helper.h"
 
 #include "core/datapacket/third_party_audio_data_packet.h"
 #include "core/datapacket/third_party_video_data_packet.h"

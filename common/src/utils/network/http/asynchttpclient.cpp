@@ -25,7 +25,7 @@
 //TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
 //TODO: #ak reconnect support
 
-static const int DEFAULT_CONNECT_TIMEOUT = 3000;
+static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
 //static const int DEFAULT_HTTP_PORT = 80;
 
@@ -44,6 +44,7 @@ namespace nx_http
         m_terminated( false ),
         m_totalBytesRead( 0 ),
         m_contentEncodingUsed( true ),
+        m_sendTimeoutMs( DEFAULT_SEND_TIMEOUT ),
         m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
         m_msgBodyReadTimeoutMs( 0 ),
         m_authType(authBasicAndDigest),
@@ -225,6 +226,11 @@ namespace nx_http
     void AsyncHttpClient::setUserPassword( const QString& userPassword )
     {
         m_userPassword = userPassword;
+    }
+
+    void AsyncHttpClient::setSendTimeoutMs( unsigned int sendTimeoutMs )
+    {
+        m_sendTimeoutMs = sendTimeoutMs;
     }
 
     void AsyncHttpClient::setResponseReadTimeoutMs( unsigned int _responseReadTimeoutMs )
@@ -622,7 +628,7 @@ namespace nx_http
         m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
         m_connectionClosed = false;
         if( !m_socket->setNonBlockingMode( true ) ||
-            !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
+            !m_socket->setSendTimeout( m_sendTimeoutMs ) ||
             !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
         {
             NX_LOG( lit("Failed to put socket to non blocking mode. %1").
