@@ -379,7 +379,7 @@
     </message>
     <message>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
+        <translation>BPS기준이 아닌 GOP기준으로 계산</translation>
     </message>
 </context>
 <context>
@@ -412,11 +412,11 @@
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>개발자에 문제점 리포트</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 자동 검색 기능 활성화</translation>
     </message>
 </context>
 <context>
@@ -761,7 +761,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>System Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템설정</translation>
     </message>
 </context>
 <context>
@@ -2512,11 +2512,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ask About Statistics Reporting</source>
-        <translation type="unfinished"></translation>
+        <translation>통계현활 문의</translation>
     </message>
     <message>
         <source>File Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>파일 설정</translation>
     </message>
 </context>
 <context>
@@ -3892,7 +3892,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This could lead to client software malfunction including crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>소프트웨어 오동작 가능성 있음</translation>
     </message>
 </context>
 <context>
@@ -4381,15 +4381,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <source>File Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>파일설정</translation>
     </message>
     <message>
         <source>Picture is not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>사진없음</translation>
     </message>
     <message>
         <source>This is a fish-eye lens file</source>
-        <translation type="unfinished"></translation>
+        <translation>어안렌즈파일 입니다.</translation>
     </message>
 </context>
 <context>
@@ -4539,7 +4539,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation>확인</translation>
     </message>
 </context>
 <context>
@@ -5388,11 +5388,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>검생데이터파일 재구성중 : %1</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>저장위치에서 고속 데이터 검색 중: %1</translation>
     </message>
 </context>
 <context>
@@ -5776,15 +5776,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>FPS value is too high</source>
-        <translation type="unfinished">프레임 값이 범위를 벗어남</translation>
+        <translation>프레임 값이 범위를 벗어남</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished">스케줄의 현재 프레임은 %1 입니다. 카메라의 최대 %2 프레임으로 떨어집니다.</translation>
+        <translation>스케줄의 현재 프레임은 %1 입니다. 카메라의 최대 %2 프레임으로 떨어집니다.</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished">소프트웨어 모션의 2.프레임은 보조 스트림에서 사용합니다. 일정의 현재 프레임은 %1. 프레임이며, 설정이 %2로 떨어집니다.</translation>
+        <translation>소프트웨어 모션의 2.프레임은 보조 스트림에서 사용합니다. 일정의 현재 프레임은 %1. 프레임이며, 설정이 %2로 떨어집니다.</translation>
     </message>
 </context>
 <context>
@@ -5901,7 +5901,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라설정에서 사용자 정보 확인요망.</translation>
     </message>
 </context>
 <context>
@@ -6620,32 +6620,32 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Some components of the system are not updated</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 구성요소중 업데이트 되지 않은 항목이 있습니다.</translation>
     </message>
     <message>
         <source>Client v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>클라이언트 %1</translation>
     </message>
     <message>
         <source>Server v%1 at %2</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 %1 에서 %2</translation>
     </message>
     <message>
         <source>Server v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 %1</translation>
     </message>
     <message>
         <source>Please update all components to the latest version %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 시스템 구성요소 업데이트 요망</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>공개된 사용 통계</translation>
     </message>
     <message>
         <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
 If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>제품 오동작및 통계정보를 개발자에서 전달 합니다. 기능을 해지하고 싶을경우 시스템 설정에서 해지 하십시오.</translation>
     </message>
 </context>
 <context>
@@ -6699,7 +6699,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>서버에 접속할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -6911,11 +6911,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>검색조건 적용:방향 변경, De-Warping,이미지 수정, 사용자 화면 비율지정(Transcoding 요구됨)</translation>
     </message>
     <message>
         <source>exported</source>
-        <translation type="unfinished"></translation>
+        <translation>저장완료</translation>
     </message>
 </context>
 <context>
@@ -7351,11 +7351,11 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1의 화면</translation>
     </message>
     <message>
         <source>%n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%n 카메라</translation>
     </message>
 </context>
 <context>

@@ -379,7 +379,7 @@
     </message>
     <message>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
+        <translation>秒単位の代りにGOP単位で計算(カメラのビットレートは増加します)</translation>
     </message>
 </context>
 <context>
@@ -412,11 +412,11 @@
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>匿名でソフトウェア開発者に送信する（推奨）</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラとサーバーの自動検索有効</translation>
     </message>
 </context>
 <context>
@@ -761,7 +761,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>System Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>システム設定</translation>
     </message>
 </context>
 <context>
@@ -2516,7 +2516,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ask About Statistics Reporting</source>
-        <translation type="unfinished"></translation>
+        <translation>統計レポートについて問い合わせる</translation>
     </message>
 </context>
 <context>
@@ -3893,7 +3893,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This could lead to client software malfunction including crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントソフトウェアの誤動作の要因となります.</translation>
     </message>
 </context>
 <context>
@@ -4540,7 +4540,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation>チェック</translation>
     </message>
 </context>
 <context>
@@ -5389,11 +5389,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブインデックスのリビルド  &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>ストレージ  &apos;%1&apos; のアーカイブスキャン</translation>
     </message>
 </context>
 <context>
@@ -5777,15 +5777,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>FPS value is too high</source>
-        <translation type="unfinished">FPS値が高すぎます</translation>
+        <translation>FPS値が高すぎます</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished">スケジュールグリッドのFPSは %1.　最高のFPS値は %2. </translation>
+        <translation>スケジュールグリッドのFPSは %1.　最高のFPS値は %2. </translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished">For software motion 2. fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2. </translation>
+        <translation>ソフトウェアモーション を使用すると2ndストリームの2fpsを使用します　スケジュールグリッドの %1. Fps は %2.になります. </translation>
     </message>
 </context>
 <context>
@@ -5902,7 +5902,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ設定画面の認証設定を確認してください</translation>
     </message>
 </context>
 <context>
@@ -6621,32 +6621,33 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Some components of the system are not updated</source>
-        <translation type="unfinished"></translation>
+        <translation>システムコンポーネントの幾つかが更新されていません</translation>
     </message>
     <message>
         <source>Client v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアント v%1</translation>
     </message>
     <message>
         <source>Server v%1 at %2</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー v%1 / %2</translation>
     </message>
     <message>
         <source>Server v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー v%1</translation>
     </message>
     <message>
         <source>Please update all components to the latest version %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>全てのコンポーネントをバージョン %1.以上に更新してください.</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>匿名の利用統計</translation>
     </message>
     <message>
         <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
 If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>システムは利用統計を匿名でソフトウェア開発チームに送信し、今後の改善に役立てますx.
+変更したい場合はシステム設定で無効にできます.</translation>
     </message>
 </context>
 <context>
@@ -6700,7 +6701,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーに接続できません...</translation>
     </message>
 </context>
 <context>
@@ -6916,7 +6917,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>exported</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポート</translation>
     </message>
 </context>
 <context>
@@ -7352,11 +7353,11 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished">%1&apos; スクリーン</translation>
+        <translation>%1&apos; スクリーン</translation>
     </message>
     <message>
         <source>%n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%n カメラ</translation>
     </message>
 </context>
 <context>
