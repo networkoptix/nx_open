@@ -8,6 +8,9 @@ struct QnIOPortData
 {
     QnIOPortData(): portType(Qn::PT_Disabled), iDefaultState(Qn::IO_OpenCircuit), oDefaultState(Qn::IO_OpenCircuit), autoResetTimeoutMs(0) {}
 
+    QString getName() const                    { return portType == Qn::PT_Output ? outputName : inputName; }
+    Qn::IODefaultState getDefaultState() const { return portType == Qn::PT_Output ? oDefaultState : iDefaultState; }
+
     QString id;
     Qn::IOPortType portType;
     Qn::IOPortTypes supportedPortTypes;

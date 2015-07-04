@@ -1,15 +1,17 @@
 #ifndef QN_CALENDAR_WIDGET_H
 #define QN_CALENDAR_WIDGET_H
 
-
+#include <QElapsedTimer>
 #include "plugins/resource/server_camera/server_camera.h"
+#include "api/model/api_ioport_data.h"
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui
 {
     class IOStateDisplayWidget;
 }
 
-class QnIOStateDisplayWidget: public QDialog 
+class QnIOStateDisplayWidget: public QDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef QDialog base_type;
@@ -27,6 +29,7 @@ private slots:
     void at_buttonClicked();
     void at_buttonStateChanged(bool toggled);
     void at_cameraStatusChanged(const QnResourcePtr & res);
+    void at_timer();
 private:
     void updateControls();
 private:
@@ -35,8 +38,18 @@ private:
     QnServerCameraPtr m_camera;
     QnIOModuleMonitorPtr m_monitor;
     
-    QMap<QString, QWidget*> m_widgetsByPort;
-    QnIOPortDataList m_ioSettings;
+    struct ModelData
+    {
+        ModelData(): widget(0) { btnPressTime.invalidate(); }
+
+        QnIOPortData ioConfigData; // port configurating parameters: name e.t.c
+        QnIOStateData ioState;     // current port state on or off
+        QWidget* widget;           // associated widget
+        QElapsedTimer btnPressTime; // button press timeout
+    };
+
+    QMap<QString, ModelData> m_model;
+    QTimer m_timer;
 };
 
 

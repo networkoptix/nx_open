@@ -51,9 +51,9 @@ QString QnIOPortsViewModel::textData(const QModelIndex &index) const
     case TypeColumn:
         return QnLexical::serialized(value.portType);
     case DefaultStateColumn:
-        return value.portType == Qn::PT_Output ? QnLexical::serialized<Qn::IODefaultState>(value.oDefaultState) : QnLexical::serialized<Qn::IODefaultState>(value.iDefaultState);
+        return QnLexical::serialized<Qn::IODefaultState>(value.getDefaultState());
     case NameColumn:
-        return value.portType == Qn::PT_Output ? value.outputName : value.inputName;
+        return value.getName();
     case AutoResetColumn:
         return QString::number(value.autoResetTimeoutMs);
     default:
@@ -72,25 +72,9 @@ QVariant QnIOPortsViewModel::editData(const QModelIndex &index) const
     case TypeColumn:
         return value.portType;
     case DefaultStateColumn:
-        switch (value.portType) 
-        {
-        case Qn::PT_Input:
-            return value.iDefaultState;
-        case Qn::PT_Output:
-            return value.oDefaultState;
-        default:
-            return QString();
-        }
+        return value.getDefaultState();
     case NameColumn:
-        switch (value.portType) 
-        {
-        case Qn::PT_Input:
-            return value.inputName;
-        case Qn::PT_Output:
-            return value.outputName;
-        default:
-            return QString();
-        }
+        return value.getName();
     case AutoResetColumn:
         return value.autoResetTimeoutMs;
     default:

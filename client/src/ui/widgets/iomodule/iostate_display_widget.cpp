@@ -11,10 +11,12 @@
 namespace
 {
     const int RECONNECT_DELAY = 1000 * 5;
+    const int COMMAND_EXECUTE_TIMEOUT = 1000 * 6;
 }
 
 QnIOStateDisplayWidget::QnIOStateDisplayWidget(QWidget *parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::IOStateDisplayWidget())
 {
     ui->setupUi(this);
@@ -35,11 +37,16 @@ void QnIOStateDisplayWidget::setCamera(const QnServerCameraPtr& camera)
     connect(m_monitor.data(), &QnIOModuleMonitor::connectionOpened, this, &QnIOStateDisplayWidget::at_connectionOpened );
     connect(m_monitor.data(), &QnIOModuleMonitor::connectionClosed, this, &QnIOStateDisplayWidget::at_connectionClosed );
     connect(m_monitor.data(), &QnIOModuleMonitor::ioStateChanged, this, &QnIOStateDisplayWidget::at_ioStateChanged );
+
     connect(camera.data(), &QnResource::propertyChanged, this, &QnIOStateDisplayWidget::at_cameraPropertyChanged );
     connect(camera.data(), &QnResource::statusChanged, this, &QnIOStateDisplayWidget::at_cameraStatusChanged );
     connect(camera.data(), &QnResource::nameChanged, this, [this]() {setWindowTitle(m_camera->getName());} );
 
+    connect (&m_timer, &QTimer::timeout, this, &QnIOStateDisplayWidget::at_timer);
+    m_timer.start(1000);
+
     connect(this, &QnIOStateDisplayWidget::close, this, [this]() {deleteLater();} );
+    
 
     updateControls();
 }
@@ -58,29 +65,30 @@ void QnIOStateDisplayWidget::at_cameraPropertyChanged(const QnResourcePtr & /*re
 
 void QnIOStateDisplayWidget::updateControls()
 {
-
-    m_ioSettings = m_camera->getIOPorts();
+    m_model.clear();
     while ( QObject* w = findChild<QObject*>() )
         delete w;
+
     ui->setupUi(this);
-    m_widgetsByPort.clear();
     setWindowTitle(m_camera->getName());
 
-    //QGridLayout* mainLayout = new QGridLayout(this);
-    //setLayout(mainLayout);
+    for (const auto& value: m_camera->getIOPorts())
+        m_model[value.id].ioConfigData = value;
+
 
     QFont labelFont = font();
     labelFont.setBold(true);
 
     int row = 0;
-    for (const QnIOPortData& value: m_ioSettings)
+    for (auto itr = m_model.begin(); itr!= m_model.end(); ++itr)
     {
-        if (value.portType != Qn::PT_Input)
+        QnIOPortData portConfigData = itr.value().ioConfigData;
+        if (portConfigData.portType != Qn::PT_Input)
             continue;
 
 
         QLabel* idLabel = new QLabel(this);
-        idLabel->setText(value.id);
+        idLabel->setText(portConfigData.id);
         idLabel->setFont(labelFont);
         idLabel->setStyleSheet(lit("QLabel { color : #80ffffff; }"));
         ui->gridLayout->addWidget(idLabel, row, 0);
@@ -90,10 +98,11 @@ void QnIOStateDisplayWidget::updateControls()
         inputStateLabel->setPixmap(pixmap);
         inputStateLabel->setFixedSize(pixmap.size());
         ui->gridLayout->addWidget(inputStateLabel, row, 1);
-        m_widgetsByPort.insert(value.id, inputStateLabel);
+
+        itr.value().widget = inputStateLabel;
 
         QLabel* inputTextLabel = new QLabel(this);
-        inputTextLabel->setText(value.inputName);
+        inputTextLabel->setText(portConfigData.inputName);
         inputTextLabel->setFont(labelFont);
         ui->gridLayout->addWidget(inputTextLabel, row, 2);
 
@@ -105,9 +114,10 @@ void QnIOStateDisplayWidget::updateControls()
     }
 
     row = 0;
-    for (const QnIOPortData& value: m_ioSettings)
+    for (auto itr = m_model.begin(); itr!= m_model.end(); ++itr)
     {
-        if (value.portType != Qn::PT_Output)
+        QnIOPortData portConfigData = itr.value().ioConfigData;
+        if (portConfigData.portType != Qn::PT_Output)
             continue;
 
         if (row >= ui->gridLayout->rowCount()) {
@@ -117,7 +127,7 @@ void QnIOStateDisplayWidget::updateControls()
         }
 
         QLabel* idLabel = new QLabel(this);
-        idLabel->setText(value.id);
+        idLabel->setText(portConfigData.id);
         idLabel->setFont(labelFont);
         idLabel->setStyleSheet(lit("QLabel { color : #80ffffff; }"));
         ui->gridLayout->addWidget(idLabel, row, 4);
@@ -129,12 +139,13 @@ void QnIOStateDisplayWidget::updateControls()
         QPushButton* button = new QPushButton(this);
         button->setCheckable(true);
         button->setDefault(false);
-        button->setText(value.outputName);
+        button->setText(portConfigData.outputName);
         button->setIcon(qnSkin->icon("item/io_indicator_off.png"));
         connect(button, &QPushButton::clicked, this, &QnIOStateDisplayWidget::at_buttonClicked);
         connect(button, &QPushButton::toggled, this, &QnIOStateDisplayWidget::at_buttonStateChanged);
         ui->gridLayout->addWidget(button, row, 6);
-        m_widgetsByPort.insert(value.id, button);
+
+        itr.value().widget = button;
 
         row++;
     }
@@ -158,24 +169,18 @@ void QnIOStateDisplayWidget::at_buttonClicked()
     QPushButton* button = dynamic_cast<QPushButton*> (sender());
     if (!button)
         return;
-    QString portId;
-    for (auto itr = m_widgetsByPort.begin(); itr != m_widgetsByPort.end(); ++itr) {
-        if (itr.value() == button) {
-            portId = itr.key();
-            break;
-        }
-    }
-    if (portId.isEmpty())
-        return;
-    for (const auto& setting: m_ioSettings) {
-        if (setting.id == portId) 
+    for (auto itr = m_model.begin(); itr != m_model.end(); ++itr) 
+    {
+        if (itr.value().widget == button) 
         {
+            auto ioConfigData = itr.value().ioConfigData;
+            
             QnBusinessEventParameters eventParams;
             eventParams.setEventTimestamp(qnSyncTime->currentMSecsSinceEpoch());
 
             QnBusinessActionParameters params;
-            params.relayOutputId = setting.id;
-            params.relayAutoResetTimeout = setting.autoResetTimeoutMs;
+            params.relayOutputId = ioConfigData.id;
+            params.relayAutoResetTimeout = ioConfigData.autoResetTimeoutMs;
             bool isInstant = true; //setting.autoResetTimeoutMs != 0;
             QnCameraOutputBusinessActionPtr action(new QnCameraOutputBusinessAction(isInstant, eventParams));
 
@@ -184,29 +189,54 @@ void QnIOStateDisplayWidget::at_buttonClicked()
             action->setToggleState(button->isChecked() ? QnBusiness::ActiveState : QnBusiness::InactiveState);
 
             ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+            // we are not interested in client->server transport error code because of real port checking by timer
             if (conn)
-                conn->getBusinessEventManager()->sendBusinessAction(action, m_camera->getParentId(), this, []{});
+                conn->getBusinessEventManager()->sendBusinessAction(action, m_camera->getParentId(), this, []{}); 
+
+            itr.value().btnPressTime.restart();
+
+            break;
+        }
+    }
+}
+
+void QnIOStateDisplayWidget::at_timer()
+{
+    QStringList errorList;
+    for (auto itr = m_model.begin(); itr != m_model.end(); ++itr)
+    {
+        ModelData& data = itr.value();
+        QPushButton* button = dynamic_cast<QPushButton*> (data.widget);
+        if (button && button->isChecked() != data.ioState.isActive && data.btnPressTime.isValid() && data.btnPressTime.hasExpired(COMMAND_EXECUTE_TIMEOUT))
+        {
+            bool wrongState = button->isCheckable();
+            button->setChecked(data.ioState.isActive);
+            data.btnPressTime.invalidate();
+            QString portName = data.ioConfigData.getName();
+            QMessageBox::warning(mainWindow(), tr("IO port error"), tr("Failed to %1 IO port '%2'").arg(wrongState ? tr("turn on") : tr("turn off")).arg(portName));
         }
     }
 }
 
 void QnIOStateDisplayWidget::at_ioStateChanged(const QnIOStateData& value)
 {
-    if (QWidget* widget = m_widgetsByPort.value(value.id))
+    auto itr = m_model.find(value.id);
+    if (itr == m_model.end())
+        return;
+
+    itr.value().btnPressTime.invalidate();
+    if (QLabel* label = dynamic_cast<QLabel*> (itr.value().widget))
     {
-        if (QLabel* label = dynamic_cast<QLabel*> (widget))
-        {
-            QPixmap pixmap;
-            if (value.isActive)
-                pixmap = qnSkin->pixmap("item/io_indicator_on.png");
-            else
-                pixmap = qnSkin->pixmap("item/io_indicator_off.png");
-            label->setPixmap(pixmap);
-        }
-        else if (QPushButton* button = dynamic_cast<QPushButton*> (widget))
-        {
-            button->setChecked(value.isActive);
-        }
+        QPixmap pixmap;
+        if (value.isActive)
+            pixmap = qnSkin->pixmap("item/io_indicator_on.png");
+        else
+            pixmap = qnSkin->pixmap("item/io_indicator_off.png");
+        label->setPixmap(pixmap);
+    }
+    else if (QPushButton* button = dynamic_cast<QPushButton*> (itr.value().widget))
+    {
+        button->setChecked(value.isActive);
     }
 }
 
@@ -218,6 +248,8 @@ void QnIOStateDisplayWidget::at_connectionOpened()
 void QnIOStateDisplayWidget::at_connectionClosed()
 {
     setEnabled(false);
+    for (auto itr = m_model.begin(); itr != m_model.end(); ++itr)
+        itr.value().btnPressTime.invalidate();
     QTimer::singleShot(RECONNECT_DELAY, this, SLOT(openConnection()));
 }
 
