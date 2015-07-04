@@ -54,6 +54,7 @@ public:
         QString serializedData(lit("%1;;%2;;%3"));
         serializedData = serializedData.arg(m_storagePath).arg(QnLexical::serialized(m_catalog)).arg(m_cameraUniqueId);
         MSSettings::roSettings()->setValue(SCAN_ARCHIVE_FROM, serializedData);
+        MSSettings::roSettings()->sync();
     }
     void load() {
         QString serializedData = MSSettings::roSettings()->value(SCAN_ARCHIVE_FROM).toString();
