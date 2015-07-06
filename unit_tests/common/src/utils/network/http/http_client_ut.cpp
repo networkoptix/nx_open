@@ -16,8 +16,7 @@
 
 //TODO #ak introduce built-in http server to automate AsyncHttpClient tests
 
-#if 0
-TEST( AsyncHttpClient, KeepAlive )
+TEST( HttpClient, DISABLED_KeepAlive )
 {
     //TODO #ak use local http server
 
@@ -42,7 +41,7 @@ TEST( AsyncHttpClient, KeepAlive )
     }
 }
 
-TEST( AsyncHttpClient, KeepAlive2 )
+TEST( HttpClient, DISABLED_KeepAlive2 )
 {
     QUrl url( "http://192.168.0.1:7001/ec2/testConnection" );
     url.setUserName( "admin" );
@@ -66,7 +65,7 @@ TEST( AsyncHttpClient, KeepAlive2 )
     }
 }
 
-TEST( AsyncHttpClient, KeepAlive3 )
+TEST( HttpClient, DISABLED_KeepAlive3 )
 {
     QUrl url( "http://192.168.0.194:7001/ec2/events?guid=%7Be7209f3e-9ebe-6ebb-3e99-e5acd61c228c%7D&runtime-guid=%7B83862a97-b7b8-4dbc-bb8f-64847f23e6d5%7D&system-identity-time=0" );
     url.setUserName( "admin" );
@@ -77,7 +76,7 @@ TEST( AsyncHttpClient, KeepAlive3 )
     for( int i = 0; i < TEST_RUNS; ++i )
     {
         nx_http::HttpClient client;
-        client.addRequestHeader( "NX-EC-SYSTEM-NAME", "ak_ec_2.3" );
+        client.addAdditionalHeader( "NX-EC-SYSTEM-NAME", "ak_ec_2.3" );
         ASSERT_TRUE( client.doGet( url ) );
         ASSERT_TRUE( client.response() );
         ASSERT_EQ( nx_http::StatusCode::ok, client.response()->statusLine.statusCode );
@@ -90,4 +89,3 @@ TEST( AsyncHttpClient, KeepAlive3 )
             ASSERT_EQ( msgBody, newMsgBody );
     }
 }
-#endif

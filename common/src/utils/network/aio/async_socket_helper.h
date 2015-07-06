@@ -162,6 +162,9 @@ public:
             addr.address,
             [this, addr]( SystemError::ErrorCode errorCode, const HostAddress& resolvedAddress )
             {
+                if( !this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+                    return; // SIGSEGV otherwise
+
                 //always calling m_connectHandler within aio thread socket is bound to
                 if( errorCode != SystemError::noError )
                     this->post( std::bind( m_connectHandler, errorCode ) );
