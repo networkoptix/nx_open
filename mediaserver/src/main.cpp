@@ -140,6 +140,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/common/system_information.h>
+#include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
@@ -154,6 +155,7 @@
 #include <media_server/server_update_tool.h>
 #include <media_server/server_connector.h>
 #include <utils/common/app_info.h>
+#include <transcoding/ffmpeg_video_transcoder.h>
 
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
@@ -206,6 +208,7 @@ static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QByteArray SYSTEM_NAME_KEY("systemName");
 static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
+static const QByteArray DISABLE_FFMPEG_OPTIMIZATION("disableFfmpegOptimization");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -384,6 +387,9 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 void ffmpegInit()
 {
+    if (MSSettings::roSettings()->value(DISABLE_FFMPEG_OPTIMIZATION, false).toBool())
+        QnFfmpegVideoTranscoder::isOptimizationDisabled = true;
+
     //avcodec_init();
     av_register_all();
 
@@ -1227,6 +1233,27 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
     }
 }
 
+void QnMain::at_adminUserChanged( const QnResourcePtr& resource )
+{
+    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+    if( !user )
+        return;
+
+    if( !user->isAdmin() )
+        return;
+
+#ifdef __linux__
+    if( QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1" )
+    {
+        //changing root password in system
+        if( !setRootPasswordDigest( "root", user->getCryptSha512Hash() ) )
+        {
+            qWarning()<<"Failed to set root password on current system";
+        }
+    }
+#endif
+}
+
 void QnMain::at_localInterfacesChanged()
 {
     if (isStopping())
@@ -1493,6 +1520,10 @@ void QnMain::run()
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
+    connect(
+        resourcePool.get(), &QnResourcePool::resourceChanged,
+        this, &QnMain::at_adminUserChanged );
+    
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
@@ -2254,6 +2285,7 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
                     ec2::ApiUserData userData;
                     fromResourceToApi(user, userData);
                     user->setDigest(userData.digest);
+                    user->setCryptSha512Hash(userData.cryptSha512Hash);
                 }
                 m_updateUserRequests.remove(user->getId());
             } );

@@ -15,6 +15,7 @@
 #include "utils/network/module_finder.h"
 #include "api/model/configure_reply.h"
 #include "rest/server/rest_connection_processor.h"
+#include "utils/crypt/linux_passwd_crypt.h"
 #include "utils/network/tcp_listener.h"
 
 
@@ -26,7 +27,7 @@ namespace {
     };
 }
 
-int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
 {
     Q_UNUSED(path)
 
@@ -36,9 +37,16 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     QString oldPassword = params.value(lit("oldPassword"));
     QByteArray passwordHash = params.value(lit("passwordHash")).toLatin1();
     QByteArray passwordDigest = params.value(lit("passwordDigest")).toLatin1();
+    QByteArray cryptSha512Hash = params.value(lit("cryptSha512Hash")).toLatin1();
     qint64 sysIdTime = params.value(lit("sysIdTime")).toLongLong();
     qint64 tranLogTime = params.value(lit("tranLogTime")).toLongLong();
     int port = params.value(lit("port")).toInt();
+
+    if( cryptSha512Hash.isEmpty() && !password.isEmpty() )
+    {
+        //genereating cryptSha512Hash
+        cryptSha512Hash = linuxCryptSha512( password.toUtf8(), generateSalt( LINUX_CRYPT_SALT_LENGTH ) );
+    }
 
     /* set system name */
     int changeSystemNameResult = changeSystemName(systemName, sysIdTime, wholeSystem, tranLogTime);
@@ -59,7 +67,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     }
 
     /* set password */
-    int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, oldPassword);
+    int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, cryptSha512Hash, oldPassword);
     if (changeAdminPasswordResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("PASSWORD"));
@@ -68,17 +76,26 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     QnConfigureReply reply;
     reply.restartNeeded = false;
     result.setReply(reply);
+
+    if (port) {
+        owner->owner()->updatePort(port);
+        owner->owner()->waitForPortUpdated();
+    }
+
     return CODE_OK;
 }
 
 void QnConfigureRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
 {
+    /*
     QnJsonRestResult reply;
     if (QJson::deserialize(body, &reply) && reply.error() ==  QnJsonRestResult::NoError) {
         int port = params.value(lit("port")).toInt();
-        if (port)
+        if (port) {
             owner->owner()->updatePort(port);
+        }
     }
+    */
 }
 
 int QnConfigureRestHandler::changeSystemName(const QString &systemName, qint64 sysIdTime, bool wholeSystem, qint64 remoteTranLogTime) {
@@ -97,7 +114,13 @@ int QnConfigureRestHandler::changeSystemName(const QString &systemName, qint64 s
     return ResultOk;
 }
 
-int QnConfigureRestHandler::changeAdminPassword(const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, const QString &oldPassword) {
+int QnConfigureRestHandler::changeAdminPassword(
+    const QString &password,
+    const QByteArray &passwordHash,
+    const QByteArray &passwordDigest,
+    const QByteArray &cryptSha512Hash,
+    const QString &oldPassword)
+{
     if (password.isEmpty() && (passwordHash.isEmpty() || passwordDigest.isEmpty()))
         return ResultSkip;
 
@@ -116,9 +139,14 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
         QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
         admin->setPassword(QString());
     } else {
-        if (admin->getHash() != passwordHash || admin->getDigest() != passwordDigest) {
+        if (admin->getHash() != passwordHash ||
+            admin->getDigest() != passwordDigest ||
+            admin->getCryptSha512Hash() != cryptSha512Hash)
+        {
             admin->setHash(passwordHash);
             admin->setDigest(passwordDigest);
+            if( !cryptSha512Hash.isEmpty() )
+                admin->setCryptSha512Hash(cryptSha512Hash);
             QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
         }
     }

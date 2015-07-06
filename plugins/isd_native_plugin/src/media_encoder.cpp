@@ -229,7 +229,7 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
 #ifndef NO_ISD_AUDIO
-    if( !m_audioStreamReader->initializeIfNeeded() )
+    if( !m_audioStreamReader->isAudioAvailable() )
         return nxcip::NX_IO_ERROR;
     *audioFormat = m_audioStreamReader->getAudioFormat();
     return nxcip::NX_NO_ERROR;

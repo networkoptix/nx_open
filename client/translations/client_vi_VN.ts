@@ -388,6 +388,10 @@
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
         <translation>&quot;Cho phép hệ thống để tối ưu hóa các cài đặt máy ảnh&quot; bị vô hiệu hóa trong Quản trị hệ thống.</translation>
     </message>
+    <message>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
+        <translation>Tính toán bitrate mỗi GOP thay vì bitrate mỗi giây (Nó sẽ làm tăng tốc độ bit cho máy ảnh)</translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -412,16 +416,20 @@
 <context>
     <name>CameraManagementWidget</name>
     <message>
-        <source>Enable camera auto discovery</source>
-        <translation>Cho phép camera tự động tìm</translation>
-    </message>
-    <message>
         <source>Allow system to optimize camera settings (Recommended)</source>
         <translation>Cho phép hệ thống để tối ưu hóa các cài đặt máy ảnh (đề nghị)</translation>
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
         <translation>Cảnh báo! Thiết lập FPS và chất lượng trong Schedule Recording sẽ không làm việc!</translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
+        <translation>Gửi sử dụng và sụp đổ số liệu thống kê vô danh với các nhà phát triển phần mềm (Recommended)</translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation>Kích hoạt máy ảnh và máy chủ phát hiện tự động</translation>
     </message>
 </context>
 <context>
@@ -761,12 +769,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Open all servers statistics on one layout</translation>
     </message>
     <message>
-        <source>Camera Management</source>
-        <translation>Quản lý ảnh</translation>
-    </message>
-    <message>
         <source>System Configuration Backup and Restore</source>
         <translation>Cấu hình sao lưu và phục hồi</translation>
+    </message>
+    <message>
+        <source>System Settings</source>
+        <translation>Cài đặt hệ thống</translation>
     </message>
 </context>
 <context>
@@ -2519,6 +2527,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>File Settings...</source>
         <translation>Cài đặt tập tin ...</translation>
     </message>
+    <message>
+        <source>Ask About Statistics Reporting</source>
+        <translation>Hỏi về kê Reporting</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -3254,18 +3266,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>mở</translation>
     </message>
     <message>
-        <source>FPS value is too high</source>
-        <translation>FPS giá trị quá cao</translation>
-    </message>
-    <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>Hiện nay trong bảng lịch trình cho %1 FPS. FPS sẽ được giảm đến giá trị tối đa của máy ảnh %2.</translation>
-    </message>
-    <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>Đối với chuyển động phần mềm 2 fps được dành riêng cho các dòng thứ cấp. Fps hiện trong lưới lịch được %1. FPS đã được giảm xuống còn %2.</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation>sự phản đối</translation>
     </message>
@@ -3892,18 +3892,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation>Chúng tôi đã phát hiện ra rằng video card của bạn không được hỗ trợ. Bạn có thể tiến hành có nguy cơ của riêng bạn.</translation>
-    </message>
-    <message>
-        <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation>Cài đặt và / hoặc cập nhật các trình điều khiển video của bạn có thể giải quyết vấn đề.</translation>
-    </message>
-    <message>
-        <source>Critical Performance Tip</source>
-        <translation>Hiệu suất quan trọng Mẹo</translation>
-    </message>
-    <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
         <translation>Chúng tôi đã phát hiện ra rằng trình điều khiển card màn hình của bạn có thể không được cài đặt hoặc hết hạn.</translation>
     </message>
@@ -3914,6 +3902,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Important Performance Tip</source>
         <translation>Hiệu suất quan trọng Mẹo</translation>
+    </message>
+    <message>
+        <source>This could lead to client software malfunction including crash.</source>
+        <translation>Điều này có thể dẫn đến sự cố phần mềm máy khách bao gồm cả tai nạn.</translation>
     </message>
 </context>
 <context>
@@ -4005,14 +3997,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;Hình ảnh không thể được nạp&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutTabBar</name>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>màn hình của %1</translation>
     </message>
 </context>
 <context>
@@ -4483,10 +4467,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>mật khẩu:</translation>
     </message>
     <message>
-        <source>Find System</source>
-        <translation>Tìm hệ thống</translation>
-    </message>
-    <message>
         <source>The new system will have password and name from the system:</source>
         <translation>Hệ thống mới sẽ có mật khẩu và tên từ hệ thống:</translation>
     </message>
@@ -4569,6 +4549,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
         <translation>Các máy chủ từ xa hệ thống sẽ xuất hiện trong hệ thống của bạn sớm.</translation>
+    </message>
+    <message>
+        <source>Check</source>
+        <translation>kiểm tra</translation>
     </message>
 </context>
 <context>
@@ -5206,11 +5190,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Users</source>
         <translation>người sử dụng</translation>
     </message>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>màn hình của %1</translation>
-    </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
@@ -5421,12 +5400,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Bạn có chắc muốn tiếp tục không?</translation>
     </message>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
-        <translation>Rebuild index kho lưu trữ để lưu trữ &apos;%1&apos; trong tiến trình</translation>
+        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
+        <translation>Xây dựng lại chỉ mục lưu trữ để lưu trữ &apos;%1&apos; là trong tiến trình</translation>
     </message>
     <message>
-        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
-        <translation>Scan lưu trữ nhanh chóng cho việc lưu trữ &apos;%1&apos; trong tiến trình</translation>
+        <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
+        <translation>Scan lưu trữ nhanh chóng cho việc lưu trữ &apos;%1&apos; là trong tiến trình</translation>
     </message>
 </context>
 <context>
@@ -5808,6 +5787,18 @@ Short for &quot;seconds&quot;</extracomment>
         <source>This action CANNOT be undone!</source>
         <translation>Hành động này không thể khôi phục!</translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation>FPS trị là quá cao</translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation>Fps hiện trong lưới tiến độ là %1. Fps được giảm xuống tối đa camera fps%2.</translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation>Đối với chuyển động phần mềm 2 fps được dành riêng cho các dòng thứ cấp. Fps hiện trong lưới tiến độ là %1. Fps được giảm xuống %2.</translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -5906,10 +5897,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>không được phép</translation>
     </message>
     <message>
-        <source>Please check authentication information&lt;br/&gt;in camera settings</source>
-        <translation>Hãy chắc chắn rằng các camera được thiết lập trong thông tin giấy phép</translation>
-    </message>
-    <message>
         <source>Activate Video Wall license to remove this message</source>
         <translation>kích hoạt giấy phép tường video để loại bỏ thông báo này</translation>
     </message>
@@ -5924,6 +5911,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Diagnose...</source>
         <translation>Chẩn đoán...</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in camera settings</source>
+        <translation>Vui lòng kiểm tra thông tin xác thực trong cài đặt camera</translation>
     </message>
 </context>
 <context>
@@ -6545,18 +6536,6 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation>Máy chủ v%1 %2 tại &lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Server v%1&lt;br/&gt;</source>
-        <translation>Máy chủ v%1 &lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>Một số thành phần của hệ thống không được cập nhật: &lt;br/&gt;&lt;br/&gt;%1 &lt;br/&gt; Vui lòng cập nhật tất cả các thành phần với phiên bản mới nhất %2.</translation>
-    </message>
-    <message>
         <source>Update...</source>
         <translation>Cập nhật ...</translation>
     </message>
@@ -6599,10 +6578,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>
             <numerusform>Không thể lưu các thay đổi được thực hiện cho các tài nguyên sau %n.</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Client v%1&lt;br/&gt;</source>
-        <translation>khách hàng v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
@@ -6656,6 +6631,36 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Error while uploading picture.</source>
         <translation>Lỗi trong khi tải lên hình ảnh.</translation>
     </message>
+    <message>
+        <source>Some components of the system are not updated</source>
+        <translation>Một số thành phần của hệ thống không được cập nhật</translation>
+    </message>
+    <message>
+        <source>Client v%1</source>
+        <translation>khách hàng v%1</translation>
+    </message>
+    <message>
+        <source>Server v%1 at %2</source>
+        <translation>Máy chủ v%1 tại %2</translation>
+    </message>
+    <message>
+        <source>Server v%1</source>
+        <translation>máy chủr v%1</translation>
+    </message>
+    <message>
+        <source>Please update all components to the latest version %1.</source>
+        <translation>Vui lòng cập nhật tất cả các thành phần với phiên bản mới nhất %1.</translation>
+    </message>
+    <message>
+        <source>Anonymous Usage Statistics</source>
+        <translation>Anonymous Cách sử dụng thống kê</translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
+If you would like to disable this feature you can do so in the System Settings dialog.</source>
+        <translation>Hệ thống sẽ gửi sử dụng và crash thống kê ẩn danh cho nhóm phát triển phần mềm để giúp chúng tôi cải thiện trải nghiệm người dùng của bạn.
+Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như vậy trong hộp thoại System Settings.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6705,6 +6710,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Connect to Server...</source>
         <translation>Kết nối đến máy chủ...</translation>
+    </message>
+    <message>
+        <source>Could not connect to server...</source>
+        <translation>Không thể kết nối với máy chủ ...</translation>
     </message>
 </context>
 <context>
@@ -6917,6 +6926,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation>áp dụng các bộ lọc: xoay, dewarping, nâng cao hình ảnh, tỉ lệ tùy chỉnh (yêu cầu chuyển mã)</translation>
+    </message>
+    <message>
+        <source>exported</source>
+        <translation>xuất khẩu</translation>
     </message>
 </context>
 <context>
@@ -7260,18 +7273,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Không thể bắt đầu video phiên điều khiển tường.</translation>
     </message>
     <message>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
-    </message>
-    <message>
-        <source>New layout</source>
-        <translation>việc bố trí mới</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>New bố trí %1</translation>
-    </message>
-    <message>
         <source>To enable the feature please activate at least one Video Wall license</source>
         <translation>Để kích hoạt tính năng xin vui lòng kích hoạt ít nhất một giấy phép bức tường video</translation>
     </message>
@@ -7360,6 +7361,15 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You&apos;ll have to start it manually.</source>
         <translation>Bạn sẽ phải bắt đầu nó bằng tay.</translation>
+    </message>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation>Màn hình của %1</translation>
+    </message>
+    <message>
+        <source>%n cameras</source>
+        <translation>%n máy ảnh</translation>
     </message>
 </context>
 <context>
@@ -7636,10 +7646,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Start</source>
         <translation>bắt đầu</translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation>chương trình tái thiết</translation>
     </message>
     <message>
         <source>Cancel</source>

@@ -86,12 +86,12 @@ QnSecurityCamResource::QnSecurityCamResource():
 
 QString QnSecurityCamResource::getName() const
 {
-    if( getId().isNull() )
-        return QnResource::getName();
-
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    if( !(*userAttributesLock)->name.isEmpty() )
-        return (*userAttributesLock)->name;
+    if( !getId().isNull() )
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if( !(*userAttributesLock)->name.isEmpty() )
+            return (*userAttributesLock)->name;
+    }
     return QnResource::getName();
 }
 
@@ -150,8 +150,6 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
-        QnConstResourceVideoLayoutPtr layout = getVideoLayout();
-
         if (other_casted->m_groupId != m_groupId)
             modifiedFields << "groupIdChanged";
 

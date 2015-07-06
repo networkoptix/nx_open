@@ -247,6 +247,8 @@ namespace ec2
         QSet<QnUuid> checkAlivePeerRouteTimeout();
         void updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
         int distanceToPeer(const QnUuid& dstPeer) const;
+        void addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tranToSend, int timeout);
+        void sendDelayedAliveTran();
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -291,6 +293,15 @@ namespace ec2
         QElapsedTimer m_currentTimeTimer;
         std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
         bool m_restartPending;
+        
+        struct DelayedAliveData
+        {
+            QnTransaction<ApiPeerAliveData> tran;
+            qint64 timeToSend;
+        };
+
+        QMap<QnUuid, DelayedAliveData> m_delayedAliveTran;
+        QElapsedTimer m_relativeTimer;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()

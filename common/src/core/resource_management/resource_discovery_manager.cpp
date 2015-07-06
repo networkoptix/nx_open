@@ -103,7 +103,7 @@ void QnResourceDiscoveryManager::start( Priority priority )
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QMutexLocker locker(&m_searchersListMutex);
-    updateSearcherUsage(serv);
+    updateSearcherUsage(serv, isRedundancyUsing());
     m_searchersList.push_back(serv);
 }
 
@@ -542,6 +542,10 @@ bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoM
 
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
 {
+    const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (server)
+        updateSearchersUsage();
+
     QMutexLocker lock(&m_searchersListMutex);
     QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
     if (itr != m_manualCameraMap.end())
@@ -551,6 +555,12 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
 
 void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 {
+    const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (server) {
+        connect(server.data(), &QnMediaServerResource::redundancyChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
+        updateSearchersUsage();
+    }
+    
     QnManualCameraInfoMap newManualCameras;
     {
         QMutexLocker lock(&m_searchersListMutex);
@@ -607,7 +617,16 @@ QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
     return m_state; 
 }
 
-void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher) {
+bool QnResourceDiscoveryManager::isRedundancyUsing() const
+{
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if (!server || !server->isRedundancy())
+        return false;
+    
+    return qnResPool->getAllServers().count() > 1;
+}
+
+void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable) {
     // TODO: #Elric strictly speaking, we must do this under lock.
 
     QSet<QString> disabledVendorsForAutoSearch;
@@ -634,6 +653,9 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
             discoveryMode = DiscoveryMode::partiallyEnabled;
         else if( disabledVendorsForAutoSearch.contains(lit("all")) )
             discoveryMode = DiscoveryMode::disabled;
+
+        if (discoveryMode == DiscoveryMode::partiallyEnabled && !usePartialEnable)
+            discoveryMode = DiscoveryMode::disabled;
     }
 
     searcher->setDiscoveryMode( discoveryMode );
@@ -646,6 +668,7 @@ void QnResourceDiscoveryManager::updateSearchersUsage() {
         searchers = m_searchersList;
     }
 
+    bool usePartialEnable = isRedundancyUsing();
     for(QnAbstractResourceSearcher *searcher: searchers)
-        updateSearcherUsage(searcher);
+        updateSearcherUsage(searcher, usePartialEnable);
 }

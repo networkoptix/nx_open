@@ -1215,7 +1215,9 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts() {
 /*------------------------------------ HANDLERS ------------------------------------------*/
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
-    if (!m_licensesHelper->isValid(Qn::LC_VideoWall)) {
+
+    QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
+    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) == 0) {
         QMessageBox::warning(mainWindow(),
             tr("More licenses required"),
             tr("To enable the feature please activate at least one Video Wall license"));
@@ -2629,6 +2631,7 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
 }
 
 bool QnWorkbenchVideoWallHandler::validateLicenses(const QString &detail) const {
+    //TODO: #GDM add "Licenses" button
     if (!m_licensesHelper->isValid()) {
         QMessageBox::warning(mainWindow(),
             tr("More licenses required"),
