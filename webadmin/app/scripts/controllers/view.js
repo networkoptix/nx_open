@@ -36,6 +36,9 @@ angular.module('webadminApp').controller('ViewCtrl',
                 playing = (new Date()).getTime();
             }
 
+            if(!$scope.positionProvider){
+                return;
+            }
             $scope.positionProvider.init(playing);
             var cameraId = $scope.activeCamera.physicalId;
             var server = getCamerasServer($scope.activeCamera);
