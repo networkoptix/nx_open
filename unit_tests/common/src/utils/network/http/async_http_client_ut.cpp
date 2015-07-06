@@ -22,6 +22,7 @@ void testHttpClientForFastRemove( const QUrl& url )
 
 TEST( AsyncHttpClient, FastRemove )
 {
+    testHttpClientForFastRemove( lit( "127.0.0.1" ) );
     testHttpClientForFastRemove( lit( "localhost" ) );
     testHttpClientForFastRemove( lit( "doesNotExist" ) );
 }
