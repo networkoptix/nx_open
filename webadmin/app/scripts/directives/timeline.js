@@ -435,6 +435,7 @@ angular.module('webadminApp')
                     if(!scope.positionProvider){
                         return;
                     }
+
                     drawMarker(context, scope.positionProvider.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
                 }
 
@@ -442,6 +443,8 @@ angular.module('webadminApp')
                     if(!mouseCoordinate || mouseInScrollbar){
                         return;
                     }
+                    mouseDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
+
                     drawMarker(context, mouseDate,timelineConfig.pointerMarkerColor,timelineConfig.pointerMarkerTextColor);
                 }
 
@@ -496,7 +499,6 @@ angular.module('webadminApp')
                     var dateWidth = context.measureText(dateString).width;
                     var textStart = (height - timelineConfig.markerFontSize) / 2;
                     context.fillText(dateString,coordinate - dateWidth/2, textStart);
-                    console.log("fillText",coordinate - dateWidth/2, textStart);
 
                     dateString = dateFormat(date, timelineConfig.timeFormat);
                     dateWidth = context.measureText(dateString).width;
@@ -525,9 +527,7 @@ angular.module('webadminApp')
                         return;
                     }
 
-                    if($(event.target).parent().hasClass("timeMarker") || $(event.target).hasClass("timeMarker")){ // Timemarker?
-                        mouseCoordinate += event.offsetX - $(event.target).outerWidth()/2;
-                    }else if($(event.target).is("canvas")){
+                    if($(event.target).is("canvas")){
                         mouseCoordinate = event.offsetX;
                     }else{
                         console.warn ("unexpected node");
