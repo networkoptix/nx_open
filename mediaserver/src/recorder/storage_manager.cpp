@@ -67,6 +67,7 @@ public:
     }
     static void reset() {
         MSSettings::roSettings()->setValue(SCAN_ARCHIVE_FROM, QString());
+        MSSettings::roSettings()->sync();
     }
     bool isEmpty() const { return m_cameraUniqueId.isEmpty(); }
     bool operator<(const ArchiveScanPosition& other) {
