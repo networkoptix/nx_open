@@ -154,7 +154,8 @@ bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     }
 
     bool rez = startIOMonitor(Qn::PT_Input, m_ioHttpMonitor[0]);
-    startIOMonitor(Qn::PT_Output, m_ioHttpMonitor[1]);
+    if (hasCameraCapabilities(Qn::IOModuleCapability))
+        startIOMonitor(Qn::PT_Output, m_ioHttpMonitor[1]);
 
     QMutexLocker lk( &m_inputPortMutex );
     readCurrentIOStateAsync(); // read current state after starting IO monitor to avoid time period if port updated before monitor was running
@@ -709,7 +710,17 @@ bool QnPlAxisResource::setRelayOutputState(
     bool activate,
     unsigned int autoResetTimeoutMS )
 {
-    int portNum = portIdToIndex(outputID);
+    int portNum = 0;
+    if (outputID.isEmpty()) {
+        QMutexLocker lock(&m_mutex);
+        for (const auto& value: m_ioPorts) {
+            if (value.portType == Qn::PT_Output)
+                portNum = portIdToIndex(value.id);
+        }
+    }
+    else {
+        portNum = portIdToIndex(outputID);
+    }
     QString cmd = lit("axis-cgi/io/port.cgi?action=%1:%2").arg(portIndexToReqParam(portNum)).arg(QLatin1String(activate ? "/" : "\\"));
     if( autoResetTimeoutMS > 0 )
     {
@@ -1052,7 +1063,7 @@ QnIOPortDataList QnPlAxisResource::mergeIOSettings(const QnIOPortDataList& camer
     {
         for (int j = 0; j < savedIO.size(); ++j) {
             if (savedIO[j].id == result[i].id) 
-                result[i] = savedIO[i];
+                result[i] = savedIO[j];
         }
     }
     return result;
@@ -1073,8 +1084,10 @@ bool QnPlAxisResource::ioPortErrorOccured()
 void QnPlAxisResource::readPortIdLIst()
 {
     QString value = getProperty(Qn::IO_PORT_DISPLAY_NAMES_PARAM_NAME);
+    if (value.isEmpty())
+        return;
+    
     QMutexLocker lock(&m_mutex);
-
     m_ioPortIdList.clear();
     for (const auto& portId: value.split(L','))
         m_ioPortIdList << portId;

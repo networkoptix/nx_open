@@ -117,8 +117,8 @@ public:
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
 
-    virtual QStringList getRelayOutputList() const;
-    virtual QStringList getInputPortList() const;
+    virtual QnIOPortDataList getRelayOutputList() const;
+    virtual QnIOPortDataList getInputPortList() const;
 
 
     Qn::CameraCapabilities getCameraCapabilities() const;

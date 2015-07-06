@@ -363,26 +363,24 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
     }
 }
 
-QStringList QnSecurityCamResource::getRelayOutputList() const {
-    QStringList result;
+QnIOPortDataList QnSecurityCamResource::getRelayOutputList() const {
+    QnIOPortDataList result;
     QnIOPortDataList ports = getIOPorts();
     for (const auto& port: ports) {
         if (port.portType == Qn::PT_Output)
-            result << port.outputName;
+            result.push_back(port);
     }
-    qSort(result);
     return result;
 }
 
-QStringList QnSecurityCamResource::getInputPortList() const 
+QnIOPortDataList QnSecurityCamResource::getInputPortList() const 
 {
-    QStringList result;
+    QnIOPortDataList result;
     QnIOPortDataList ports = getIOPorts();
     for (const auto& port: ports) {
         if (port.portType == Qn::PT_Input)
-            result << port.inputName;
+            result.push_back(port);
     }
-    qSort(result);
     return result;
 }
 
