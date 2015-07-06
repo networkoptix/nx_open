@@ -6,10 +6,6 @@
   overflow:hidden;
   height:110px;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
   cursor: default;
 }
@@ -126,9 +122,25 @@ ng-include{
 }
 
 
+.timeline .timeline-panel{
+  width:33%;
+  display:inline-block;
+}
+
 .timeline:hover .timeMarker.pointer{
   display:block;
 }
 .timeline .timeMarker.hiddenTimemarker{
   display:none !important;
+}
+
+.timeline-info{
+  font-size: 120%;
+}
+
+.timeline-info .timeline-button{
+  padding:10px;
+  display: inline-block;
+  user-select: none;
+  cursor:pointer;
 }

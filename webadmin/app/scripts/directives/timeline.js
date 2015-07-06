@@ -27,6 +27,7 @@ angular.module('webadminApp')
                     font:'Roboto',//'sans-serif',
 
                     labelPadding: 2,
+                    lineWidth: 1,
 
                     topLabelAlign: "center", // center, left, above
                     topLabelHeight: 20/110, //% // Size for top label text
@@ -334,12 +335,14 @@ angular.module('webadminApp')
                             break;
                     }
 
+
                     if(markColor) {
                         context.strokeStyle = blurColor(markColor, alpha);
                         context.beginPath();
-                        context.moveTo(coordinate, markTop * scope.viewportHeight);
-                        context.lineTo(coordinate,
-                                markBottom * scope.viewportHeight);
+                        context.moveTo(coordinate + 0.5, markTop * scope.viewportHeight);
+                        context.lineTo(coordinate + 0.5, markBottom * scope.viewportHeight);
+
+                        context.lineWidth = timelineConfig.lineWidth;
                         context.stroke();
                     }
 
@@ -452,8 +455,10 @@ angular.module('webadminApp')
                     context.fillStyle = blurColor(timelineConfig.timeMarkerColor,1);
 
                     context.beginPath();
-                    context.moveTo(positionCoordinate, 0);
-                    context.lineTo(positionCoordinate, scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight);
+                    context.moveTo(positionCoordinate + 0.5, 0);
+                    context.lineTo(positionCoordinate + 0.5, scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight);
+
+                    context.lineWidth = timelineConfig.lineWidth;
                     context.stroke();
                 }
 
@@ -473,8 +478,10 @@ angular.module('webadminApp')
                     context.fillStyle = blurColor(timelineConfig.pointerMarkerColor,1);
 
                     context.beginPath();
-                    context.moveTo(mouseCoordinate, 0);
-                    context.lineTo(mouseCoordinate, scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight);
+                    context.moveTo(mouseCoordinate + 0.5, 0);
+                    context.lineTo(mouseCoordinate + 0.5, Math.round(scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight));
+
+                    context.lineWidth = timelineConfig.lineWidth;
                     context.stroke();
                 }
 
