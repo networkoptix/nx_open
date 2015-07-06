@@ -19,7 +19,7 @@ angular.module('webadminApp')
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
 
                     zoomBase: Math.log(10), // Base for exponential function for zooming
-                    zoomSpeed: 0.05, // Zoom speed 0 -> 1 = full zoom
+                    zoomSpeed: 0.2, // Zoom speed 0 -> 1 = full zoom
                     maxVerticalScrollForZoom: 5000, // value for adjusting zoom
                     animationDuration: 500, // 300, // 200-400 for smooth animation
 
@@ -57,9 +57,15 @@ angular.module('webadminApp')
                     scrollBarHighlightColor: [53,70,79,0.8],
 
                     timeMarkerColor: [255,255,255], // Timemarker color
+                    timeMarkerTextColor: [0,0,0],
                     pointerMarkerColor: [0,0,0], // Mouse pointer marker color
-                    dateFormat:'dd mmmm yyyy', // Timemarker format for date
-                    timeFormat:'HH:MM:ss', // Timemarker format for time
+                    pointerMarkerTextColor: [255,255,255],
+                    markerFontSize:12,
+                    markerWidth: 120,
+                    markerHeight: 45/110,
+                    markerTriangleHeight: 10/110,
+                    dateFormat: 'd mmmm yyyy', // Timemarker format for date
+                    timeFormat: 'HH:MM:ss', // Timemarker format for time
 
                     scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
                     scrollingSpeed: 0.25,// Scrolling speed for scroll buttons right-left
@@ -213,6 +219,7 @@ angular.module('webadminApp')
                     var context = canvas.getContext('2d');
                     context.fillStyle = blurColor(timelineConfig.timelineBgColor,1);
                     context.fillRect(0, 0, scope.viewportWidth, scope.viewportHeight);
+                    context.lineWidth = timelineConfig.lineWidth;
                     return context;
                 }
 
@@ -341,8 +348,6 @@ angular.module('webadminApp')
                         context.beginPath();
                         context.moveTo(coordinate + 0.5, markTop * scope.viewportHeight);
                         context.lineTo(coordinate + 0.5, markBottom * scope.viewportHeight);
-
-                        context.lineWidth = timelineConfig.lineWidth;
                         context.stroke();
                     }
 
@@ -426,63 +431,78 @@ angular.module('webadminApp')
                 }
 
                 // !!! Draw and position for timeMarker
-                var positionCoordinate = 0;
                 function drawTimeMarker(context){
-                    var lastCoord = positionCoordinate;
                     if(!scope.positionProvider){
-                        timeMarker.addClass("hiddenTimemarker");
                         return;
                     }
-
-                    var date = scope.positionProvider.playedPosition;
-                    positionCoordinate =  scope.scaleManager.dateToScreenCoordinate(date);
-
-
-                    if(positionCoordinate != lastCoord){
-                        if(positionCoordinate > 0 && positionCoordinate < scope.viewportWidth) {
-                            timeMarker.removeClass("hiddenTimemarker");
-                            timeMarker.css("left", positionCoordinate + "px");
-                        }else{
-                            timeMarker.addClass("hiddenTimemarker");
-                        }
-                    }
-
-                    date = new Date(scope.positionProvider.playedPosition);
-                    scope.playingDate = dateFormat(date, timelineConfig.dateFormat);
-                    scope.playingTime = dateFormat(date, timelineConfig.timeFormat);
-
-                    context.strokeStyle = blurColor(timelineConfig.timeMarkerColor,1);
-                    context.fillStyle = blurColor(timelineConfig.timeMarkerColor,1);
-
-                    context.beginPath();
-                    context.moveTo(positionCoordinate + 0.5, 0);
-                    context.lineTo(positionCoordinate + 0.5, scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight);
-
-                    context.lineWidth = timelineConfig.lineWidth;
-                    context.stroke();
+                    drawMarker(context, scope.positionProvider.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
                 }
 
                 function drawPointerMarker(context){
-                    if(!mouseCoordinate){
-                        pointerMarker.addClass("hiddenTimemarker");
+                    if(!mouseCoordinate || mouseInScrollbar){
                         return;
                     }
-                    pointerMarker.removeClass("hiddenTimemarker");
-                    pointerMarker.css("left", mouseCoordinate + "px");
+                    drawMarker(context, mouseDate,timelineConfig.pointerMarkerColor,timelineConfig.pointerMarkerTextColor);
+                }
 
-                    var date = new Date(mouseDate);
-                    scope.pointerDate = dateFormat(date, timelineConfig.dateFormat);
-                    scope.pointerTime = dateFormat(date, timelineConfig.timeFormat);
+                function drawMarker(context, date,markerColor,textColor){
+                    var coordinate =  scope.scaleManager.dateToScreenCoordinate(date);
 
-                    context.strokeStyle = blurColor(timelineConfig.pointerMarkerColor,1);
-                    context.fillStyle = blurColor(timelineConfig.pointerMarkerColor,1);
+                    if(coordinate < 0 || coordinate > scope.viewportWidth ) {
+                        return;
+                    }
+
+                    date = new Date(date);
+
+                    var height = timelineConfig.markerHeight * scope.viewportHeight;
+
+                    // Line
+                    context.strokeStyle = blurColor(markerColor,1);
+                    context.fillStyle = blurColor(markerColor,1);
 
                     context.beginPath();
-                    context.moveTo(mouseCoordinate + 0.5, 0);
-                    context.lineTo(mouseCoordinate + 0.5, Math.round(scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight));
-
-                    context.lineWidth = timelineConfig.lineWidth;
+                    context.moveTo(coordinate + 0.5, 0);
+                    context.lineTo(coordinate + 0.5, Math.round(scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight));
                     context.stroke();
+
+                    var side = null;
+                    var startCoord = coordinate - timelineConfig.markerWidth /2;
+                    if(startCoord < 0){
+                        side = "left";
+                        startCoord = 0;
+                    }
+                    if(startCoord + timelineConfig.markerWidth > scope.viewportWidth){
+                        side = "right";
+                        startCoord = scope.viewportWidth - timelineConfig.markerWidth;
+                    }
+
+                    // Bubble
+                    context.fillRect(startCoord, 0, timelineConfig.markerWidth, height );
+
+                    // Triangle
+                    context.beginPath();
+                    context.moveTo(coordinate + timelineConfig.markerTriangleHeight * scope.viewportHeight, height);
+                    context.lineTo(coordinate, height + timelineConfig.markerTriangleHeight * scope.viewportHeight);
+                    context.lineTo(coordinate - timelineConfig.markerTriangleHeight * scope.viewportHeight, height);
+                    context.closePath();
+                    context.fill();
+
+                    // Labels
+                    context.fillStyle = blurColor(textColor,1);
+                    context.font = timelineConfig.markerFontSize  + 'px ' + timelineConfig.font;
+                    coordinate = startCoord + timelineConfig.markerWidth /2; // Set actual center of the marker
+
+                    var dateString = dateFormat(date, timelineConfig.dateFormat);
+                    var dateWidth = context.measureText(dateString).width;
+                    var textStart = (height - timelineConfig.markerFontSize) / 2;
+                    context.fillText(dateString,coordinate - dateWidth/2, textStart);
+                    console.log("fillText",coordinate - dateWidth/2, textStart);
+
+                    dateString = dateFormat(date, timelineConfig.timeFormat);
+                    dateWidth = context.measureText(dateString).width;
+                    textStart = height/2 + textStart;
+                    context.fillText(dateString,coordinate - dateWidth/2, textStart);
+
                 }
 
                 // !!! Mouse events

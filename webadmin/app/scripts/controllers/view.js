@@ -203,7 +203,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                  }*/
 
 
-                alert('network problem');
+                console.error('network problem');
             });
         }
 
@@ -221,7 +221,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             $scope.selectCameraById($routeParams.cameraId,$location.search().time || false);
         }, function () {
-            alert('network problem');
+            console.error('network problem');
         });
 
 

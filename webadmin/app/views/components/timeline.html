@@ -27,11 +27,6 @@
         </div>
     </div>
 
-    <div class="popover top timeMarker playing small" >
-        <div class="arrow" style="left: 50%;"></div>
-        <div>{{playingDate}}<br>{{playingTime}}</div>
-    </div>
-
     <div class="viewport"
          ng-mouseup="mouseUp($event)"
          ng-mouseleave="mouseLeave($event)"
@@ -39,10 +34,6 @@
          ng-dblclick="dblClick($event)"
          ng-click="click($event)"
          ng-mousedown="mouseDown($event)">
-        <div class="popover top timeMarker pointer small" >
-            <div class="arrow" style="left: 50%;"></div>
-            <div>{{pointerDate}}<br>{{pointerTime}}</div>
-        </div>
         <canvas ></canvas>
     </div>
 
