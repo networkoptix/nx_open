@@ -13,7 +13,7 @@ class QnMediaResourceHelper : public QObject {
     Q_PROPERTY(QUrl mediaUrl READ mediaUrl NOTIFY mediaUrlChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
     Q_PROPERTY(QStringList resolutions READ resolutions NOTIFY resolutionsChanged)
-    Q_PROPERTY(QString resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
+    Q_PROPERTY(QString stream READ stream WRITE setStream NOTIFY streamChanged)
     Q_PROPERTY(QSize screenSize READ screenSize WRITE setScreenSize NOTIFY screenSizeChanged)
 
     Q_ENUMS(Protocol)
@@ -38,8 +38,8 @@ public:
     Q_INVOKABLE void setLive();
 
     QStringList resolutions() const;
-    QString resolution() const;
-    void setResolution(const QString &resolution);
+    QString stream() const;
+    void setStream(const QString &stream);
 
     QSize screenSize() const;
     void setScreenSize(const QSize &size);
@@ -51,20 +51,29 @@ signals:
     void mediaUrlChanged();
     void resourceNameChanged();
     void resolutionsChanged();
-    void resolutionChanged();
+    void streamChanged();
     void screenSizeChanged();
 
 private:
     void at_resourcePropertyChanged(const QnResourcePtr &resource, const QString &key);
 
 private:
+    void setStardardResolutions();
+    void setUrl(const QUrl &url);
+    void updateUrl();
+
+private:
     QnResourcePtr m_resource;
+    QUrl m_url;
     QDateTime m_dateTime;
     Protocol m_protocol;
     CameraMediaStreams m_supportedStreams;
     QString m_resolution;
+    int m_standardResolution;
+    QList<int> m_standardResolutions;
     QSize m_screenSize;
     qreal m_aspectRatio;
+    int m_nativeStreamIndex;
 };
 
 #endif // MEDIA_RESOURCE_HELPER_H
