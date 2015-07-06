@@ -106,7 +106,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.switchPosition = function( val ){
 
-            var playing = $scope.positionProvider.checkPlayingDate(val);
+            //var playing = $scope.positionProvider.checkPlayingDate(val);
 
             //console.log("switchPosition", new Date(val), playing);
             //if(playing === false) {

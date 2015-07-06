@@ -1,0 +1,29 @@
+.dark-theme{
+  color:white;
+  background-color: #1C2327;
+  height:800px;
+}
+.dark-theme videogular{
+  background-color: #1C2327;
+}
+
+.container-fluid.dark-theme{
+  margin: 0;
+}
+.webclient-window{
+  width:100%;
+  height:100%;
+}
+
+.webclient-window>tbody>tr>td{
+  vertical-align: top;
+}
+.cameras-panel{
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+.view-panel{
+}
+

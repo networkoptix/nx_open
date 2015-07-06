@@ -14,7 +14,7 @@ angular.module('webadminApp')
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
-                    initialInterval: 1000*60 /* *24*365*/, // no records - show small interval
+                    initialInterval: 1000*60 *60*24*365 /* *24*365*/, // no records - show small interval
                     minMsPerPixel: 1, // 1ms per pixel - best detailization
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
 
@@ -49,8 +49,8 @@ angular.module('webadminApp')
                     scrollBarHeight: 20/110, // %
                     minScrollBarWidth: 50, // px
                     scrollBarBgColor: [28,35,39],
-                    scrollBarColor: [105,135,150],
-                    scrollBarHighlightColor: [105,135,150,0.8],
+                    scrollBarColor: [53,70,79],
+                    scrollBarHighlightColor: [53,70,79,0.8],
 
                     timeMarkerColor: [255,255,255], // Timemarker color
                     pointerMarkerColor: [0,0,0], // Mouse pointer marker color
