@@ -61,10 +61,7 @@ FocusScope
 
             anchors
             {
-                left: parent.left;
-                right: parent.right;
-                top: parent.top;
-                bottom: parent.bottom;
+                fill: parent;
 
                 topMargin: Common.SizeManager.fontSizes.base;
                 bottomMargin: Common.SizeManager.spacing.base;
@@ -93,6 +90,8 @@ FocusScope
                 {
                     id: systemAndPasswordSettings;
                 }
+
+                Base.EmptyCell {}
             }
         }
     }
