@@ -5,6 +5,10 @@
 #   include <sys/time.h>
 #endif
 
+#ifdef Q_OS_WIN32
+#   include <mmsystem.h>
+#endif
+
 #include <QtCore/QDateTime>
 #include <QtCore/QStandardPaths>
 #include <QtGui/QDesktopServices>
@@ -230,8 +234,8 @@ quint64 getUsecTimer()
 
     static quint32 prevTics = 0;
     static quint64 cycleCount = 0;
-    static QMutex timeMutex;
-    QMutexLocker lock(&timeMutex);
+    static QnMutex timeMutex;
+    QnMutexLocker lock( &timeMutex );
     quint32 tics = (qint32) timeGetTime();
     if (tics < prevTics) 
         cycleCount+= 0x100000000ull;

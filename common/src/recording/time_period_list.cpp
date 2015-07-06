@@ -447,7 +447,7 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
 }
 
 
-QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeriodList>& periodLists)
+QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeriodList>& periodLists, int limit)
 {
     QVector<QnTimePeriodList> nonEmptyPeriods;
     for (const QnTimePeriodList &periodList: periodLists)
@@ -457,8 +457,12 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
     if (nonEmptyPeriods.empty())
         return QnTimePeriodList();
 
-    if(nonEmptyPeriods.size() == 1)
-        return nonEmptyPeriods.first();
+    if(nonEmptyPeriods.size() == 1) {
+        QnTimePeriodList result = nonEmptyPeriods.first();
+        if (result.size() > limit)
+            result.resize(limit);
+        return result;
+    }
 
     std::vector< QnTimePeriodList::const_iterator > minIndices(nonEmptyPeriods.size());
     for (int i = 0; i < nonEmptyPeriods.size(); ++i)
@@ -466,7 +470,10 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
 
     QnTimePeriodList result;
 
-    int maxSize = std::max_element(nonEmptyPeriods.cbegin(), nonEmptyPeriods.cend(), [](const QnTimePeriodList &l, const QnTimePeriodList &r) {return l.size() < r.size(); })->size();
+    int maxSize = std::min<int>(
+        limit,
+        std::max_element(nonEmptyPeriods.cbegin(), nonEmptyPeriods.cend(), [](const QnTimePeriodList &l, const QnTimePeriodList &r) {return l.size() < r.size(); })->size()
+        );
     result.reserve(maxSize);
 
     int minIndex = 0;
@@ -494,6 +501,8 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
 
             // add chunk to merged data
             if (result.empty()) {
+                if (result.size() >= limit)
+                    return result;
                 result.push_back(startPeriod);
                 if (startPeriod.isInfinite())
                     return result;
@@ -504,8 +513,11 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
                     Q_ASSERT_X(!last.isInfinite(), Q_FUNC_INFO, "This should never happen");
                     if (last.isInfinite())
                         last.startTimeMs = qMin(last.startTimeMs, startPeriod.startTimeMs);
-                    else if (startPeriod.startTimeMs > last.startTimeMs+last.durationMs)
+                    else if (startPeriod.startTimeMs > last.startTimeMs+last.durationMs) {
+                        if (result.size() >= limit)
+                            return result;
                         result.push_back(startPeriod);
+                    }
                     else 
                         last.durationMs = QnTimePeriod::infiniteDuration();
                     /* Last element is live and starts before all of rest - no need to process other elements. */
@@ -513,6 +525,8 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
                 } else if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime) {
                     last.durationMs = qMax(last.durationMs, minStartTime + startPeriod.durationMs - last.startTimeMs);
                 } else {
+                    if (result.size() >= limit)
+                        return result;
                     result.push_back(startPeriod);
                 }
             } 

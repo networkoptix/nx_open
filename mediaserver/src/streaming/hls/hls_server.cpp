@@ -266,7 +266,7 @@ namespace nx_hls
         const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
 
         //searching for requested resource
-        QnResourcePtr resource = qnResPool->getResourceByUniqId( shortFileName.toString() );
+        QnResourcePtr resource = qnResPool->getResourceByUniqueId( shortFileName.toString() );
         if( !resource )
         {
             NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Requested resource %1 not found").
@@ -397,7 +397,7 @@ namespace nx_hls
             m_switchToChunkedTransfer = false;
         }
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         for( ;; )
         {
             //reading chunk data
@@ -965,7 +965,7 @@ namespace nx_hls
 
     void QnHttpLiveStreamingProcessor::chunkDataAvailable( StreamingChunkPtr /*chunk*/, quint64 /*newSizeBytes*/ )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_cond.wakeAll();
     }
 

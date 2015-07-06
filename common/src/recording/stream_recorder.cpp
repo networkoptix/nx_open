@@ -439,6 +439,12 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
     avPkt.size = static_cast<int>(md->dataSize());
     avPkt.stream_index= streamIndex;
 
+    if (avPkt.pts < avPkt.dts)
+    {
+        avPkt.pts = avPkt.dts;
+        NX_LOG(QLatin1String("Timestamp error: PTS < DTS. Fixed."), cl_logWARNING);
+    }
+
     if (av_write_frame(m_formatCtx, &avPkt) < 0) 
     {
         NX_LOG(QLatin1String("AV packet write error"), cl_logWARNING);

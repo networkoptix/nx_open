@@ -68,11 +68,11 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 {
     static QList<QnInterfaceAndAddr> lastResult;
     static QElapsedTimer timer;
-    static QMutex mutex;
+    static QnMutex mutex;
 
     {
         // speed optimization
-        QMutexLocker lock(&mutex);
+        QnMutexLocker lock( &mutex );
         if (!lastResult.isEmpty() && timer.elapsed() < 5000)
             return lastResult;
     }
@@ -129,14 +129,14 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
-                    result.append(QnInterfaceAndAddr(iface.name(), address.ip(), iface));
+                    result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
                     break;
                 }
             }
         }
     }
 
-    QMutexLocker lock(&mutex);
+    QnMutexLocker lock( &mutex );
     timer.restart();
     lastResult = result;
 
@@ -728,3 +728,12 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
     return 0;
 }
 #endif
+
+QString getMacFromPrimaryIF()
+{
+    char  mac[MAC_ADDR_LEN];
+    char* host = 0;
+    if (getMacFromPrimaryIF(mac, &host) != 0)
+        return QString();
+    return QString::fromLatin1(mac);
+}

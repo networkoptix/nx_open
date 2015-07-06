@@ -196,7 +196,7 @@ void QnPlDlinkResource::setCroppingPhysical(QRect /*cropping*/)
 
 QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    QnMutexLocker mutexLocker( &m_mutex );
     return m_camInfo;
 }
 
@@ -350,8 +350,6 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
     if (std::abs(apectRatio_0 - apectRatio_1) > 0.01)
         apectRatio = apectRatio_1; // 
-            
-   
 
     QList<QSize>::iterator it = m_camInfo.resolutions.begin();
 
@@ -367,17 +365,6 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
             ++it;
     }
 
-    //detecting and saving selected resolutions
-    /*
-    const CodecID supportedCodec = !m_camInfo.hasH264.isEmpty()
-        ? CODEC_ID_H264
-        : (m_camInfo.hasMPEG4 ? CODEC_ID_MPEG4 : CODEC_ID_MJPEG);
-    CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_camInfo.primaryStreamResolution(), supportedCodec) );
-    if( m_camInfo.secondaryStreamResolution().width() > 0 )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_camInfo.secondaryStreamResolution(), supportedCodec ) );
-    saveMediaStreamInfoIfNeeded( mediaStreams );
-    */
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();

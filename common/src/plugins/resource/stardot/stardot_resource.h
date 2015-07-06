@@ -4,7 +4,7 @@
 #ifdef ENABLE_STARDOT
 
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"

@@ -148,7 +148,7 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
     quit();
     wait();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     while( !m_aggregatedEmails.isEmpty() )
     {
         const quint64 taskID = m_aggregatedEmails.begin()->periodicTaskID;
@@ -164,8 +164,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
 {
     if (action->actionType() == QnBusiness::SendMailAction) {
         // looking for server with public IP address
-        const QnResourcePtr& mServerRes = qnResPool->getResourceById(qnCommon->moduleGUID());
-        const QnMediaServerResource* mServer = dynamic_cast<const QnMediaServerResource*>(mServerRes.data());
+        const QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
             return QnMediaServerResourcePtr(); // do not proxy
         for (const QnMediaServerResourcePtr& mServer: qnResPool->getAllServers())
@@ -183,7 +182,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
-    return qnResPool->getResourceById(res->getParentId()).dynamicCast<QnMediaServerResource>();
+    return qnResPool->getResourceById<QnMediaServerResource>(res->getParentId());
 }
 
 bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
@@ -313,7 +312,7 @@ void QnBusinessRuleProcessor::addBusinessRule(const QnBusinessEventRulePtr& valu
 
 void QnBusinessRuleProcessor::processBusinessEvent(const QnAbstractBusinessEventPtr& bEvent)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QnAbstractBusinessActionList actions = matchActions(bEvent);
     for(const QnAbstractBusinessActionPtr& action: actions)
@@ -438,7 +437,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
 
 void QnBusinessRuleProcessor::at_timer()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QMap<QString, QnProcessorAggregationInfo>::iterator itr = m_aggregateActions.begin();
     while (itr != m_aggregateActions.end())
     {
@@ -530,7 +529,7 @@ static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
 
 bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
 {
-    //QMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
+    //QnMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
 
     //aggregating by recipients and eventtype
     if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
@@ -569,7 +568,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
 void QnBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggregationKey& aggregationKey )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     auto aggregatedActionIter = m_aggregatedEmails.find(aggregationKey);
     if( aggregatedActionIter == m_aggregatedEmails.end() )
@@ -710,13 +709,13 @@ void QnBusinessRuleProcessor::at_businessRuleChanged_i(const QnBusinessEventRule
 
 void QnBusinessRuleProcessor::at_businessRuleChanged(const QnBusinessEventRulePtr& bRule)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     at_businessRuleChanged_i(bRule);
 }
 
 void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList& rules)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     // Remove all rules
     for (int i = 0; i < m_rules.size(); ++i)
@@ -734,7 +733,7 @@ void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList
 
 void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, bool toggle)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QnVirtualCameraResourcePtr camResource = resource.dynamicCast<QnVirtualCameraResource>();
     if(!camResource)
@@ -796,7 +795,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr&
 
 void QnBusinessRuleProcessor::at_businessRuleDeleted(QnUuid id)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     for (int i = 0; i < m_rules.size(); ++i)
     {

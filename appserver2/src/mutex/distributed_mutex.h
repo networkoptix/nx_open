@@ -75,7 +75,7 @@ namespace ec2
         LockedMap m_peerLockInfo;
         QSet<QnUuid> m_proccesedPeers;
         QTimer* m_timer;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         bool m_locked;
         QQueue<ApiLockData> m_delayedResponse;
         QnDistributedMutexManager* m_owner;

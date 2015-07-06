@@ -5,7 +5,7 @@
 #include <QtCore/QString>
 #include <QtCore/QMap>
 #include <QtCore/QFile>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
 
@@ -63,7 +63,7 @@ public:
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator);
 
     QnStorageResourcePtr getStorageByUrl(const QString& fileName);
-    QnStorageResourcePtr storageRoot(int storage_index) const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots.value(storage_index); }
+    QnStorageResourcePtr storageRoot(int storage_index) const { QnMutexLocker lock( &m_mutexStorages ); return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const; 
     bool isStorageAvailable(const QnStorageResourcePtr& storage) const; 
 
@@ -134,7 +134,7 @@ private:
     int detectStorageIndex(const QString& path);
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
-    void getTimePeriodInternal(std::vector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog, int limit);
+    void getTimePeriodInternal(std::vector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
 
@@ -162,10 +162,10 @@ private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
 
-    mutable QMutex m_mutexStorages;
-    mutable QMutex m_mutexCatalog;
-    mutable QMutex m_mutexRebuild;
-    mutable QMutex m_rebuildStateMtx;
+    mutable QnMutex m_mutexStorages;
+    mutable QnMutex m_mutexCatalog;
+    mutable QnMutex m_mutexRebuild;
+    mutable QnMutex m_rebuildStateMtx;
 
     QMap<QString, QSet<int> > m_storageIndexes;
     bool m_storagesStatisticsReady;
@@ -190,9 +190,9 @@ private:
 
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     bool m_initInProgress;
-    mutable QMutex m_sdbMutex;
+    mutable QnMutex m_sdbMutex;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
-    mutable QMutex m_csvMigrationMutex;
+    mutable QnMutex m_csvMigrationMutex;
     bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
 };

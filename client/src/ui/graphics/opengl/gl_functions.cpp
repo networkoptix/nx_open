@@ -2,13 +2,15 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QRegExp>
 #include <QtGui/QOpenGLContext>
 
 #include <utils/common/warnings.h>
+#include <utils/thread/mutex.h>
 
 #include "gl_context_data.h"
+
 
 namespace {
     bool qn_warnOnInvalidCalls = false;
@@ -41,7 +43,7 @@ public:
     }
 
     void initialize(const QGLContext *context) {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if(m_initialized)
             return;
 
@@ -71,7 +73,7 @@ public:
     }
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     bool m_initialized;
     GLint m_maxTextureSize;
 };
@@ -93,15 +95,29 @@ public:
     {
         qn_glFunctionsGlobal()->initialize(context);
 
-        QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-        QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-        if (vendor.contains("Tungsten Graphics") && renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
+		m_openGLInfo.version = getGLString(GL_VERSION);
+		m_openGLInfo.vendor = getGLString(GL_VENDOR);
+		m_openGLInfo.renderer = getGLString(GL_RENDERER);
+		{
+			QnMutexLocker lock(&m_mutex);
+			m_openGLInfoCache = m_openGLInfo;
+		}
+		m_openGLInfoCache = m_openGLInfo;
+
+        if (m_openGLInfo.vendor.contains(lit("Tungsten Graphics")) && 
+			m_openGLInfo.renderer.contains(lit("Gallium 0.1, Poulsbo on EMGD")))
+		{
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
+		}
+
 #ifdef Q_OS_MACX
         /* Intel HD 3000 driver handles textures with size > 4096 incorrectly (see bug #3141).
          * To fix that we have to override maximum texture size to 4096 for this graphics adapter. */
-        if (vendor.contains("Intel") && QRegExp(lit(".*Intel.+3000.*")).exactMatch(QString::fromLatin1(renderer)))
+        if (m_openGLInfo.vendor.contains(lit("Intel")) && 
+            QRegExp(lit(".*Intel.+3000.*")).exactMatch(m_openGLInfo.renderer))
+        {
             qn_glFunctionsGlobal()->overrideMaxTextureSize(4096);
+        }
 #endif
 
         
@@ -124,10 +140,35 @@ public:
     {
         return m_context;
     }
+
+	const QnGlFunctions::OpenGLInfo& openGLInfo() const
+	{
+		return m_openGLInfo;
+	}
+
+	static const QnGlFunctions::OpenGLInfo openGLCachedInfo()
+	{
+		QnMutexLocker lock(&m_mutex);
+		return m_openGLInfoCache;
+	}
+
 private:
+	QString getGLString(GLenum id)
+	{
+		return QLatin1String(reinterpret_cast<const char *>(glGetString(id)));
+	}
+
     const QGLContext *m_context;
     QnGlFunctions::Features m_features;
+	QnGlFunctions::OpenGLInfo m_openGLInfo;
+
+	static QnMutex m_mutex;
+	static QnGlFunctions::OpenGLInfo m_openGLInfoCache;
 };
+
+// static
+QnMutex QnGlFunctionsPrivate::m_mutex;
+QnGlFunctions::OpenGLInfo QnGlFunctionsPrivate::m_openGLInfoCache;
 
 typedef QnGlContextData<QnGlFunctionsPrivate, QnGlContextDataForwardingFactory<QnGlFunctionsPrivate> > QnGlFunctionsPrivateStorage;
 Q_GLOBAL_STATIC(QnGlFunctionsPrivateStorage, qn_glFunctionsPrivateStorage);
@@ -154,6 +195,16 @@ const QGLContext* QnGlFunctions::context() const
 
 QnGlFunctions::Features QnGlFunctions::features() const {
     return d->features();
+}
+
+const QnGlFunctions::OpenGLInfo& QnGlFunctions::openGLInfo() const
+{
+	return d->openGLInfo();
+}
+
+QnGlFunctions::OpenGLInfo QnGlFunctions::openGLCachedInfo()
+{
+	return QnGlFunctionsPrivate::openGLCachedInfo();
 }
 
 void QnGlFunctions::setWarningsEnabled(bool enable) {

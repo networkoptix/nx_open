@@ -47,7 +47,7 @@ namespace {
 
 QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     QObject(parent),
-    m_mutex(QMutex::Recursive)
+    m_mutex(QnMutex::Recursive)
 {
     connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource) {
         /* Fast check. */
@@ -70,7 +70,7 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
 QnCameraHistoryPool::~QnCameraHistoryPool() {}
 
 bool QnCameraHistoryPool::isCameraHistoryValid(const QnVirtualCameraResourcePtr &camera) const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_historyValidCameras.contains(camera->getId());
 }
 
@@ -78,7 +78,7 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
     bool notify = false;
 
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         notify = m_historyValidCameras.contains(cameraId);
         m_historyValidCameras.remove(cameraId);
     }
@@ -112,7 +112,7 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
         return false;
 
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         m_runningRequests[handle] = callback;
     }
 
@@ -120,7 +120,7 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
 }
 
 void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHistoryDataList &periods, int handle) {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     QSet<QnUuid> loadedCamerasIds;
     bool success = (status == 0);
@@ -168,7 +168,7 @@ void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHist
 }
 
 QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid &cameraId) const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     QnMediaServerResourceList result;
     for(auto itr = m_archivedCamerasByServer.cbegin(); itr != m_archivedCamerasByServer.cend(); ++itr) {
@@ -191,7 +191,7 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirt
     if (!isCameraHistoryValid(camera))
         return getCameraFootageData(camera);
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     auto itr = m_historyDetail.find(camera->getId());
     const auto& moveData = itr.value();
     if (moveData.empty())
@@ -233,7 +233,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtu
     if (foundPeriod)
         foundPeriod->clear();
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     const auto& itr = m_historyDetail.find(camera->getId());
     if (itr == m_historyDetail.end())
         return currentServerForCamera(camera); // no history data. use current server constantly
@@ -256,7 +256,6 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
     if (!foundPeriod)
         return getMediaServerOnTime(camera, timestamp);
 
-    QMutexLocker lock(&m_mutex);
     foundPeriod->clear();
     const auto& itr = m_historyDetail.find(camera->getId());
     if (itr == m_historyDetail.end())
@@ -292,7 +291,7 @@ void QnCameraHistoryPool::resetServerFootageData(const ec2::ApiServerFootageData
     QSet<QnUuid> localHistoryValidCameras;
     QSet<QnUuid> allCameras;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_archivedCamerasByServer.clear();
         m_historyDetail.clear();
         localHistoryValidCameras = m_historyValidCameras;
@@ -313,7 +312,7 @@ void QnCameraHistoryPool::resetServerFootageData(const ec2::ApiServerFootageData
 
 void QnCameraHistoryPool::setServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras) {
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         m_archivedCamerasByServer.insert(serverGuid, cameras);
     }
     for (const auto &cameraId : cameras) {
@@ -328,7 +327,7 @@ void QnCameraHistoryPool::setServerFootageData(const ec2::ApiServerFootageData &
 }
 
 std::vector<QnUuid> QnCameraHistoryPool::getServerFootageData(const QnUuid& serverGuid) const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     std::vector<QnUuid> result;
     for(const auto& value: m_archivedCamerasByServer.value(serverGuid))
         result.push_back(value);

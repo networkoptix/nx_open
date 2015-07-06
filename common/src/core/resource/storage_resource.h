@@ -112,11 +112,14 @@ public:
      * \returns                         Size of the file, or 0 if the file does not exist.
      */
     virtual qint64 getFileSize(const QString& url) const = 0;
+
+    static QString toNativeDirPath(const QString &dirPath);
+
 protected:
     //qint64 m_writedSpace;
 
 private:
-    mutable QMutex m_writedSpaceMtx;
+    mutable QnMutex m_writedSpaceMtx;
 };
 
 
@@ -135,7 +138,7 @@ public:
 private:
     QHash<QString, StorageResourceFactory> m_factoryByProtocol;
     StorageResourceFactory m_defaultFactory;
-    QMutex m_mutex; // TODO: #vasilenko this mutex is not used, is it intentional?
+    QnMutex m_mutex; // TODO: #vasilenko this mutex is not used, is it intentional?
 };
 
 #endif // QN_STORAGE_RESOURCE_H

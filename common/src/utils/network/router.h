@@ -2,7 +2,7 @@
 #define ROUTER_H
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/singleton.h>
 #include <utils/network/http/httptypes.h>
@@ -12,13 +12,15 @@ class QnModuleFinder;
 
 struct QnRoute
 {
+
     SocketAddress addr; // address for physical connect
     QnUuid id;          // requested server ID
     QnUuid gatewayId;   // proxy server ID. May be null
     bool reverseConnect;// if target server should connect to this one
+    int distance;
 
+    QnRoute() : reverseConnect(false), distance(0) {}
     bool isValid() const { return !addr.isNull(); }
-    QnRoute() : reverseConnect(false) {}
 };
 
 class QnRouter : public QObject, public Singleton<QnRouter> {

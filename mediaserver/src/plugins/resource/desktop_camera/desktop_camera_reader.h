@@ -20,15 +20,13 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
-
-    virtual void updateStreamParamsBasedOnQuality() override;
-    virtual void updateStreamParamsBasedOnFps() override;
-
+    virtual void pleaseReopenStream() override;
     virtual void pleaseStop() override;
+
 private:
     int processTextResponse();
 private:
@@ -37,7 +35,7 @@ private:
     QnFfmpegRtpParser m_parsers[2];
     QElapsedTimer m_keepaliveTimer;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
-    mutable QMutex m_audioLayoutMutex;
+    mutable QnMutex m_audioLayoutMutex;
 };
 
 #endif  //ENABLE_DESKTOP_CAMERA

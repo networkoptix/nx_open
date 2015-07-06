@@ -154,6 +154,12 @@ namespace Qn {
          */
         BetaVersionMessageAction,
 
+
+        /** 
+         * Displays dialog asking about statistics reporting.
+         */
+        AllowStatisticsReportMessageAction,
+
         /**
          * Opens the provided url in the default browser.
          *

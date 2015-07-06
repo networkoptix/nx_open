@@ -68,7 +68,7 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
-    QMutexLocker lock(&m_discoveryMutex);
+    QnMutexLocker lock( &m_discoveryMutex );
 
     QnResourceList extraResources;
 
@@ -97,7 +97,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             continue;
         }
 
-        QnResourcePtr rpResource = qnResPool->getResourceByUniqId(newNetRes->getUniqueId());
+        QnResourcePtr rpResource = qnResPool->getResourceByUniqueId(newNetRes->getUniqueId());
         if (!rpResource) {
             ++it; // keep new resource in a list
             continue;

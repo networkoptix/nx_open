@@ -46,7 +46,7 @@ protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);
 private:
-    //QMutex m_mutex;
+    //QnMutex m_mutex;
     //bool m_usePrebuffer;
     //QnAbstractMediaDataPtr m_nextData;
     QnAbstractArchiveReader* m_reader; 

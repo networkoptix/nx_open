@@ -24,10 +24,11 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 }
 
 
-void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, const QString& userName, const QString &userId)
+void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, 
+													 const QString& userName, const QString &userId)
 {
     connection->setSendTimeout(1);
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_connections << ClientConnectionInfo(connection, userName, userId);
 #ifdef DESKTOP_CAMERA_DEBUG
     qDebug() << "register camera" << userName << userId;
@@ -47,7 +48,7 @@ bool QnDesktopCameraResourceSearcher::isCameraConnected(const QnVirtualCameraRes
 
     QString userId = camera->getUniqueId();
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     for (int i = 0; i < m_connections.size(); ++i) {
         if (m_connections[i].userId == userId)
             return true;
@@ -64,7 +65,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     if (rt->getId().isNull())
         return result;
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QQueue<ClientConnectionInfo>::Iterator itr = m_connections.begin();
     
@@ -117,7 +118,7 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid &reso
 
 void QnDesktopCameraResourceSearcher::cleanupConnections()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QQueue<ClientConnectionInfo>::Iterator itr = m_connections.begin();
     while(itr != m_connections.end())
@@ -154,7 +155,7 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
 }
 
 TCPSocketPtr QnDesktopCameraResourceSearcher::getConnectionByUserId(const QString& userId) {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     for (int i = 0; i < m_connections.size(); ++i)
     {
         ClientConnectionInfo& conn = m_connections[i];
@@ -173,7 +174,7 @@ TCPSocketPtr QnDesktopCameraResourceSearcher::getConnectionByUserId(const QStrin
 
 quint32 QnDesktopCameraResourceSearcher::incCSeq(const TCPSocketPtr& socket)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     for (int i = 0; i < m_connections.size(); ++i)
     {
@@ -187,7 +188,7 @@ quint32 QnDesktopCameraResourceSearcher::incCSeq(const TCPSocketPtr& socket)
 
 void QnDesktopCameraResourceSearcher::releaseConnection(const TCPSocketPtr& socket)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     for (int i = 0; i < m_connections.size(); ++i)
     {

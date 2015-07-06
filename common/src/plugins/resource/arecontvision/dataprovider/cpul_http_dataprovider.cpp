@@ -49,7 +49,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
     bool h264;
 
     {
-            QMutexLocker mutex(&m_mutex);
+            QnMutexLocker mutex( &m_mutex );
 
             h264 = isH264();
 
@@ -80,7 +80,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
             {
                 streamID = m_streamParam.value("streamID").toInt();
                 //bitrate = m_streamParam.get("Bitrate").value.value;
-                bitrate = getBitrate();
+                bitrate = getBitrateMbps();
             }
             //=========
 

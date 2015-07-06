@@ -140,6 +140,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_dataLoader(context->instance<QnCameraDataManager>()->loader(m_resource))
 {
     updateBookmarks();
+/*
     connect(m_dataLoader, &QnCachingCameraDataLoader::bookmarksChanged, this, &QnMediaResourceWidget::updateBookmarks);
     connect(m_dataLoader, &QnCachingCameraDataLoader::loadingFailed, this, [this]()
     {
@@ -153,7 +154,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
             updateBookmarks();
         }
     });
-
+*/
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
 
@@ -974,7 +975,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
             continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
-        mbps += statistics->getBitrate();
+        mbps += statistics->getBitrateMbps();
     }
 
     QSize size = m_display->camDisplay()->getRawDataSize();
@@ -1334,11 +1335,11 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
 
 void QnMediaResourceWidget::updateBookmarks()
 {
-    m_bookmarks = m_dataLoader->bookmarks();
-    m_bookmarksBeginPosition = m_bookmarks.cbegin();
-
-    if (m_currentTime != kInvalidTime)
-        updateCurrentTime(m_currentTime);
+//     m_bookmarks = m_dataLoader->bookmarks();
+//     m_bookmarksBeginPosition = m_bookmarks.cbegin();
+// 
+//     if (m_currentTime != kInvalidTime)
+//         updateCurrentTime(m_currentTime);
 }
 
 void QnMediaResourceWidget::updateCurrentTime(qreal timeMs)

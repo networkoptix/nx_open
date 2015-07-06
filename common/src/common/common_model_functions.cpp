@@ -51,4 +51,12 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
     (Qn::CompressedPeriodsFormat, "periods")
 )
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BookmarkSearchStrategy,
+    (Qn::EarliestFirst,     "earliest")
+    (Qn::EarliestFirst,     "default")
+    (Qn::LatestFirst,       "latest")
+    (Qn::LatestFirst,       "reverse")
+    (Qn::LongestFirst,      "longest")
+    (Qn::LongestFirst,      "size")
+)
 

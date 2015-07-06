@@ -2,7 +2,7 @@
 #define QN_RESOURCE_DATA_POOL_H
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_fwd.h>
@@ -23,7 +23,7 @@ public:
      * \param camera                    resource to get data for.
      * \returns                         Resource data for the given camera.
      */
-    QnResourceData data(const QnSecurityCamResourcePtr &camera) const;
+    QnResourceData data(const QnConstSecurityCamResourcePtr &camera) const;
     
     bool load(const QString &fileName);
 

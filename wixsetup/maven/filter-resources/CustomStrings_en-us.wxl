@@ -48,7 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Confirm Password</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Extra parameters</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Allow system to optimize cameras settings (Recommended)</String>   
-    <String Id="AppServerDlg_AllowCollectStatistics"                Overridable="yes">Send usage and crash statistics to software developers</String>   
+    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">Send anonymous usage and crash statistics to software developers</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Play with ${display.product.name}</String>

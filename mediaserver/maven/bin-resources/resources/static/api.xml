@@ -739,9 +739,9 @@
                         <caption>Return XML with 'OK' message or error code</caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>events</name>
-                    <description>Returns event log</description>
+                    <description>Returns event log in proprietary binary format</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1562,6 +1562,7 @@
 
                 <function>
                     <name>&lt;physicalId&gt;</name>
+                    <caption>RTSP Streaming</caption>
                     <description>
                                         Open RTSP video from a camera. It is not an exact method name. It means that RTSP url may contain any camera unique ID. For instance:
                                         rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p
@@ -1636,6 +1637,7 @@
 
                 <function>
                     <name>media/&lt;physicalId&gt;.&lt;format&gt;</name>
+                    <caption>HTTP Streaming</caption>
                     <description>
                         Url format for opening camera stream using HTTP protocol. Codec and stream format can be specified in url parameters.
                         Live stream and archive can be downloaded. If required and possible, media stream transcoding is performed on-the-fly.
@@ -1671,6 +1673,7 @@
                 </function>
                 <function>
                     <name>hls/&lt;physicalId&gt;.m3u</name>
+                    <caption>HLS Streaming</caption>
                     <description>
                             Url format for opening camera stream with Http Live Streaming (HLS).
                             This protocol is supported by iOS-based devices (iPhone, iPad).
@@ -1705,6 +1708,7 @@
                 </function>
                 <function>
                     <name>hls/&lt;physicalId&gt;.&lt;format&gt;</name>
+                    <caption>Direct download</caption>
                     <description>
                         Url format for downloading fragment of archive by specifying fragment start time and duration.
                         Fragment can be downloaded in mpeg-2/ts (.ts) format or matroska (.mkv).
@@ -1742,6 +1746,29 @@
                     </params>
                     <result>
                         <caption>Video stream in requested format</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
+         <group>
+            <groupName>Proxy API</groupName>
+            <urlPrefix>/proxy</urlPrefix>
+            <groupDescription>
+                This group contains information requests proxy from one server to another
+            </groupDescription>
+            <functions>
+
+                <function>
+                    <name>&lt;protocol&gt;/&lt;serverGuid&gt;/&lt;apiRequest&gt;</name>
+                    <description>
+                        Proxy methods allows to send any request to any server using the existing public connection. Can also be used to get video streams.
+                        Example: rtsp://10.0.2.1/proxy/rtsp/{72934575-ceb7-54bb-23a0-84b81cf1d3f1}/12AB42FD5912?pos=1235631&amp;resolution=240p
+                        Example: http://10.0.2.1/proxy/http/{72934575-ceb7-54bb-23a0-84b81cf1d3f1}/showLog
+                    </description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>Return result of the target api request.</caption>
                     </result>
                 </function>
             </functions>

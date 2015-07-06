@@ -192,7 +192,7 @@ QnResourceList QnActionParameterTypes::resources(const QnLayoutItemIndexList &la
         if(!data.resource.id.isNull()) {
             resource = qnResPool->getResourceById(data.resource.id);
         } else {
-            resource = qnResPool->getResourceByUniqId(data.resource.path);
+            resource = qnResPool->getResourceByUniqueId(data.resource.path);
         }
 
         if(resource)

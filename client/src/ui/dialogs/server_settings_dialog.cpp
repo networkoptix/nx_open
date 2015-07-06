@@ -55,6 +55,7 @@ namespace {
     const int TotalSpaceRole = Qt::UserRole + 2;
     const int StorageIdRole = Qt::UserRole + 3;
     const int ExternalRole = Qt::UserRole + 4;
+    const int StorageType = Qt::UserRole + 5;
 
     enum Column {
         CheckBoxColumn,
@@ -220,6 +221,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     checkBoxItem->setCheckState(item.isUsedForWriting ? Qt::Checked : Qt::Unchecked);
     checkBoxItem->setData(StorageIdRole, QVariant::fromValue<QnUuid>(item.storageId));
     checkBoxItem->setData(ExternalRole, item.isExternal);
+    checkBoxItem->setData(StorageType, item.storageType);
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -285,6 +287,7 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
+    result.storageType = checkBoxItem->data(StorageType).value<QString>();
     result.storageId = checkBoxItem->data(StorageIdRole).value<QnUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
@@ -376,6 +379,7 @@ void QnServerSettingsDialog::submitToResources()
                 storage->setUrl(item.url);
                 storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
                 storage->setUsedForWriting(item.isUsedForWriting);
+                storage->setStorageType(item.storageType);
                 newStorages.push_back(storage);
             }
         }
@@ -537,18 +541,17 @@ void QnServerSettingsDialog::updateRebuildUi(const QnStorageScanData& reply) {
      m_rebuildState = reply;
 
      ui->rebuildGroupBox->setEnabled(reply.state != Qn::RebuildState_Unknown);
-     //TODO: #TR #gdm remove trailing spaces from messages
      QString status;
      if (!reply.path.isEmpty()) {
          if (reply.state == Qn::RebuildState_FullScan)
-            status = tr("Rebuild archive index for storage '%1' in progress").arg(reply.path);
+            status = tr("Rebuild archive index for storage '%1' is in progress").arg(reply.path);
          else if (reply.state == Qn::RebuildState_PartialScan)
-             status = tr("Fast archive scan for storage '%1' in progress ").arg(reply.path);
+             status = tr("Fast archive scan for storage '%1' is in progress").arg(reply.path);
      }
      else if (reply.state == Qn::RebuildState_FullScan)
-         status = tr("Rebuild archive index for storage '%1' in progress").arg(reply.path);
+         status = tr("Rebuild archive index for storage '%1' is in progress").arg(reply.path);
      else if (reply.state == Qn::RebuildState_PartialScan)
-         status = tr("Fast archive scan for storage '%1' in progress ").arg(reply.path);
+         status = tr("Fast archive scan for storage '%1' is in progress").arg(reply.path);
      
      ui->rebuildStatusLabel->setText(status);
          

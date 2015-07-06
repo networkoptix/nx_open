@@ -48,7 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">确认密码</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">系统优化设置</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允许系统优化摄像机配置(不推荐)</String>     
-    <String Id="AppServerDlg_AllowCollectStatistics"                Overridable="yes">Send usage and crash statistics to software developers</String>   
+    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">Send anonymous usage and crash statistics to software developers</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${display.product.name}</String>

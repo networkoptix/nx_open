@@ -18,6 +18,7 @@ namespace Qn
     static const QString MOTION_MASK_WINDOW_CNT_PARAM_NAME = lit("motionMaskWindowCnt");
     static const QString MOTION_SENS_WINDOW_CNT_PARAM_NAME = lit("motionSensWindowCnt");
     static const QString FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME = lit("forcedIsAudioSupported");
+    static const QString FORCE_BITRATE_PER_GOP = lit("bitratePerGOP");
     /*!
         String parameter with following values allowed:\n
         - \a softwaregrid. Software motion calculated on mediaserver
@@ -30,12 +31,23 @@ namespace Qn
     static const QString CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME = lit("defaultCredentials");
     static const QString CAMERA_CAPABILITIES_PARAM_NAME = lit("cameraCapabilities");
     static const QString CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = lit("mediaStreams");
+    static const QString CAMERA_BITRATE_INFO_LIST_PARAM_NAME = lit("bitrateInfos");
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
     static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
+
+    /* Whether statistics gathering is allowed on the current server. */
+    static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
+
+    // Hardware information  
+    static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
+    static const QString CPU_MODEL_NAME = lit("cpuModelName");
+    static const QString PHISICAL_MEMORY = lit("phisicalMemory");
+    static const QString BETA = lit("beta");
+    static const QString PUBLIC_IP = lit("publicIp");
 }
 
 #endif // QN_PARAM_H

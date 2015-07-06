@@ -4,6 +4,9 @@
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QStringList>
+
+#include <common/common_globals.h>
+
 #include <utils/common/uuid.h>
 
 #include "camera_bookmark_fwd.h"
@@ -48,11 +51,9 @@ struct QnCameraBookmark {
         durationMs(0)
     {}
 
-    QString tagsAsString() const
-    {
-        static const QString kDelimiter = lit(" ");
-        return tags.join(kDelimiter);
-    }
+    QString tagsAsString() const;
+
+    static QnCameraBookmarkList mergeCameraBookmarks(const MultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);
 };
 #define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)
 
@@ -61,22 +62,22 @@ struct QnCameraBookmark {
  *                                                  with length exceeding fixed minimal, with name and/or tags containing fixed string.
  */
 struct QnCameraBookmarkSearchFilter {
-    //TODO: #GDM #Bookmarks change minStartTimeMs to maxEndTimeMs to load bookmarks that end in the current window.
     /** Minimum start time for the bookmark. */
-    qint64 minStartTimeMs;
+    qint64 startTimeMs;
 
-    /** Maximum start time for the bookmark. */
-    qint64 maxStartTimeMs;
-
-    /** Minimum bookmark duration. */
-    qint64 minDurationMs;
+    /** Maximum end time for the bookmark. */
+    qint64 endTimeMs;
 
     /** Text-search filter string. */
     QString text;
 
+    int limit;
+
+    Qn::BookmarkSearchStrategy strategy;
+
     QnCameraBookmarkSearchFilter();
 };
-#define QnCameraBookmarkSearchFilter_Fields (minStartTimeMs)(maxStartTimeMs)(minDurationMs)(text)
+#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(strategy)
 
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
 

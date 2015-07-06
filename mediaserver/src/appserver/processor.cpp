@@ -74,7 +74,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
 {
     bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferedServerId() == qnCommon->moduleGUID(); // return camera back without mutex
-    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     bool takeCameraWithoutLock = ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy();
     if (!ec2::QnDistributedMutexManager::instance() || takeCameraWithoutLock || isOwnChangeParentId)
     {
@@ -82,7 +82,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
         return;
     }
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QString name;
     if (cameraResource->hasFlags(Qn::parent_change))
         name = ec2::QnMutexCameraDataHandler::CAM_UPD_PREFIX;
@@ -107,7 +107,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
 
 void QnAppserverResourceProcessor::at_mutexLocked()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     LockData data = m_lockInProgress.value(mutex->name());
     if (!data.mutex)
@@ -196,7 +196,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 
 void QnAppserverResourceProcessor::at_mutexTimeout()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     m_lockInProgress.remove(mutex->name());
     mutex->deleteLater();

@@ -5,7 +5,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QMap>
 #include <QtCore/QSet>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
@@ -33,6 +33,7 @@ public:
     qint64 addUpdateFileChunkSync(const QString &updateId, const QByteArray &data, qint64 offset);
     void addUpdateFileChunkAsync(const QString &updateId, const QByteArray &data, qint64 offset);
     bool installUpdate(const QString &updateId);
+    void installUpdateDelayed(const QString &updateId);
 
 private:
     qint64 addUpdateFileChunkInternal(const QString &updateId, const QByteArray &data, qint64 offset);
@@ -44,7 +45,7 @@ private slots:
     void at_zipExtractor_extractionFinished(int error);
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
 
     QString m_updateId;
     QScopedPointer<QFile> m_file;

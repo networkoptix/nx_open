@@ -25,12 +25,9 @@ public:
 
 
 protected:
-    virtual void updateStreamParamsBasedOnFps() override {};
-    virtual void updateStreamParamsBasedOnQuality() override; 
-    //virtual void updateCameraMotion(const QnMotionRegion& region) override;
+    virtual void pleaseReopenStream() override;
 
-
-    int getBitrate() const;
+    int getBitrateMbps() const;
     bool isH264() const;
     void updateCameraParams();
 
@@ -46,7 +43,7 @@ protected:
     // but will slow down a bit coz of extra memcpy ( I think not much )
     QnByteArray m_videoFrameBuff; 
     bool m_needUpdateParams;
-    mutable QMutex m_needUpdateMtx;
+    mutable QnMutex m_needUpdateMtx;
 };
 
 #endif

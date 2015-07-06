@@ -59,7 +59,6 @@ typedef QList<QnResourceTypePtr> QnResourceTypeList;
 class QnVirtualCameraResource;
 typedef QnSharedResourcePointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
 typedef QnSharedResourcePointerList<QnVirtualCameraResource> QnVirtualCameraResourceList;
-typedef QSharedPointer<QnVirtualCameraResourceList> QnVirtualCameraResourceListPtr; // TODO: #Elric remove?
 
 class QnPhysicalCameraResource;
 typedef QnSharedResourcePointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
@@ -90,6 +89,7 @@ typedef QnSharedResourcePointerList<QnNetworkResource> QnNetworkResourceList;
 
 class QnSecurityCamResource;
 typedef QnSharedResourcePointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
+typedef QnSharedResourcePointer<const QnSecurityCamResource> QnConstSecurityCamResourcePtr;
 typedef QnSharedResourcePointerList<QnSecurityCamResource> QnSecurityCamResourceList;
 
 class QnCameraUserAttributes;

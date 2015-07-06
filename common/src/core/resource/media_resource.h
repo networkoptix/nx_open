@@ -77,7 +77,7 @@ protected:
 
 private:
     mutable QString m_cachedLayout;
-    mutable QMutex m_layoutMutex;
+    mutable QnMutex m_layoutMutex;
 };
 
 #endif // QN_MEDIA_RESOURCE_H

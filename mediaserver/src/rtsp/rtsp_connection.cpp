@@ -58,7 +58,7 @@ enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
 static const int DEFAULT_RTSP_TIMEOUT = 60; // in seconds
 const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
-QMutex RtspServerTrackInfo::m_createSocketMutex;
+QnMutex RtspServerTrackInfo::m_createSocketMutex;
 
 bool updatePort(AbstractDatagramSocket* &socket, int port)
 {
@@ -70,7 +70,7 @@ bool updatePort(AbstractDatagramSocket* &socket, int port)
 bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
     // try to find a couple of port, even for RTP, odd for RTCP
-    QMutexLocker lock(&m_createSocketMutex);
+    QnMutexLocker lock( &m_createSocketMutex );
     mediaSocket = SocketFactory::createDatagramSocket();
     rtcpSocket = SocketFactory::createDatagramSocket();
 
@@ -186,7 +186,7 @@ public:
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
-    QMutex mutex;
+    QnMutex mutex;
     int lastPlayCSeq;
     MediaQuality quality;
     bool qualityFastSwitch;
@@ -899,7 +899,7 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
 void QnRtspConnectionProcessor::at_camera_resourceChanged()
 {
     Q_D(QnRtspConnectionProcessor);
-    QMutexLocker lock(&d->mutex);
+    QnMutexLocker lock( &d->mutex );
 
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
@@ -917,7 +917,7 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged()
 {
     Q_D(QnRtspConnectionProcessor);
 
-    QMutexLocker lock(&d->mutex);
+    QnMutexLocker lock( &d->mutex );
     if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
         m_needStop = true;
         d->socket->close();
@@ -980,9 +980,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
             QSharedPointer<QnLiveStreamProvider> liveHiProvider = qSharedPointerDynamicCast<QnLiveStreamProvider> (d->liveDpHi);
 
-            bool canRunSecondStream = cameraRes && liveHiProvider && (cameraRes->streamFpsSharingMethod() != Qn::BasicFpsSharing || cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS);
-
-            if (canRunSecondStream)
+            if (cameraRes->hasDualStreaming2())
                 d->liveDpLow = camera->getLiveReader(QnServer::LowQualityCatalog);
         }
         if (d->liveDpLow) {
@@ -1328,7 +1326,7 @@ int QnRtspConnectionProcessor::composeGetParameter()
 void QnRtspConnectionProcessor::processRequest()
 {
     Q_D(QnRtspConnectionProcessor);
-    QMutexLocker lock(&d->mutex);
+    QnMutexLocker lock( &d->mutex );
 
     if (d->dataProcessor)
         d->dataProcessor->pauseNetwork();

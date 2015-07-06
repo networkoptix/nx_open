@@ -3,7 +3,7 @@
 
 #include <QtCore/QSet>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include "transaction.h"
 #include "nx_ec/ec_api.h"
@@ -208,6 +208,7 @@ namespace ec2
         QnUuid transactionHash(const ApiUpdateSequenceData& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiTranSyncDoneData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiLicenseOverflowData& ) const            { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
+        QnUuid transactionHash(const ApiClientInfoData& params) const           { return makeHash(params.id.toRfc4122()); }
         QnUuid transactionHash(const ApiReverseConnectionData& ) const          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
@@ -251,7 +252,7 @@ namespace ec2
         QnTranState m_state;
         QMap<QnUuid, UpdateHistoryData> m_updateHistory;
         
-        mutable QMutex m_timeMutex;
+        mutable QnMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
         qint64 m_baseTime;
         qint64 m_lastTimestamp;

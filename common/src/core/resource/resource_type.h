@@ -3,7 +3,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 
 #include "param.h"
@@ -51,7 +51,7 @@ private:
 
     ParamTypeMap m_paramTypeList;
 
-    mutable QMutex m_allParamTypeListCacheMutex;
+    mutable QnMutex m_allParamTypeListCacheMutex;
     mutable QSharedPointer<ParamTypeMap> m_allParamTypeListCache;
 
     mutable bool m_isCamera;
@@ -64,6 +64,8 @@ class QN_EXPORT QnResourceTypePool
 {
 public:
     typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
+
+    static const QString desktopCameraTypeName;
 
     static QnResourceTypePool *instance();
 
@@ -87,7 +89,7 @@ public:
 
     QnResourceTypePtr desktopCameraResourceType() const;
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnResourceTypeMap m_resourceTypeMap;
     mutable QnResourceTypePtr m_desktopCamResourceType;
 };

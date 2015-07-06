@@ -80,7 +80,6 @@ void QnAboutDialog::changeEvent(QEvent *event)
         retranslateUi();
 }
 
-
 QString QnAboutDialog::connectedServers() const {
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
 
@@ -112,9 +111,6 @@ QString QnAboutDialog::connectedServers() const {
 
     return servers;
 }
-
-
-
 
 void QnAboutDialog::retranslateUi()
 {
@@ -159,9 +155,10 @@ void QnAboutDialog::retranslateUi()
 
     QStringList gpu;
      // TODO: #Elric same shit, OpenGL calls.
-    gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL version")).arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VERSION))));
-    gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL renderer")).arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER))));
-    gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL vendor")).arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VENDOR))));
+	auto gl = QnGlFunctions::openGLCachedInfo();
+	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL version")).arg(gl.version);
+	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL renderer")).arg(gl.renderer);
+	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL vendor")).arg(gl.vendor);
     gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL max texture size")).arg(maxTextureSize);
     
     const QString lineSeparator = lit("<br>\n");

@@ -2,7 +2,7 @@
 #define sequrity_cam_resource_h_1239
 
 #include <QtGui/QRegion>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/value_cache.h>
 
@@ -43,6 +43,8 @@ public:
         Can differ from resource name
     */
     void setCameraName( const QString& newCameraName );
+
+    QnMediaServerResourcePtr getParentServer() const;
 
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
@@ -289,7 +291,7 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
-
+    virtual bool isBitratePerGOP() const;
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
@@ -302,7 +304,7 @@ private:
     QString m_model;
     QString m_vendor;
     mutable Qn::LicenseType m_cachedLicenseType;
-    //CachedValue<bool> m_cachedHasDualStreaming2; // UNDO c29dd798445d: do not work with cam restored from db. Do not emit signal
+    CachedValue<bool> m_cachedHasDualStreaming2;
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;

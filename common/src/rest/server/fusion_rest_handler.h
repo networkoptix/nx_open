@@ -23,7 +23,7 @@ namespace QnFusionRestHandlerDetail
             break;
         case Qn::JsonFormat:
             result = QJson::serialized(outputData);
-            if (params.contains("extraFormatting"))
+            if (params.contains(lit("extraFormatting")))
                 formatJSonString(result);
             break;
         case Qn::CsvFormat:

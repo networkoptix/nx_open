@@ -180,6 +180,8 @@ namespace ec2
 
         case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
+    case ApiCommand::saveClientInfo:        return handleTransactionParams<ApiClientInfoData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+
         case ApiCommand::lockRequest:
         case ApiCommand::lockResponse:
         case ApiCommand::unlockRequest:         return handleTransactionParams<ApiLockData>             (serializedTransaction, serializationSupport, transaction, function, fastFunction); 
@@ -267,7 +269,7 @@ namespace ec2
         m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
         m_handler(nullptr),
         m_timer(nullptr), 
-        m_mutex(QMutex::Recursive),
+        m_mutex(QnMutex::Recursive),
         m_thread(nullptr),
         m_runtimeTransactionLog(new QnRuntimeTransactionLog()),
         m_restartPending(false)
@@ -667,7 +669,7 @@ namespace ec2
     template <class T>
     void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
 
         // do not perform any logic (aka sequence update) for foreign transaction. Just proxy
         if (!transportHeader.dstPeers.isEmpty() && !transportHeader.dstPeers.contains(m_localPeer.id))
@@ -814,7 +816,6 @@ namespace ec2
 
         // proxy incoming transaction to other peers.
         if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
-            emit transactionProcessed(tran);
             return; // all dstPeers already processed
         }
 
@@ -845,7 +846,6 @@ namespace ec2
                 NX_LOG( QnLog::EC2_TRAN_LOG, lit("proxy transaction %1 to (%2)").arg(tran.toString()).arg(proxyListStr), cl_logDEBUG1);
             }
 
-            emit transactionProcessed(tran);
     };
 
     void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
@@ -1135,7 +1135,7 @@ namespace ec2
 
     void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         QnTransactionTransport* transport = (QnTransactionTransport*) sender();
         if (!transport)
             return;
@@ -1223,7 +1223,7 @@ namespace ec2
 
     void QnTransactionMessageBus::at_peerIdDiscovered(const QUrl& url, const QnUuid& id)
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         auto itr = m_remoteUrls.find(url);
         if (itr != m_remoteUrls.end()) {
             itr.value().discoveredTimeout.restart();
@@ -1233,7 +1233,7 @@ namespace ec2
 
     void QnTransactionMessageBus::doPeriodicTasks()
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
 
         // send HTTP level keep alive (empty chunk) for server <---> server connections
         if (!m_localPeer.isClient()) 
@@ -1390,7 +1390,7 @@ namespace ec2
         connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
         connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection );
 
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         transport->moveToThread(thread());
         m_connectingConnections << transport;
         transport->setState(QnTransactionTransport::Connected);
@@ -1400,8 +1400,8 @@ namespace ec2
     void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
         const QSharedPointer<AbstractStreamSocket>& socket,
-        const ApiPeerData &remotePeer,
-        qint64 remoteSystemIdentityTime,
+    const ApiPeerData &/*remotePeer*/,
+    qint64 /*remoteSystemIdentityTime*/,
         const nx_http::Request& request,
         const QByteArray& requestBuf )
     {
@@ -1414,7 +1414,7 @@ namespace ec2
         if (m_restartPending)
             return; // reject incoming connection because of media server is about to restart
 
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         for(QnTransactionTransport* transport: m_connections.values())
         {
             if( transport->connectionGuid() == connectionGuid )
@@ -1442,7 +1442,7 @@ namespace ec2
         if (m_restartPending)
             return false; // reject incoming connection because of media server is about to restart
 
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
 
         for( QnTransactionTransport* transport: m_connections.values() )
         {
@@ -1473,7 +1473,7 @@ namespace ec2
     void QnTransactionMessageBus::addConnectionToPeer(const QUrl& _url)
     {
         QUrl url = addCurrentPeerInfo(_url);
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (!m_remoteUrls.contains(url)) {
             m_remoteUrls.insert(url, RemoteUrlConnectInfo());
             QTimer::singleShot(0, this, SLOT(doPeriodicTasks()));
@@ -1484,7 +1484,7 @@ namespace ec2
     {
         QUrl url = addCurrentPeerInfo(_url);
 
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_remoteUrls.remove(url);
         const SocketAddress& urlStr = getUrlAddr(url);
         for(QnTransactionTransport* transport: m_connections.values())
@@ -1496,25 +1496,84 @@ namespace ec2
         }
     }
 
+    QList<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() const {
+        QList<QnTransportConnectionInfo> connections;
+
+        auto storeTransport = [&connections](const QnTransactionTransport *transport) {
+            QnTransportConnectionInfo info;
+            info.url = transport->remoteAddr();
+            info.state = transport->getState();
+            info.incoming = transport->isIncoming();
+            info.remotePeerId = transport->remotePeer().id;
+            connections.append(info);
+        };
+
+        QnMutexLocker lock(&m_mutex);
+
+        for (const QnTransactionTransport *transport: m_connections.values())
+            storeTransport(transport);
+        for (const QnTransactionTransport *transport: m_connectingConnections)
+            storeTransport(transport);
+
+        return connections;
+    }
+
+    void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
+    {
+        QnMutexLocker lock( &m_mutex );
+        for( QnTransactionTransport* transport: m_connections )
+        {
+            if( transport->connectionGuid() != connectionGuid )
+                continue;
+            //lock.unlock();
+            //mutex is unlocked if we go to wait
+            transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+            return;
+        }
+
+        for( QnTransactionTransport* transport: m_connectingConnections )
+        {
+            if( transport->connectionGuid() != connectionGuid )
+                continue;
+            //mutex is unlocked if we go to wait
+            transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+            return;
+        }
+    }
+
+    void QnTransactionMessageBus::connectionFailure( const QnUuid& connectionGuid )
+    {
+        QnMutexLocker lock( &m_mutex );
+        for( QnTransactionTransport* transport : m_connections )
+        {
+            if( transport->connectionGuid() != connectionGuid )
+                continue;
+            //mutex is unlocked if we go to wait
+            transport->connectionFailure();
+            return;
+        }
+    }
+
     void QnTransactionMessageBus::dropConnections()
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_remoteUrls.clear();
-        for(QnTransactionTransport* transport: m_connections) {
+        for( QnTransactionTransport* transport : m_connections )
+        {
             qWarning() << "Disconnected from peer" << transport->remoteAddr();
-            transport->setState(QnTransactionTransport::Error);
+            transport->setState( QnTransactionTransport::Error );
         }
-        for (auto transport: m_connectingConnections) 
-            transport->setState(ec2::QnTransactionTransport::Error);
+        for( auto transport : m_connectingConnections )
+            transport->setState( ec2::QnTransactionTransport::Error );
     }
 
     QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         return m_alivePeers;
     }
 
-QnPeerSet QnTransactionMessageBus::connectedServerPeers() const
+    QnPeerSet QnTransactionMessageBus::connectedServerPeers() const
     {
         QnPeerSet result;
         for(QnConnectionMap::const_iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
@@ -1529,7 +1588,7 @@ QnPeerSet QnTransactionMessageBus::connectedServerPeers() const
 
     QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveServerPeers() const
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         AlivePeersMap result;
         for(AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
         {
@@ -1544,7 +1603,7 @@ QnPeerSet QnTransactionMessageBus::connectedServerPeers() const
 
     QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveClientPeers() const
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         AlivePeersMap result;
         for(AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
         {
@@ -1568,45 +1627,47 @@ QnPeerSet QnTransactionMessageBus::connectedServerPeers() const
 
     void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (!m_alivePeers.contains(id))
             emit remotePeerUnauthorized( id );
     }
 
     void QnTransactionMessageBus::setHandler(ECConnectionNotificationManager* handler) {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         Q_ASSERT(!m_thread->isRunning());
         Q_ASSERT_X(m_handler == NULL, Q_FUNC_INFO, "Previous handler must be removed at this time");
         m_handler = handler;
     }
 
-    void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* handler) {
-        QMutexLocker lock(&m_mutex);
-        Q_ASSERT(!m_thread->isRunning());
-        Q_ASSERT_X(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
-        if( m_handler == handler )
-            m_handler = nullptr;
-    }
+	void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* handler) {
+    	QnMutexLocker lock(&m_mutex);
+	    Q_ASSERT(!m_thread->isRunning());
+    	Q_ASSERT_X(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
+	    if( m_handler == handler )
+    	    m_handler = nullptr;
+	}
 
-    QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
-    {
-        QMutexLocker lock(&m_mutex);
-        const auto itr = m_alivePeers.find(dstPeer);
-        if (itr == m_alivePeers.cend())
-            return QnUuid(); // route info not found
-        const AlivePeerInfo& peerInfo = itr.value();
-        int minDistance = INT_MAX;
-        QnUuid result;
-        for (auto itr2 = peerInfo.routingInfo.cbegin(); itr2 != peerInfo.routingInfo.cend(); ++itr2)
-        {
-            int distance = itr2.value().distance;
-            if (distance < minDistance) {
-                minDistance = distance;
-                result = itr2.key();
-            }
-        }
-        return result;
-    }
+	QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* peerDistance) const
+	{
+	    QnMutexLocker lock(&m_mutex);
+	    *peerDistance = INT_MAX;
+	    const auto itr = m_alivePeers.find(dstPeer);
+    	if (itr == m_alivePeers.cend())
+        	return QnUuid(); // route info not found
+	    const AlivePeerInfo& peerInfo = itr.value();
+    	int minDistance = INT_MAX;
+	    QnUuid result;
+    	for (auto itr2 = peerInfo.routingInfo.cbegin(); itr2 != peerInfo.routingInfo.cend(); ++itr2)
+	    {
+    	    int distance = itr2.value().distance;
+        	if (distance < minDistance) {
+	            minDistance = distance;
+    	        result = itr2.key();
+        	}
+	    }
+    	*peerDistance = minDistance;
+	    return result;
+	}
 
     int QnTransactionMessageBus::distanceToPeer(const QnUuid& dstPeer) const
     {

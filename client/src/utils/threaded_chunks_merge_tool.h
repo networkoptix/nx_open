@@ -1,9 +1,11 @@
 #pragma once
 
 #include <utils/common/long_runnable.h>
+#include <utils/thread/mutex.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
+
 
 class QnThreadedChunksMergeTool: public QnLongRunnable {
     Q_OBJECT
@@ -27,5 +29,5 @@ private:
     int m_handle;
     bool m_queuedData;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
 };

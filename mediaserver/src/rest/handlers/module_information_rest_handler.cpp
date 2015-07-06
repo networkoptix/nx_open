@@ -32,7 +32,7 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
     Q_UNUSED(path)
 
     bool allModules = params.value(lit("allModules")) == lit("true");
-    bool useAddresses = params.value(lit("showAddresses"), lit("false")) != lit("false");
+    bool useAddresses = params.value(lit("showAddresses"), lit("true")) != lit("false");
 
     if (allModules) {
         if (useAddresses) {
@@ -51,7 +51,7 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
         }
     } else if (useAddresses) {
         QnModuleInformationWithAddresses moduleInformation(qnCommon->moduleInformation());
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (server)
             moduleInformation.remoteAddresses = getAddresses(server);
         result.setReply(moduleInformation);

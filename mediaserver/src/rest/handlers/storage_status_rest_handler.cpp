@@ -7,6 +7,8 @@
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/storage_resource.h>
 
+#include <platform/platform_abstraction.h>
+
 #include "utils/common/util.h"
 #include "recorder/storage_manager.h"
 #include "api/model/storage_status_reply.h"
@@ -26,6 +28,15 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
         if(storage) {
             storage->setUrl(storageUrl);
             storage->setSpaceLimit(nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE);
+
+            const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+            const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+            const auto it = std::find_if(partitions.begin(), partitions.end(),
+                                         [&](const QnPlatformMonitor::PartitionSpace& part)
+                { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
+    
+            const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+            storage->setStorageType(QnLexical::serialized(storageType));
         }
     }
     
@@ -37,6 +48,7 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     reply.storage.reservedSpace = storage ? storage->getSpaceLimit() : -1;
     reply.storage.totalSpace = storage ? storage->getTotalSpace() : -1;
     reply.storage.isExternal = storage && storage->isExternal();
+    reply.storage.storageType = storage->getStorageType();
 #ifdef WIN32
     if (!reply.storage.isExternal) {
         reply.storage.isWritable = false;

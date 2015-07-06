@@ -25,7 +25,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 #include <QtCore/QThread>
 
 #include <utils/common/log.h>
@@ -96,15 +96,18 @@ unsigned int StreamReader::releaseRef()
     return m_refManager.releaseRef();
 }
 
+static const unsigned int MAX_FRAME_DURATION_MS = 5000;
+
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     bool httpClientHasBeenJustCreated = false;
-    QSharedPointer<nx_http::HttpClient> localHttpClientPtr;
+    std::shared_ptr<nx_http::HttpClient> localHttpClientPtr;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( !m_httpClient )
         {
-            m_httpClient = QSharedPointer<nx_http::HttpClient>( new nx_http::HttpClient() );
+            m_httpClient = std::make_shared<nx_http::HttpClient>();
+            m_httpClient->setMessageBodyReadTimeoutMs( MAX_FRAME_DURATION_MS );
             httpClientHasBeenJustCreated = true;
         }
         localHttpClientPtr = m_httpClient;
@@ -112,7 +115,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
     if( httpClientHasBeenJustCreated )
     {
-        const int result = doRequest( localHttpClientPtr.data() );
+        const int result = doRequest( localHttpClientPtr.get() );
         if( result != nxcip::NX_NO_ERROR )
             return result;
 
@@ -141,7 +144,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             {
                 if( !waitForNextFrameTime() )
                     return nxcip::NX_INTERRUPTED;
-                const int result = doRequest( localHttpClientPtr.data() );
+                const int result = doRequest( localHttpClientPtr.get() );
                 if( result != nxcip::NX_NO_ERROR )
                     return result;
             }
@@ -151,7 +154,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             {
                 const nx_http::BufferType& msgBodyBuf = localHttpClientPtr->fetchMessageBodyBuffer();
                 {
-                    QMutexLocker lk( &m_mutex );
+                    QnMutexLocker lk( &m_mutex );
                     if( m_terminated )
                     {
                         m_terminated = false;
@@ -178,7 +181,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             {
                 m_multipartContentParser.processData( localHttpClientPtr->fetchMessageBodyBuffer() );
                 {
-                    QMutexLocker lk( &m_mutex );
+                    QnMutexLocker lk( &m_mutex );
                     if( m_terminated )
                     {
                         m_terminated = false;
@@ -198,7 +201,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_NO_ERROR;
     }
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( m_httpClient )
     {
         //reconnecting
@@ -210,7 +213,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::interrupt()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_terminated = true;
     m_cond.wakeAll();
 
@@ -282,7 +285,7 @@ bool StreamReader::waitForNextFrameTime()
         const qint64 msecToSleep = m_frameDurationMSec - (currentTime - m_prevFrameClock);
         if( msecToSleep > 0 )
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             QElapsedTimer monotonicTimer;
             monotonicTimer.start();
             qint64 msElapsed = monotonicTimer.elapsed();

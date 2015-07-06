@@ -39,18 +39,12 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
     virtual void setCameraControlDisabled(bool value) override;
 
-
-    virtual void updateStreamParamsBasedOnQuality() override;
-    virtual void updateStreamParamsBasedOnFps() override;
 private:
-
-    
-    
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
     QStringList getRTPurls() const;
@@ -58,11 +52,11 @@ private:
 
     bool isGotFrame(QnCompressedVideoDataPtr videoData);
 
-    CameraDiagnostics::Result updateCameraAndFetchStreamUrl( QString* const streamUrl, bool isCameraControlRequired);
-    CameraDiagnostics::Result updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl, bool isCameraControlRequired ) const;
+    CameraDiagnostics::Result updateCameraAndFetchStreamUrl( QString* const streamUrl, bool isCameraControlRequired, const QnLiveStreamParams& params);
+    CameraDiagnostics::Result updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl, bool isCameraControlRequired, const QnLiveStreamParams& params ) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
-    CameraDiagnostics::Result fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
+    CameraDiagnostics::Result fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired, const QnLiveStreamParams& params) const;
     CameraDiagnostics::Result fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
     
     CameraDiagnostics::Result fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
@@ -77,7 +71,7 @@ private:
     void fetchProfile(ProfilesResp& response, ProfilePair& profiles, bool isPrimary) const;
     AudioSource* fetchAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const;
 
-    void updateVideoEncoder(VideoEncoder& encoder, bool isPrimary) const;
+    void updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& params) const;
     void updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const;
 
     CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, Profile& profile, bool create = false) const;

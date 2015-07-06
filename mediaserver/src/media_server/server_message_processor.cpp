@@ -36,7 +36,7 @@ QnServerMessageProcessor::QnServerMessageProcessor()
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) 
 {
     QnCommonMessageProcessor::updateResource(resource);
-    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById<QnMediaServerResource>(serverGuid());
 
     const bool isServer = dynamic_cast<const QnMediaServerResource*>(resource.data()) != nullptr;
     const bool isCamera = dynamic_cast<const QnVirtualCameraResource*>(resource.data()) != nullptr;
@@ -183,7 +183,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     if (addr == "localhost" || addr == "127.0.0.1")
         return true;
     if( !m_mServer )
-        m_mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        m_mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (m_mServer) 
     {
         QHostAddress hostAddr(addr);
@@ -237,7 +237,7 @@ void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, c
 }
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
-    QnServerUpdateTool::instance()->installUpdate(updateId);
+    QnServerUpdateTool::instance()->installUpdateDelayed(updateId);
 }
 
 void QnServerMessageProcessor::at_reverseConnectionRequested(const ec2::ApiReverseConnectionData &data) {
@@ -273,8 +273,8 @@ bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)
 
 void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId) 
 {
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
-    QnStorageResourcePtr storage = qnResPool->getResourceById(resourceId).dynamicCast<QnStorageResource>();
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(resourceId);
+    QnStorageResourcePtr storage = qnResPool->getResourceById<QnStorageResource>(resourceId);
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
     bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
     if (isOwnServer) {

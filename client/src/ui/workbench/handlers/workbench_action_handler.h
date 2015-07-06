@@ -295,6 +295,9 @@ private:
     /** Check if resource can be safely renamed to the new name. */
     bool validateResourceName(const QnResourcePtr &resource, const QString &newName) const;
 
+    /** Check if statistics reporting is allowed in the system - and ask user if still not defined. */
+    void checkIfStatisticsReportAllowed();
+
     void deleteDialogs();
 
     void closeApplication(bool force = false);

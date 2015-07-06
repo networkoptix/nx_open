@@ -11,8 +11,8 @@
 #include <memory>
 
 #include <QtCore/QIODevice>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 extern "C"
 {
@@ -130,8 +130,8 @@ private:
         sWorking
     };
 
-    mutable QMutex m_mutex;
-    QWaitCondition m_cond;
+    mutable QnMutex m_mutex;
+    QnWaitCondition m_cond;
     std::unique_ptr<QnAviArchiveDelegate> m_mediaFileReader;
     QnFfmpegTranscoder m_transcoder;
     int m_resultCode;

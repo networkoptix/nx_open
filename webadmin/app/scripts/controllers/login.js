@@ -7,8 +7,13 @@ angular.module('webadminApp')
         // Login digest: http://en.wikipedia.org/wiki/Digest_access_authentication
         // Task: https://hdw.mx/redmine/issues/4812
 
+        $scope.authorized = false;
+
         function reload(){
-            window.location.reload();
+            $scope.authorized = true;
+            setTimeout(function(){
+                window.location.reload();
+            },0);
             return false;
         }
 

@@ -7,6 +7,7 @@
 #include <api/common_message_processor.h>
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <crash_reporter.h>
 
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
@@ -34,7 +35,6 @@ public:
     void stopObjects();
     void run();
 
-    void changePort(quint16 port);
 public slots:
     void stopAsync();
     void stopSync();
@@ -77,12 +77,13 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     QHostAddress m_publicAddress;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
     quint64 m_dumpSystemResourceUsageTaskID;
     bool m_stopping;
-    mutable QMutex m_stopMutex;
+    mutable QnMutex m_stopMutex;
+    ec2::CrashReporter m_crashReporter;
 };
 
 #endif // MAIN_H

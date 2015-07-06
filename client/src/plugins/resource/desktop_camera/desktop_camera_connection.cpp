@@ -1,4 +1,7 @@
 #include "desktop_camera_connection.h"
+
+#include <common/common_module.h>
+
 #include "core/resource/media_server_resource.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "api/app_server_connection.h"
@@ -78,7 +81,7 @@ public:
     QnDesktopResource* desktop;
     QnAbstractStreamDataProvider* dataProvider;
     QnAbstractDataConsumer* dataConsumer;
-    QMutex sendMutex;
+    QnMutex sendMutex;
 };
 
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, void* sslContext, QnDesktopResource* desktop):
@@ -124,7 +127,7 @@ void QnDesktopCameraConnectionProcessor::processRequest()
         // nothing to do. we restarting timer on any request
     }
     d->response.headers.insert(std::make_pair("cSeq", nx_http::getHeaderValue(d->request.headers, "cSeq")));
-    //QMutexLocker lock(&d->sendMutex);
+    //QnMutexLocker lock( &d->sendMutex );
     //sendResponse("RTSP", CODE_OK, QByteArray(), QByteArray());
 }
 
@@ -191,7 +194,7 @@ QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, c
 {
     m_auth.username = QnAppServerConnectionFactory::url().userName();
     m_auth.password = QnAppServerConnectionFactory::url().password();
-    m_auth.clientGuid = QnAppServerConnectionFactory::clientGuid();
+    m_auth.clientGuid = qnCommon->moduleGUID();
 }
 
 QnDesktopCameraConnection::~QnDesktopCameraConnection()
@@ -209,7 +212,7 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
 void QnDesktopCameraConnection::pleaseStop()
 {
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (processor)
             processor->pleaseStop();
         if (connection)
@@ -224,7 +227,7 @@ void QnDesktopCameraConnection::run()
     while (!m_needStop)
     {
         {
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock( &m_mutex );
             delete processor;
             processor = 0;
             delete connection;
@@ -233,9 +236,10 @@ void QnDesktopCameraConnection::run()
             QAuthenticator auth;
             auth.setUser(m_auth.username);
             auth.setPassword(m_auth.password);
+
             connection = new CLSimpleHTTPClient(m_server->getApiUrl(), CONNECT_TIMEOUT, auth);
             connection->addHeader("user-name", auth.user().toUtf8());
-            connection->addHeader("user-id", m_auth.clientGuid.toUtf8());
+            connection->addHeader("user-id", m_auth.clientGuid.toString().toUtf8());
         }
 
         CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));
@@ -262,7 +266,7 @@ void QnDesktopCameraConnection::run()
         }
     }
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     delete processor;
     delete connection;

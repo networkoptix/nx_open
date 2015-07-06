@@ -41,7 +41,7 @@ QnActiResource::QnActiResource()
 
 QnActiResource::~QnActiResource()
 {
-    QMutexLocker lk( &m_dioMutex );
+    QnMutexLocker lk( &m_dioMutex );
     for( std::map<quint64, TriggerOutputTask>::iterator
         it = m_triggerOutputTasks.begin();
         it != m_triggerOutputTasks.end();
@@ -360,15 +360,6 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
     setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0);
-
-    //detecting and saving selected resolutions
-    /*
-    CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_resolution[0], CODEC_ID_H264 ) );
-    if( !m_resolution[1].isEmpty() )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_resolution[1], CODEC_ID_H264 ) );
-    saveMediaStreamInfoIfNeeded( mediaStreams );
-    */
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -621,7 +612,7 @@ bool QnActiResource::setRelayOutputState(
     bool activate,
     unsigned int autoResetTimeoutMS )
 {
-    QMutexLocker lk( &m_dioMutex );
+    QnMutexLocker lk( &m_dioMutex );
 
     bool outputNumberOK = true;
     const int outputNumber = !ouputID.isEmpty() ? ouputID.toInt(&outputNumberOK) : 1;
@@ -639,7 +630,7 @@ void QnActiResource::onTimer( const quint64& timerID )
 {
     TriggerOutputTask triggerOutputTask;
     {
-        QMutexLocker lk( &m_dioMutex );
+        QnMutexLocker lk( &m_dioMutex );
         std::map<quint64, TriggerOutputTask>::iterator it = m_triggerOutputTasks.find( timerID );
         if( it == m_triggerOutputTasks.end() )
             return;
