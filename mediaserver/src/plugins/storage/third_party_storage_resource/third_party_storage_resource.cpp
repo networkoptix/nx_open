@@ -150,7 +150,6 @@ namespace aux
             return false;
         }
 
-        virtual bool realFile() const override {return false;}
     private:
         QString         m_filename;
         TPIODevicePtr   m_impl;

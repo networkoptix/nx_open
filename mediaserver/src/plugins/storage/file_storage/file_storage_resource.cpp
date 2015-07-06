@@ -8,6 +8,7 @@
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
+#include "utils/fs/file.h"
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -40,6 +41,13 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
+    
+    if (openMode & QIODevice::WriteOnly) 
+    {
+        QDir dir;
+        dir.mkpath(QnFile::absolutePath(fileName));
+    }
+
     std::unique_ptr<QBufferedFile> rez(
         new QBufferedFile(
             std::shared_ptr<IQnFile>(new QnFile(fileName)), 
