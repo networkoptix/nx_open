@@ -21,6 +21,7 @@
 #include "utils/common/synctime.h"
 #include "plugins/resource/server_camera/server_camera_factory.h"
 #include "mobile_client/mobile_client_message_processor.h"
+#include "watchers/user_watcher.h"
 
 #include "version.h"
 
@@ -57,6 +58,8 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnMobileClientMessageProcessor>(new QnMobileClientMessageProcessor());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnServerCameraFactory>(new QnServerCameraFactory());
+
+    common->store<QnUserWatcher>(new QnUserWatcher());
 
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 

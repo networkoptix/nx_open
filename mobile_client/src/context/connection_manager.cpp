@@ -13,6 +13,7 @@
 #include "utils/common/synctime.h"
 #include "mobile_client/mobile_client_settings.h"
 #include "common/common_module.h"
+#include "watchers/user_watcher.h"
 
 namespace {
 
@@ -101,8 +102,7 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
     connect(ec2Connection->getTimeManager().get(), &ec2::AbstractTimeManager::timeChanged, QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
     qnCommon->setLocalSystemName(connectionInfo.systemName);
-
-//    context()->setUserName(appServerUrl.userName());
+    qnCommon->instance<QnUserWatcher>()->setUserName(url.userName());
 
     connect(QnMobileClientMessageProcessor::instance(), &QnMobileClientMessageProcessor::initialResourcesReceived, this, &QnConnectionManager::initialResourcesReceived);
 
@@ -112,7 +112,6 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
 bool QnConnectionManager::disconnectFromServer(bool force) {
     if (!force) {
         QnGlobalSettings::instance()->synchronizeNow();
-//        qnSettings->setLastUsedConnection(QnConnectionData());
     }
 
     QnMobileClientMessageProcessor::instance()->init(NULL);
@@ -123,6 +122,6 @@ bool QnConnectionManager::disconnectFromServer(bool force) {
     QnSessionManager::instance()->stop();
 //    QnResource::stopCommandProc();
 
-//    context()->setUserName(QString());
+    qnCommon->instance<QnUserWatcher>()->setUserName(QString());
     return true;
 }

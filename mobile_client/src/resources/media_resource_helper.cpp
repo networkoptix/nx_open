@@ -9,10 +9,12 @@
 #include "api/network_proxy_factory.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
+#include "core/resource/user_resource.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
 #include "common/common_module.h"
 #include "utils/common/model_functions.h"
+#include "watchers/user_watcher.h"
 
 namespace {
 
@@ -43,6 +45,11 @@ namespace {
         if (ok)
             return QSize(width, height);
         return QSize();
+    }
+
+    QString getAuth(const QnUserResourcePtr &user) {
+        QString auth = user->getName() + lit(":0:") + QString::fromLatin1(user->getDigest());
+        return QString::fromLatin1(auth.toUtf8().toBase64());
     }
 
 } // anonymous namespace
@@ -95,9 +102,6 @@ QUrl QnMediaResourceHelper::mediaUrl() const {
 
     QUrl url(server->getUrl());
 
-    url.setUserName(QnAppServerConnectionFactory::url().userName());
-    url.setPassword(QnAppServerConnectionFactory::getConnection2()->authInfo());
-
     QUrlQuery query;
 
     switch (m_protocol) {
@@ -112,12 +116,14 @@ QUrl QnMediaResourceHelper::mediaUrl() const {
         url.setPath(lit("/media/%1.webm").arg(camera->getMAC().toString()));
     }
 
-    query.addQueryItem(lit("serverGuid"), server->getId().toString());
-    query.addQueryItem(lit("cameraGuid"), camera->getId().toString());
     if (!m_resolution.isEmpty())
         query.addQueryItem(lit("resolution"), m_resolution);
     if (m_dateTime.isValid())
         query.addQueryItem(lit("pos"), QString::number(m_dateTime.toMSecsSinceEpoch()));
+
+    if (QnUserResourcePtr user = qnCommon->instance<QnUserWatcher>()->user())
+        query.addQueryItem(lit("auth"), getAuth(user));
+
     url.setQuery(query);
 
     return QnNetworkProxyFactory::instance()->urlToResource(url, server);
