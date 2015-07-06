@@ -27,7 +27,7 @@ Dialogs.Dialog
             thisComponent.area.date = initDate;
     }
 
-    title: qsTr("Date selection");
+    title: qsTr("Select date...");
 
     buttons: NxRtu.Buttons.Ok | NxRtu.Buttons.Cancel;
     styledButtons: NxRtu.Buttons.Ok;

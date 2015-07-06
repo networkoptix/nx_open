@@ -59,10 +59,18 @@ FocusScope
             flickableDirection: Flickable.VerticalFlick;
             contentHeight: settingsColumn.height;
 
-            topMargin: Common.SizeManager.fontSizes.base;
-            bottomMargin: Common.SizeManager.spacing.base;
-            leftMargin: Common.SizeManager.spacing.medium;
-            rightMargin: Common.SizeManager.spacing.medium;
+            anchors
+            {
+                left: parent.left;
+                right: parent.right;
+                top: parent.top;
+                bottom: parent.bottom;
+
+                topMargin: Common.SizeManager.fontSizes.base;
+                bottomMargin: Common.SizeManager.spacing.base;
+                leftMargin: Common.SizeManager.spacing.medium;
+                rightMargin: Common.SizeManager.spacing.medium;
+            }
 
             Column
             {

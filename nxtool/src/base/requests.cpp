@@ -596,7 +596,7 @@ rtu::ItfUpdateInfo::ItfUpdateInfo()
 
 rtu::ItfUpdateInfo::ItfUpdateInfo(const ItfUpdateInfo &other)
     : name(other.name)
-    , useDHCP(other.useDHCP) //TODO: #ynikitenkov what's this? 
+    , useDHCP(other.useDHCP ? new bool (*other.useDHCP) : nullptr)
     , ip(other.ip ? new QString(*other.ip) : nullptr)
     , mask(other.mask ? new QString(*other.mask) : nullptr)
     , dns(other.dns ? new QString(*other.dns) : nullptr)
@@ -616,9 +616,8 @@ rtu::ItfUpdateInfo::ItfUpdateInfo(const QString &initName)
 
 rtu::ItfUpdateInfo &rtu::ItfUpdateInfo::operator =(const ItfUpdateInfo &other)
 {
-    //TODO: #ynikitenkov what's this? 
     name = other.name;
-    useDHCP = other.useDHCP;
+    useDHCP = BoolPointer(other.useDHCP ? new bool (*other.useDHCP) : nullptr);
     ip = StringPointer(other.ip ? new QString(*other.ip) : nullptr);
     mask = StringPointer(other.mask ? new QString(*other.mask) : nullptr);
     dns = StringPointer(other.dns ? new QString(*other.dns) : nullptr);
