@@ -10,21 +10,22 @@ void testHttpClientForFastRemove( const QUrl& url )
 {
     EXPECT_TRUE( std::make_shared<AsyncHttpClient>()->doGet( url ) );
 
-    for( uint time = 10; time < 1000000; time *= 2 )
+    // use different delays (10us - 0.5s) to catch problems on different stages
+    for( uint time = 10; time < 500000; time *= 2 )
     {
         const auto client = std::make_shared<AsyncHttpClient>();
         EXPECT_TRUE( client->doGet( url ) );
 
-        // Kill the client after some delay
+        // kill the client after some delay
         QThread::usleep( time );
     }
 }
 
 TEST( AsyncHttpClient, FastRemove )
 {
-    testHttpClientForFastRemove( lit( "127.0.0.1" ) );
-    testHttpClientForFastRemove( lit( "localhost" ) );
-    testHttpClientForFastRemove( lit( "doesNotExist" ) );
+    testHttpClientForFastRemove( lit( "http://127.0.0.1/" ) );
+    testHttpClientForFastRemove( lit( "http://localhost/" ) );
+    testHttpClientForFastRemove( lit( "http://doestNotExist.host/" ) );
 }
 
 } // namespace nx_http
