@@ -737,8 +737,12 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     {
         std::for_each(m_systems.begin(), m_systems.end()
             , [&row](const SystemModelInfo &info){ row += kSystemItemCapacity + info.servers.size(); });
-        m_systems.push_back(SystemModelInfo(systemName));
-        systemModelInfo = &m_systems.last();
+
+        SystemModelInfo systemInfo(systemName);
+        SystemModelInfosVector::iterator place = std::lower_bound(m_systems.begin(), m_systems.end(), systemInfo,
+            [](const SystemModelInfo &left, const SystemModelInfo &right) { 
+                return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0; });
+        systemModelInfo = m_systems.insert(place, systemInfo);
         exist = false;
     }
     
