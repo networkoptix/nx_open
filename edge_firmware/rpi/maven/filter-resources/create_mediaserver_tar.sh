@@ -96,6 +96,7 @@ do
   cp $LIBS_DIR/${var} $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
   if [ ! -z "$STRIP" ]; then
     $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var} $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}.debug
+    $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
     $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
   fi
 done
@@ -116,6 +117,7 @@ mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 if [ ! -z "$STRIP" ]; then
   $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug
+  $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
   $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
 fi
 
@@ -123,7 +125,16 @@ fi
 #copying plugins
 if [ -e "$BUILD_OUTPUT_DIR/bin/release/plugins" ]; then
   mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
+  mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
   cp $BUILD_OUTPUT_DIR/bin/release/plugins/*.* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
+  for f in `ls $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/`
+    do
+      if [ ! -z "$STRIP" ]; then
+        $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f} $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}.debug
+        $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}
+        $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}
+      fi
+    done
 fi
 
 #conf

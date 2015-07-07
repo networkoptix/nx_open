@@ -429,7 +429,8 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
 
 bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader)
 {
-    m_delayedAliveTran.remove(aliveData.peer.id); // cancel delayed status tran if we got new alive data for that peer
+    if (ttHeader->dstPeers.isEmpty())
+        m_delayedAliveTran.remove(aliveData.peer.id); // cancel delayed status tran if we got new broadcast alive data for that peer
 
     QnUuid gotFromPeer;
     if (transport)

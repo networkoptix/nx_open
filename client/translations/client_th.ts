@@ -379,7 +379,7 @@
     </message>
     <message>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
+        <translation>คำนวณอัตราบิตต่อ GOP แทนบิตต่อวินาที (มันจะเพิ่มบิตสำหรับกล้อง)</translation>
     </message>
 </context>
 <context>
@@ -412,11 +412,11 @@
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>ส่งการใช้งานที่ไม่ระบุชื่อและสถิติความผิดพลาดในการพัฒนาซอฟต์แวร์ (แนะนำ)</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดใช้งานกล้องและการค้นพบเซิร์ฟเวอร์อัตโนมัติ</translation>
     </message>
 </context>
 <context>
@@ -762,7 +762,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>System Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าระบบ</translation>
     </message>
 </context>
 <context>
@@ -2518,7 +2518,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ask About Statistics Reporting</source>
-        <translation type="unfinished"></translation>
+        <translation>สอบถามข้อมูลเกี่ยวกับสถิติการรายงาน</translation>
     </message>
 </context>
 <context>
@@ -3895,7 +3895,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This could lead to client software malfunction including crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>ซึ่งอาจนำไปสู่ความผิดปกติซอฟต์แวร์ของลูกค้ารวมทั้งความผิดพลาด.</translation>
     </message>
 </context>
 <context>
@@ -4542,7 +4542,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบ</translation>
     </message>
 </context>
 <context>
@@ -5391,11 +5391,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>สร้างดัชนีเก็บสำหรับการจัดเก็บ &apos;%1&apos; ที่อยู่ในความคืบหน้า</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>สแกนอย่างรวดเร็วสำหรับพื้นที่จัดเก็บข้อมูล &apos;%1&apos; ที่อยู่ในความคืบหน้า</translation>
     </message>
 </context>
 <context>
@@ -5779,15 +5779,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>FPS value is too high</source>
-        <translation type="unfinished">FPS มากเกินไป</translation>
+        <translation>FPS มากเกินไป</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished">fps ปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไปที่กล้อง fps สูงสุด %2.</translation>
+        <translation>fps ปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไปที่กล้อง fps สูงสุด %2.</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished">สำหรับการเคลื่อนไหวซอฟต์แวร์ 2 fps ที่สงวนไว้สำหรับสตรีมสำรอง fps ปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไป %2.</translation>
+        <translation>สำหรับการเคลื่อนไหวซอฟต์แวร์ 2 fps ที่สงวนไว้สำหรับสตรีมสำรอง fps ปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไป %2.</translation>
     </message>
 </context>
 <context>
@@ -5904,7 +5904,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาตรวจสอบข้อมูลการตรวจสอบในการตั้งค่ากล้อง</translation>
     </message>
 </context>
 <context>
@@ -6623,32 +6623,33 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Some components of the system are not updated</source>
-        <translation type="unfinished"></translation>
+        <translation>บางส่วนของระบบที่ไม่ได้ปรับปรุง</translation>
     </message>
     <message>
         <source>Client v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>ไคลเอนต์ V %1</translation>
     </message>
     <message>
         <source>Server v%1 at %2</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ V %1 ที่ %2</translation>
     </message>
     <message>
         <source>Server v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ V%1</translation>
     </message>
     <message>
         <source>Please update all components to the latest version %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดอัปเดตทุกส่วนให้เป็นรุ่นล่าสุด %1.</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>สถิติการใช้งานที่ไม่ระบุชื่อ</translation>
     </message>
     <message>
         <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
 If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>ระบบส่งการใช้งานที่ไม่ระบุชื่อและสถิติความผิดพลาดให้กับทีมพัฒนาซอฟต์แวร์ที่จะช่วยให้เราปรับปรุงประสบการณ์การใช้งานของคุณ
+ถ้าคุณต้องการที่จะปิดใช้งานคุณลักษณะนี้คุณสามารถทำได้ในการตั้งค่าระบบโต้ตอบ.</translation>
     </message>
 </context>
 <context>
@@ -6702,7 +6703,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ ...</translation>
     </message>
 </context>
 <context>
@@ -6918,7 +6919,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>exported</source>
-        <translation type="unfinished"></translation>
+        <translation>การส่งออก</translation>
     </message>
 </context>
 <context>
@@ -7354,11 +7355,11 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished">หน้าจอ %1 s</translation>
+        <translation>หน้าจอ %1 s</translation>
     </message>
     <message>
         <source>%n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%n กล้อง</translation>
     </message>
 </context>
 <context>
