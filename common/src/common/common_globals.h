@@ -327,6 +327,12 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 
+    enum BitratePerGopType {
+        BPG_None,
+        BPG_Predefined,
+        BPG_User
+    };
+
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag { 
         SF_None         = 0x0, 
