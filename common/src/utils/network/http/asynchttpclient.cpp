@@ -20,7 +20,6 @@
 #include "auth_tools.h"
 #include "version.h"
 
-
 //TODO: #ak persistent connection support
 //TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
 //TODO: #ak reconnect support
@@ -106,6 +105,9 @@ namespace nx_http
     */
     bool AsyncHttpClient::doGet( const QUrl& url )
     {
+        if( !url.isValid() )
+            return false;
+
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::GET );
@@ -117,6 +119,9 @@ namespace nx_http
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody)
     {
+        if( !url.isValid() )
+            return false;
+
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::POST );
@@ -133,6 +138,9 @@ namespace nx_http
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody )
     {
+        if( !url.isValid() )
+            return false;
+
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::PUT );
@@ -245,13 +253,13 @@ namespace nx_http
 
     void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
     {
-        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
-
+        std::shared_ptr<AsyncHttpClient> sharedThis;
         QMutexLocker lk( &m_mutex );
-
-        Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
             return;
+
+        sharedThis = shared_from_this();
+        Q_ASSERT( sock == m_socket.data() );
 
         if( m_state != sWaitingConnectToHost )
         {
@@ -290,13 +298,13 @@ namespace nx_http
 
     void AsyncHttpClient::asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten )
     {
-        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
-
+        std::shared_ptr<AsyncHttpClient> sharedThis;
         QMutexLocker lk( &m_mutex );
-
-        Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
             return;
+
+        sharedThis = shared_from_this();
+        Q_ASSERT( sock == m_socket.data() );
 
         if( m_state != sSendingRequest )
         {
@@ -352,13 +360,13 @@ namespace nx_http
     {
         using namespace std::placeholders;
 
-        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
-
+        std::shared_ptr<AsyncHttpClient> sharedThis;
         QMutexLocker lk( &m_mutex );
-
-        Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
             return;
+
+        sharedThis = shared_from_this();
+        Q_ASSERT( sock == m_socket.data() );
 
         if( errorCode != SystemError::noError )
         {
