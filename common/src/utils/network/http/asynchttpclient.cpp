@@ -253,11 +253,12 @@ namespace nx_http
 
     void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
     {
+        std::shared_ptr<AsyncHttpClient> sharedThis;
         QMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
-        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+        sharedThis = shared_from_this();
         Q_ASSERT( sock == m_socket.data() );
 
         if( m_state != sWaitingConnectToHost )
@@ -297,11 +298,12 @@ namespace nx_http
 
     void AsyncHttpClient::asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten )
     {
+        std::shared_ptr<AsyncHttpClient> sharedThis;
         QMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
-        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+        sharedThis = shared_from_this();
         Q_ASSERT( sock == m_socket.data() );
 
         if( m_state != sSendingRequest )
@@ -358,11 +360,12 @@ namespace nx_http
     {
         using namespace std::placeholders;
 
+        std::shared_ptr<AsyncHttpClient> sharedThis;
         QMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
-        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+        sharedThis = shared_from_this();
         Q_ASSERT( sock == m_socket.data() );
 
         if( errorCode != SystemError::noError )
