@@ -49,9 +49,10 @@ angular.module('webadminApp')
                         face:"Roboto",
                         color: [105,135,150], // Color for text for top labels
                     },
-                    labelMarkerColor:[28,35,39],//false
+                    labelMarkerColor:[28,35,39,0],//false
                     labelBgColor: [28,35,39],
                     labelPositionFix:-5, //Vertical fix for position
+                    labelMarkerHeight:22/110,
 
                     chunkHeight:35/110, // %    //Height for event line
                     minChunkWidth: 1,
@@ -103,7 +104,7 @@ angular.module('webadminApp')
                     topLabelBgColor: false,
 
                     labelAlign:"above",// center, left, above
-                    labelMarkerColor:[28,35,39],//false
+                    labelMarkerColor:[28,35,39,0],//false
                     labelBgColor: [28,35,39]
                 },{
                     topLabelAlign: "left", // center, left, above
@@ -111,7 +112,7 @@ angular.module('webadminApp')
                     topLabelBgColor: false,
 
                     labelAlign:"above",// center, left, above
-                    labelMarkerColor:[28,35,39],//false
+                    labelMarkerColor:[28,35,39,0],//false
                     labelBgColor: [28,35,39]
                 }];
                 scope.activePreset = scope.presets[1];
@@ -217,6 +218,10 @@ angular.module('webadminApp')
 
                     return colorString;
                 }
+                function formatFont(font){
+                    return font.weight + " " + font.size + "px " + font.face;
+                }
+
                 function clearTimeline(){
                     var context = canvas.getContext('2d');
                     context.fillStyle = blurColor(timelineConfig.timelineBgColor,1);
@@ -258,7 +263,6 @@ angular.module('webadminApp')
                 var targetLabelLevelIndex = 0;
                 scope.changingLevel = 1;
                 function drawLabels(context){
-
                     var instantLevelIndex = scope.scaleManager.levels.labels.index;
                     if(instantLevelIndex != targetLabelLevelIndex){ // Start animation here
                         targetLabelLevelIndex = instantLevelIndex;
@@ -281,7 +285,7 @@ angular.module('webadminApp')
                         timelineConfig.labelBgColor,
                         timelineConfig.labelMarkerColor,
                         timelineConfig.labelPositionFix,
-                        timelineConfig.topLabelHeight + timelineConfig.labelHeight / 2,
+                        timelineConfig.topLabelHeight + timelineConfig.labelHeight - timelineConfig.labelMarkerHeight,
                         timelineConfig.topLabelHeight + timelineConfig.labelHeight );
 
                 }
@@ -309,9 +313,6 @@ angular.module('webadminApp')
                                         labelFormat, levelTop, levelHeight, font, labelAlign, bgColor,  markColor, labelPositionFix, markTop, markBottom);
                         start = level.interval.addToDate(start);
                     }
-                }
-                function formatFont(font){
-                    return font.weight + " " + font.size + "px " + font.face;
                 }
                 function drawLabel( context, date, level, alpha,
                                         labelFormat, levelTop, levelHeight, font, labelAlign, bgColor,  markColor, labelPositionFix, markTop, markBottom){
@@ -376,7 +377,7 @@ angular.module('webadminApp')
 
                     if(bgColor) {
                         context.fillStyle = blurColor(bgColor, alpha);
-                        context.fillRect(x, textStart - font.size, x + textWidth, font.size);
+                        context.fillRect(x, textStart - font.size, textWidth, font.size);
                     }
 
                     context.fillStyle = blurColor(font.color, alpha);

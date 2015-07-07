@@ -1,7 +1,6 @@
 <div class="timeline">
 
-    <div class="timeline-info">
-        <div class="timeline-panel text-left">
+    <div class="timeline-info"><div class="timeline-panel text-left">
             <span class="timeline-button"
                   ng-click="zoom(false)"
                   ng-disabled="disableZoomOut">
@@ -12,20 +11,16 @@
                   ng-disabled="disableZoomIn">
                 <span class="glyphicon glyphicon-plus"></span>
             </span>
-        </div>
-
-        <div class="timeline-panel text-center">
+        </div><div class="timeline-panel text-center">
             <span class="timeline-button">
                 <span class="glyphicon glyphicon-play"></span>
             </span>
-        </div>
-        <div class="timeline-panel text-right" >
+        </div><div class="timeline-panel text-right" >
             <span class="timeline-button"
                   ng-class="{'active':liveMode}"
                   ng-disabled="liveMode"
                   ng-click="goToLive()">LIVE</span>
-        </div>
-    </div>
+        </div></div>
 
     <div class="viewport"
          ng-mouseup="mouseUp($event)"
@@ -125,6 +120,9 @@
         </div>
         <label>
             Вертикальная корректировка: <input type="number" ng-model="timelineConfig.labelPositionFix">
+        </label><br/>
+        <label>
+            Высота отметки: <input type="number" ng-model="timelineConfig.labelMarkerHeight">
         </label><br/>
         <label>
             Шрифт: <input type="number" ng-model="timelineConfig.labelFont.size">
