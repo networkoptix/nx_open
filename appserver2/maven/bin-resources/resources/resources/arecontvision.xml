@@ -8,6 +8,7 @@
                 <param name = "MaxSensorWidth" default_value ="2048"/>
                 <param name = "MaxSensorHeight" default_value ="1536"/>
                 <param name = "MaxFPS" default_value ="5"/>
+                <param name = "VideoLayout" default_value="width=4;height=1;sensors=0,1,2,3"/>
             </params>
         </resource>
 		

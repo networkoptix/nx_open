@@ -151,6 +151,7 @@
 #include <media_server/server_update_tool.h>
 #include <media_server/server_connector.h>
 #include <utils/common/app_info.h>
+#include <transcoding/ffmpeg_video_transcoder.h>
 
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
@@ -192,6 +193,7 @@ static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
+static const QByteArray DISABLE_FFMPEG_OPTIMIZATION("disableFfmpegOptimization");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -370,6 +372,9 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 void ffmpegInit()
 {
+    if (MSSettings::roSettings()->value(DISABLE_FFMPEG_OPTIMIZATION, false).toBool())
+        QnFfmpegVideoTranscoder::isOptimizationDisabled = true;
+
     //avcodec_init();
     av_register_all();
 
