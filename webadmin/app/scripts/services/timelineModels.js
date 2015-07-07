@@ -650,6 +650,7 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
     return lastPosition + positionDate - this.checkPoints[key]; // Video should jump to this position
 };
 
+
 ShortCache.prototype.setPlayingPosition = function(position){
     // This function translate playing position (in millisecond) into actual date. Should be used while playing video only. Position must be in current buffered video
     this.played = position;
@@ -699,12 +700,10 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
     //console.log("new played position",new Date(this.playedPosition),i,this.currentDetailization.length);
 
-
     if(position > this.lastPlayedPosition){
         this.lastPlayedPosition = position; // Save the boundaries of uploaded cache
         this.lastPlayedDate =  this.playedPosition; // Save the boundaries of uploaded cache
     }
-
 
     return this.playedPosition;
 };
@@ -792,6 +791,13 @@ ScaleManager.prototype.updateCurrentInterval = function(){
 
     // Adjust here with msPerPixel again!
     this.updateLevels();
+};
+
+ScaleManager.prototype.setAnchorDate = function(date){
+    this.setAnchorDateAndPoint(date,this.anchorPoint);
+}
+ScaleManager.prototype.setAnchorCoordinate = function(coordinate){ // Set anchor date
+    this.setAnchorDateAndPoint(this.screenCoordinateToDate(coordinate),coordinate / this.viewportWidth);
 };
 
 ScaleManager.prototype.setAnchorDateAndPoint = function(date,point){ // Set anchor date

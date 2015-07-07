@@ -7,9 +7,9 @@ angular.module('webadminApp')
             scope: {
                 recordsProvider: '=',
                 positionProvider: '=',
-
+                playHandler: '=',
                 ngClick: '&',
-                handler: '='
+                positionHandler: '='
             },
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
@@ -180,6 +180,11 @@ angular.module('webadminApp')
 
                 // !!! Drawing and redrawing functions
                 function drawAll(){
+                    scope.scaleManager.setEnd((new Date()).getTime()); // Set right border
+                    if(scope.positionProvider) {
+                        scope.scaleManager.setAnchorDate(scope.positionProvider.playedPosition);
+                    }
+
                     var context = clearTimeline();
                     drawTopLabels(context);
                     drawLabels(context);
@@ -210,11 +215,6 @@ angular.module('webadminApp')
                         Math.round(color[1]) + ',' +
                         Math.round(color[2]) + ',' +
                         alpha + ')';
-
-                    /*var colorString =  'rgb(' +
-                        Math.round(color[0] * alpha + 255 * (1 - alpha)) + ',' +
-                        Math.round(color[1] * alpha + 255 * (1 - alpha)) + ',' +
-                        Math.round(color[2] * alpha + 255 * (1 - alpha)) + ')';*/
 
                     return colorString;
                 }
@@ -466,9 +466,7 @@ angular.module('webadminApp')
                     if(!mouseCoordinate || mouseInScrollbar){
                         return;
                     }
-                    mouseDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
-
-                    drawMarker(context, mouseDate,timelineConfig.pointerMarkerColor,timelineConfig.pointerMarkerTextColor);
+                    drawMarker(context, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),timelineConfig.pointerMarkerColor,timelineConfig.pointerMarkerTextColor);
                 }
 
                 function drawMarker(context, date,markerColor,textColor){
@@ -531,7 +529,6 @@ angular.module('webadminApp')
                 }
 
                 // !!! Mouse events
-                var mouseDate = null;
                 var mouseCoordinate = null;
                 var mouseRow = 0;
                 var mouseInScrollbar = false;
@@ -542,7 +539,6 @@ angular.module('webadminApp')
                     if(!event){
                         mouseRow = 0;
                         mouseCoordinate = null;
-                        mouseDate = null;
                         mouseInScrollbar = false;
                         mouseInScrollbarRow = false;
                         catchScrollBar = false;
@@ -556,7 +552,6 @@ angular.module('webadminApp')
                         return; //Something strange - ignore it
                     }
                     mouseRow = event.offsetY;
-                    mouseDate = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
 
                     drawOrCheckScrollBar();
                 }
@@ -566,7 +561,7 @@ angular.module('webadminApp')
                     updateMouseCoordinate(event);
                     event.preventDefault();
                     if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
-                        scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate / scope.viewportWidth);// Set position to keep
+                        scope.scaleManager.setAnchorCoordinate( mouseCoordinate );// Set position to keep
                         if( window.jscd.touch ) {
                             scope.scaleManager.zoom(scope.scaleManager.zoom() - event.deltaY / timelineConfig.maxVerticalScrollForZoom);
 
@@ -589,7 +584,7 @@ angular.module('webadminApp')
                 scope.dblClick = function(event){
                     updateMouseCoordinate(event);
                     if(!mouseInScrollbarRow) {
-                        scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate / scope.viewportWidth);// Set position to keep
+                        scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         scope.zoom(true);
                     }else{
                         if(!mouseInScrollbar){
@@ -607,8 +602,8 @@ angular.module('webadminApp')
                 scope.click = function(event){
                     updateMouseCoordinate(event);
                     if(!mouseInScrollbarRow) {
-                        scope.scaleManager.setAnchorDateAndPoint(mouseDate, mouseCoordinate / scope.viewportWidth);// Set position to keep
-                        scope.handler(mouseDate);
+                        scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
+                        scope.positionHandler(scope.scaleManager.screenCoordinateToDate(mouseCoordinate));
                     }else{
                         if(!mouseInScrollbar){
                             scope.scrollPosition = scope.scaleManager.scroll() ;
@@ -662,6 +657,14 @@ angular.module('webadminApp')
 
                 };
 
+                scope.goToLive = function(){
+                    scope.scaleManager.setAnchorCoordinate(1);// Set position to keep
+                    scope.positionHandler(false);
+                };
+
+                scope.playPause = function(){
+                    scope.playHandler(!scope.positionProvider.playing)
+                };
 
                 // !!! Subscribe for different events which affect timeline
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
@@ -671,7 +674,6 @@ angular.module('webadminApp')
                     }
                 });
                 viewport.mousewheel(mouseWheel);
-
 
                 // !!! Finally run required functions to initialize timeline
                 updateTimelineHeight();

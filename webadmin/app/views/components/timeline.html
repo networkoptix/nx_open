@@ -12,13 +12,14 @@
                 <span class="glyphicon glyphicon-plus"></span>
             </span>
         </div><div class="timeline-panel text-center">
-            <span class="timeline-button">
-                <span class="glyphicon glyphicon-play"></span>
+            <span class="timeline-button"
+                    ng-click="playPause()">
+                <span class="glyphicon glyphicon-play"
+                        ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
             </span>
         </div><div class="timeline-panel text-right" >
             <span class="timeline-button"
-                  ng-class="{'active':liveMode}"
-                  ng-disabled="liveMode"
+                  ng-class="{'active':positionProvider.liveMode}"
                   ng-click="goToLive()">LIVE</span>
         </div></div>
 

@@ -9,6 +9,12 @@ angular.module('webadminApp')
 
         $scope.authorized = false;
         $scope.authorizing = false;
+        if(!$scope.user){
+            $scope.user = {
+                username:"",
+                password:""
+            }
+        }
 
         function reload(){
             $scope.authorized = true;

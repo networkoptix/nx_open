@@ -39,7 +39,10 @@
 
             <tr>
                 <td>
-                    <timeline records-provider="activeVideoRecords" handler="switchPosition" position-provider="positionProvider" ></timeline>
+                    <timeline records-provider="activeVideoRecords"
+                              position-handler="switchPosition"
+                              play-handler="switchPlaying"
+                              position-provider="positionProvider" ></timeline>
                     <!-- <timelineold records="activeVideoRecords" handler="switchPosition" position-provider="positionProvider" ></timelineold> -->
                 </td>
             </tr>

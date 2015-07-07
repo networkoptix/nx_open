@@ -109,7 +109,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/', host: '192.168.0.25', port: 7001}/**/
 
                 //demo.networkoptix.com
-                /*{context: '/api/', host: 'demo.networkoptix.com', port: 7001},
+                {context: '/api/', host: 'demo.networkoptix.com', port: 7001},
                 {context: '/ec2/', host: 'demo.networkoptix.com', port: 7001},
                 {context: '/hls/', host: 'demo.networkoptix.com',port: 7001},
                 {context: '/media/', host: 'demo.networkoptix.com', port: 7001},

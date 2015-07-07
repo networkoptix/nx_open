@@ -77,7 +77,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
-            API.play();
+            $scope.switchPlaying(true);
         };
 
         $scope.selectCameraById = function (cameraId,position) {
@@ -106,6 +106,17 @@ angular.module('webadminApp').controller('ViewCtrl',
         $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {
             $scope.selectCameraById(next.params.cameraId, $location.search().time || false);
         });
+
+        $scope.switchPlaying = function(play){
+            if(play) {
+                $scope.playerAPI.play();
+            }else{
+                $scope.playerAPI.pause();
+            }
+            if( $scope.positionProvider) {
+                $scope.positionProvider.playing = play;
+            }
+        };
 
         $scope.switchPosition = function( val ){
 
