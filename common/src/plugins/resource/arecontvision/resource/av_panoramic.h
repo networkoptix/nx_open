@@ -37,6 +37,7 @@ protected:
     mutable QnCustomResourceVideoLayoutPtr m_rotatedLayout;
     QElapsedTimer m_flipTimer;
     mutable QnResourceVideoLayoutPtr m_defaultVideoLayout;
+    mutable QMutex m_layoutMutex;
 };
 
 typedef QnSharedResourcePointer<QnArecontPanoramicResource> QnArecontPanoramicResourcePtr;

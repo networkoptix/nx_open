@@ -1,31 +1,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
+
     A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
+    It should also be possible to have one maven project per solution project,
     and have a parent pom to deletegate the build.
   -->
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.3.1-SNAPSHOT</version>
+        <version>2.3.2-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.3.2-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Client</name>
+    <name>HD Witness Client Library</name>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
@@ -34,32 +34,33 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>appserver2</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
         </dependency>			
     </dependencies>	
 
-    <properties>  
+    <properties>
         <product.title>${client.name}</product.title>
         <product.display.title>${client.display.name}</product.display.title>
         <!--Global libs-->
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
+        <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lquazip</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lFestival -lestools -leststring -lestbase -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx</mac.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx -lFestival -lestools -leststring -lestbase</mac.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>
-    </properties>   
+        <buildLib>sharedlib</buildLib>
+    </properties>
     <profiles>
         <profile>
             <id>windows</id>
@@ -69,7 +70,7 @@
                 </os>
             </activation>
             <build>
-                <plugins>                   
+                <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
@@ -83,32 +84,43 @@
                                 </goals>
                                 <configuration>
                                     <executable>build-${arch}.bat</executable>
-                                    <workingDirectory>${basedir}/launcher</workingDirectory>        
+                                    <workingDirectory>${basedir}/launcher</workingDirectory>
                                     <arguments>
                                         <commandlineArgs>${build.configuration}</commandlineArgs>
                                     </arguments>
                                 </configuration>
-                            </execution>                            
+                            </execution>
                         </executions>
-                    </plugin>   
+                    </plugin>
                 </plugins>
             </build>
-        </profile>  
+        </profile>
 
         <profile>
             <id>webkit-win</id>
             <activation>
                 <os>
                     <family>Windows</family>
-                </os>    
+                </os>
                 <property>
                     <name>webkit</name>
                     <value>!false</value>
-                </property>                  
+                </property>
             </activation>
             <properties>
                 <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
             </properties>
-        </profile>  
+        </profile>
+        <profile>
+            <id>windows-staticlib</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
     </profiles>
 </project>

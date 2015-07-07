@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>494</width>
-    <height>495</height>
+    <height>497</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -163,7 +163,7 @@
      <property name="title">
       <string>Storages</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
        <widget class="QTableWidget" name="storagesTable">
         <property name="autoFillBackground">
@@ -226,6 +226,14 @@
           <string>Space</string>
          </property>
         </column>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="storagesWarningLabel">
+        <property name="text">
+         <string>Unchecking the storage will cause nothing but writing stop.
+It won't deny oldest footage removing from the drive.</string>
+        </property>
        </widget>
       </item>
      </layout>

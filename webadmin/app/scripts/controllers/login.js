@@ -1,14 +1,21 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('LoginCtrl', function ($scope,mediaserver, ipCookie) {
+    .controller('LoginCtrl', function ($scope, mediaserver, ipCookie) {
 
 
         // Login digest: http://en.wikipedia.org/wiki/Digest_access_authentication
         // Task: https://hdw.mx/redmine/issues/4812
 
+        $scope.authorized = false;
+        $scope.authorizing = false;
+
         function reload(){
-            window.location.reload();
+            $scope.authorized = true;
+            $scope.authorizing = false;
+            setTimeout(function(){
+                window.location.reload();
+            },20);
             return false;
         }
 
@@ -28,7 +35,9 @@ angular.module('webadminApp')
                 ipCookie('username',lowercaseLogin, { path: '/' });
 
                 // Check auth again
+                $scope.authorizing = true;
                 mediaserver.getCurrentUser(true).then(reload).catch(function(error){
+                    $scope.authorizing = false;
                     alert("not authorized ");
                 });
             }

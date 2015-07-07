@@ -38,11 +38,13 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="name"/>
+                <xs:element ref="caption" minOccurs="0" maxOccurs="1"/>
                 <xs:element ref="description"/>
                 <xs:element ref="method"/>
                 <xs:element ref="params"/>
                 <xs:element ref="result"/>
             </xs:sequence>
+            <xs:attribute name="proprietary" type="xs:boolean" default="false" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="method" type="xs:string"/>
@@ -82,7 +84,7 @@
     <xs:element name="result">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="caption" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="caption" minOccurs="0" maxOccurs="1"/>
                 <xs:element ref="attributes" minOccurs="0" maxOccurs="1"/>
             </xs:sequence>
         </xs:complexType>
@@ -103,5 +105,6 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="name" type="xs:string"/>
+    <xs:element name="caption" type="xs:string"/>
     <xs:element name="description" type="xs:string"/>
 </xs:schema>

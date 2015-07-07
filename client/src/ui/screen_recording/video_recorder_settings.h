@@ -78,7 +78,6 @@ private:
     QnAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *isDefault = 0) const;
 private:
     QSettings settings;
-    static QRegExp m_devNumberExpr;
 };
 
 #endif // VIDEORECORDERSETTINGS_H

@@ -68,7 +68,10 @@ StreamingChunkTranscoder::~StreamingChunkTranscoder()
     for( auto val: m_taskIDToTranscode )
         TimerManager::instance()->joinAndDeleteTimer( val.first );
 
-    std::for_each( m_transcodeThreads.begin(), m_transcodeThreads.end(), std::default_delete<StreamingChunkTranscoderThread>() );
+    std::for_each(
+        m_transcodeThreads.begin(),
+        m_transcodeThreads.end(),
+        std::default_delete<StreamingChunkTranscoderThread>() );
     m_transcodeThreads.clear();
 }
 
@@ -77,7 +80,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     StreamingChunkPtr chunk )
 {
     //searching for resource
-    QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( transcodeParams.srcResourceUniqueID() );
+    QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqueId( transcodeParams.srcResourceUniqueID() );
     if( !resource )
     {
         NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found").
@@ -232,13 +235,6 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     return true;
-}
-
-Q_GLOBAL_STATIC_WITH_ARGS( StreamingChunkTranscoder, streamingChunkTranscoderInstance, (StreamingChunkTranscoder::fBeginOfRangeInclusive) );
-
-StreamingChunkTranscoder* StreamingChunkTranscoder::instance()
-{
-    return streamingChunkTranscoderInstance();
 }
 
 void StreamingChunkTranscoder::onTimer( const quint64& timerID )

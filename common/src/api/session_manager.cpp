@@ -1,7 +1,5 @@
 #include "session_manager.h"
 
-#include <cassert>
-
 #include <QtCore/QMetaEnum>
 #include <QtCore/QUrl>
 #include <QtCore/QBuffer>
@@ -114,7 +112,8 @@ void QnSessionManager::at_replyReceived(QNetworkReply * reply)
 }
 
 QnSessionManager *QnSessionManager::instance() {
-    return qnCommon->sessionManager();
+    Q_ASSERT_X(qnCommon->instance<QnSessionManager>(), Q_FUNC_INFO, "Make sure session manager exists");
+    return qnCommon->instance<QnSessionManager>();
 }
 
 void QnSessionManager::start() {
@@ -188,7 +187,7 @@ void QnSessionManager::at_SyncRequestFinished(const QnHTTPRawResponse& response,
 {
     QMutexLocker lock(&m_syncReplyMutex);
     QnSessionManagerSyncReply* reply = m_syncReplyInProgress.value(handle);
-    assert(reply);
+    Q_ASSERT(reply);
     if (reply)
         reply->requestFinished(response, handle);
 }
@@ -273,7 +272,7 @@ int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &obj
 // QnSessionManager :: handlers
 // -------------------------------------------------------------------------- //
 void QnSessionManager::at_aboutToBeStarted() {
-    assert(QThread::currentThread() == this->thread());
+    Q_ASSERT(QThread::currentThread() == this->thread());
 
     QMutexLocker locker(&m_accessManagerMutex);
     if (m_accessManager)
@@ -289,7 +288,7 @@ void QnSessionManager::at_aboutToBeStarted() {
 }
 
 void QnSessionManager::at_aboutToBeStopped() {
-    assert(QThread::currentThread() == this->thread());
+    Q_ASSERT(QThread::currentThread() == this->thread());
 
     QMutexLocker locker(&m_accessManagerMutex);
     if (!m_accessManager)
@@ -336,7 +335,7 @@ void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenti
 void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo reqInfo, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, 
                                              const QnRequestParamList &params, const QByteArray& data) 
 {
-    assert(QThread::currentThread() == this->thread());
+    Q_ASSERT(QThread::currentThread() == this->thread());
 
     {
         QMutexLocker lock(&m_accessManagerMutex);

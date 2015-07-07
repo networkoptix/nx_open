@@ -85,12 +85,12 @@ float QnByteArrayConstRef::toFloat() const
     return toByteArrayWithRawData().toFloat();
 }
 
-const QnByteArrayConstRef::value_type& QnByteArrayConstRef::front() const
+QnByteArrayConstRef::value_type QnByteArrayConstRef::front() const
 {
     return m_src->at(m_offset);
 }
 
-const QnByteArrayConstRef::value_type& QnByteArrayConstRef::back() const
+QnByteArrayConstRef::value_type QnByteArrayConstRef::back() const
 {
     return m_src->at(m_offset+m_count-1);
 }

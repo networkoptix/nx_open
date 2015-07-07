@@ -377,6 +377,10 @@
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
         <translation>&quot;อนุญาตให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่ากล้อง&quot; ถูกปิดใช้งานในระบบการบริหาร.</translation>
     </message>
+    <message>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
+        <translation>คำนวณอัตราบิตต่อ GOP แทนบิตต่อวินาที (มันจะเพิ่มบิตสำหรับกล้อง)</translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -399,16 +403,20 @@
 <context>
     <name>CameraManagementWidget</name>
     <message>
-        <source>Enable camera auto discovery</source>
-        <translation>เปิดใช้งานค้นหากล้องโดยอัตโนมัติ</translation>
-    </message>
-    <message>
         <source>Allow system to optimize camera settings (Recommended)</source>
         <translation>ช่วยให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่ากล้อง (แนะนำ)</translation>
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
         <translation>คำเตือน! FPS และการตั้งค่าที่มีคุณภาพในตารางเวลาการบันทึกจะไม่ทำงาน!</translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
+        <translation>ส่งการใช้งานที่ไม่ระบุชื่อและสถิติความผิดพลาดในการพัฒนาซอฟต์แวร์ (แนะนำ)</translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation>เปิดใช้งานกล้องและการค้นพบเซิร์ฟเวอร์อัตโนมัติ</translation>
     </message>
 </context>
 <context>
@@ -749,12 +757,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>เปิดดูการแสดงผล</translation>
     </message>
     <message>
-        <source>Camera Management</source>
-        <translation>การจัดการกล้อง</translation>
-    </message>
-    <message>
         <source>System Configuration Backup and Restore</source>
         <translation>การตั้งค่า สำรองข้อมูล และคืนค่า</translation>
+    </message>
+    <message>
+        <source>System Settings</source>
+        <translation>การตั้งค่าระบบ</translation>
     </message>
 </context>
 <context>
@@ -2508,6 +2516,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>File Settings...</source>
         <translation>ตั้งค่าแฟ้มข้อมูล...</translation>
     </message>
+    <message>
+        <source>Ask About Statistics Reporting</source>
+        <translation>สอบถามข้อมูลเกี่ยวกับสถิติการรายงาน</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -3244,18 +3256,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>เปิด</translation>
     </message>
     <message>
-        <source>FPS value is too high</source>
-        <translation>FPS มากเกินไป</translation>
-    </message>
-    <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>fps ปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไปที่กล้อง fps สูงสุด %2.</translation>
-    </message>
-    <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>สำหรับการเคลื่อนไหวซอฟต์แวร์ 2 fps ที่สงวนไว้สำหรับสตรีมสำรอง fps ปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไป %2.</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation>การเตือน</translation>
     </message>
@@ -3882,18 +3882,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation>เราตรวจพบว่าการ์ดจอของคุณจะไม่ได้รับการสนับสนุน คุณสามารถดำเนินการภายใต้ความเสี่ยงของคุณเอง.</translation>
-    </message>
-    <message>
-        <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation>การติดตั้งและ / หรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณอาจแก้ไขปัญหา.</translation>
-    </message>
-    <message>
-        <source>Critical Performance Tip</source>
-        <translation>เคล็ดลับการปฏิบัติงานที่สำคัญ</translation>
-    </message>
-    <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
         <translation>เราตรวจพบว่าไดรเวอร์การ์ดจอของคุณอาจจะไม่ได้ติดตั้งหรือหมดอายุ.</translation>
     </message>
@@ -3904,6 +3892,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Important Performance Tip</source>
         <translation>เคล็ดลับการปฏิบัติงานที่สำคัญ</translation>
+    </message>
+    <message>
+        <source>This could lead to client software malfunction including crash.</source>
+        <translation>ซึ่งอาจนำไปสู่ความผิดปกติซอฟต์แวร์ของลูกค้ารวมทั้งความผิดพลาด.</translation>
     </message>
 </context>
 <context>
@@ -3995,14 +3987,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;ภาพ ไม่สามารถโหลด&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutTabBar</name>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>หน้าจอ %1 s</translation>
     </message>
 </context>
 <context>
@@ -4473,10 +4457,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>รหัสผ่าน:</translation>
     </message>
     <message>
-        <source>Find System</source>
-        <translation>ค้นหาระบบ</translation>
-    </message>
-    <message>
         <source>The new system will have password and name from the system:</source>
         <translation>ระบบใหม่จะมีรหัสผ่านและชื่อจากระบบ:</translation>
     </message>
@@ -4559,6 +4539,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
         <translation>เซิร์ฟเวอร์จากระบบระยะไกลควรจะปรากฏขึ้นในระบบของคุณเร็ว ๆ นี้.</translation>
+    </message>
+    <message>
+        <source>Check</source>
+        <translation>ตรวจสอบ</translation>
     </message>
 </context>
 <context>
@@ -5196,11 +5180,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Users</source>
         <translation>ผู้ใช้งาน</translation>
     </message>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>หน้าจอ %1 s</translation>
-    </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
@@ -5411,12 +5390,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>คุณแน่ใจว่าต้องการที่จะทำต่อไปหรือไม่?</translation>
     </message>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
-        <translation>สร้างดัชนีเก็บสำหรับการจัดเก็บ &apos;%1&apos; ในความคืบหน้า</translation>
+        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
+        <translation>สร้างดัชนีเก็บสำหรับการจัดเก็บ &apos;%1&apos; ที่อยู่ในความคืบหน้า</translation>
     </message>
     <message>
-        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
-        <translation>สแกนได้อย่างรวดเร็วสำหรับการจัดเก็บข้อมูล &apos;%1&apos; ในความคืบหน้า</translation>
+        <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
+        <translation>สแกนอย่างรวดเร็วสำหรับพื้นที่จัดเก็บข้อมูล &apos;%1&apos; ที่อยู่ในความคืบหน้า</translation>
     </message>
 </context>
 <context>
@@ -5798,6 +5777,18 @@ Short for &quot;seconds&quot;</extracomment>
         <source>This action CANNOT be undone!</source>
         <translation>การดำเนินการนี้ไม่สามารถยกเลิกได้!</translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation>FPS มากเกินไป</translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation>fps ปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไปที่กล้อง fps สูงสุด %2.</translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation>สำหรับการเคลื่อนไหวซอฟต์แวร์ 2 fps ที่สงวนไว้สำหรับสตรีมสำรอง fps ปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไป %2.</translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -5896,10 +5887,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>ไม่มีสิทธิ</translation>
     </message>
     <message>
-        <source>Please check authentication information&lt;br/&gt;in camera settings</source>
-        <translation>กรุณาตรวจสอบ &lt;br/&gt; ข้อมูลการตรวจสอบในการตั้งค่ากล้อง</translation>
-    </message>
-    <message>
         <source>Activate analog license to remove this message</source>
         <translation>เปิดใช้งานใบอนุญาต anolog ที่จะลบข้อความนี้</translation>
     </message>
@@ -5914,6 +5901,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Diagnose...</source>
         <translation>วินิจฉัย ...</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in camera settings</source>
+        <translation>กรุณาตรวจสอบข้อมูลการตรวจสอบในการตั้งค่ากล้อง</translation>
     </message>
 </context>
 <context>
@@ -6567,22 +6558,6 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>Client v%1&lt;br/&gt;</source>
-        <translation>ไคลเอนต์ v%1&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation>เซิร์ฟเวอร์ v %1 ที่ %2 &lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Server v%1&lt;br/&gt;</source>
-        <translation>เซิร์ฟเวอร์ v%1&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>บางส่วนของระบบจะไม่อัพเดท: &lt;br/&gt; %1 &lt;br/&gt; โปรดทำการอัพเดตทุกองค์ประกอบจาก รุ่นล่าสุด %2.</translation>
-    </message>
-    <message>
         <source>Version Mismatch</source>
         <translation>รุ่นไม่ตรงกัน</translation>
     </message>
@@ -6646,6 +6621,36 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Error while uploading picture.</source>
         <translation>ข้อผิดพลาดในขณะที่การอัปโหลดภาพ.</translation>
     </message>
+    <message>
+        <source>Some components of the system are not updated</source>
+        <translation>บางส่วนของระบบที่ไม่ได้ปรับปรุง</translation>
+    </message>
+    <message>
+        <source>Client v%1</source>
+        <translation>ไคลเอนต์ V %1</translation>
+    </message>
+    <message>
+        <source>Server v%1 at %2</source>
+        <translation>เซิร์ฟเวอร์ V %1 ที่ %2</translation>
+    </message>
+    <message>
+        <source>Server v%1</source>
+        <translation>เซิร์ฟเวอร์ V%1</translation>
+    </message>
+    <message>
+        <source>Please update all components to the latest version %1.</source>
+        <translation>โปรดอัปเดตทุกส่วนให้เป็นรุ่นล่าสุด %1.</translation>
+    </message>
+    <message>
+        <source>Anonymous Usage Statistics</source>
+        <translation>สถิติการใช้งานที่ไม่ระบุชื่อ</translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
+If you would like to disable this feature you can do so in the System Settings dialog.</source>
+        <translation>ระบบส่งการใช้งานที่ไม่ระบุชื่อและสถิติความผิดพลาดให้กับทีมพัฒนาซอฟต์แวร์ที่จะช่วยให้เราปรับปรุงประสบการณ์การใช้งานของคุณ
+ถ้าคุณต้องการที่จะปิดใช้งานคุณลักษณะนี้คุณสามารถทำได้ในการตั้งค่าระบบโต้ตอบ.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6695,6 +6700,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Connect to Server...</source>
         <translation>เชื่อมต่อกับเซิร์ฟเวอร์ ...</translation>
+    </message>
+    <message>
+        <source>Could not connect to server...</source>
+        <translation>ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ ...</translation>
     </message>
 </context>
 <context>
@@ -6907,6 +6916,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation>การกรอง: หมุน หหการเพิ่มประสิทธิภาพของภาพที่กำหนดเองอัตราส่วน (ต้องแปลง)</translation>
+    </message>
+    <message>
+        <source>exported</source>
+        <translation>การส่งออก</translation>
     </message>
 </context>
 <context>
@@ -7250,18 +7263,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>ไม่สามารถเริ่มเซสชันการควบคุมของ Video Wall.</translation>
     </message>
     <message>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
-    </message>
-    <message>
-        <source>New layout</source>
-        <translation>เปิดหน้าต่างใหม่</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>เปิดหน้าต่างใหม่ %1</translation>
-    </message>
-    <message>
         <source>To enable the feature please activate at least one Video Wall license</source>
         <translation>เมื่อต้องการเปิดใช้งานเพิ่มกรุณาเปิดใช้งานใบอนุญาตของจอแสดงผล</translation>
     </message>
@@ -7350,6 +7351,15 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You&apos;ll have to start it manually.</source>
         <translation>คุณจะต้องเริ่มต้นด้วยตนเอง.</translation>
+    </message>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation>หน้าจอ %1 s</translation>
+    </message>
+    <message>
+        <source>%n cameras</source>
+        <translation>%n กล้อง</translation>
     </message>
 </context>
 <context>
@@ -7626,10 +7636,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Start</source>
         <translation>เริ่ม</translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation>สร้างความคืบหน้า</translation>
     </message>
     <message>
         <source>Cancel</source>

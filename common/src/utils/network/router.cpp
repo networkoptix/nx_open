@@ -31,18 +31,28 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     if (!connection)
         return result; // no connection to the server, can't route
 
-    bool isknownServer = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>() != 0;
+    bool isknownServer = qnResPool->getResourceById<QnMediaServerResource>(id) != 0;
     bool isClient = qnCommon->remoteGUID() != qnCommon->moduleGUID();
     if (!isknownServer && isClient) {
-        result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
-        result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
+        if (qnCommon->remoteGUID().isNull())
+            return result;
+        result.addr = m_moduleFinder->primaryAddress(qnCommon->remoteGUID());
         Q_ASSERT_X(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
+        if (!result.addr.isNull())
+            result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
+		// todo: add distance for camera route
         return result;
     }
 
-    QnUuid routeVia = connection->routeToPeerVia(id);
-    if (routeVia == id || routeVia.isNull())
+    result.distance = INT_MAX;
+    QnUuid routeVia = connection->routeToPeerVia(id, &result.distance);
+    if (routeVia.isNull())
         return result; // can't route
+    if (routeVia == id) {
+        result.reverseConnect = true;
+        return result; // need backwards connection
+    }
+
     result.addr = m_moduleFinder->primaryAddress(routeVia);
     if (!result.addr.isNull())
         result.gatewayId = routeVia; // route gateway is found

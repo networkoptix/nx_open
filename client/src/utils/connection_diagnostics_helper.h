@@ -4,8 +4,11 @@
 #include <QtCore/QObject>
 
 #include <nx_ec/ec_api_fwd.h>
+#include <api/model/compatibility_item.h>
 
 struct QnConnectionInfo;
+//struct QnCompatibilityItem;
+class QnSoftwareVersion;
 
 class QnConnectionDiagnosticsHelper: public QObject
 {
@@ -22,6 +25,13 @@ public:
         QString details;
         int helpTopicId;
     };
+
+    /** Light check of connection validity. Returns Success if we can connect without problems, Failure otherwise. */
+    static Result validateConnectionLight(
+        const QString &brand,
+        const QnSoftwareVersion &version,
+        int protoVersion,
+        const QList<QnCompatibilityItem> &compatibilityItems = QList<QnCompatibilityItem>());
 
     /** Light check of connection validity. Returns Success if we can connect without problems, Failure otherwise. */
     static Result validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode);

@@ -20,6 +20,7 @@ extern "C"
 #include <core/resource/media_server_resource.h>
 
 #include <plugins/resource/server_camera/server_camera.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
 
 #include <redass/redass_controller.h>
 
@@ -70,8 +71,6 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     if (reader)
         connect(this, SIGNAL(dataDropped(QnArchiveStreamReader*)), qnRedAssController, SLOT(onSlowStream(QnArchiveStreamReader*)));
 
-    m_defaultVideoLayout.reset( new QnDefaultResourceVideoLayout() );
-
     m_auth.username = QnAppServerConnectionFactory::url().userName();
     m_auth.password = QnAppServerConnectionFactory::url().password();
     m_auth.videowall = QnAppServerConnectionFactory::videowallGuid();
@@ -83,7 +82,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &ca
         return;
 
     m_camera = camera;
-    m_server = qnResPool->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    m_server = camera->getParentServer();
     setupRtspSession(camera, m_server, &m_rtspSession, m_playNowModeAllowed);
 }
 
@@ -112,7 +111,7 @@ QString QnRtspClientArchiveDelegate::getUrl(const QnVirtualCameraResourcePtr &ca
     // if camera is null we can't get its parent in any case
     QnMediaServerResourcePtr server = (_server || (!camera))
         ? _server 
-        : qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+        : camera->getParentServer();
     if (!server)
         return QString();
     QString url = server->getUrl() + QLatin1Char('/');
@@ -192,7 +191,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 timeUsec) {
     if (!m_camera)
         return QnMediaServerResourcePtr();
-    QnMediaServerResourcePtr currentServer = qnResPool->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr currentServer = m_camera->getParentServer();
 
     if (timeUsec == DATETIME_NOW)
         return currentServer;
@@ -281,9 +280,11 @@ bool QnRtspClientArchiveDelegate::openInternal() {
 
         QString vLayout = m_rtspSession.getVideoLayout();
         if (!vLayout.isEmpty()) {
-            m_customVideoLayout = QnCustomResourceVideoLayout::fromString(vLayout);
-            // TODO: #Elric we need to create another layout instance, but there is no need to reparse it!
-            m_camera->setCustomVideoLayout(QnCustomResourceVideoLayout::fromString(vLayout));
+            auto newValue = QnCustomResourceVideoLayout::fromString(vLayout);
+            bool isChanged =  getVideoLayout()->toString() != newValue->toString();
+            m_customVideoLayout = newValue;
+            if(isChanged)
+                emit m_reader->videoLayoutChanged();
         }
     }
     return m_opened;
@@ -319,7 +320,6 @@ void QnRtspClientArchiveDelegate::close()
     QMutexLocker lock(&m_mutex);
     //m_waitBOF = false;
     m_rtspSession.stop();
-    m_rtpData = 0;
     m_lastPacketFlags = -1;
     m_opened = false;
     m_audioLayout.reset();
@@ -432,7 +432,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     receiveTimer.restart();
     while(!result)
     {
-        if (!m_rtpData){
+        if (!m_rtpData || (!m_opened && !m_closing)) {
             //m_rtspSession.stop(); // reconnect
             reopen();
             return result;
@@ -641,15 +641,17 @@ void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
     */
 }
 
-QnResourceVideoLayoutPtr QnRtspClientArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnRtspClientArchiveDelegate::getVideoLayout()
 {
     if (m_customVideoLayout)
         return m_customVideoLayout;
+    else if (m_camera)
+        return m_camera->getVideoLayout();
     else
-        return m_defaultVideoLayout;
+        return QnMediaResource::getDefaultVideoLayout();
 }
 
-QnResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
 {
     if (!m_audioLayout) {
         m_audioLayout.reset( new QnResourceCustomAudioLayout() );

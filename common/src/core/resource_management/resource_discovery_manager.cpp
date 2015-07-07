@@ -102,7 +102,7 @@ void QnResourceDiscoveryManager::start( Priority priority )
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QMutexLocker locker(&m_searchersListMutex);
-    updateSearcherUsage(serv);
+    updateSearcherUsage(serv, isRedundancyUsing());
     m_searchersList.push_back(serv);
 }
 
@@ -276,8 +276,8 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return false;
 
     QnUuid ownGuid = qnCommon->moduleGUID();
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr mServer = camera->getParentServer();
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(ownGuid);
     if (!mServer)
         return true; // can take foreign camera is camera's server is absent
     if (!ownServer)
@@ -405,7 +405,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         switch( it->second->discoveryMode() )
         {
             case DiscoveryMode::partiallyEnabled:
-                if( !qnResPool->getResourceByUniqId(it->first->getUniqueId()) )
+                if( !qnResPool->getResourceByUniqueId(it->first->getUniqueId()) )
                     continue;   //ignoring newly discovered camera
                 it->first->addFlags(Qn::search_upd_only);
                 break;
@@ -495,7 +495,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
         if (needToStop())
             return false;
 
-        const QnResourcePtr& rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
+        const QnResourcePtr& rpResource = qnResPool->getResourceByUniqueId((*it)->getUniqueId());
         QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(rpResource.data());
         if (rpNetRes) {
             QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
@@ -541,6 +541,10 @@ bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoM
 
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
 {
+    const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (server)
+        updateSearchersUsage();
+
     QMutexLocker lock(&m_searchersListMutex);
     QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
     if (itr != m_manualCameraMap.end())
@@ -550,6 +554,12 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
 
 void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 {
+    const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (server) {
+        connect(server.data(), &QnMediaServerResource::redundancyChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
+        updateSearchersUsage();
+    }
+    
     QnManualCameraInfoMap newManualCameras;
     {
         QMutexLocker lock(&m_searchersListMutex);
@@ -584,7 +594,7 @@ void QnResourceDiscoveryManager::dtsAssignment()
 
         for(const QnDtsUnit& unit: unitsLst)
         {
-            QnResourcePtr res = qnResPool->getResourceByUniqId(unit.resourceID);
+            QnResourcePtr res = qnResPool->getResourceByUniqueId(unit.resourceID);
             if (!res)
                 continue;
 
@@ -606,7 +616,20 @@ QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
     return m_state; 
 }
 
-void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher) {
+bool QnResourceDiscoveryManager::isRedundancyUsing() const
+{
+    auto servers = qnResPool->getAllServers();
+    if (servers.size() < 2)
+        return false;
+    for (const auto& server: servers)
+    {
+        if (server->isRedundancy())
+            return true;
+    }
+    return false;
+}
+
+void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable) {
     // TODO: #Elric strictly speaking, we must do this under lock.
 
     QSet<QString> disabledVendorsForAutoSearch;
@@ -633,6 +656,9 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
             discoveryMode = DiscoveryMode::partiallyEnabled;
         else if( disabledVendorsForAutoSearch.contains(lit("all")) )
             discoveryMode = DiscoveryMode::disabled;
+
+        if (discoveryMode == DiscoveryMode::partiallyEnabled && !usePartialEnable)
+            discoveryMode = DiscoveryMode::disabled;
     }
 
     searcher->setDiscoveryMode( discoveryMode );
@@ -645,6 +671,7 @@ void QnResourceDiscoveryManager::updateSearchersUsage() {
         searchers = m_searchersList;
     }
 
+    bool usePartialEnable = isRedundancyUsing();
     for(QnAbstractResourceSearcher *searcher: searchers)
-        updateSearcherUsage(searcher);
+        updateSearcherUsage(searcher, usePartialEnable);
 }

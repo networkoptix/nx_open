@@ -7,11 +7,12 @@
 class QnProxyReceiverConnectionPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    QnTcpListener* owner;
+    QnUniversalTcpListener* owner;
     bool takeSocketOwnership;
 };
 
-QnProxyReceiverConnection::QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+QnProxyReceiverConnection::QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket,
+                                                     QnUniversalTcpListener* owner):
     QnTCPConnectionProcessor(new QnProxyReceiverConnectionPrivate, socket)
 {
     Q_D(QnProxyReceiverConnection);
@@ -32,12 +33,6 @@ void QnProxyReceiverConnection::run()
 
     parseRequest();
 
-    if (d->protocol != "PROXY")
-    {
-        d->socket->close();
-        return;
-    }
-
     QString mServerAddress = d->socket->getForeignAddress().address.toString();
     /*
     QnProxyMessageProcessor* processor = dynamic_cast<QnProxyMessageProcessor*> (QnProxyMessageProcessor::instance());
@@ -47,10 +42,10 @@ void QnProxyReceiverConnection::run()
     }
     */
 
-
     sendResponse(nx_http::StatusCode::ok, QByteArray());
-    QString guid = d->request.requestLine.url.path();
-    if ((dynamic_cast<QnUniversalTcpListener*>(d->owner))->registerProxyReceiverConnection(guid, d->socket)) {
+
+    auto guid = nx_http::getHeaderValue(d->request.headers, "x-server-uuid");
+    if (d->owner->registerProxyReceiverConnection(guid, d->socket)) {
         d->takeSocketOwnership = true; // remove ownership from socket
         d->socket.clear();
     }

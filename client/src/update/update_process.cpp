@@ -57,7 +57,8 @@ QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
     m_target(target),
     m_stage(QnFullUpdateStage::Init),
     m_clientRequiresInstaller(true),
-    m_updateResult(QnUpdateResult::Cancelled)
+    m_updateResult(QnUpdateResult::Cancelled),
+    m_protocolChanged(false)
 {
     moveToThread(this);
 }
@@ -96,6 +97,7 @@ void QnUpdateProcess::run() {
     result.targetVersion = m_target.version;
     result.clientInstallerRequired = m_clientRequiresInstaller;
     result.failedPeers = m_failedPeerIds;
+    result.protocolChanged = m_protocolChanged;
 
     emit updateFinished(result);
 }
@@ -291,6 +293,7 @@ void QnUpdateProcess::installClientUpdate() {
         || qnSettings->isClientUpdateDisabled() 
         || m_clientUpdateFile->version == qnCommon->engineVersion())
     {
+            NX_LOG(lit("Update: QnUpdateProcess: Client update skipped."), cl_logDEBUG1);
             prepareToUpload();
             return;
     }
@@ -317,13 +320,13 @@ void QnUpdateProcess::at_clientUpdateInstalled() {
         return;
 
     if (futureWatcher->result() != applauncher::api::ResultType::ok) {
-        NX_LOG(lit("Update: QnUpdateProcess: Client update failed."), cl_logDEBUG1);
+        NX_LOG(lit("Update: QnUpdateProcess: Client update failed."), cl_logERROR);
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::ClientInstallationFailed);
         return;
     }
 
-    NX_LOG(lit("Update: QnUpdateProcess: Client update installed."), cl_logDEBUG1);
+    NX_LOG(lit("Update: QnUpdateProcess: Client update installed."), cl_logINFO);
 
     prepareToUpload();
 }
@@ -360,7 +363,7 @@ void QnUpdateProcess::installIncompatiblePeers() {
 void QnUpdateProcess::at_restUpdateTask_peerUpdateFinished(const QnUuid &incompatibleId, const QnUuid &id) {
     QnPeerUpdateInformation info = m_updateInformationById.take(incompatibleId);
     info.stage = QnPeerUpdateStage::Init;
-    info.server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+    info.server = qnResPool->getResourceById<QnMediaServerResource>(id);
     m_updateInformationById.insert(id, info);
     emit targetsChanged(QSet<QnUuid>::fromList(m_updateInformationById.keys()));
     emit peerStageChanged(id, QnPeerUpdateStage::Init);
@@ -385,7 +388,7 @@ void QnUpdateProcess::prepareToUpload() {
     setStage(QnFullUpdateStage::Push);
 
     foreach (const QnUuid &target, m_targetPeerIds) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(target).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(target);
         if (!server || server->getStatus() != Qn::Online)
             m_failedPeerIds.insert(target);
     }
@@ -481,6 +484,7 @@ void QnUpdateProcess::installUpdatesToServers() {
         emit peerStageProgressChanged(peerId, QnPeerUpdateStage::Install, progress);
     });
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::finished,                   installUpdatesPeerTask,   &QObject::deleteLater);
+    connect(installUpdatesPeerTask, &QnInstallUpdatesPeerTask::protocolProblemDetected, this,   [this](){ m_protocolChanged = true; });
     setStage(QnFullUpdateStage::Servers);
     setCompatiblePeersStage(QnPeerUpdateStage::Install);
     installUpdatesPeerTask->start(m_targetPeerIds);

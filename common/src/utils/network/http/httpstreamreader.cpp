@@ -67,15 +67,17 @@ namespace nx_http
                         //different buffers, we MUST read LF before reading message body
                     size_t bytesRead = 0;
                     m_lineSplitter.finishCurrentLineEnding(
-                        //ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
                         data.mid( currentDataPos, count-currentDataPos ),
                         &bytesRead );
                     currentDataPos += bytesRead;
                     if( bytesProcessed )
                         *bytesProcessed = currentDataPos;
                     m_state = m_nextState;
-                    if( m_breakAfterReadingHeaders )
+                    if( m_breakAfterReadingHeaders ||
+                        m_state == messageDone )    //MUST break parsing on message boudary so that calling entity has chance to handle message
+                    {
                         return true;
+                    }
                     break;
                 }
 
@@ -86,7 +88,6 @@ namespace nx_http
                     if( m_contentDecoder )
                     {
                         msgBodyBytesRead = readMessageBody(
-                            //QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
                             data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data ){ m_codedMessageBodyBuffer.append(data.constData(), data.size()); } );
                         //decoding content
@@ -94,7 +95,8 @@ namespace nx_http
                         {
                             if( !m_codedMessageBodyBuffer.isEmpty() )
                             {
-                                m_contentDecoder->processData( m_codedMessageBodyBuffer );  //result of processing is appended to m_msgBodyBuffer
+                                if( !m_contentDecoder->processData( m_codedMessageBodyBuffer ) )  //result of processing is appended to m_msgBodyBuffer
+                                    return false;
                                 m_codedMessageBodyBuffer.clear();
                             }
                         }
@@ -102,7 +104,6 @@ namespace nx_http
                     else
                     {
                         msgBodyBytesRead = readMessageBody(
-                            //QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
                             data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data )
                                 {
@@ -142,7 +143,6 @@ namespace nx_http
                     ConstBufferRefType lineBuffer;
                     size_t bytesRead = 0;
                     const bool lineFound = m_lineSplitter.parseByLines(
-                        //ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
                         data.mid( currentDataPos, count-currentDataPos ),
                         &lineBuffer,
                         &bytesRead );
@@ -342,7 +342,7 @@ namespace nx_http
         if( contentEncodingIter != m_httpMessage.headers().end() &&
             contentEncodingIter->second != "identity" )
         {
-            AbstractByteStreamConverter* contentDecoder = createContentDecoder( contentEncodingIter->second );
+            AbstractByteStreamFilter* contentDecoder = createContentDecoder( contentEncodingIter->second );
             if( contentDecoder == nullptr )
                 return false;   //cannot decode message body
             //all operations with m_msgBodyBuffer MUST be done with m_mutex locked
@@ -546,7 +546,7 @@ namespace nx_http
         return 0;
     }
 
-    AbstractByteStreamConverter* HttpStreamReader::createContentDecoder( const nx_http::StringType& encodingName )
+    AbstractByteStreamFilter* HttpStreamReader::createContentDecoder( const nx_http::StringType& encodingName )
     {
         if( encodingName == "gzip" )
             return new GZipUncompressor();

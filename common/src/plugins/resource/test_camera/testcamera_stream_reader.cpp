@@ -102,7 +102,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     return rez;
 }
 
-CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     Q_UNUSED(isCameraControlRequired);
     if (isStreamOpened())
@@ -111,7 +111,7 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(bool isCa
     QString urlStr = m_resource->getUrl();
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
 
-    urlStr += QString(QLatin1String("?primary=%1&fps=%2")).arg(getRole() == Qn::CR_LiveVideo).arg(getFps());
+    urlStr += QString(QLatin1String("?primary=%1&fps=%2")).arg(getRole() == Qn::CR_LiveVideo).arg(params.fps);
     QUrl url(urlStr);
 
 
@@ -140,16 +140,6 @@ void QnTestCameraStreamReader::closeStream()
 bool QnTestCameraStreamReader::isStreamOpened() const
 {
     return m_tcpSock->isConnected();
-}
-
-void QnTestCameraStreamReader::updateStreamParamsBasedOnQuality()
-{
-    pleaseReOpen();
-}
-
-void QnTestCameraStreamReader::updateStreamParamsBasedOnFps()
-{
-    pleaseReOpen();
 }
 
 #endif // #ifdef ENABLE_TEST_CAMERA

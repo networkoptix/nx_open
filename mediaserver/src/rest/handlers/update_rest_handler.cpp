@@ -22,13 +22,20 @@ int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParams 
 
     qint64 offset = params.value(lit("offset")).toLongLong();
     QString updateId = params.value(lit("updateId"));
+    bool delayed = params.value(lit("delayed"), lit("false")) != lit("false");
 
     if (!updateId.isEmpty()) {
         if (params.contains(lit("offset"))) {
             return handlePartialUpdate(updateId, body, offset, result);
         } else if (body.isEmpty()) {
             QnUploadUpdateReply reply;
-            bool res = QnServerUpdateTool::instance()->installUpdate(updateId);
+            bool res = true;
+
+            if (delayed)
+                QnServerUpdateTool::instance()->installUpdateDelayed(updateId);
+            else
+                res = QnServerUpdateTool::instance()->installUpdate(updateId);
+
             reply.offset = res ? ec2::AbstractUpdatesManager::NoError : ec2::AbstractUpdatesManager::UnknownError;
             result.setReply(reply);
             return nx_http::StatusCode::ok;

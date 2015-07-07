@@ -11,9 +11,10 @@ struct QnTimeReply {
 
     /** Time zone offset, in msecs. */
     qint64 timeZoneOffset;
+    QString timezoneId;
 };
 
-#define QnTimeReply_Fields (utcTime)(timeZoneOffset)
+#define QnTimeReply_Fields (utcTime)(timeZoneOffset)(timezoneId)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnTimeReply, (json)(metatype))
 

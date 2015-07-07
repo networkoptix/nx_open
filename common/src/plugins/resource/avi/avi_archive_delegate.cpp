@@ -165,8 +165,6 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
     if (m_contexts[stream->index] == 0 || m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
     {
 	    m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
-        if (stream->codec->codec_id == CODEC_ID_PCM_ALAW || stream->codec->codec_id == CODEC_ID_PCM_MULAW)
-            m_contexts[stream->index]->ctx()->sample_fmt = AV_SAMPLE_FMT_U8;
     }
 
     return m_contexts[stream->index];
@@ -365,7 +363,7 @@ const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
 }
 
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
-QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
 {
     if (!m_initialized)
         return defaultVideoLayout;
@@ -431,7 +429,7 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
     return m_videoLayout;
 }
 
-QnResourceAudioLayoutPtr QnAviArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnAviArchiveDelegate::getAudioLayout()
 {
     return m_audioLayout;
 }

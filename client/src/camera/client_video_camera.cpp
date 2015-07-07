@@ -33,8 +33,6 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
     m_exportReader(0),
     m_displayStarted(false)
 {
-    if (m_resource)
-        cl_log.log(QLatin1String("Creating camera for "), m_resource->toResource()->toString(), cl_logDEBUG1);
     if (m_reader) {
         m_reader->addDataProcessor(&m_camdispay);
         if (dynamic_cast<QnAbstractArchiveReader*>(m_reader)) {
@@ -55,9 +53,6 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
 
 QnClientVideoCamera::~QnClientVideoCamera()
 {
-    if (m_resource)
-        cl_log.log(QLatin1String("Destroy camera for "), m_resource->toResource()->toString(), cl_logDEBUG1);
-
     stopDisplay();
     delete m_reader;
 }

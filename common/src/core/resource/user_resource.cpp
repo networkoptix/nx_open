@@ -1,5 +1,8 @@
+
 #include "user_resource.h"
 #include "network/authenticate_helper.h"
+#include <utils/crypt/linux_passwd_crypt.h>
+
 
 QnUserResource::QnUserResource():
     m_permissions(0),
@@ -58,6 +61,7 @@ void QnUserResource::generateHash() {
 
     setHash(hash);
     setDigest(digest);
+    setCryptSha512Hash( linuxCryptSha512( password.toUtf8(), generateSalt( LINUX_CRYPT_SALT_LENGTH ) ) );
 }
 
 bool QnUserResource::checkPassword(const QString &password) {
@@ -88,6 +92,24 @@ QByteArray QnUserResource::getDigest() const
     QMutexLocker locker(&m_mutex);
     return m_digest;
 }
+
+void QnUserResource::setCryptSha512Hash( const QByteArray& cryptSha512Hash )
+{
+    {
+        QMutexLocker locker( &m_mutex );
+        if( m_cryptSha512Hash == cryptSha512Hash )
+            return;
+        m_cryptSha512Hash = cryptSha512Hash;
+    }
+    emit cryptSha512HashChanged( ::toSharedPointer( this ) );
+}
+
+QByteArray QnUserResource::getCryptSha512Hash() const
+{
+    QMutexLocker locker( &m_mutex );
+    return m_cryptSha512Hash;
+}
+
 quint64 QnUserResource::getPermissions() const
 {
     QMutexLocker locker(&m_mutex);
@@ -158,6 +180,11 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
         if (m_digest != localOther->m_digest) {
             m_digest = localOther->m_digest;
             modifiedFields << "digestChanged";
+        }
+
+        if (m_cryptSha512Hash != localOther->m_cryptSha512Hash ) {
+            m_cryptSha512Hash = localOther->m_cryptSha512Hash;
+            modifiedFields << "cryptSha512HashChanged";
         }
 
         if (m_permissions != localOther->m_permissions) {

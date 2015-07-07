@@ -40,7 +40,7 @@ public:
     QMovie *newMovie(const QString &name, QObject* parent = NULL);
     QMovie *newMovie(const char *name, QObject* parent = NULL);
 
-    QStyle *newStyle();
+    static QStyle *newStyle();
 
 private:
     void init(const QStringList &paths);

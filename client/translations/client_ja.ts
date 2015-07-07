@@ -377,6 +377,10 @@
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
         <translation>&quot;システムによるカメラ設定最適化&quot;はシステムアドミニストレーションで無効になっています.</translation>
     </message>
+    <message>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
+        <translation>秒単位の代りにGOP単位で計算(カメラのビットレートは増加します)</translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -399,16 +403,20 @@
 <context>
     <name>CameraManagementWidget</name>
     <message>
-        <source>Enable camera auto discovery</source>
-        <translation>カメラ自動検索有効</translation>
-    </message>
-    <message>
         <source>Allow system to optimize camera settings (Recommended)</source>
         <translation>システムによるカメラ設定最適化 (推奨)</translation>
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
         <translation>注意　録画スケジュールのFPSと画質設定は適応されません!</translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
+        <translation>匿名でソフトウェア開発者に送信する（推奨）</translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation>カメラとサーバーの自動検索有効</translation>
     </message>
 </context>
 <context>
@@ -748,12 +756,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>全サーバーの統計を表示する</translation>
     </message>
     <message>
-        <source>Camera Management</source>
-        <translation>カメラ管理</translation>
-    </message>
-    <message>
         <source>System Configuration Backup and Restore</source>
         <translation>システム構成 バックアップとリストア</translation>
+    </message>
+    <message>
+        <source>System Settings</source>
+        <translation>システム設定</translation>
     </message>
 </context>
 <context>
@@ -2506,6 +2514,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>File Settings...</source>
         <translation>ファイル設定...</translation>
     </message>
+    <message>
+        <source>Ask About Statistics Reporting</source>
+        <translation>統計レポートについて問い合わせる</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -3242,18 +3254,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>On</translation>
     </message>
     <message>
-        <source>FPS value is too high</source>
-        <translation>FPS値が高すぎます</translation>
-    </message>
-    <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>スケジュールグリッドのFPSは %1.　最高のFPS値は %2. </translation>
-    </message>
-    <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>For software motion 2. fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2. </translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
@@ -3880,18 +3880,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation>サポートされないビデオカードが検出されました　正常に表示出来ない可能性があります.</translation>
-    </message>
-    <message>
-        <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation>ビデオドライバーのインストールまたは更新で問題が解決される可能性があります.</translation>
-    </message>
-    <message>
-        <source>Critical Performance Tip</source>
-        <translation>深刻なパフォーマンス情報</translation>
-    </message>
-    <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
         <translation>ビデオカードのドライバーがインストールされていないかサポート外のビデオカードです.</translation>
     </message>
@@ -3902,6 +3890,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Important Performance Tip</source>
         <translation>重要なパフォーマンス情報</translation>
+    </message>
+    <message>
+        <source>This could lead to client software malfunction including crash.</source>
+        <translation>クライアントソフトウェアの誤動作の要因となります.</translation>
     </message>
 </context>
 <context>
@@ -3993,14 +3985,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutTabBar</name>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1&apos; スクリーン</translation>
     </message>
 </context>
 <context>
@@ -4471,10 +4455,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>パスワード:</translation>
     </message>
     <message>
-        <source>Find System</source>
-        <translation>システム検索</translation>
-    </message>
-    <message>
         <source>The new system will have password and name from the system:</source>
         <translation>新規システムには既存システムより名前とパスワードが引継がれます:</translation>
     </message>
@@ -4557,6 +4537,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
         <translation>リモートシステムのサーバーは直ぐに表示されます.</translation>
+    </message>
+    <message>
+        <source>Check</source>
+        <translation>チェック</translation>
     </message>
 </context>
 <context>
@@ -5194,11 +5178,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Users</source>
         <translation>ユーザー</translation>
     </message>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1&apos; スクリーン</translation>
-    </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
@@ -5409,12 +5388,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>実行すますか?</translation>
     </message>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
-        <translation>ストレージ &apos;%1&apos;のアーカイブインデックスのリビルド中</translation>
+        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
+        <translation>アーカイブインデックスのリビルド  &apos;%1&apos;</translation>
     </message>
     <message>
-        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
-        <translation>ストレージ &apos;%1&apos; のアーカイブスキャン中</translation>
+        <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
+        <translation>ストレージ  &apos;%1&apos; のアーカイブスキャン</translation>
     </message>
 </context>
 <context>
@@ -5796,6 +5775,18 @@ Short for &quot;seconds&quot;</extracomment>
         <source>This action CANNOT be undone!</source>
         <translation>このアクションは取消せません!</translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation>FPS値が高すぎます</translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation>スケジュールグリッドのFPSは %1.　最高のFPS値は %2. </translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation>ソフトウェアモーション を使用すると2ndストリームの2fpsを使用します　スケジュールグリッドの %1. Fps は %2.になります. </translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -5894,10 +5885,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>認証されていない</translation>
     </message>
     <message>
-        <source>Please check authentication information&lt;br/&gt;in camera settings</source>
-        <translation>カメラ設定&lt;br/&gt;認証情報を確認してください</translation>
-    </message>
-    <message>
         <source>Activate Video Wall license to remove this message</source>
         <translation>アクティベートビデオウォールライセンス</translation>
     </message>
@@ -5912,6 +5899,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Diagnose...</source>
         <translation>診断...</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in camera settings</source>
+        <translation>カメラ設定画面の認証設定を確認してください</translation>
     </message>
 </context>
 <context>
@@ -6533,18 +6524,6 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation>サーバー v%1 at %2&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Server v%1&lt;br/&gt;</source>
-        <translation>サーバー v%1&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>コンポーネントの幾つかが更新されていません:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;全てのポンポーネントを最新バージョンに更新してください %2.</translation>
-    </message>
-    <message>
         <source>Update...</source>
         <translation>更新...</translation>
     </message>
@@ -6587,10 +6566,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>
             <numerusform> %n リソースの変更を保存できません.</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Client v%1&lt;br/&gt;</source>
-        <translation>クライアント v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
@@ -6644,6 +6619,36 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Error while uploading picture.</source>
         <translation>アップロード中にエラーが発生しました.</translation>
     </message>
+    <message>
+        <source>Some components of the system are not updated</source>
+        <translation>システムコンポーネントの幾つかが更新されていません</translation>
+    </message>
+    <message>
+        <source>Client v%1</source>
+        <translation>クライアント v%1</translation>
+    </message>
+    <message>
+        <source>Server v%1 at %2</source>
+        <translation>サーバー v%1 / %2</translation>
+    </message>
+    <message>
+        <source>Server v%1</source>
+        <translation>サーバー v%1</translation>
+    </message>
+    <message>
+        <source>Please update all components to the latest version %1.</source>
+        <translation>全てのコンポーネントをバージョン %1.以上に更新してください.</translation>
+    </message>
+    <message>
+        <source>Anonymous Usage Statistics</source>
+        <translation>匿名の利用統計</translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
+If you would like to disable this feature you can do so in the System Settings dialog.</source>
+        <translation>システムは利用統計を匿名でソフトウェア開発チームに送信し、今後の改善に役立てますx.
+変更したい場合はシステム設定で無効にできます.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6693,6 +6698,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Connect to Server...</source>
         <translation>サーバーに接続....</translation>
+    </message>
+    <message>
+        <source>Could not connect to server...</source>
+        <translation>サーバーに接続できません...</translation>
     </message>
 </context>
 <context>
@@ -6905,6 +6914,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation>フィルター、回転、歪み補正、拡張イメージ、カスタムアスペクトの適用（トランスコード必要）</translation>
+    </message>
+    <message>
+        <source>exported</source>
+        <translation>エクスポート</translation>
     </message>
 </context>
 <context>
@@ -7248,18 +7261,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>ビデオウォールコントロールを開始できません.</translation>
     </message>
     <message>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
-    </message>
-    <message>
-        <source>New layout</source>
-        <translation>新規レイアウト</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>新規レイアウト%1</translation>
-    </message>
-    <message>
         <source>To enable the feature please activate at least one Video Wall license</source>
         <translation>有効にするにはビデオウォールライセンスをアクティベートしてください</translation>
     </message>
@@ -7348,6 +7349,15 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You&apos;ll have to start it manually.</source>
         <translation>マニュアルで開始してください.</translation>
+    </message>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation>%1&apos; スクリーン</translation>
+    </message>
+    <message>
+        <source>%n cameras</source>
+        <translation>%n カメラ</translation>
     </message>
 </context>
 <context>
@@ -7624,10 +7634,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Start</source>
         <translation>開始</translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation>リビルドプロセス</translation>
     </message>
     <message>
         <source>Cancel</source>

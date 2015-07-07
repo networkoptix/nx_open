@@ -34,6 +34,7 @@ public:
     bool bindToLocalAddress();
 
     void updatePort(int newPort);
+    void waitForPortUpdated();
 
     int getPort() const;
 
@@ -52,7 +53,7 @@ public slots:
 
 protected:
     virtual void run();
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) = 0;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket) = 0;
     virtual void doPeriodicTasks();
 private:
     void removeDisconnectedConnections();

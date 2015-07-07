@@ -97,12 +97,14 @@
         </Property>
 
         <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes"/>
+        <Property Id="STATISTICS_REPORT_ALLOWED" Secure="yes" Value="1"/>
    
         <Property Id="SERVER_LOGIN" Value="admin"/>
         <Property Id="SERVER_PASSWORD" Secure="yes"/>
         <Property Id="SERVER_PASSWORD_CONFIRM" Secure="yes"/>
 
         <Property Id="ALLOW_CAMERA_CHANGES_REF" Value="ALLOW_CAMERA_CHANGES"/>
+        <Property Id="STATISTICS_REPORT_ALLOWED_REF" Value="STATISTICS_REPORT_ALLOWED"/>        
 
         <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
 

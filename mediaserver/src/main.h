@@ -7,6 +7,7 @@
 #include <api/common_message_processor.h>
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <crash_reporter.h>
 
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
@@ -34,7 +35,6 @@ public:
     void stopObjects();
     void run();
 
-    void changePort(quint16 port);
 public slots:
     void stopAsync();
     void stopSync();
@@ -56,6 +56,8 @@ private slots:
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIP);
+    void at_adminUserChanged(const QnResourcePtr& resource);
+
 private:
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
@@ -83,6 +85,7 @@ private:
     quint64 m_dumpSystemResourceUsageTaskID;
     bool m_stopping;
     mutable QMutex m_stopMutex;
+    ec2::CrashReporter m_crashReporter;
 };
 
 #endif // MAIN_H

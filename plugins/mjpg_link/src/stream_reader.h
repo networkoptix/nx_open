@@ -62,7 +62,7 @@ private:
     float m_fps;
     int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
-    QSharedPointer<nx_http::HttpClient> m_httpClient;
+    std::shared_ptr<nx_http::HttpClient> m_httpClient;
     nx_http::MultipartContentParser m_multipartContentParser;
     std::unique_ptr<ILPVideoPacket> m_videoPacket;
     StreamType m_streamType;

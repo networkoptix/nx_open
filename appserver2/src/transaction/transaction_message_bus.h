@@ -17,6 +17,7 @@
 #include "transaction_transport.h"
 #include <transaction/transaction_log.h>
 #include "runtime_transaction_log.h"
+#include "transport_connection_info.h"
 
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
@@ -43,6 +44,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
+        QList<QnTransportConnectionInfo> connectionsInfo() const;
         void gotConnectionFromRemotePeer(
             const QnUuid& connectionGuid,
             QSharedPointer<AbstractStreamSocket> socket,
@@ -67,6 +69,9 @@ namespace ec2
             const QnUuid& connectionGuid,
             const nx_http::Request& request,
             const QByteArray& requestMsgBody );
+        //!Blocks till connection \a connectionGuid is ready to accept new transactions
+        void waitForNewTransactionsReady( const QnUuid& connectionGuid );
+        void connectionFailure( const QnUuid& connectionGuid );
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -88,7 +93,7 @@ namespace ec2
             QMutexLocker lock(&m_mutex);
             if (m_connections.isEmpty())
                 return;
-            QnTransactionTransportHeader ttHeader(connectedServerPeers(tran.command) << m_localPeer.id, dstPeers);
+            QnTransactionTransportHeader ttHeader(connectedServerPeers() << m_localPeer.id, dstPeers);
             ttHeader.fillSequence();
             sendTransactionInternal(tran, ttHeader);
         }
@@ -138,7 +143,7 @@ namespace ec2
         * If can't find route info then return null value. 
         * Otherwise return route gateway.
         */
-        QnUuid routeToPeerVia(const QnUuid& dstPeer) const;
+        QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
 
     signals:
         void peerLost(ApiPeerAliveData data);
@@ -151,7 +156,6 @@ namespace ec2
         //void gotUnlockRequest(ApiLockData);
         void gotLockResponse(ApiLockData);
 
-        void transactionProcessed(const QnAbstractTransaction &transaction);
         void remotePeerUnauthorized(const QnUuid& id);
     private:
         friend class QnTransactionTransport;
@@ -226,7 +230,7 @@ namespace ec2
         */
         bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader);
 
-        QnPeerSet connectedServerPeers(ApiCommand::Value command) const;
+        QnPeerSet connectedServerPeers() const;
 
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
 
@@ -243,6 +247,8 @@ namespace ec2
         QSet<QnUuid> checkAlivePeerRouteTimeout();
         void updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
         int distanceToPeer(const QnUuid& dstPeer) const;
+        void addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tranToSend, int timeout);
+        void sendDelayedAliveTran();
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -287,6 +293,15 @@ namespace ec2
         QElapsedTimer m_currentTimeTimer;
         std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
         bool m_restartPending;
+        
+        struct DelayedAliveData
+        {
+            QnTransaction<ApiPeerAliveData> tran;
+            qint64 timeToSend;
+        };
+
+        QMap<QnUuid, DelayedAliveData> m_delayedAliveTran;
+        QElapsedTimer m_relativeTimer;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()

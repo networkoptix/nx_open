@@ -33,6 +33,9 @@ namespace {
     QUrl requestUrl(const QUrl &url) {
         QUrl result = trimmedUrl(url);
         result.setPath(lit("/api/moduleInformation"));
+        QUrlQuery query;
+        query.addQueryItem(lit("showAddresses"), lit("false"));
+        result.setQuery(query);
         return result;
     }
 
@@ -72,6 +75,11 @@ void QnDirectModuleFinder::removeUrl(const QUrl &url) {
 }
 
 void QnDirectModuleFinder::checkUrl(const QUrl &url) {
+    if (QThread::currentThread() != thread()) {
+        QMetaObject::invokeMethod(this, "checkUrl", Q_ARG(QUrl, url));
+        return;
+    }
+
     enqueRequest(trimmedUrl(url));
 }
 
@@ -158,7 +166,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     if (moduleInformation.id.isNull())
         return;
 
-    if (moduleInformation.type != nxMediaServerId)
+    if (moduleInformation.type != QnModuleInformation::nxMediaServerId())
         return;
 
     if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())

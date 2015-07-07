@@ -51,7 +51,7 @@ PlDlinkStreamReader::~PlDlinkStreamReader()
 }
 
 
-CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -68,7 +68,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
     }
 
     //==== profile setup
-    QString prifileStr = composeVideoProfile(isCameraControlRequired);
+    QString prifileStr = composeVideoProfile(isCameraControlRequired, params);
 
     if (prifileStr.length()==0)
     {
@@ -196,18 +196,6 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
 
 }
 
-void PlDlinkStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
 //=====================================================================================
 
 int scaleInt(int value, int from, int to)
@@ -231,7 +219,7 @@ bool PlDlinkStreamReader::isTextQualities(const QStringList& qualities) const
     return false;
 }
 
-QString PlDlinkStreamReader::getQualityString() const
+QString PlDlinkStreamReader::getQualityString(const QnLiveStreamParams& params) const
 {
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     QnDlink_cam_info info = res->getCamInfo();
@@ -239,7 +227,7 @@ QString PlDlinkStreamReader::getQualityString() const
     if (!info.hasFixedQuality) 
     {
         int q;
-        switch (getQuality())
+        switch (params.quality)
         {
         case Qn::QualityHighest:
             q = 90;
@@ -267,13 +255,13 @@ QString PlDlinkStreamReader::getQualityString() const
         }
         return QString::number(q);
     }
-    int qualityIndex = scaleInt((int) getQuality(), Qn::QualityHighest-Qn::QualityLowest+1, info.possibleQualities.size());
+    int qualityIndex = scaleInt((int) params.quality, Qn::QualityHighest-Qn::QualityLowest+1, info.possibleQualities.size());
     if (isTextQualities(info.possibleQualities))
         qualityIndex = info.possibleQualities.size()-1 - qualityIndex; // index 0 is best quality if quality is text
     return info.possibleQualities[qualityIndex];
 }
 
-QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired) 
+QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, const QnLiveStreamParams& params) 
 {
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     QnDlink_cam_info info = res->getCamInfo();
@@ -297,7 +285,7 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired)
         //resolution = info.resolutionCloseTo(320);
         resolution = info.primaryStreamResolution();
     }
-
+    m_resolution = resolution;
 
     QString result;
     QTextStream t(&result);
@@ -307,7 +295,7 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired)
     {
         t << "&resolution=" << resolution.width() << "x" << resolution.height() << "&";
 
-        int fps = info.frameRateCloseTo( qMin((int)getFps(), res->getMaxFps()) );
+        int fps = info.frameRateCloseTo( qMin((int)params.fps, res->getMaxFps()) );
         t << "framerate=" << fps << "&";
         t << "codec=";
 
@@ -339,13 +327,13 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired)
         {
             // just CBR fo mpeg so far
             t << "qualitymode=CBR" << "&";
-            t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(getQuality(), resolution, fps));
+            t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(params.quality, resolution, fps));
         }
         else
         {
             t << "qualitymode=Fixquality" << "&";
             
-            t << "quality=" << getQualityString();
+            t << "quality=" << getQualityString(params);
         }
     }
 
@@ -482,8 +470,8 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
         videoData->m_data.finishWriting(-1);
 
     videoData->compressionType = CODEC_ID_MJPEG;
-    videoData->width = 1920;
-    videoData->height = 1088;
+    videoData->width = m_resolution.width();
+    videoData->height = m_resolution.height();
     videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     videoData->channelNumber = 0;
     videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;

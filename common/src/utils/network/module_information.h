@@ -22,12 +22,17 @@ struct QnModuleInformation {
     QByteArray authHash;
     int protoVersion;
     QnUuid runtimeId;
+    Qn::ServerFlags flags;
 
-    QnModuleInformation() : port(0), sslAllowed(false), protoVersion(0) {}
+    QnModuleInformation() : port(0), sslAllowed(false), protoVersion(0), flags(0) {}
 
     bool isCompatibleToCurrentSystem() const;
     bool hasCompatibleVersion() const;
     void fixRuntimeId();
+
+    static QString nxMediaServerId();
+    static QString nxECId();
+    static QString nxClientId();
 };
 
 struct QnModuleInformationWithAddresses : QnModuleInformation {
@@ -38,7 +43,7 @@ struct QnModuleInformationWithAddresses : QnModuleInformation {
     {}
 };
 
-#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(id)(sslAllowed)(authHash)(protoVersion)(runtimeId)
+#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(id)(sslAllowed)(authHash)(protoVersion)(runtimeId)(flags)
 #define QnModuleInformationWithAddresses_Fields QnModuleInformation_Fields(remoteAddresses)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(metatype)(eq))

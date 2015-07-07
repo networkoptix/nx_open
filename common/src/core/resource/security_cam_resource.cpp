@@ -86,12 +86,12 @@ QnSecurityCamResource::QnSecurityCamResource():
 
 QString QnSecurityCamResource::getName() const
 {
-    if( getId().isNull() )
-        return QnResource::getName();
-
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    if( !(*userAttributesLock)->name.isEmpty() )
-        return (*userAttributesLock)->name;
+    if( !getId().isNull() )
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if( !(*userAttributesLock)->name.isEmpty() )
+            return (*userAttributesLock)->name;
+    }
     return QnResource::getName();
 }
 
@@ -113,6 +113,11 @@ void QnSecurityCamResource::setCameraName( const QString& newCameraName )
     }
     QnResource::setName( newCameraName );
 }
+
+QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
+    return getParentResource().dynamicCast<QnMediaServerResource>();
+}
+
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(lit("groupplay"));
@@ -145,8 +150,6 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
-        QnConstResourceVideoLayoutPtr layout = getVideoLayout();
-
         if (other_casted->m_groupId != m_groupId)
             modifiedFields << "groupIdChanged";
 
@@ -205,6 +208,7 @@ void QnSecurityCamResource::initializationDone()
     QnNetworkResource::initializationDone();
     if( m_inputPortListenerCount.load() > 0 )
         startInputPortMonitoringAsync( std::function<void(bool)>() );
+    resetCachedValues();
 }
 
 bool QnSecurityCamResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ ) {
@@ -300,8 +304,7 @@ bool QnSecurityCamResource::isAnalog() const {
 }
 
 bool QnSecurityCamResource::isAnalogEncoder() const {
-    const QnSecurityCamResourcePtr ptr = toSharedPointer(const_cast<QnSecurityCamResource*> (this));
-    QnResourceData resourceData = qnCommon->dataPool()->data(ptr);
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     return resourceData.value<bool>(lit("analogEncoder"));
 }
 
@@ -864,4 +867,10 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedCameraCapabilities.reset();
     m_cachedIsDtsBased.reset();
     m_motionType.reset();
+}
+
+bool QnSecurityCamResource::isBitratePerGOP() const
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    return resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP) || getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0;
 }

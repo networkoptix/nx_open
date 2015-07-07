@@ -243,6 +243,10 @@ namespace ec2
 
         //getTransactionLog
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList);
+        
+        //getClientInfos
+        ErrorCode doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data);
+        ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);
 
 
         // ------------ transactions --------------------------------------
@@ -272,6 +276,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
@@ -422,6 +427,11 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiReverseConnectionData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         ErrorCode deleteTableRecord(const QnUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
@@ -528,6 +538,7 @@ namespace ec2
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
+        bool removeEmptyLayoutsFromTransactionLog();
         bool tuneDBAfterOpen();
         bool updateCameraHistoryGuids();
         bool migrateServerGUID(const QString& table, const QString& field);

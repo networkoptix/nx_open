@@ -49,7 +49,7 @@ void QnRestUpdatePeerTask::doStart() {
         NX_LOG(lit("Update: QnRestUpdatePeerTask: Request [%1, %2, %3].")
                .arg(m_updateId).arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
 
-        int handle = server->apiConnection()->installUpdate(m_updateId, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
+        int handle = server->apiConnection()->installUpdate(m_updateId, true, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
         m_serverByRequest[handle] = server;
         m_serverByRealId.insert(server->getOriginalGuid(), server);
 

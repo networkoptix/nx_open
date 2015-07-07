@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QElapsedTimer>
 #include <QSet>
+#include <QtCore/QWaitCondition>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -17,6 +18,7 @@
 #include <utils/common/uuid.h>
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
+#include <utils/network/http/auth_cache.h>
 #include "utils/network/http/httpstreamreader.h"
 #include "utils/network/http/http_message_stream_parser.h"
 #include "utils/network/http/multipart_content_parser.h"
@@ -158,13 +160,15 @@ public:
     bool isNeedResync() const { return m_needResync; }
     void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
 
-    QUrl remoteAddr() const       { return m_remoteAddr; }
+    QUrl remoteAddr() const;
 
     ApiPeerData remotePeer() const { return m_remotePeer; }
 
     // This is multi thread getters/setters
     void setState(State state);
     State getState() const;
+
+    bool isIncoming() const;
 
     void setRemoteIdentityTime(qint64 time);
     qint64 remoteIdentityTime() const;
@@ -182,7 +186,7 @@ public:
     //!Remove event handler, installed by \a QnTransactionTransport::setHttpChunkExtensonHandler or \a QnTransactionTransport::setBeforeSendingChunkHandler
     void removeEventHandler( int eventHandlerID );
 
-    AbstractStreamSocket* getSocket() const;
+    QSharedPointer<AbstractStreamSocket> getSocket() const;
 
     static bool tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator);
     static bool tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator);
@@ -205,6 +209,15 @@ public:
         const QSharedPointer<AbstractStreamSocket>& socket,
         const nx_http::Request& request,
         const QByteArray& requestBuf );
+    //!Blocks till connection is ready to accept new transactions
+    /*!
+        \param invokeBeforeWait This handler is invoked if wait is required. Invoked with internal mutex locked
+        \note After \a invokeBeforeWait has been called this object cannot be destroyed (will block in destructor)
+            until \a QnTransactionTransport::waitForNewTransactionsReady has returned
+    */
+    void waitForNewTransactionsReady( std::function<void()> invokeBeforeWait );
+    //!Transport level logic should use this method to report connection problem
+    void connectionFailure();
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 
@@ -265,20 +278,25 @@ private:
     qint64 m_remoteIdentityTime;
     nx_http::HttpStreamReader m_httpStreamReader;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
-    std::shared_ptr<nx_http::HttpMessageStreamParser> m_incomingTransactionsRequestsParser;
     ConnectionType::Type m_connectionType;
     PeerRole m_peerRole;
     QByteArray m_contentEncoding;
-    std::shared_ptr<AbstractByteStreamConverter> m_incomingTransactionStreamParser;
+    std::shared_ptr<AbstractByteStreamFilter> m_incomingTransactionStreamParser;
+    std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
-    QUrl m_postTranUrl;
+    QUrl m_postTranBaseUrl;
     quint64 m_sendKeepAliveTask;
     nx::Buffer m_dummyReadBuffer;
     bool m_base64EncodeOutgoingTransactions;
     std::vector<nx_http::HttpHeader> m_outgoingClientHeaders;
+    size_t m_sentTranSequence;
+    nx_http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
+    //!Number of threads waiting on \a QnTransactionTransport::waitForNewTransactionsReady
+    int m_waiterCount;
+    QWaitCondition m_cond;
 
 private:
     void default_initializer();
@@ -286,13 +304,6 @@ private:
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void addData(QByteArray&& data);
-    //!\a data will be sent as-is with no HTTP encoding applied
-    void addEncodedData(QByteArray&& data);
-    /*!
-        \return in case of success returns number of bytes read from \a data. In case of parse error returns 0
-        \note In case of error \a chunkHeader contents are undefined
-    */
-    int readChunkHeader(const quint8* data, int dataLen, nx_http::ChunkHeader* const chunkHeader);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
@@ -309,20 +320,18 @@ private:
     */
     void scheduleAsyncRead();
     bool readCreateIncomingTunnelMessage();
-    void receivedTransactionViaInternalTunnel( const QnByteArrayConstRef& tranDataWithHeader );
-    void receivedTransactionNonSafe(
-        const nx_http::HttpHeaders& headers,
-        const QnByteArrayConstRef& tranData );
+    void receivedTransactionNonSafe( const QnByteArrayConstRef& tranData );
     void startListeningNonSafe();
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
     void startSendKeepAliveTimerNonSafe();
     void monitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
+    QUrl generatePostTranUrl();
+    void aggregateOutgoingTransactionsNonSafe();
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
     void repeatDoGet();
-    void openPostTransactionConnectionDone( const nx_http::AsyncHttpClientPtr& );
     void postTransactionDone( const nx_http::AsyncHttpClientPtr& );
 };
 

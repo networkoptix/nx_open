@@ -154,6 +154,12 @@ namespace Qn {
          */
         BetaVersionMessageAction,
 
+
+        /** 
+         * Displays dialog asking about statistics reporting.
+         */
+        AllowStatisticsReportMessageAction,
+
         /**
          * Opens the provided url in the default browser.
          *
@@ -1139,10 +1145,21 @@ namespace Qn {
 
 } // namespace Qn
 
+namespace QnActionTypes {
+    enum ClientMode {
+        DesktopMode         = 0x1,
+        VideoWallMode       = 0x2,
+        ActiveXMode         = 0x4,
+        AnyMode             = 0xFF
+    };
+    Q_DECLARE_FLAGS(ClientModes, ClientMode)
+}
+
 Q_DECLARE_METATYPE(Qn::ActionId);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionScopes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionParameterTypes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnActionTypes::ClientModes);
 
 #endif // QN_ACTIONS_H

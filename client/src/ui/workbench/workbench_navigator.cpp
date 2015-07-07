@@ -21,6 +21,7 @@ extern "C"
 #include <utils/threaded_chunks_merge_tool.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <camera/resource_display.h>
 #include <core/resource/camera_bookmark.h>
@@ -62,6 +63,9 @@ extern "C"
 namespace {
     const int discardCacheIntervalMs = 10 * 60 * 1000;
 
+    /** Size of timeline window near live when there is no recorded periods on cameras. */
+    const int timelineWindowNearLive = 10 * 1000;
+
     QAtomicInt qn_threadedMergeHandle(1);
 }
 
@@ -93,8 +97,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastSpeed(0.0),
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
-    m_lastUpdateSlider(0),
-    m_lastCameraTime(0),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
@@ -622,7 +624,7 @@ void QnWorkbenchNavigator::updateSliderFromItemData(QnResourceWidget *widget, bo
         /* Just skip window initialization. */
     } else {
         if(window.isEmpty())
-            window = QnTimePeriod(0, -1);
+            window = QnTimePeriod(0, QnTimePeriod::infiniteDuration());
 
         qint64 windowStart = window.startTimeMs;
         qint64 windowEnd = window.isInfinite() ? m_timeSlider->maximum() : window.startTimeMs + window.durationMs;
@@ -986,24 +988,53 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     bool isSearch = searchState.step > 0;
 
-    qint64 startTimeUSec, endTimeUSec;
     qint64 endTimeMSec, startTimeMSec;
+
+    bool widgetLoaded = false;
     if(isSearch) {
         endTimeMSec = searchState.period.endTimeMs();
-        endTimeUSec = endTimeMSec * 1000;
         startTimeMSec = searchState.period.startTimeMs;
-        startTimeUSec = startTimeMSec * 1000;
+        widgetLoaded = true;
     } else {
-        endTimeUSec = reader->endTime();
-        endTimeMSec = endTimeUSec == DATETIME_NOW ? qnSyncTime->currentMSecsSinceEpoch() : ((quint64)endTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->maximum() : endTimeUSec / 1000);
+        const qint64 startTimeUSec = reader->startTime();
+        const qint64 endTimeUSec = reader->endTime();
+        widgetLoaded = (quint64)startTimeUSec != AV_NOPTS_VALUE 
+            && (quint64)endTimeUSec != AV_NOPTS_VALUE;
 
-        startTimeUSec = reader->startTime();                       
-        startTimeMSec = startTimeUSec == DATETIME_NOW 
-            ? endTimeMSec - 10000                               /* If nothing is recorded, set minimum to end - 10s. */        
-            : (quint64)startTimeUSec == AV_NOPTS_VALUE 
-            ? m_timeSlider->minimum() 
-            : startTimeUSec / 1000;
+        /* This can also be true if the current widget has no archive at all and all other synced widgets still have not received rtsp response. */
+        bool noRecordedPeriodsFound = startTimeUSec == DATETIME_NOW;
+
+        if (!widgetLoaded) {
+            startTimeMSec = m_timeSlider->minimum();
+            endTimeMSec = m_timeSlider->maximum();
+
+        } else if (noRecordedPeriodsFound) {  
+            /* Set to default value. */
+            endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();            
+            startTimeMSec =  endTimeMSec - timelineWindowNearLive;
+
+            /* And then try to read saved value - it was valid someday. */
+            if (qnSettings->isActiveXMode()) { //TODO: #gdm refactor this safety check sometime
+                if (QnWorkbenchItem *item = m_currentMediaWidget->item()) {
+                    QnTimePeriod window = item->data(Qn::ItemSliderWindowRole).value<QnTimePeriod>();
+                    if (window.isValid()) {
+                        startTimeMSec = window.startTimeMs;
+                        endTimeMSec = window.isInfinite()
+                            ? qnSyncTime->currentMSecsSinceEpoch()
+                            : window.endTimeMs();
+                    }
+                }
+            }
+
+        } else {
+            /* Both values are valid. */
+            startTimeMSec = startTimeUSec / 1000;
+            endTimeMSec = endTimeUSec == DATETIME_NOW
+                ? qnSyncTime->currentMSecsSinceEpoch()
+                : endTimeUSec / 1000;
+        }
     }
+    
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
     if(m_calendar)
@@ -1022,19 +1053,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
                 timeUSec *= 1000;
         }
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec < 0 ? m_timeSlider->value() : timeUSec / 1000);
-        qint64 timeNext = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? AV_NOPTS_VALUE : m_currentMediaWidget->display()->camDisplay()->getNextTime();
-
-        if (timeUSec != DATETIME_NOW && timeUSec >= 0) {
-            qint64 now = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
-            if (m_lastUpdateSlider && m_lastCameraTime == timeMSec && (quint64)timeNext != AV_NOPTS_VALUE && timeNext - timeMSec <= MAX_FRAME_DURATION){
-                qint64 timeDiff = (now - m_lastUpdateSlider) * speed();
-                if (timeDiff < MAX_FRAME_DURATION)
-                    timeMSec += timeDiff;
-            } else {
-                m_lastCameraTime = timeMSec;
-                m_lastUpdateSlider = now;
-            }
-        }
 
         m_timeSlider->setValue(timeMSec, keepInWindow);
 
@@ -1054,7 +1072,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         }
     }
 
-    if(!m_currentWidgetLoaded && ((quint64)startTimeUSec != AV_NOPTS_VALUE && (quint64)endTimeUSec != AV_NOPTS_VALUE)) {
+    if(!m_currentWidgetLoaded && widgetLoaded) {
         m_currentWidgetLoaded = true;
         updateTargetPeriod();
 
@@ -1388,6 +1406,10 @@ void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy() {
     if (!m_timeSlider)
         return;
 
+    /* This option should never be cleared in ActiveX mode */
+    if (qnRuntime->isActiveXMode())
+        return;
+
     m_timeSlider->setOption(QnTimeSlider::PreserveWindowSize, m_timeSlider->isThumbnailsVisible());
 }
 
@@ -1444,7 +1466,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         return;
     }
 
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode())
         return;
 
     QnActionManager *manager = context()->menu();

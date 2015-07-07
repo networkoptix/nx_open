@@ -11,11 +11,13 @@ class QnModuleFinder;
 
 struct QnRoute
 {
+
     SocketAddress addr; // address for physical connect
     QnUuid id;          // requested server ID
     QnUuid gatewayId;   // proxy server ID. May be null
-
-    bool isValid() const { return !addr.isNull(); }
+    bool reverseConnect;// if target server should connect to this one
+    int distance;
+    QnRoute() : reverseConnect(false), distance(0) {}
 };
 
 class QnRouter : public QObject, public Singleton<QnRouter> {

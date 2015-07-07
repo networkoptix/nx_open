@@ -100,10 +100,12 @@ QString QnMediaServerResource::getName() const
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
-
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
-    if( !(*lk)->name.isEmpty() )
-        return (*lk)->name;
+    else
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if( !(*lk)->name.isEmpty() )
+            return (*lk)->name;
+    }
     return QnResource::getName();
 }
 
@@ -240,38 +242,6 @@ void QnMediaServerResource::onRequestDone( int reqID, ec2::ErrorCode errorCode )
     emit storageSavingDone(reqID, errorCode);
 }
 
-/*
-void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &storages)
-{
-    m_storages = storages;
-}
-*/
-
-// --------------------------------------------------
-
-/*
-class TestConnectionTask: public QRunnable
-{
-public:
-    TestConnectionTask(QnMediaServerResourcePtr owner, const QUrl& url): m_owner(owner), m_url(url) {}
-
-    void run()
-    {
-        QnHTTPRawResponse response;
-        QnSessionManager::instance()->sendGetRequest(m_url.toString(), QLatin1String("ping"), QnRequestHeaderList(), QnRequestParamList(), response);
-        QByteArray guid = m_owner->getGuid().toUtf8();
-        if (response.data.contains("Requested method is absent") || response.data.contains(guid))
-        {
-            // server OK
-            m_owner->setPrimaryIF(m_url.host());
-        }
-    }
-private:
-    QnMediaServerResourcePtr m_owner;
-    QUrl m_url;
-};
-*/
-
 void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
 {
     QString apiScheme = QUrl(getApiUrl()).scheme();
@@ -309,7 +279,13 @@ Qn::ServerFlags QnMediaServerResource::getServerFlags() const
 
 void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
 {
-    m_serverFlags = flags;
+    {
+        QMutexLocker lock(&m_mutex);
+        if (flags == m_serverFlags)
+            return;
+        m_serverFlags = flags;
+    }
+    emit serverFlagsChanged(::toSharedPointer(this));
 }
 
 QnAbstractStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
@@ -444,10 +420,11 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
 
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     QnModuleInformation moduleInformation;
-    moduleInformation.type = nxMediaServerId;
+    moduleInformation.type = QnModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.sslAllowed = false;
     moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
+    moduleInformation.name = getName();
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
     
@@ -456,9 +433,9 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
-    moduleInformation.name = getName();
     moduleInformation.port = QUrl(m_apiUrl).port();
     moduleInformation.id = getId();
+    moduleInformation.flags = getServerFlags();
 
     return moduleInformation;
 }

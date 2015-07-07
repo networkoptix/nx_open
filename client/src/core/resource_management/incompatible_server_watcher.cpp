@@ -1,6 +1,6 @@
 #include "incompatible_server_watcher.h"
 
-#include <api/app_server_connection.h>
+#include <api/common_message_processor.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/common/log.h>
@@ -57,16 +57,14 @@ QnIncompatibleServerWatcher::~QnIncompatibleServerWatcher() {
 }
 
 void QnIncompatibleServerWatcher::start() {
-    connect(QnAppServerConnectionFactory::getConnection2()->getMiscManager().get(), &ec2::AbstractMiscManager::moduleChanged, this, &QnIncompatibleServerWatcher::at_moduleChanged);
+    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::moduleChanged, this, &QnIncompatibleServerWatcher::at_moduleChanged);
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
     connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
 }
 
 void QnIncompatibleServerWatcher::stop() {
-    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
-    if (connection)
-        disconnect(connection->getMiscManager().get(), 0, this, 0);
+    disconnect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::moduleChanged, this, &QnIncompatibleServerWatcher::at_moduleChanged);
     disconnect(qnResPool, 0, this, 0);
 
     QList<QnUuid> ids;
@@ -197,6 +195,8 @@ void QnIncompatibleServerWatcher::addResource(const QnModuleInformationWithAddre
         // update the resource
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
+        if (!server)
+            return;
         updateServer(server, moduleInformation);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")

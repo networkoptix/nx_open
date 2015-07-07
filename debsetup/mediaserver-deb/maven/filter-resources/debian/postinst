@@ -40,13 +40,14 @@ PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
 CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
+STATISTICS_REPORT_ALLOWED_DEFAULT=true
 
 function is_local_addr {
     local hostname=$1;
     local addr=$(gethostip -d $hostname)
 
     if [ $? -ne 0 ]; then
-	addr=$hostname
+    addr=$hostname
     fi
 
     [[ "$addr" =~ ^127.[0-9]+.[0-9]+.[0-9]+$ ]] && return 0
@@ -186,6 +187,11 @@ case "$1" in
             [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
             CAMERA_SETTINGS_OPTIMIZATION=$(ask_for_value cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION")
             $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
+
+            STATISTICS_REPORT_ALLOWED="$($CFG_HELPER statisticsReportAllowed)"
+            [ -z "$STATISTICS_REPORT_ALLOWED" ] && STATISTICS_REPORT_ALLOWED=$STATISTICS_REPORT_ALLOWED_DEFAULT
+            STATISTICS_REPORT_ALLOWED=$(ask_for_value statisticsReportAllowed "$STATISTICS_REPORT_ALLOWED")
+            $CFG_HELPER statisticsReportAllowed "$STATISTICS_REPORT_ALLOWED"
         else
             PORT="$($CFG_HELPER port)"
             [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
@@ -199,6 +205,15 @@ case "$1" in
             [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$($EC_CFG_HELPER allowCameraChanges)
             [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
             $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
+        fi
+
+        EC_GUID="$($EC_CFG_HELPER ecsGuid)"
+        [ -n "$EC_GUID" ] && $CFG_HELPER ecsGuid "$EC_GUID"
+
+
+        if [ -d $EC_DIR/var/hostedfiles -a ! -d $BASE_DIR/var/vms_storedfiles ]; then
+            [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var
+            mv $EC_DIR/var/hostedfiles $BASE_DIR/var/vms_storedfiles
         fi
 
         "$CERTGEN" -i
@@ -221,7 +236,7 @@ case "$1" in
 esac
 
 if [ -e "/etc/init/$COMPANY_NAME-mediaserver.conf" ]; then
-	invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?
+    invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?
 fi
 update-rc.d -f $COMPANY_NAME-mediaserver remove >/dev/null || exit $?
 

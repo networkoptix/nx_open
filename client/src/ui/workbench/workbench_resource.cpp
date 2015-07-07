@@ -82,7 +82,7 @@ namespace {
             }
 
             if(fromOtherApp) {
-                resource = qnResPool->getResourceByUniqId(uniqueId);
+                resource = qnResPool->getResourceByUniqueId(uniqueId);
                 if(resource) {
                     result.push_back(resource);
                     continue;

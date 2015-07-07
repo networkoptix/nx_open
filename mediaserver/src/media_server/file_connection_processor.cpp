@@ -29,8 +29,8 @@ struct HttpContentTypes
 
 static HttpContentTypes contentTypes[] =
 {
-    { "html", "text/html; charset=iso-8859-1"},
-    { "htm",  "text/html; charset=iso-8859-1"},
+    { "html", "text/html; charset=utf-8"},
+    { "htm",  "text/html; charset=utf-8"},
     { "css",  "text/css"},
     { "js",   "application/javascript"},
     { "json", "application/json"},

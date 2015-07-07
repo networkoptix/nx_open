@@ -56,8 +56,8 @@ win* {
   OUTPUT_PATH = ${libdir}/${arch}
 } else {
   OUTPUT_PATH = ${libdir}
-}  
-    
+}
+
 isEmpty(BUILDLIB) {
   DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
 } else {
@@ -113,39 +113,33 @@ CONFIG += ${arch}
 
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
-  ICON = ${customization.dir}/icons/hdw_logo.ico	
+  ICON = ${customization.dir}/icons/hdw_logo.ico
   LIBS += ${windows.oslibs}
-  DEFINES += ${windows.defines}  
-  DEFINES += ${global.windows.defines}  
+  DEFINES += ${windows.defines}
+  DEFINES += ${global.windows.defines}
   win32-msvc* {
     # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj
-	# /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
-	QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
-	QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF 
+    # /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
+    QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
+    QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF
     QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
   }
-  
+
   !staticlib {
     DEFINES += QN_EXPORT=Q_DECL_EXPORT
   }
   else {
     DEFINES += QN_EXPORT=
   }
-  
+
   QMAKE_MOC_OPTIONS += -DQ_OS_WIN
 }
 
 ## BOTH LINUX AND MAC
 unix: {
-  DEFINES += override=
-  DEFINES += QN_EXPORT=  
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Wuninitialized
-  arm {
-    QMAKE_CXXFLAGS += -std=c++0x 
-  } else {
-    QMAKE_CXXFLAGS += -std=c++11
-  }
+  DEFINES += QN_EXPORT=
+  QMAKE_CXXFLAGS += -std=c++11 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Wuninitialized
 }
 
 ## LINUX
@@ -164,7 +158,7 @@ unix:!mac {
   } else {
     LIBS -= -lssl
     LIBS += ${linux.arm.oslibs}
-  } 
+  }
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX

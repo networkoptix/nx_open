@@ -26,16 +26,28 @@ public:
 
     virtual QnResourceList findResources(void) override;
 
-    void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, const QString& userName, const QString &userId);
+    void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, 
+		                const QString& userName, const QString &userId);
 
-    TCPSocketPtr getConnectionByUserId(const QString& userId);
+    
     quint32 incCSeq(const TCPSocketPtr& socket);
+
+    TCPSocketPtr acquireConnection(const QString& userId);
     void releaseConnection(const TCPSocketPtr& socket);
 
     virtual bool isVirtualResource() const override { return true; }
 
     /** Check if camera really connected to our server. */
     bool isCameraConnected(const QnVirtualCameraResourcePtr &camera);
+
+private:
+    void cleanupConnections();
+
+    /**
+     * Check if this uniqueId is present in the connections list.
+     * Does NOT lock the mutex.
+     */
+    bool isClientConnectedInternal(const QString &uniqueId) const;
 private:
     struct ClientConnectionInfo
     {
@@ -58,8 +70,9 @@ private:
 
     QList<ClientConnectionInfo> m_connections;
     QMutex m_mutex;
+
 private:
-    void cleanupConnections();
+    void log(const QByteArray &message, const ClientConnectionInfo &info) const;
 };
 
 #endif //ENABLE_DESKTOP_CAMERA

@@ -27,6 +27,13 @@
 
         {
             "keys": [
+                "DW|*"
+            ],
+            "bitratePerGOP": true
+        },
+
+        {
+            "keys": [
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04",
                 "Avigilon|ENC-*"

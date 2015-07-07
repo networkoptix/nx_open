@@ -69,6 +69,33 @@ namespace {
 
 } // anonymous namespace
 
+/************************************************************************/
+/* QnEcData                                                             */
+/************************************************************************/
+
+QnLoginDialog::QnEcData::QnEcData() : 
+    protoVersion(0)
+{
+}
+
+bool QnLoginDialog::QnEcData::operator==(const QnEcData& other) const {
+    return 
+           id == other.id 
+        && url == other.url 
+        && version == other.version 
+        && protoVersion == other.protoVersion
+        && systemName == other.systemName
+        && brand == other.brand
+        ;
+}
+
+bool QnLoginDialog::QnEcData::operator!=(const QnEcData& other) const {
+    return !(*this == other);
+}
+
+/************************************************************************/
+/* QnLoginDialog                                                        */
+/************************************************************************/
 
 QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
@@ -288,8 +315,6 @@ void QnLoginDialog::resetSavedSessionsModel() {
 }
 
 void QnLoginDialog::resetAutoFoundConnectionsModel() {
-    QnCompatibilityChecker checker(localCompatibilityItems());
-
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
     if (m_foundEcs.size() == 0) {
         QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
@@ -299,10 +324,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
         foreach (const QnEcData& data, m_foundEcs) {
             QUrl url = data.url;
 
-            QnSoftwareVersion ecVersion(data.version);
-            bool isCompatible = checker.isCompatible(lit("Client"), qnCommon->engineVersion(),
-                                                     lit("ECS"),    ecVersion);
-
+            bool isCompatible = QnConnectionDiagnosticsHelper::validateConnectionLight(data.brand, data.version, data.protoVersion) == QnConnectionDiagnosticsHelper::Result::Success;
 
             QString title;
             if (!data.systemName.isEmpty())
@@ -310,7 +332,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
             else
                 title = lit("%1:%2").arg(url.host()).arg(url.port());
             if (!isCompatible)
-                title += lit(" (v%3)").arg(ecVersion.toString(QnSoftwareVersion::MinorFormat));
+                title += lit(" (v%3)").arg(data.version.toString(QnSoftwareVersion::MinorFormat));
 
             QStandardItem* item = new QStandardItem(title);
             item->setData(url, Qn::UrlRole);
@@ -502,13 +524,17 @@ void QnLoginDialog::at_deleteButton_clicked() {
 void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     QSet<SocketAddress> addresses = QnModuleFinder::instance()->moduleAddresses(moduleInformation.id);
 
-    if (addresses.isEmpty())
+    if (addresses.isEmpty()) {
+        at_moduleFinder_moduleLost(moduleInformation);
         return;
+    }
 
     QnEcData data;
     data.id = moduleInformation.id;
-    data.version = moduleInformation.version.toString();
+    data.version = moduleInformation.version;
+    data.protoVersion = moduleInformation.protoVersion;
     data.systemName = moduleInformation.systemName;
+    data.brand = moduleInformation.customization;
 
     /* prefer localhost */
     SocketAddress address = SocketAddress(QHostAddress(QHostAddress::LocalHost).toString(), moduleInformation.port);
@@ -519,8 +545,8 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
     data.url.setHost(address.address.toString());
     data.url.setPort(address.port);
 
-    QnEcData &oldData = m_foundEcs[moduleInformation.id];
-    if (!oldData.id.isNull()) {
+    if (m_foundEcs.contains(moduleInformation.id)) {
+        QnEcData &oldData = m_foundEcs[moduleInformation.id];
         if (!QHostAddress(address.address.toString()).isLoopback() && addresses.contains(oldData.url.host()))
             data.url.setHost(oldData.url.host());
 
@@ -529,7 +555,7 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
             resetAutoFoundConnectionsModel();
         }
     } else {
-        oldData = data;
+        m_foundEcs.insert(moduleInformation.id, data);
         resetAutoFoundConnectionsModel();
     }
 }

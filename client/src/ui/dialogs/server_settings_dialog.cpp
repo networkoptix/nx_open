@@ -55,6 +55,7 @@ namespace {
     const int TotalSpaceRole = Qt::UserRole + 2;
     const int StorageIdRole = Qt::UserRole + 3;
     const int ExternalRole = Qt::UserRole + 4;
+    const int StorageType = Qt::UserRole + 5;
 
     enum Column {
         CheckBoxColumn,
@@ -131,6 +132,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 #endif
 
     setWarningStyle(ui->failoverWarningLabel);
+    setWarningStyle(ui->storagesWarningLabel);
+    ui->storagesWarningLabel->hide();
 
     /* Edge servers cannot be renamed. */
     ui->nameLineEdit->setReadOnly(QnMediaServerResource::isEdgeServer(server));
@@ -220,6 +223,8 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     checkBoxItem->setCheckState(item.isUsedForWriting ? Qt::Checked : Qt::Unchecked);
     checkBoxItem->setData(StorageIdRole, QVariant::fromValue<QnUuid>(item.storageId));
     checkBoxItem->setData(ExternalRole, item.isExternal);
+    checkBoxItem->setData(StorageType, item.storageType);
+    m_initialStorageCheckStates[row] = checkBoxItem->checkState() == Qt::Checked;
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -263,6 +268,7 @@ void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &item
     QString bottomLabelText = this->bottomLabelText();
 
     ui->storagesTable->setRowCount(0);
+    m_initialStorageCheckStates.resize(items.count());
     foreach(const QnStorageSpaceData &item, items)
         addTableItem(item);
 
@@ -285,6 +291,7 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
+    result.storageType = checkBoxItem->data(StorageType).value<QString>();
     result.storageId = checkBoxItem->data(StorageIdRole).value<QnUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
@@ -376,6 +383,7 @@ void QnServerSettingsDialog::submitToResources()
                 storage->setUrl(item.url);
                 storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
                 storage->setUsedForWriting(item.isUsedForWriting);
+                storage->setStorageType(item.storageType);
                 newStorages.push_back(storage);
             }
         }
@@ -462,8 +470,13 @@ void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
 }
 
 void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
-    Q_UNUSED(column)
-    Q_UNUSED(row)
+    if (column == CheckBoxColumn) {
+        if (QTableWidgetItem *item = ui->storagesTable->item(row, column)) {
+            bool checked = item->checkState() == Qt::Checked;
+            if (!checked && m_initialStorageCheckStates[row])
+                ui->storagesWarningLabel->show();
+        }
+    }
 
     m_hasStorageChanges = true;
 }
@@ -537,18 +550,17 @@ void QnServerSettingsDialog::updateRebuildUi(const QnStorageScanData& reply) {
      m_rebuildState = reply;
 
      ui->rebuildGroupBox->setEnabled(reply.state != Qn::RebuildState_Unknown);
-     //TODO: #TR #gdm remove trailing spaces from messages
      QString status;
      if (!reply.path.isEmpty()) {
          if (reply.state == Qn::RebuildState_FullScan)
-            status = tr("Rebuild archive index for storage '%1' in progress").arg(reply.path);
+            status = tr("Rebuild archive index for storage '%1' is in progress").arg(reply.path);
          else if (reply.state == Qn::RebuildState_PartialScan)
-             status = tr("Fast archive scan for storage '%1' in progress ").arg(reply.path);
+             status = tr("Fast archive scan for storage '%1' is in progress").arg(reply.path);
      }
      else if (reply.state == Qn::RebuildState_FullScan)
-         status = tr("Rebuild archive index for storage '%1' in progress").arg(reply.path);
+         status = tr("Rebuild archive index for storage '%1' is in progress").arg(reply.path);
      else if (reply.state == Qn::RebuildState_PartialScan)
-         status = tr("Fast archive scan for storage '%1' in progress ").arg(reply.path);
+         status = tr("Fast archive scan for storage '%1' is in progress").arg(reply.path);
      
      ui->rebuildStatusLabel->setText(status);
          

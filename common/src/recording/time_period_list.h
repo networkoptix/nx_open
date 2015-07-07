@@ -125,7 +125,7 @@ public:
     qint64 roundTimeToPeriodUSec(qint64 timeUsec, bool searchForward) const;
 
     /** Merge some time period lists into one. */
-    static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
+    static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods, int limit = INT_MAX);
 
     /** Update tail of the period list with provided tail.
      * 

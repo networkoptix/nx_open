@@ -1,58 +1,60 @@
+----------------------------------------------2.3.2.xxxx------------------------------------------
+
 Features:
-5575(?) - Added embedded help to app
+Feature #5301 - Gathering statistics about product usage
+Feature #5507 - 41_Nx1 Config Utility
+Feature #5051 - Optional server auto discovery. "Enable cameras auto-duscovery" was renamed to "Enable cameras and servers auto-duscovery"
+Feature #5767 - Autoupdates: multiple servers support
+Feature #5716,5537 - Introduced NX1
+Feature #5618 - expert tab setting for cameras with kbpGOP target bitrate
+Task #5764 -  Windows 10 support
 
 Improvements:
-5276 - Perform fast archive scan if storage was mounted after server startup
-5397 - Allow to add RTSP link event if non RTSP camera with same IP/port already exists
-4577 - Improved DB synchronization betweeen servers
-5480 - Timeline optimization
-5431 - Improved update timeouts
-5340, 5335 - Improved mediaserver start up
+Feature #5757 - Merge system dialog renaming
+Feature #4041 - Auto updates. Add a proper warning if there isn't enough free space on C:
+Feature #5683 - Login page for strange requests
+Feature #5621 - WA, server API. Add additional tag for second level header.
+Feature #5581 - Added some changes to reduce CPU usage of ISD.
+Feature #5580 - Archive reindex should start form the place it was over
+Feature #5548 - Proxy reverse connection mediaserver-mediaserver by request
+Feature #5534 - Default system password should be "admin"
+Feature #5517 - Add warning to "Server Settings" about storage usage
+Feature #5750 - add some text to bad video card warning
 
-Bug Fixes:
-5338 - User cannot see green chunks in full screen.
-5344 - HTTP streaming for android doesn't work
-5327, 5511,  - Introduced proper HTTP tunneling for server <-> server and server <-> client connections to be antivirus- and firewall- friendly
-4920 - !DOCTYPE is shown on the web page above the header
-5392 - Web-admin. Cannot expand tree on API.
-5407 - Deadlock on linux x86. 
-5396 - Deleted camera may appear again inspite of "do not discovery cameras" setting
-5409, 5410 - Server crashes on rebuilding archive on Windows Server 2008 if remote storage was added with credentials
-5428 - Camera stops in wrong positions during PTZ tour
-5314 - Deadlock when stopping server. Fixed.
-4729 - Some Servers disappear from "Updates" form while updating to incompatible version. Fixed.
-5525 - Chunks for VMAX archive isn't shown. Fixed.
-5524 - Motion archive is deleted if storage is temporary offline. Fixed.
-5493 - Layout's background is lost after migration from 2.2.1 to 2.3
-5530 - VMAX: certain scenario leads to 'No signal' at the functioning streams.
-5417 - Recording didn't start if multicast stop working
-5557 - Email settings are being erased after client restart
-5553 - Fixed some misprints on API
-5434 - High fps of secondary stream on Axis camera.
-5442 - Cannot merge two systems with the same user name.
-5490 - Invalid supported motion type for ONVIF cameras with disabled secondary stream.
-5582 - For some Arecont Vision panoramic cameras zoom window takes 4 items at the scene instead of one
-5591 - Backup should be created on both sides before systems merge
-5578 - Do not control camera settings works wrong
-5401 - Too many requests for checking manual cameras
-- fixed secondary stream for camera PSIA | 3516F0
-- onvif fix: do not strict resolution list if camera sensor size is 0x0
-5559 - Client's memory usage is over 12 Gb while playing local files
+Bugs:
+Bug #4011 - Video wall. Hide and auto-remove auto-created videowall layouts.
+Bug #5565 - Timeline twitches on speed changing from 1x to -1x and back
+Bug #5583 - If user disables all addresses from the specific subnet, servers from this subnet should go offline
+Bug #5608 - AVI export from AV20185 panoramic is broken.
+Bug #5584 - Http-link is not available after camera's reboot
+Bug #5731 - built-in motion jpeg stream reader returns incorrect resolution for video frames
+Bug #5747 - Authentication issue if server time has been changed
+Bug #5749 - Server should not send multicast packets for cameras discovery if enable camera auto discovery is disabled and server has no failover enabled or only one server in the system.
+Bug #5766 - Login dialog displays servers with different protocol version as compatible
+Bug #5784 - Fixed small memory leak in client
 
------DW---------------------
-- Fixed bitrate for DW cameras
 
-----Vista------------------
-4703 - Client Opens on Correct Monitor if two monitors are used but when more than two monitors its incorrect
-5220 - Added "Absolute Positioning" on Samsung PTZ unit (SNP-6321, SNP-5430)
-5145 - Added input for avigilon cameras
-5190 - Have to press the "AF" button twice before it works
-5230 - Alarm input not discovered on Samsung SNO-6011RP
 ----------------------------------------------2.3.1.xxxx-------------------------------------------
+
+
+
+
+
 Features:
 5389 - Edge Introduced
 
 Improvements:
+5575 - Embedded Client User Manual is returned back
+5276 - Perform fast archive scan if storage was mounted after server startup
+5397 - Allow to add RTSP link event if non RTSP camera with same IP/port already exists
+4577 - Improved DB synchronization betweeen servers: system can handle much more servers.
+5480 - Archive is drawn much faster on the timeline
+5340, 5335 - Mediaserver starts up faster
+5559 - Client's memory usage is optimized when playing back local files) (too much memory was consumed on certain files)
+5401 - Onvif improvement: fixed secondary stream for camera PSIA | 3516F0
+5220 - Added "Absolute Positioning" on Samsung PTZ unit (SNP-6321, SNP-5430)
+5145 - Added input for avigilon cameras
+5230 - Alarm input not discovered on Samsung SNO-6011RP
 3252 - New version notification is displayed to administrators only
 5255 - "Disable automatic update popup" check box is introduced on System administration -> general. This will suppress update notifications
 5318 - Dewarping on local files. User can export footage from a fish-eye camera and then apply Dewarping when viewing
@@ -82,6 +84,42 @@ Bug Fixes:
 5214 - MAC OS - Update notification popped up even if all components were of the same latest version. Fixed
 5341 - In rare cases Split/Merge Systems worked incorrectly if servers were accessing each other via Public IP (Client could not reconnect). Fixed
 5357 - Sometimes incorrect firmware versions was displayed (if a firmware was upgraded after the camera was discovered). Fixed
+5431 - On slow computers update could take a long and resulted in timeout. Timeout is increased.
+5338 - Sometimes archive wasn't visible on timeline but user could navigate through it
+5344 - Fixed HTTP streaming for android
+5327, 5511, - System is antivirus- and firewall- friendly (Introduced proper HTTP tunneling for server <-> server and server <-> client connections)
+4920 - Removed debug text that was shown on the Server web page above the header (Ubuntu+Firefox only)
+5392 - Web-admin. Fixed the issue with the tree that could not be expanded (API page).
+5396 - Deleted camera could appear again in spite of "do not discovery cameras" setting had been set. Fixed
+5409, 5410 - Fixed the Server crash when rebuilding archive on password-protected remote storages (Windows Server 2008)
+5428 - Sometimes camera was stopping in wrong positions during PTZ tour. Fixed
+4729 - Sometimes Servers were disappearing from "Updates" form while updating to an incompatible version. Fixed.
+5524 - Motion data could be lost if storage went offline temporary. Fixed.
+5493 - Layouts' background might be lost during migration from 2.2.1 to 2.3. Fixed: it is necessary to update 2.2.1 to 2.3.1 to keep this data
+5557 - Server Email settings were sometimes erased after client restart
+5553 - Server Admin page: some fixes in API documentation.
+5434 - Sometimes too high fps was configured on secondary stream on Axis cameras. Fixed
+5442 - Fixed the issue when it was impossible to merge two systems with the same user name.
+5490 - If disable and re-enable secndary stream in Expert settings after camera initializatrion, Software motion could not be configured. Fixed
+5582 - For some Arecont Vision panoramic cameras zoom window takes 4 cells at the scene instead of one. Fixed
+5578 - "Do not control camera settings" option worked only after recording on this camera had been restored. Fixed
+4703 - Client Opens on Correct Monitor if two monitors are used but when more than two monitors its incorrect
+
+-----DW---------------------
+- Fixed bitrate for DW cameras
+ - Improvements to DW MEGApix® IP cameras’ recording bit rate.
+ - Live and Playback issues for DW VMAX Flex™ and VMAX 960H™ DVRs have been resolved.
+ 
+----Vista------------------
+5190 - Had to press the "AF" button twice before it works. Fixed
+
+----------------------------------------------Add All Felease Notes for Patches------------------
+
+----------------------------------------------2.3.0.8388-------------------------------------------
+ - Lost video streams from manually added cameras after moving between servers fixed.
+ - auto-discovered cameras not returning to online status after server restart fixed.
+ - NAS/Windows Server memory leak fixed.
+ - Secondary stream problems resolved.
 
 ----------------------------------------------2.3.0.8344-------------------------------------------
 March 30, 2015
