@@ -1106,6 +1106,7 @@ void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
 {
     if (m_alivePeers.contains(peer.id)) 
         return;
+    m_delayedAliveTran.remove(peer.id); // it's expected new tran about peer state if we connected / reconnected. drop previous (probably offline) tran
     addAlivePeerInfo(peer, peer.id, 0);
     handlePeerAliveChanged(peer, true, false);
 }
