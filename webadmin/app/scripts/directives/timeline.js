@@ -26,28 +26,38 @@ angular.module('webadminApp')
                     timelineBgColor: [28,35,39], //Color for ruler marks and labels
                     font:'Roboto',//'sans-serif',
 
-                    labelPadding: 2,
+                    labelPadding: 10,
                     lineWidth: 1,
 
                     topLabelAlign: "center", // center, left, above
-                    topLabelHeight: 20/110, //% // Size for top label text
-                    topLabelFontSize: 12, //px // Font size
-                    topLabelTextColor: [255,255,255], // Color for text for top labels
-                    topLabelMarkerColor: [105,135,150], // Color for mark for top label
+                    topLabelHeight: 30/110, //% // Size for top label text
+                    topLabelFont:{
+                        size:17,
+                        weight:400,
+                        face:"Roboto",
+                        color: [255,255,255], // Color for text for top labels
+                    },
+                    topLabelMarkerColor: [83,112,127], // Color for mark for top label
                     topLabelBgColor: false,
+                    topLabelPositionFix:0, //Vertical fix for position
 
                     labelAlign:"above",// center, left, above
-                    labelHeight:35/110, // %
-                    labelFontSize: 12, // px
-                    labelTextColor: [105,135,150],
+                    labelHeight:25/110, // %
+                    labelFont:{
+                        size:15,
+                        weight:400,
+                        face:"Roboto",
+                        color: [105,135,150], // Color for text for top labels
+                    },
                     labelMarkerColor:[28,35,39],//false
                     labelBgColor: [28,35,39],
+                    labelPositionFix:-5, //Vertical fix for position
 
                     chunkHeight:35/110, // %    //Height for event line
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
-                    loadingChunkColor: [58,145,30,0.8],
+                    loadingChunkColor: [58,145,30],
 
                     scrollBarSpeed: 0.1, // By default - scroll by 10%
                     scrollBarHeight: 20/110, // %
@@ -60,7 +70,11 @@ angular.module('webadminApp')
                     timeMarkerTextColor: [0,0,0],
                     pointerMarkerColor: [0,0,0], // Mouse pointer marker color
                     pointerMarkerTextColor: [255,255,255],
-                    markerFontSize:12,
+                    markerFont:{
+                        size:12,
+                        weight:400,
+                        face:"Roboto"
+                    },
                     markerWidth: 120,
                     markerHeight: 45/110,
                     markerTriangleHeight: 10/110,
@@ -77,38 +91,26 @@ angular.module('webadminApp')
 
                 scope.presets = [{
                     topLabelAlign: "left", // center, left, above
-                    topLabelFontSize: 12, //px // Font size
-                    topLabelTextColor: [255,255,255], // Color for text for top labels
                     topLabelMarkerColor: [105,135,150], // Color for mark for top label
                     topLabelBgColor: false,
 
                     labelAlign:"left",// center, left, above
-                    labelFontSize: 12, // px
-                    labelTextColor: [105,135,150],
-                    labelMarkerColor:[105,135,150],//false
+                    labelMarkerColor:[53,70,79],//false
                     labelBgColor: [28,35,39]
                 },{
                     topLabelAlign: "center", // center, left, above
-                    topLabelFontSize: 12, //px // Font size
-                    topLabelTextColor: [255,255,255], // Color for text for top labels
                     topLabelMarkerColor: [105,135,150], // Color for mark for top label
                     topLabelBgColor: false,
 
                     labelAlign:"above",// center, left, above
-                    labelFontSize: 12, // px
-                    labelTextColor: [105,135,150],
                     labelMarkerColor:[28,35,39],//false
                     labelBgColor: [28,35,39]
                 },{
                     topLabelAlign: "left", // center, left, above
-                    topLabelFontSize: 12, //px // Font size
-                    topLabelTextColor: [255,255,255], // Color for text for top labels
                     topLabelMarkerColor: [105,135,150], // Color for mark for top label
                     topLabelBgColor: false,
 
                     labelAlign:"above",// center, left, above
-                    labelFontSize: 12, // px
-                    labelTextColor: [105,135,150],
                     labelMarkerColor:[28,35,39],//false
                     labelBgColor: [28,35,39]
                 }];
@@ -236,11 +238,20 @@ angular.module('webadminApp')
                         });
                     }
 
-                    drawLabelsRow(context, currentTopLabelLevelIndex,targetTopLabelLevelIndex,
+                    drawLabelsRow(context,
+                        currentTopLabelLevelIndex,
+                        targetTopLabelLevelIndex,
                         scope.changingTopLevel,
-                        "topFormat", 0, timelineConfig.topLabelHeight,timelineConfig.topLabelFontSize, timelineConfig.topLabelAlign,
-                        timelineConfig.topLabelTextColor, timelineConfig.topLabelBgColor,
-                        timelineConfig.topLabelMarkerColor, 0, timelineConfig.topLabelHeight + timelineConfig.labelHeight);
+                        "topFormat",
+                        0,
+                        timelineConfig.topLabelHeight,
+                        timelineConfig.topLabelFont,
+                        timelineConfig.topLabelAlign,
+                        timelineConfig.topLabelBgColor,
+                        timelineConfig.topLabelMarkerColor,
+                        timelineConfig.topLabelPositionFix,
+                        0,
+                        timelineConfig.topLabelHeight + timelineConfig.labelHeight);
                 }
 
                 var currentLabelLevelIndex = 0;
@@ -257,17 +268,27 @@ angular.module('webadminApp')
                     }
 
 
-                    drawLabelsRow(context, currentLabelLevelIndex,targetLabelLevelIndex,
+                    drawLabelsRow(
+                        context,
+                        currentLabelLevelIndex,
+                        targetLabelLevelIndex,
                         scope.changingLevel,
-                        "format", timelineConfig.topLabelHeight, timelineConfig.labelHeight,timelineConfig.labelFontSize, timelineConfig.labelAlign,
-                        timelineConfig.labelTextColor, timelineConfig.labelBgColor,
+                        "format",
+                        timelineConfig.topLabelHeight,
+                        timelineConfig.labelHeight,
+                        timelineConfig.labelFont,
+                        timelineConfig.labelAlign,
+                        timelineConfig.labelBgColor,
                         timelineConfig.labelMarkerColor,
-                            timelineConfig.topLabelHeight + timelineConfig.labelHeight / 2,
-                            timelineConfig.topLabelHeight + timelineConfig.labelHeight );
+                        timelineConfig.labelPositionFix,
+                        timelineConfig.topLabelHeight + timelineConfig.labelHeight / 2,
+                        timelineConfig.topLabelHeight + timelineConfig.labelHeight );
 
                 }
 
-                function drawLabelsRow (context, currentLevelIndex, taretLevelIndex ,animation,labelFormat,levelTop, levelHeight, fontSize, labelAlign, fontColor, bgColor,  markColor, markTop, markBottom){
+                function drawLabelsRow (context, currentLevelIndex, taretLevelIndex, animation,
+                                        labelFormat, levelTop, levelHeight,
+                                        font, labelAlign, bgColor,  markColor, labelPositionFix, markTop, markBottom){
 
                     var levelIndex = Math.max(currentLevelIndex, taretLevelIndex);
                     var level = RulerModel.levels[levelIndex]; // Actual calculating level
@@ -284,25 +305,31 @@ angular.module('webadminApp')
                         }else if(pointLevelIndex > currentLevelIndex){ // fade in
                             alpha =  animation;
                         }
-                        drawLabel(context,start,level,alpha,labelFormat,levelTop, levelHeight, fontSize, labelAlign, fontColor, bgColor,  markColor, markTop, markBottom);
+                        drawLabel(context,start,level,alpha,
+                                        labelFormat, levelTop, levelHeight, font, labelAlign, bgColor,  markColor, labelPositionFix, markTop, markBottom);
                         start = level.interval.addToDate(start);
                     }
                 }
-                function drawLabel( context, date, level, alpha, labelFormat, levelTop, levelHeight, fontSize, labelAlign, fontColor, bgColor,  markColor, markTop, markBottom){
+                function formatFont(font){
+                    return font.weight + " " + font.size + "px " + font.face;
+                }
+                function drawLabel( context, date, level, alpha,
+                                        labelFormat, levelTop, levelHeight, font, labelAlign, bgColor,  markColor, labelPositionFix, markTop, markBottom){
 
-                    var coordinate = scope.scaleManager.dateToScreenCoordinate(date);
+                    context.font = formatFont(font);
 
                     var nextDate = level.interval.addToDate(date);
                     var stopcoordinate = scope.scaleManager.dateToScreenCoordinate(nextDate);
+                    var nextLabel = dateFormat(new Date(nextDate), level[labelFormat]);
+                    var nextWidth = context.measureText(nextLabel).width;
 
+                    var coordinate = scope.scaleManager.dateToScreenCoordinate(date);
                     var label = dateFormat(new Date(date), level[labelFormat]);
-
-                    context.font = fontSize  + 'px ' + timelineConfig.font;
-
                     var textWidth = context.measureText(label).width;
+
                     var textStart = levelTop * scope.viewportHeight // Top border
-                        + (levelHeight * scope.viewportHeight  - fontSize) / 2 // Top padding
-                        + fontSize; // Font size
+                        + (levelHeight * scope.viewportHeight  - font.size) / 2 // Top padding
+                        + font.size + labelPositionFix; // Font size
 
                     var x = 0;
                     switch(labelAlign){
@@ -311,33 +338,29 @@ angular.module('webadminApp')
                             var rightbound = Math.min(stopcoordinate, scope.viewportWidth);
                             var center = (leftbound + rightbound) / 2;
 
-                            x = center - textWidth / 2;
-
-                            if(x < coordinate + timelineConfig.labelPadding){
-                                x = coordinate + timelineConfig.labelPadding;
-                            }
-
-                            if(x > stopcoordinate - textWidth - timelineConfig.labelPadding){
-                                x = stopcoordinate - textWidth - timelineConfig.labelPadding;
-                            }
-
+                            x = scope.scaleManager.bound(
+                                    coordinate + timelineConfig.labelPadding,
+                                    center - textWidth / 2,
+                                    stopcoordinate - textWidth - timelineConfig.labelPadding
+                            );
 
                             break;
 
                         case "left":
                             x = scope.scaleManager.bound(
                                 timelineConfig.labelPadding,
-                                    coordinate + timelineConfig.labelPadding,
-                                    stopcoordinate - textWidth - 2 * timelineConfig.labelPadding
+                                coordinate + timelineConfig.labelPadding,
+                                stopcoordinate - textWidth - timelineConfig.labelPadding
                             );
+
                             break;
 
                         case "above":
                         default:
                             x = scope.scaleManager.bound(
                                 timelineConfig.labelPadding,
-                                    coordinate - textWidth / 2,
-                                    stopcoordinate - textWidth / 2 - 2 * timelineConfig.labelPadding
+                                coordinate - textWidth / 2,
+                                stopcoordinate - nextWidth / 2 - textWidth - timelineConfig.labelPadding
                             );
                             break;
                     }
@@ -353,13 +376,12 @@ angular.module('webadminApp')
 
                     if(bgColor) {
                         context.fillStyle = blurColor(bgColor, alpha);
-                        context.fillRect(x, textStart - fontSize, x + textWidth, fontSize);
+                        context.fillRect(x, textStart - font.size, x + textWidth, font.size);
                     }
 
-                    context.fillStyle = blurColor(fontColor, alpha);
+                    context.fillStyle = blurColor(font.color, alpha);
                     context.fillText(label, x, textStart);
                 }
-
 
                 // !!! Draw events
                 function drawEvents(context){
@@ -420,7 +442,7 @@ angular.module('webadminApp')
                         context.fillStyle = mouseInScrollbar ? blurColor(timelineConfig.scrollBarHighlightColor, 1) : blurColor(timelineConfig.scrollBarColor, 1);
                         context.fillRect(startCoordinate, top, scrollBarWidth, timelineConfig.scrollBarHeight * scope.viewportHeight);
                     }else{
-                        if(mouseInScrollbar){
+                        if(mouseInScrollbar || catchScrollBar){
                             mouseInScrollbar = mouseCoordinate - startCoordinate;
                         }
                         if(mouseInScrollbarRow){
@@ -492,12 +514,12 @@ angular.module('webadminApp')
 
                     // Labels
                     context.fillStyle = blurColor(textColor,1);
-                    context.font = timelineConfig.markerFontSize  + 'px ' + timelineConfig.font;
+                    context.font = formatFont(timelineConfig.markerFont);
                     coordinate = startCoord + timelineConfig.markerWidth /2; // Set actual center of the marker
 
                     var dateString = dateFormat(date, timelineConfig.dateFormat);
                     var dateWidth = context.measureText(dateString).width;
-                    var textStart = (height - timelineConfig.markerFontSize) / 2;
+                    var textStart = (height - timelineConfig.markerFont.size) / 2;
                     context.fillText(dateString,coordinate - dateWidth/2, textStart);
 
                     dateString = dateFormat(date, timelineConfig.timeFormat);
@@ -514,7 +536,6 @@ angular.module('webadminApp')
                 var mouseInScrollbar = false;
                 var mouseInScrollbarRow = false;
                 var catchScrollBar = false;
-
 
                 function updateMouseCoordinate( event){
                     if(!event){
@@ -612,16 +633,14 @@ angular.module('webadminApp')
                 };
                 scope.mouseLeave = function(event){
                     updateMouseCoordinate(null);
-                    console.log("mouse leave - stop drag and drop");
                 };
                 scope.mouseMove = function(event){
                     updateMouseCoordinate(event);
-                    if(mouseInScrollbar && catchScrollBar){
+                    if(catchScrollBar){
                         var moveScroll = mouseInScrollbar - catchScrollBar;
                         scope.scaleManager.scrollBy( moveScroll / scope.viewportWidth );
                     }
                 };
-
                 scope.mouseDown = function(event){
                     updateMouseCoordinate(event);
                     catchScrollBar = mouseInScrollbar;

@@ -141,36 +141,36 @@ var RulerModel = {
      * @type {{detailization: number}[]}
      */
     levels: [
-        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy' , width: 25 , topWidth: 0, topFormat:'yyyy' }, // root
-        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy' , width: 25 },
+        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy' , width: 30 , topWidth: 0, topFormat:'yyyy' }, // root
+        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy' , width: 30 },
         {
             name:'Year', //Years
             format:'yyyy',//Format string for date
             interval:  new Interval(0,0,0,0,0,0,1),// Interval for marks
-            width: 25, // Minimal width for label. We should choose minimal width in order to not intresect labels on timeline
+            width: 30, // Minimal width for label. We should choose minimal width in order to not intresect labels on timeline
             topWidth: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
-        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , width: 70 },
-        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , width: 70 },
-        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , width: 70 , topWidth: 140, topFormat:'mmmm yyyy'},
+        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , width: 90 },
+        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , width: 90 },
+        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , width: 90 , topWidth: 170, topFormat:'mmmm yyyy'},
         //{ name:'15 Days'    , interval:  new Interval(  0, 0, 0, 0,15, 0, 0), format:'dd'   , width: 60 },
         //{ name:'5 Days'     , interval:  new Interval(  0, 0, 0, 0, 5, 0, 0), format:'dd'   , width: 60 },
-        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , width: 30 , topWidth: 140, topFormat:'d mmmm yyyy' },
-        { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH"h"', width: 60 },
-        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH"h"', width: 60 },
-        { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH"h"', width: 60 },
-        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH"h"', width: 60 },
-        { name:'30 minutes' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', width: 60 },
-        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', width: 60 },
-        { name:'5 minutes'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', width: 60 },
-        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', width: 60 , topWidth: 140, topFormat:'d mmmm yyyy HH:MM' },
-        { name:'30 seconds' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', width: 80 },
-        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', width: 60 },
-        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', width: 50 },
-        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', width: 40 , topWidth: 140, topFormat:'d mmmm yyyy HH:MM:ss' },
-        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', width: 80 },
-        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', width: 60 }
+        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , width: 30 , topWidth: 170, topFormat:'d mmmm yyyy' },
+        { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH"h"', width: 100 },
+        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH"h"', width: 80 },
+        { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH"h"', width: 80 },
+        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH"h"', width: 80 },
+        { name:'30 minutes' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', width: 80 },
+        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', width: 80 },
+        { name:'5 minutes'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', width: 80 },
+        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', width: 80 , topWidth: 170, topFormat:'d mmmm yyyy HH:MM' },
+        { name:'30 seconds' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', width: 100 },
+        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', width: 80 },
+        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', width: 70 },
+        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', width: 60 , topWidth: 200, topFormat:'d mmmm yyyy HH:MM:ss' },
+        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', width: 120 },
+        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', width: 80 }
     ],
 
     getLevelIndex: function(searchdetailization,width){
@@ -744,6 +744,7 @@ ScaleManager.prototype.updateTotalInterval = function(){
 ScaleManager.prototype.setViewportWidth = function(width){ // For initialization and window resize
     this.viewportWidth = width;
     this.updateTotalInterval();
+    this.updateCurrentInterval();
 };
 ScaleManager.prototype.setStart = function(start){// Update the begining end of the timeline. Live mode must be supported here
     this.start = start;
@@ -756,12 +757,13 @@ ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeli
 
 ScaleManager.prototype.bound = function (min,val,max){
     if(min > max){
-        var i = max;
-        max = min;
-        min = i;
+    //    console.warn("screwed bound");
+        // var i = max;
+        // max = min;
+        // min = i;
     }
-    val = Math.min(val,max);
-    return Math.max(val,min);
+    val = Math.max(val,min);
+    return Math.min(val,max);
 };
 ScaleManager.prototype.updateCurrentInterval = function(){
     //Calculate visibleEnd and visibleStart

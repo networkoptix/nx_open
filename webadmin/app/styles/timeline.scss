@@ -5,8 +5,6 @@
   position:relative;
   overflow:hidden;
   height:110px;
-  -webkit-touch-callout: none;
-  user-select: none;
   cursor: default;
 }
 
@@ -98,6 +96,9 @@ ng-include{
 
 .timeline{
   position:relative;
+
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 
@@ -113,6 +114,5 @@ ng-include{
 .timeline-info .timeline-button{
   padding:10px;
   display: inline-block;
-  user-select: none;
   cursor:pointer;
 }
