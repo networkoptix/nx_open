@@ -23,7 +23,6 @@ angular.module('webadminApp')
         };
 
         $scope.logout = function(){
-
             ipCookie.remove('response',{ path: '/' });
             ipCookie.remove('nonce',{ path: '/' });
             ipCookie.remove('realm',{ path: '/' });

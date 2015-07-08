@@ -793,16 +793,29 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.updateLevels();
 };
 
-ScaleManager.prototype.setAnchorDate = function(date){
-    this.setAnchorDateAndPoint(date,this.anchorPoint);
-}
+ScaleManager.prototype.tryToSetLiveDate = function(date){
+    var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
+    if(0 <= targetPoint && targetPoint <= 1){ // Check if date is on screen
+        this.setAnchorDateAndPoint(date, this.anchorPoint);
+    }
+};
+
+ScaleManager.prototype.tryToRestoreAnchorDate = function(date){
+    var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
+    if(0 <= targetPoint && targetPoint <= 1){
+        this.setAnchorDateAndPoint(date, targetPoint);
+    }
+};
+
 ScaleManager.prototype.setAnchorCoordinate = function(coordinate){ // Set anchor date
     this.setAnchorDateAndPoint(this.screenCoordinateToDate(coordinate),coordinate / this.viewportWidth);
 };
 
 ScaleManager.prototype.setAnchorDateAndPoint = function(date,point){ // Set anchor date
     this.anchorDate = date;
-    this.anchorPoint = point;
+    if(typeof(point)!="undefined") {
+        this.anchorPoint = point;
+    }
     this.updateCurrentInterval();
 };
 
@@ -856,7 +869,7 @@ ScaleManager.prototype.dateToScreenCoordinate = function(date){
     return Math.round(this.viewportWidth * (date - this.visibleStart) / (this.visibleEnd - this.visibleStart));
 };
 ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
-    return this.visibleStart + coordinate / this.viewportWidth * (this.visibleEnd - this.visibleStart);
+    return Math.round(this.visibleStart + coordinate / this.viewportWidth * (this.visibleEnd - this.visibleStart));
 };
 
 // Some function for scroll support
@@ -879,16 +892,15 @@ ScaleManager.prototype.scroll = function(value){
     }
     value = this.bound(0,value,1);
     //scroll right or left by relative value - move anchor
-    this.setAnchorDateAndPoint(this.start + value * (this.end-this.start),0.5);
+
+    var achcorDate = this.anchorDate; //Save anchorDate
+    this.setAnchorDateAndPoint(this.start + value * (this.end-this.start),0.5); //Move viewport
+    this.tryToRestoreAnchorDate(achcorDate); //Try to restore anchorDate
 };
 
-ScaleManager.prototype.scrollBy = function(relativeValue){
-    //scroll right or left by relative value - move anchor
-    this.scroll(this.scroll() + relativeValue);
-};
 ScaleManager.prototype.scrollByPixels = function(pixels){
     //scroll right or left by relative value - move anchor date
-    this.scrollBy( pixels / this.viewportWidth * this.getRelativeWidth() );
+    this.scroll(this.scroll() +  pixels / this.viewportWidth * this.getRelativeWidth() );
 };
 
 
@@ -915,4 +927,10 @@ ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (fro
     }
     this.msPerPixel = this.zoomToMs(zoomValue);
     this.updateCurrentInterval();
+};
+ScaleManager.prototype.zoomAroundDate = function(zoomValue, aroundDate){
+    var anchorDate = this.anchorDate;
+    this.tryToRestoreAnchorDate(aroundDate); // try to set new anchorDate
+    this.zoom(zoomValue);                    // zoom and update visible interval
+    this.tryToRestoreAnchorDate(anchorDate); // try to restore anchorDate
 };

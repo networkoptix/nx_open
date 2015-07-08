@@ -182,7 +182,7 @@ angular.module('webadminApp')
                 function drawAll(){
                     scope.scaleManager.setEnd((new Date()).getTime()); // Set right border
                     if(scope.positionProvider) {
-                        scope.scaleManager.setAnchorDate(scope.positionProvider.playedPosition);
+                        scope.scaleManager.tryToSetLiveDate(scope.positionProvider.playedPosition);
                     }
 
                     var context = clearTimeline();
@@ -561,9 +561,12 @@ angular.module('webadminApp')
                     updateMouseCoordinate(event);
                     event.preventDefault();
                     if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
-                        scope.scaleManager.setAnchorCoordinate( mouseCoordinate );// Set position to keep
+                        //scope.scaleManager.setAnchorCoordinate( mouseCoordinate );// Set position to keep
                         if( window.jscd.touch ) {
-                            scope.scaleManager.zoom(scope.scaleManager.zoom() - event.deltaY / timelineConfig.maxVerticalScrollForZoom);
+                            scope.scaleManager.zoomAroundDate(
+                                scope.scaleManager.zoom() - event.deltaY / timelineConfig.maxVerticalScrollForZoom,
+                                scope.scaleManager.screenCoordinateToDate(mouseCoordinate)
+                            );
 
                         }else{
                             // We need to smooth zoom here
@@ -571,7 +574,11 @@ angular.module('webadminApp')
                             var zoomTarget = scope.zoomTarget - event.deltaY / timelineConfig.maxVerticalScrollForZoom;
                             animateScope.animate(scope,"zoomTarget",zoomTarget).then(function(){},function(){},
                                 function(value){
-                                    scope.scaleManager.zoom(value);
+                                    console.log("animate zoom",value,zoomTarget,scope.zoomTarget);
+                                    scope.scaleManager.zoomAroundDate(
+                                        value,
+                                        scope.scaleManager.screenCoordinateToDate(mouseCoordinate)
+                                    );
                                 }
                             );
                         }
@@ -634,7 +641,7 @@ angular.module('webadminApp')
                     updateMouseCoordinate(event);
                     if(catchScrollBar){
                         var moveScroll = mouseInScrollbar - catchScrollBar;
-                        scope.scaleManager.scrollBy( moveScroll / scope.viewportWidth );
+                        scope.scaleManager.scroll( scope.scaleManager.scroll() + moveScroll / scope.viewportWidth );
                     }
                 };
                 scope.mouseDown = function(event){

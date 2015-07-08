@@ -10,7 +10,6 @@ angular.module('webadminApp')
                     return;
                 }
                 function updateValidity(){
-                    console.log("updateValidity",model.$viewValue,scope.$eval(attrs.nxEqualEx));
                     // Only compare values if the second ctrl has a value.
                     if (model.$viewValue !== undefined && model.$viewValue !== '') {
                         model.$setValidity('nxEqualEx', scope.$eval(attrs.nxEqualEx) === model.$viewValue);

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords) {
+    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$sce) {
 
         $scope.cameras = {};
         $scope.activeCamera = null;
@@ -36,28 +36,42 @@ angular.module('webadminApp').controller('ViewCtrl',
                 playing = (new Date()).getTime();
             }
 
+
             if(!$scope.positionProvider){
                 return;
             }
             $scope.positionProvider.init(playing);
             var cameraId = $scope.activeCamera.physicalId;
             var server = getCamerasServer($scope.activeCamera);
-            var serverUrl = mediaserver.mdeiaUrl();
+            var serverUrl = '';
+
 
             if ($scope.settings.id && ($scope.settings.id.replace('{', '').replace('}', '') !== server.id.replace('{', '').replace('}', ''))) {
                 serverUrl = '/proxy/' + getServerUrl(server);
             }
+
+
+            var extParam = '';
+            var mediaDemo = mediaserver.mediaDemo();
+            if(mediaDemo){
+                serverUrl = mediaDemo;
+                extParam = Config.demoAuth;
+
+            }
+
+
+
             var positionMedia = !live ? "&pos=" + (playing) : "";
             var positionHls = !live ? "&startTimestamp=" + (playing) : "";
 
             $scope.acitveVideoSource = [
-                { src: serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia, type: 'video/webm' },
-                { src: serverUrl + '/media/' + cameraId + '.mp4?resolution='    + $scope.activeResolution + positionMedia, type: 'video/mp4' },
-                { src: serverUrl + '/hls/'   + cameraId + '.m3u?resolution='    + $scope.activeResolution + positionHls},
-                { src: serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls},
-                { src: serverUrl + '/media/' + cameraId + '.mpegts?resolution=' + $scope.activeResolution + positionMedia},
-                { src: serverUrl + '/media/' + cameraId + '.3gp?resolution='    + $scope.activeResolution + positionMedia},
-                { src: serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia }
+                { src: $sce.trustAsResourceUrl( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + extParam ), type: 'video/webm' },
+                { src: $sce.trustAsResourceUrl( serverUrl + '/media/' + cameraId + '.mp4?resolution='    + $scope.activeResolution + positionMedia + extParam ), type: 'video/mp4' },
+                { src: $sce.trustAsResourceUrl( serverUrl + '/hls/'   + cameraId + '.m3u?resolution='    + $scope.activeResolution + positionHls   + extParam )},
+                { src: $sce.trustAsResourceUrl( serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls   + extParam )},
+                { src: $sce.trustAsResourceUrl( serverUrl + '/media/' + cameraId + '.mpegts?resolution=' + $scope.activeResolution + positionMedia + extParam )},
+                { src: $sce.trustAsResourceUrl( serverUrl + '/media/' + cameraId + '.3gp?resolution='    + $scope.activeResolution + positionMedia + extParam )},
+                { src: $sce.trustAsResourceUrl( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam )}
             ];
 
             console.log($scope.acitveVideoSource);

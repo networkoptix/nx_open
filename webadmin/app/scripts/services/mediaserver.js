@@ -80,11 +80,11 @@ angular.module('webadminApp')
             url:function(){
                 return proxy;
             },
-            mdeiaUrl:function(){
+            mediaDemo:function(){
                 if(proxy == Config.demo){
                     return Config.demoMedia;
                 }
-                return '';
+                return false;
             },
             logUrl:function(params){
                 return proxy + '/api/showLog' + (params||'');
