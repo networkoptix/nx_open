@@ -19,9 +19,13 @@ namespace rtu
     const QString &adminUserName();
     const QStringList &defaultAdminPasswords();
     
+    void parseModuleInformationReply(const QJsonObject &reply
+        , rtu::BaseServerInfo &baseInfo);
+
+    /// TODO: #ynikitenkov think about usage and rename if necessary to "invalid entity"
     enum AffectedEntity
     {
-        kNoEntitiesAffected = 0x0
+        kNoEntitiesAffected         = 0x0
         , kPortAffected             = 0x1
         , kPasswordAffected         = 0x2
         , kSystemNameAffected       = 0x4

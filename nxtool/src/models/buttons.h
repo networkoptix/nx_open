@@ -20,9 +20,10 @@ namespace rtu
             Yes                 = 0x01
             , ApplyChanges      = 0x02
             , Ok                = 0x04
-            , No                = 0x08
-            , DiscardChanges    = 0x10
-            , Cancel            = 0x20
+            , Update            = 0x08
+            , No                = 0x10
+            , DiscardChanges    = 0x20
+            , Cancel            = 0x40
             
         };
         Q_ENUMS(ButtonType)

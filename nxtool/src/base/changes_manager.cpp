@@ -145,7 +145,7 @@ private:
     rtu::ChangesSummaryModel *m_failedChangesModel;
     
     ServerInfoValueContainer m_serverValues;
-    rtu::ServerInfoList m_targetServers;
+    rtu::ServerInfoPtrContainer m_targetServers;
     ChangesetPointer m_changeset;
     RequestContainer m_requests;
     ItfChangesContainer m_itfChanges;
@@ -221,7 +221,7 @@ void rtu::ChangesManager::Impl::applyChanges()
     if (!m_changeset || !m_model->selectedCount())
         return;
 
-    m_serverValues = [](const ServerInfoList &infos) -> ServerInfoValueContainer 
+    m_serverValues = [](const ServerInfoPtrContainer &infos) -> ServerInfoValueContainer 
     {
         ServerInfoValueContainer result;
         result.reserve(infos.size());
@@ -234,7 +234,7 @@ void rtu::ChangesManager::Impl::applyChanges()
     
     m_targetServers = [](ServerInfoValueContainer &values)
     {
-        ServerInfoList result;
+        ServerInfoPtrContainer result;
         result.reserve(values.size());
         for(ServerInfo &info: values)
         {
@@ -417,7 +417,6 @@ void rtu::ChangesManager::Impl::onChangeApplied()
     
     m_changeset.reset();
     m_context->setCurrentPage(Constants::SummaryPage);
-    emit m_model->selectionChanged();
 }
 
 void rtu::ChangesManager::Impl::sendRequests()
@@ -657,10 +656,6 @@ bool rtu::ChangesManager::Impl::addSummaryItem(const rtu::ServerInfo &info
     , AffectedEntities checkFlags
     , AffectedEntities affected)
 {
-    static const Qt::HANDLE h = QThread::currentThreadId();
-    if (h != QThread::currentThreadId())
-        qDebug() << "***************************************************";
-                    
     const bool successResult = error.isEmpty() && 
         ((affected & checkFlags) == checkFlags);
     ChangesSummaryModel * const model = (successResult ?

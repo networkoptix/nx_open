@@ -59,7 +59,7 @@ GenericSettingsPanel
 
                     wrapMode: Text.Wrap;
                     font.pixelSize: Common.SizeManager.fontSizes.medium;
-                    text: qsTr("Settings in this partition are different for selected servers.");
+                    text: qsTr("Settings in this partition can be different for selected servers.");
                 }
 
                 Row
