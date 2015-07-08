@@ -30,7 +30,7 @@ public:
         qint64 startTimeMs;
     };
 
-    QnStorageDb(int storageIndex);
+    QnStorageDb(const QnStorageResourcePtr& storage, int storageIndex);
     virtual ~QnStorageDb();
 
     bool open(const QString& fileName);
@@ -68,9 +68,14 @@ private:
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
     QVector<DeviceFileCatalogPtr> loadBookmarksFileCatalog();
 
-    void addCatalogFromMediaFolder(const QString& postfix, QnServer::ChunksCatalog catalog, QVector<DeviceFileCatalogPtr>& result);
+    void addCatalogFromMediaFolder(
+        const QString&                  postfix, 
+        QnServer::ChunksCatalog         catalog, 
+        QVector<DeviceFileCatalogPtr>&  result
+    );
 
 private:
+    QnStorageResourcePtr m_storage;
     int m_storageIndex;
     QElapsedTimer m_lastTranTime;
 

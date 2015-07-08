@@ -21,6 +21,7 @@
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/resource_searcher.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/storage_plugin_factory.h>
 
 #include <plugins/resource/upnp/upnp_device_searcher.h>
 #include <plugins/storage/dts/abstract_dts_searcher.h>

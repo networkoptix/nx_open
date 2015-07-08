@@ -10,6 +10,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/storage_plugin_factory.h>
 
 #include <core/datapacket/abstract_data_packet.h>
 #include <core/datapacket/media_data_packet.h>

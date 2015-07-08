@@ -17,7 +17,7 @@
 #include <api/model/storage_space_reply.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/storage_resource.h>
+#include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include <client/client_model_types.h>
@@ -228,7 +228,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    pathItem->setData(Qt::DisplayRole, QnAbstractStorageResource::urlToPath(item.url));
+    pathItem->setData(Qt::DisplayRole, item.url);
 
     QTableWidgetItem *capacityItem = new QTableWidgetItem();
     capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -300,10 +300,15 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
     if (login.isEmpty())
         result.url = pathItem->text();
     else {
-        QUrl url = QString(lit("file:///%1")).arg(pathItem->text());
-        url.setUserName(login);
-        url.setPassword(password);
-        result.url = url.toString();
+        if (pathItem->text().indexOf(lit("://")) != -1)
+            result.url = pathItem->text();
+        else
+        {
+            QUrl url = QString(lit("file:///%1")).arg(pathItem->text());
+            url.setUserName(login);
+            url.setPassword(password);
+            result.url = url.toString();
+        }
     }
 
     result.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();
@@ -357,13 +362,13 @@ void QnServerSettingsDialog::updateFromResources()
     updateFailoverLabel();
 }
 
-void QnServerSettingsDialog::submitToResources() 
+void QnServerSettingsDialog::submitToResources()
 {
     if(m_hasStorageChanges) {
-        QnAbstractStorageResourceList newStorages;
+        QnStorageResourceList newStorages;
         foreach(const QnStorageSpaceData &item, tableItems()) 
         {
-            QnAbstractStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
+            QnStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
             if (storage) {
                 if (item.isUsedForWriting != storage->isUsedForWriting()) {
                     storage->setUsedForWriting(item.isUsedForWriting);
@@ -372,7 +377,7 @@ void QnServerSettingsDialog::submitToResources()
             }
             else {
                 // create or remove new storage
-                QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
+                QnStorageResourcePtr storage(new QnClientStorageResource());
                 if (!item.storageId.isNull())
                     storage->setId(item.storageId);
                 QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));

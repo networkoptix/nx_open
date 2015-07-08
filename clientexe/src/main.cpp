@@ -51,6 +51,7 @@ extern "C"
 #include "core/resource/storage_resource.h"
 #include "core/resource/resource_directory_browser.h"
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/storage_plugin_factory.h>
 
 #include "decoders/video/ipp_h264_decoder.h"
 
