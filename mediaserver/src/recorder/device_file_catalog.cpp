@@ -336,8 +336,8 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
 QnTimePeriod DeviceFileCatalog::timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName)
 {
     QnTimePeriod timePeriod;
-    QString sUrl = storage->getPath();
-    QStringList folders = dirName.mid(sUrl.size()).split('/').mid(3);
+    QString sUrl = storage->getUrl();
+    QStringList folders = dirName.mid(sUrl.size()).split(getPathSeparator(dirName)).mid(3);
 
     QString timestamp(lit("%1/%2/%3T%4:00:00"));
     for (int i = 0; i < folders.size(); ++i)
@@ -415,10 +415,28 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
             QString fileName = fi.absoluteFilePath();
 
+            auto timestampFromName = [](const QString& s) -> qint64
+            {
+                int ind = s.lastIndexOf(lit("\\"));
+                if (ind == -1)
+                    ind = s.lastIndexOf(lit("/"));
+                int dotInd = s.lastIndexOf(lit("."));
+                int len = dotInd == -1 ? s.size() - (ind + 1) : dotInd - (ind + 1);
+                return s.mid(ind + 1, len).toLongLong();
+                return 0;
+            };
+
+            qint64 fileTime = timestampFromName(fileName);
+
+            if (!filter.isEmpty() && fileTime > filter.scanPeriod.endTimeMs())
+                return;
+
             Chunk chunk = chunkFromFile(storage, fileName);
             chunk.setFileSize(fi.size());
             if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
+            {
                 return;
+            }
 
             QMutexLocker lock(&scanFilesMutex);
             if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
@@ -451,11 +469,18 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
 
 void DeviceFileCatalog::readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& scanFilter) 
 {
-    scanMediaFiles(rootFolder(storage, catalog), storage, allChunks, emptyFileList, scanFilter);
+    scanMediaFiles(
+        rootFolder(storage, catalog), 
+        storage, 
+        allChunks, 
+        emptyFileList, 
+        scanFilter
+    );
 }
+
 QString DeviceFileCatalog::rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const 
 {
-    QString path = closeDirPath(storage->getPath());
+    QString path = closeDirPath(storage->getUrl());
     QString separator = getPathSeparator(path);
 
     return path + prefixByCatalog(catalog) + separator + m_cameraUniqueId + separator;
@@ -477,7 +502,13 @@ bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, co
         return false;
     
     QVector<EmptyFileInfo> emptyFileList;
-    readStorageData(storage, m_catalog, allChunks, emptyFileList, period);
+    readStorageData(
+        storage, 
+        m_catalog, 
+        allChunks, 
+        emptyFileList, 
+        period
+    );
 
     for(const EmptyFileInfo& emptyFile: emptyFileList) {
         if (emptyFile.startTimeMs < period.endTimeMs())

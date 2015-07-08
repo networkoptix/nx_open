@@ -285,7 +285,7 @@ QIODevice *QnThirdPartyStorageResource::open(
         ioFlags |= Qn::io::WriteOnly;
 
     Qn::IODevice* ioRaw = m_storage->open(
-        fileName.toLatin1().data(), 
+        QUrl(fileName).path().toLatin1().data(), 
         ioFlags, 
         &ecode
     );
@@ -383,7 +383,7 @@ bool QnThirdPartyStorageResource::isAvailable() const
 bool QnThirdPartyStorageResource::removeFile(const QString& url)
 {
     int ecode;
-    m_storage->removeFile(url.toLatin1().data(), &ecode);
+    m_storage->removeFile(urlToPath(url).toLatin1().data(), &ecode);
     if (ecode != Qn::error::NoError)
         return false;
     return true;
@@ -392,7 +392,7 @@ bool QnThirdPartyStorageResource::removeFile(const QString& url)
 bool QnThirdPartyStorageResource::removeDir(const QString& url)
 {
     int ecode;
-    m_storage->removeDir(url.toLatin1().data(), &ecode);
+    m_storage->removeDir(urlToPath(url).toLatin1().data(), &ecode);
     if (ecode != Qn::error::NoError)
         return false;
     return true;
@@ -405,8 +405,8 @@ bool QnThirdPartyStorageResource::renameFile(
 {
     int ecode;
     m_storage->renameFile(
-        oldName.toLatin1().data(), 
-        newName.toLatin1().data(), 
+        urlToPath(oldName).toLatin1().data(), 
+        urlToPath(newName).toLatin1().data(), 
         &ecode
     );
     if (ecode != Qn::error::NoError)
@@ -421,7 +421,7 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
     QMutexLocker lock(&m_mutex);
     int ecode;
     Qn::FileInfoIterator* fitRaw = m_storage->getFileIterator(
-        dirName.toLatin1().data(), 
+        urlToPath(dirName).toLatin1().data(), 
         &ecode
     );
     if (fitRaw == nullptr)
@@ -464,7 +464,7 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
             
             ret.append(
                 QnAbstractStorageResource::FileInfo(
-                    QString::fromLatin1(fi->url), 
+                    QUrl(dirName).toString(QUrl::RemovePath) + QString::fromLatin1(fi->url), 
                     fi->size, 
                     (fi->type & Qn::isDir) ? true : false
                 )

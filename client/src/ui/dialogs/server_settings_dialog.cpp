@@ -224,6 +224,8 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     checkBoxItem->setData(StorageIdRole, QVariant::fromValue<QnUuid>(item.storageId));
     checkBoxItem->setData(ExternalRole, item.isExternal);
     checkBoxItem->setData(StorageType, item.storageType);
+    if (m_initialStorageCheckStates.size() <= row)
+        m_initialStorageCheckStates.resize(row + 1);
     m_initialStorageCheckStates[row] = checkBoxItem->checkState() == Qt::Checked;
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();

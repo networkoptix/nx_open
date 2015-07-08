@@ -14,7 +14,7 @@
 
 #include "ftp_library.h"
 
-std::atomic<int64_t> totalSize = 5500000000; // !!!! TODO: REMOVE THIS!!!
+std::atomic<int64_t> totalSize = 100000000000; // !!!! TODO: REMOVE THIS!!!
 
 namespace Qn
 {   // auxillary data structures/functions
@@ -484,7 +484,6 @@ namespace Qn
                 *ecode = error::NoError;
             return 1;
         }
-
     } // namesapce aux
 
     // FileInfo Iterator
@@ -611,57 +610,21 @@ namespace Qn
     FtpStorage::FtpStorage(const std::string& url)
         : m_available(false)
     {
-        //// catch these in StorageFactory::createStorage()
-        //try 
-        //{
-        //    m_impl.reset(new ftplib);
-        //} 
-        //catch (const std::exception& e) 
-        //{
-        //    throw aux::NetworkException(e.what());
-        //}
-        //
-        //aux::Url u;
-
-        //try
-        //{
-        //    u = aux::Url::fromString(url);
-        //}
-        //catch (const std::exception& e)
-        //{
-        //    throw aux::BadUrlException(e.what());
-        //}
-
-        //try 
-        //{
-        //    m_implurl = u.host + ':' + (u.port.empty() ? std::string("21") : u.port);
-
-        //    if (m_impl->Connect(m_implurl.c_str()) == 0)
-        //        throw aux::BadUrlException("Bad url");
-
-        //    m_user = u.uname.empty() ? "anonymous" : u.uname.c_str();
-        //    m_passwd = u.upasswd.empty() ? "" : u.upasswd.c_str();
-
-        //    if (m_impl->Login(m_user.c_str(), m_passwd.c_str()) == 0)
-        //    {
-        //        m_impl->Quit();
-        //        throw aux::BadUrlException("Bad url");
-        //    }
-        //    m_available = true;
-        //} 
-        //catch (const std::exception&) 
-        //{
-        //    if (m_impl)
-        //        m_impl->Quit();
-        //    throw;
-        //}
-        aux::establishFtpConnection(
-            &url,
-            m_implurl,
-            m_user,
-            m_passwd,
-            m_impl
-        );
+        try
+        {
+            aux::establishFtpConnection(
+                &url,
+                m_implurl,
+                m_user,
+                m_passwd,
+                m_impl
+            );
+        }
+        catch(...)
+        {
+            m_impl->Quit();
+            throw;
+        }
         m_available = true;
     }
 
@@ -762,7 +725,7 @@ namespace Qn
         std::lock_guard<std::mutex> lock(m_mutex);
         if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
             return;
-        totalSize = 5500000000;                 // !!!! TODO: REMOVE THIS!!!
+        //totalSize = 5500000000;                 // !!!! TODO: REMOVE THIS!!!
         std::printf("File removed: %s\n", url); // !!!! TODO: REMOVE THIS!!!
         if (m_impl->Delete(url) == 0 && ecode)
             *ecode = error::UnknownError;
@@ -1065,60 +1028,68 @@ namespace Qn
         //  If file opened for read-only and no such file uri in storage throw BadUrl
         //  If file opened for write and no such file uri in stor - create it.
         std::lock_guard<std::mutex> lock(m_mutex);
-        aux::establishFtpConnection(
-            nullptr,
-            m_implurl,
-            m_user,
-            m_passwd,
-            m_impl
-        );
-        std::string remoteDir, remoteFile;
-        aux::dirFromUri(uri, &remoteDir, &remoteFile);
-        m_localfile = aux::getRandomFileName() + "_" + remoteFile;
-        bool fileExists = false;
-        try 
+        try
         {
-            fileExists = aux::remoteFileExists(uri, *m_impl);
-        }
-        catch (const aux::BadUrlException& e)
-        {
-            if (m_impl->Mkdir(remoteDir.c_str()) == 0)
-                throw aux::InternalErrorException(e.what());
-            else fileExists = false;
-        }
-        catch (const std::exception& e) 
-        {
-            throw aux::InternalErrorException(e.what());
-        }
-
-        if (mode & io::WriteOnly) 
-        {
-            if (!fileExists) 
+            aux::establishFtpConnection(
+                nullptr,
+                m_implurl,
+                m_user,
+                m_passwd,
+                m_impl
+            );
+            std::string remoteDir, remoteFile;
+            aux::dirFromUri(uri, &remoteDir, &remoteFile);
+            m_localfile = aux::getRandomFileName() + "_" + remoteFile;
+            bool fileExists = false;
+            try 
             {
-                FILE *f = fopen(m_localfile.c_str(), "wb");
-                if (f == NULL)
-                    throw aux::InternalErrorException("couldn't create local temporary file");
-                fclose(f);
-                if (m_impl->Put(m_localfile.c_str(), uri, ftplib::image) == 0)
-                    throw aux::InternalErrorException("ftp put failed");
+                fileExists = aux::remoteFileExists(uri, *m_impl);
             }
-            else
+            catch (const aux::BadUrlException& e)
             {
-                if (m_impl->Get(m_localfile.c_str(), uri, ftplib::image) == 0)
+                if (m_impl->Mkdir(remoteDir.c_str()) == 0)
+                    throw aux::InternalErrorException(e.what());
+                else fileExists = false;
+            }
+            catch (const std::exception& e) 
+            {
+                throw aux::InternalErrorException(e.what());
+            }
+
+            if (mode & io::WriteOnly) 
+            {
+                if (!fileExists) 
+                {
+                    FILE *f = fopen(m_localfile.c_str(), "wb");
+                    if (f == NULL)
+                        throw aux::InternalErrorException("couldn't create local temporary file");
+                    fclose(f);
+                    if (m_impl->Put(m_localfile.c_str(), uri, ftplib::image) == 0)
+                        throw aux::InternalErrorException("ftp put failed");
+                }
+                else
+                {
+                    if (m_impl->Get(m_localfile.c_str(), uri, ftplib::image) == 0)
+                        throw aux::InternalErrorException("ftp get failed");
+                }
+            }
+            else if (mode & io::ReadOnly)
+            {
+                if (!fileExists)
+                    throw aux::BadUrlException("file not found in storage");
+                else if (m_impl->Get(m_localfile.c_str(), uri, ftplib::image) == 0)
                     throw aux::InternalErrorException("ftp get failed");
             }
-        }
-        else if (mode & io::ReadOnly)
-        {
-            if (!fileExists)
-                throw aux::BadUrlException("file not found in storage");
-            else if (m_impl->Get(m_localfile.c_str(), uri, ftplib::image) == 0)
-                throw aux::InternalErrorException("ftp get failed");
-        }
 
-        // calc local file size
-        if ((m_localsize = aux::getFileSize(m_localfile.c_str())) == -1)
-            throw aux::InternalErrorException("local file calc size failed");
+            // calc local file size
+            if ((m_localsize = aux::getFileSize(m_localfile.c_str())) == -1)
+                throw aux::InternalErrorException("local file calc size failed");
+        }
+        catch(...)
+        {
+            m_impl->Quit();
+            throw;
+        }
     }
 
     FtpIODevice::~FtpIODevice()
@@ -1157,7 +1128,7 @@ namespace Qn
     )
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        totalSize -= size; // !!!! TODO: REMOVE THIS!!!
+        //totalSize -= size; // !!!! TODO: REMOVE THIS!!!
         if (ecode)
             *ecode = error::NoError;
 

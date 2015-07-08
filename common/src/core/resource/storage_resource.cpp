@@ -92,7 +92,7 @@ void QnStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider* provid
 
 QString QnStorageResource::getPath() const
 {
-    return urlToPath(getUrl());
+    return getUrl();//urlToPath(getUrl());
 }
 
 void QnStorageResource::setStorageBitrateCoeff(float value)
@@ -106,7 +106,7 @@ QString QnStorageResource::urlToPath(const QString& url)
     if (!url.contains(lit("://")))
         return url;
     else
-        return QUrl(url).path().mid(1);
+        return QUrl(url).path();
 }
 
 float QnStorageResource::getAvarageWritingUsage() const
