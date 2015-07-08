@@ -1515,6 +1515,10 @@ void QnMain::run()
 
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
+    std::unique_ptr<QnResourcePropertyDictionary> dictionary(new QnResourcePropertyDictionary());
+    std::unique_ptr<QnResourceStatusDictionary> statusDict(new QnResourceStatusDictionary());
+    std::unique_ptr<QnServerAdditionalAddressesDictionary> serverAdditionalAddressesDictionary(new QnServerAdditionalAddressesDictionary());
+
     std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
     connect(
@@ -1640,9 +1644,6 @@ void QnMain::run()
     ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
-    QnResourcePropertyDictionary dictionary;
-    QnResourceStatusDictionary statusDict;
-    QnServerAdditionalAddressesDictionary serverAdditionalAddressesDictionary;
 
     while (!needToStop())
     {

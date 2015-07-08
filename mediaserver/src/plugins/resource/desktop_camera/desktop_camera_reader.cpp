@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include "desktop_camera_reader.h"
 #include "utils/common/sleep.h"
+#include "utils/common/log.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
@@ -131,6 +132,12 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
                 return result;
             }
         }
+        if (streamIndex >= MEDIA_STREAM_COUNT)
+        {
+            NX_LOG(lit("QnDesktopCameraStreamReader: wrong streamIndex from pocket (%1 >= %2), pocket rejected")
+                   .arg(streamIndex).arg(MEDIA_STREAM_COUNT), cl_logERROR);
+        }
+        else
         if (bufferSize == packetSize)
         {
             bool gotData;
