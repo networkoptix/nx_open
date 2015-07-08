@@ -35,10 +35,10 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
     bool success = qnRuntime->isDevMode() || brand.isEmpty() || brand == QnAppInfo::productNameShort();
 
     if(!success)
-        return Result::Failure;
+        return Result::IncompatibleBrand;
 
     if (protoVersion != nx_ec::EC2_PROTO_VERSION)
-        return Result::Failure;
+        return Result::IncompatibleProtocol;
 
     QnCompatibilityChecker remoteChecker(compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
@@ -52,13 +52,16 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 
     return (compatibilityChecker->isCompatible(lit("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), lit("ECS"), version))
         ? Result::Success
-        : Result::Failure;
+        : Result::IncompatibleVersion;
 }
 
 
 QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode) {
+    if (errorCode == ec2::ErrorCode::unauthorized)
+        return Result::Unauthorized;
+
     if (errorCode != ec2::ErrorCode::ok)
-        return Result::Failure;
+        return Result::ServerError;
 
     return validateConnectionLight(connectionInfo.brand, 
         connectionInfo.version,
@@ -68,36 +71,29 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 
 
 QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnection(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode, const QUrl &url, QWidget* parentWidget) {
-    if (validateConnectionLight(connectionInfo, errorCode) == Result::Success)
-        return Result::Success;
-
-    //TODO: #GDM duplicated code, Result enum should be improved to handle all existing connect options
-    bool success = (errorCode == ec2::ErrorCode::ok);
-
-    //checking brand compatibility
-    if (success)
-        success = qnRuntime->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
+    QnConnectionDiagnosticsHelper::Result result = validateConnectionLight(connectionInfo, errorCode);
+    if (result == Result::Success)
+        return result;
 
     QString detail;
-
-    if (errorCode == ec2::ErrorCode::unauthorized) {
+    if (result == Result::Unauthorized) {
         detail = tr("Login or password you have entered are incorrect, please try again.");
-    } else if (errorCode != ec2::ErrorCode::ok) {
+    } else if (result == Result::ServerError) {
         detail = tr("Connection to the Server could not be established.") + L'\n' 
                + tr("Connection details that you have entered are incorrect, please try again.") + L'\n' 
                + tr("If this error persists, please contact your VMS administrator.");
-    } else { //brand incompatible
+    } else if (result == Result::IncompatibleBrand) { //brand incompatible
         detail = tr("You are trying to connect to incompatible Server.");
     }
 
-    if(!success) {
+    if(!detail.isEmpty()) {
         QnMessageBox::warning(
             parentWidget,
             Qn::Login_Help,
             tr("Could not connect to Server"),
             detail
             );
-        return Result::Failure;
+        return result;
     }
 
     QString versionDetails =                             
@@ -142,7 +138,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 message,
                 QMessageBox::Ok
                 );
-            return Result::Failure;
+            return Result::IncompatibleVersion;
         }
     }
 
@@ -156,7 +152,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             + tr("Compatibility mode for versions lower than %1 is not supported.").arg(minSupportedVersion.toString()),
             QMessageBox::Ok
             );
-        return Result::Failure;
+        return Result::IncompatibleVersion;
     }
 
 #ifdef Q_OS_MACX
@@ -170,7 +166,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             + tr("The other version of the Client is needed in order to establish the connection to this Server."),
             QMessageBox::Ok
             );
-        return Result::Failure;
+        return Result::IncompatibleVersion;
     }
 #endif
 
@@ -199,7 +195,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 QMessageBox::Ok
                 );
 #endif
-            return Result::Failure;
+            return Result::IncompatibleVersion;
         }
 
         if (!isInstalled || (needExactVersion && !haveExactVersion)) {
@@ -231,7 +227,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                     continue;   //offering to start newly-installed compatibility version
                 }
             }
-            return Result::Failure;
+            return Result::IncompatibleVersion;
         }
 
         //version is installed, trying to run
@@ -247,11 +243,11 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             );
 
         if (button != QMessageBox::Ok)
-            return Result::Failure;
+            return Result::IncompatibleVersion;
 
         switch( applauncher::restartClient(connectionInfo.version, url.toEncoded()) ) {
         case applauncher::api::ResultType::ok:
-            return Result::Restart;
+            return Result::RestartRequested;
 
         case applauncher::api::ResultType::connectError:
             QMessageBox::critical(
@@ -260,7 +256,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 tr("Cannot restart the Client in compatibility mode.") + L'\n' 
               + tr("Please close the application and start it again using the shortcut in the start menu.")
                 );
-            return Result::Failure;
+            return Result::IncompatibleVersion;
 
         default:
             {
@@ -281,14 +277,14 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                     if (installationDialog->installationSucceeded())
                         continue;   //offering to start newly-installed compatibility version
                 }
-                return Result::Failure;
+                return Result::IncompatibleVersion;
             }
         } // switch restartClient
 
     } // while(true)
 
     Q_ASSERT(false);    //should never get here
-    return Result::Failure; //just in case
+    return Result::IncompatibleVersion; //just in case
 }
 
 QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelper::validateConnectionTest(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode)
@@ -317,17 +313,17 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
         || connectionInfo.brand == QnAppInfo::productNameShort();
 
     if (errorCode == ec2::ErrorCode::unauthorized) {
-        result.result = Result::Failure;
+        result.result = Result::Unauthorized;
         result.details = tr("Login or password you have entered are incorrect, please try again.");
         result.helpTopicId = Qn::Login_Help;
     } else if (errorCode != ec2::ErrorCode::ok) {
-        result.result = Result::Failure;
+        result.result = Result::ServerError;
         result.details = tr("Connection to the Server could not be established.") + L'\n' 
             + tr("Connection details that you have entered are incorrect, please try again.") + L'\n' 
             + tr("If this error persists, please contact your VMS administrator.");
         result.helpTopicId = Qn::Login_Help;
     } else if (!compatibleProduct) {
-        result.result = Result::Failure;
+        result.result = Result::IncompatibleBrand;
         result.details = tr("You are trying to connect to incompatible Server.");
         result.helpTopicId = Qn::Login_Help;
     } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qnCommon->engineVersion(), QLatin1String("ECS"), connectionInfo.version)) {
@@ -338,7 +334,7 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
             result.details = tr("Server has a different version:") + L'\n' 
                 + versionDetails
                 + tr("Compatibility mode for versions lower than %1 is not supported.").arg(minSupportedVersion.toString());
-            result.result = Result::Failure;
+            result.result = Result::IncompatibleVersion;
 
         } else {
             result.details = tr("Server has a different version:") + L'\n' 

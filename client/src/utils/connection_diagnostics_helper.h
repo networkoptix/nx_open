@@ -16,8 +16,12 @@ class QnConnectionDiagnosticsHelper: public QObject
 public:
     enum class Result {
         Success,
-        Failure,
-        Restart
+        RestartRequested,
+        IncompatibleBrand,
+        IncompatibleVersion,
+        IncompatibleProtocol,
+        Unauthorized,
+        ServerError
     };
 
     struct TestConnectionResult {

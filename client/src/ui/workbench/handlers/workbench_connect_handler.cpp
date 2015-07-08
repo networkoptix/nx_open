@@ -313,15 +313,15 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
         : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, parentWidget);
 
     switch (status) {
-    case QnConnectionDiagnosticsHelper::Result::Failure:
+    case QnConnectionDiagnosticsHelper::Result::Success:
+        break;
+    case QnConnectionDiagnosticsHelper::Result::RestartRequested:
+        menu()->trigger(Qn::DelayedForcedExitAction);
+        return ec2::ErrorCode::ok; // to avoid cycle
+    default:    //error
         return errCode == ec2::ErrorCode::ok 
             ? ec2::ErrorCode::incompatiblePeer  /* Substitute value for incompatible peers. */
             : errCode;
-    case QnConnectionDiagnosticsHelper::Result::Restart:
-        menu()->trigger(Qn::DelayedForcedExitAction);
-        return ec2::ErrorCode::ok; // to avoid cycle
-    default:    //success
-        break;
     }
 
     QnAppServerConnectionFactory::setUrl(connectionInfo.ecUrl);

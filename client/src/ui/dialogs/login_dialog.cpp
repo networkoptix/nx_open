@@ -220,15 +220,15 @@ void QnLoginDialog::accept() {
 
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
         switch (status) {
-        case QnConnectionDiagnosticsHelper::Result::Failure:
-            return;
-        case QnConnectionDiagnosticsHelper::Result::Restart:
-            menu()->trigger(Qn::DelayedForcedExitAction);
-            break; // to avoid cycle
-        default:    //success
+        case QnConnectionDiagnosticsHelper::Result::Success:
             menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
             updateStoredConnections(url, name);
             break;
+        case QnConnectionDiagnosticsHelper::Result::RestartRequested:
+            menu()->trigger(Qn::DelayedForcedExitAction);
+            break; // to avoid cycle
+        default:    //error
+            return;
         }
 
         base_type::accept();
@@ -332,7 +332,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
             else
                 title = lit("%1:%2").arg(url.host()).arg(url.port());
             if (!isCompatible)
-                title += lit(" (v%3)").arg(data.version.toString(QnSoftwareVersion::MinorFormat));
+                title += lit(" (v%3)").arg(data.version.toString(QnSoftwareVersion::BugfixFormat));
 
             QStandardItem* item = new QStandardItem(title);
             item->setData(url, Qn::UrlRole);
