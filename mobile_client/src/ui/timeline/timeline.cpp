@@ -310,6 +310,9 @@ QnTimeline::QnTimeline(QQuickItem *parent) :
 {
     setFlag(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::LeftButton);
+
+    connect(this, &QnTimeline::positionChanged, this, &QnTimeline::positionDateChanged);
+
     connect(this, &QnTimeline::widthChanged, this, [this](){ d->updateZoomLevel(); });
 
     QnTimelineZoomLevel::monthsNames << tr("January")   << tr("February")   << tr("March")
@@ -350,17 +353,7 @@ void QnTimeline::setWindowStart(qint64 windowStart) {
     d->updateZoomLevel();
     update();
     emit windowStartChanged();
-    emit windowStartDateChanged();
     emit positionChanged();
-    emit positionDateChanged();
-}
-
-QDateTime QnTimeline::windowStartDate() const {
-    return QDateTime::fromMSecsSinceEpoch(windowStart(), Qt::UTC);
-}
-
-void QnTimeline::setWindowStartDate(const QDateTime &dateTime) {
-    setWindowStart(dateTime.toMSecsSinceEpoch());
 }
 
 qint64 QnTimeline::windowEnd() const {
@@ -375,17 +368,7 @@ void QnTimeline::setWindowEnd(qint64 windowEnd) {
     d->updateZoomLevel();
     update();
     emit windowEndChanged();
-    emit windowEndDateChanged();
     emit positionChanged();
-    emit positionDateChanged();
-}
-
-QDateTime QnTimeline::windowEndDate() const {
-    return QDateTime::fromMSecsSinceEpoch(windowEnd(), Qt::UTC);
-}
-
-void QnTimeline::setWindowEndDate(const QDateTime &dateTime) {
-    setWindowEnd(dateTime.toMSecsSinceEpoch());
 }
 
 void QnTimeline::setWindow(qint64 windowStart, qint64 windowEnd) {
@@ -397,11 +380,8 @@ void QnTimeline::setWindow(qint64 windowStart, qint64 windowEnd) {
     d->updateZoomLevel();
     update();
     emit windowStartChanged();
-    emit windowStartDateChanged();
     emit windowEndChanged();
-    emit windowEndDateChanged();
     emit positionChanged();
-    emit positionDateChanged();
 }
 
 qint64 QnTimeline::position() const {
@@ -412,7 +392,10 @@ void QnTimeline::setPosition(qint64 position) {
     if (position == this->position())
         return;
 
-    d->targetPosition = qBound(d->startBoundTime, position, d->endBoundTime != -1 ? d->endBoundTime : QDateTime::currentMSecsSinceEpoch());
+    setStickToEnd(position < 0);
+
+    if (!stickToEnd())
+        d->targetPosition = qBound(d->startBoundTime, position, d->endBoundTime != -1 ? d->endBoundTime : QDateTime::currentMSecsSinceEpoch());
 
     update();
 }
@@ -422,10 +405,7 @@ QDateTime QnTimeline::positionDate() const {
 }
 
 void QnTimeline::setPositionDate(const QDateTime &dateTime) {
-    if (dateTime.isValid())
-        setPosition(dateTime.toMSecsSinceEpoch());
-    else
-        setStickToEnd(true);
+    setPosition(dateTime.isValid() ? dateTime.toMSecsSinceEpoch() : -1);
 }
 
 bool QnTimeline::stickToEnd() const {
@@ -449,17 +429,8 @@ void QnTimeline::setStartBound(qint64 startBound) {
     d->startBoundTime = startBound;
 
     emit startBoundChanged();
-    emit startBoundDateChanged();
 
     update();
-}
-
-QDateTime QnTimeline::startBoundDate() const {
-    return QDateTime::fromMSecsSinceEpoch(startBound(), Qt::UTC);
-}
-
-void QnTimeline::setStartBoundDate(const QDateTime &startBoundDate) {
-    setStartBound(startBoundDate.isValid() ? startBoundDate.toMSecsSinceEpoch() : -1);
 }
 
 bool QnTimeline::autoPlay() const {
@@ -1151,9 +1122,6 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         parent->windowStartChanged();
         parent->windowEndChanged();
         parent->positionChanged();
-        parent->windowStartDateChanged();
-        parent->windowEndDateChanged();
-        parent->positionDateChanged();
     }
 
     bool live = parent->position() + 1000 >= QDateTime::currentMSecsSinceEpoch();

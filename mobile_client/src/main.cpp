@@ -62,8 +62,10 @@ int runUi(QGuiApplication *application) {
     QScopedPointer<QObject> mainWindow(mainComponent.create());
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-    mainWindow->setProperty("width", 480);
-    mainWindow->setProperty("height", 800);
+    if (mainWindow) {
+        mainWindow->setProperty("width", 480);
+        mainWindow->setProperty("height", 800);
+    }
 #endif
 
     if (!mainComponent.errors().isEmpty())

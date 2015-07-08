@@ -5,14 +5,15 @@ import com.networkoptix.qml 1.0
 Item {
     id: root
 
-    property alias startDate: timeline.windowStartDate
-    property alias endDate: timeline.windowEndDate
+    property alias windowStart: timeline.windowStart
+    property alias windowEnd: timeline.windowEnd
+    property alias position: timeline.position
     property alias positionDate: timeline.positionDate
     property alias chunkBarHeight: timeline.chunkBarHeight
     property alias textY: timeline.textY
     property alias stickToEnd: timeline.stickToEnd
     property alias chunkProvider: timeline.chunkProvider
-    property alias startBoundDate: timeline.startBoundDate
+    property alias startBound: timeline.startBound
     property alias autoPlay: timeline.autoPlay
     readonly property bool dragging: mouseArea.pressed || pinchArea.pinch.active
     readonly property var timelineView: timeline
@@ -66,7 +67,7 @@ Item {
             onPressed: {
                 pressX = mouseX
             }
-            onPositionChanged: {
+            onMouseXChanged: {
                 if (pressX != -1 && Math.abs(pressX - mouseX) > drag.threshold) {
                     preventStealing = true
                     timeline.startDrag(pressX)

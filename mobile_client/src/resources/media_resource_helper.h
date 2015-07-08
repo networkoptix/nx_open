@@ -34,8 +34,7 @@ public:
 
     QString resourceName() const;
 
-    Q_INVOKABLE void setDateTime(const QDateTime &dateTime);
-    Q_INVOKABLE void setLive();
+    Q_INVOKABLE void setPosition(qint64 position);
 
     QStringList resolutions() const;
     QString stream() const;
@@ -65,6 +64,7 @@ private:
 private:
     QnResourcePtr m_resource;
     QUrl m_url;
+    qint64 m_position;
     QDateTime m_dateTime;
     Protocol m_protocol;
     CameraMediaStreams m_supportedStreams;

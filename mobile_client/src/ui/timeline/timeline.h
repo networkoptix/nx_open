@@ -12,11 +12,12 @@ class QnCameraChunkProvider;
 
 class QnTimeline : public QQuickItem {
     Q_OBJECT
-    Q_PROPERTY(QDateTime windowStartDate READ windowStartDate WRITE setWindowStartDate NOTIFY windowStartDateChanged)
-    Q_PROPERTY(QDateTime windowEndDate READ windowEndDate WRITE setWindowEndDate NOTIFY windowEndDateChanged)
+    Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart NOTIFY windowStartChanged)
+    Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd NOTIFY windowEndChanged)
+    Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
     Q_PROPERTY(QDateTime positionDate READ positionDate WRITE setPositionDate NOTIFY positionDateChanged)
+    Q_PROPERTY(qint64 startBound READ startBound WRITE setStartBound NOTIFY startBoundChanged)
     Q_PROPERTY(bool stickToEnd READ stickToEnd WRITE setStickToEnd NOTIFY stickToEndChanged)
-    Q_PROPERTY(QDateTime startBoundDate READ startBoundDate WRITE setStartBoundDate NOTIFY startBoundDateChanged)
     Q_PROPERTY(bool autoPlay READ autoPlay WRITE setAutoPlay NOTIFY autoPlayChanged)
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
@@ -52,9 +53,6 @@ public:
     qint64 windowStart() const;
     void setWindowStart(qint64 windowStart);
 
-    QDateTime windowStartDate() const;
-    void setWindowStartDate(const QDateTime &dateTime);
-
     qint64 windowEnd() const;
     void setWindowEnd(qint64 windowEnd);
 
@@ -78,9 +76,6 @@ public:
     qint64 startBound() const;
     void setStartBound(qint64 startBound);
 
-    QDateTime startBoundDate() const;
-    void setStartBoundDate(const QDateTime &startBoundDate);
-
     bool autoPlay() const;
     void setAutoPlay(bool autoPlay);
 
@@ -102,14 +97,11 @@ signals:
     void zoomLevelChanged();
     void lowerTextOpacityChanged();
     void windowStartChanged();
-    void windowStartDateChanged();
     void windowEndChanged();
-    void windowEndDateChanged();
     void positionChanged();
     void positionDateChanged();
     void stickToEndChanged();
     void startBoundChanged();
-    void startBoundDateChanged();
     void autoPlayChanged();
 
     void textColorChanged();

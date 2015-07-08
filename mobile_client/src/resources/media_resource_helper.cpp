@@ -56,6 +56,7 @@ namespace {
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     QObject(parent),
+    m_position(-1),
     m_protocol(Http),
     m_standardResolution(-1),
     m_nativeStreamIndex(-1)
@@ -115,7 +116,7 @@ void QnMediaResourceHelper::updateUrl() {
     }
 
     QnTimePeriod period;
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, m_dateTime.toMSecsSinceEpoch(), &period);
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, m_position, &period);
     if (!server) {
         setUrl(QUrl());
         return;
@@ -150,8 +151,8 @@ void QnMediaResourceHelper::updateUrl() {
             query.addQueryItem(lit("resolution"), m_resolution);
     }
 
-    if (m_dateTime.isValid())
-        query.addQueryItem(lit("pos"), QString::number(m_dateTime.toMSecsSinceEpoch()));
+    if (m_position >= 0)
+        query.addQueryItem(lit("pos"), QString::number(m_position));
 
     if (QnUserResourcePtr user = qnCommon->instance<QnUserWatcher>()->user())
         query.addQueryItem(lit("auth"), getAuth(user));
@@ -169,17 +170,13 @@ QString QnMediaResourceHelper::resourceName() const {
     return m_resource->getName();
 }
 
-void QnMediaResourceHelper::setDateTime(const QDateTime &dateTime) {
-    if (m_dateTime == dateTime)
+void QnMediaResourceHelper::setPosition(qint64 position) {
+    if (m_position == position)
         return;
 
-    m_dateTime = dateTime;
+    m_position = position;
 
     updateUrl();
-}
-
-void QnMediaResourceHelper::setLive() {
-    setDateTime(QDateTime());
 }
 
 QStringList QnMediaResourceHelper::resolutions() const {
