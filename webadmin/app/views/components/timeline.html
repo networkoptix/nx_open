@@ -1,24 +1,24 @@
 <div class="timeline">
 
-    <div class="timeline-info"><div class="timeline-panel text-left">
-            <span class="timeline-button"
+    <div class="webclient-panel"><div class="text-left">
+            <span class="webclient-button"
                   ng-click="zoom(false)"
                   ng-disabled="disableZoomOut">
                 <span class="glyphicon glyphicon-minus"></span>
             </span>
-            <span class="timeline-button"
+            <span class="webclient-button"
                   ng-click="zoom(true)"
                   ng-disabled="disableZoomIn">
                 <span class="glyphicon glyphicon-plus"></span>
             </span>
-        </div><div class="timeline-panel text-center">
-            <span class="timeline-button"
+        </div><div class="text-center">
+            <span class="webclient-button"
                     ng-click="playPause()">
                 <span class="glyphicon glyphicon-play"
                         ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
             </span>
-        </div><div class="timeline-panel text-right" >
-            <span class="timeline-button"
+        </div><div class="text-right" >
+            <span class="webclient-button"
                   ng-class="{'active':positionProvider.liveMode}"
                   ng-click="goToLive()">LIVE</span>
         </div></div>

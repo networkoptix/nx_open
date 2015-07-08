@@ -100,29 +100,3 @@ ng-include{
   -webkit-touch-callout: none;
   user-select: none;
 }
-
-
-.timeline .timeline-panel.text-left,
-.timeline .timeline-panel.text-right{
-  width:30%;
-  display:inline-block;
-}
-
-.timeline .timeline-panel.text-center{
-  width:40%;
-  display:inline-block;
-}
-
-.timeline-info{
-  font-size: 120%;
-}
-
-.timeline-info .timeline-button{
-  padding:10px;
-  display: inline-block;
-  cursor:pointer;
-}
-
-.timeline-info .timeline-button.active{
-  color: #3A911E;
-}

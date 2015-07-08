@@ -7,7 +7,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.activeCamera = null;
 
         $scope.activeResolution = '320p';
-        $scope.availableResolutions = ['1080p', '720p', '640p', '320p', '240p'];
+        $scope.availableResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
 
         $scope.settings = {id: null};
         mediaserver.getSettings().then(function (r) {
@@ -91,7 +91,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
-            $scope.switchPlaying(true);
         };
 
         $scope.selectCameraById = function (cameraId,position) {
@@ -110,6 +109,8 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
 
                 updateVideoSource(position);
+
+                $scope.switchPlaying(true);
             }
         };
         $scope.selectCamera = function (activeCamera) {
@@ -231,6 +232,22 @@ angular.module('webadminApp').controller('ViewCtrl',
                 console.error('network problem');
             });
         }
+
+        $scope.selectResolution = function(resolution){
+            if(resolution == "auto" || resolution == "Auto" || resolution == "AUTO"){
+                resolution = "320p";
+            }
+
+            if($scope.activeResolution == resolution){
+                return;
+            }
+            $scope.activeResolution = resolution;
+            updateVideoSource($scope.positionProvider.playingPosition);
+        };
+
+        $scope.fullScreen = function(){
+            $scope.playerAPI.toggleFullScreen();
+        };
 
         $scope.$watch('allcameras', function () {
             $scope.selectCameraById($scope.cameraId,$location.search().time || false);

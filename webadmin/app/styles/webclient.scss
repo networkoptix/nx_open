@@ -11,6 +11,10 @@
   background-color: #1C2327;
 }
 
+.dark-theme .caret{
+  border-top-color:white;
+}
+
 .container-fluid.dark-theme{
   margin: 0;
 }
@@ -33,3 +37,44 @@
 .view-panel{
 }
 
+
+
+
+
+.webclient-panel>div.text-left,
+.webclient-panel>div.text-right{
+  width:30%;
+  display:inline-block;
+}
+.webclient-panel>div.text-center{
+  width:40%;
+  display:inline-block;
+}
+
+.webclient-panel{
+  font-size: 120%;
+  min-height: 44px;
+}
+
+.webclient-panel .webclient-button{
+  padding:10px;
+  display: inline-block;
+  cursor:pointer;
+}
+
+.webclient-panel .webclient-button.active{
+  color: #3A911E;
+}
+
+.webclient-button>.dropdown-menu{
+  display: block;
+  min-width: auto;
+  border-radius: 0;
+  padding:0;
+}
+.webclient-button>.dropdown-menu.collapse{
+  display: none;
+}
+.webclient-button>.dropdown-menu.collapse.in{
+  display: block;
+}
