@@ -19,8 +19,7 @@ Window
     color: "white";
 
     minimumHeight: 480;
-    minimumWidth: selectionPage.width 
-        + (loader.item && loader.item.minWidth ? loader.item.minWidth : 0);
+    minimumWidth: 1024;
     
     visible: true;
     

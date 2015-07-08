@@ -2499,16 +2499,11 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
         mainWindow(),
         tr("Anonymous Usage Statistics"),                                   
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
-           "If you would like to disable this feature you can do so in the System Settings dialog."),
-        QMessageBox::Ok | QMessageBox::Cancel,
-        QMessageBox::Ok);
+           "If you would like to disable this feature you can do so in the System Settings dialog.")
+           );
 
-    if (result == QMessageBox::Ok) {
-        ec2::Ec2StaticticsReporter::setAllowed(servers, true);
-        propertyDictionary->saveParamsAsync(idListFromResList(servers));
-    } else {
-        menu()->triggerIfPossible(Qn::SystemAdministrationAction);
-    }
+    ec2::Ec2StaticticsReporter::setAllowed(servers, true);
+    propertyDictionary->saveParamsAsync(idListFromResList(servers));
 }
 
 
