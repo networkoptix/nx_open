@@ -12,7 +12,8 @@ namespace rtu
     typedef QHash<int, QByteArray> Roles;
 
     class ServerInfo;
-    typedef QVector<ServerInfo *> ServerInfoList;
+    typedef QVector<ServerInfo *> ServerInfoPtrContainer;
+    typedef QVector<ServerInfo> ServerInfoContainer;
 
     typedef QVector<QUuid> IDsVector;
 
