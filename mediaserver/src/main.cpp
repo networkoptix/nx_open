@@ -1869,10 +1869,10 @@ void QnMain::run()
         const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
         if (!confStats.isNull()) // if present
         {
-            const bool normStats = confStats.toBool();
-            const bool msStats = QnLexical::deserialized(server->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true);
+            const auto normStats = QnLexical::serialized(confStats.toBool());
+            const auto msStats = server->getProperty(Qn::STATISTICS_REPORT_ALLOWED);
             if (normStats != msStats)
-                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(normStats));
+                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, normStats);
 
             MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
             MSSettings::roSettings()->sync();
