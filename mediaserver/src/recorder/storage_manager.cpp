@@ -796,9 +796,14 @@ QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 startTime, qin
             // join new data from LQ
             mainItr = result.insert(itr.key(), itr.value());
         }
-        QnRecordingStatsData& data = mainItr.value();
-        if (data.recordedMs >= 1000)
-            data.avarageBitrate = data.recordedBytes / (data.recordedMs / 1000);
+    }
+
+    // 2. full avg bitrate
+    for (auto itr = result.begin(); itr != result.end(); ++itr) 
+    {
+        QnRecordingStatsData& data = itr.value();
+        if (data.recordedSecs > 0)
+            data.averageBitrate = data.recordedBytes / (data.recordedSecs);
     }
 
     return result;

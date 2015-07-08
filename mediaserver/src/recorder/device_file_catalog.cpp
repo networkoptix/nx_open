@@ -927,8 +927,9 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 startTime, qint64 e
         const Chunk& chunk = *itr;
         if (chunk.durationMs != Chunk::UnknownDuration) {
             result.recordedBytes += chunk.getFileSize();
-            result.recordedMs += chunk.durationMs;
+            result.recordedSecs += chunk.durationMs;
         }
+        result.recordedSecs /= 1000;
     }
     return result;
 }
