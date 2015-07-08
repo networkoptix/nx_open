@@ -101,8 +101,10 @@ namespace
     QDateTime calcDateTime(const rtu::ServerInfoPtrContainer &servers
         , rtu::Constants::ServerFlags flags)
     {
+        QDateTime defaultDateTime = QDateTime::currentDateTime();
+
         if (servers.empty())
-            return QDateTime();
+            return defaultDateTime;
         
         const qint64 now = QDateTime::currentMSecsSinceEpoch();
         const auto &getter = [now](const rtu::ServerInfo &info) -> qint64
@@ -121,7 +123,7 @@ namespace
             const rtu::ServerInfo &firstInfo = **servers.begin();
             qint64 utcTimeMs = getter(firstInfo);
             if (utcTimeMs <= 0)
-                return QDateTime();
+                return defaultDateTime;
 
             return rtu::convertUtcToTimeZone(utcTimeMs, QTimeZone(firstInfo.extraInfo().timeZoneId));
         }
@@ -142,7 +144,7 @@ namespace
         });
 
         return (utcTimeMs <= 0  || tz.isEmpty() ?
-            QDateTime() : rtu::convertUtcToTimeZone(utcTimeMs, QTimeZone(tz)));
+            defaultDateTime : rtu::convertUtcToTimeZone(utcTimeMs, QTimeZone(tz)));
     }
 
     

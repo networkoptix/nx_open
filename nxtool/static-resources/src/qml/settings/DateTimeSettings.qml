@@ -155,7 +155,7 @@ Expandable.MaskedSettingsPanel
                             id: datePicker;
 
                             initDate: (rtuContext.selection && rtuContext.selection !== null ?
-                                rtuContext.selection.dateTime : undefined);
+                                rtuContext.selection.dateTime : new Date());
                         }
 
                         Base.Button
