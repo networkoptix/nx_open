@@ -24,28 +24,18 @@ ListView
     
     header: Rtu.SelectionHeader 
     {
-        selectAllCheckedState: (!model.serversCount || !model.selectedCount ? Qt.Unchecked
-            : (model.selectedCount === model.serversCount ? Qt.Checked : Qt.PartiallyChecked));
+        selectAllCheckedState: impl.selectAllCheckedState;
         
-        onSelectAllServers:
-        {
-            var selectedParam = select;
-            impl.tryChangeSelectedServers(function()
-            {
-                thisComponent.model.setAllItemSelected(selectedParam);
-            });
-        }
+        onSelectAllServers: { impl.selectAllServers(select); }
     }
 
     footer: Rtu.SelectionFooter 
     {
-        enabled: (model.serversCount && (model.selectedCount !== model.serversCount));
-    
-        onSelectAllClicked: impl.tryChangeSelectedServers(function()
-        {
-            thisComponent.model.setAllItemSelected(true);
-        });
-       
+        visible: thisComponent.contentHeight > thisComponent.height;
+
+        selectAllCheckedState: impl.selectAllCheckedState;
+
+        onSelectAllServers: { impl.selectAllServers(select); }
     }
     
     delegate: Loader
@@ -137,6 +127,19 @@ ListView
 
     property QtObject impl: QtObject
     {
+        readonly property int selectAllCheckedState:
+            (!model.serversCount || !model.selectedCount ? Qt.Unchecked
+            : (model.selectedCount === model.serversCount ? Qt.Checked : Qt.PartiallyChecked));
+
+        function selectAllServers(select)
+        {
+            var selectedParam = select;
+            impl.tryChangeSelectedServers(function()
+            {
+                thisComponent.model.setAllItemSelected(selectedParam);
+            });
+        }
+
         function tryChangeSelectedServers(changeFunc)
         {
             if (askForSelectionChange)

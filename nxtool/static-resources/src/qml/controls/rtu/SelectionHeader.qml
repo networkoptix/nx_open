@@ -1,6 +1,7 @@
 import QtQuick 2.0;
 
 import "../base" as Base;
+import "../rtu" as Rtu;
 import "../../common" as Common;
 
 Base.Column
@@ -9,7 +10,7 @@ Base.Column
 
     signal selectAllServers(bool select);
     
-    property int selectAllCheckedState: 0;
+    property alias selectAllCheckedState: selectAllCheckBox.selectAllCheckedState;
     
     anchors
     {
@@ -39,59 +40,13 @@ Base.Column
 
         text: qsTr("Auto-Detected Nx1 Devices and Systems.");
     }
-    
-    Item
+
+    Rtu.SelectAllCheckbox
     {
-        height: row.height + Common.SizeManager.spacing.base * 2;
-        
-        anchors
-        {
-            left: parent.left;
-            right: parent.right;
-        }
+        id: selectAllCheckBox;
 
-        Row
-        {
-            id: row;
-            spacing: Common.SizeManager.spacing.base;
-            
-            anchors.centerIn: parent;
-            
-            Base.CheckBox
-            {
-                id: selectAllCheckbox;
-                
-        
-                Binding
-                {
-                    target: selectAllCheckbox;
-                    property: "checkedState";
-                    value: thisComponent.selectAllCheckedState;
-                }
-
-                onClicked: 
-                {
-                    thisComponent.selectAllServers(checkedState === Qt.Unchecked); 
-                }
-            }
-            
-            Base.Text
-            {
-                text: qsTr("select / unselect all");
-            }
-        }
-        
-        MouseArea
-        {
-            anchors.fill: parent;
-
-            onClicked: 
-            {
-                thisComponent.selectAllServers(selectAllCheckbox.checkedState === Qt.Unchecked); 
-            }
-        }
+        onSelectAllServers: { thisComponent.selectAllServers(select); }
     }
-
     
     Base.LineDelimiter
     {
