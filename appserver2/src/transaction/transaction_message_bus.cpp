@@ -1106,6 +1106,7 @@ void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
 {
     if (m_alivePeers.contains(peer.id)) 
         return;
+    m_delayedAliveTran.remove(peer.id); // it's expected new tran about peer state if we connected / reconnected. drop previous (probably offline) tran
     addAlivePeerInfo(peer, peer.id, 0);
     handlePeerAliveChanged(peer, true, false);
 }
@@ -1123,7 +1124,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
             tran.params.persistentState = transactionLog->getTransactionsState();
             tran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
         }
-        if (transactionLog && peer.id == m_localPeer.id)
+        if (peer.id == m_localPeer.id)
             sendTransaction(tran);
         else  {
             int delay = rand() % (ALIVE_RESEND_TIMEOUT_MAX - ALIVE_RESEND_TIMEOUT_MIN) + ALIVE_RESEND_TIMEOUT_MIN;
@@ -1343,9 +1344,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL) {
         m_aliveSendTimer.restart();
         handlePeerAliveChanged(m_localPeer, true, true);
-    NX_LOG( QnLog::EC2_TRAN_LOG, "Current transaction state:", cl_logDEBUG1 );
-    if (transactionLog)
-        printTranState(transactionLog->getTransactionsState());
+        NX_LOG( QnLog::EC2_TRAN_LOG, "Current transaction state:", cl_logDEBUG1 );
+        if (transactionLog)
+            printTranState(transactionLog->getTransactionsState());
     }
 
     QSet<QnUuid> lostPeers = checkAlivePeerRouteTimeout(); // check if some routs to a server not accessible any more
