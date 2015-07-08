@@ -59,10 +59,15 @@ FocusScope
             flickableDirection: Flickable.VerticalFlick;
             contentHeight: settingsColumn.height;
 
-            topMargin: Common.SizeManager.fontSizes.base;
-            bottomMargin: Common.SizeManager.spacing.base;
-            leftMargin: Common.SizeManager.spacing.medium;
-            rightMargin: Common.SizeManager.spacing.medium;
+            anchors
+            {
+                fill: parent;
+
+                topMargin: Common.SizeManager.fontSizes.base;
+                bottomMargin: Common.SizeManager.spacing.base;
+                leftMargin: Common.SizeManager.spacing.medium;
+                rightMargin: Common.SizeManager.spacing.medium;
+            }
 
             Column
             {
@@ -85,6 +90,8 @@ FocusScope
                 {
                     id: systemAndPasswordSettings;
                 }
+
+                Base.EmptyCell {}
             }
         }
     }

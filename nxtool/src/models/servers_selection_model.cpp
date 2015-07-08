@@ -380,7 +380,9 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         case kSystemNameRoleId:
             return systemInfo.name;
         case kNameRoleId:
-            return info.baseInfo().name;
+            //TODO: #gdm #nx2 make correct implementation later on, when we will adopt the tool to the nx2 
+            //with several network interfaces.
+            return QString("%1 (%2)").arg(info.baseInfo().name).arg(info.baseInfo().hostAddress);
         case kIdRoleId:
             return info.baseInfo().id;
         case kMacAddressRoleId:
@@ -393,7 +395,7 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         case kDefaultPassword:
             return (info.hasExtraInfo() && rtu::defaultAdminPasswords().contains(info.extraInfo().password));
         case kIpAddressRoleId: 
-            return (!serverInfo.serverInfo.hasExtraInfo() || (info.extraInfo().interfaces.empty())
+            return (!info.hasExtraInfo() || (info.extraInfo().interfaces.empty())
                 ? QVariant() : QVariant::fromValue(info.extraInfo().interfaces));
         }
     }
@@ -648,6 +650,7 @@ void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
     if (!findAndMarkSelected(id, searchInfo))
         return;
 
+    searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().hostAddress = host;
     ExtraServerInfo &extra = getExtraInfo(searchInfo);
     for (const InterfaceInfo &itf: interfaces)
     {
@@ -734,8 +737,12 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     {
         std::for_each(m_systems.begin(), m_systems.end()
             , [&row](const SystemModelInfo &info){ row += kSystemItemCapacity + info.servers.size(); });
-        m_systems.push_back(SystemModelInfo(systemName));
-        systemModelInfo = &m_systems.last();
+
+        SystemModelInfo systemInfo(systemName);
+        SystemModelInfosVector::iterator place = std::lower_bound(m_systems.begin(), m_systems.end(), systemInfo,
+            [](const SystemModelInfo &left, const SystemModelInfo &right) { 
+                return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0; });
+        systemModelInfo = m_systems.insert(place, systemInfo);
         exist = false;
     }
     
