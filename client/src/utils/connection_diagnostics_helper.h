@@ -7,7 +7,6 @@
 #include <api/model/compatibility_item.h>
 
 struct QnConnectionInfo;
-//struct QnCompatibilityItem;
 class QnSoftwareVersion;
 
 class QnConnectionDiagnosticsHelper: public QObject
@@ -23,6 +22,10 @@ public:
         Unauthorized,
         ServerError
     };
+
+#ifdef _DEBUG
+    static QString resultToString(Result value);
+#endif //  _DEBUG
 
     struct TestConnectionResult {
         Result result;

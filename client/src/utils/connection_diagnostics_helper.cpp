@@ -353,3 +353,29 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
 
     return result;
 }
+
+#ifdef _DEBUG
+QString QnConnectionDiagnosticsHelper::resultToString(Result value) {
+    switch (value)
+    {
+    case QnConnectionDiagnosticsHelper::Result::Success:
+        return lit("Success");
+    case QnConnectionDiagnosticsHelper::Result::RestartRequested:
+        return lit("RestartRequested");
+    case QnConnectionDiagnosticsHelper::Result::IncompatibleBrand:
+        return lit("IncompatibleBrand");
+    case QnConnectionDiagnosticsHelper::Result::IncompatibleVersion:
+        return lit("IncompatibleVersion");
+    case QnConnectionDiagnosticsHelper::Result::IncompatibleProtocol:
+        return lit("IncompatibleProtocol");
+    case QnConnectionDiagnosticsHelper::Result::Unauthorized:
+        return lit("Unauthorized");
+    case QnConnectionDiagnosticsHelper::Result::ServerError:
+        return lit("ServerError");
+    default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        break;
+    }
+    return QString();
+}
+#endif

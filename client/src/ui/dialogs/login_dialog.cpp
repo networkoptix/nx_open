@@ -85,7 +85,6 @@ bool QnLoginDialog::QnEcData::operator==(const QnEcData& other) const {
         && version == other.version 
         && protoVersion == other.protoVersion
         && systemName == other.systemName
-        && brand == other.brand
         ;
 }
 
@@ -324,7 +323,9 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
         foreach (const QnEcData& data, m_foundEcs) {
             QUrl url = data.url;
 
-            bool isCompatible = QnConnectionDiagnosticsHelper::validateConnectionLight(data.brand, data.version, data.protoVersion) == QnConnectionDiagnosticsHelper::Result::Success;
+            auto compatibilityCode = QnConnectionDiagnosticsHelper::validateConnectionLight(QString(), data.version, data.protoVersion);
+
+            bool isCompatible = (compatibilityCode == QnConnectionDiagnosticsHelper::Result::Success);
 
             QString title;
             if (!data.systemName.isEmpty())
@@ -332,7 +333,12 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
             else
                 title = lit("%1:%2").arg(url.host()).arg(url.port());
             if (!isCompatible)
-                title += lit(" (v%3)").arg(data.version.toString(QnSoftwareVersion::BugfixFormat));
+                title += lit(" (v%1)").arg(data.version.toString(QnSoftwareVersion::BugfixFormat));
+#ifdef _DEBUG
+            if (!isCompatible)
+                title += lit(" (%1)").arg(QnConnectionDiagnosticsHelper::resultToString(compatibilityCode));
+#endif // _DEBUG
+
 
             QStandardItem* item = new QStandardItem(title);
             item->setData(url, Qn::UrlRole);
@@ -534,7 +540,6 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
     data.version = moduleInformation.version;
     data.protoVersion = moduleInformation.protoVersion;
     data.systemName = moduleInformation.systemName;
-    data.brand = moduleInformation.customization;
 
     /* prefer localhost */
     SocketAddress address = SocketAddress(QHostAddress(QHostAddress::LocalHost).toString(), moduleInformation.port);
