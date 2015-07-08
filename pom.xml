@@ -398,7 +398,7 @@
         </profile>
         <!-- Paxton stuff can be built only on Windows x86 -->
         <profile>
-            <id>windows-x86</id>
+            <id>paxton</id>
             <activation>
                 <os>
                     <family>Windows</family>
