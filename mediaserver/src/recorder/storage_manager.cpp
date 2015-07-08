@@ -773,6 +773,63 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
     return QnTimePeriodList::mergeTimePeriods(periods, limit);
 }
 
+QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 startTime, qint64 endTime)
+{
+    QnRecordingStatsReply result;
+
+    // 1. obtain data
+    const QnRecordingStatsReply resultHi = getChunkStatisticsInternal(startTime, endTime, QnServer::HiQualityCatalog);
+    const QnRecordingStatsReply resulLow = getChunkStatisticsInternal(startTime, endTime, QnServer::LowQualityCatalog);
+
+    // 2. merge data
+    result = resultHi;
+    for (auto itr = resulLow.constBegin(); itr != resulLow.constEnd(); ++itr) {
+        auto mainItr = result.find(itr.key());
+        if (mainItr != result.end()) 
+        {
+            // merge HQ and LQ data
+            QnRecordingStatsData& left = mainItr.value();
+            const QnRecordingStatsData& right = itr.value();
+            left += right;
+        }
+        else {
+            // join new data from LQ
+            mainItr = result.insert(itr.key(), itr.value());
+        }
+        QnRecordingStatsData& data = mainItr.value();
+        if (data.recordedMs >= 1000)
+            data.avarageBitrate = data.recordedBytes / (data.recordedMs / 1000);
+    }
+
+    return result;
+}
+
+QnRecordingStatsReply QnStorageManager::getChunkStatisticsInternal(qint64 startTime, qint64 endTime, QnServer::ChunksCatalog catalog)
+{
+    FileCatalogMap& catalogMap = m_devFileCatalog[catalog]; // this line doesn't require mutex
+    QnRecordingStatsReply result;
+
+    // It could be long function. I've reduced mutex lock time to lock it per catalog
+    QList<QString> cameraUniqueIdList;
+    {
+        QMutexLocker lock(&m_mutexCatalog);
+        cameraUniqueIdList = catalogMap.keys();
+    }
+
+    for (const auto& uniqueId: cameraUniqueIdList)
+    {
+        QnResourcePtr camera = qnResPool->getResourceByUniqueId(uniqueId);
+        if (!camera)
+            continue;
+        QMutexLocker lock(&m_mutexCatalog);
+        const auto& fileCatalog = catalogMap.value(uniqueId);
+        if (fileCatalog)
+           result.insert(camera->getId(), fileCatalog->getStatistics(startTime, endTime));
+    }
+
+    return result;
+}
+
 void QnStorageManager::clearSpace()
 {
     testOfflineStorages();

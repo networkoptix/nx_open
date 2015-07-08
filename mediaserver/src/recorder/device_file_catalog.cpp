@@ -914,6 +914,25 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
     return true;
 }
 
+QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 startTime, qint64 endTime) const
+{
+    QnRecordingStatsData result;
+    QMutexLocker lock(&m_mutex);
+
+    auto itrLeft = qLowerBound(m_chunks.cbegin(), m_chunks.cend(), startTime);
+    auto itrRight = qUpperBound(itrLeft, m_chunks.cend(), endTime);
+    
+    for (auto itr = itrLeft; itr != itrRight; ++itr)
+    {
+        const Chunk& chunk = *itr;
+        if (chunk.durationMs != Chunk::UnknownDuration) {
+            result.recordedBytes += chunk.getFileSize();
+            result.recordedMs += chunk.durationMs;
+        }
+    }
+    return result;
+}
+
 bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other)
 { 
     return first < other.startTimeMs;

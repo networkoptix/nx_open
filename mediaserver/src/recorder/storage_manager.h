@@ -21,6 +21,7 @@
 #include "storage_db.h"
 #include "utils/common/uuid.h"
 #include "api/model/rebuild_archive_reply.h"
+#include "api/model/recording_stats_reply.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
@@ -70,6 +71,7 @@ public:
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
 
     QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs, int limit);
+    QnRecordingStatsReply getChunkStatistics(qint64 startTime, qint64 endTime);
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
@@ -151,6 +153,7 @@ private:
     bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
     void testStoragesDone();
+    QnRecordingStatsReply getChunkStatisticsInternal(qint64 startTime, qint64 endTime, QnServer::ChunksCatalog catalog);
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];

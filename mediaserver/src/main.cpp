@@ -105,6 +105,7 @@
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
+#include <rest/handlers/recording_stats_rest_handler.h>
 #include <rest/handlers/ping_system_rest_handler.h>
 #include <rest/handlers/ptz_rest_handler.h>
 #include <rest/handlers/can_accept_cameras_rest_handler.h>
@@ -1379,6 +1380,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/rec_stats", new QnRecordingStatsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());

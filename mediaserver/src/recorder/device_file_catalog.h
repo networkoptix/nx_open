@@ -16,6 +16,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include "recording/time_period.h"
+#include "api/model/recording_stats_reply.h"
 
 class QnTimePeriodList;
 class QnTimePeriod;
@@ -28,6 +29,7 @@ public:
     struct Chunk
     {
         static const quint16 FILE_INDEX_NONE = 0xffff;
+        static const int UnknownDuration = -1;
 
         Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1), fileSizeHi(0), fileSizeLo(0) {}
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) : 
@@ -137,6 +139,7 @@ public:
     void addChunks(const std::deque<Chunk>& chunk);
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
+    QnRecordingStatsData getStatistics(qint64 startTime, qint64 endTime) const;
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
