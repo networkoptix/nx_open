@@ -92,6 +92,9 @@ namespace rtu
         
         ServerInfo(const BaseServerInfo &baseInfo);
         
+        ServerInfo(const BaseServerInfo &baseInfo
+            , const ExtraServerInfo &extraInfo);
+
         ~ServerInfo();
         
         ServerInfo &operator = (const ServerInfo &other);

@@ -417,7 +417,6 @@ void rtu::ChangesManager::Impl::onChangeApplied()
     
     m_changeset.reset();
     m_context->setCurrentPage(Constants::SummaryPage);
-    emit m_model->selectionChanged();
 }
 
 void rtu::ChangesManager::Impl::sendRequests()

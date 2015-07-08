@@ -4,6 +4,7 @@
 #include <functional>
 
 #include <QStringList>
+#include <QElapsedTimer>
 
 #include <base/server_info.h>
 #include <base/requests.h>
@@ -52,14 +53,22 @@ public:
     void updateServerInfos(const ServerInfoContainer &servers);
 
 private:
+    typedef QHash<QUuid, qint64> LastUpdateTimeMap;
+
     ServerInfoManager * const m_owner;
     HttpClient * const m_httpClient;
+
+    QElapsedTimer m_msCounter;
+    LastUpdateTimeMap m_lastUpdated;
 };
 
 rtu::ServerInfoManager::Impl::Impl(ServerInfoManager *parent)
     : QObject(parent)
     , m_owner(parent)
     , m_httpClient(new HttpClient(this))
+
+    , m_msCounter()
+    , m_lastUpdated()
 {   
 }
 
@@ -118,17 +127,21 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
     {
         const BaseServerInfo &base = server.baseInfo();
         const QUuid &id = base.id;
-        const auto &successful = [this, id](const QUuid &, const ExtraServerInfo &extraInfo)
+
+        const int timestamp = m_msCounter.elapsed();
+        const auto &successful = [this, id, timestamp](const QUuid &, const ExtraServerInfo &extraInfo)
         {
+            m_lastUpdated[id] = timestamp;
             emit m_owner->serverExtraInfoUpdated(id, extraInfo);
         };
 
-        const auto &failed = [this, base, successful](const QString &, int) 
+        const auto &failed = [this, base, successful, timestamp](const QString &, int) 
         {
             /// on fail - try re-login
-            const auto &loginFailed = [this](const QUuid &id)
+            const auto &loginFailed = [this, timestamp](const QUuid &id)
             {
-                emit m_owner->serverExtraInfoUpdateFailed(id);
+                if (m_lastUpdated[id] <= timestamp)
+                    emit m_owner->serverExtraInfoUpdateFailed(id);
             };
 
             loginToServer(base, 0, successful, loginFailed);

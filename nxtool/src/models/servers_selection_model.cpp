@@ -499,8 +499,8 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
     if (!findItem(rowIndex, m_systems, searchInfo))
         return;
     
-    typedef QScopedPointer<SelectionUpdaterGuard> GaurdHolder;
-    GaurdHolder localGuard;
+    typedef QScopedPointer<SelectionUpdaterGuard> GuardHolder;
+    GuardHolder localGuard;
     if (!guard)
     {
         localGuard.reset(new SelectionUpdaterGuard(m_serverInfoManager));
@@ -854,8 +854,11 @@ void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &ba
     if (!findServer(baseInfo.id, searchInfo))
         return;
 
-    m_serverInfoManager->updateServerInfos(
-        ServerInfoContainer(1, searchInfo.serverInfoIterator->serverInfo));
+    const ServerInfo &foundInfo = searchInfo.serverInfoIterator->serverInfo;
+    ServerInfo tmp = (!foundInfo.hasExtraInfo() ? ServerInfo(baseInfo)
+        : ServerInfo(baseInfo, foundInfo.extraInfo()));
+
+    m_serverInfoManager->updateServerInfos(ServerInfoContainer(1, tmp));
 }
 
 void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
