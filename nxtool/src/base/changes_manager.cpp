@@ -794,7 +794,7 @@ void rtu::ChangesManager::addDateTimeChange(const QDate &date
     , const QTime &time
     , const QByteArray &timeZoneId)
 {
-    qint64 utcTimeMs = utcMsFromTimeZone(date, time, QTimeZone(timeZoneId));
+    qint64 utcTimeMs = msecondsFromEpoch(date, time, QTimeZone(timeZoneId));
     m_impl->getChangeset().dateTime.reset(new DateTime(utcTimeMs, timeZoneId));
 }
 
