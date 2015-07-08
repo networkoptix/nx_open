@@ -26,7 +26,7 @@ struct QnCheckForUpdateResult {
 
     Value result;
     QSet<QnSystemInformation> systems;  /**< Set of supported system, for which updates were found. */
-    QnSoftwareVersion latestVersion;
+    QnSoftwareVersion version;
     bool clientInstallerRequired;
     QUrl releaseNotesUrl;
 };
