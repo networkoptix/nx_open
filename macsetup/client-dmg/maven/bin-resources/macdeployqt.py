@@ -41,12 +41,12 @@ def prepare(binary, sbindir, tlibdir):
 
     tresdir = join(os.path.dirname(tbindir), 'Resources')
 
-    shutil.copyfile(join(sbindir, 'client'), binary)
+    shutil.copyfile(join(sbindir, 'clientexe'), binary)
     os.chmod(binary, 0755)
     yield binary
 
     ignore = shutil.ignore_patterns('*debug*', '.*')
-    for subfolder in 'platforms', 'styles', 'imageformats':
+    for subfolder in 'platforms', 'styles', 'imageformats', 'vox':
         tfolder = join(tbindir, subfolder)
         shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore)
         for f in os.listdir(tfolder):
