@@ -170,7 +170,7 @@
         },
     {
             "keys": [
-                "DW|DWC-PV2M4TIR","DW|DWC-PB2M4TIR"
+                "DW|DWC-PV2M4TIR","DW|DWC-PB2M4TIR", "DWC|DWC-PV2M4T", "DW|DWC-PV2M4T"
             ],
         "dw-http-ptz": true
         },
