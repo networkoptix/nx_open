@@ -241,6 +241,9 @@
                     <name>mobile</name>
                     <value>true</value>
                 </property>
+                <file>
+                    <missing>customization/${customization}/mobile.skip</missing>
+                </file>                
             </activation>
             <modules>
                 <module>android-client/protobuf-classes</module>
@@ -258,6 +261,9 @@
                     <name>mobile</name>
                     <value>true</value>
                 </property>
+                <file>
+                    <missing>customization/${customization}/mobile.skip</missing>
+                </file>                 
             </activation>
             <modules>
                 <module>ios-client</module>
@@ -401,6 +407,9 @@
                     <name>arch</name>
                     <value>x86</value>
                 </property>
+                <file>
+                    <missing>customization/${customization}/paxton.skip</missing>
+                </file>
             </activation>
             <modules>
                 <module>plugins/nxinterface</module>     
