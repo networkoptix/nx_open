@@ -872,24 +872,22 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     SystemModelInfo *systemModelInfo = findSystemModelInfo(systemName, row);
     if (!systemModelInfo)
     {
-        std::for_each(m_systems.begin(), m_systems.end()
-            , [&row](const SystemModelInfo &info){ row += kSystemItemCapacity + info.servers.size(); });
 
         SystemModelInfo systemInfo(systemName);
         SystemModelInfosVector::iterator place = std::lower_bound(m_systems.begin(), m_systems.end(), systemInfo,
             [](const SystemModelInfo &left, const SystemModelInfo &right) { 
                 return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0; });
-        systemModelInfo = m_systems.insert(place, systemInfo);
+
+        m_systems.insert(place, systemInfo);
+        systemModelInfo = findSystemModelInfo(systemName, row);
         exist = false;
     }
-    
+
     systemModelInfo->servers.push_back(ServerModelInfo(selected, info));
     systemModelInfo->loggedServers += (info.hasExtraInfo() ? 1 : 0);
 
     if (selected != Qt::Unchecked)
         ++systemModelInfo->selectedServers;
-
-    m_changeHelper->dataChanged(row, row);
 
     const int rowStart = (exist ? row + systemModelInfo->servers.size() : row);
     const int rowFinish = (row + systemModelInfo->servers.size());
@@ -898,7 +896,10 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     
     if (!info.hasExtraInfo())
         m_serverInfoManager->loginToServer(info.baseInfo());
-    
+
+    if (exist)
+        m_changeHelper->dataChanged(row, row);
+
     emit m_owner->serversCountChanged();
 }
 
