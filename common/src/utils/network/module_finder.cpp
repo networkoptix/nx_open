@@ -372,7 +372,7 @@ void QnModuleFinder::at_timer_timeout() {
         QSet<QUrl> ignoredUrls = ignoredUrlsForServer(id);
         {
             QMutexLocker lk(&m_connectedPeersMutex);
-            if (m_connectedPeers.find(id) != m_connectedPeers.end())
+            if (!m_connectedPeers.contains(id))
                 continue;
         }
         removeAddress(address, false, ignoredUrls);
