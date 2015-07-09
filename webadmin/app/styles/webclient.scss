@@ -98,15 +98,12 @@
 
 
 .webclient-window .tree{
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
   width:350px;
   max-height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
-}
-.webclient-window .tree .active>a{
-  font-weight: bold;
 }
 
 .webclient-window .tree .offline {
@@ -159,4 +156,9 @@
   background-color: rgba(53,70,79,0.4);
   border-left: 3px solid lightblue;
   padding-left:12px;
+}
+
+.camera-node small{
+  color: rgb(105,135,150);
+  font-size: 75%
 }

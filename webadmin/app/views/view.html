@@ -10,8 +10,6 @@
                                 <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-up pull-right" title-true="collapse" ></icon>
                                 <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-down pull-right" title-true="expand"  ></icon>
 
-                                <icon for="!cameras[server.id] || cameras[server.id].length < 1" on-true="empty"></icon>
-
                                 <icon for="server.status=='Unauthorized'" on-true="lock" title="Unauthorized" ></icon>
                                 &nbsp;{{server.name}} ({{server.url}}) {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
                             </a>
