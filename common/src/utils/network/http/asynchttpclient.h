@@ -297,6 +297,7 @@ namespace nx_http
         {
             if( this == &right )
                 return *this;
+            reset();
             m_obj = right.m_obj;
             return *this;
         }
@@ -305,7 +306,7 @@ namespace nx_http
         {
             if( this == &right )
                 return *this;
-            m_obj.reset();
+            reset();
             std::swap( m_obj, right.m_obj );
             return *this;
         }
