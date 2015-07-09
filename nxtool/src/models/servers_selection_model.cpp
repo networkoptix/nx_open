@@ -671,7 +671,11 @@ rtu::ExtraServerInfo& rtu::ServersSelectionModel::Impl::getExtraInfo(ItemSearchI
 {
     ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
     if (!info.hasExtraInfo())
+    {
         info.setExtraInfo(ExtraServerInfo());
+        ++searchInfo.systemInfoIterator->loggedServers;
+        m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
+    }
 
     return info.writableExtraInfo();
 }
@@ -684,12 +688,6 @@ void rtu::ServersSelectionModel::Impl::updateExtraInfo(const QUuid &id
     ItemSearchInfo searchInfo;
     if (!findServer(id, searchInfo))
         return;
-
-    if (!searchInfo.serverInfoIterator->serverInfo.hasExtraInfo())
-    {
-        ++searchInfo.systemInfoIterator->loggedServers;
-        m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
-    }
 
     updatePasswordInfo(searchInfo, extraInfo.password);
     updateTimeDateInfo(searchInfo, extraInfo.utcDateTimeMs

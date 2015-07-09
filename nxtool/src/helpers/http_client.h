@@ -17,6 +17,8 @@ namespace rtu
         typedef std::function<void (const QString &errorReason
             , int errorCode)> ErrorCallback;
         
+        enum { kUseDefaultTimeout = 0 };
+
         HttpClient(QObject *parent);
         
         virtual ~HttpClient();
@@ -25,14 +27,14 @@ namespace rtu
         void sendGet(const QUrl &url
             , const ReplyCallback &sucessfullCallback = ReplyCallback()
             , const ErrorCallback &errorCallback = ErrorCallback()
-            , qint64 timeoutMs = 0);
+            , qint64 timeoutMs = kUseDefaultTimeout);
         
         //TODO: #gdm describe default values for timeout
         void sendPost(const QUrl &url
             , const QByteArray &data
             , const ReplyCallback &successfullCallback
             , const ErrorCallback &errorCallback = ErrorCallback()
-            , qint64 timeoutMs = 0);
+            , qint64 timeoutMs = kUseDefaultTimeout);
         
     private:
         class Impl;

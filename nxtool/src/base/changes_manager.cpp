@@ -1,7 +1,7 @@
 
 #include "changes_manager.h"
 
-#include <QObject>
+#include <QTimer>
 
 #include <base/types.h>
 #include <base/requests.h>
@@ -18,6 +18,13 @@
 
 namespace
 {
+    enum 
+    {
+        kIfListRequestsPeriod = 2 * 1000
+        , kWaitTriesCount = 15
+        , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount
+    };
+
     struct DateTime
     {
         qint64 utcDateTimeMs;
@@ -329,9 +336,8 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
         return;
     }
     
-    enum { kRequestsMinOffset = 2 * 1000};
     const qint64 current = QDateTime::currentMSecsSinceEpoch();
-    if ((current - request.timestamp) < kRequestsMinOffset)
+    if ((current - request.timestamp) < kIfListRequestsPeriod)
         return;
     
     const auto processCallback =
@@ -347,8 +353,7 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
         
         const bool totalApplied = changesApplied(extraInfo.interfaces, request.itfUpdateInfo);
         
-        enum { kMaxTriesCount = 20 };
-        if (!(successful && totalApplied) && (++request.tries < kMaxTriesCount))
+        if (!(successful && totalApplied) && (++request.tries < kWaitTriesCount))
             return;
 
         InterfaceInfoList newInterfaces;
@@ -391,8 +396,9 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
     };
     
     request.inProgress = true;
+
     sendIfListRequest(m_client, baseInfo
-        , request.info->extraInfo().password, successful, failed);
+        , request.info->extraInfo().password, successful, failed, kIfListRequestsPeriod);
 }
 
 
@@ -556,21 +562,37 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
         const auto &request = 
             [this, info, changes]()
         {
-            const auto &callback = 
+            const auto &failedCallback = 
                 [this, info, changes](const QString &errorReason, AffectedEntities affected)
             {
-                /* In case of success we need to wait more until server is rediscovered. */
-                if (errorReason.isEmpty()) //TODO: #ynikitenkov very strange way to check error
+                const auto &it = m_itfChanges.find(info->baseInfo().id);
+                if (it == m_itfChanges.end())
                     return;
-                
+
+                m_itfChanges.erase(it);
                 for (const auto &change: changes)
                     addUpdateInfoSummaryItem(*info, errorReason, change, affected);
 
-                const auto &it = m_itfChanges.find(info->baseInfo().id);
-                if (it != m_itfChanges.end())
-                    m_itfChanges.erase(it);
-
                 onChangeApplied();
+            };
+
+            const auto &callback = 
+                [this, failedCallback](const QString &errorReason, AffectedEntities affected)
+            {
+                if (!errorReason.isEmpty())
+                {
+                    failedCallback(errorReason, affected);
+                }
+                else
+                {
+                    /* In case of success we need to wait more until server is rediscovered. */
+                    QTimer::singleShot(kTotalIfConfigTimeout
+                        , [this, failedCallback, affected]() 
+                    {
+                        failedCallback(tr("Request timeout"), affected);
+                    });
+                }
+                
             };
 
             m_itfChanges.insert(info->baseInfo().id, ItfChangeRequest(info, changes));

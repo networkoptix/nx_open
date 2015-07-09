@@ -70,7 +70,7 @@ private:
             success(success), error(error)
         {
             //TODO: #gdm describe default values
-            if (timeoutMs == 0)
+            if (timeoutMs == HttpClient::kUseDefaultTimeout)
                 timeoutMs = defaultRequestTimeoutMs;
             timeoutTimeMs = QDateTime::currentMSecsSinceEpoch() + timeoutMs;
         }

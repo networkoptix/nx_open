@@ -7,6 +7,7 @@
 
 #include <base/types.h>
 #include <base/server_info.h>
+#include <helpers/http_client.h>
 
 class QDateTime;
 class QTimeZone;
@@ -93,7 +94,8 @@ namespace rtu
         , const BaseServerInfo &info
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
-        , const OperationCallback &failed);
+        , const OperationCallback &failed
+        , int timeout = HttpClient::kUseDefaultTimeout);
 
     ///
 
