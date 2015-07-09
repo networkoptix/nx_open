@@ -34,7 +34,7 @@ namespace rtu
         void sendGet(const QUrl &url
             , const ReplyCallback &sucessfullCallback = ReplyCallback()
             , const ErrorCallback &errorCallback = ErrorCallback()
-            , qint64 timeoutMs = 0);
+            , qint64 timeoutMs = HttpClient::kUseDefaultTimeout);
         
         /** Send post request to the given url.
          * @param url                   Target url.
@@ -49,7 +49,7 @@ namespace rtu
             , const QByteArray &data = QByteArray()
             , const ReplyCallback &successfullCallback = ReplyCallback()
             , const ErrorCallback &errorCallback = ErrorCallback()
-            , qint64 timeoutMs = 0);
+            , qint64 timeoutMs = HttpClient::kUseDefaultTimeout);
         
     private:
         class Impl;
