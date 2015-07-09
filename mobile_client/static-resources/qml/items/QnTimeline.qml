@@ -16,6 +16,7 @@ Item {
     property alias startBound: timeline.startBound
     property alias autoPlay: timeline.autoPlay
     readonly property bool dragging: mouseArea.pressed || pinchArea.pinch.active
+    readonly property bool moving: timeline.moving
     readonly property var timelineView: timeline
 
     signal dragFinished()
@@ -41,12 +42,17 @@ Item {
         id: timeline
         anchors.fill: parent
 
+        property bool moving: false
+
         textColor: QnTheme.timelineText
         chunkColor: QnTheme.timelineChunk
 
         font.pixelSize: sp(16)
 
-        onMoveFinished: root.moveFinished()
+        onMoveFinished: {
+            moving = false
+            root.moveFinished()
+        }
     }
 
     PinchArea {
@@ -57,8 +63,13 @@ Item {
         pinch.maximumRotation: 0
         pinch.dragAxis: Qt.XAxis
 
-        onPinchStarted: timeline.startPinch(pinch.center.x, pinch.scale)
-        onPinchUpdated: timeline.updatePinch(pinch.center.x, pinch.scale)
+        onPinchStarted: {
+            timeline.moving = true
+            timeline.startPinch(pinch.center.x, pinch.scale)
+        }
+        onPinchUpdated: {
+            timeline.updatePinch(pinch.center.x, pinch.scale)
+        }
         onPinchFinished: {
             timeline.finishPinch(pinch.center.x, pinch.scale)
             root.dragFinished()
@@ -78,6 +89,7 @@ Item {
             onMouseXChanged: {
                 if (pressX != -1 && Math.abs(pressX - mouseX) > drag.threshold) {
                     preventStealing = true
+                    timeline.moving = true
                     timeline.startDrag(pressX)
                     pressX = -1
                 }
