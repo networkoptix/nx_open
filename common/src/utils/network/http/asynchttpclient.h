@@ -346,7 +346,7 @@ namespace nx_http
 
         operator bool() const
         {
-            return m_obj;
+            return (bool)m_obj;
         }
 
     private:
