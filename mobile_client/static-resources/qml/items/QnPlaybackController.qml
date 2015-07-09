@@ -33,6 +33,10 @@ Item {
         var w = center - speedMarkers.padding
         var factor
 
+        /* Positive and negative speeds have different scales.
+           Coefficients are just evaluated to match grip position with the displayed speed.
+         */
+        // TODO: #dklychkov: Reimplement without magic numbers.
         if (grip.x < w) {
             factor = Math.pow((w - grip.x) / w, 4)
             return -1.0 + factor * (d.minSpeed + 1.0)
