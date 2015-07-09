@@ -32,6 +32,8 @@ public: //ctors, dtor
         const QString  &storageUrl
     );
 
+    QnThirdPartyStorageResource(); //designates invalid storagere source
+
     ~QnThirdPartyStorageResource();
 
 public: // inherited interface overrides
@@ -63,6 +65,7 @@ private:
     qn_storage_error_message_function   m_emf;
     StoragePtrType                      m_storage;
     mutable QMutex                      m_mutex;
+    bool                                m_valid;
 }; // QnThirdPartyStorageResource
 
 #endif

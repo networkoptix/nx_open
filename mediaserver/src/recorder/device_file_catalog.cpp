@@ -414,19 +414,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         {
             //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
             QString fileName = fi.absoluteFilePath();
-
-            auto timestampFromName = [](const QString& s) -> qint64
-            {
-                int ind = s.lastIndexOf(lit("\\"));
-                if (ind == -1)
-                    ind = s.lastIndexOf(lit("/"));
-                int dotInd = s.lastIndexOf(lit("."));
-                int len = dotInd == -1 ? s.size() - (ind + 1) : dotInd - (ind + 1);
-                return s.mid(ind + 1, len).toLongLong();
-                return 0;
-            };
-
-            qint64 fileTime = timestampFromName(fileName);
+            qint64 fileTime = QFileInfo(fileName).baseName().toLongLong();
 
             if (!filter.isEmpty() && fileTime > filter.scanPeriod.endTimeMs())
                 return;

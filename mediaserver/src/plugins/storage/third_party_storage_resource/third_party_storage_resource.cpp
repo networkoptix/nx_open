@@ -178,17 +178,18 @@ QnStorageResource* QnThirdPartyStorageResource::instance(const QString& url)
             }
             catch(const std::exception&)
             {
-                return nullptr;
+                return new QnThirdPartyStorageResource;
             }
         }
     }
-    return nullptr;
+    return new QnThirdPartyStorageResource;
 }
 
 QnThirdPartyStorageResource::QnThirdPartyStorageResource(
     const QString  &libraryPath,
     const QString  &storageUrl
-) : m_lib(libraryPath.toLatin1().constData())
+) : m_lib(libraryPath.toLatin1().constData()),
+    m_valid(true)
 {
     if (libraryPath.isEmpty() || storageUrl.isEmpty())
         throw std::runtime_error("Invalid storage construction arguments");
@@ -209,6 +210,11 @@ QnThirdPartyStorageResource::QnThirdPartyStorageResource(
 
     openStorage(storageUrl.toLatin1().constData());
 }
+
+QnThirdPartyStorageResource::QnThirdPartyStorageResource()
+    : m_lib(nullptr),
+      m_valid(false)
+{}
 
 QnThirdPartyStorageResource::~QnThirdPartyStorageResource()
 {}
@@ -273,6 +279,9 @@ QIODevice *QnThirdPartyStorageResource::open(
     QIODevice::OpenMode  openMode
 )
 {
+    if (!m_valid)
+        return nullptr;
+
     if (fileName.isEmpty())
         return nullptr;
 
@@ -354,11 +363,14 @@ QIODevice *QnThirdPartyStorageResource::open(
 
 int QnThirdPartyStorageResource::getCapabilities() const
 {
-    return m_storage->getCapabilities();
+    return m_valid ? m_storage->getCapabilities() : 0;
 }
     
 qint64 QnThirdPartyStorageResource::getFreeSpace()
 {
+    if (!m_valid)
+        return 0;
+
     int ecode;
     qint64 freeSpace = m_storage->getFreeSpace(&ecode);
     if (ecode != Qn::error::NoError)
@@ -368,6 +380,9 @@ qint64 QnThirdPartyStorageResource::getFreeSpace()
 
 qint64 QnThirdPartyStorageResource::getTotalSpace()
 {
+    if (!m_valid)
+        return 0;
+
     int ecode;
     qint64 totalSpace = m_storage->getTotalSpace(&ecode);
     if (ecode != Qn::error::NoError)
@@ -377,11 +392,16 @@ qint64 QnThirdPartyStorageResource::getTotalSpace()
 
 bool QnThirdPartyStorageResource::isAvailable() const
 {
+    if (!m_valid)
+       return false;
     return m_storage->isAvailable();
 }
 
 bool QnThirdPartyStorageResource::removeFile(const QString& url)
 {
+    if (!m_valid)
+        return false;
+
     int ecode;
     m_storage->removeFile(urlToPath(url).toLatin1().data(), &ecode);
     if (ecode != Qn::error::NoError)
@@ -391,6 +411,9 @@ bool QnThirdPartyStorageResource::removeFile(const QString& url)
 
 bool QnThirdPartyStorageResource::removeDir(const QString& url)
 {
+    if (!m_valid)
+        return false;
+
     int ecode;
     m_storage->removeDir(urlToPath(url).toLatin1().data(), &ecode);
     if (ecode != Qn::error::NoError)
@@ -403,6 +426,9 @@ bool QnThirdPartyStorageResource::renameFile(
     const QString   &newName
 )
 {
+    if (!m_valid)
+        return false;
+
     int ecode;
     m_storage->renameFile(
         urlToPath(oldName).toLatin1().data(), 
@@ -418,6 +444,9 @@ bool QnThirdPartyStorageResource::renameFile(
 QnAbstractStorageResource::FileInfoList 
 QnThirdPartyStorageResource::getFileList(const QString& dirName)
 {
+    if (!m_valid)
+        return QnAbstractStorageResource::FileInfoList();
+
     QMutexLocker lock(&m_mutex);
     int ecode;
     Qn::FileInfoIterator* fitRaw = m_storage->getFileIterator(
@@ -476,6 +505,9 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
 
 bool QnThirdPartyStorageResource::isFileExists(const QString& url)
 {
+    if (!m_valid)
+        return false;
+
     QMutexLocker lock(&m_mutex);
     int ecode;
     int result = m_storage->fileExists(url.toLatin1().constData(), &ecode);
@@ -486,6 +518,9 @@ bool QnThirdPartyStorageResource::isFileExists(const QString& url)
 
 bool QnThirdPartyStorageResource::isDirExists(const QString& url)
 {
+    if (!m_valid)
+        return false;
+
     QMutexLocker lock(&m_mutex);
     int ecode;
     int result = m_storage->dirExists(url.toLatin1().constData(), &ecode);
@@ -496,6 +531,9 @@ bool QnThirdPartyStorageResource::isDirExists(const QString& url)
 
 qint64 QnThirdPartyStorageResource::getFileSize(const QString& url) const
 {
+    if (!m_valid)
+        return 0;
+
     QMutexLocker lock(&m_mutex);
     int ecode;
     qint64 fsize = m_storage->fileSize(url.toLatin1().constData(), &ecode);
