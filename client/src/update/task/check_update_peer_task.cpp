@@ -121,7 +121,7 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
 void QnCheckForUpdatesPeerTask::checkBuildOnline() {
     QUrl url(m_updateLocationPrefix + lit("/") + QString::number(m_target.version.build()) + lit("/") + buildInformationSuffix);
 
-    nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
     QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
@@ -150,7 +150,7 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
 
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Checking online updates [%1]").arg(m_target.version.toString()), cl_logDEBUG1);
 
-    nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
     QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);

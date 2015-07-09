@@ -73,8 +73,11 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
         {
             QString urlStr = url.toString();
 
-            std::shared_ptr<nx_http::AsyncHttpClient> request = std::make_shared<nx_http::AsyncHttpClient>();
-            connect(request.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)), this, SLOT(at_httpConnectionDone(nx_http::AsyncHttpClientPtr)), Qt::DirectConnection);
+            auto request = nx_http::AsyncHttpClient::create();
+            connect(
+                request.get(), &nx_http::AsyncHttpClient::done,
+                this, &QnActiResourceSearcher::at_httpConnectionDone,
+                Qt::DirectConnection );
             if( request->doGet(url) )
                 m_httpInProgress[url.host()] = request;
         }

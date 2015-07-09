@@ -462,7 +462,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
 
     setState(ConnectingStage1);
 
-    m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    m_httpClient = nx_http::AsyncHttpClient::create();
     m_httpClient->setSendTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
     m_httpClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
     connect(
@@ -1007,7 +1007,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         //using http client just to authenticate on server
         if( !m_outgoingTranClient )
         {
-            m_outgoingTranClient = std::make_shared<nx_http::AsyncHttpClient>();
+            m_outgoingTranClient = nx_http::AsyncHttpClient::create();
             m_outgoingTranClient->setSendTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
             m_outgoingTranClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
             m_outgoingTranClient->addAdditionalHeader(

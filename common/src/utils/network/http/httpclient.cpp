@@ -12,7 +12,7 @@ namespace nx_http
 {
     HttpClient::HttpClient()
     :
-        m_asyncHttpClient( std::make_shared<AsyncHttpClient>() ),
+        m_asyncHttpClient( nx_http::AsyncHttpClient::create() ),
         m_done( false ),
         m_terminated( false )
     {
