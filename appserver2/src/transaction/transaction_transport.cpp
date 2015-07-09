@@ -494,7 +494,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
         }
     }
 
-    QUrlQuery q = QUrlQuery(m_remoteAddr.query());
+    QUrlQuery q = QUrlQuery(remoteAddr().query());
 #ifdef USE_JSON
     q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
 #endif
