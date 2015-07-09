@@ -153,7 +153,9 @@ private:
     bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
     void testStoragesDone();
-    QnRecordingStatsReply getChunkStatisticsInternal(qint64 startTime, qint64 endTime, QnServer::ChunksCatalog catalog);
+    //QMap<QnUuid, QnRecordingStatsData> getChunkStatisticsInternal(qint64 startTime, qint64 endTime, QnServer::ChunksCatalog catalog);
+    QnRecordingStatsData getChunkStatisticsByCamera(qint64 startTime, qint64 endTime, const QString& uniqueId);
+    QnRecordingStatsData mergeStatsFromCatalogs(qint64 startTime, qint64 endTime, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];

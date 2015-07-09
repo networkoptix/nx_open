@@ -929,8 +929,9 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 startTime, qint64 e
             result.recordedBytes += chunk.getFileSize();
             result.recordedSecs += chunk.durationMs;
         }
-        result.recordedSecs /= 1000;
     }
+    result.recordedSecs /= 1000;
+    result.averageBitrate = result.recordedBytes / (qreal) result.recordedSecs;
     return result;
 }
 

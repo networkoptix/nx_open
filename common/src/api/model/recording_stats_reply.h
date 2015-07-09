@@ -21,11 +21,22 @@ public:
     }
 
 };
-
 #define QnRecordingStatsData_Fields (recordedBytes)(recordedSecs)(averageBitrate)
 
-typedef QMap<QnUuid, QnRecordingStatsData> QnRecordingStatsReply;
+struct QnCamRecordingStatsData: public QnRecordingStatsData
+{
+    QnCamRecordingStatsData(): QnRecordingStatsData() {}
+    QnCamRecordingStatsData(const QnRecordingStatsData& value): QnRecordingStatsData(value) {}
+
+    QnUuid id;
+};
+#define QnCamRecordingStatsData_Fields (id) QnRecordingStatsData_Fields
 
 QN_FUSION_DECLARE_FUNCTIONS(QnRecordingStatsData, (json))
+QN_FUSION_DECLARE_FUNCTIONS(QnCamRecordingStatsData, (json))
+
+typedef QVector<QnCamRecordingStatsData> QnRecordingStatsReply;
+Q_DECLARE_METATYPE(QnRecordingStatsReply)
+
 
 #endif  //NX_RECORDING_STATS_DATA_H

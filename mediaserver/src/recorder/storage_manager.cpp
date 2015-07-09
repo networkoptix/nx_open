@@ -776,16 +776,25 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
 QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 startTime, qint64 endTime)
 {
     QnRecordingStatsReply result;
+    
+    QnResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID());
+    QnVirtualCameraResourceList cameras = qnResPool->getAllCameras(server, true);
+    for (const auto& camera: cameras) {
+        QnRecordingStatsData stats = getChunkStatisticsByCamera(startTime, endTime, camera->getUniqueId());
+        QnCamRecordingStatsData data(stats);
+        data.id = camera->getId();
+        result.push_back(data);
+    }
+/*    
 
     // 1. obtain data
-    const QnRecordingStatsReply resultHi = getChunkStatisticsInternal(startTime, endTime, QnServer::HiQualityCatalog);
-    const QnRecordingStatsReply resulLow = getChunkStatisticsInternal(startTime, endTime, QnServer::LowQualityCatalog);
+    QMap<QnUuid, QnRecordingStatsData> resultHi = getChunkStatisticsInternal(startTime, endTime, QnServer::HiQualityCatalog);
+    QMap<QnUuid, QnRecordingStatsData> resulLow = getChunkStatisticsInternal(startTime, endTime, QnServer::LowQualityCatalog);
 
     // 2. merge data
-    result = resultHi;
     for (auto itr = resulLow.constBegin(); itr != resulLow.constEnd(); ++itr) {
-        auto mainItr = result.find(itr.key());
-        if (mainItr != result.end()) 
+        auto mainItr = resultHi.find(itr.key());
+        if (mainItr != resultHi.end()) 
         {
             // merge HQ and LQ data
             QnRecordingStatsData& left = mainItr.value();
@@ -794,44 +803,117 @@ QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 startTime, qin
         }
         else {
             // join new data from LQ
-            mainItr = result.insert(itr.key(), itr.value());
+            mainItr = resultHi.insert(itr.key(), itr.value());
         }
     }
 
     // 2. full avg bitrate
-    for (auto itr = result.begin(); itr != result.end(); ++itr) 
+    for (auto itr = resultHi.begin(); itr != resultHi.end(); ++itr) 
     {
         QnRecordingStatsData& data = itr.value();
-        if (data.recordedSecs > 0)
-            data.averageBitrate = data.recordedBytes / (data.recordedSecs);
-    }
+        QnCamRecordingStatsData outputData(data);
+        if (outputData.recordedSecs > 0)
+            outputData.averageBitrate = data.recordedBytes / (data.recordedSecs);
+        outputData.id = itr.key();
 
+        result.push_back(std::move(outputData));
+    }
+*/
     return result;
 }
 
-QnRecordingStatsReply QnStorageManager::getChunkStatisticsInternal(qint64 startTime, qint64 endTime, QnServer::ChunksCatalog catalog)
+QnRecordingStatsData QnStorageManager::getChunkStatisticsByCamera(qint64 startTime, qint64 endTime, const QString& uniqueId)
 {
-    FileCatalogMap& catalogMap = m_devFileCatalog[catalog]; // this line doesn't require mutex
-    QnRecordingStatsReply result;
+    QMutexLocker lock(&m_mutexCatalog);
+    auto catalogHi = m_devFileCatalog[QnServer::HiQualityCatalog].value(uniqueId);
+    auto catalogLow = m_devFileCatalog[QnServer::LowQualityCatalog].value(uniqueId);
 
-    // It could be long function. I've reduced mutex lock time to lock it per catalog
-    QList<QString> cameraUniqueIdList;
+    if (catalogHi && catalogLow)
+        return mergeStatsFromCatalogs(startTime, endTime, catalogHi, catalogLow);
+    else if (catalogHi)
+        return catalogHi->getStatistics(startTime, endTime);
+    else if (catalogLow)
+        return catalogLow->getStatistics(startTime, endTime);
+    else
+        return QnRecordingStatsData();
+}
+
+QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 startTime, qint64 endTime, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow)
+{
+    QnRecordingStatsData result;
+    QnRecordingStatsData tmpStats; // temp stats for virtual bitrate calculation
+    
+    QMutexLocker lock1(&catalogHi->m_mutex);
+    QMutexLocker lock2(&catalogLow->m_mutex);
+
+    auto itrHiLeft = qLowerBound(catalogHi->m_chunks.cbegin(), catalogHi->m_chunks.cend(), startTime);
+    auto itrHiRight = qUpperBound(itrHiLeft, catalogHi->m_chunks.cend(), endTime);
+
+    auto itrLowLeft = qLowerBound(catalogLow->m_chunks.cbegin(), catalogLow->m_chunks.cend(), startTime);
+    auto itrLowRight = qUpperBound(itrLowLeft, catalogLow->m_chunks.cend(), endTime);
+
+    qint64 hiTime = itrHiLeft < itrHiRight ? itrHiLeft->startTimeMs : DATETIME_NOW;
+    qint64 lowTime = itrLowLeft < itrLowRight ? itrLowLeft->startTimeMs : DATETIME_NOW;
+    qint64 currentTime = qMin(hiTime, lowTime);
+
+    while (itrHiLeft < itrHiRight || itrLowLeft < itrLowLeft)
     {
-        QMutexLocker lock(&m_mutexCatalog);
-        cameraUniqueIdList = catalogMap.keys();
-    }
+        qint64 nextHiTime = DATETIME_NOW;
+        qint64 nextLowTime = DATETIME_NOW;
+        bool hasHi = false;
+        bool hasLow = false;
+        if (itrHiLeft != itrHiRight) {
+            nextHiTime = itrHiLeft->containsTime(currentTime) ? itrHiLeft->endTimeMs() : itrHiLeft->startTimeMs;
+            hasHi = itrHiLeft->durationMs > 0 && itrHiLeft->containsTime(currentTime);
+        }
+        if (itrLowLeft != itrLowRight) {
+            nextLowTime = itrLowLeft->containsTime(currentTime) ? itrLowLeft->endTimeMs() : itrLowLeft->startTimeMs;
+            hasLow = itrLowLeft->durationMs > 0 && itrLowLeft->containsTime(currentTime);
+        }
 
-    for (const auto& uniqueId: cameraUniqueIdList)
-    {
-        QnResourcePtr camera = qnResPool->getResourceByUniqueId(uniqueId);
-        if (!camera)
-            continue;
-        QMutexLocker lock(&m_mutexCatalog);
-        const auto& fileCatalog = catalogMap.value(uniqueId);
-        if (fileCatalog)
-           result.insert(camera->getId(), fileCatalog->getStatistics(startTime, endTime));
-    }
+        qint64 nextTime = qMin(nextHiTime, nextLowTime);
+        Q_ASSERT(nextTime > currentTime);
+        qint64 blockDuration = nextTime - currentTime;
+        
+        if (hasHi) 
+        {
+            qreal persentUsage = blockDuration / (qreal) itrHiLeft->durationMs;
+            Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            result.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
+            tmpStats.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
 
+            result.recordedSecs += itrHiLeft->durationMs * persentUsage;
+            tmpStats.recordedSecs += itrHiLeft->durationMs * persentUsage;
+        }
+
+        if (hasLow) 
+        {
+            qreal persentUsage = blockDuration / (qreal) itrLowLeft->durationMs;
+            Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            result.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
+
+            if (hasHi) 
+            {
+                // do not include bitrate calculation if only LQ quality
+                tmpStats.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
+                tmpStats.recordedSecs += itrLowLeft->durationMs * persentUsage;
+            }
+            else {
+                // inc time if no HQ
+                result.recordedSecs += itrLowLeft->durationMs * persentUsage;
+            }
+        }
+
+        while (itrHiLeft < itrHiRight && nextTime >= itrHiLeft->endTimeMs())
+            ++itrHiLeft;
+        while (itrLowLeft < itrLowRight && nextTime >= itrLowLeft->endTimeMs())
+            ++itrLowLeft;
+        currentTime = nextTime;
+    }
+    
+    result.recordedSecs /= 1000;   // msec to sec
+    tmpStats.recordedSecs /= 1000; // msec to sec
+    result.averageBitrate = tmpStats.recordedBytes / (qreal) tmpStats.recordedSecs;
     return result;
 }
 

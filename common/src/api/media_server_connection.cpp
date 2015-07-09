@@ -37,6 +37,7 @@
 #include "model/configure_reply.h"
 #include "model/upload_update_reply.h"
 #include "http/custom_headers.h"
+#include "model/recording_stats_reply.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -85,6 +86,7 @@ namespace {
         (Restart,                  "restart")
         (ConfigureObject,          "configure")
         (PingSystemObject,         "pingSystem")
+        (RecordingStatsObject,     "recStats")
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
@@ -284,6 +286,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case PingSystemObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
+        break;
+    case RecordingStatsObject:
+        processJsonReply<QnRecordingStatsReply>(this, response, handle);
         break;
     case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
@@ -832,6 +837,14 @@ int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &use
     params << QnRequestParam("password", password);
 
     return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
+}
+
+int QnMediaServerConnection::recordingStatisticsAsync(qint64 startTime, qint64 endTime, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("startTime", startTime);
+    params << QnRequestParam("endTime", endTime);
+
+    return sendAsyncGetRequest(RecordingStatsObject, params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
 }
 
 int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {
