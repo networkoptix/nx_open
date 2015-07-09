@@ -896,7 +896,6 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 startTime, 
             {
                 // do not include bitrate calculation if only LQ quality
                 tmpStats.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
-                tmpStats.recordedSecs += itrLowLeft->durationMs * persentUsage;
             }
             else {
                 // inc time if no HQ
