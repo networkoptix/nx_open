@@ -370,40 +370,12 @@ $state-danger-border:            darken(adjust-hue($state-danger-bg, -10), 5%) !
 }
 
 
-.tree .active>a{
-  font-weight: bold;
-}
-.tree .offline {
-  color:silver;
-}
-
-.small .nav>li>a, .small .nav>li>.span-element{
-  padding:5px 15px;
-  display: block;
-}
 .offline {
   color:silver;
 }
 
 html, body {height: 100%;}
 
-
-.tree li>a, .tree li>.span-element {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-
-.nav>li>ul>li>a,
-.nav>li>ul>li>.span-element {
-  padding-left: 30px !important;
-}
-
-.nav>li ul>li>ul>li>a,
-.nav>li ul>li>ul>li>.span-element {
-  padding-left: 50px !important;
-}
 
 span.danger{
   color:$alert-danger-text;

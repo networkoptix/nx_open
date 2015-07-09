@@ -89,6 +89,14 @@ angular.module('webadminApp')
             logUrl:function(params){
                 return proxy + '/api/showLog' + (params||'');
             },
+            previewUrl:function(cameraPhysicalId,time,width,height){
+                return proxy + '/api/image' +
+                    '?physicalId=' + cameraPhysicalId +
+                    (width? '&width=' + width:'') +
+                    (height? '&height=' + height:'') +
+                    (time? '&time=' + time : '');
+
+            },
             hasProxy:function(){
                 return proxy !=='';
             },

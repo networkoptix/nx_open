@@ -1,3 +1,19 @@
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track
+{
+  background: rgb(28,35,39);
+}
+
+::-webkit-scrollbar-thumb
+{
+  background: rgb(53,70,79);
+}
+
+
 .dark-theme{
   color:white;
   background-color: #1C2327;
@@ -77,4 +93,70 @@
 }
 .webclient-button>.dropdown-menu.collapse.in{
   display: block;
+}
+
+
+
+.webclient-window .tree{
+  font-size: 15px;
+  font-weight: 500;
+  width:350px;
+  max-height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+.webclient-window .tree .active>a{
+  font-weight: bold;
+}
+
+.webclient-window .tree .offline {
+  color:silver;
+}
+
+.webclient-window .tree li>a{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-right: 10px;
+}
+
+.webclient-window .tree li>.collapse-group{
+  padding:15px 10px;
+}
+
+.camera-preview{
+  width:70px !important;
+  height:40px !important;
+  margin-right: 10px;
+}
+
+
+.camera-preview>img{
+  max-width:70px !important;
+  max-height:40px !important;
+
+  display:block;
+
+  position: relative;
+  top: 50%;
+  transform: 			translateY(-50%);
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dark-theme .nav > li > a{
+  color:white;
+  font-weight: normal;
+}
+.dark-theme .nav > li > a:hover,
+.dark-theme .nav > li > a:focus {
+  text-decoration: none;
+  background-color: rgba(53,70,79,0.2);
+}
+.dark-theme .nav > li.active > a{
+  text-decoration: none;
+  background-color: rgba(53,70,79,0.4);
+  border-left: 3px solid lightblue;
+  padding-left:12px;
 }

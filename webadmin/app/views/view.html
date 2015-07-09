@@ -3,19 +3,21 @@
         <tbody>
             <tr>
                 <td rowspan="2" class="cameras-panel">
-                    <ul class="tree nav nav-pills nav-stacked  small" style="width:350px">
+                    <ul class="tree nav" >
                         <li ng-repeat="server in mediaServers">
-                            <span  ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
-                                   ng-click="server.collapsed = !server.collapsed" class="span-element" ng-class="{offline:server.status!='Online'}">
-                                <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="collapse" ></icon>
-                                <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-right" title-true="expand"  ></icon>
+                            <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
+                                   ng-click="server.collapsed = !server.collapsed" class="collapse-group" ng-class="{offline:server.status!='Online'}">
+                                <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-up pull-right" title-true="collapse" ></icon>
+                                <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-down pull-right" title-true="expand"  ></icon>
+
                                 <icon for="!cameras[server.id] || cameras[server.id].length < 1" on-true="empty"></icon>
-                                <span class="glyphicon glyphicon-align-justify" title="{{server.status}}"></span>
+
                                 <icon for="server.status=='Unauthorized'" on-true="lock" title="Unauthorized" ></icon>
                                 &nbsp;{{server.name}} ({{server.url}}) {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
-                            </span>
-                            <ul class="nav nav-pills nav-stacked"
-                                ng-class="{hidden:server.collapsed, edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy }">
+                            </a>
+                            <ul class="nav "
+                                collapse="server.collapsed"
+                                ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy }">
                                 <li ng-repeat="camera in cameras[server.id]"
                                     ng-class="{active:activeCamera===camera}"
                                     ng-include="camera.isGroup?'views/components/camerasGroupNode.html':'views/components/cameraNode.html'" >

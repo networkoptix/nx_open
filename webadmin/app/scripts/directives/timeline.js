@@ -104,7 +104,15 @@ angular.module('webadminApp')
                     topLabelBgColor: false,
 
                     labelAlign:"above",// center, left, above
-                    labelMarkerColor:[28,35,39,0],//false
+                    labelMarkerColor:[53,70,79],//false
+                    labelBgColor: [28,35,39]
+                },{
+                    topLabelAlign: "center", // center, left, above
+                    topLabelMarkerColor: [105,135,150], // Color for mark for top label
+                    topLabelBgColor: false,
+
+                    labelAlign:"above",// center, left, above
+                    labelMarkerColor:[53,70,79,0],//false
                     labelBgColor: [28,35,39]
                 },{
                     topLabelAlign: "left", // center, left, above
@@ -112,7 +120,7 @@ angular.module('webadminApp')
                     topLabelBgColor: false,
 
                     labelAlign:"above",// center, left, above
-                    labelMarkerColor:[28,35,39,0],//false
+                    labelMarkerColor:[53,70,79],//false
                     labelBgColor: [28,35,39]
                 }];
                 scope.activePreset = scope.presets[1];
@@ -562,7 +570,7 @@ angular.module('webadminApp')
                     event.preventDefault();
                     if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
                         //scope.scaleManager.setAnchorCoordinate( mouseCoordinate );// Set position to keep
-                        if( window.jscd.touch ) {
+                        if( false && window.jscd.touch ) {
                             scope.scaleManager.zoomAroundDate(
                                 scope.scaleManager.zoom() - event.deltaY / timelineConfig.maxVerticalScrollForZoom,
                                 scope.scaleManager.screenCoordinateToDate(mouseCoordinate)
@@ -572,7 +580,9 @@ angular.module('webadminApp')
                             // We need to smooth zoom here
                             scope.zoomTarget = scope.scaleManager.zoom();
                             var zoomTarget = scope.zoomTarget - event.deltaY / timelineConfig.maxVerticalScrollForZoom;
-                            animateScope.animate(scope,"zoomTarget",zoomTarget).then(function(){},function(){},
+                            animateScope.animate(scope,"zoomTarget",zoomTarget).then(
+                                function(){},
+                                function(){},
                                 function(value){
                                     console.log("animate zoom",value,zoomTarget,scope.zoomTarget);
                                     scope.scaleManager.zoomAroundDate(

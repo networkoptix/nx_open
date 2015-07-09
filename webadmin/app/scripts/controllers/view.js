@@ -158,6 +158,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                 function cameraSorter(camera) {
                     camera.url = extractDomain(camera.url);
+                    camera.preview = mediaserver.previewUrl(camera.physicalId, 70);
 
                     var num = 0;
                     try {
