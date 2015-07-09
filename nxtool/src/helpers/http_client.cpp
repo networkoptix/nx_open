@@ -134,7 +134,7 @@ void rtu::HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs)
         timeoutMs = defaultRequestTimeoutMs;
 
     QPointer<QNetworkReply> replyPtr(reply);
-    QTimer::singleShot(timeoutMs, [this, replyPtr] {
+    QTimer::singleShot(timeoutMs, [replyPtr] {
         if (replyPtr) {
             logReply(replyPtr.data(), "aborting request");
             replyPtr->abort(); // here finished() will be emitted and replies will be removed from the m_replies map
