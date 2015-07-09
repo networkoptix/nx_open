@@ -62,7 +62,8 @@ Item {
             Image {
                 width: timeline.width
                 height: sourceSize.height
-                y: -playbackController.height / 2
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: timeline.chunkBarHeight
                 sourceSize.height: timeline.height - timeline.chunkBarHeight + playbackController.height / 2
                 source: "image://icon/timeline_gradient.png"
             }
