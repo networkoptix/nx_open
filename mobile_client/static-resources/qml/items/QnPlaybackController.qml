@@ -122,6 +122,12 @@ Item {
         property color idleColor: QnTheme.transparent(rootItem.color, 0)
 
         x: defaultX
+        Binding {
+            target: grip
+            property: "x"
+            value: grip.defaultX
+            when: !gripMouseArea.pressed && !returnAnimation.running
+        }
 
         height: parent.height - tickSize
         width: height
@@ -177,19 +183,15 @@ Item {
             drag.minimumX: 0
             drag.maximumX: rootItem.width - grip.width
 
-            onReleased: {
-                gripXBehavior.enabled = true
-                grip.x = grip.defaultX
-            }
+            onReleased: returnAnimation.start()
         }
 
-        Behavior on x {
-            id: gripXBehavior
-            enabled: false
-            NumberAnimation {
-                duration: 200
-                onStopped: gripXBehavior.enabled = false
-            }
+        NumberAnimation on x {
+            id: returnAnimation
+            to: grip.defaultX
+            duration: 500
+            easing.type: Easing.OutCubic
+            running: false
         }
     }
 }
