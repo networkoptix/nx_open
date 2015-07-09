@@ -171,7 +171,10 @@ Item {
                     text: qsTr("LIVE")
                     flat: true
                     iconic: true
-                    onClicked: mediaPlayer.playLive()
+                    onClicked: {
+                        mediaPlayer.playLive()
+                        playbackController.paused = false
+                    }
                     opacity: timeline.stickToEnd ? 0.0 : 1.0
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                 }
