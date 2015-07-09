@@ -28,6 +28,18 @@ def binary_deps(binary):
         yield fname
 
 
+def set_permissions(path):
+    if os.path.isdir(path):
+        os.chmod(path, 0755)
+        for root, dirs, files in os.walk(path):
+            for xdir in dirs:
+                os.chmod(join(root, xdir), 0755)
+            for xfile in files:
+                os.chmod(join(root, xfile), 0644)
+    else:
+        os.chmod(path, 0644)
+
+	
 def prepare(binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
     if os.path.exists(tbindir):
@@ -51,7 +63,7 @@ def prepare(binary, sbindir, tlibdir):
         shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore)
         for f in os.listdir(tfolder):
             dep = join(tfolder, f)
-            os.chmod(dep, 0644)
+            set_permissions(dep)
             yield dep
 
     shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
