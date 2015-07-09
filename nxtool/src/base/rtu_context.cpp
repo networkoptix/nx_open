@@ -162,6 +162,9 @@ QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     , const QByteArray &prevTimeZoneId
     , const QByteArray &newTimeZoneId)
 {
+    if (prevTimeZoneId.isEmpty() || newTimeZoneId.isEmpty())
+        return QDateTime();
+
     const QTimeZone prevTimeZone(prevTimeZoneId);
     const QTimeZone nextTimeZone(newTimeZoneId);
     if (date.isNull() || time.isNull() || !prevTimeZone.isValid()
@@ -169,7 +172,7 @@ QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     {
         return QDateTime();
     }
-    \
+    
     return convertDateTime(date, time, prevTimeZone, nextTimeZone).toLocalTime();
 }
 

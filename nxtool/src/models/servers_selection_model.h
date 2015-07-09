@@ -47,9 +47,9 @@ namespace rtu
         void removeServers(const IDsVector &removed);
 
         void updateTimeDateInfo(const QUuid &id
-            , const QDateTime &utcDateTime
-            , const QTimeZone &timeZone
-            , const QDateTime &timestamp);
+            , qint64 utcDateTimeMs
+            , const QByteArray &timeZoneId
+            , qint64 timestampMs);
 
         void updateInterfacesInfo(const QUuid &id
             , const QString &host

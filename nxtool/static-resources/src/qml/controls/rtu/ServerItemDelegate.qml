@@ -20,12 +20,7 @@ Item
     signal explicitSelectionCalled(int currentItemIndex);
     
     height: column.height;
-    anchors
-    {
-        left: parent.left;
-        right: parent.right;
-    }
-    
+
     opacity: (logged ? 1 : 0.3);
     
     Column

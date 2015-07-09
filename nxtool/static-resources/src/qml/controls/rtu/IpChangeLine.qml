@@ -83,24 +83,6 @@ Grid
     
     Base.Text
     {
-        id: dnsServerText;
-        
-        text: qsTr("DNS server");
-    }
-    
-    Base.IpControl
-    {
-        id: dnsServerField;
-        
-        enabled: !useDHCPCheckBox.checked;
-    }
-    
-    Base.EmptyCell {}
-
-    ///
-    
-    Base.Text
-    {
         id: defaultGatewayText;
         
         text: qsTr("Default Gateway");
@@ -109,7 +91,25 @@ Grid
     Base.IpControl
     {
         id: defaultGatewayField;
+
+        enabled: !useDHCPCheckBox.checked;
     }
     
+    Base.EmptyCell {}
+
+	///
+
+    Base.Text
+    {
+        id: dnsServerText;
+
+        text: qsTr("DNS server");
+    }
+
+    Base.IpControl
+    {
+        id: dnsServerField;
+    }
+
     Base.EmptyCell {}
 }

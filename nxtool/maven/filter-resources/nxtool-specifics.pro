@@ -26,5 +26,8 @@ android-no-sdk {
     INSTALLS += target
 }
 
+OUTPUT_PATH = ${project.build.directory}
+DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
+
 export(INSTALLS)
 

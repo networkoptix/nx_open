@@ -67,7 +67,7 @@ namespace nx_http
         void setUserPassword( const QString& userAgent );
 
     private:
-        std::shared_ptr<AsyncHttpClient> m_asyncHttpClient;
+        nx_http::AsyncHttpClientPtr m_asyncHttpClient;
         QWaitCondition m_cond;
         mutable QMutex m_mutex;
         bool m_done;

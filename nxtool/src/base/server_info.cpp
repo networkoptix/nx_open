@@ -55,22 +55,22 @@ bool rtu::operator != (const BaseServerInfo &first
 
 rtu::ExtraServerInfo::ExtraServerInfo()
     : password()
-    , timestamp()
-    , utcDateTime()
-    , timeZone()
+    , timestampMs(0)
+    , utcDateTimeMs(0)
+    , timeZoneId()
     , interfaces()
 {
 }
 
 rtu::ExtraServerInfo::ExtraServerInfo(const QString &initPassword
-    , const QDateTime &initTimestamp
-    , const QDateTime &initUtcDateTime
-    , const QTimeZone &initTimeZone
+    , const qint64 &initTimestampMs
+    , const qint64 &initUtcDateTimeMs
+    , const QByteArray &initTimeZoneId
     , const InterfaceInfoList initInterfaces)
     : password(initPassword)
-    , timestamp(initTimestamp)
-    , utcDateTime(initUtcDateTime)
-    , timeZone(initTimeZone)
+    , timestampMs(initTimestampMs)
+    , utcDateTimeMs(initUtcDateTimeMs)
+    , timeZoneId(initTimeZoneId)
     , interfaces(initInterfaces)
 {
 }

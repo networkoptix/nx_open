@@ -17,7 +17,7 @@ namespace rpi_cam
     class CameraManager : public DefaultRefCounter<nxcip::BaseCameraManager>
     {
     public:
-        CameraManager(const std::string& serial);
+        CameraManager(const std::string& serial, const std::string& serverUrl);
         virtual ~CameraManager();
 
         // nxpl::PluginInterface
@@ -45,7 +45,7 @@ namespace rpi_cam
         nxcip::CameraInfo m_info;
         CameraParameters m_parameters;
 
-        void makeInfo(const std::string& serial);
+        void makeInfo(const std::string& serial, const std::string& url);
     };
 }
 

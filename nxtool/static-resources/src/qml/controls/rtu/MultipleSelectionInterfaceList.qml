@@ -8,6 +8,16 @@ Base.Column
 
     property int dhcpState: 0;
     property alias forceUseDHCP: forceUseDHCPChecklBox.checked;
+    property alias changed: forceUseDHCPChecklBox.changed;
+    
+    function tryApplyChanges() 
+    {
+        if (!forceUseDHCPChecklBox.changed)
+            return true;
+
+        rtuContext.changesManager().addDHCPChange("doesn't matter for multiple selection", true);
+        return true;
+    }
 
     Base.Text
     {

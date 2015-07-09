@@ -4,6 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QCoreApplication>
+#include <QElapsedTimer>
 
 #include "transcoder.h"
 
@@ -19,6 +20,8 @@ class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
+    static bool isOptimizationDisabled;
+
     QnFfmpegVideoTranscoder(CodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
@@ -30,6 +33,10 @@ public:
     /* Allow multithread transcoding */
     void setMTMode(bool value);
     virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList) override;
+
+private:
+    int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
+
 private:
     QVector<CLFFmpegVideoDecoder*> m_videoDecoders;
     CLVideoDecoderOutputPtr m_decodedVideoFrame;
@@ -42,6 +49,13 @@ private:
 
     qint64 m_firstEncodedPts;
     bool m_mtMode;
+
+    QElapsedTimer m_encodeTimer;
+    qint64 m_lastEncodedTime;
+    qint64 m_averageCodingTimePerFrame;
+    qint64 m_averageVideoTimePerFrame;
+    qint64 m_encodedFrames;
+    qint64 m_droppedFrames;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

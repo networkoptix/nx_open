@@ -11,8 +11,7 @@ QDateTime rtu::convertDateTime(const QDate &date
     , const QTimeZone &targetTimeZone)
 {
     const qint64 sourceUtcMSecs = msecondsFromEpoch(date, time, sourceTimeZone);
-    const QDateTime targetPseudoUtc = convertUtcToTimeZone(
-        QDateTime::fromMSecsSinceEpoch(sourceUtcMSecs, Qt::UTC), targetTimeZone);
+    const QDateTime targetPseudoUtc = convertUtcToTimeZone(sourceUtcMSecs, targetTimeZone);
 
     qDebug() << "_______________";
     qDebug() << sourceTimeZone << " : " << targetTimeZone;
@@ -21,21 +20,21 @@ QDateTime rtu::convertDateTime(const QDate &date
     return QDateTime(targetPseudoUtc.date(), targetPseudoUtc.time());
 }
 
-QDateTime rtu::convertUtcToTimeZone(const QDateTime &utcTime
+QDateTime rtu::convertUtcToTimeZone(qint64 utcTimeMs
     , const QTimeZone &timeZone)
 {
-    const int offsetFromUtc = timeZone.offsetFromUtc(utcTime);
+    const int offsetFromUtc = timeZone.offsetFromUtc(QDateTime::fromMSecsSinceEpoch(utcTimeMs));
     const QDateTime pseudoDateTime = QDateTime::fromMSecsSinceEpoch(
-        utcTime.toMSecsSinceEpoch() +  offsetFromUtc * kMSecFactor, Qt::UTC);
+        utcTimeMs +  offsetFromUtc * kMSecFactor, Qt::UTC);
+    //TODO: #ynikitenkov are you sure it should work this way?
     return QDateTime(pseudoDateTime.date(), pseudoDateTime.time());
 }
 
-QDateTime rtu::utcFromTimeZone(const QDate &date
+qint64 rtu::utcMsFromTimeZone(const QDate &date
     , const QTime &time
     , const QTimeZone &timeZone)
 {
-    return QDateTime::fromMSecsSinceEpoch(
-        msecondsFromEpoch(date, time, timeZone), Qt::UTC);
+    return msecondsFromEpoch(date, time, timeZone);
 }
 
 qint64 rtu::msecondsFromEpoch(const QDate &date
@@ -51,4 +50,16 @@ qint64 rtu::msecondsFromEpoch(const QDate &date
     qDebug() << offsetFromUtc;
     qDebug() << "target: " << result << "\n";
     return result;
+}
+
+QString rtu::timeZoneNameWithOffset(const QTimeZone &timeZone, const QDateTime &atDateTime) {
+    if (!timeZone.comment().isEmpty()) {
+        Q_ASSERT_X(timeZone.comment().contains("UTC"), Q_FUNC_INFO, "We are waiting for the (UTC+03:00) format");
+        return timeZone.comment();
+    }
+
+    // Constructing format manually
+    QString tzTemplate("(%1) %2");
+    QString baseName(timeZone.id());      
+    return tzTemplate.arg(timeZone.displayName(atDateTime, QTimeZone::OffsetName), baseName);
 }

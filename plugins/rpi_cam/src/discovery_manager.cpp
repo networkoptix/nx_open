@@ -82,17 +82,20 @@ namespace rpi_cam
         strcpy(buf, VENDOR_NAME);
     }
 
-    int DiscoveryManager::findCameras(nxcip::CameraInfo * cameras, const char * /*localInterfaceIPAddr*/)
+    int DiscoveryManager::findCameras(nxcip::CameraInfo * cameras, const char * serverURL)
     {
         {
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             if (! m_camera)
             {
+                std::string url;
+                if (serverURL)
+                    url = serverURL;
                 std::string serial;
                 getSerial(serial);
 
-                m_camera = new CameraManager(serial);
+                m_camera = new CameraManager(serial, url);
             }
         }
 

@@ -28,6 +28,7 @@ namespace ec2
     const QString Ec2StaticticsReporter::SR_TIME_CYCLE = lit("statisticsReportTimeCycle");
     const QString Ec2StaticticsReporter::SR_SERVER_API = lit("statisticsReportServerApi");
     const QString Ec2StaticticsReporter::SYSTEM_ID = lit("systemId");
+    const QString Ec2StaticticsReporter::SYSTEM_NAME_FOR_ID = lit("systemNameForId");
 
     const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = lit("http://stats.networkoptix.com");
 
@@ -239,10 +240,14 @@ namespace ec2
         
         const QDateTime now = qnSyncTime->currentDateTime().toUTC();
         const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), Qt::ISODate);
+        if (!lastTime.isValid())
+        {
+            m_admin->setProperty(SR_LAST_TIME, now.toString(Qt::ISODate));
+            propertyDictionary->saveParams(m_admin->getId());
+        }
 
         const uint timeCycle = secsWithPostfix(m_admin->getProperty(SR_TIME_CYCLE), DEFAULT_TIME_CYCLE);
         const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
-
         if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(timeCycle + maxDelay))
         {
             static std::once_flag flag;
@@ -250,7 +255,7 @@ namespace ec2
 
             const auto minDelay = timeCycle * MIN_DELAY_RATIO / 100;
             const auto rndDelay = timeCycle * (static_cast<uint>(qrand()) % RND_DELAY_RATIO) / 100;
-            m_plannedReportTime = lastTime.addSecs(timeCycle + minDelay + rndDelay);
+            m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(minDelay + rndDelay);
             
             NX_LOG(lit("Ec2StaticticsReporter: Last report was at %1, the next planned for %2")
                    .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))
@@ -278,7 +283,7 @@ namespace ec2
             return res;
         }
 
-        m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+        m_httpClient = nx_http::AsyncHttpClient::create();
         connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done,
                 this, &Ec2StaticticsReporter::finishReport, Qt::DirectConnection);
 
@@ -305,12 +310,19 @@ namespace ec2
 
     QnUuid Ec2StaticticsReporter::getOrCreateSystemId()
     {
-        auto systemId = m_admin->getProperty(SYSTEM_ID);
-        if (!systemId.isEmpty())
-            return QnUuid(systemId);
+        const auto systemName = qnCommon->localSystemName();
+        const auto systemNameForId = m_admin->getProperty(SYSTEM_NAME_FOR_ID);
+        const auto systemId = m_admin->getProperty(SYSTEM_ID);
 
-        auto newId = QnUuid::createUuid();
+        if (systemNameForId == systemName // system name was not changed
+            && !systemId.isEmpty())       // and systemId is already generated
+        {
+            return QnUuid(systemId);
+        }
+
+        const auto newId = QnUuid::createUuid();
         m_admin->setProperty(SYSTEM_ID, newId.toString());
+        m_admin->setProperty(SYSTEM_NAME_FOR_ID, systemName);
         propertyDictionary->saveParams(m_admin->getId());
         return newId;
     }

@@ -60,5 +60,5 @@ if os.path.exists(join(bin_source_dir, 'applauncher.exe')):
     
 if os.path.exists(join(bin_source_dir, '${product.name}.exe')):
     os.unlink(join(bin_source_dir, '${product.name}.exe'))          
-if os.path.exists(join(bin_source_dir, 'client.exe')):
-    shutil.copy2(join(bin_source_dir, 'client.exe'), join(bin_source_dir, '${product.name}.exe'))
+if os.path.exists(join(bin_source_dir, 'clientexe.exe')):
+    shutil.copy2(join(bin_source_dir, 'clientexe.exe'), join(bin_source_dir, '${product.name}.exe'))

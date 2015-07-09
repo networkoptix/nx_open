@@ -30,6 +30,14 @@ QtControls.TextField
 
     enabled: !showNow;
     
+    Timer  {
+        id: updateSecondsTimer
+        interval: 1000;
+        running: true;
+        repeat: true;
+        onTriggered: impl.timeChanged()
+    }
+
     onShowNowChanged:
     {
         inputMask = (showNow ? "" : impl.mask);
@@ -45,13 +53,13 @@ QtControls.TextField
 
     validator: RegExpValidator
     {
-        regExp: /([01]?[0-9]|2[0-3]):[0-5][0-9]/;
+        regExp: /([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]/;
     }
 
     onTextChanged: 
     {
         time = Date.fromLocaleTimeString(Qt.locale(), text, impl.timeFormat);
-        if (!initTime && (text === impl.emptyMaskValue))
+        if (!impl.textIsValid())
             return;
         
         thisComponent.changed = (initTime && time 
@@ -60,13 +68,36 @@ QtControls.TextField
     
     property QtObject impl: QtObject
     {
-        readonly property string timeFormat: "hh:mm";
+        readonly property string timeFormat: "hh:mm:ss";
         readonly property string mask: (timeFormat.replace(new RegExp(/[a-zA-Z0-9]/g), "9") + ";-");
-        readonly property string emptyMaskValue: ":";  
+        readonly property string emptyMaskValue: "::";  
     
+        function textIsValid() {
+            return (text !== impl.emptyMaskValue);
+        }
+
         function stringFromTime(timeValue)
         {
             return (timeValue ? timeValue.toLocaleTimeString(Qt.locale(), timeFormat) : "");
+        }
+
+        function timeChanged()
+        {
+            if (initTime)
+                initTime.setSeconds(initTime.getSeconds() + 1);
+
+            if (activeFocus || !enabled || !textIsValid())
+                return;
+
+            if (changed) {
+                time = Date.fromLocaleTimeString(Qt.locale(), text, impl.timeFormat);
+                var seconds = time.getSeconds();
+                time.setSeconds(seconds + 1);
+            }
+            else {
+                time = initTime;
+            }
+            text = stringFromTime(time);
         }
     }
 }

@@ -22,7 +22,7 @@ Expandable.MaskedSettingsPanel
     }
 
     propertiesGroupName: qsTr("Set Device Date & Time");
-    propertiesDelegate: Item
+    propertiesDelegate: FocusScope
     {
         property bool changed: (!flagged.showFirst ? false 
             : flagged.currentItem.changed);
@@ -65,7 +65,7 @@ Expandable.MaskedSettingsPanel
                         
                         if (!useCurrentTimeCheckbox.checked && !timePicker.acceptableInput)
                         {
-                            timeZonePicker.focus = true;
+                            timePicker.focus = true;
                             return false;
                         }
                         
@@ -79,15 +79,13 @@ Expandable.MaskedSettingsPanel
                         var newTime = timePicker.time;
                         if (useCurrentTimeCheckbox.checked)
                         {
-                            if (useCurrentTimeCheckbox.checked)
-                            {
-                                var now = new Date();
-                                newDate = now;
-                                newTime = now;
-                            }
+                            var now = new Date();
+                            newDate = now;
+                            newTime = now;
                         }
-                        rtuContext.changesManager().addDateTimeChange(
-                            newDate, newTime, timeZonePicker.currentText);
+
+                        var timeZoneId = timeZonePicker.model.timeZoneIdByIndex(timeZonePicker.currentIndex)
+                        rtuContext.changesManager().addDateTimeChange(newDate, newTime, timeZoneId);
                         return true;
                     }
 
@@ -138,7 +136,10 @@ Expandable.MaskedSettingsPanel
                             if (useCurrentTimeCheckbox.checked)
                                 return;
                             
-                            var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, from, to);
+                            var prevZoneId = timeZonePicker.model.timeZoneIdByIndex(from);
+                            var curZoneId = timeZonePicker.model.timeZoneIdByIndex(to);
+                            console.log("Chaning timezone from " + prevZoneId + " to " + curZoneId);
+                            var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, prevZoneId, curZoneId);
                             datePicker.setDate(dateTime);
                             timePicker.setTime(dateTime);
                         }

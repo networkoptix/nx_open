@@ -20,19 +20,14 @@ namespace
 {
     struct DateTime
     {
-        QDateTime utcDateTime;
-        QTimeZone timeZone;
+        qint64 utcDateTimeMs;
+        QByteArray timeZoneId;
 
-        DateTime(const QDateTime &initUtcDateTime
-            , const QTimeZone &initTimeZone);
+        DateTime(qint64 utcDateTimeMs, const QByteArray &timeZoneId)
+            : utcDateTimeMs(utcDateTimeMs)
+            , timeZoneId(timeZoneId)
+            {}
     };
-
-    DateTime::DateTime(const QDateTime &initUtcDateTime
-        , const QTimeZone &initTimeZone)
-        : utcDateTime(initUtcDateTime)
-        , timeZone(initTimeZone)
-    {}
-
 
     struct Changeset
     {
@@ -125,6 +120,11 @@ private:
         , const QString &value
         , const QString &error
         , AffectedEntities checkFlags
+        , AffectedEntities affected);
+
+    bool addUpdateInfoSummaryItem(const rtu::ServerInfo &info
+        , const QString &error
+        , const ItfUpdateInfo &change
         , AffectedEntities affected);
     
 private:
@@ -321,6 +321,13 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
     ItfChangeRequest &request = it.value();
     if (request.inProgress)
         return;
+
+    //TODO: #ynikitenkov #high invalid scenario
+    if (!request.info->hasExtraInfo()) {
+        m_itfChanges.erase(it);
+        onChangeApplied();
+        return;
+    }
     
     enum { kRequestsMinOffset = 2 * 1000};
     const qint64 current = QDateTime::currentMSecsSinceEpoch();
@@ -348,46 +355,14 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
         const ServerInfo &info = *request.info; 
         for (ItfUpdateInfo &change: request.itfUpdateInfo)
         {
-            static const QString &kDHCPDescription = "dhcp";
-            static const QString &kYes = "yes";
-            static const QString &kNo = "no";
-            
             const auto &it = changeAppliedPos(extraInfo.interfaces, change);
             const bool applied = (it != extraInfo.interfaces.end());
             const QString errorReason = (applied ? QString() : QString("Can't apply this parameter"));
-            const AffectedEntities affected = (applied ? kNoEntitiesAffected : kAllEntitiesAffected);
-            
-            const QString useDHCPValue = (change.useDHCP && *change.useDHCP? kYes : kNo);
-            addSummaryItem(info, kDHCPDescription, useDHCPValue, errorReason
-                , kDHCPUsageAffected, affected);
-            
-            if (change.ip)
-            {
-                static const QString &kIpDescription = "ip";
-                addSummaryItem(info, kIpDescription, *change.ip, errorReason
-                    , kIpAddressAffected, affected);
-            }
-            
-            if (change.mask)
-            {
-                static const QString &kMaskDescription = "mask";
-                addSummaryItem(info, kMaskDescription, *change.mask, errorReason
-                    , kMaskAffected, affected);
-            }
 
-            if (change.dns)
-            {
-                static const QString &kDnsDescription = "dns";
-                addSummaryItem(info, kDnsDescription, *change.dns, errorReason
-                    , kDNSAffected, affected);
-            }
-            
-            if (change.gateway)
-            {
-                static const QString &kGatewayDescription = "gateway";
-                addSummaryItem(info, kGatewayDescription, *change.gateway, errorReason
-                    , kGatewayAffected, affected);
-            }
+            //TODO: #ynikitenkov I do not understand this strange logic
+            //const AffectedEntities affected = (applied ? kNoEntitiesAffected : kAllEntitiesAffected);
+            const AffectedEntities affected = (applied ? kAllEntitiesAffected : kNoEntitiesAffected);
+            addUpdateInfoSummaryItem(info, errorReason, change, affected);
             
             if (applied)
                 newInterfaces.push_back(*it);
@@ -466,39 +441,44 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
     if (!m_changeset || !m_changeset->dateTime)
         return;
 
-    const QDateTime timestamp = QDateTime::currentDateTimeUtc();
+    const qint64 timestampMs = QDateTime::currentMSecsSinceEpoch();
     const DateTime &change = *m_changeset->dateTime;
     for (ServerInfo *info: m_targetServers)
     {
-        const auto request = [this, info, change, timestamp]()
+        const auto request = [this, info, change, timestampMs]()
         {
             const auto &callback = 
-                [this, info, change, timestamp](const QString &errorReason, AffectedEntities affected)
+                [this, info, change, timestampMs](const QString &errorReason, AffectedEntities affected)
             {
                 static const QString kDateTimeDescription = "date / time";
                 static const QString kTimeZoneDescription = "time zone";
                 
-                const QString &value= convertUtcToTimeZone(change.utcDateTime, change.timeZone).toString();
+
+                QString timeZoneName = timeZoneNameWithOffset(QTimeZone(change.timeZoneId), QDateTime::currentDateTime());
+
+                const QString &value= convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId)).toString();
                 const bool dateTimeOk = addSummaryItem(*info, kDateTimeDescription
                     , value, errorReason, kDateTimeAffected, affected);
                 const bool timeZoneOk = addSummaryItem(*info, kTimeZoneDescription
-                    , QString(change.timeZone.id()), errorReason, kTimeZoneAffected, affected);
+                    , timeZoneName, errorReason, kTimeZoneAffected, affected);
                 
                 if (dateTimeOk && timeZoneOk)
                 {
-                    m_model->updateTimeDateInfo(info->baseInfo().id, change.utcDateTime
-                        , change.timeZone, timestamp);
+                    m_model->updateTimeDateInfo(info->baseInfo().id, change.utcDateTimeMs
+                        , change.timeZoneId, timestampMs);
                     
                     ExtraServerInfo &extraInfo = info->writableExtraInfo();
-                    extraInfo.timestamp = timestamp;
-                    extraInfo.timeZone = change.timeZone;
-                    extraInfo.utcDateTime = change.utcDateTime;
+                    extraInfo.timestampMs = timestampMs;
+                    extraInfo.timeZoneId = change.timeZoneId;
+                    extraInfo.utcDateTimeMs = change.utcDateTimeMs;
                 }
                 
                 onChangeApplied();
             };
 
-            sendSetTimeRequest(m_client, *info, change.utcDateTime, change.timeZone, callback);
+            if (!sendSetTimeRequest(m_client, *info, change.utcDateTimeMs, change.timeZoneId, callback)) {
+                callback("Invalid request", rtu::kNoEntitiesAffected);
+            }
         };
 
         m_requests.push_back(RequestData(kNonBlockingRequest, request));
@@ -579,8 +559,25 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
         const auto &request = 
             [this, info, changes]()
         {
+            const auto &callback = 
+                [this, info, changes](const QString &errorReason, AffectedEntities affected)
+            {
+                /* In case of success we need to wait more until server is rediscovered. */
+                if (errorReason.isEmpty()) //TODO: #ynikitenkov very strange way to check error
+                    return;
+                
+                for (const auto &change: changes)
+                    addUpdateInfoSummaryItem(*info, errorReason, change, affected);
+
+                const auto &it = m_itfChanges.find(info->baseInfo().id);
+                if (it != m_itfChanges.end())
+                    m_itfChanges.erase(it);
+
+                onChangeApplied();
+            };
+
             m_itfChanges.insert(info->baseInfo().id, ItfChangeRequest(info, changes));
-            sendChangeItfRequest(m_client, *info, changes, OperationCallback());
+            sendChangeItfRequest(m_client, *info, changes, callback);
         };
         
         m_requests.push_back(RequestData(kBlockingRequest, request));
@@ -666,12 +663,61 @@ bool rtu::ChangesManager::Impl::addSummaryItem(const rtu::ServerInfo &info
     if (h != QThread::currentThreadId())
         qDebug() << "***************************************************";
                     
-    const bool successResult = error.isEmpty() && !(affected & checkFlags);
+    const bool successResult = error.isEmpty() && 
+        ((affected & checkFlags) == checkFlags);
     ChangesSummaryModel * const model = (successResult ?
         m_succesfulChangesModel : m_failedChangesModel);
 
     model->addRequestResult(info, description, value, error);
     return successResult;
+}
+
+bool rtu::ChangesManager::Impl::addUpdateInfoSummaryItem(const rtu::ServerInfo &info
+    , const QString &error
+    , const ItfUpdateInfo &change
+    , AffectedEntities affected)
+{
+    bool success = error.isEmpty();
+
+    if (change.useDHCP)
+    {
+        static const QString &kDHCPDescription = "dhcp";
+        static const QString &kYes = "yes";
+        static const QString &kNo = "no";
+        const QString useDHCPValue = (*change.useDHCP? kYes : kNo);
+        success &= addSummaryItem(info, kDHCPDescription, useDHCPValue, error
+            , kDHCPUsageAffected, affected);
+    }
+
+    if (change.ip)
+    {
+        static const QString &kIpDescription = "ip";
+        success &= addSummaryItem(info, kIpDescription, *change.ip, error
+            , kIpAddressAffected, affected);
+    }
+
+    if (change.mask)
+    {
+        static const QString &kMaskDescription = "mask";
+        success &= addSummaryItem(info, kMaskDescription, *change.mask, error
+            , kMaskAffected, affected);
+    }
+
+    if (change.dns)
+    {
+        static const QString &kDnsDescription = "dns";
+        success &= addSummaryItem(info, kDnsDescription, *change.dns, error
+            , kDNSAffected, affected);
+    }
+
+    if (change.gateway)
+    {
+        static const QString &kGatewayDescription = "gateway";
+        success &= addSummaryItem(info, kGatewayDescription, *change.gateway, error
+            , kGatewayAffected, affected);
+    }
+
+    return success;
 }
 
 ///
@@ -748,13 +794,13 @@ void rtu::ChangesManager::addDateTimeChange(const QDate &date
     , const QTime &time
     , const QByteArray &timeZoneId)
 {
-    const QDateTime &utcTime = utcFromTimeZone(date, time, QTimeZone(timeZoneId));
-    m_impl->getChangeset().dateTime.reset(new DateTime(utcTime, QTimeZone(timeZoneId)));
+    qint64 utcTimeMs = utcMsFromTimeZone(date, time, QTimeZone(timeZoneId));
+    m_impl->getChangeset().dateTime.reset(new DateTime(utcTimeMs, timeZoneId));
 }
 
 void rtu::ChangesManager::turnOnDhcp()
 {
-    static const QString &kAnyName = "blah blah";
+    static const QString &kAnyName = "turnOnDhcp";
     /// In this case it is multiple selection. Just add empty interface
     /// change information to indicate that we should force dhcp on
     m_impl->getItfUpdateInfo(kAnyName);

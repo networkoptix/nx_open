@@ -86,12 +86,12 @@ QnSecurityCamResource::QnSecurityCamResource():
 
 QString QnSecurityCamResource::getName() const
 {
-    if( getId().isNull() )
-        return QnResource::getName();
-
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    if( !(*userAttributesLock)->name.isEmpty() )
-        return (*userAttributesLock)->name;
+    if( !getId().isNull() )
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if( !(*userAttributesLock)->name.isEmpty() )
+            return (*userAttributesLock)->name;
+    }
     return QnResource::getName();
 }
 
@@ -869,8 +869,14 @@ void QnSecurityCamResource::resetCachedValues()
     m_motionType.reset();
 }
 
-bool QnSecurityCamResource::isBitratePerGOP() const
+Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    return resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP) || getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0;
+    if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
+        return Qn::BPG_Predefined;
+
+    if (getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0)
+        return Qn::BPG_User;
+
+    return Qn::BPG_None;
 }

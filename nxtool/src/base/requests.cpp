@@ -90,7 +90,8 @@ namespace
             }
             else
             {
-                callback(QString(), rtu::kNoEntitiesAffected);
+                //TODO: #ynikitenkov #High Describe why no entities are affected here?
+                callback(QString(), affected /*rtu::kNoEntitiesAffected*/ );
             }
         };
         
@@ -208,18 +209,17 @@ bool parseGetTimeCmd(const QJsonObject &object
         || (!timeData.contains(kTimeZoneIdTag) && !timeData.contains(kTimeZoneOffsetTag)))
         return false;
     
-    const QTimeZone &timeZone = (containsTimeZoneId 
-        ? QTimeZone(timeData.value(kTimeZoneIdTag).toString().toStdString().c_str())
-        : QTimeZone(timeData.value(kTimeZoneOffsetTag).toInt()));
+    const QByteArray &timeZoneId = containsTimeZoneId 
+        ? timeData.value(kTimeZoneIdTag).toString().toUtf8()
+        : QTimeZone(timeData.value(kTimeZoneOffsetTag).toInt()).id();
 
     const qint64 msecs = timeData.value(kUtcTimeTag).toString().toLongLong();
     
-    extraInfo.timeZone = timeZone;
-    extraInfo.utcDateTime = QDateTime::fromMSecsSinceEpoch(msecs, Qt::UTC);
+    extraInfo.timeZoneId = timeZoneId;
+    extraInfo.utcDateTimeMs = msecs;
+    extraInfo.timestampMs = QDateTime::currentMSecsSinceEpoch();
 
-    extraInfo.timestamp = QDateTime::currentDateTime();
-
-    return true;    
+    return true;
 }
 
 ///
@@ -354,13 +354,14 @@ bool rtu::getServerExtraInfo(HttpClient *client
 
 bool rtu::sendSetTimeRequest(HttpClient *client
     , const ServerInfo &info
-    , const QDateTime &utcDateTime
-    , const QTimeZone &timeZone
+    , qint64 utcDateTimeMs
+    , const QByteArray &timeZoneId
     , const OperationCallback &callback)
 {
-    if (!info.hasExtraInfo() || !utcDateTime.isValid() 
-        || !timeZone.isValid() || !client)
+    if (!info.hasExtraInfo() || utcDateTimeMs <= 0
+        || !QTimeZone(timeZoneId).isValid() || !client)
     {
+        qDebug() << timeZoneId << QTimeZone(timeZoneId).isValid();
         return false;
     }
     
@@ -370,8 +371,8 @@ bool rtu::sendSetTimeRequest(HttpClient *client
     QUrl url = makeUrl(info, kSetTimeCommand);
     
     QUrlQuery query;
-    query.addQueryItem(kDateTimeTag, QString::number(utcDateTime.toMSecsSinceEpoch()));
-    query.addQueryItem(kTimeZoneTag, timeZone.id());
+    query.addQueryItem(kDateTimeTag, QString::number(utcDateTimeMs));
+    query.addQueryItem(kTimeZoneTag, timeZoneId);
     url.setQuery(query);
     
     const AffectedEntities affected = (kDateTimeAffected | kTimeZoneAffected);
@@ -573,7 +574,7 @@ rtu::ItfUpdateInfo::ItfUpdateInfo()
 
 rtu::ItfUpdateInfo::ItfUpdateInfo(const ItfUpdateInfo &other)
     : name(other.name)
-    , useDHCP(other.useDHCP)
+    , useDHCP(other.useDHCP) //TODO: #ynikitenkov what's this? 
     , ip(other.ip ? new QString(*other.ip) : nullptr)
     , mask(other.mask ? new QString(*other.mask) : nullptr)
     , dns(other.dns ? new QString(*other.dns) : nullptr)
@@ -593,8 +594,13 @@ rtu::ItfUpdateInfo::ItfUpdateInfo(const QString &initName)
 
 rtu::ItfUpdateInfo &rtu::ItfUpdateInfo::operator =(const ItfUpdateInfo &other)
 {
-    ItfUpdateInfo tmp(other);
-    std::swap(tmp, *this);
+    //TODO: #ynikitenkov what's this? 
+    name = other.name;
+    useDHCP = other.useDHCP;
+    ip = StringPointer(other.ip ? new QString(*other.ip) : nullptr);
+    mask = StringPointer(other.mask ? new QString(*other.mask) : nullptr);
+    dns = StringPointer(other.dns ? new QString(*other.dns) : nullptr);
+    gateway = StringPointer(other.gateway ? new QString(*other.gateway) : nullptr);
     return *this;
 }
 

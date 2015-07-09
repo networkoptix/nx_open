@@ -379,7 +379,7 @@
     </message>
     <message>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
+        <translation>Calcule bitrate por GOP en vez de bitrate por segundo (aumentará bitrate para la cámara)</translation>
     </message>
 </context>
 <context>
@@ -412,11 +412,11 @@
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>Enviar uso anónimo y accidente estadísticas a los desarrolladores de software (recomendado)</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Permita el descubrimiento automático de servidores y cámaras</translation>
     </message>
 </context>
 <context>
@@ -761,7 +761,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>System Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustes del sistema</translation>
     </message>
 </context>
 <context>
@@ -2524,7 +2524,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ask About Statistics Reporting</source>
-        <translation type="unfinished"></translation>
+        <translation>Pedir información acerca de las Estadísticas</translation>
     </message>
 </context>
 <context>
@@ -3924,7 +3924,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This could lead to client software malfunction including crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esto podría llevar al funcionamiento defectuoso del software del cliente incluyendo crash.</translation>
     </message>
 </context>
 <context>
@@ -4574,7 +4574,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation>Compruebe</translation>
     </message>
 </context>
 <context>
@@ -5429,11 +5429,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Reconstrucción de índice de archivo para el almacenamiento de &apos;%1&apos; está en marcha</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Escaneo rápido archivo de almacenamiento &apos;%1&apos; está en marcha</translation>
     </message>
 </context>
 <context>
@@ -5821,15 +5821,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>FPS value is too high</source>
-        <translation type="unfinished">FPS valor es demasiado alto</translation>
+        <translation>El valor de FPS es demasiado alto</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished">Fps actuales en cuadrícula de programación es %1. Fps se bajó a fps máxima de la cámara %2.</translation>
+        <translation>Fps actuales en cuadrícula de programación es %1. Fps se bajó a fps máxima de la cámara %2.</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished">Para el movimiento de software fps 2 está reservada para la corriente secundaria. Actual fps en cuadrícula de horario es de %1. FPS fue bajado a %2.</translation>
+        <translation>Para el movimiento de software fps 2 está reservada para la corriente secundaria. Actual fps en cuadrícula de horario es de %1. FPS fue bajado a %2.</translation>
     </message>
 </context>
 <context>
@@ -5946,7 +5946,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor comprueba la información de autenticación en ajustes de la cámara</translation>
     </message>
 </context>
 <context>
@@ -6677,32 +6677,32 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Some components of the system are not updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Algunos de los componentes del sistema no están actualizadas</translation>
     </message>
     <message>
         <source>Client v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliente v%1</translation>
     </message>
     <message>
         <source>Server v%1 at %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor v%1 at %2</translation>
     </message>
     <message>
         <source>Server v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor v%1</translation>
     </message>
     <message>
         <source>Please update all components to the latest version %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualice todos los componentes a la versión %1.</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Estadística de uso anónima</translation>
     </message>
     <message>
         <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
 If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>El sistema envía el uso anónimo y la estadística del accidente al equipo de desarrollo de software para ayudarnos a mejorar su experiencia del usuario. Si desea desactivar esta característica puede hacerlo en el diálogo de Ajustes del Sistema.</translation>
     </message>
 </context>
 <context>
@@ -6756,7 +6756,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo conectar al servidor...</translation>
     </message>
 </context>
 <context>
@@ -6973,7 +6973,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>exported</source>
-        <translation type="unfinished"></translation>
+        <translation>exportado</translation>
     </message>
 </context>
 <context>
@@ -7416,11 +7416,11 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished">Pantalla de%1</translation>
+        <translation>%1&apos;s Pantalla</translation>
     </message>
     <message>
         <source>%n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%n cámara</translation>
     </message>
 </context>
 <context>

@@ -4,9 +4,10 @@
 #include <QtCore/QObject>
 
 #include <nx_ec/ec_api_fwd.h>
+#include <api/model/compatibility_item.h>
 
 struct QnConnectionInfo;
-struct QnCompatibilityItem;
+//struct QnCompatibilityItem;
 class QnSoftwareVersion;
 
 class QnConnectionDiagnosticsHelper: public QObject

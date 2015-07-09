@@ -11,14 +11,16 @@ namespace rtu
         , const QTimeZone &sourceTimeZone
         , const QTimeZone &targetTimeZone);
 
-    QDateTime convertUtcToTimeZone(const QDateTime &utcTime
+    QDateTime convertUtcToTimeZone(qint64 utcTimeMs
         , const QTimeZone &timeZone);
 
-    QDateTime utcFromTimeZone(const QDate &date
+    qint64 utcMsFromTimeZone(const QDate &date
         , const QTime &time
         , const QTimeZone &timeZone);
 
     qint64 msecondsFromEpoch(const QDate &date
         , const QTime &time
         , const QTimeZone &timeZone);
+
+    QString timeZoneNameWithOffset(const QTimeZone &timeZone, const QDateTime &atDateTime);
 }

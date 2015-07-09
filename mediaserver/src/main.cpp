@@ -155,6 +155,7 @@
 #include <media_server/server_update_tool.h>
 #include <media_server/server_connector.h>
 #include <utils/common/app_info.h>
+#include <transcoding/ffmpeg_video_transcoder.h>
 
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
@@ -207,6 +208,7 @@ static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QByteArray SYSTEM_NAME_KEY("systemName");
 static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
+static const QByteArray DISABLE_FFMPEG_OPTIMIZATION("disableFfmpegOptimization");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -385,6 +387,9 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 void ffmpegInit()
 {
+    if (MSSettings::roSettings()->value(DISABLE_FFMPEG_OPTIMIZATION, false).toBool())
+        QnFfmpegVideoTranscoder::isOptimizationDisabled = true;
+
     //avcodec_init();
     av_register_all();
 
@@ -1538,6 +1543,10 @@ void QnMain::run()
 
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
+    std::unique_ptr<QnResourcePropertyDictionary> dictionary(new QnResourcePropertyDictionary());
+    std::unique_ptr<QnResourceStatusDictionary> statusDict(new QnResourceStatusDictionary());
+    std::unique_ptr<QnServerAdditionalAddressesDictionary> serverAdditionalAddressesDictionary(new QnServerAdditionalAddressesDictionary());
+
     std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
     connect(
@@ -1663,9 +1672,6 @@ void QnMain::run()
     ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
-    QnResourcePropertyDictionary dictionary;
-    QnResourceStatusDictionary statusDict;
-    QnServerAdditionalAddressesDictionary serverAdditionalAddressesDictionary;
 
     while (!needToStop())
     {
@@ -1891,10 +1897,10 @@ void QnMain::run()
         const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
         if (!confStats.isNull()) // if present
         {
-            const bool normStats = confStats.toBool();
-            const bool msStats = QnLexical::deserialized(server->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true);
+            const auto normStats = QnLexical::serialized(confStats.toBool());
+            const auto msStats = server->getProperty(Qn::STATISTICS_REPORT_ALLOWED);
             if (normStats != msStats)
-                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(normStats));
+                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, normStats);
 
             MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
             MSSettings::roSettings()->sync();

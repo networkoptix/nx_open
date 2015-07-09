@@ -1,93 +1,31 @@
-/**********************************************************
-* 26 dec 2014
-* a.kolesnikov
-***********************************************************/
-
-#include <condition_variable>
-#include <mutex>
-#include <vector>
-
-#include <gtest/gtest.h>
-
 #include <common/common_globals.h>
 #include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/httpclient.h>
 
+#include <gtest.h>
+#include <QThread>
 
-//TODO #ak introduce built-in http server to automate AsyncHttpClient tests
+namespace nx_http {
 
-#if 0
-TEST( AsyncHttpClient, KeepAlive )
+void testHttpClientForFastRemove( const QUrl& url )
 {
-    //TODO #ak use local http server
+    EXPECT_TRUE( nx_http::AsyncHttpClient::create()->doGet( url ) );
 
-    static const QUrl url( "http://192.168.0.1/girls/candice_swanepoel_07_original.jpg" );
-    static const int TEST_RUNS = 2;
-
-    nx_http::HttpClient client;
-
-    nx::Buffer msgBody;
-    for( int i = 0; i < TEST_RUNS; ++i )
+    // use different delays (10us - 0.5s) to catch problems on different stages
+    for( uint time = 10; time < 500000; time *= 2 )
     {
-        ASSERT_TRUE( client.doGet( url ) );
-        ASSERT_TRUE( client.response() );
-        ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
-        nx::Buffer newMsgBody;
-        while( !client.eof() )
-            newMsgBody += client.fetchMessageBodyBuffer();
-        if( i == 0 )
-            msgBody = newMsgBody;
-        else
-            ASSERT_EQ( msgBody, newMsgBody );
+        const auto client = nx_http::AsyncHttpClient::create();
+        EXPECT_TRUE( client->doGet( url ) );
+
+        // kill the client after some delay
+        QThread::usleep( time );
     }
 }
 
-TEST( AsyncHttpClient, KeepAlive2 )
+TEST( AsyncHttpClient, FastRemove )
 {
-    QUrl url( "http://192.168.0.1:7001/ec2/testConnection" );
-    url.setUserName( "admin" );
-    url.setPassword( "123" );
-    static const int TEST_RUNS = 2;
-
-    nx::Buffer msgBody;
-    for( int i = 0; i < TEST_RUNS; ++i )
-    {
-        nx_http::HttpClient client;
-        ASSERT_TRUE( client.doGet( url ) );
-        ASSERT_TRUE( client.response() );
-        ASSERT_EQ( nx_http::StatusCode::ok, client.response()->statusLine.statusCode );
-        nx::Buffer newMsgBody;
-        while( !client.eof() )
-            newMsgBody += client.fetchMessageBodyBuffer();
-        if( i == 0 )
-            msgBody = newMsgBody;
-        else
-            ASSERT_EQ( msgBody, newMsgBody );
-    }
+    testHttpClientForFastRemove( lit( "http://127.0.0.1/" ) );
+    testHttpClientForFastRemove( lit( "http://localhost/" ) );
+    testHttpClientForFastRemove( lit( "http://doestNotExist.host/" ) );
 }
 
-TEST( AsyncHttpClient, KeepAlive3 )
-{
-    QUrl url( "http://192.168.0.194:7001/ec2/events?guid=%7Be7209f3e-9ebe-6ebb-3e99-e5acd61c228c%7D&runtime-guid=%7B83862a97-b7b8-4dbc-bb8f-64847f23e6d5%7D&system-identity-time=0" );
-    url.setUserName( "admin" );
-    url.setPassword( "123" );
-    static const int TEST_RUNS = 2;
-
-    nx::Buffer msgBody;
-    for( int i = 0; i < TEST_RUNS; ++i )
-    {
-        nx_http::HttpClient client;
-        client.addRequestHeader( "NX-EC-SYSTEM-NAME", "ak_ec_2.3" );
-        ASSERT_TRUE( client.doGet( url ) );
-        ASSERT_TRUE( client.response() );
-        ASSERT_EQ( nx_http::StatusCode::ok, client.response()->statusLine.statusCode );
-        nx::Buffer newMsgBody;
-        while( !client.eof() )
-            newMsgBody += client.fetchMessageBodyBuffer();
-        if( i == 0 )
-            msgBody = newMsgBody;
-        else
-            ASSERT_EQ( msgBody, newMsgBody );
-    }
-}
-#endif
+} // namespace nx_http

@@ -95,8 +95,8 @@ namespace rtu
 
     bool sendSetTimeRequest(HttpClient *client
         , const ServerInfo &info
-        , const QDateTime &utcDateTime
-        , const QTimeZone &timeZone
+        , qint64 utcDateTimeMs
+        , const QByteArray &timeZoneId
         , const OperationCallback &callback);
 
     ///

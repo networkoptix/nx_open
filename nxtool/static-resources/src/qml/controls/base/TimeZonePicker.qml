@@ -9,7 +9,8 @@ ComboBox
 {
     id: thisComponent;
     
-    signal timeZoneChanged(string from, string to);
+    clip: true;
+    signal timeZoneChanged(int from, int to);
     
     property bool changed: (currentIndex !== initIndex);
     
@@ -36,17 +37,11 @@ ComboBox
             lastSelectedIndex = currentIndex;
         }
 
-        if ((currentIndex === initIndex) )
+        if (!model.isValidValue(currentIndex))
             return;
-        
-        var newTimeZone = textAt(currentIndex);
-        var newTimeZoneString = (newTimeZone ? newTimeZone : "");
-        
-        var lastTimeZone = textAt(lastSelectedIndex);
-        var lastTimeZoneString = (lastTimeZone ? lastTimeZone : "");
-        
-        if ((newTimeZoneString !== lastTimeZoneString) && (model.isValidValue(lastSelectedIndex)))
-            timeZoneChanged(lastTimeZoneString, newTimeZoneString);
+      
+        if (currentIndex !== lastSelectedIndex)
+            timeZoneChanged(lastSelectedIndex, currentIndex);
 
         lastSelectedIndex = currentIndex;
     }

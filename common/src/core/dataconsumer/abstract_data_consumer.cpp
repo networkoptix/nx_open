@@ -56,7 +56,7 @@ void QnAbstractDataConsumer::run()
             if (processData(data))
                 break;
             else
-                QnSleep::msleep(1);
+                QnSleep::msleep(10);
         }
     }
 

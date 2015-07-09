@@ -21,7 +21,7 @@ Expandable.ExpandableItem
         right: parent.right;
     }
 
-    headerDelegate: Item
+    headerDelegate: FocusScope
     {
         id: headerHolder;
 
@@ -44,7 +44,7 @@ Expandable.ExpandableItem
                 right: parent.right;
             }
 
-            Item
+            FocusScope
             {
                 id: header;
 
@@ -96,7 +96,7 @@ Expandable.ExpandableItem
                 }
             }
             
-            Item
+            FocusScope
             {
                 id: spacer;
                 width: 1;

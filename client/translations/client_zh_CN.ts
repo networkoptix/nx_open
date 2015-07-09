@@ -379,7 +379,7 @@
     </message>
     <message>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
+        <translation>计算每个GPO比特率替代秒比特率（将增加摄像机比特率）</translation>
     </message>
 </context>
 <context>
@@ -412,11 +412,11 @@
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>发送匿名使用和异常统计至开发者（推荐）</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>允许自动扫描在线摄像机和服务器</translation>
     </message>
 </context>
 <context>
@@ -761,7 +761,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>System Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>系统设置</translation>
     </message>
 </context>
 <context>
@@ -2517,7 +2517,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ask About Statistics Reporting</source>
-        <translation type="unfinished"></translation>
+        <translation>获取数据统计报告</translation>
     </message>
 </context>
 <context>
@@ -3893,7 +3893,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This could lead to client software malfunction including crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>可能导致客户端异常崩溃.</translation>
     </message>
 </context>
 <context>
@@ -4540,7 +4540,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation>检查</translation>
     </message>
 </context>
 <context>
@@ -5389,11 +5389,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>正在重建录像索引&apos;%1&apos;</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>正在快速扫描录像&apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -5777,15 +5777,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>FPS value is too high</source>
-        <translation type="unfinished">每秒帧数数值过高</translation>
+        <translation>每秒帧数数值过高</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished">日程网格中当前为每秒 %1帧。每秒帧数降到最大每秒 %2帧。</translation>
+        <translation>日程网格中当前为每秒 %1帧。每秒帧数降到最大每秒 %2帧。</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished">使用软件运动侦测功能，副码流默认2.fps。当前在日程表中的fps是%1。fps下降到%2.</translation>
+        <translation>使用软件移动侦测功能，副码流默认2.fps。当前在日程表中的fps为%1。fps已下降到%2.</translation>
     </message>
 </context>
 <context>
@@ -5902,7 +5902,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>请检查摄像机设置中的身份验证信息</translation>
     </message>
 </context>
 <context>
@@ -6621,32 +6621,33 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Some components of the system are not updated</source>
-        <translation type="unfinished"></translation>
+        <translation>部分系统组件未更新</translation>
     </message>
     <message>
         <source>Client v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>客户端 v%1</translation>
     </message>
     <message>
         <source>Server v%1 at %2</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器 v%1 at %2</translation>
     </message>
     <message>
         <source>Server v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器 v%1</translation>
     </message>
     <message>
         <source>Please update all components to the latest version %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>请升级到最新程序组件  %1.</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>匿名使用的数据统计</translation>
     </message>
     <message>
         <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
 If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>系统向开发者发送匿名使用和异常统计来提升用户体验.
+此功能可在系统设置中开启和关闭.</translation>
     </message>
 </context>
 <context>
@@ -6700,7 +6701,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接至服务器...</translation>
     </message>
 </context>
 <context>
@@ -6916,7 +6917,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>exported</source>
-        <translation type="unfinished"></translation>
+        <translation>导出</translation>
     </message>
 </context>
 <context>
@@ -7352,11 +7353,11 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished">%1&apos;的屏幕</translation>
+        <translation>%1&apos;屏幕</translation>
     </message>
     <message>
         <source>%n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%n 摄像机</translation>
     </message>
 </context>
 <context>

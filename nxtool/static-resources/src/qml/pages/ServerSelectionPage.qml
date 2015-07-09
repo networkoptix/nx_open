@@ -16,12 +16,8 @@ ScrollView
     Rtu.ServerSelectionListView
     {
         id: selectionView;
-        
-        anchors
-        {
-            left: parent.left;
-            right: parent.right;
-        }
+
+        anchors.fill: parent;
         
         onApplyChanges: { thisComponent.applyChanges(); }
     }
