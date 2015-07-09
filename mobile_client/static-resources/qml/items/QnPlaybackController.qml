@@ -15,14 +15,18 @@ Item {
     property real tickSize: 10
     property real lineWidth: 2
     property bool speedEnabled: true
-    readonly property alias dragging: rootItem.__dragging
+    readonly property alias dragging: d.dragging
 
-    readonly property int __minSpeed: -16
-    readonly property int __maxSpeed: 16
-    property bool __dragging: gripMouseArea.drag.active
+    QtObject {
+        id: d
+
+        readonly property int minSpeed: -16
+        readonly property int maxSpeed: 16
+        property bool dragging: gripMouseArea.drag.active
+    }
 
     readonly property real speed: {
-        if (!__dragging)
+        if (!d.dragging)
             return 1.0
 
         var center = (rootItem.width - grip.width) / 2
@@ -31,10 +35,10 @@ Item {
 
         if (grip.x < w) {
             factor = Math.pow((w - grip.x) / w, 4)
-            return -1.0 + factor * (__minSpeed + 1.0)
+            return -1.0 + factor * (d.minSpeed + 1.0)
         } else if (grip.x > center + speedMarkers.padding) {
             factor = Math.pow((grip.x - w - speedMarkers.padding * 2) / w, 2.5)
-            return 2.0 + factor * (__maxSpeed - 2.0)
+            return 2.0 + factor * (d.maxSpeed - 2.0)
         } else {
             return 1.0
         }
