@@ -305,12 +305,11 @@
             </dependencies>
         </profile>
         <profile>
-            <id>linux-noarm</id>
+            <id>unix-noarm</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
-                    <name>linux</name>
                 </os>
                 <property>
                     <name>arch</name>

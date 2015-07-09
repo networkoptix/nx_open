@@ -397,7 +397,7 @@ namespace detail
         //starting async http request to get remote file size
         QUrl downloadUrl = baseUrl;
         downloadUrl.setPath( downloadUrl.path() + "/" + entryPath );
-        m_httpClient.reset( new nx_http::AsyncHttpClient() );
+        m_httpClient = nx_http::AsyncHttpClient::create();
         connect(
             m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
             this, &GetFileOperation::onResponseReceived,
@@ -462,7 +462,7 @@ namespace detail
         QUrl downloadUrl = baseUrl;
         downloadUrl.setPath( downloadUrl.path() + "/" + entryPath );
 
-        m_httpClient.reset( new nx_http::AsyncHttpClient() );
+        m_httpClient = nx_http::AsyncHttpClient::create();
         connect(
             m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
             this, &GetFileOperation::onResponseReceived,

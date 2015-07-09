@@ -118,7 +118,7 @@ bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     requestUrl.setPath( requestPath );
 
     QMutexLocker lk( &m_inputPortMutex );
-    nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     connect( httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnPlAxisResource::onMonitorResponseReceived, Qt::DirectConnection );
     connect( httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnPlAxisResource::onMonitorMessageBodyAvailable, Qt::DirectConnection );
     connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnPlAxisResource::onMonitorConnectionClosed, Qt::DirectConnection );
@@ -140,7 +140,7 @@ void QnPlAxisResource::stopInputPortMonitoringAsync()
     if( !m_inputPortHttpMonitor )
         return;
 
-    std::shared_ptr<nx_http::AsyncHttpClient> httpClient = std::move(m_inputPortHttpMonitor);
+    nx_http::AsyncHttpClientPtr httpClient = std::move(m_inputPortHttpMonitor);
     lk.unlock();
     httpClient->terminate();
     httpClient.reset();

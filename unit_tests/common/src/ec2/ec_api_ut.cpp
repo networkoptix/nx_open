@@ -54,7 +54,7 @@ public:
 
         if( m_requestsStarted < maxRequestsToPerform() )
         {
-            nx_http::AsyncHttpClientPtr newClient = std::make_shared<nx_http::AsyncHttpClient>();
+            nx_http::AsyncHttpClientPtr newClient = nx_http::AsyncHttpClient::create();
             connect( newClient.get(), &nx_http::AsyncHttpClient::done, 
                      this, &RequestsGenerator::startAnotherClient,
                      Qt::DirectConnection );
