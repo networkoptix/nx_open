@@ -98,10 +98,10 @@ Base.Column
                         item.ipAddressControl.focus = true;
                         return false;
                     }
-                    /// !Do not send ip addres if it is not correct and we use dhcp
+                    /// !Do not send ip address if it is not correct and we use dhcp
                 }
                 
-                if (!item.subnetMaskControl.changed || !useDHCP)
+                if (item.subnetMaskControl.changed || !useDHCP)
                 {
                     if (item.subnetMaskControl.acceptableInput)
                     {

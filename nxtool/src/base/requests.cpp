@@ -417,7 +417,8 @@ void rtu::sendIfListRequest(HttpClient *client
     , const BaseServerInfo &info
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
-    , const OperationCallback &failed)
+    , const OperationCallback &failed
+    , int timeout)
 {
     if (!client)
     {
@@ -448,7 +449,7 @@ void rtu::sendIfListRequest(HttpClient *client
     };
 
    client->sendGet(url, successfullCallback
-        , makeErrorCallback(failed, kAllAddressFlagsAffected));
+        , makeErrorCallback(failed, kAllAddressFlagsAffected), timeout);
 }
 
 ///

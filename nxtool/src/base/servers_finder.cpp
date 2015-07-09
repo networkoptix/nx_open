@@ -29,7 +29,7 @@ namespace
       
     enum 
     {
-        kUpdateServersInfoInterval = 2000
+        kUpdateServersInfoInterval = 4000
         , kServerAliveTimeout = 12 * 1000
     };
 
@@ -65,7 +65,7 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
-        //if (!jsonObject.value("systemName").toString().contains("nx1"))
+        // if (!jsonObject.value("systemName").toString().contains("nx1_192_local"))
         //    return false;
 
         rtu::parseModuleInformationReply(jsonObject, info);
