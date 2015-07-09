@@ -4,10 +4,13 @@
 #include <QtCore/QTimer>
 #include <QtCore/QDateTime>
 #include <QtCore/QMap>
+#include <QtCore/QPointer>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QAuthenticator>
+
+//#define HTTP_CLIENT_DEBUG
 
 namespace
 {
@@ -33,8 +36,18 @@ namespace
         return L'#'+QString::number(errorCode);
     }
 
+#ifdef HTTP_CLIENT_DEBUG
+    void logReply(QNetworkReply* reply, const QString &message) {
+        if (reply)
+            qDebug() << reply << message << reply->url();
+        else
+            qDebug() << "NULL REPLY" << message;
+    }
+#else
+#define logReply(...)
+#endif
+
     const qint64 defaultRequestTimeoutMs = 10 * 1000;
-    const qint64 timerPrecisionMs = 500;
 }
 
 class rtu::HttpClient::Impl : public QObject
@@ -58,22 +71,17 @@ public:
         );
     
 private:
+    void setupTimeout(QNetworkReply *reply, qint64 timeoutMs);
     void onReply(QNetworkReply *reply);
     
 private:
     struct ReplyInfo {
         ReplyCallback success;
         ErrorCallback error;
-        qint64 timeoutTimeMs;
 
-        ReplyInfo(ReplyCallback success, ErrorCallback error, qint64 timeoutMs):
+        ReplyInfo(ReplyCallback success, ErrorCallback error):
             success(success), error(error)
-        {
-            //TODO: #gdm describe default values
-            if (timeoutMs == HttpClient::kUseDefaultTimeout)
-                timeoutMs = defaultRequestTimeoutMs;
-            timeoutTimeMs = QDateTime::currentMSecsSinceEpoch() + timeoutMs;
-        }
+        {}
     };
     typedef QMap<QNetworkReply *, ReplyInfo> RepliesMap;
     
@@ -87,25 +95,6 @@ rtu::HttpClient::Impl::Impl(QObject *parent)
     , m_replies()
 {
     QObject::connect(m_manager, &QNetworkAccessManager::finished, this, &Impl::onReply);
-
-    QTimer *timeoutTimer = new QTimer(this);
-    timeoutTimer->setInterval(timerPrecisionMs);
-    timeoutTimer->setSingleShot(false);
-    connect(timeoutTimer, &QTimer::timeout, this, [this] {
-
-        QList<QNetworkReply*> timedOutReplies;
-        qint64 time = QDateTime::currentMSecsSinceEpoch();
-        for (auto it = m_replies.cbegin(); it != m_replies.cend(); ++it) {
-            if (time >= it->timeoutTimeMs)
-                timedOutReplies.push_back(it.key());
-        }
-        for (auto reply: timedOutReplies) {
-//            qDebug() << "Aborting reply";
-            reply->abort(); // here finished() will be emitted and replies will be removed from the m_replies map 
-        }
-
-    });
-    timeoutTimer->start();
 }
 
 rtu::HttpClient::Impl::~Impl()
@@ -118,9 +107,10 @@ void rtu::HttpClient::Impl::sendGet(const QUrl &url
     , qint64 timeoutMs)
 {
     QNetworkReply *reply = m_manager->get(QNetworkRequest(url));
-//    qDebug() << reply << " sending command: " << url; 
+    logReply(reply, "sending get command");
+    setupTimeout(reply, timeoutMs);
     m_replies.insert(reply
-        , ReplyInfo(successfullCallback, errorCallback, timeoutMs));
+        , ReplyInfo(successfullCallback, errorCallback));
 }
 
 void rtu::HttpClient::Impl::sendPost(const QUrl &url
@@ -130,9 +120,26 @@ void rtu::HttpClient::Impl::sendPost(const QUrl &url
     , qint64 timeoutMs)
 {
     QNetworkReply *reply = m_manager->post(preparePostJsonRequestRequest(url), data);
-//    qDebug() << reply << "sending post command: " << url; 
+    logReply(reply, "sending post command");
+    setupTimeout(reply, timeoutMs);
     m_replies.insert(reply
-        , ReplyInfo(successfullCallback, errorCallback, timeoutMs));
+        , ReplyInfo(successfullCallback, errorCallback));
+}
+
+void rtu::HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs) {
+    if (timeoutMs < kUseDefaultTimeout)
+        return;
+
+    if (timeoutMs == kUseDefaultTimeout)
+        timeoutMs = defaultRequestTimeoutMs;
+
+    QPointer<QNetworkReply> replyPtr(reply);
+    QTimer::singleShot(timeoutMs, [replyPtr] {
+        if (replyPtr) {
+            logReply(replyPtr.data(), "aborting request");
+            replyPtr->abort(); // here finished() will be emitted and replies will be removed from the m_replies map
+        }
+    });
 }
 
 void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
@@ -140,8 +147,10 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
     reply->deleteLater();
     
     RepliesMap::iterator it = m_replies.find(reply);
-    if (it == m_replies.end())
+    if (it == m_replies.end()) {
+        logReply(reply, "do not waiting for this reply anymore");
         return;
+    }
     
     enum
     {
@@ -155,8 +164,7 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
     const bool isHttpError = ((httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast));
     const QByteArray &data = reply->readAll();
     
-//    qDebug() << reply << " network reply: " << errorCode << " : " << httpCode;
-//    qDebug() << data;
+    logReply(reply, QString("reply received %1 : %2").arg(errorCode).arg(httpCode));
     if (isRequestError || isHttpError)
     { 
         const ErrorCallback &errorCallback = it->error;
