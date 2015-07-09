@@ -16,6 +16,12 @@ Base.TextField
 
     text: initialText;
 
+    onEnabledChanged:
+    {
+        if (!enabled && !acceptableInput)
+            text = initialText;
+    }
+
     onTextChanged: 
     {
         //maximum value of the first two digits is 25, otherwise appending dot
