@@ -78,7 +78,7 @@ Item {
                 windowEnd: (new Date(Date.now() + 5 * 60 * 1000)).getTime()
                 windowStart: (new Date(Date.now() - 5 * 60 * 1000)).getTime()
 
-                stickToEnd: mediaPlayer.atLive && mediaPlayer.playing
+                stickToEnd: mediaPlayer.atLive && !playbackController.paused
 
                 chunkBarHeight: dp(36)
                 textY: (height - chunkBarHeight) / 2

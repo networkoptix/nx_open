@@ -87,9 +87,16 @@ QnObject {
             return
         }
 
+        var aligned = alignedPosition(pos)
+        if (d.position == -1 && aligned === -1) {
+            timelinePositionRequest(d.position)
+            if (!playing)
+                mediaPlayer.play()
+            return
+        }
+
         mediaPlayer.stop()
 
-        var aligned = alignedPosition(pos)
         d.position = aligned >= 0 ? Math.max(aligned, pos) : -1
         d.chunkEnd = (d.position >= 0) ? chunkProvider.closestChunkEndMs(pos, true) : -1
 
