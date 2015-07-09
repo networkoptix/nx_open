@@ -25,6 +25,7 @@ QnObject {
     readonly property int videoHeight: mediaPlayer.metaData.resolution ? mediaPlayer.metaData.resolution.height : 0
 
     signal timelineCorrectionRequest(real position)
+    signal timelinePositionRequest(real position)
 
     QtObject {
         id: d
@@ -92,8 +93,8 @@ QnObject {
         d.position = aligned >= 0 ? Math.max(aligned, pos) : -1
         d.chunkEnd = (d.position >= 0) ? chunkProvider.closestChunkEndMs(pos, true) : -1
 
-        timelineCorrectionRequest(d.position)
-        d.updateTimeline = false
+        timelinePositionRequest(d.position)
+        d.updateTimeline = true
         resourceHelper.setPosition(d.position)
 
         d.prevPlayerPosition = 0
@@ -113,7 +114,7 @@ QnObject {
 
         if (d.paused) {
             d.position = pos
-            timelineCorrectionRequest(d.position)
+            timelinePositionRequest(d.position)
             d.updateTimeline = false
         } else {
             play(pos)

@@ -33,6 +33,7 @@ namespace {
     const qreal liveOpacityAnimationSpeed = 0.01;
     const qreal stripesMovingSpeed = 0.002;
     const qreal windowMovingSpeed = 0.04;
+    const qint64 correctionThreshold = 5000;
 
     struct MarkInfo {
         qint64 tick;
@@ -95,6 +96,10 @@ public:
     qreal stripesPosition;
     bool stickToEnd;
     bool autoPlay;
+    qreal autoPlaySpeed;
+    qreal playSpeedCorrection;
+    qint64 previousCorrectionTime;
+    qint64 previousCorrectedPosition;
 
     qint64 startBoundTime;
     qint64 endBoundTime;
@@ -145,6 +150,9 @@ public:
         stripesPosition(0.0),
         stickToEnd(false),
         autoPlay(false),
+        autoPlaySpeed(1.0),
+        playSpeedCorrection(1.0),
+        previousCorrectionTime(-1),
         startBoundTime(-1),
         endBoundTime(-1),
         targetPosition(-1),
@@ -392,6 +400,8 @@ void QnTimeline::setPosition(qint64 position) {
     if (position == this->position())
         return;
 
+    clearCorrection();
+
     setStickToEnd(position < 0);
 
     if (!stickToEnd())
@@ -496,6 +506,39 @@ void QnTimeline::updateDrag(int x) {
 void QnTimeline::finishDrag(int x) {
     d->stickyPointKineticHelper.finish(x);
     update();
+}
+
+void QnTimeline::clearCorrection() {
+    d->previousCorrectionTime = -1;
+    d->previousCorrectedPosition = -1;
+    d->playSpeedCorrection = 1.0;
+}
+
+void QnTimeline::correctPosition(qint64 position) {
+    if (position < 0) {
+        setPosition(position);
+        return;
+    }
+
+    qint64 time = d->animationTimer.elapsed();
+    if (d->previousCorrectionTime >= 0) {
+        qint64 dt = time - d->previousCorrectionTime;
+        qint64 prognosed = d->previousCorrectedPosition + dt * d->autoPlaySpeed * d->playSpeedCorrection;
+
+        qint64 diff = prognosed - position;
+
+        if (qAbs(diff) > correctionThreshold * d->autoPlaySpeed) {
+            setPosition(position);
+            return;
+        }
+
+        qint64 dp = d->previousCorrectedPosition + (position - d->previousCorrectedPosition) * 2 - prognosed;
+        qreal correction = dp / (dt * d->autoPlaySpeed);
+        d->playSpeedCorrection = (d->playSpeedCorrection + correction) / 2; /* take middle value to stabilize correction coefficient */
+    }
+
+    d->previousCorrectionTime = time;
+    d->previousCorrectedPosition = position;
 }
 
 QnCameraChunkProvider *QnTimeline::chunkProvider() const {
@@ -1016,8 +1059,9 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
     if (!stickToEnd && autoPlay) {
         windowChanged = true;
-        windowStart += dt;
-        windowEnd += dt;
+        qint64 shift = dt * autoPlaySpeed * playSpeedCorrection;
+        windowStart += shift;
+        windowEnd += shift;
     }
 
     zoomKineticHelper.update();

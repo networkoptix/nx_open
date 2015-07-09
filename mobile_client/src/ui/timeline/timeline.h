@@ -90,6 +90,9 @@ public:
     Q_INVOKABLE void updateDrag(int x);
     Q_INVOKABLE void finishDrag(int x);
 
+    Q_INVOKABLE void clearCorrection();
+    Q_INVOKABLE void correctPosition(qint64 position);
+
     QnCameraChunkProvider *chunkProvider() const;
     void setChunkProvider(QnCameraChunkProvider *chunkProvider);
 

@@ -91,8 +91,11 @@ Item {
 
                 Connections {
                     target: mediaPlayer
-                    onTimelineCorrectionRequest: {
-                        timeline.position = position
+                    onTimelineCorrectionRequest: timeline.correctPosition(position)
+                    onTimelinePositionRequest: timeline.position = position
+                    onPlayingChanged: {
+                        if (!mediaPlayer.playing)
+                            timeline.clearCorrection()
                     }
                 }
             }

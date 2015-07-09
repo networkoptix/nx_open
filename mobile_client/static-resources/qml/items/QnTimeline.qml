@@ -29,6 +29,14 @@ Item {
         timeline.zoomOut()
     }
 
+    function correctPosition(position) {
+        timelineView.correctPosition(position)
+    }
+
+    function clearCorrection() {
+        timelineView.clearCorrection()
+    }
+
     QnTimelineView {
         id: timeline
         anchors.fill: parent
