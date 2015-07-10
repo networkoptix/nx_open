@@ -52,6 +52,10 @@ namespace {
         return QString::fromLatin1(auth.toUtf8().toBase64());
     }
 
+    qint64 convertPosition(qint64 position, QnMediaResourceHelper::Protocol protocol) {
+        return protocol == QnMediaResourceHelper::Rtsp ? position * 1000 : position;
+    }
+
 } // anonymous namespace
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
@@ -59,7 +63,8 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     m_position(-1),
     m_protocol(Http),
     m_standardResolution(-1),
-    m_nativeStreamIndex(-1)
+    m_nativeStreamIndex(-1),
+    m_transcodingSupported(true)
 {
     setStardardResolutions();
 }
@@ -122,7 +127,7 @@ void QnMediaResourceHelper::updateUrl() {
         return;
     }
 
-    if (m_nativeStreamIndex < 0 && m_resolution.isEmpty()) {
+    if (m_nativeStreamIndex < 0 && (m_resolution.isEmpty() && m_screenSize.isEmpty())) {
         setUrl(QUrl());
         return;
     }
@@ -146,13 +151,13 @@ void QnMediaResourceHelper::updateUrl() {
 
     if (m_nativeStreamIndex >= 0) {
         // TODO: #dklychkov implement
+        // query.addQueryItem(lit("stream"), m_nativeStreamIndex);
     } else {
-        if (!m_resolution.isEmpty())
-            query.addQueryItem(lit("resolution"), m_resolution);
+        query.addQueryItem(lit("resolution"), m_resolution.isEmpty() ? optimalResolution() : m_resolution);
     }
 
     if (m_position >= 0)
-        query.addQueryItem(lit("pos"), QString::number(m_position));
+        query.addQueryItem(lit("pos"), QString::number(convertPosition(m_position, m_protocol)));
 
     if (QnUserResourcePtr user = qnCommon->instance<QnUserWatcher>()->user())
         query.addQueryItem(lit("auth"), getAuth(user));
@@ -182,28 +187,31 @@ void QnMediaResourceHelper::setPosition(qint64 position) {
 QStringList QnMediaResourceHelper::resolutions() const {
     QStringList result;
 
-    for (const CameraMediaStreamInfo &info: m_supportedStreams.streams) {
-        if (!result.contains(info.resolution))
-            result.append(info.resolution);
+    if (m_transcodingSupported) {
+        for (int resolution: m_standardResolutions)
+            result.append(lit("%1p").arg(resolution));
+        result.append(QString());
+    } else {
+        // TODO: #dklychkov implement
     }
 
     return result;
 }
 
-QString QnMediaResourceHelper::stream() const {
+QString QnMediaResourceHelper::resolution() const {
     if (m_nativeStreamIndex >= 0) {
         // TODO: #dklychkov
     }
     return m_resolution;
 }
 
-void QnMediaResourceHelper::setStream(const QString &resolution) {
+void QnMediaResourceHelper::setResolution(const QString &resolution) {
     if (m_resolution == resolution)
         return;
 
     m_resolution = resolution;
 
-    emit streamChanged();
+    emit resolutionChanged();
 
     updateUrl();
 }
@@ -220,7 +228,7 @@ void QnMediaResourceHelper::setScreenSize(const QSize &size) {
 
     emit screenSizeChanged();
 
-    setStream(optimalResolution());
+    updateUrl();
 }
 
 QString QnMediaResourceHelper::optimalResolution() const {

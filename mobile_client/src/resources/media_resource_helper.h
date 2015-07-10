@@ -13,7 +13,7 @@ class QnMediaResourceHelper : public QObject {
     Q_PROPERTY(QUrl mediaUrl READ mediaUrl NOTIFY mediaUrlChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
     Q_PROPERTY(QStringList resolutions READ resolutions NOTIFY resolutionsChanged)
-    Q_PROPERTY(QString stream READ stream WRITE setStream NOTIFY streamChanged)
+    Q_PROPERTY(QString resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
     Q_PROPERTY(QSize screenSize READ screenSize WRITE setScreenSize NOTIFY screenSizeChanged)
 
     Q_ENUMS(Protocol)
@@ -37,8 +37,8 @@ public:
     Q_INVOKABLE void setPosition(qint64 position);
 
     QStringList resolutions() const;
-    QString stream() const;
-    void setStream(const QString &stream);
+    QString resolution() const;
+    void setResolution(const QString &resolution);
 
     QSize screenSize() const;
     void setScreenSize(const QSize &size);
@@ -50,7 +50,7 @@ signals:
     void mediaUrlChanged();
     void resourceNameChanged();
     void resolutionsChanged();
-    void streamChanged();
+    void resolutionChanged();
     void screenSizeChanged();
 
 private:
@@ -74,6 +74,7 @@ private:
     QSize m_screenSize;
     qreal m_aspectRatio;
     int m_nativeStreamIndex;
+    bool m_transcodingSupported;
 };
 
 #endif // MEDIA_RESOURCE_HELPER_H

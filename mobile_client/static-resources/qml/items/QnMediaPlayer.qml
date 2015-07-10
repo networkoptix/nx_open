@@ -19,6 +19,7 @@ QnObject {
 
     readonly property var mediaPlayer: mediaPlayer
     readonly property var chunkProvider: chunkProvider
+    readonly property var resourceHelper: resourceHelper
 
     readonly property alias resourceName: resourceHelper.resourceName
     readonly property int videoWidth: mediaPlayer.metaData.resolution ? mediaPlayer.metaData.resolution.width : 0
@@ -41,6 +42,8 @@ QnObject {
     MediaPlayer {
         id: mediaPlayer
         source: resourceHelper.mediaUrl
+
+        autoPlay: !d.paused
 
         onPositionChanged: updatePosition()
         onSourceChanged: console.log(source)

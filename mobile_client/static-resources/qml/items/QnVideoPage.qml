@@ -20,6 +20,29 @@ QnPage {
         onClicked: Main.gotoMainScreen()
     }
 
+    QnIconButton {
+        parent: toolBar
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: dp(8)
+        icon: "image://icon/more_vert.png"
+        visible: pageStatus == Stack.Active || pageStatus == Stack.Activating
+        onClicked: cameraMenu.open(toolBar.width, dp(4))
+    }
+
+    QnCameraMenu {
+        id: cameraMenu
+        currentQuality: mediaPlayer.resourceHelper.resolution
+        onSelectQuality: qualityDialog.open()
+    }
+
+    QnQualityDialog {
+        id: qualityDialog
+        resolutionList: mediaPlayer.resourceHelper.resolutions
+        currentResolution: mediaPlayer.resourceHelper.resolution
+        onQualityPicked: mediaPlayer.resourceHelper.resolution = resolution
+    }
+
     VideoOutput {
         id: video
 
