@@ -304,7 +304,7 @@ public:
     void updateStripesTextures();
 
     void animateProperties(qint64 dt);
-    void zoomWindow(qreal factor, int x, qint64 stickyTime = -1);
+    void zoomWindow(qreal factor);
 
     void setStickToEnd(bool stickToEnd);
 
@@ -461,12 +461,14 @@ qint64 QnTimeline::startBound() const {
     return d->startBoundTime;
 }
 
-void QnTimeline::zoomIn(int x) {
-    d->zoomWindow(zoomMultiplier, x >= 0 ? x : width() / 2, position());
+void QnTimeline::zoomIn() {
+    d->stickyTime = position();
+    d->zoomWindow(zoomMultiplier);
 }
 
-void QnTimeline::zoomOut(int x) {
-    d->zoomWindow(1.0 / zoomMultiplier, x >= 0 ? x : width() / 2, position());
+void QnTimeline::zoomOut() {
+    d->stickyTime = position();
+    d->zoomWindow(1.0 / zoomMultiplier);
 }
 
 void QnTimeline::startPinch(int x, qreal scale) {
@@ -541,6 +543,10 @@ void QnTimeline::correctPosition(qint64 position) {
     d->previousCorrectedPosition = position;
 }
 
+qint64 QnTimeline::positionAtX(qreal x) const {
+    return d->pixelPosToTime(x);
+}
+
 QnCameraChunkProvider *QnTimeline::chunkProvider() const {
     return d->chunkProvider;
 }
@@ -562,25 +568,6 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider *chunkProvider) {
     }
 
     emit chunkProviderChanged();
-}
-
-void QnTimeline::wheelEvent(QWheelEvent *event) {
-#if 0
-    if (event->angleDelta().x() != 0) {
-        int zoomIndex = qFloor(d->zoomLevel);
-        const QnTimelineZoomLevel &zoomLevel = d->zoomLevels[zoomIndex];
-        qreal zoomMultiplier = 1.0 - (d->zoomLevel - zoomIndex);
-        qint64 timeDelta = zoomLevel.interval * zoomMultiplier * event->angleDelta().x() * 0.01;
-        setWindow(windowStart() + timeDelta, windowEnd() + timeDelta);
-    }
-#endif
-
-    if (event->angleDelta().y() != 0) {
-        qreal factor = qAbs(event->angleDelta().y()) / 120.0 * zoomMultiplier;
-        if (event->angleDelta().y() < 0)
-            factor = 1.0 / factor;
-        d->zoomWindow(factor, width() / 2, position());
-    }
 }
 
 QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *updatePaintNodeData) {
@@ -1188,14 +1175,11 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         parent->moveFinished();
 }
 
-void QnTimelinePrivate::zoomWindow(qreal factor, int x, qint64 stickyTime) {
+void QnTimelinePrivate::zoomWindow(qreal factor) {
     qreal speed = qSqrt(2 * zoomKineticHelper.deceleration() * parent->width() * qAbs(factor - 1));
     if (factor < 1)
         speed = -speed;
 
-    stickyPointKineticHelper.start(x);
-    stickyPointKineticHelper.stop();
-    this->stickyTime = stickyTime > 0 ? stickyTime : pixelPosToTime(x);
     startZoom = parent->width();
     startWindowSize = windowEnd - windowStart;
     zoomKineticHelper.flick(startZoom, speed);

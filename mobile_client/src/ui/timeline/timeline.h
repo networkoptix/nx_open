@@ -79,8 +79,8 @@ public:
     bool autoPlay() const;
     void setAutoPlay(bool autoPlay);
 
-    Q_INVOKABLE void zoomIn(int x = -1);
-    Q_INVOKABLE void zoomOut(int x = -1);
+    Q_INVOKABLE void zoomIn();
+    Q_INVOKABLE void zoomOut();
 
     Q_INVOKABLE void startPinch(int x, qreal scale);
     Q_INVOKABLE void updatePinch(int x, qreal scale);
@@ -92,6 +92,8 @@ public:
 
     Q_INVOKABLE void clearCorrection();
     Q_INVOKABLE void correctPosition(qint64 position);
+
+    Q_INVOKABLE qint64 positionAtX(qreal x) const;
 
     QnCameraChunkProvider *chunkProvider() const;
     void setChunkProvider(QnCameraChunkProvider *chunkProvider);
@@ -117,9 +119,6 @@ signals:
     void chunkProviderChanged();
 
     void moveFinished();
-
-protected:
-    void wheelEvent(QWheelEvent *event) override;
 
 private:
     QSGNode *updateTextNode(QSGNode *textRootNode);

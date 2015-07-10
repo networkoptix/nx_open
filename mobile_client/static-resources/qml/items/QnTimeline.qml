@@ -99,9 +99,20 @@ Item {
                 preventStealing = false
                 pressX = -1
                 timeline.finishDrag(mouse.x)
-                root.dragFinished()
+
+                if (timeline.moving)
+                    root.dragFinished()
             }
-            onDoubleClicked: timeline.zoomIn(mouse.x)
+            onClicked: {
+                timeline.position = timeline.positionAtX(mouseArea.pressX)
+                root.moveFinished()
+            }
+            onWheel: {
+                if (wheel.angleDelta.y > 0)
+                    timeline.zoomIn()
+                else if (wheel.angleDelta.y < 0)
+                    timeline.zoomOut()
+            }
         }
     }
 }
