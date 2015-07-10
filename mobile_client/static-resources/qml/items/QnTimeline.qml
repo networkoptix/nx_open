@@ -21,6 +21,7 @@ Item {
 
     signal dragFinished()
     signal moveFinished()
+    signal positionTapped(real position)
 
     function zoomIn() {
         timeline.zoomIn()
@@ -104,8 +105,10 @@ Item {
                     root.dragFinished()
             }
             onClicked: {
-                timeline.position = timeline.positionAtX(mouseArea.pressX)
-                root.moveFinished()
+                if (moving)
+                    return
+
+                positionTapped(timeline.positionAtX(mouse.x))
             }
             onWheel: {
                 if (wheel.angleDelta.y > 0)

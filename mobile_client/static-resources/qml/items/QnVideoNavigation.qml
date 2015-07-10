@@ -90,6 +90,8 @@ Item {
 
                 onMoveFinished: mediaPlayer.seek(position)
 
+                onPositionTapped: mediaPlayer.seek(position)
+
                 Connections {
                     target: mediaPlayer
                     onTimelineCorrectionRequest: {
