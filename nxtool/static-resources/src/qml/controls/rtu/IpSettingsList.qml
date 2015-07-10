@@ -84,13 +84,13 @@ Base.Column
                 if (item.useDHCPControl.changed)
                     rtuContext.changesManager().addDHCPChange(name, useDHCP);
 
-                if (item.ipAddressControl.changed || !useDHCP)
+                if (!useDHCP)   /// do not send address and mask if dhcp is on
                 {
                     if (item.ipAddressControl.acceptableInput)
                     {
                         rtuContext.changesManager().addAddressChange(name, item.ipAddressControl.text);
                     }
-                    else if (!useDHCP)
+                    else
                     {
                         errorDialog.message = errorTemplate.arg(qsTr("ip address")).arg(name);
                         errorDialog.show();
@@ -98,16 +98,12 @@ Base.Column
                         item.ipAddressControl.focus = true;
                         return false;
                     }
-                    /// !Do not send ip address if it is not correct and we use dhcp
-                }
-                
-                if (item.subnetMaskControl.changed || !useDHCP)
-                {
+
                     if (item.subnetMaskControl.acceptableInput)
                     {
                         rtuContext.changesManager().addMaskChange(name, item.subnetMaskControl.text);
                     }
-                    else if (!useDHCP)
+                    else
                     {
                         errorDialog.message = errorTemplate.arg(qsTr("mask")).arg(name);
                         errorDialog.show();
@@ -115,7 +111,6 @@ Base.Column
                         item.subnetMaskControl.focus = true;
                         return false;
                     }
-                    /// !Do not send mask if it is not correct and we use dhcp
                 }
                 
                 if (item.dnsControl.changed)
