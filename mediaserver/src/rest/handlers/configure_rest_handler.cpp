@@ -17,6 +17,7 @@
 #include "rest/server/rest_connection_processor.h"
 #include "utils/crypt/linux_passwd_crypt.h"
 #include "utils/network/tcp_listener.h"
+#include "server/host_system_password_synchronizer.h"
 
 
 namespace {
@@ -138,6 +139,7 @@ int QnConfigureRestHandler::changeAdminPassword(
         admin->generateHash();
         QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
         admin->setPassword(QString());
+        HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded( admin );
     } else {
         if (admin->getHash() != passwordHash ||
             admin->getDigest() != passwordDigest ||
