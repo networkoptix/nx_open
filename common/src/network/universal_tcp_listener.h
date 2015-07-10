@@ -74,7 +74,7 @@ public:
 
     typedef std::function<void(int count)> SocketRequest;
     QSharedPointer<AbstractStreamSocket> getProxySocket(
-            const QString& guid, int timeout, const SocketRequest& socketRequest = SocketRequest());
+            const QString& guid, int timeout, const SocketRequest& socketRequest);
 
     void disableAuth();
 
@@ -93,10 +93,18 @@ private:
         QElapsedTimer timer;
     };
 
+    struct ServerProxyPool
+    {
+        ServerProxyPool() : requested(0) {}
+
+        size_t requested;
+        QList<AwaitProxyInfo> available;
+    };
+
     QList<HandlerInfo> m_handlers;
     ProxyInfo m_proxyInfo;
     QMutex m_proxyMutex;
-    QMap<QString, QList<AwaitProxyInfo>> m_proxyPool;
+    QMap<QString, ServerProxyPool> m_proxyPool;
     QWaitCondition m_proxyCondition;
     bool m_needAuth;
 };
