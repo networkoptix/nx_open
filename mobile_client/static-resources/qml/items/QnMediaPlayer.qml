@@ -88,7 +88,7 @@ QnObject {
         }
 
         var aligned = alignedPosition(pos)
-        if (d.position == -1 && aligned === -1) {
+        if (d.position == -1 && aligned == -1) {
             timelinePositionRequest(d.position)
             if (!playing)
                 mediaPlayer.play()
