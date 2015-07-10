@@ -61,6 +61,15 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     return rez.release();
 }
 
+QString QnFileStorageResource::getPath() const
+{
+    QString url = getUrl();
+    if (!url.contains(lit("://")))
+        return url;
+    else
+        return QUrl(url).path().mid(1);
+}
+
 bool QnFileStorageResource::updatePermissions() const
 {
     QMutexLocker lock(&m_mutexPermission);

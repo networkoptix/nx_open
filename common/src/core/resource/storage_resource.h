@@ -31,7 +31,7 @@ public:
 
     void setUsedForWriting(bool isUsedForWriting);
     bool isUsedForWriting() const;
-    QString getPath() const;
+    virtual QString getPath() const;
     static QString urlToPath(const QString &url);
 
     static QnUuid fillID(const QnUuid& mserverId, const QString& url);

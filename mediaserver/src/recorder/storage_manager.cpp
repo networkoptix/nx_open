@@ -494,12 +494,12 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
     {
         //have to use db from data directory, not from storage
         //reading guid from file
-        QIODevice *dbGuidFile = storage->open(dbRefFilePath, QIODevice::ReadOnly);
+        auto dbGuidFile = std::unique_ptr<QIODevice>(storage->open(dbRefFilePath, QIODevice::ReadOnly));
 
-        if (dbGuidFile == nullptr)
+        if (!dbGuidFile)
             return false;
         dbRefGuidStr = dbGuidFile->readAll();
-        dbGuidFile->close();
+        //dbGuidFile->close();
     }
 
     if( !dbRefGuidStr.isEmpty() )
