@@ -36,6 +36,15 @@ QtObject {
     property color sideNavigationSplitter
     property color sideNavigationSection
 
+    property color popupMenuBackground
+    property color popupMenuText
+
+    property color dialogBackground
+    property color dialogText
+    property color dialogTitleText
+    property color dialogSelectedBackground
+    property color dialogSelectedText
+
     property color cameraText
     property color cameraOfflineText
     property color cameraRecordingIndicator
@@ -82,6 +91,13 @@ QtObject {
         sideNavigationCopyright = colorTheme.color("sideNavigation.copyright")
         sideNavigationSplitter  = colorTheme.color("sideNavigation.splitter")
         sideNavigationSection   = colorTheme.color("sideNavigation.section")
+        popupMenuBackground     = colorTheme.color("popupMenu.background")
+        popupMenuText           = colorTheme.color("popupMenu.text")
+        dialogBackground        = colorTheme.color("dialog.background")
+        dialogText              = colorTheme.color("dialog.text")
+        dialogTitleText         = colorTheme.color("dialog.titleText")
+        dialogSelectedBackground = colorTheme.color("dialog.selectedBackground")
+        dialogSelectedText      = colorTheme.color("dialog.selectedText")
         cameraText              = colorTheme.color("cameras.text")
         cameraOfflineText       = colorTheme.color("cameras.offlineText")
         cameraRecordingIndicator = colorTheme.color("cameras.recordingIndicator")

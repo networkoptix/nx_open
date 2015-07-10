@@ -6,38 +6,24 @@ import "../controls"
 
 import "../main.js" as Main
 
-Item {
+QnPopup {
     id: calendarPanel
 
-    parent: Main.findRootItem(calendarPanel)
+    overlayLayer: "popupLayer"
+    overlayColor: "#66171c1f"
 
     signal datePicked(date date)
     property alias date: calendar.date
     property alias chunkProvider: calendar.chunkProvider
 
+    padding: 0
     width: parent.width
     height: calendarContent.height
-    z: 100.0
 
     visible: opacity > 0.0
     opacity: 0.0
 
     readonly property real _yAnimationShift: dp(56)
-
-    Rectangle {
-        parent: calendarPanel.parent
-        anchors.fill: parent
-
-        opacity: calendarPanel.opacity
-        color: "#66171c1f"
-        z: 10.0
-        visible: opacity > 0.0
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: calendarPanel.hide()
-        }
-    }
 
     Rectangle {
         anchors.fill: calendarContent
@@ -90,8 +76,8 @@ Item {
                 property: "y"
                 duration: 150
                 easing.type: Easing.OutCubic
-                from: calendarPanel.parent.height - calendarPanel.height + _yAnimationShift
-                to: calendarPanel.parent.height - calendarPanel.height
+                from: _yAnimationShift
+                to: 0
             }
         }
     }
@@ -113,12 +99,15 @@ Item {
                 property: "y"
                 duration: 150
                 easing.type: Easing.OutCubic
-                to: calendarPanel.parent.height - calendarPanel.height + _yAnimationShift
+                to: _yAnimationShift
             }
         }
     }
 
+    onYChanged: console.log(y)
+
     function show() {
+        y = parent.height - height
         hideAnimation.stop()
         showAnimation.start()
     }
@@ -128,14 +117,6 @@ Item {
         hideAnimation.start()
     }
 
-    focus: true
-
-    Keys.onReleased: {
-        if (event.key === Qt.Key_Back) {
-            if (visible) {
-                hide()
-                event.accepted = true
-            }
-        }
-    }
+    onClosed: hide()
+    onOpened: show()
 }

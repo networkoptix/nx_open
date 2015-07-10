@@ -87,6 +87,18 @@ Window {
         }
     }
 
+    QnOverlayLayer {
+        id: dialogLayer
+        objectName: "dialogLayer"
+        z: 10.0
+    }
+
+    QnOverlayLayer {
+        id: popupLayer
+        objectName: "popupLayer"
+        z: 15.0
+    }
+
     Component {
         id: loginPageComponent
 

@@ -1,8 +1,25 @@
 function findRootItem(item) {
-    var parent = item
-    while (parent.parent)
-        parent = parent.parent
-    return parent
+    while (item.parent)
+        item = item.parent
+    return item
+}
+
+function findRootChild(item, objectName) {
+    item = findRootItem(item)
+
+    var children = new Array(0)
+    children.push(item)
+    while (children.length > 0) {
+        if (children[0].objectName == objectName)
+            return children[0]
+
+        for (var i in children[0].data)
+            children.push(children[0].data[i])
+
+        children.splice(0, 1)
+    }
+
+    return null
 }
 
 function openDiscoveredSession(_host, _port, _systemName) {
