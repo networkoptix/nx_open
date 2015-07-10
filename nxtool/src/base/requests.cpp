@@ -343,12 +343,16 @@ void rtu::getServerExtraInfo(HttpClient *client
     , const BaseServerInfo &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
-    , const OperationCallback &failed)
+    , const OperationCallback &failed
+    , int timeout)
 {
+    static const AffectedEntities affected = kAllAddressFlagsAffected 
+        | kTimeZoneAffected | kDateTimeAffected;
+
     if (!client)
     {
         if (failed)
-            failed(kInvalidRequest, kAllEntitiesAffected);
+            failed(kInvalidRequest, affected);
         return;
     }
 
@@ -367,7 +371,7 @@ void rtu::getServerExtraInfo(HttpClient *client
     const QUuid &id = baseInfo.id;
     
     const auto &handleSuccessfullResult = 
-        [id, successful, failed, password](const QByteArray &data, const QString &cmdName)
+        [id, successful, failed, password, timeout](const QByteArray &data, const QString &cmdName)
     {
         rtu::ExtraServerInfo extraInfo;
         const bool parsed = parseExtraInfoCommand(cmdName
@@ -383,8 +387,7 @@ void rtu::getServerExtraInfo(HttpClient *client
         }
         else if (failed)
         {
-            failed(kErrorDesc, kAllAddressFlagsAffected 
-                | kTimeZoneAffected | kDateTimeAffected);
+            failed(kErrorDesc, affected);
         }
     };
 
@@ -393,22 +396,31 @@ void rtu::getServerExtraInfo(HttpClient *client
         handleSuccessfullResult(data, kGetServerExtraInfoCommand);
     };
 
-    const auto failedCallback = 
-        [client, baseInfo, failed, password, handleSuccessfullResult](const QString &, int)
+    const auto failedCallback = [client, baseInfo, failed, password
+        , handleSuccessfullResult, timeout](const QString &reason, int error)
     {
-        const auto &succesful = 
-            [handleSuccessfullResult](const QByteArray &data)
+        enum { kHttpNotAuthorizedErrorCode = 401 };
+        if (error == kHttpNotAuthorizedErrorCode)
         {
-            handleSuccessfullResult(data, kGetTimeCommand);
-        };
+            if (failed)
+                failed(reason, affected);
+        }
+        else
+        {
+            const auto &succesful = 
+                [handleSuccessfullResult](const QByteArray &data)
+            {
+                handleSuccessfullResult(data, kGetTimeCommand);
+            };
 
-        const QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port
-            , password, kGetTimeCommand);
-        client->sendGet(url, succesful
-            , makeErrorCallback(failed, kAllEntitiesAffected));
+            const QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port
+                , password, kGetTimeCommand);
+            client->sendGet(url, succesful
+                , makeErrorCallback(failed, affected), timeout);
+        }
     };
     
-    client->sendGet(url, successfulCallback, failedCallback);
+    client->sendGet(url, successfulCallback, failedCallback, timeout);
 }
 
 ///

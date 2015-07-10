@@ -178,9 +178,14 @@ QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     return convertDateTime(date, time, prevTimeZone, nextTimeZone).toLocalTime();
 }
 
-void rtu::RtuContext::tryLoginWith(const QString &password)
+void rtu::RtuContext::tryLoginWith(const QString &primarySystem
+    , const QString &password)
 {
-    return m_impl->selectionModel()->tryLoginWith(password);
+    return m_impl->selectionModel()->tryLoginWith(primarySystem, password
+        , [this, primarySystem]() 
+    {
+        emit this->loginOperationFailed(primarySystem);
+    });
 }
 
 void rtu::RtuContext::setCurrentPage(int pageId)

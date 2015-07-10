@@ -88,7 +88,8 @@ namespace rtu
         , const BaseServerInfo &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
-        , const OperationCallback &failed);
+        , const OperationCallback &failed
+        , int timeout = HttpClient::kUseDefaultTimeout);
 
     void sendIfListRequest(HttpClient *client
         , const BaseServerInfo &info

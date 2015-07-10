@@ -154,11 +154,13 @@ Item
         
             text: qsTr("enter password");
             fontSize: Common.SizeManager.fontSizes.base;
-            onClicked: { loginDialog.visible = true; }    
+            onClicked: { loginDialog.show(); }
             
             Dialogs.LoginToSystemDialog
             {
                 id: loginDialog;
+
+                onLoginClicked: { rtuContext.tryLoginWith(thisComponent.systemName, password); }
             }
         }
     }
