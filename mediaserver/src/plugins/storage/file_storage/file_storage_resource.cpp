@@ -283,7 +283,7 @@ bool QnFileStorageResource::isAvailable() const
 QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 {
     int prefix = url.indexOf("://");
-    return prefix == -1 ? url : url.mid(prefix + 3);
+    return prefix == -1 ? url :QUrl(url).path().mid(1);//url.mid(prefix + 3);
 }
 
 QnStorageResource* QnFileStorageResource::instance(const QString&)

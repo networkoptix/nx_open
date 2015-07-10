@@ -14,8 +14,6 @@
 
 #include "ftp_library.h"
 
-std::atomic<int64_t> totalSize = 100000000000; // !!!! TODO: REMOVE THIS!!!
-
 namespace Qn
 {   // auxillary data structures/functions
     namespace aux
@@ -658,7 +656,7 @@ namespace Qn
         if (ecode)
             *ecode = error::NoError;
 
-        return totalSize; // for tests
+        return 100000000000; // for tests
     }
 
     uint64_t STORAGE_METHOD_CALL FtpStorage::getTotalSpace(int* ecode) const
@@ -669,7 +667,7 @@ namespace Qn
         if (ecode)
             *ecode = error::NoError;
 
-        return 10000000000; // for tests
+        return 100000000000; // for tests
     }
 
     int STORAGE_METHOD_CALL FtpStorage::getCapabilities() const
@@ -725,8 +723,6 @@ namespace Qn
         std::lock_guard<std::mutex> lock(m_mutex);
         if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
             return;
-        //totalSize = 5500000000;                 // !!!! TODO: REMOVE THIS!!!
-        std::printf("File removed: %s\n", url); // !!!! TODO: REMOVE THIS!!!
         if (m_impl->Delete(url) == 0 && ecode)
             *ecode = error::UnknownError;
     }
@@ -1128,7 +1124,6 @@ namespace Qn
     )
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        //totalSize -= size; // !!!! TODO: REMOVE THIS!!!
         if (ecode)
             *ecode = error::NoError;
 

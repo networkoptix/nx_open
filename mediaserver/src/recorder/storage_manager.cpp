@@ -480,7 +480,7 @@ static const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
 static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
 {
-    QString storagePath = storage->getUrl();
+    QString storagePath = storage->getPath();
     QString dbRefFilePath;
     
     if (storagePath.indexOf(lit("://")) != -1)
