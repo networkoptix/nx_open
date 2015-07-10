@@ -281,25 +281,25 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
         it->timestamp = timestamp; /// Update alive info
         BaseServerInfo &oldInfo = it->info;
 
-        bool visibleAddressOutdated = false;
-        info.visibleAddress = oldInfo.visibleAddress;
-        if (oldInfo.visibleAddress == host)
+        bool displayAddressOutdated = false;
+        info.displayAddress = oldInfo.displayAddress;
+        if (oldInfo.displayAddress == host)
         {
             it->visibleAddressTimestamp = timestamp;
         }
         else if ((timestamp - it->visibleAddressTimestamp) > kVisibleAddressTimeout)
         {
             it->visibleAddressTimestamp = timestamp;
-            info.visibleAddress = host;
-            visibleAddressOutdated = true;
+            info.displayAddress = host;
+            displayAddressOutdated = true;
         }
 
-        if ((info != it->info) || visibleAddressOutdated)
+        if ((info != it->info) || displayAddressOutdated)
         {
             oldInfo.name = info.name;
             oldInfo.systemName = info.systemName;
             oldInfo.port = info.port;
-            oldInfo.visibleAddress = info.visibleAddress;
+            oldInfo.displayAddress = info.displayAddress;
 
             emit m_owner->serverChanged(info);
         }

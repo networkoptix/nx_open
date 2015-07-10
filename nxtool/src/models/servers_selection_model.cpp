@@ -410,7 +410,7 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         case kNameRoleId:
             //TODO: #gdm #nx2 make correct implementation later on, when we will adopt the tool to the nx2 
             //with several network interfaces.
-            return QString("%1 (%2)").arg(info.baseInfo().name).arg(info.baseInfo().visibleAddress);
+            return QString("%1 (%2)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress);
         case kIdRoleId:
             return info.baseInfo().id;
         case kMacAddressRoleId:
