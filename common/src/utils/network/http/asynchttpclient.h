@@ -271,6 +271,9 @@ namespace nx_http
     //!Smart pointer for \a AsyncHttpClient
     class AsyncHttpClientPtr
     {
+        typedef void (AsyncHttpClientPtr::*bool_type)() const;
+        void this_type_does_not_support_comparisons() const {}
+
     public:
         AsyncHttpClientPtr()
         {
@@ -344,10 +347,15 @@ namespace nx_http
             return m_obj.get();
         }
 
-        operator bool() const
+        operator bool_type() const
         {
-            return (bool)m_obj;
+            return m_obj ? &AsyncHttpClientPtr::this_type_does_not_support_comparisons : 0;
         }
+
+        bool operator<( const AsyncHttpClientPtr& right ) const { return m_obj < right.m_obj; }
+        bool operator<=( const AsyncHttpClientPtr& right ) const { return m_obj <= right.m_obj; }
+        bool operator>( const AsyncHttpClientPtr& right ) const { return m_obj > right.m_obj; }
+        bool operator>=( const AsyncHttpClientPtr& right ) const { return m_obj >= right.m_obj; }
 
     private:
         std::shared_ptr<AsyncHttpClient> m_obj;
