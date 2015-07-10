@@ -334,6 +334,11 @@ namespace nx_http
             m_obj.reset();
         }
 
+        void swap( AsyncHttpClientPtr& right )
+        {
+            std::swap( m_obj, right.m_obj );
+        }
+
         const AsyncHttpClient* get() const
         {
             return m_obj.get();

@@ -113,15 +113,13 @@ private:
     mutable QMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
     
-    typedef std::shared_ptr<nx_http::AsyncHttpClient> HttpClient;
-
     struct IOMonitor {
-        HttpClient httpClient;
+        nx_http::AsyncHttpClientPtr httpClient;
         std::shared_ptr<nx_http::MultipartContentParser> contentParser;
     };
 
     IOMonitor m_ioHttpMonitor[2];
-    HttpClient m_inputPortStateReader;
+    nx_http::AsyncHttpClientPtr m_inputPortStateReader;
     QVector<QString> m_ioPortIdList;
     
 
@@ -152,7 +150,7 @@ private:
     bool ioPortErrorOccured();
     void updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist);
     bool startIOMonitor(Qn::IOPortType portType, IOMonitor& result);
-    void resetHttpClient(HttpClient& value);
+    void resetHttpClient(nx_http::AsyncHttpClientPtr& value);
 
     /*!
         Convert port number to ID
