@@ -16,7 +16,7 @@ QtControls.Button
 
     property int fontSize: Common.SizeManager.fontSizes.medium;
 
-    implicitHeight: Common.SizeManager.clickableSizes.medium;
+    implicitHeight: Common.SizeManager.clickableSizes.base;
 
     activeFocusOnPress: true;
 

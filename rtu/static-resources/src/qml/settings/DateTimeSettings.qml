@@ -13,11 +13,21 @@ Expandable.MaskedSettingsPanel
     
     changed:  (maskedArea && maskedArea.changed?  true : false);
     
+    function tryApplyChanges()
+    {
+        if (!changed)
+            return true;
+        
+        return maskedArea.flaggedItem.currentItem.tryApplyChanges();
+    }
+
     propertiesGroupName: qsTr("Set Device Date & Time");
     propertiesDelegate: Item
     {
         property bool changed: (!flagged.showFirst ? false 
             : flagged.currentItem.changed);
+    
+        property alias flaggedItem: flagged;
     
         width: flagged.width + flagged.anchors.leftMargin;
         height: flagged.height;
@@ -45,6 +55,42 @@ Expandable.MaskedSettingsPanel
                 {
                     id: dateTimeGrid;
                  
+                    function tryApplyChanges()
+                    {
+                        if (!timeZonePicker.model.isValidValue(timeZonePicker.currentIndex))
+                        {
+                            timeZonePicker.focus = true;
+                            return false;
+                        }
+                        
+                        if (!useCurrentTimeCheckbox.checked && !timePicker.acceptableInput)
+                        {
+                            timeZonePicker.focus = true;
+                            return false;
+                        }
+                        
+                        if (!useCurrentTimeCheckbox.checked && !datePicker.acceptableInput)
+                        {
+                            datePicker.focus = true;
+                            return false;
+                        }
+                        
+                        var newDate = datePicker.date;
+                        var newTime = timePicker.time;
+                        if (useCurrentTimeCheckbox.checked)
+                        {
+                            if (useCurrentTimeCheckbox.checked)
+                            {
+                                var now = new Date();
+                                newDate = now;
+                                newTime = now;
+                            }
+                        }
+                        rtuContext.changesManager().addDateTimeChange(
+                            newDate, newTime, timeZonePicker.currentText);
+                        return true;
+                    }
+
                     property bool changed: (timeZonePicker.changed || timePicker.changed || datePicker.changed);
                     enabled: (Utils.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
     
@@ -62,24 +108,23 @@ Expandable.MaskedSettingsPanel
     
                     Base.Text
                     {
+                        thin: false;
                         text: qsTr("Time zone");
                     }
                     
                     Base.Text
                     {
+                        thin: false;
                         text: qsTr("Date");
                     }
     
                     Base.Text
                     {
+                        thin: false;
                         text: qsTr("Time");
                     }
     
-                    Item
-                    {
-                        width: 1;
-                        height: 1;
-                    }
+                    Base.EmptyCell {}
     
                     Base.TimeZonePicker
                     {
@@ -128,32 +173,6 @@ Expandable.MaskedSettingsPanel
                             
                             datePicker.showNow = checked;
                             timePicker.showNow = checked;
-                        }
-                    }
-                    
-
-                    Connections
-                    {
-                        target: thisComponent;
-                        onApplyButtonPressed:
-                        {
-                            if (timeZonePicker.changed || datePicker.changed || timePicker.changed
-                                || useCurrentTimeCheckbox.changed)
-                            {
-                                var newDate = datePicker.date;
-                                var newTime = timePicker.time;
-                                if (useCurrentTimeCheckbox.checked)
-                                {
-                                    var now = new Date();
-                                    newDate = now;
-                                    newTime = now;
-                                    
-                                    console.log(now);
-                                }
-        
-                                rtuContext.changesManager().addDateTimeChange(
-                                    newDate, newTime, timeZonePicker.currentText);
-                            }
                         }
                     }
                 }

@@ -8,7 +8,9 @@ import "../controls/rtu" as Rtu;
 ScrollView
 {
     id: thisComponent;
-    
+
+    signal applyChanges();
+
     property alias askForSelectionChange: selectionView.askForSelectionChange;
     
     Rtu.ServerSelectionListView
@@ -20,6 +22,8 @@ ScrollView
             left: parent.left;
             right: parent.right;
         }
+        
+        onApplyChanges: { thisComponent.applyChanges(); }
     }
 }
 

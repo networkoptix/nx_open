@@ -19,17 +19,19 @@ rtu::InterfaceInfo::InterfaceInfo(bool initUseDHCP)
     , useDHCP(initUseDHCP ? Qt::Checked : Qt::Unchecked)
 {}
 
-rtu::InterfaceInfo::InterfaceInfo(QString initName
-    , QString initIp
-    , QString initMacAddress
-    , QString initMask
-    , QString initGateway
+rtu::InterfaceInfo::InterfaceInfo(const QString &initName
+    , const QString &initIp
+    , const QString &initMacAddress
+    , const QString &initMask
+    , const QString &initGateway
+    , const QString &initDns
     , Qt::CheckState initUseDHCP)
     : name(initName)
     , ip(initIp)
     , macAddress(initMacAddress)
     , mask(initMask)
     , gateway(initGateway)
+    , dns(initDns)
     , useDHCP(initUseDHCP)
 {}
 

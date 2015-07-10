@@ -22,6 +22,7 @@ namespace rtu
         QString macAddress;
         QString mask;
         QString gateway;
+        QString dns;
         Qt::CheckState useDHCP;
         
         bool operator == (const InterfaceInfo &other);
@@ -30,11 +31,12 @@ namespace rtu
 
         InterfaceInfo(bool initUseDHCP);
 
-        InterfaceInfo(QString initName
-            , QString initIp
-            , QString initMacAddress
-            , QString initMask
-            , QString initGateway
+        InterfaceInfo(const QString &initName
+            , const QString &initIp
+            , const QString &initMacAddress
+            , const QString &initMask
+            , const QString &initGateway
+            , const QString &initDns
             , Qt::CheckState initUseDHCP);
 
     };

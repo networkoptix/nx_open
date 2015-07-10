@@ -143,7 +143,7 @@ namespace ec2
         * If can't find route info then return null value. 
         * Otherwise return route gateway.
         */
-        QnUuid routeToPeerVia(const QnUuid& dstPeer) const;
+        QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
 
     signals:
         void peerLost(ApiPeerAliveData data);

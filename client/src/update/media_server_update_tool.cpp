@@ -15,7 +15,7 @@
 #include <update/task/check_update_peer_task.h>
 
 #include <client/client_settings.h>
-#include <client/client_message_processor.h>
+#include <client/desktop_client_message_processor.h>
 
 #include <utils/common/app_info.h>
 
@@ -259,7 +259,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
             if (realId.isNull())
                 continue;
             incompatibleTargets.insert(realId);
-            qnClientMessageProcessor->incompatibleServerWatcher()->keepServer(realId, true);
+            qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(realId, true);
         }
     }
 
@@ -274,7 +274,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
         m_updateProcess->deleteLater();
         m_updateProcess = NULL;
         for (const QnUuid &id: incompatibleTargets)
-            qnClientMessageProcessor->incompatibleServerWatcher()->keepServer(id, false);
+            qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(id, false);
     });
 
     m_updateProcess->start();

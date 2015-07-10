@@ -61,7 +61,7 @@ void rtu::HttpClient::Impl::sendGet(const QUrl &url
     , const ErrorCallback &errorCallback)
 {
     QNetworkReply *reply = m_manager->get(QNetworkRequest(url));
-    qDebug() << reply << " sending command: " << url; 
+   // qDebug() << reply << " sending command: " << url; 
     m_replies.insert(reply
         , CallbacksPair(successfullCallback, errorCallback));
 }
@@ -95,8 +95,8 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
     const bool isHttpError = ((httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast));
     const QByteArray &data = reply->readAll();
     
-    qDebug() << reply << " netowrk reply: " << errorCode << " : " << httpCode;
-    qDebug() << data;
+//    qDebug() << reply << " netowrk reply: " << errorCode << " : " << httpCode;
+//    qDebug() << data;
     if (isRequestError || isHttpError)
     { 
         const ErrorCallback &errorCallback = it->second;

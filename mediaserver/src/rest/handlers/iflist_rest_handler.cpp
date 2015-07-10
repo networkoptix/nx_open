@@ -36,18 +36,21 @@ bool readExtraFields(QnNetworkAddressEntryList& entryList)
         if (worlds.size() < 2)
             continue;
 
-        if (data.startsWith("iface")) {
+        if (data.startsWith("iface")) 
             lastIfName = worlds[1].trimmed();
-            for (auto& entry: entryList) {
-                if (entry.name == lastIfName)
-                    entry.dhcp = data.contains("dhcp");
-            }
 
-        }
-        else if (data.startsWith("netmask")) {
-            for (auto& entry: entryList) {
-                if (entry.name == lastIfName)
+        for (auto& entry: entryList) 
+        {
+            if (entry.name == lastIfName) 
+            {
+                if (data.startsWith("iface")) 
+                    entry.dhcp = data.contains("dhcp");
+                else if (data.startsWith("netmask"))
                     entry.netMask = worlds[1].trimmed();
+                else if (data.startsWith("gateway"))
+                    entry.gateway = worlds[1].trimmed();
+                else if (data.startsWith("dns-nameservers"))
+                    entry.dns_servers = data.mid(worlds[0].length() + 1);
             }
         }
     }

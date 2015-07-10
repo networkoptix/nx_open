@@ -16,8 +16,10 @@ namespace
         , kAdapterNameRoleId
         , kIpAddressRoleId
         , kSubnetMaskRoleId
-        , kIsDHCP
-        , kReadableName
+        , kIsDHCPRoleId
+        , kReadableNameRoleId
+        , kDnsRoleId
+        , kGatewayRoleId
         
         , kLastCustomRoleId
     };
@@ -29,8 +31,10 @@ namespace
         result.insert(kAdapterNameRoleId, "adapterName");
         result.insert(kIpAddressRoleId, "address");
         result.insert(kSubnetMaskRoleId, "subnetMask");
-        result.insert(kIsDHCP, "useDHCP");
-        result.insert(kReadableName, "readableName");
+        result.insert(kIsDHCPRoleId, "useDHCP");
+        result.insert(kDnsRoleId, "dns");
+        result.insert(kGatewayRoleId, "gateway");
+        result.insert(kReadableNameRoleId, "readableName");
         return result;
     }();
     
@@ -159,10 +163,14 @@ QVariant rtu::IpSettingsModel::Impl::data(const QModelIndex &index
         return info.ip;
     case kSubnetMaskRoleId:
         return info.mask;
-    case kIsDHCP:
+    case kIsDHCPRoleId:
         return info.useDHCP;
-    case kReadableName:
+    case kReadableNameRoleId:
         return QString("Interface #%1").arg(QString::number(row + 1));
+    case kDnsRoleId:
+        return info.dns;
+    case kGatewayRoleId:
+        return info.gateway;
     default:
         return QVariant();
     }

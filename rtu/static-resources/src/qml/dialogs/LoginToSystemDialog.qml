@@ -3,6 +3,7 @@ import QtQuick.Window 2.0;
 
 import "../common" as Common;
 import "../controls/base" as Base;
+import "../controls/rtu" as Rtu;
 
 Window
 {
@@ -13,12 +14,12 @@ Window
     signal okClicked();
     signal cancelClicked();
     
-    flags: Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint;
+    flags: Qt.WindowTitleHint | Qt.MSWindowsFixedSizeDialogHint;
     
     title: qsTr("Login to server");
 
-    width: spacer.width + Common.SizeManager.spacing.base;
-    height: spacer.height + Common.SizeManager.spacing.base
+    width: spacer.width + Common.SizeManager.spacing.medium;
+    height: spacer.height + Common.SizeManager.spacing.medium;
     
     onVisibleChanged:
     {
@@ -35,7 +36,7 @@ Window
         id: spacer;
 
         anchors.centerIn: parent;        
-
+        spacing: Common.SizeManager.spacing.base;
         Row
         {
             id: row;
@@ -56,7 +57,7 @@ Window
                 focus: true;
 
                 echoMode: (showPasswordCheckbox.checked ? TextInput.Normal : TextInput.Password);
-                onEditingFinished:
+                onAccepted:
                 {
                     okClicked();
                     thisComponent.close();
@@ -80,12 +81,12 @@ Window
             spacing: Common.SizeManager.spacing.base;
             anchors.right: parent.right;
             
-            Base.Button
+            Base.StyledButton
             {
                 id: okButton;
                 text: qsTr("Ok");
 
-                width: height * 2.5;
+                width: height * 3;
                 
                 onClicked:
                 {
@@ -97,7 +98,7 @@ Window
             Base.Button
             {
                 text: qsTr("Cancel");
-                width: height * 2.5;
+                width: height * 3;
                 
                 onClicked:
                 {

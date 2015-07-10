@@ -753,9 +753,10 @@ int QnMediaServerConnection::deleteBookmarkAsync(const QnVirtualCameraResourcePt
     return sendAsyncPostRequest(BookmarkDeleteObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
 }
 
-int QnMediaServerConnection::installUpdate(const QString &updateId, QObject *target, const char *slot) {
+int QnMediaServerConnection::installUpdate(const QString &updateId, bool delayed, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("updateId", updateId);
+    params << QnRequestParam("delayed", delayed);
 
     return sendAsyncGetRequest(InstallUpdateObject, params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }

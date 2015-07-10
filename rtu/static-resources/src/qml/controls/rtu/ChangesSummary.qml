@@ -87,7 +87,7 @@ Expandable.ExpandableItem
         contentFooter: Item {}
         style: ScrollViewStyle
         {
-            frame: Rectangle {}
+            frame: Item {}
         }
 
         selectionMode: SelectionMode.NoSelection;

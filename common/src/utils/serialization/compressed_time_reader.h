@@ -70,7 +70,7 @@ private:
         if (decoded <= 0)
             return false;
         assert((decoded >= 2 && decoded <= 5) || decoded == 11);
-        qint64 offset = 0x20 << ((decoded-1) * 8);
+        qint64 offset = 0x20ll << ((decoded-1) * 8);
         if (decoded == 11)
             offset = 0x800000000000ll;
         result -= offset;
