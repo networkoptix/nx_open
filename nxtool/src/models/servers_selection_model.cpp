@@ -283,7 +283,7 @@ public:
     
     void updateInterfacesInfo(ItemSearchInfo &searchInfo
         , const InterfaceInfoList &interfaces
-        , const QString &host = QString());
+        , const QString &host);
         
     void updatePasswordInfo(ItemSearchInfo &searchInfo
         , const QString &password);
@@ -305,7 +305,8 @@ public:
     void removeServers(const rtu::IDsVector &removed);
 
     void updateExtraInfo(const QUuid &id
-        , const ExtraServerInfo &extraServerInfo);
+        , const ExtraServerInfo &extraServerInfo
+        , const QString &host);
 
     void updateExtraInfoFailed(const QUuid &id);
 
@@ -409,7 +410,7 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         case kNameRoleId:
             //TODO: #gdm #nx2 make correct implementation later on, when we will adopt the tool to the nx2 
             //with several network interfaces.
-            return QString("%1 (%2)").arg(info.baseInfo().name).arg(info.baseInfo().hostAddress);
+            return QString("%1 (%2)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress);
         case kIdRoleId:
             return info.baseInfo().id;
         case kMacAddressRoleId:
@@ -681,7 +682,8 @@ rtu::ExtraServerInfo& rtu::ServersSelectionModel::Impl::getExtraInfo(ItemSearchI
 }
 
 void rtu::ServersSelectionModel::Impl::updateExtraInfo(const QUuid &id
-    , const ExtraServerInfo &extraInfo)
+    , const ExtraServerInfo &extraInfo
+    , const QString &hostName)
 {
     /// server is discovered and logged in
 
@@ -692,7 +694,7 @@ void rtu::ServersSelectionModel::Impl::updateExtraInfo(const QUuid &id
     updatePasswordInfo(searchInfo, extraInfo.password);
     updateTimeDateInfo(searchInfo, extraInfo.utcDateTimeMs
         , extraInfo.timeZoneId, extraInfo.timestampMs);
-    updateInterfacesInfo(searchInfo, extraInfo.interfaces);
+    updateInterfacesInfo(searchInfo, extraInfo.interfaces, hostName);
 }
 
 void rtu::ServersSelectionModel::Impl::updateExtraInfoFailed(const QUuid &id)
@@ -753,11 +755,8 @@ void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(
     , const InterfaceInfoList &interfaces
     , const QString &host)
 {
-    if (!host.isEmpty())
-    {
-        searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().hostAddress = host;
-        m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
-    }
+    searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().hostAddress = host;
+    m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
 
     ExtraServerInfo &extra = getExtraInfo(searchInfo);
 

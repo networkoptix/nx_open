@@ -52,6 +52,7 @@ namespace rtu
     struct BaseServerInfo
     {
         QUuid id;
+        QString displayAddress;
         Constants::ServerFlags flags;
         
         QString name;

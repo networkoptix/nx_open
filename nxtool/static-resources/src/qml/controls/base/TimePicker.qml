@@ -35,7 +35,7 @@ QtControls.TextField
         interval: 1000;
         running: true;
         repeat: true;
-        onTriggered: impl.timeChanged()
+        onTriggered: impl.tick()
     }
 
     onShowNowChanged:
@@ -76,12 +76,12 @@ QtControls.TextField
             return (timeValue ? timeValue.toLocaleTimeString(Qt.locale(), timeFormat) : "");
         }
 
-        function timeChanged()
+        function tick()
         {
             if (initTime)
                 initTime.setSeconds(initTime.getSeconds() + 1);
 
-            if (activeFocus || !enabled || !acceptableInput)
+            if (activeFocus || !acceptableInput)
                 return;
 
             if (changed) {

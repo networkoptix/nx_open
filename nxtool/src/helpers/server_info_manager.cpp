@@ -126,13 +126,11 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
     for (const ServerInfo &server: servers)
     {
         const BaseServerInfo &base = server.baseInfo();
-        const QUuid &id = base.id;
-
         const int timestamp = m_msCounter.elapsed();
-        const auto &successful = [this, id, timestamp](const QUuid &, const ExtraServerInfo &extraInfo)
+        const auto &successful = [this, base, timestamp](const QUuid &, const ExtraServerInfo &extraInfo)
         {
-            m_lastUpdated[id] = timestamp;
-            emit m_owner->serverExtraInfoUpdated(id, extraInfo);
+            m_lastUpdated[base.id] = timestamp;
+            emit m_owner->serverExtraInfoUpdated(base.id, extraInfo, base.hostAddress);
         };
 
         const auto &failed = [this, base, successful, timestamp](const QString &, int) 
@@ -168,9 +166,9 @@ rtu::ServerInfoManager::~ServerInfoManager()
 
 void rtu::ServerInfoManager::loginToServer(const BaseServerInfo &info)
 {
-    const auto &successful = [this](const QUuid &id, const ExtraServerInfo &extraInfo)
+    const auto &successful = [this, info](const QUuid &id, const ExtraServerInfo &extraInfo)
     {
-        emit loginOperationSuccessfull(id, extraInfo);
+        emit loginOperationSuccessfull(id, extraInfo, info.hostAddress);
     };
 
     const auto &failed = [this](const QUuid &id)
@@ -184,9 +182,9 @@ void rtu::ServerInfoManager::loginToServer(const BaseServerInfo &info)
 void rtu::ServerInfoManager::loginToServer(const BaseServerInfo &info
     , const QString &password)
 {
-    const auto &successful = [this](const QUuid &id, const ExtraServerInfo &extraInfo)
+    const auto &successful = [this, info](const QUuid &id, const ExtraServerInfo &extraInfo)
     {
-        emit loginOperationSuccessfull(id, extraInfo);
+        emit loginOperationSuccessfull(id, extraInfo, info.hostAddress);
     };
 
     const auto &failed = [this](const QUuid &id)

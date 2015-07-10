@@ -174,7 +174,7 @@ Expandable.MaskedSettingsPanel
 
                             onClicked:
                             {
-                                calendarDialog.initDate = datePicker.date;
+                                calendarDialog.initDate = isNaN(datePicker.date) ? new Date() : datePicker.date;
                                 calendarDialog.show();
                             }
 

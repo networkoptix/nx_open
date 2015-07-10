@@ -29,7 +29,8 @@ namespace
       
     enum 
     {
-        kUpdateServersInfoInterval = 4000
+        kUpdateServersInfoInterval = 2000
+        , kVisibleAddressTimeout = kUpdateServersInfoInterval * 2
         , kServerAliveTimeout = 12 * 1000
     };
 
@@ -65,13 +66,32 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
-        // if (!jsonObject.value("systemName").toString().contains("nx1_192_local"))
+        // if (!jsonObject.value("systemName").toString().contains("nx1_"))
         //    return false;
 
         rtu::parseModuleInformationReply(jsonObject, info);
 
         return true;
     }
+
+    struct ServerInfoData
+    {
+        qint64 timestamp;
+        qint64 visibleAddressTimestamp;
+        rtu::BaseServerInfo info;
+
+        ServerInfoData(qint64 newTimestamp
+            , rtu::BaseServerInfo newInfo);
+    };
+
+    ServerInfoData::ServerInfoData(qint64 newTimestamp
+        , rtu::BaseServerInfo newInfo)
+        : timestamp(newTimestamp)
+        , visibleAddressTimestamp(- newTimestamp * 2) /// for correct first initialization 
+        , info(newInfo)
+    {
+    }
+
 }
 
 ///
@@ -94,9 +114,10 @@ private:
     typedef QSharedPointer<QUdpSocket> SocketPtr;
     bool readData(const SocketPtr &socket);
 
+    void readAllSocketData(const SocketPtr &socket);
+
 private:
     typedef QHash<QHostAddress, SocketPtr> SocketsContainer;
-    typedef QPair<qint64, rtu::BaseServerInfo> ServerInfoData;
     typedef QHash<QUuid, ServerInfoData> ServerDataContainer;
 
     rtu::ServersFinder *m_owner;
@@ -140,8 +161,8 @@ void rtu::ServersFinder::Impl::checkOutdatedServers()
     IDsVector forRemove;
     for(const auto &infoData: m_infos)
     {
-        const qint64 lastUpdateTime = infoData.first;
-        const BaseServerInfo &info = infoData.second;
+        const qint64 lastUpdateTime = infoData.timestamp;
+        const BaseServerInfo &info = infoData.info;
         if ((currentTime - lastUpdateTime) > kServerAliveTimeout)
             forRemove.push_back(info.id);
     }
@@ -168,7 +189,13 @@ void rtu::ServersFinder::Impl::updateServers()
 
         SocketsContainer::iterator &it = m_sockets.find(address);
         if (it == m_sockets.end())
+        {
             it = m_sockets.insert(address, SocketPtr(new QUdpSocket()));
+            QObject::connect(it->data(), &QUdpSocket::readyRead, this, [this, it]
+            {
+                readAllSocketData(*it);
+            });
+        }
         
         const SocketPtr &socket = *it;
         if (socket->state() != QAbstractSocket::BoundState)
@@ -178,9 +205,7 @@ void rtu::ServersFinder::Impl::updateServers()
                 continue;
         }
 
-        while(socket->hasPendingDatagrams() && readData(socket))
-        {
-        }
+        readAllSocketData(socket);
 
         int written = 0;
         while(written < kSearchRequestBody.size())
@@ -196,6 +221,13 @@ void rtu::ServersFinder::Impl::updateServers()
 
         if (written != kSearchRequestSize)
             socket->close();
+    }
+}
+
+void rtu::ServersFinder::Impl::readAllSocketData(const SocketPtr &socket)
+{
+    while(socket->hasPendingDatagrams() && readData(socket))
+    {
     }
 }
 
@@ -231,8 +263,8 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     if (!parseUdpPacket(data, info) )
         return true;
 
-
-    info.hostAddress = sender.toString();
+    const QString &host = sender.toString();
+    info.hostAddress = host;
 
     emit m_owner->serverDiscovered(info);
 
@@ -246,12 +278,29 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     }
     else
     {
-        it.value().first = timestamp; /// Update alive info
-        if (info != it->second)
+        it->timestamp = timestamp; /// Update alive info
+        BaseServerInfo &oldInfo = it->info;
+
+        bool displayAddressOutdated = false;
+        info.displayAddress = oldInfo.displayAddress;
+        if (oldInfo.displayAddress == host)
         {
-            it.value().second.name = info.name;
-            it.value().second.systemName = info.systemName;
-            it.value().second.port = info.port;
+            it->visibleAddressTimestamp = timestamp;
+        }
+        else if ((timestamp - it->visibleAddressTimestamp) > kVisibleAddressTimeout)
+        {
+            it->visibleAddressTimestamp = timestamp;
+            info.displayAddress = host;
+            displayAddressOutdated = true;
+        }
+
+        if ((info != it->info) || displayAddressOutdated)
+        {
+            oldInfo.name = info.name;
+            oldInfo.systemName = info.systemName;
+            oldInfo.port = info.port;
+            oldInfo.displayAddress = info.displayAddress;
+
             emit m_owner->serverChanged(info);
         }
     }

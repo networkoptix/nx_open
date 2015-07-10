@@ -32,10 +32,12 @@ namespace rtu
         void loginOperationFailed(const QUuid &id);
         
         void loginOperationSuccessfull(const QUuid &id
-            , const ExtraServerInfo &extraInfo);
+            , const ExtraServerInfo &extraInfo
+            , const QString &host);
 
         void serverExtraInfoUpdated(const QUuid &id
-            , const ExtraServerInfo &extraInfo);
+            , const ExtraServerInfo &extraInfo
+            , const QString &host);
 
         void serverExtraInfoUpdateFailed(const QUuid &id);
 
