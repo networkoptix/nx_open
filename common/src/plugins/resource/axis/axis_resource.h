@@ -125,6 +125,9 @@ private:
     QVector<QString> m_ioPortIdList;
     
 
+    nx_http::AsyncHttpClientPtr m_inputPortHttpMonitor;
+    nx_http::MultipartContentParserHelper m_multipartContentParser;
+    nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs

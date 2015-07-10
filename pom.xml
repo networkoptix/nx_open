@@ -243,6 +243,9 @@
                     <name>mobile</name>
                     <value>true</value>
                 </property>
+                <file>
+                    <missing>customization/${customization}/mobile.skip</missing>
+                </file>                
             </activation>
             <modules>
                 <module>android-client/protobuf-classes</module>
@@ -260,6 +263,9 @@
                     <name>mobile</name>
                     <value>true</value>
                 </property>
+                <file>
+                    <missing>customization/${customization}/mobile.skip</missing>
+                </file>                 
             </activation>
             <modules>
                 <module>ios-client</module>
@@ -360,7 +366,6 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>
-                <module>axclient</module>
                 <module>nxtool</module>
                 <module>clientexe</module>
                 <module>wixsetup</module>
@@ -396,7 +401,7 @@
         </profile>
         <!-- Paxton stuff can be built only on Windows x86 -->
         <profile>
-            <id>windows-x86</id>
+            <id>paxton</id>
             <activation>
                 <os>
                     <family>Windows</family>
@@ -405,8 +410,12 @@
                     <name>arch</name>
                     <value>x86</value>
                 </property>
+                <file>
+                    <missing>customization/${customization}/paxton.skip</missing>
+                </file>
             </activation>
             <modules>
+                <module>axclient</module>
                 <module>plugins/nxinterface</module>     
                 <module>plugins/nxcontrol</module>     
                 <module>plugins/acs/paxton</module>     
