@@ -28,6 +28,18 @@ def binary_deps(binary):
         yield fname
 
 
+def set_permissions(path):
+    if os.path.isdir(path):
+        os.chmod(path, 0755)
+        for root, dirs, files in os.walk(path):
+            for xdir in dirs:
+                os.chmod(join(root, xdir), 0755)
+            for xfile in files:
+                os.chmod(join(root, xfile), 0644)
+    else:
+        os.chmod(path, 0644)
+
+	
 def prepare(binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
     if os.path.exists(tbindir):
@@ -41,17 +53,17 @@ def prepare(binary, sbindir, tlibdir):
 
     tresdir = join(os.path.dirname(tbindir), 'Resources')
 
-    shutil.copyfile(join(sbindir, 'client'), binary)
+    shutil.copyfile(join(sbindir, 'clientexe'), binary)
     os.chmod(binary, 0755)
     yield binary
 
     ignore = shutil.ignore_patterns('*debug*', '.*')
-    for subfolder in 'platforms', 'styles', 'imageformats':
+    for subfolder in 'platforms', 'styles', 'imageformats', 'vox':
         tfolder = join(tbindir, subfolder)
         shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore)
         for f in os.listdir(tfolder):
             dep = join(tfolder, f)
-            os.chmod(dep, 0644)
+            set_permissions(dep)
             yield dep
 
     shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))

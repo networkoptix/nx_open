@@ -117,7 +117,7 @@ void QnAvigilonResource::checkInputPortState( qint64 timerID )
 
     if( !m_checkInputPortsRequest )
     {
-        m_checkInputPortsRequest = std::make_shared<nx_http::AsyncHttpClient>();
+        m_checkInputPortsRequest = nx_http::AsyncHttpClient::create();
         connect( m_checkInputPortsRequest.get(), &nx_http::AsyncHttpClient::done,
                  this, &QnAvigilonResource::onCheckPortRequestDone, Qt::DirectConnection );
     }

@@ -283,7 +283,7 @@ namespace ec2
             return res;
         }
 
-        m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+        m_httpClient = nx_http::AsyncHttpClient::create();
         connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done,
                 this, &Ec2StaticticsReporter::finishReport, Qt::DirectConnection);
 

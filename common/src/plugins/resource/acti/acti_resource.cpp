@@ -488,7 +488,7 @@ void QnActiResource::stopInputPortMonitoringAsync()
     const QAuthenticator auth = getAuth();
     QUrl url = getUrl();
     url.setPath( lit("/cgi-bin/%1?USER=%2&PWD=%3&%4").arg(lit("encoder")).arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr) );
-    nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
     connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
         ec2::DummyHandler::instance(), [httpClient](nx_http::AsyncHttpClientPtr) mutable {
