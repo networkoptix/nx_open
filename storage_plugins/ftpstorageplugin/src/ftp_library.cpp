@@ -47,6 +47,21 @@ namespace Qn
             }
         };
 
+        class ConnectException 
+            : public std::runtime_error
+        {
+        public:
+            explicit ConnectException(const char* s)
+                : runtime_error(s)
+            {}
+            
+            virtual const char* what() const
+            {
+                return runtime_error::what();
+            }
+        };
+
+
         class InternalErrorException 
             : public std::runtime_error
         {
@@ -444,12 +459,12 @@ namespace Qn
             try 
             {
                 if (impl->Connect(url.c_str()) == 0)
-                    throw aux::BadUrlException("Bad url");
+                    throw aux::ConnectException("Couldn't connect");
 
                 if (impl->Login(uname.c_str(), upasswd.c_str()) == 0)
                 {
                     impl->Quit();
-                    throw aux::BadUrlException("Bad url");
+                    throw aux::ConnectException("couldn't login");
                 }
             } 
             catch (const std::exception&) 
@@ -617,6 +632,12 @@ namespace Qn
                 m_passwd,
                 m_impl
             );
+        }
+        catch(const aux::ConnectException&)
+        {
+            m_impl->Quit();
+            m_available = false;
+            return;
         }
         catch(...)
         {
