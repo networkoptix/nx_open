@@ -36,6 +36,7 @@ QN_FUSION_DECLARE_FUNCTIONS(QnRecordingStatsData, (json))
 QN_FUSION_DECLARE_FUNCTIONS(QnCamRecordingStatsData, (json))
 
 typedef QVector<QnCamRecordingStatsData> QnRecordingStatsReply;
+Q_DECLARE_METATYPE(QnCamRecordingStatsData)
 Q_DECLARE_METATYPE(QnRecordingStatsReply)
 
 

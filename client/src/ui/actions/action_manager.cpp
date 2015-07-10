@@ -842,6 +842,15 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+L")).
         autoRepeat(false);
 
+    factory(Qn::RecordingStatisticsAction).
+        flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Recording statistics...")).
+        //icon(qnSkin->icon("events/log.png")).
+        //shortcut(tr("Ctrl+L")).
+        autoRepeat(false);
+
     factory(Qn::CameraListAction).
         flags(Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).

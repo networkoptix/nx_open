@@ -214,7 +214,7 @@ public:
         const QByteArray &passwordDigest, const QByteArray &cryptSha512Hash, int port, QObject *target, const char *slot);
 
     int pingSystemAsync(const QUrl &url, const QString &user, const QString &password, QObject *target, const char *slot);
-    int recordingStatisticsAsync(qint64 startTime, qint64 endTime, QObject *target, const char *slot);
+    int getRecordingStatisticsAsync(qint64 startTime, qint64 endTime, QObject *target, const char *slot);
     int mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot);
 
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
