@@ -99,6 +99,7 @@ private:
 
         size_t requested;
         QList<AwaitProxyInfo> available;
+        QElapsedTimer timer;
     };
 
     QList<HandlerInfo> m_handlers;

@@ -121,8 +121,13 @@ QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(
                 return QSharedPointer<AbstractStreamSocket>();
             }
 
-            if (serverPool.requested == 0)
-                socketRequest(serverPool.requested = PROXY_CONNECTIONS_TO_REQUEST);
+            if (serverPool.requested == 0 || // was not requested by another thread
+                serverPool.timer.elapsed() > timeout) // or request was not field within timeout
+            {
+                serverPool.requested = PROXY_CONNECTIONS_TO_REQUEST;
+                serverPool.timer.restart();
+                socketRequest(serverPool.requested);
+            }
 
             m_proxyCondition.wait(&m_proxyMutex, timeout - elapsed);
         }
