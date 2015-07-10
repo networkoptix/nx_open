@@ -3,6 +3,7 @@
 '''
 
 from datetime import datetime
+from decimal import Decimal
 
 import json
 import re
@@ -57,6 +58,7 @@ class SqlAdapter(object):
         cols = list(d[0] for d in self._cursor.description)
         def fetchValue(value):
             if isinstance(value, datetime): return str(value)
+            if isinstance(value, Decimal): return float(value)
             return value
         res = list(list(fetchValue(v) for v in row)
                    for row in self._cursor.fetchall())
