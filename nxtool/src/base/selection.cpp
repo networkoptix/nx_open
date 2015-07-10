@@ -101,7 +101,7 @@ namespace
     QDateTime calcDateTime(const rtu::ServerInfoPtrContainer &servers
         , rtu::Constants::ServerFlags flags)
     {
-        QDateTime defaultDateTime = QDateTime::currentDateTime();
+        QDateTime defaultDateTime = QDateTime();
 
         if (servers.empty())
             return defaultDateTime;
