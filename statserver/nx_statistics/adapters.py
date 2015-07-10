@@ -108,6 +108,10 @@ class SqlAdapter(object):
             if data.has_key(source):
                 data[target] = function(data[source])
                 del data[source]
+        for name, value in data.items():
+            if isinstance(value, unicode) or isinstance(value, str):
+                if value == 'true': data[name] = 1
+                elif value == 'false': data[name] = 0
         field_names = self._field_names(table)
         etc = {}
         for name, value in data.items():
