@@ -7,6 +7,7 @@
 #include <cctype>
 #include <cstdio>
 #include <fstream>
+#include <cassert>
 
 #ifdef __linux__
 #   include <sys/stat.h>
@@ -14,7 +15,7 @@
 
 #include "ftp_library.h"
 
-namespace Qn
+namespace nx_spl
 {   // auxillary data structures/functions
     namespace aux
     {   // Some custom exceptions. 
@@ -588,7 +589,7 @@ namespace Qn
     FileInfo* STORAGE_METHOD_CALL FtpFileInfoIterator::next(int* ecode) const
     {
         if (ecode)
-            *ecode = Qn::error::NoError;
+            *ecode = nx_spl::error::NoError;
 
         if (m_curFile != m_fileList.cend()) 
         {
@@ -612,7 +613,7 @@ namespace Qn
                         sizeof(nxpl::NX_GUID)) == 0) 
         {
             addRef();
-            return static_cast<Qn::FileInfoIterator*>(this);
+            return static_cast<nx_spl::FileInfoIterator*>(this);
         } 
         else if (std::memcmp(&interfaceID, 
                              &nxpl::IID_PluginInterface, 
@@ -758,7 +759,7 @@ namespace Qn
     )
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
+        if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
             return;
         if (m_impl->Delete(url) == 0 && ecode)
             *ecode = error::UnknownError;
@@ -770,7 +771,7 @@ namespace Qn
     )
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
+        if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
             return;
 
         if (m_impl->Rmdir(url) == 0 && ecode)
@@ -784,7 +785,7 @@ namespace Qn
     )
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
+        if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
             return;
 
         if (m_impl->Rename(oldUrl, newUrl) == 0 && ecode)
@@ -797,7 +798,7 @@ namespace Qn
     ) const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
+        if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
             return nullptr;
 
         std::string fileName(aux::getRandomFileName());
@@ -839,7 +840,7 @@ namespace Qn
     ) const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
+        if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
             return 0;
 
         try
@@ -862,7 +863,7 @@ namespace Qn
     ) const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
+        if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
             return 0;
 
         std::string fileName(aux::getRandomFileName());
@@ -880,7 +881,7 @@ namespace Qn
     ) const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if(aux::checkECode(ecode, getAvail()) != Qn::error::NoError)
+        if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
             return 0;
 
         int size;
@@ -943,7 +944,7 @@ namespace Qn
                         sizeof(nxpl::NX_GUID)) == 0) 
         {
             addRef();
-            return static_cast<Qn::Storage*>(this);
+            return static_cast<nx_spl::Storage*>(this);
         } 
         else if (std::memcmp(&interfaceID, 
                              &nxpl::IID_PluginInterface, 
@@ -1041,15 +1042,15 @@ namespace Qn
     }
 
 #define ERROR_LIST(APPLY) \
-    APPLY(Qn::error::EndOfFile) \
-    APPLY(Qn::error::NoError) \
-    APPLY(Qn::error::NotEnoughSpace) \
-    APPLY(Qn::error::ReadNotSupported) \
-    APPLY(Qn::error::SpaceInfoNotAvailable) \
-    APPLY(Qn::error::StorageUnavailable) \
-    APPLY(Qn::error::UnknownError) \
-    APPLY(Qn::error::UrlNotExists) \
-    APPLY(Qn::error::WriteNotSupported)
+    APPLY(nx_spl::error::EndOfFile) \
+    APPLY(nx_spl::error::NoError) \
+    APPLY(nx_spl::error::NotEnoughSpace) \
+    APPLY(nx_spl::error::ReadNotSupported) \
+    APPLY(nx_spl::error::SpaceInfoNotAvailable) \
+    APPLY(nx_spl::error::StorageUnavailable) \
+    APPLY(nx_spl::error::UnknownError) \
+    APPLY(nx_spl::error::UrlNotExists) \
+    APPLY(nx_spl::error::WriteNotSupported)
 
 #define STR_ERROR(ecode) case ecode: return #ecode;
 
@@ -1300,7 +1301,7 @@ namespace Qn
                         sizeof(nxpl::NX_GUID)) == 0) 
         {
             addRef();
-            return static_cast<Qn::IODevice*>(this);
+            return static_cast<nx_spl::IODevice*>(this);
         } 
         else if (std::memcmp(&interfaceID, 
                              &nxpl::IID_PluginInterface, 
@@ -1331,7 +1332,7 @@ extern "C"
 #endif
     nxpl::PluginInterface* createNXPluginInstance()
     {
-        return new Qn::FtpStorageFactory();
+        return new nx_spl::FtpStorageFactory();
     }
 }
 

@@ -10,7 +10,7 @@
     #define STORAGE_METHOD_CALL
 #endif
  
-namespace Qn
+namespace nx_spl
 {
     const uint64_t unknown_size = 0xffffffffffffffff;
  

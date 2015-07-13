@@ -11,18 +11,18 @@ class QnThirdPartyStorageResource
 {
 public: //typedefs
     typedef std::shared_ptr<
-        Qn::Storage
+        nx_spl::Storage
     > StoragePtrType;
 
-    typedef Qn::StorageFactory *StorageFactoryPtrType;
+    typedef nx_spl::StorageFactory *StorageFactoryPtrType;
 
 
     typedef std::shared_ptr<
-        Qn::FileInfoIterator
+        nx_spl::FileInfoIterator
     > FileInfoIteratorPtrType;
 
     typedef std::shared_ptr<
-        Qn::IODevice
+        nx_spl::IODevice
     > IODevicePtrType;
 
 public: // static funcs

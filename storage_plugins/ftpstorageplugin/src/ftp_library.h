@@ -10,7 +10,7 @@
 #include "plugins/storage/third_party/third_party_storage.h"
 #include "impl/ftplib.h"
 
-namespace Qn 
+namespace nx_spl 
 {
     namespace aux
     {   // Generic reference counter Mix-In. Private inherit it.
