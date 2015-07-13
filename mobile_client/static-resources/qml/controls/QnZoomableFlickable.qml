@@ -73,6 +73,9 @@ Item {
                 return
             }
 
+            /* Cannot use returnToBounds for smooth animation due to the mentioned Flickable bug. */
+            animateToSize(contentWidth, contentHeight)
+            /*
             boundsAnimation.stop()
 
             var x = contentX
@@ -84,6 +87,7 @@ Item {
             contentY = y
 
             returnToBounds()
+            */
         }
 
         function animateToSize(cw, ch) {
