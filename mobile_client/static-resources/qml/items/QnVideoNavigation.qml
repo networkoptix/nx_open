@@ -19,6 +19,8 @@ Item {
     property real timelineTextMargin: timeline.height - timeline.chunkBarHeight
     property real cursorWidth: dp(2)
 
+    property real videoBottomMargin: visible ? (timeline.chunkBarHeight + navigationPanel.height - navigator.y) : 0
+
     readonly property var _locale: Qt.locale()
 
     Item {

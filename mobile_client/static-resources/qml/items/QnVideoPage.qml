@@ -43,11 +43,11 @@ QnPage {
         onQualityPicked: mediaPlayer.resourceHelper.resolution = resolution
     }
 
-    VideoOutput {
+    QnScalableVideo {
         id: video
 
-        width: parent.width
-        height: parent.height
+        anchors.fill: parent
+        anchors.bottomMargin: videoNavigation.videoBottomMargin
 
         source: mediaPlayer.mediaPlayer
     }
