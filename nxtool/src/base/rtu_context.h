@@ -45,12 +45,15 @@ namespace rtu
             , const QByteArray &prevTimeZoneId
             , const QByteArray &newTimeZoneId);
         
-        void tryLoginWith(const QString &password);
+        void tryLoginWith(const QString &primarySystem
+            , const QString &password);
         
     signals:
         void currentPageChanged();
 
         void selectionChanged();
+
+        void loginOperationFailed(const QString &primarySystem);
         
     private:
         class Impl;

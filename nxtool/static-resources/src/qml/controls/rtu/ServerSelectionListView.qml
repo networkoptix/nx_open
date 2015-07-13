@@ -155,5 +155,22 @@ ListView
         }
     }
 
+    Dialogs.ErrorDialog
+    {
+        id: loginToSystemFailed;
+        property string systemName;
+
+        message: qsTr("Can't login to any server in system %1 with entered password").arg(systemName);
+
+        Connections
+        {
+            target: rtuContext;
+            onLoginOperationFailed:
+            {
+                loginToSystemFailed.systemName = primarySystem;
+                loginToSystemFailed.show();
+            }
+        }
+    }
 }
 

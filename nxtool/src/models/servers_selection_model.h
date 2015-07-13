@@ -29,7 +29,9 @@ namespace rtu
 
         void setAllItemSelected(bool selected);
         
-        void tryLoginWith(const QString &password);
+        void tryLoginWith(const QString &primarySystem
+            , const QString &password
+            , const Callback &callback);
 
         ///
 

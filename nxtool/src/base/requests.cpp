@@ -26,15 +26,16 @@ namespace
     const QString kIfListCommand = kApiNamespaceTag + "iflist";
     const QString kGetServerExtraInfoCommand = kApiNamespaceTag + "aggregator";
 
-    const QString &kInvalidRequest = "Invalid request parameters";
-    const QString &kErrorDesc = "Invalid response";
+    const QString kInvalidRequest = "Invalid request parameters";
+    const QString kErrorDesc = "Invalid response";
 
-    const QString &kIDTag = "id";
-    const QString &kSeedTag = "seed";
-    const QString &kNameTag = "name";
-    const QString &kSystemNameTag = "systemName";
-    const QString &kPortTag = "port";
-    const QString &kFlagsTag = "flags";
+    const QString kIDTag = "id";
+    const QString kSeedTag = "seed";
+    const QString kNameTag = "name";
+    const QString kSystemNameTag = "systemName";
+    const QString kPortTag = "port";
+    const QString kFlagsTag = "flags";
+    const QString kLocalTimeFlagTag = "local";
 
     QUrl makeUrl(const QString &host
         , const int port
@@ -339,21 +340,81 @@ bool parseExtraInfoCommand(const QString &cmdName
 
 ///
 
+void rtu::getTime(HttpClient *client
+    , const BaseServerInfo &baseInfo
+    , const QString &password
+    , const ExtraServerInfoSuccessCallback &successful
+    , const OperationCallback &failed
+    , int timeout)
+{
+    static const AffectedEntities affected = (kTimeZoneAffected | kDateTimeAffected);
+
+    if (!client)
+    {
+        if (failed)
+            failed(kInvalidRequest, affected);
+        return;
+    }
+
+    QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port
+        , password, kGetTimeCommand);
+
+    if (baseInfo.flags & Constants::AllowChangeDateTimeFlag)
+    {
+        QUrlQuery query;
+        query.addQueryItem(kLocalTimeFlagTag, QString());
+        url.setQuery(query);
+    }
+
+    const QUuid &id = baseInfo.id;
+    const auto &localSuccessful = [id, password, successful, failed](const QByteArray &data)
+    {
+        rtu::ExtraServerInfo extraInfo;
+        const bool parsed = parseGetTimeCmd(
+            QJsonDocument::fromJson(data.data()).object(), extraInfo);
+                
+        if (parsed)
+        {
+            if (successful)
+            {
+                extraInfo.password = password;
+                successful(id, extraInfo);
+            }
+        }
+        else if (failed)
+        {
+            failed(kErrorDesc, affected);
+        }
+    };
+
+    client->sendGet(url, localSuccessful
+        , makeErrorCallback(failed, affected), timeout);
+}
+
 void rtu::getServerExtraInfo(HttpClient *client
     , const BaseServerInfo &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
-    , const OperationCallback &failed)
+    , const OperationCallback &failed
+    , int timeout)
 {
+    static const AffectedEntities affected = (kAllAddressFlagsAffected 
+        | kTimeZoneAffected | kDateTimeAffected);
+
     if (!client)
     {
         if (failed)
-            failed(kInvalidRequest, kAllEntitiesAffected);
+            failed(kInvalidRequest, affected);
         return;
     }
 
+    if (!(baseInfo.flags & Constants::AllowChangeDateTimeFlag)
+        || !(baseInfo.flags & Constants::AllowIfConfigFlag))
+    {
+        return getTime(client, baseInfo, password, successful, failed, timeout);
+    }
+
     static const QString kCmdTag = "exec_cmd";
-    static const QString kLocalTimeFlagTag = "local";
 
     QUrlQuery query;
     query.addQueryItem(kCmdTag, kGetTimeCommand);
@@ -366,11 +427,11 @@ void rtu::getServerExtraInfo(HttpClient *client
 
     const QUuid &id = baseInfo.id;
     
-    const auto &handleSuccessfullResult = 
-        [id, successful, failed, password](const QByteArray &data, const QString &cmdName)
+    const auto &successfulCallback = 
+        [id, successful, failed, password, timeout](const QByteArray &data)
     {
         rtu::ExtraServerInfo extraInfo;
-        const bool parsed = parseExtraInfoCommand(cmdName
+        const bool parsed = parseExtraInfoCommand(kGetServerExtraInfoCommand
             , QJsonDocument::fromJson(data.data()).object(), extraInfo);
                 
         if (parsed)
@@ -383,32 +444,12 @@ void rtu::getServerExtraInfo(HttpClient *client
         }
         else if (failed)
         {
-            failed(kErrorDesc, kAllAddressFlagsAffected 
-                | kTimeZoneAffected | kDateTimeAffected);
+            failed(kErrorDesc, affected);
         }
     };
 
-    const auto &successfulCallback = [handleSuccessfullResult](const QByteArray &data)
-    {
-        handleSuccessfullResult(data, kGetServerExtraInfoCommand);
-    };
-
-    const auto failedCallback = 
-        [client, baseInfo, failed, password, handleSuccessfullResult](const QString &, int)
-    {
-        const auto &succesful = 
-            [handleSuccessfullResult](const QByteArray &data)
-        {
-            handleSuccessfullResult(data, kGetTimeCommand);
-        };
-
-        const QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port
-            , password, kGetTimeCommand);
-        client->sendGet(url, succesful
-            , makeErrorCallback(failed, kAllEntitiesAffected));
-    };
-    
-    client->sendGet(url, successfulCallback, failedCallback);
+    client->sendGet(url, successfulCallback
+        , makeErrorCallback(failed, affected), timeout);
 }
 
 ///
@@ -420,7 +461,7 @@ void rtu::sendIfListRequest(HttpClient *client
     , const OperationCallback &failed
     , int timeout)
 {
-    if (!client)
+    if (!client || !(info.flags & Constants::AllowIfConfigFlag))
     {
         if (failed)
             failed(kInvalidRequest, kAllEntitiesAffected);

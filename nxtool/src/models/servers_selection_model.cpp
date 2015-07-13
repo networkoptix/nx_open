@@ -14,11 +14,13 @@ namespace
 {
     struct ServerModelInfo
     {
+        qint64 updateTimestamp;
         Qt::CheckState selectedState;
         rtu::ServerInfo serverInfo;
         
         ServerModelInfo();
-        explicit ServerModelInfo(Qt::CheckState initSelectedState
+        explicit ServerModelInfo(qint64 initUpdateTimestamp 
+            , Qt::CheckState initSelectedState
             , const rtu::ServerInfo initServerInfo);
     };
 
@@ -27,9 +29,11 @@ namespace
         , serverInfo()
     {}
 
-    ServerModelInfo::ServerModelInfo(Qt::CheckState initSelectedState
+    ServerModelInfo::ServerModelInfo(qint64 initUpdateTimestamp 
+        , Qt::CheckState initSelectedState
         , const rtu::ServerInfo initServerInfo)
-        : selectedState(initSelectedState)
+        : updateTimestamp(initUpdateTimestamp)
+        , selectedState(initSelectedState)
         , serverInfo(initServerInfo)
     {}
     
@@ -102,7 +106,9 @@ namespace
     class SelectionUpdaterGuard
     {
     public:
-        SelectionUpdaterGuard(rtu::ServerInfoManager *serverInfoManager);
+        SelectionUpdaterGuard(rtu::ServerInfoManager *serverInfoManager
+            , const rtu::ServerInfoManager::SuccessfulCallback &success
+            , const rtu::ServerInfoManager::FailedCallback &failed);
 
         ~SelectionUpdaterGuard();
 
@@ -110,11 +116,17 @@ namespace
 
     private:
         rtu::ServerInfoManager * const m_serverInfoManager;
+        const rtu::ServerInfoManager::SuccessfulCallback m_success;
+        const rtu::ServerInfoManager::FailedCallback m_failed;
         rtu::ServerInfoContainer m_selectedServers;
     };
 
-    SelectionUpdaterGuard::SelectionUpdaterGuard(rtu::ServerInfoManager *serverInfoManager)
+    SelectionUpdaterGuard::SelectionUpdaterGuard(rtu::ServerInfoManager *serverInfoManager
+        , const rtu::ServerInfoManager::SuccessfulCallback &success
+        , const rtu::ServerInfoManager::FailedCallback &failed)
         : m_serverInfoManager(serverInfoManager)
+        , m_success(success)
+        , m_failed(failed)
         , m_selectedServers()
     {
     }
@@ -122,7 +134,8 @@ namespace
     SelectionUpdaterGuard::~SelectionUpdaterGuard()
     {
         if (!m_selectedServers.empty())
-            m_serverInfoManager->updateServerInfos(m_selectedServers);
+            m_serverInfoManager->updateServerInfos(
+                m_selectedServers, m_success, m_failed);
     }
 
     void SelectionUpdaterGuard::addServerToUpdate(const rtu::ServerInfo *info)
@@ -130,6 +143,38 @@ namespace
         if (info && info->hasExtraInfo())
             m_selectedServers.push_back(*info);
     }
+
+    class ActiveDestructable
+    {
+    public:
+        typedef std::function<void ()> Callback;
+        ActiveDestructable(const Callback &callback);
+
+        ~ActiveDestructable();
+
+        void cancel();
+
+    private:
+        Callback m_callback;
+    };
+
+    ActiveDestructable::ActiveDestructable(const Callback &callback)
+        : m_callback(callback)
+    {
+    }
+
+    ActiveDestructable::~ActiveDestructable()
+    {
+        if (m_callback)
+            m_callback();
+    }
+
+    void ActiveDestructable::cancel()
+    {
+        m_callback = Callback();
+    }
+
+    typedef QSharedPointer<ActiveDestructable> ActiveDestructablePtr;
 }
 
 namespace
@@ -261,7 +306,9 @@ public:
     
     rtu::ServerInfoPtrContainer selectedServers();
     
-    void tryLoginWith(const QString &password);
+    void tryLoginWith(const QString &primarySystem
+        , const QString &password
+        , const Callback &callback);
     
     ///
 
@@ -294,7 +341,7 @@ public:
     void updatePortInfo(const QUuid &id
         , int port);
 
-    void serverDiscovered(const BaseServerInfo &baseInfo);\
+    void serverDiscovered(const BaseServerInfo &baseInfo);
 
     void addServer(const rtu::ServerInfo &info
         , Qt::CheckState selected);
@@ -333,6 +380,10 @@ private:
     SystemModelInfosVector m_systems;
     rtu::ServerInfoManager *m_serverInfoManager;
     bool m_selectionOutdated;
+
+    const ServerInfoManager::SuccessfulCallback m_updateExtra;
+    const ServerInfoManager::FailedCallback m_updateExtraFailed;
+
 };
 
 rtu::ServersSelectionModel::Impl::Impl(rtu::ServersSelectionModel *owner
@@ -341,23 +392,19 @@ rtu::ServersSelectionModel::Impl::Impl(rtu::ServersSelectionModel *owner
     , m_owner(owner)
     , m_changeHelper(changeHelper)
     , m_systems()
+
     , m_serverInfoManager(new ServerInfoManager(this))
     , m_selectionOutdated(false)
+
+    , m_updateExtra([this](const QUuid &id, const ExtraServerInfo &extra
+        , const QString &host) { updateExtraInfo(id, extra, host); })
+    , m_updateExtraFailed([this](const QUuid &id) { updateExtraInfoFailed(id); })
+
 {
     QObject::connect(m_owner, &ServersSelectionModel::selectionChanged, this, [this]()
     {
         setSelectionOutdated(false);
     });
-
-    QObject::connect(m_serverInfoManager, &ServerInfoManager::serverExtraInfoUpdated
-        , this, &Impl::updateExtraInfo);
-    QObject::connect(m_serverInfoManager, &ServerInfoManager::serverExtraInfoUpdateFailed
-        , this, &Impl::updateExtraInfoFailed);
-
-    QObject::connect(m_serverInfoManager, &ServerInfoManager::loginOperationSuccessfull
-        , this, &Impl::updateExtraInfo);
-    QObject::connect(m_serverInfoManager, &ServerInfoManager::loginOperationFailed
-        , this, &Impl::updateExtraInfoFailed);
 }
 
 rtu::ServersSelectionModel::Impl::~Impl() {}
@@ -408,8 +455,6 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         case kSystemNameRoleId:
             return systemInfo.name;
         case kNameRoleId:
-            //TODO: #gdm #nx2 make correct implementation later on, when we will adopt the tool to the nx2 
-            //with several network interfaces.
             return QString("%1 (%2)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress);
         case kIdRoleId:
             return info.baseInfo().id;
@@ -504,7 +549,8 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
     GuardHolder localGuard;
     if (!guard)
     {
-        localGuard.reset(new SelectionUpdaterGuard(m_serverInfoManager));
+        localGuard.reset(new SelectionUpdaterGuard(
+            m_serverInfoManager, m_updateExtra, m_updateExtraFailed));
         guard = localGuard.data();
     }
 
@@ -569,7 +615,7 @@ void rtu::ServersSelectionModel::Impl::setAllItemSelected(bool selected)
     bool selectionChanged = false;
     int index = 0;
 
-    SelectionUpdaterGuard guard(m_serverInfoManager);
+    SelectionUpdaterGuard guard(m_serverInfoManager, m_updateExtra, m_updateExtraFailed);
     for (int systemIndex = 0; systemIndex != m_systems.count(); ++systemIndex)
     {
         index += kSystemItemCapacity;
@@ -623,8 +669,12 @@ rtu::ServerInfoPtrContainer rtu::ServersSelectionModel::Impl::selectedServers()
     return result;
 }
 
-void rtu::ServersSelectionModel::Impl::tryLoginWith(const QString &password)
+void rtu::ServersSelectionModel::Impl::tryLoginWith(const QString &primarySystem
+    , const QString &password
+    , const Callback &callback)
 {
+    const auto &failedHandler = ActiveDestructablePtr(new ActiveDestructable(callback));
+
     for (const SystemModelInfo &systemInfo: m_systems)
     {
         if (systemInfo.loggedServers == systemInfo.servers.size())
@@ -634,8 +684,20 @@ void rtu::ServersSelectionModel::Impl::tryLoginWith(const QString &password)
         {
             if (serverInfo.serverInfo.hasExtraInfo())
                 continue;
-            
-            m_serverInfoManager->loginToServer(serverInfo.serverInfo.baseInfo(), password);
+
+            auto handler = (serverInfo.serverInfo.baseInfo().systemName == primarySystem 
+                ? failedHandler : ActiveDestructablePtr());
+
+            const auto &success = 
+                [this, handler](const QUuid &id, const ExtraServerInfo &extra, const QString &host)
+            {
+                updateExtraInfo(id, extra, host);
+                if (handler)
+                    handler->cancel();
+            };
+
+            m_serverInfoManager->loginToServer(serverInfo.serverInfo.baseInfo(), password
+                , success, m_updateExtraFailed);
         }
     }
 }
@@ -851,11 +913,21 @@ void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &ba
     if (!findServer(baseInfo.id, searchInfo))
         return;
 
+    enum { kUpdatePeriod = 60 * 1000};
+
+    /// TODO: #ynikitenkov change for QElapsedTimer implementation
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    const qint64 msSinceLastUpdate = (now - searchInfo.serverInfoIterator->updateTimestamp);
+    if (msSinceLastUpdate < kUpdatePeriod)
+        return;
+    searchInfo.serverInfoIterator->updateTimestamp = now;
+
     const ServerInfo &foundInfo = searchInfo.serverInfoIterator->serverInfo;
-    ServerInfo tmp = (!foundInfo.hasExtraInfo() ? ServerInfo(baseInfo)
+    const ServerInfo tmp = (!foundInfo.hasExtraInfo() ? ServerInfo(baseInfo)
         : ServerInfo(baseInfo, foundInfo.extraInfo()));
 
-    m_serverInfoManager->updateServerInfos(ServerInfoContainer(1, tmp));
+    m_serverInfoManager->updateServerInfos(ServerInfoContainer(1, tmp)
+        , m_updateExtra, m_updateExtraFailed);
 }
 
 void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
@@ -880,7 +952,8 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
         exist = false;
     }
 
-    systemModelInfo->servers.push_back(ServerModelInfo(selected, info));
+    /// TODO: #ynikitenkov change for QElapsedTimer implementation
+    systemModelInfo->servers.push_back(ServerModelInfo(QDateTime::currentMSecsSinceEpoch(), selected, info));
     systemModelInfo->loggedServers += (info.hasExtraInfo() ? 1 : 0);
 
     if (selected != Qt::Unchecked)
@@ -892,7 +965,8 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
     const auto &modelChangeAction = m_changeHelper->insertRowsGuard(rowStart, rowFinish);
     
     if (!info.hasExtraInfo())
-        m_serverInfoManager->loginToServer(info.baseInfo());
+        m_serverInfoManager->loginToServer(info.baseInfo()
+            , m_updateExtra, m_updateExtraFailed);
 
     if (exist)
         m_changeHelper->dataChanged(row, row);
@@ -1043,9 +1117,12 @@ void rtu::ServersSelectionModel::setAllItemSelected(bool selected)
     emit dataChanged(index(0), index(m_impl->rowCount() - 1));
 }
 
-void rtu::ServersSelectionModel::tryLoginWith(const QString &password)
+void rtu::ServersSelectionModel::tryLoginWith(
+    const QString &primarySystem
+    , const QString &password
+    , const rtu::Callback &callback)
 {
-    m_impl->tryLoginWith(password);
+    m_impl->tryLoginWith(primarySystem, password, callback);
 }
 
 void rtu::ServersSelectionModel::serverDiscovered(const BaseServerInfo &baseInfo)

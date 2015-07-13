@@ -84,11 +84,19 @@ namespace rtu
     typedef std::function<void (const QUuid &id
         , const rtu::ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
     
+    void getTime(HttpClient *client
+        , const BaseServerInfo &baseInfo
+        , const QString &password
+        , const ExtraServerInfoSuccessCallback &successful
+        , const OperationCallback &failed
+        , int timeout = HttpClient::kUseDefaultTimeout);
+
     void getServerExtraInfo(HttpClient *client
         , const BaseServerInfo &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
-        , const OperationCallback &failed);
+        , const OperationCallback &failed
+        , int timeout = HttpClient::kUseDefaultTimeout);
 
     void sendIfListRequest(HttpClient *client
         , const BaseServerInfo &info
