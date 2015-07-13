@@ -2,7 +2,7 @@
 
 Q_GLOBAL_STATIC(QnStoragePluginFactory, QnStoragePluginFactory_instance)
 
-QnStoragePluginFactory::QnStoragePluginFactory(): m_defaultFactory(0)
+QnStoragePluginFactory::QnStoragePluginFactory(): m_defaultFactory()
 {
 }
 

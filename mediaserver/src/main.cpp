@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <functional>
 #include <signal.h>
 #ifdef __linux__
 #include <signal.h>
@@ -763,11 +764,20 @@ int serverMain(int argc, char *argv[])
     qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     ffmpegInit();
-    QnStoragePluginFactory::instance()->registerStoragePlugin(
-        "ftp", 
-        QnThirdPartyStorageResource::instance, 
-        false
-    );
+    using namespace std::placeholders;
+    for (const auto storagePlugin : 
+         PluginManager::instance()->findNxPlugins<Qn::StorageFactory>(Qn::IID_StorageFactory))
+    {
+        QnStoragePluginFactory::instance()->registerStoragePlugin(
+            storagePlugin->storageType(),
+            std::bind(
+                &QnThirdPartyStorageResource::instance,
+                _1,
+                storagePlugin
+            ),
+            false
+        );                    
+    }
 
     // ------------------------------------------
 #ifdef TEST_RTSP_SERVER

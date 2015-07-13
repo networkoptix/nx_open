@@ -156,84 +156,48 @@ namespace aux
     };
 } //namespace aux
 
-QnStorageResource* QnThirdPartyStorageResource::instance(const QString& url)
+QnStorageResource* QnThirdPartyStorageResource::instance(
+    const QString               &url, 
+    const StorageFactoryPtrType &sf
+)
 {
-    int pIndex = url.indexOf(lit("://"));
-    if (pIndex == -1)
-        return nullptr;
-    
-    QString proto(url.left(pIndex));
-    QDir pluginDir(lit("plugins"));
-
-    for (const auto& fi : pluginDir.entryInfoList(QDir::Files))
-    {   // TODO: #akulikov. Maybe another plugin finder algorithm is needed here
-        if (fi.fileName().indexOf(proto) != -1)
-        {
-            try
-            {
-                return new QnThirdPartyStorageResource(
-                    fi.absoluteFilePath(),
-                    url
-                );
-            }
-            catch(const std::exception&)
-            {
-                return new QnThirdPartyStorageResource;
-            }
-        }
+    try
+    {
+        return new QnThirdPartyStorageResource(
+            sf,
+            url
+        );
     }
-    return new QnThirdPartyStorageResource;
+    catch(...)
+    {
+        return new QnThirdPartyStorageResource;
+    }
 }
 
 QnThirdPartyStorageResource::QnThirdPartyStorageResource(
-    const QString  &libraryPath,
-    const QString  &storageUrl
-) : m_lib(libraryPath.toLatin1().constData()),
-    m_valid(true)
+        const StorageFactoryPtrType &sf,
+        const QString               &storageUrl
+) : m_valid(true)
 {
-    if (libraryPath.isEmpty() || storageUrl.isEmpty())
-        throw std::runtime_error("Invalid storage construction arguments");
-
-    if (!m_lib)
-        throw std::runtime_error("Couldn't load storage plugin");
-
-    m_csf = static_cast<create_qn_storage_factory_function>(
-        m_lib.symbol("create_qn_storage_factory")
+    openStorage(
+        storageUrl.toLatin1().constData(),
+        sf
     );
-    
-    m_emf = static_cast<qn_storage_error_message_function>(
-        m_lib.symbol("qn_storage_error_message")
-    );
-
-    if (m_csf == nullptr || m_emf == nullptr)
-        throw std::runtime_error("Couldn't load library functions");
-
-    openStorage(storageUrl.toLatin1().constData());
 }
 
 QnThirdPartyStorageResource::QnThirdPartyStorageResource()
-    : m_lib(nullptr),
-      m_valid(false)
+    : m_valid(false)
 {}
 
 QnThirdPartyStorageResource::~QnThirdPartyStorageResource()
 {}
 
-void QnThirdPartyStorageResource::openStorage(const char *storageUrl)
+void QnThirdPartyStorageResource::openStorage(
+    const char                  *storageUrl,
+    const StorageFactoryPtrType &sf
+)
 {
     QMutexLocker lock(&m_mutex);
-    Qn::StorageFactory* sfRaw = m_csf();
-    if (sfRaw == nullptr)
-        throw std::runtime_error("Couldn't create StorageFactory");
-
-    std::shared_ptr<Qn::StorageFactory> sf = 
-        std::shared_ptr<Qn::StorageFactory>(
-            sfRaw, 
-            [](Qn::StorageFactory* p)
-            {
-                p->releaseRef();
-            }
-        );
 
     int ecode;
     Qn::Storage* spRaw = sf->createStorage(storageUrl, &ecode);

@@ -122,6 +122,7 @@ namespace Qn
             std::string upasswd;
             std::string host;
             std::string port;
+            std::string path;
 
             static Url fromString(const std::string& s)
             {   
@@ -203,6 +204,13 @@ namespace Qn
                             goto end;
                         }
                         c = s[cur];
+                        if (c == '/') //path begins
+                        {
+                            u.host.assign(s.begin() + start, s.begin() + cur);
+                            u.path.assign(s.begin() + cur, s.end());
+                            goto end;
+                        }
+
                         if (c != ':')
                             ++cur;
                         else
@@ -216,7 +224,15 @@ namespace Qn
                         }
                         break;
                     case port:
-                       if (cur == s.size())
+                        c = s[cur];
+                        if (c == '/') //path begins
+                        {
+                            u.port.assign(s.begin() + start, s.begin() + cur);
+                            u.path.assign(s.begin() + cur, s.end());
+                            goto end;
+                        }
+                        
+                        if (cur == s.size())
                         {
                             if (cur - start == 0) // If you wrote ':' after hostname, provide some valid port value too
                                 throw std::logic_error("Url parse failed. Port is empty");
@@ -1024,6 +1040,31 @@ namespace Qn
         return "ftp";
     }
 
+#define ERROR_LIST(APPLY) \
+    APPLY(Qn::error::EndOfFile) \
+    APPLY(Qn::error::NoError) \
+    APPLY(Qn::error::NotEnoughSpace) \
+    APPLY(Qn::error::ReadNotSupported) \
+    APPLY(Qn::error::SpaceInfoNotAvailable) \
+    APPLY(Qn::error::StorageUnavailable) \
+    APPLY(Qn::error::UnknownError) \
+    APPLY(Qn::error::UrlNotExists) \
+    APPLY(Qn::error::WriteNotSupported)
+
+#define STR_ERROR(ecode) case ecode: return #ecode;
+
+    const char* FtpStorageFactory::lastErrorMessage(int ecode) const
+    {
+        switch(ecode)
+        {
+            ERROR_LIST(STR_ERROR);
+        }
+        return "";
+    }
+
+#undef PRINT_ERROR
+#undef ERROR_LIST
+
 
     // Ftp IO Device
     FtpIODevice::FtpIODevice(
@@ -1283,34 +1324,15 @@ namespace Qn
 
 } // namespace Qn
 
-// DLL public functions
-extern "C" STORAGE_API Qn::StorageFactory* create_qn_storage_factory()
+extern "C"
 {
-    return new Qn::FtpStorageFactory();
-}
-
-#define ERROR_LIST(APPLY) \
-    APPLY(Qn::error::EndOfFile) \
-    APPLY(Qn::error::NoError) \
-    APPLY(Qn::error::NotEnoughSpace) \
-    APPLY(Qn::error::ReadNotSupported) \
-    APPLY(Qn::error::SpaceInfoNotAvailable) \
-    APPLY(Qn::error::StorageUnavailable) \
-    APPLY(Qn::error::UnknownError) \
-    APPLY(Qn::error::UrlNotExists) \
-    APPLY(Qn::error::WriteNotSupported)
-
-#define STR_ERROR(ecode) case ecode: return #ecode;
-
-extern "C" STORAGE_API const char* qn_storage_error_message(int ecode)
-{
-    switch(ecode)
+#ifdef _WIN32
+    __declspec(dllexport)
+#endif
+    nxpl::PluginInterface* createNXPluginInstance()
     {
-        ERROR_LIST(STR_ERROR);
+        return new Qn::FtpStorageFactory();
     }
-
-    return "";
 }
 
-#undef PRINT_ERROR
-#undef ERROR_LIST
+

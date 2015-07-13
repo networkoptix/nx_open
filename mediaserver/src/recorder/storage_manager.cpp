@@ -483,10 +483,10 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
     QString storagePath = storage->getPath();
     QString dbRefFilePath;
     
-    if (storagePath.indexOf(lit("://")) != -1)
-        dbRefFilePath = dbRefFileName.arg(getLocalGuid());
-    else
-        dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
+    //if (storagePath.indexOf(lit("://")) != -1)
+    //    dbRefFilePath = dbRefFileName.arg(getLocalGuid());
+    //else
+    dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
 
     QByteArray dbRefGuidStr;
     //checking for file db_ref.guid existence
@@ -1327,14 +1327,22 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
     return QnStorageResourcePtr();
 }
 
-QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
+QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName, bool exact)
 {
     QMutexLocker lock(&m_mutexStorages);
     for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         QString root = itr.value()->getUrl();
-        if (fileName.startsWith(root))
-            return itr.value();
+        if (!exact)
+        {
+            if (fileName.startsWith(root))
+                return itr.value();
+        }
+        else
+        {
+            if (fileName == root)
+                return itr.value();
+        }
     }
     return QnStorageResourcePtr();
 }

@@ -4,7 +4,6 @@
 #include <memory>
 
 #include "core/resource/storage_resource.h"
-#include "utils/library/library.h"
 #include "plugins/storage/third_party/third_party_storage.h"
 
 class QnThirdPartyStorageResource
@@ -15,6 +14,9 @@ public: //typedefs
         Qn::Storage
     > StoragePtrType;
 
+    typedef Qn::StorageFactory *StorageFactoryPtrType;
+
+
     typedef std::shared_ptr<
         Qn::FileInfoIterator
     > FileInfoIteratorPtrType;
@@ -24,12 +26,15 @@ public: //typedefs
     > IODevicePtrType;
 
 public: // static funcs
-    static QnStorageResource* instance(const QString&);
+    static QnStorageResource* instance(
+        const QString               &url,
+        const StorageFactoryPtrType &sf
+    );
 
 public: //ctors, dtor
     QnThirdPartyStorageResource(
-        const QString  &libraryPath,
-        const QString  &storageUrl
+        const StorageFactoryPtrType &sf,
+        const QString               &storageUrl
     );
 
     QnThirdPartyStorageResource(); //designates invalid storagere source
@@ -58,11 +63,11 @@ public: // inherited interface overrides
     getFileList(const QString& dirName) override;
 
 private:
-    void openStorage(const char *storageUrl);
+    void openStorage(
+        const char                  *storageUrl,
+        const StorageFactoryPtrType &sf
+    );
 private:
-    QnLibrary                           m_lib;
-    create_qn_storage_factory_function  m_csf;
-    qn_storage_error_message_function   m_emf;
     StoragePtrType                      m_storage;
     mutable QMutex                      m_mutex;
     bool                                m_valid;

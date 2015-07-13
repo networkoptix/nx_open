@@ -258,6 +258,7 @@ namespace Qn
         ) override;
  
         virtual const char* STORAGE_METHOD_CALL storageType() const override;
+        virtual const char* lastErrorMessage(int ecode) const override;
 
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
