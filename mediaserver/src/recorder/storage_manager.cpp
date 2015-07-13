@@ -776,14 +776,21 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
 QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 startTime, qint64 endTime)
 {
     QnRecordingStatsReply result;
-    
-    QnResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID());
-    QnVirtualCameraResourceList cameras = qnResPool->getAllCameras(server, true);
-    for (const auto& camera: cameras) {
-        QnRecordingStatsData stats = getChunkStatisticsByCamera(startTime, endTime, camera->getUniqueId());
+    QSet<QString> cameras;
+    {
+        QMutexLocker lock(&m_mutexCatalog);
+        for(const auto& uniqueId: m_devFileCatalog[QnServer::HiQualityCatalog].keys())
+            cameras << uniqueId;
+        for(const auto& uniqueId: m_devFileCatalog[QnServer::LowQualityCatalog].keys())
+            cameras << uniqueId;
+    }
+
+    for (const auto& uniqueId: cameras) {
+        QnRecordingStatsData stats = getChunkStatisticsByCamera(startTime, endTime, uniqueId);
         QnCamRecordingStatsData data(stats);
-        data.id = camera->getId();
-        result.push_back(data);
+        data.uniqueId = uniqueId;
+        if (data.recordedBytes > 0)
+            result.push_back(data);
     }
     return result;
 }

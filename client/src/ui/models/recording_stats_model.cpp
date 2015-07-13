@@ -15,8 +15,8 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
     QnCamRecordingStatsData leftData = left.data(Qn::RecordingStatsDataRole).value<QnCamRecordingStatsData>();
     QnCamRecordingStatsData rightData = right.data(Qn::RecordingStatsDataRole).value<QnCamRecordingStatsData>();
 
-    bool isNulIDLeft = leftData.id.isNull();
-    bool isNulIDRight = rightData.id.isNull();
+    bool isNulIDLeft = leftData.uniqueId.isNull();
+    bool isNulIDRight = rightData.uniqueId.isNull();
     if (isNulIDLeft != isNulIDRight) {
         if (sortOrder() == Qt::AscendingOrder)
             return isNulIDLeft < isNulIDRight; // keep footer without ID at the last place
@@ -83,7 +83,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
     switch(index.column())
     {
         case CameraNameColumn:
-            return getResourceName(qnResPool->getResourceById(value.id));
+            return getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId));
         case BytesColumn:
             return QString::number(value.recordedBytes  / BYTES_IN_GB, 'f', PREC) + lit(" Gb");
         case DurationColumn:
@@ -122,7 +122,7 @@ QnResourcePtr QnRecordingStatsModel::getResource(const QModelIndex &index) const
     switch(index.column())
     {
     case CameraNameColumn:
-        return qnResPool->getResourceById(value.id);
+        return qnResPool->getResourceByUniqueId(value.uniqueId);
     default:
         return QnResourcePtr();
     }

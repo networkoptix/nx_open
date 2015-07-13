@@ -71,7 +71,7 @@ private:
     QScopedPointer<Ui::RecordingStatsDialog> ui;
     QnRecordingStatsModel *m_model;
 
-    QSet<int> m_requests;
+    QMap<int, QnUuid> m_requests;
 
     bool m_updateDisabled;
     bool m_dirty;
@@ -80,7 +80,8 @@ private:
     QAction *m_exportAction;
     QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
-    QnRecordingStatsReply m_allData;
+    QMap<QnUuid, QnRecordingStatsReply> m_allData; // key - serverId
+    QMap<QnUuid, QnRecordingStatsReply> m_hidenCameras; // hidden cameras by server
 
     QVector<QnStorageSpaceData> m_availStorages;
 private:

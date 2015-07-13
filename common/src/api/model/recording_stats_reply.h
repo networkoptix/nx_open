@@ -29,9 +29,9 @@ struct QnCamRecordingStatsData: public QnRecordingStatsData
     QnCamRecordingStatsData(): QnRecordingStatsData() {}
     QnCamRecordingStatsData(const QnRecordingStatsData& value): QnRecordingStatsData(value) {}
 
-    QnUuid id;
+    QString uniqueId;
 };
-#define QnCamRecordingStatsData_Fields (id) QnRecordingStatsData_Fields
+#define QnCamRecordingStatsData_Fields (uniqueId) QnRecordingStatsData_Fields
 
 QN_FUSION_DECLARE_FUNCTIONS(QnRecordingStatsData, (json))
 QN_FUSION_DECLARE_FUNCTIONS(QnCamRecordingStatsData, (json))
