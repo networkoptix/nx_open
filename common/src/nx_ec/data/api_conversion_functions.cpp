@@ -578,6 +578,7 @@ static QString serializeNetAddrList(const QList<QHostAddress>& netAddrList) {
 void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
+    dst.space = src->getTotalSpace();
     dst.spaceLimit = src->getSpaceLimit();
     dst.usedForWriting = src->isUsedForWriting();
     dst.storageType = src->getStorageType();

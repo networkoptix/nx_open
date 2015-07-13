@@ -160,6 +160,7 @@ CREATE TABLE `storages` (
   `systemId` varchar(45) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `etc` text,
+  `space` bigint(20) DEFAULT NULL,
   `spaceLimit` bigint(20) DEFAULT NULL,
   `usedForWriting` tinyint(1) DEFAULT NULL,
   `storageType` varchar(45) DEFAULT NULL

@@ -44,7 +44,7 @@ namespace ec2 {
         ApiStorageDataStatistics();
         ApiStorageDataStatistics(ApiStorageData&& data);
     };
-#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)(storageType)
+#define ApiStorageDataStatistics_Fields (id)(parentId)(space)(spaceLimit)(usedForWriting)(storageType)
 
     struct ApiMediaServerDataStatistics
 		: ApiMediaServerDataEx

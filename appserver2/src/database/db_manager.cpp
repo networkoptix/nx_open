@@ -1759,8 +1759,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorage
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_storage (space_limit, used_for_writing, storage_type, resource_ptr_id) \
-        VALUES (:spaceLimit, :usedForWriting, :storageType, :internalId)\
+        INSERT OR REPLACE INTO vms_storage (space, space_limit, used_for_writing, storage_type, resource_ptr_id) \
+        VALUES (:space, :spaceLimit, :usedForWriting, :storageType, :internalId)\
     ");
     QnSql::bind(tran.params, &insQuery);
     insQuery.bindValue(":internalId", internalId);
@@ -2949,7 +2949,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     queryStorage.setForwardOnly(true);
     queryStorage.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        s.space_limit as spaceLimit, s.used_for_writing as usedForWriting, s.storage_type as storageType \
+        s.space as space, s.space_limit as spaceLimit, s.used_for_writing as usedForWriting, s.storage_type as storageType \
         FROM vms_resource r \
         JOIN vms_storage s on s.resource_ptr_id = r.id \
         %1 \
