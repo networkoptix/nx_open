@@ -81,8 +81,9 @@ Base.Column
                 var name = item.adapterNameValue;
                 
                 var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
-                if (item.useDHCPControl.changed)
-                    rtuContext.changesManager().addDHCPChange(name, useDHCP);
+
+                /// Always send dhcp state due to serialization issue on the server side
+                rtuContext.changesManager().addDHCPChange(name, useDHCP);
 
                 if (!useDHCP)   /// do not send address and mask if dhcp is on
                 {
