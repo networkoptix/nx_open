@@ -18,4 +18,9 @@ QSize QnScaleImageFilter::updatedResolution(const QSize& srcSize)
     return m_size;
 }
 
+void QnScaleImageFilter::setOutputImageSize( const QSize& size )
+{
+    m_size = size;
+}
+
 #endif // ENABLE_DATA_PROVIDERS
