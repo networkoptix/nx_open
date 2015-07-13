@@ -127,7 +127,8 @@
     <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Port you specified is already occupied. Press 'Next' only if you know what you're doing.</String>    
 
     <!-- Product -->
-    <String Id="Product_LaunchClient"                               Overridable="yes">Launch ${display.product.name} when setup exits.</String>    
+    <String Id="Product_LaunchClient"                               Overridable="yes">Launch ${display.product.name} when setup exits.</String>
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">Launch ${display.product.name} when setup exits.</String>
     <String Id="Product_ArchMismatch"                               Overridable="yes">This package is designed for 32-bit OS. Setup will now exit.</String>
 
     <!-- SelectionWarningDlg -->
