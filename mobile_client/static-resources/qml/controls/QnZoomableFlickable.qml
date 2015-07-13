@@ -174,6 +174,8 @@ Item {
             initialContentY = flick.contentY
             flick.leftMargin = 0
             flick.topMargin = 0
+            flick.contentX = initialContentX
+            flick.contentY = initialContentY
         }
 
         onPinchUpdated: {
