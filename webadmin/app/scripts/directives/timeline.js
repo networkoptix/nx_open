@@ -18,8 +18,8 @@ angular.module('webadminApp')
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
                     minMsPerPixel: 1, // Minimum level for zooming:
 
-                    zoomSpeed: 0.05, // Zoom speed for buttons 0 -> 1 = full zoom
-                    maxVerticalScrollForZoom: 5000, // value for adjusting zoom
+                    zoomSpeed: 0.025, // Zoom speed for buttons 0 -> 1 = full zoom
+                    maxVerticalScrollForZoom: 50, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
                     animationDuration: 500, // 300, // 200-400 for smooth animation
 
@@ -39,6 +39,7 @@ angular.module('webadminApp')
                     },
                     topLabelMarkerColor: [83,112,127], // Color for mark for top label
                     topLabelBgColor: false,
+                    topLabelBgOddColor: false,
                     topLabelPositionFix:0, //Vertical fix for position
 
                     labelAlign:"above",// center, left, above
@@ -49,10 +50,13 @@ angular.module('webadminApp')
                         face:"Roboto",
                         color: [105,135,150] // Color for text for top labels
                     },
-                    labelMarkerColor:[28,35,39,0],//false
+                    labelMarkerColor:[83,112,127,0.6],//false
                     labelBgColor: [28,35,39],
                     labelPositionFix:-5, //Vertical fix for position
                     labelMarkerHeight:22/110,
+
+                    lowerMarksHeight:10/110,
+                    lowerMarksColor:[83,112,127,0.4],
 
                     chunkHeight:35/110, // %    //Height for event line
                     minChunkWidth: 1,
@@ -91,39 +95,52 @@ angular.module('webadminApp')
 
 
                 scope.presets = [{
-                    topLabelAlign: "left", // center, left, above
-                    topLabelMarkerColor: [105,135,150], // Color for mark for top label
-                    topLabelBgColor: false,
-
-                    labelAlign:"left",// center, left, above
-                    labelMarkerColor:[53,70,79],//false
-                    labelBgColor: [28,35,39]
-                },{
                     topLabelAlign: "center", // center, left, above
                     topLabelMarkerColor: [105,135,150], // Color for mark for top label
                     topLabelBgColor: false,
-
-                    labelAlign:"above",// center, left, above
-                    labelMarkerColor:[53,70,79],//false
-                    labelBgColor: [28,35,39]
-                },{
-                    topLabelAlign: "center", // center, left, above
-                    topLabelMarkerColor: [105,135,150], // Color for mark for top label
-                    topLabelBgColor: false,
+                    topLabelBgOddColor: false,
 
                     labelAlign:"above",// center, left, above
                     labelMarkerColor:[53,70,79,0],//false
-                    labelBgColor: [28,35,39]
+                    labelBgColor: [28,35,39],
+
+                    lowerMarksColor:[83,112,127,0]
+                },{
+                    topLabelAlign: "center", // center, left, above
+                    topLabelMarkerColor: [105,135,150], // Color for mark for top label
+                    topLabelBgColor: false,
+                    topLabelBgOddColor: false,
+
+                    labelAlign:"above",// center, left, above
+                    labelMarkerColor:[83,112,127,0.6],//false
+                    labelBgColor: [28,35,39],
+
+                    lowerMarksColor:[83,112,127,0]
                 },{
                     topLabelAlign: "left", // center, left, above
                     topLabelMarkerColor: [105,135,150], // Color for mark for top label
                     topLabelBgColor: false,
+                    topLabelBgOddColor: false,
 
-                    labelAlign:"above",// center, left, above
-                    labelMarkerColor:[53,70,79],//false
-                    labelBgColor: [28,35,39]
+                    labelAlign:"left",// center, left, above
+                    labelMarkerColor:[83,112,127,0.6],//false
+                    labelBgColor: [28,35,39],
+
+                    lowerMarksColor:[83,112,127,0.4]
+                },{
+                    topLabelAlign: "center", // center, left, above
+                    topLabelMarkerColor: [105,135,150], // Color for mark for top label
+                    topLabelBgColor: [43,56,63],
+                    topLabelBgOddColor: [33,42,47],
+
+                    labelAlign:"left",// center, left, above
+                    labelMarkerColor:[83,112,127,0.6],//false
+                    labelBgColor: [28,35,39,0],
+
+
+                    lowerMarksColor:[83,112,127,0.4]
                 }];
-                scope.activePreset = scope.presets[1];
+                scope.activePreset = null;
                 scope.selectPreset = function(preset){
                     scope.activePreset = preset;
                     scope.timelineConfig = $.extend(scope.timelineConfig, preset);
@@ -196,6 +213,8 @@ angular.module('webadminApp')
                     var context = clearTimeline();
                     drawTopLabels(context);
                     drawLabels(context);
+                    drawLowerMarks(context);
+
                     drawEvents(context);
                     drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
@@ -261,6 +280,7 @@ angular.module('webadminApp')
                         timelineConfig.topLabelFont,
                         timelineConfig.topLabelAlign,
                         timelineConfig.topLabelBgColor,
+                        timelineConfig.topLabelBgOddColor,
                         timelineConfig.topLabelMarkerColor,
                         timelineConfig.topLabelPositionFix,
                         0,
@@ -291,6 +311,7 @@ angular.module('webadminApp')
                         timelineConfig.labelFont,
                         timelineConfig.labelAlign,
                         timelineConfig.labelBgColor,
+                        timelineConfig.labelBgColor,
                         timelineConfig.labelMarkerColor,
                         timelineConfig.labelPositionFix,
                         timelineConfig.topLabelHeight + timelineConfig.labelHeight - timelineConfig.labelMarkerHeight,
@@ -298,9 +319,41 @@ angular.module('webadminApp')
 
                 }
 
+
+                var currentLowerMarksLevelIndex = 0;
+                var targetLowerMarksLevelIndex = 0;
+                scope.changingLowerMarksLevel = 1;
+                function drawLowerMarks(context){
+                    var instantLevelIndex = scope.scaleManager.levels.lowerMarks.index;
+                    if(instantLevelIndex != targetLowerMarksLevelIndex){ // Start animation here
+                        targetLowerMarksLevelIndex = instantLevelIndex;
+                        animateScope.progress(scope,'changingLowerMarksLevel').then(function(){
+
+                            currentLowerMarksLevelIndex = targetLowerMarksLevelIndex;
+                        });
+                    }
+
+                    drawLabelsRow(
+                        context,
+                        currentLowerMarksLevelIndex,
+                        targetLowerMarksLevelIndex,
+                        scope.changingLowerMarksLevel,
+                        false,// No format
+                        timelineConfig.topLabelHeight,
+                        timelineConfig.labelHeight,
+                        null,//font
+                        null,//align
+                        null,//no bg label
+                        null,//no bg label
+                        timelineConfig.lowerMarksColor,
+                        0,
+                        timelineConfig.topLabelHeight + timelineConfig.labelHeight - timelineConfig.lowerMarksHeight,
+                        timelineConfig.topLabelHeight + timelineConfig.labelHeight );
+                }
+
                 function drawLabelsRow (context, currentLevelIndex, taretLevelIndex, animation,
                                         labelFormat, levelTop, levelHeight,
-                                        font, labelAlign, bgColor,  markColor, labelPositionFix, markTop, markBottom){
+                                        font, labelAlign, bgColor, bgOddColor, markColor, labelPositionFix, markTop, markBottom){
 
                     var levelIndex = Math.max(currentLevelIndex, taretLevelIndex);
                     var level = RulerModel.levels[levelIndex]; // Actual calculating level
@@ -316,9 +369,10 @@ angular.module('webadminApp')
                         console.error("broken Date",checkDate(start), checkDate(end));
                     }
 
-
-                    var counter = 100;
+                    var odd = false;
+                    var counter = 1000;
                     while(start <= end && counter-- > 0){
+                        odd = !odd;
                         var pointLevelIndex = RulerModel.findBestLevelIndex(start);
                         var alpha = 1;
                         if(pointLevelIndex > taretLevelIndex){ //fade out
@@ -327,7 +381,7 @@ angular.module('webadminApp')
                             alpha =  animation;
                         }
                         drawLabel(context,start,level,alpha,
-                                        labelFormat, levelTop, levelHeight, font, labelAlign, bgColor,  markColor, labelPositionFix, markTop, markBottom);
+                                        labelFormat, levelTop, levelHeight, font, labelAlign, odd?bgColor: bgOddColor, markColor, labelPositionFix, markTop, markBottom);
                         var newStart = level.interval.addToDate(start);
 
                         if(!(checkDate(start)|| checkDate(newStart))){
@@ -336,61 +390,74 @@ angular.module('webadminApp')
                         start = newStart;
                     }
                     if(counter < 1){
-                        console.log("problem!", start1, start, end, level);
+                        console.error("problem!", start1, start, end, level);
                     }
                 }
                 function drawLabel( context, date, level, alpha,
-                                        labelFormat, levelTop, levelHeight, font, labelAlign, bgColor,  markColor, labelPositionFix, markTop, markBottom){
-
-                    context.font = formatFont(font);
-
-                    var nextDate = level.interval.addToDate(date);
-                    var stopcoordinate = scope.scaleManager.dateToScreenCoordinate(nextDate);
-                    var nextLabel = dateFormat(new Date(nextDate), level[labelFormat]);
-                    var nextWidth = context.measureText(nextLabel).width;
+                                        labelFormat, levelTop, levelHeight, font, labelAlign, bgColor, markColor, labelPositionFix, markTop, markBottom){
 
                     var coordinate = scope.scaleManager.dateToScreenCoordinate(date);
-                    var label = dateFormat(new Date(date), level[labelFormat]);
-                    var textWidth = context.measureText(label).width;
 
-                    var textStart = levelTop * scope.viewportHeight // Top border
-                        + (levelHeight * scope.viewportHeight  - font.size) / 2 // Top padding
-                        + font.size + labelPositionFix; // Font size
+                    if(labelFormat) {
+                        context.font = formatFont(font);
 
-                    var x = 0;
-                    switch(labelAlign){
-                        case "center":
-                            var leftbound = Math.max(0,coordinate);
-                            var rightbound = Math.min(stopcoordinate, scope.viewportWidth);
-                            var center = (leftbound + rightbound) / 2;
+                        var nextDate = level.interval.addToDate(date);
+                        var stopcoordinate = scope.scaleManager.dateToScreenCoordinate(nextDate);
+                        var nextLabel = dateFormat(new Date(nextDate), level[labelFormat]);
+                        var nextWidth = context.measureText(nextLabel).width;
 
-                            x = scope.scaleManager.bound(
-                                    coordinate + timelineConfig.labelPadding,
-                                    center - textWidth / 2,
-                                    stopcoordinate - textWidth - timelineConfig.labelPadding
-                            );
+                        var label = dateFormat(new Date(date), level[labelFormat]);
+                        var textWidth = context.measureText(label).width;
 
-                            break;
+                        var textStart = levelTop * scope.viewportHeight // Top border
+                            + (levelHeight * scope.viewportHeight - font.size) / 2 // Top padding
+                            + font.size + labelPositionFix; // Font size
 
-                        case "left":
-                            x = scope.scaleManager.bound(
-                                timelineConfig.labelPadding,
-                                coordinate + timelineConfig.labelPadding,
-                                stopcoordinate - textWidth - timelineConfig.labelPadding
-                            );
+                        var x = 0;
+                        switch (labelAlign) {
+                            case "center":
+                                var leftbound = Math.max(0, coordinate);
+                                var rightbound = Math.min(stopcoordinate, scope.viewportWidth);
+                                var center = (leftbound + rightbound) / 2;
 
-                            break;
+                                x = scope.scaleManager.bound(
+                                        coordinate + timelineConfig.labelPadding,
+                                        center - textWidth / 2,
+                                        stopcoordinate - textWidth - timelineConfig.labelPadding
+                                );
 
-                        case "above":
-                        default:
-                            x = scope.scaleManager.bound(
-                                timelineConfig.labelPadding,
-                                coordinate - textWidth / 2,
-                                stopcoordinate - nextWidth / 2 - textWidth - timelineConfig.labelPadding
-                            );
-                            break;
+                                break;
+
+                            case "left":
+                                x = scope.scaleManager.bound(
+                                    timelineConfig.labelPadding,
+                                        coordinate + timelineConfig.labelPadding,
+                                        stopcoordinate - textWidth - timelineConfig.labelPadding
+                                );
+
+                                break;
+
+                            case "above":
+                            default:
+                                x = scope.scaleManager.bound(
+                                    timelineConfig.labelPadding,
+                                        coordinate - textWidth / 2,
+                                        stopcoordinate - nextWidth / 2 - textWidth - timelineConfig.labelPadding
+                                );
+                                break;
+                        }
                     }
 
+                    if(bgColor) {
+                        context.fillStyle = blurColor(bgColor, alpha);
+
+                        switch (labelAlign) {
+                            case "center": // fill the whole interval
+                            case "left":
+                                context.fillRect(coordinate, markTop * scope.viewportHeight, stopcoordinate - coordinate, (markBottom - markTop) * scope.viewportHeight); // above
+                                break;
+                        }
+                    }
 
                     if(markColor) {
                         context.strokeStyle = blurColor(markColor, alpha);
@@ -402,11 +469,21 @@ angular.module('webadminApp')
 
                     if(bgColor) {
                         context.fillStyle = blurColor(bgColor, alpha);
-                        context.fillRect(x, textStart - font.size, textWidth, font.size);
+                        switch (labelAlign) {
+                            case "center": // fill the whole interval
+                            case "left":
+                                break;
+                            case "above":
+                            default:
+                                context.fillRect(x, textStart - font.size, textWidth, font.size); // above
+                                break;
+                        }
                     }
 
-                    context.fillStyle = blurColor(font.color, alpha);
-                    context.fillText(label, x, textStart);
+                    if(labelFormat) {
+                        context.fillStyle = blurColor(font.color, alpha);
+                        context.fillText(label, x, textStart);
+                    }
                 }
 
                 // !!! Draw events
@@ -601,23 +678,17 @@ angular.module('webadminApp')
                             // We need to smooth zoom here
                             scope.zoomTarget = scope.scaleManager.zoom();
                             var zoomTarget = scope.zoomTarget - event.deltaY / timelineConfig.maxVerticalScrollForZoom;
-                            console.log("zoom", event.deltaY, scope.zoomTarget, zoomTarget);
 
-                            scope.scaleManager.zoomAroundDate(
-                                zoomTarget,
-                                scope.scaleManager.screenCoordinateToDate(mouseCoordinate)
-                            );
-                            /*animateScope.animate(scope,"zoomTarget",zoomTarget).then(
+                            animateScope.animate(scope,"zoomTarget",zoomTarget).then(
                                 function(){},
                                 function(){},
                                 function(value){
-                                    console.log("animate zoom",value,zoomTarget,scope.zoomTarget);
                                     scope.scaleManager.zoomAroundDate(
                                         value,
                                         scope.scaleManager.screenCoordinateToDate(mouseCoordinate)
                                     );
                                 }
-                            );*/
+                            );
                         }
                     } else {
                         scope.scaleManager.scrollByPixels(event.deltaX);
@@ -693,10 +764,8 @@ angular.module('webadminApp')
                 scope.zoom = function(zoomIn){
                     scope.zoomTarget = scope.scaleManager.zoom();
                     var zoomTarget = scope.zoomTarget - (zoomIn?1:-1) * timelineConfig.zoomSpeed;
-                    console.log("start animate zoom", scope.zoomTarget, zoomTarget);
                     animateScope.animate(scope,"zoomTarget",zoomTarget).then(function(){},function(){},
                         function(value){
-                            console.log("animate zoom", scope.zoomTarget, zoomTarget, value);
                             scope.scaleManager.zoom(value);
                         }
                     );

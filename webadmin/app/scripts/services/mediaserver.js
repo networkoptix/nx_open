@@ -92,8 +92,8 @@ angular.module('webadminApp')
             previewUrl:function(cameraPhysicalId,time,width,height){
                 return proxy + '/api/image' +
                     '?physicalId=' + cameraPhysicalId +
-                    (width? '&width=' + width:'') +
-                    (height? '&height=' + height:'') +
+                    //(width? '&width=' + width:'') +
+                    //(height? '&height=' + height:'') +
                     ('&time=' + (time || 'NOW')); // mb LATEST?
 
             },

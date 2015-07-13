@@ -141,8 +141,8 @@ var RulerModel = {
      * @type {{detailization: number}[]}
      */
     levels: [
-        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy' , width: 30 , topWidth: 0, topFormat:'yyyy' }, // root
-        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy' , width: 30 },
+        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy' , width: 30 , lowerWidth: 15, topWidth: 0, topFormat:'yyyy' }, // root
+        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy' , width: 30 , lowerWidth: 15},
         {
             name:'Year', //Years
             format:'yyyy',//Format string for date
@@ -151,26 +151,26 @@ var RulerModel = {
             topWidth: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
-        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , width: 90 },
-        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , width: 90 },
-        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , width: 90 , topWidth: 170, topFormat:'mmmm yyyy'},
-        //{ name:'15 Days'    , interval:  new Interval(  0, 0, 0, 0,15, 0, 0), format:'dd'   , width: 60 },
-        //{ name:'5 Days'     , interval:  new Interval(  0, 0, 0, 0, 5, 0, 0), format:'dd'   , width: 60 },
-        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , width: 30 , topWidth: 170, topFormat:'d mmmm yyyy' },
-        { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH"h"', width: 100 },
-        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH"h"', width: 80 },
-        { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH"h"', width: 80 },
-        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH"h"', width: 80 },
-        { name:'30 minutes' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', width: 80 },
-        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', width: 80 },
-        { name:'5 minutes'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', width: 80 },
-        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', width: 80 , topWidth: 170, topFormat:'d mmmm yyyy HH:MM' },
-        { name:'30 seconds' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', width: 100 },
-        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', width: 80 },
-        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', width: 70 },
-        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', width: 60 , topWidth: 200, topFormat:'d mmmm yyyy HH:MM:ss' },
-        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', width: 120 },
-        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', width: 80 }
+        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , width: 90 , lowerWidth: 15},
+        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , width: 90 , lowerWidth: 15},
+        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , width: 90 , lowerWidth: 15, topWidth: 170, topFormat:'mmmm yyyy'},
+        //{ name:'15 Days'    , interval:  new Interval(  0, 0, 0, 0,15, 0, 0), format:'dd'   , width: 60 , lowerWidth: 15},
+        //{ name:'5 Days'     , interval:  new Interval(  0, 0, 0, 0, 5, 0, 0), format:'dd'   , width: 60 , lowerWidth: 15},
+        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , width: 30 , lowerWidth: 5, topWidth: 170, topFormat:'d mmmm yyyy'},
+        { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH"h"', width: 100, lowerWidth: 40},
+        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH"h"', width: 80 , lowerWidth: 40},
+        { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH"h"', width: 80 , lowerWidth: 40},
+        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH"h"', width: 80 , lowerWidth: 40},
+        { name:'30 minutes' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', width: 80 , lowerWidth: 40},
+        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', width: 80 , lowerWidth: 40},
+        { name:'5 minutes'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', width: 80 , lowerWidth: 40},
+        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', width: 80 , lowerWidth: 40, topWidth: 170, topFormat:'d mmmm yyyy HH:MM'},
+        { name:'30 seconds' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', width: 100, lowerWidth: 40},
+        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', width: 80 , lowerWidth: 40},
+        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', width: 70 , lowerWidth: 40},
+        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', width: 60 , lowerWidth: 40, topWidth: 200, topFormat:'d mmmm yyyy HH:MM:ss'},
+        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', width: 120, lowerWidth: 40},
+        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', width: 80 , lowerWidth: 40}
     ],
 
     getLevelIndex: function(searchdetailization,width){
@@ -717,9 +717,10 @@ function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initial
     this.minMsPerPixel = minMsPerPixel;
 
     this.levels = {
-        topLabels:{index:0,level:RulerModel.levels[0]},
-        labels: {index:0,level:RulerModel.levels[0]},
-        events: {index:0,level:RulerModel.levels[0]}
+        topLabels:  {index:0,level:RulerModel.levels[0]},
+        labels:     {index:0,level:RulerModel.levels[0]},
+        lowerMarks: {index:0,level:RulerModel.levels[0]},
+        events:     {index:0,level:RulerModel.levels[0]}
     };
 
 // Setup total boundaries
@@ -843,6 +844,10 @@ ScaleManager.prototype.updateLevels = function() {
 
         if (pixelsPerLevel >= level.width) {
             levels.labels = {index:i,level:level};
+        }
+
+        if (pixelsPerLevel >= level.lowerWidth) {
+            levels.lowerMarks = {index:i,level:level};
         }
 
         if (pixelsPerLevel >= 1) {
@@ -991,7 +996,6 @@ ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (fro
         return this.msToZoom(this.msPerPixel);
     }
     this.msPerPixel = this.zoomToMs(zoomValue);
-    console.log("zoom",this.msPerPixel,this.minMsPerPixel,zoomValue);
     this.updateCurrentInterval();
 };
 ScaleManager.prototype.zoomAroundDate = function(zoomValue, aroundDate){
