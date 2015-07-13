@@ -919,6 +919,9 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 startTime, qint64 e
     QnRecordingStatsData result;
     QMutexLocker lock(&m_mutex);
 
+    if (!m_chunks.empty())
+        result.archiveStartTimeMs = m_chunks[0].startTimeMs;
+
     auto itrLeft = qLowerBound(m_chunks.cbegin(), m_chunks.cend(), startTime);
     auto itrRight = qUpperBound(itrLeft, m_chunks.cend(), endTime);
     

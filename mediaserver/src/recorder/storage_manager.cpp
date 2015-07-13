@@ -812,6 +812,16 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 startTime, 
     QMutexLocker lock1(&catalogHi->m_mutex);
     QMutexLocker lock2(&catalogLow->m_mutex);
 
+    if (catalogHi && !catalogHi->m_chunks.empty())
+        result.archiveStartTimeMs = catalogHi->m_chunks[0].startTimeMs;
+    if (catalogLow && !catalogLow->m_chunks.empty()) {
+        if (result.archiveStartTimeMs == -1)
+            result.archiveStartTimeMs = catalogLow->m_chunks[0].startTimeMs;
+        else
+            result.archiveStartTimeMs = qMin(result.archiveStartTimeMs, catalogLow->m_chunks[0].startTimeMs);
+    }
+
+
     auto itrHiLeft = qLowerBound(catalogHi->m_chunks.cbegin(), catalogHi->m_chunks.cend(), startTime);
     auto itrHiRight = qUpperBound(itrHiLeft, catalogHi->m_chunks.cend(), endTime);
 

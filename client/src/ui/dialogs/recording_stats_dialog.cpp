@@ -27,6 +27,13 @@
 #include "utils/common/event_processors.h"
 #include <utils/common/scoped_painter_rollback.h>
 #include "utils/math/color_transformations.h"
+#include "utils/common/synctime.h"
+
+namespace {
+    const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
+    const qint64 SECS_PER_DAY = 3600 * 24;
+    const qint64 SECS_PER_WEEK = SECS_PER_DAY * 7;
+}
 
 void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
@@ -339,8 +346,95 @@ void QnRecordingStatsDialog::setVisible(bool value)
     QDialog::setVisible(value);
 }
 
+qreal cameraAvaregaScheduleUsage(const QnSecurityCamResourcePtr& cameRes)
+{
+    qreal coeff = 0.0;
+    for (const QnScheduleTask& task: cameRes->getScheduleTasks()) {
+        if (task.getRecordingType() != Qn::RT_Never)
+            coeff += (task.getEndTime() - task.getStartTime()) / (qreal) SECS_PER_WEEK;
+    }
+    return coeff;
+}
+
 QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBytes)
 {
-    QnRecordingStatsReply realData = m_model->modelData();
-    return QnRecordingStatsReply();
+    QnRecordingStatsReply modelData = m_model->modelData();
+    ServerForecast serverStats; // key is a server
+    CameraForecast cameraStats; // key is a camera
+    qint64 currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+
+    // 1. collect primary stats: how many days and archive spend per server
+    for(const auto& camera: modelData) 
+    {
+        if (camera.id.isNull())
+            continue;
+        QnSecurityCamResourcePtr camRes = qnResPool->getResourceById<QnSecurityCamResource>(camera.id);
+        if (!camRes)
+            continue;
+
+        cameraStats[camera.id].archiveDays = (currentTimeMs - camera.archiveStartTimeMs + MSECS_PER_DAY/2) / MSECS_PER_DAY;
+        cameraStats[camera.id].averegeScheduleUsing = cameraAvaregaScheduleUsage(camRes);
+        serverStats[camRes->getParentId()].camerasByServer << camera;
+    }
+
+    // 2. collect 'spaceForArchive' value: how many space we will have taking into account full storage usage and extraSize variable
+    for (const auto& storageSpaceData: m_availStorages) 
+    {
+        QnResourcePtr storageRes = qnResPool->getResourceById(storageSpaceData.storageId);
+        if (!storageRes)
+            continue;
+        if (storageSpaceData.isUsedForWriting && storageSpaceData.isWritable) 
+        {
+            auto itr = serverStats.find(storageRes->getParentId());
+            if (itr != serverStats.end())
+                itr.value().extraSpace = qMax(0ll, storageSpaceData.freeSpace - storageSpaceData.reservedSpace);
+        }
+    }
+    for (auto& value: serverStats)
+        value.extraSpace += extraSizeBytes;
+
+    
+    // 3. Start spend extraSpace  (do forecast)
+    doForecastMainStep(serverStats, cameraStats, modelData);
+
+    return modelData;
+}
+
+void QnRecordingStatsDialog::doForecastMainStep(ServerForecast& serverStats, CameraForecast& cameraStats, QnRecordingStatsReply& modelData)
+{
+    for (auto& forecastData: serverStats)
+    {
+        // Go to the future, one step is a one day and spend extraSpace
+        qint64 prevExtraSpace = -1;
+        while (forecastData.extraSpace > 0 && forecastData.extraSpace != prevExtraSpace)
+        {
+            prevExtraSpace = forecastData.extraSpace;
+            for (const auto& camera: forecastData.camerasByServer)
+            {
+                QnSecurityCamResourcePtr camRes = qnResPool->getResourceById<QnSecurityCamResource>(camera.id);
+                if (!camRes)
+                    continue;
+                if (camRes->isScheduleDisabled())
+                    continue; // this camera not recording, so it doesn't spend extra archive
+                if (camRes->maxDays() > 0 && camRes->maxDays() > cameraStats[camera.id].archiveDays)
+                    continue; // this camera reached the limit of max recorded archive days
+                if (camRes->getStatus() != Qn::Online && camRes->getStatus() != Qn::Recording)
+                    continue; // this camera doesn't recording and doesn't spend archive also
+                cameraStats[camRes->getId()].archiveDays++; // spend one more calendar day
+                qint64 bitrate = camera.recordedBytes / camera.recordedSecs; // bitrate in bytes/sec
+                qint64 bytesPerDay = bitrate * SECS_PER_DAY;
+                qreal recCoeff = cameraStats[camera.id].averegeScheduleUsing; // it's addition coeff corresponding to camera schedule. If camera writes 1 hour per day, it'll give 1/24.0 value
+                bytesPerDay *= recCoeff;
+                for (auto& cameraStats: modelData) {
+                    if (cameraStats.id == camera.id) {
+                        modelData[0].recordedBytes += bytesPerDay;
+                        modelData[0].recordedSecs += 1.0 / recCoeff;
+                        break;
+                    }
+                }
+
+                forecastData.extraSpace -= bytesPerDay;
+            }
+        }
+    }
 }

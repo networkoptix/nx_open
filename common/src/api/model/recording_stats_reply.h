@@ -9,11 +9,12 @@
 struct QnRecordingStatsData
 {
 public:
-    QnRecordingStatsData(): recordedBytes(0), recordedSecs(0), averageBitrate(0) {}
+    QnRecordingStatsData(): recordedBytes(0), recordedSecs(0), averageBitrate(0), archiveStartTimeMs(-1) {}
 
-    qint64 recordedBytes;  // recorded archive in bytes
+    qint64 recordedBytes;    // recorded archive in bytes
     qint64 recordedSecs;     // recorded archive in seconds
-    qint64 averageBitrate; // average bitrate in bytes/sec
+    qint64 averageBitrate;   // average bitrate in bytes/sec
+    qint64 archiveStartTimeMs; // timestamp of the first record in archive
     
     void operator +=(const QnRecordingStatsData& right) {
         recordedBytes += right.recordedBytes;
@@ -21,7 +22,7 @@ public:
     }
 
 };
-#define QnRecordingStatsData_Fields (recordedBytes)(recordedSecs)(averageBitrate)
+#define QnRecordingStatsData_Fields (recordedBytes)(recordedSecs)(averageBitrate)(archiveStartTimeMs)
 
 struct QnCamRecordingStatsData: public QnRecordingStatsData
 {
