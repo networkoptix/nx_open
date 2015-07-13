@@ -19,7 +19,7 @@ Item {
     property real timelineTextMargin: timeline.height - timeline.chunkBarHeight
     property real cursorWidth: dp(2)
 
-    property real videoBottomMargin: visible ? (timeline.chunkBarHeight + navigationPanel.height - navigator.y) : 0
+    property real videoBottomMargin: timeline.chunkBarHeight + navigationPanel.height - navigator.y
 
     readonly property var _locale: Qt.locale()
 
@@ -67,7 +67,7 @@ Item {
                 anchors.bottom: timeline.bottom
                 anchors.bottomMargin: timeline.chunkBarHeight
                 sourceSize.height: timeline.height - timeline.chunkBarHeight + playbackController.height / 2
-                source: "image://icon/timeline_gradient.png"
+                source: "qrc:///images/timeline_gradient.png"
             }
 
             QnTimeline {

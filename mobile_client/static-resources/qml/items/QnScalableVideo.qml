@@ -63,7 +63,7 @@ QnZoomableFlickable {
             if (!d.stick)
                 return
 
-            zf.animateToSize(zf.width, zf.height)
+            zf.fitToBounds()
         }
     }
 
@@ -79,4 +79,8 @@ QnZoomableFlickable {
 
     onWidthChanged: d.autoSize()
     onHeightChanged: d.autoSize()
+
+    function fitToBounds() {
+        animateToSize(zf.width, zf.height)
+    }
 }

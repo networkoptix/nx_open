@@ -110,6 +110,9 @@ function gotoResources() {
 }
 
 function gotoMainScreen() {
+    toolBar.opacity = 1.0
+    toolBar.backgroundOpacity = 1.0
+
     if (connectionManager.connected)
         gotoResources()
     else
@@ -121,6 +124,7 @@ function openMediaResource(uuid) {
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
+    toolBar.backgroundOpacity = 0.0
     stackView.push(videoPlayerComponent)
 }
 

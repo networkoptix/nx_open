@@ -18,6 +18,9 @@ Item {
     readonly property alias contentX: flick.contentX
     readonly property alias contentY: flick.contentY
 
+    signal clicked()
+    signal doubleClicked()
+
     function animateToSize(width, height) {
         flick.animateToSize(width, height)
     }
@@ -154,7 +157,7 @@ Item {
     PinchArea {
         id: pinchArea
 
-	parent: flick
+        parent: flick
 
         anchors.fill: flick
 
@@ -195,6 +198,13 @@ Item {
 
         onPinchFinished: {
             flick.animateToBounds()
+        }
+
+        MouseArea {
+            anchors.fill: parent
+
+            onClicked: rootItem.clicked()
+            onDoubleClicked: rootItem.doubleClicked()
         }
     }
 }

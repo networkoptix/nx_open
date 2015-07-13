@@ -47,9 +47,18 @@ QnPage {
         id: video
 
         anchors.fill: parent
+        anchors.topMargin: -toolBar.height
         anchors.bottomMargin: videoNavigation.videoBottomMargin
+        Behavior on anchors.bottomMargin { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
         source: mediaPlayer.mediaPlayer
+
+        onClicked: {
+            if (videoNavigation.visible)
+                hideUi()
+            else
+                showUi()
+        }
     }
 
     QnMediaPlayer {
@@ -60,10 +69,26 @@ QnPage {
     QnVideoNavigation {
         id: videoNavigation
         mediaPlayer: mediaPlayer
+
+        visible: opacity > 0
+        opacity: 1.0
+        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
     }
 
     Component.onCompleted: {
         mediaPlayer.playLive()
+    }
+
+    function hideUi() {
+        videoNavigation.opacity = 0.0
+        toolBar.opacity = 0.0
+        video.anchors.bottomMargin = 0
+    }
+
+    function showUi() {
+        videoNavigation.opacity = 1.0
+        toolBar.opacity = 1.0
+        video.anchors.bottomMargin = Qt.binding(function() { return videoNavigation.videoBottomMargin; })
     }
 
     focus: true
