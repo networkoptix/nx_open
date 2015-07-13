@@ -65,6 +65,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     if (changePortResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("PORT"));
+        port = 0;   //not switching port
     }
 
     /* set password */
