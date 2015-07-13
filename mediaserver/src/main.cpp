@@ -766,7 +766,7 @@ int serverMain(int argc, char *argv[])
     ffmpegInit();
     using namespace std::placeholders;
     for (const auto storagePlugin : 
-         PluginManager::instance()->findNxPlugins<Qn::StorageFactory>(Qn::IID_StorageFactory))
+         PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
         QnStoragePluginFactory::instance()->registerStoragePlugin(
             storagePlugin->storageType(),
