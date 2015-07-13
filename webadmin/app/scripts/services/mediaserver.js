@@ -94,7 +94,7 @@ angular.module('webadminApp')
                     '?physicalId=' + cameraPhysicalId +
                     (width? '&width=' + width:'') +
                     (height? '&height=' + height:'') +
-                    (time? '&time=' + time : '');
+                    ('&time=' + (time || 'NOW')); // mb LATEST?
 
             },
             hasProxy:function(){

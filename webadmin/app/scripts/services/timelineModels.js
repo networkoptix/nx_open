@@ -712,10 +712,10 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (zoomBase, minmsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth){
-    this.minMsPerPixel = minmsPerPixel;
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth){
     this.absMaxMsPerPixel = maxMsPerPixel;
-    this.zoomBase = zoomBase;
+    this.minMsPerPixel = minMsPerPixel;
+
     this.levels = {
         topLabels:{index:0,level:RulerModel.levels[0]},
         labels: {index:0,level:RulerModel.levels[0]},
@@ -773,6 +773,7 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.visibleStart = Math.round(this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint);
     this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));
 
+
     if(this.visibleStart < this.start){
         //Move end
         this.visibleEnd += this.start - this.visibleStart;
@@ -803,7 +804,9 @@ ScaleManager.prototype.tryToSetLiveDate = function(date){
 ScaleManager.prototype.tryToRestoreAnchorDate = function(date){
     var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
     if(0 <= targetPoint && targetPoint <= 1){
-        this.setAnchorDateAndPoint(date, targetPoint);
+        //this.setAnchorDateAndPoint(date, targetPoint);
+        this.anchorDate = date;
+        this.anchorPoint = targetPoint;
     }
 };
 
@@ -850,7 +853,7 @@ ScaleManager.prototype.updateLevels = function() {
             break;
         }
     }
-    if(levels.topLabels.index == levels.labels.index){
+    if(levels.topLabels.index == levels.labels.index && levels.topLabels.index > 0){
         do{
             levels.topLabels.index --;
             levels.topLabels.level = RulerModel.levels[levels.topLabels.index];
@@ -905,27 +908,90 @@ ScaleManager.prototype.scrollByPixels = function(pixels){
 
 
 // These two function implements logarifmic scale for zoom
-ScaleManager.prototype.logRelative = function(val){
-    return Math.log(val)/this.zoomBase + 1;
+/*ScaleManager.prototype.logRelative = function(val){
+    return Math.log((Math.exp(this.zoomBase) - 1) * val + 1)/this.zoomBase;
 };
 ScaleManager.prototype.expRelative = function(val){
-    return Math.exp(this.zoomBase * (val-1) );
+    return (Math.exp(this.zoomBase * val) - 1)/(Math.exp(this.zoomBase) - 1);
+};*/
+
+
+/*
+ * Details about zoom logic:
+ * Main internal parameters, responsible for actual zoom is msPerPixel - number of miliseconds per one pixel on the screen, it changes from minMsPerPixel to absMaxMsPerPixel
+ * Both extreme values are unreachable: we can't zoom out to years if we have archive only for two months. And we can't zoom to 0 ms/pixel (infinite width of the timeline)
+ *
+ * So there are actual minimum and maximum values for msPerPixel.
+ *
+ * Outer code operates with zoom as relative value from 0 to 1 and we have to translate that value to msPerPixel with some function.
+ *
+ * Our changing zoom is proportional to actual msPerPixel
+ *
+ * So, finally we have differential equation:
+ *
+ * X - msPerPixel
+ * z - zoom
+ *
+ * Xmin = minMsPerPixel
+ * Xmax = maxMsPerPixel
+ *
+ *
+ * x'(z)*dz = k*x(z)
+ * x(0) = Xmin
+ * x(1) = Xmax
+ * z € [0,1]
+ *
+ * x(z) = C*e^(k*z)
+ * x(0) = Xmin = C
+ * x(1) = Xmax = Xmin * e^k
+ * k = ln(Xmax/Xmin)
+ *
+ * x(z) = Xmin * e^( ln(Xmax/Xmin) * z) = Xmin * (Xmax/Xmin) ^ z
+  *
+  * Wow!
+  *
+  * z(x) = ln(x/Xmin) / ln (Xmax/Xmin)
+  *
+  * Rejoice!
+  *
+ **/
+
+/*
+// These two function implements logarifmic scale for zoom
+ScaleManager.prototype.logRelative = function(relMsPerPixel){
+    relMsPerPixel = this.bound(0, relMsPerPixel, 1);
+    var zoom = Math.log( relMsPerPixel * (Math.exp(this.zoomBase) - 1) + 1 ) / this.zoomBase;
+    return zoom;
+};
+ScaleManager.prototype.expRelative = function(zoom){
+    zoom = this.bound(0, zoom, 1);
+    var relMsPerPixel = (Math.exp(this.zoomBase * zoom) - 1)/(Math.exp(this.zoomBase) - 1);
+    return relMsPerPixel;
+};
+*/
+
+
+ScaleManager.prototype.zoomToMs = function(zoom){
+    // x(z) = Xmin * e^( ln(Xmax/Xmin) * z) = Xmin * (Xmax/Xmin) ^ z
+    var msPerPixel = this.minMsPerPixel * Math.pow(this.absMaxMsPerPixel / this.minMsPerPixel,zoom);
+    return this.bound(this.minMsPerPixel, msPerPixel, this.maxMsPerPixel);
+};
+ScaleManager.prototype.msToZoom = function(ms){
+    // z(x) = ln(x/Xmin) / ln (Xmax/Xmin)
+    var zoom = Math.log(ms/this.minMsPerPixel) / Math.log(this.absMaxMsPerPixel / this.minMsPerPixel);
+    return zoom;
 };
 
-ScaleManager.prototype.zoomToMs= function(zoom){
-    var relPixels = this.expRelative(zoom);
-    return this.minMsPerPixel + relPixels * (this.absMaxMsPerPixel -  this.minMsPerPixel);
-};
-ScaleManager.prototype.msToZoom  = function(pixels){
-    var relPixels = (pixels - this.minMsPerPixel)/(this.absMaxMsPerPixel -  this.minMsPerPixel);
-    return this.logRelative(relPixels);
-};
 
+ScaleManager.prototype.availableZoomProportion = function(){
+    return (this.msToZoom(this.maxMsPerPixel) - this.msToZoom(this.minMsPerPixel)) / this.msToZoom(this.absMaxMsPerPixel);
+};
 ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
     if(typeof(zoomValue)=="undefined"){
         return this.msToZoom(this.msPerPixel);
     }
     this.msPerPixel = this.zoomToMs(zoomValue);
+    console.log("zoom",this.msPerPixel,this.minMsPerPixel,zoomValue);
     this.updateCurrentInterval();
 };
 ScaleManager.prototype.zoomAroundDate = function(zoomValue, aroundDate){

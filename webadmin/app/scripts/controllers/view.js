@@ -65,13 +65,13 @@ angular.module('webadminApp').controller('ViewCtrl',
             var positionHls = !live ? "&startTimestamp=" + (playing) : "";
 
             $scope.acitveVideoSource = [
-                { src: $sce.trustAsResourceUrl( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + extParam ), type: 'video/webm' },
-                { src: $sce.trustAsResourceUrl( serverUrl + '/media/' + cameraId + '.mp4?resolution='    + $scope.activeResolution + positionMedia + extParam ), type: 'video/mp4' },
-                { src: $sce.trustAsResourceUrl( serverUrl + '/hls/'   + cameraId + '.m3u?resolution='    + $scope.activeResolution + positionHls   + extParam )},
-                { src: $sce.trustAsResourceUrl( serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls   + extParam )},
-                { src: $sce.trustAsResourceUrl( serverUrl + '/media/' + cameraId + '.mpegts?resolution=' + $scope.activeResolution + positionMedia + extParam )},
-                { src: $sce.trustAsResourceUrl( serverUrl + '/media/' + cameraId + '.3gp?resolution='    + $scope.activeResolution + positionMedia + extParam )},
-                { src: $sce.trustAsResourceUrl( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam )}
+                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + extParam ), type: 'video/webm' },
+                { src: ( serverUrl + '/media/' + cameraId + '.mp4?resolution='    + $scope.activeResolution + positionMedia + extParam ), type: 'video/mp4' },
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u?resolution='    + $scope.activeResolution + positionHls   + extParam )},
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls   + extParam )},
+                { src: ( serverUrl + '/media/' + cameraId + '.mpegts?resolution=' + $scope.activeResolution + positionMedia + extParam )},
+                { src: ( serverUrl + '/media/' + cameraId + '.3gp?resolution='    + $scope.activeResolution + positionMedia + extParam )},
+                { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam )}
             ];
 
             console.log($scope.acitveVideoSource);
@@ -158,24 +158,21 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                 function cameraSorter(camera) {
                     camera.url = extractDomain(camera.url);
-                    camera.preview = mediaserver.previewUrl(camera.physicalId, 70);
+                    camera.preview = mediaserver.previewUrl(camera.physicalId, false, 70);
 
                     var num = 0;
-                    try {
-                        var addrArray = camera.url.split('.');
-                        for (var i = 0; i < addrArray.length; i++) {
-                            var power = 3 - i;
-                            num += ((parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
-                        }
-                        if (isNaN(num)) {
-                            throw num;
-                        }
+                    var addrArray = camera.url.split('.');
+                    for (var i = 0; i < addrArray.length; i++) {
+                        var power = 3 - i;
+                        num += ((parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
+                    }
+                    if (isNaN(num)) {
+                        num = camera.url;
+                    }else {
                         num = num.toString(16);
                         if (num.length < 8) {
                             num = '0' + num;
                         }
-                    } catch (a) {
-                        num = camera.url;
                     }
                     return camera.name + '__' + num;
                 }
@@ -243,7 +240,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return;
             }
             $scope.activeResolution = resolution;
-            updateVideoSource($scope.positionProvider.playingPosition);
+            updateVideoSource($scope.positionProvider.playedPosition);
         };
 
         $scope.fullScreen = function(){

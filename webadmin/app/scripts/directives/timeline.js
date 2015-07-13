@@ -15,12 +15,12 @@ angular.module('webadminApp')
             link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
                     initialInterval: 1000*60 *60*24*365 /* *24*365*/, // no records - show small interval
-                    minMsPerPixel: 1, // 1ms per pixel - best detailization
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
+                    minMsPerPixel: 1, // Minimum level for zooming:
 
-                    zoomBase: Math.log(10), // Base for exponential function for zooming
-                    zoomSpeed: 0.2, // Zoom speed 0 -> 1 = full zoom
+                    zoomSpeed: 0.05, // Zoom speed for buttons 0 -> 1 = full zoom
                     maxVerticalScrollForZoom: 5000, // value for adjusting zoom
+                    maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
                     animationDuration: 500, // 300, // 200-400 for smooth animation
 
                     timelineBgColor: [28,35,39], //Color for ruler marks and labels
@@ -35,7 +35,7 @@ angular.module('webadminApp')
                         size:17,
                         weight:400,
                         face:"Roboto",
-                        color: [255,255,255], // Color for text for top labels
+                        color: [255,255,255] // Color for text for top labels
                     },
                     topLabelMarkerColor: [83,112,127], // Color for mark for top label
                     topLabelBgColor: false,
@@ -47,7 +47,7 @@ angular.module('webadminApp')
                         size:15,
                         weight:400,
                         face:"Roboto",
-                        color: [105,135,150], // Color for text for top labels
+                        color: [105,135,150] // Color for text for top labels
                     },
                     labelMarkerColor:[28,35,39,0],//false
                     labelBgColor: [28,35,39],
@@ -167,7 +167,7 @@ angular.module('webadminApp')
                 var timeMarker = element.find(".timeMarker.playing");
                 var pointerMarker = element.find(".timeMarker.pointer");
                 var canvas = element.find('canvas').get(0);
-                scope.scaleManager = new ScaleManager(timelineConfig.zoomBase, timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100); //Init boundariesProvider
+                scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100); //Init boundariesProvider
 
                 // !!! Initialization functions
                 function updateTimelineHeight(){
@@ -305,11 +305,20 @@ angular.module('webadminApp')
                     var levelIndex = Math.max(currentLevelIndex, taretLevelIndex);
                     var level = RulerModel.levels[levelIndex]; // Actual calculating level
 
+                    var start1 = scope.scaleManager.alignStart(level);
                     var start = scope.scaleManager.alignStart(level);
                     var end = scope.scaleManager.alignEnd(level);
 
+                    function checkDate(date){
+                        return !isNaN( date.getTime());
+                    }
+                    if(!(checkDate(start)|| checkDate(end))){
+                        console.error("broken Date",checkDate(start), checkDate(end));
+                    }
 
-                    while(start <= end){
+
+                    var counter = 100;
+                    while(start <= end && counter-- > 0){
                         var pointLevelIndex = RulerModel.findBestLevelIndex(start);
                         var alpha = 1;
                         if(pointLevelIndex > taretLevelIndex){ //fade out
@@ -319,7 +328,15 @@ angular.module('webadminApp')
                         }
                         drawLabel(context,start,level,alpha,
                                         labelFormat, levelTop, levelHeight, font, labelAlign, bgColor,  markColor, labelPositionFix, markTop, markBottom);
-                        start = level.interval.addToDate(start);
+                        var newStart = level.interval.addToDate(start);
+
+                        if(!(checkDate(start)|| checkDate(newStart))){
+                            console.error("broken Date 2 ",checkDate(start), checkDate(newStart));
+                        }
+                        start = newStart;
+                    }
+                    if(counter < 1){
+                        console.log("problem!", start1, start, end, level);
                     }
                 }
                 function drawLabel( context, date, level, alpha,
@@ -570,9 +587,13 @@ angular.module('webadminApp')
                     event.preventDefault();
                     if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
                         //scope.scaleManager.setAnchorCoordinate( mouseCoordinate );// Set position to keep
-                        if( false && window.jscd.touch ) {
+                        if( window.jscd.touch ) {
+
+                            scope.zoomTarget = scope.scaleManager.zoom();
+                            var zoomTarget = scope.zoomTarget - event.deltaY / timelineConfig.maxVerticalScrollForZoom;
+
                             scope.scaleManager.zoomAroundDate(
-                                scope.scaleManager.zoom() - event.deltaY / timelineConfig.maxVerticalScrollForZoom,
+                                scope.scaleManager.zoom() - event.deltaY / timelineConfig.maxVerticalScrollForZoomWithTouch,
                                 scope.scaleManager.screenCoordinateToDate(mouseCoordinate)
                             );
 
@@ -580,7 +601,13 @@ angular.module('webadminApp')
                             // We need to smooth zoom here
                             scope.zoomTarget = scope.scaleManager.zoom();
                             var zoomTarget = scope.zoomTarget - event.deltaY / timelineConfig.maxVerticalScrollForZoom;
-                            animateScope.animate(scope,"zoomTarget",zoomTarget).then(
+                            console.log("zoom", event.deltaY, scope.zoomTarget, zoomTarget);
+
+                            scope.scaleManager.zoomAroundDate(
+                                zoomTarget,
+                                scope.scaleManager.screenCoordinateToDate(mouseCoordinate)
+                            );
+                            /*animateScope.animate(scope,"zoomTarget",zoomTarget).then(
                                 function(){},
                                 function(){},
                                 function(value){
@@ -590,7 +617,7 @@ angular.module('webadminApp')
                                         scope.scaleManager.screenCoordinateToDate(mouseCoordinate)
                                     );
                                 }
-                            );
+                            );*/
                         }
                     } else {
                         scope.scaleManager.scrollByPixels(event.deltaX);
@@ -666,8 +693,10 @@ angular.module('webadminApp')
                 scope.zoom = function(zoomIn){
                     scope.zoomTarget = scope.scaleManager.zoom();
                     var zoomTarget = scope.zoomTarget - (zoomIn?1:-1) * timelineConfig.zoomSpeed;
+                    console.log("start animate zoom", scope.zoomTarget, zoomTarget);
                     animateScope.animate(scope,"zoomTarget",zoomTarget).then(function(){},function(){},
                         function(value){
+                            console.log("animate zoom", scope.zoomTarget, zoomTarget, value);
                             scope.scaleManager.zoom(value);
                         }
                     );
