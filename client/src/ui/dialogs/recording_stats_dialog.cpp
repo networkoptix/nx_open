@@ -25,9 +25,58 @@
 #include <ui/actions/actions.h>
 #include <core/resource/media_server_resource.h>
 #include "utils/common/event_processors.h"
+#include <utils/common/scoped_painter_rollback.h>
+#include "utils/math/color_transformations.h"
 
-namespace {
-    const int ProlongedActionRole = Qt::UserRole + 2;
+void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
+{
+    Q_ASSERT(index.isValid());
+
+    QStyleOptionViewItem opt = option;
+    initStyleOption(&opt, index);
+
+    const QWidget *widget = option.widget;
+    QStyle *style = widget ? widget->style() : QApplication::style();
+
+    if (index.column() != QnRecordingStatsModel::CameraNameColumn)
+    {
+        // draw chart manually
+        QnScopedPainterTransformRollback rollback(painter);
+        QnScopedPainterBrushRollback rollback2(painter);
+
+        QPoint shift = opt.rect.topLeft();
+        painter->translate(shift);
+        opt.rect.translate(-shift);
+
+        qreal realData = index.data(Qn::RecordingStatChartDataRole).toReal();
+        qreal forecastData = index.data(Qn::RecordingStatForecastDataRole).toReal();
+
+        QColor baseColor = opt.backgroundBrush.color(); //opt.palette.color(QPalette::Normal, QPalette::Base);
+        QColor realColor(7, 98, 129);
+        QColor forecastColor(12, 81, 105);
+        
+        if (opt.state & QStyle::State_Selected) {
+            // alternate row color
+            const int shift = 16;
+            baseColor = shiftColor(baseColor, shift, shift, shift);
+            realColor = shiftColor(realColor, shift, shift, shift);
+            forecastColor = shiftColor(forecastColor, shift, shift, shift);
+        }
+        painter->fillRect(opt.rect, baseColor);
+        
+        painter->fillRect(QRect(0,0, opt.rect.width() * forecastData, opt.rect.height()), forecastColor);
+        painter->fillRect(QRect(0,0, opt.rect.width() * realData, opt.rect.height()), realColor);
+        QString text = index.data().toString();
+        QFontMetrics fm(opt.font);
+        QSize textSize = fm.size(Qt::TextSingleLine, text);
+        painter->setFont(opt.font);
+
+        painter->drawText(opt.rect.width() - textSize.width() - 4, (opt.rect.height()+fm.ascent())/2, text);
+
+    }
+    else {
+        style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
+    }
 }
 
 
@@ -47,13 +96,15 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     QnSortedRecordingStatsModel* sortModel = new QnSortedRecordingStatsModel(this);
     sortModel->setSourceModel(m_model);
     ui->gridEvents->setModel(sortModel);
+    ui->gridEvents->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
     QDate dt = QDateTime::currentDateTime().date();
     ui->dateEditFrom->setDate(dt.addYears(-1));
     ui->dateEditTo->setDate(dt);
 
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
-    headers->setSectionResizeMode(QHeaderView::ResizeToContents);
+    headers->setSectionResizeMode(QHeaderView::Interactive);
+    headers->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::ResizeToContents);
 
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
     m_exportAction      = new QAction(tr("Export Selection to File..."), this);
@@ -146,6 +197,9 @@ void QnRecordingStatsDialog::query(qint64 fromMsec, qint64 toMsec)
             m_requests << mserver->apiConnection()->getRecordingStatisticsAsync(
                 fromMsec, toMsec,
                 this, SLOT(at_gotStatiscits(int, const QnRecordingStatsReply&, int)));
+
+            m_requests << mserver->apiConnection()->getStorageSpaceAsync(
+                this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
         }
     }
 }
@@ -166,10 +220,26 @@ void QnRecordingStatsDialog::at_gotStatiscits(int httpStatus, const QnRecordingS
     }
 }
 
+void QnRecordingStatsDialog::at_gotStorageSpace(int httpStatus, const QnStorageSpaceReply& data, int requestNum)
+{
+    if (!m_requests.contains(requestNum))
+        return;
+    m_requests.remove(requestNum);
+    if (httpStatus == 0) {
+        for (const auto& storage: data.storages) 
+            m_availStorages << storage;
+    }
+    if (m_requests.isEmpty()) {
+        requestFinished();
+    }
+}
+
 void QnRecordingStatsDialog::requestFinished()
 {
     m_model->setModelData(m_allData);
+
     m_allData.clear();
+    m_availStorages.clear();
     ui->gridEvents->setDisabled(false);
     setCursor(Qt::ArrowCursor);
     updateHeaderWidth();
@@ -202,7 +272,7 @@ void QnRecordingStatsDialog::at_eventsGrid_customContextMenuRequested(const QPoi
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
-        QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr resource = ui->gridEvents->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
         if (resource) {
             menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resource));
@@ -267,4 +337,10 @@ void QnRecordingStatsDialog::setVisible(bool value)
     if (value && !isVisible())
         updateData();
     QDialog::setVisible(value);
+}
+
+QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBytes)
+{
+    QnRecordingStatsReply realData = m_model->modelData();
+    return QnRecordingStatsReply();
 }

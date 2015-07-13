@@ -785,40 +785,6 @@ QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 startTime, qin
         data.id = camera->getId();
         result.push_back(data);
     }
-/*    
-
-    // 1. obtain data
-    QMap<QnUuid, QnRecordingStatsData> resultHi = getChunkStatisticsInternal(startTime, endTime, QnServer::HiQualityCatalog);
-    QMap<QnUuid, QnRecordingStatsData> resulLow = getChunkStatisticsInternal(startTime, endTime, QnServer::LowQualityCatalog);
-
-    // 2. merge data
-    for (auto itr = resulLow.constBegin(); itr != resulLow.constEnd(); ++itr) {
-        auto mainItr = resultHi.find(itr.key());
-        if (mainItr != resultHi.end()) 
-        {
-            // merge HQ and LQ data
-            QnRecordingStatsData& left = mainItr.value();
-            const QnRecordingStatsData& right = itr.value();
-            left += right;
-        }
-        else {
-            // join new data from LQ
-            mainItr = resultHi.insert(itr.key(), itr.value());
-        }
-    }
-
-    // 2. full avg bitrate
-    for (auto itr = resultHi.begin(); itr != resultHi.end(); ++itr) 
-    {
-        QnRecordingStatsData& data = itr.value();
-        QnCamRecordingStatsData outputData(data);
-        if (outputData.recordedSecs > 0)
-            outputData.averageBitrate = data.recordedBytes / (data.recordedSecs);
-        outputData.id = itr.key();
-
-        result.push_back(std::move(outputData));
-    }
-*/
     return result;
 }
 
@@ -912,7 +878,9 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 startTime, 
     
     result.recordedSecs /= 1000;   // msec to sec
     tmpStats.recordedSecs /= 1000; // msec to sec
-    result.averageBitrate = tmpStats.recordedBytes / (qreal) tmpStats.recordedSecs;
+    if (tmpStats.recordedBytes > 0 && tmpStats.recordedSecs > 0)
+        result.averageBitrate = tmpStats.recordedBytes / (qreal) tmpStats.recordedSecs;
+    Q_ASSERT(result.averageBitrate >= 0);
     return result;
 }
 

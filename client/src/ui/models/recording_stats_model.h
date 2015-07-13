@@ -48,12 +48,19 @@ public:
     
     void clear();
     void setModelData(const QnRecordingStatsReply& data);
+    QnRecordingStatsReply modelData() const;
+    void setForecastData(const QnRecordingStatsReply& data);
 private:
     QString displayData(const QModelIndex &index) const;
+    QString footerDisplayData(const QModelIndex &index) const;
     QnResourcePtr getResource(const QModelIndex &index) const;
+    qreal chartData(const QModelIndex &index, bool isForecast) const;
+    QVariant footerData(const QModelIndex &index, int role) const;
+    void setModelDataInternal(const QnRecordingStatsReply& data, QnRecordingStatsReply& result);
 private:
 
     QnRecordingStatsReply m_data;
+    QnRecordingStatsReply m_forecastData;
 };
 
 

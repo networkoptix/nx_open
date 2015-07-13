@@ -10,12 +10,22 @@
 
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 #include "api/model/recording_stats_reply.h"
+#include "api/model/storage_space_reply.h"
 
 class QnRecordingStatsModel;
 
 namespace Ui {
     class RecordingStatsDialog;
 }
+
+class QnRecordingStatsItemDelegate: public QStyledItemDelegate 
+{
+    typedef QStyledItemDelegate base_type;
+
+public:
+    explicit QnRecordingStatsItemDelegate(QObject *parent = NULL): base_type(parent) {}
+    virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override;
+};
 
 class QnRecordingStatsDialog: public QnWorkbenchStateDependentButtonBoxDialog
 {
@@ -37,6 +47,7 @@ protected:
 private slots:
     void updateData();
     void at_gotStatiscits(int httpStatus, const QnRecordingStatsReply& data, int requestNum);
+    void at_gotStorageSpace(int httpStatus, const QnStorageSpaceReply& data, int requestNum);
     void at_eventsGrid_clicked(const QModelIndex & index);
     void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();
@@ -47,6 +58,7 @@ private:
     void updateHeaderWidth();
     void requestFinished();
     QList<QnMediaServerResourcePtr> getServerList() const;
+    QnRecordingStatsReply getForecastData(qint64 extraSizeBytes);
 
     /**
      * Get data from server
@@ -70,6 +82,8 @@ private:
     QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
     QnRecordingStatsReply m_allData;
+
+    QVector<QnStorageSpaceData> m_availStorages;
 };
 
 #endif // QN_RECORDING_STATISTICS_DIALOG_H

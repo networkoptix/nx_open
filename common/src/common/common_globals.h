@@ -516,7 +516,10 @@ public:
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
         IOPortDataRole,                             /**< Return QnIOPortData object. Used in IOPortDataModel */
-        RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in IOPortDataModel */
+        
+        RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
+        RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
+        RecordingStatForecastDataRole,              /**< Return qreal for chart. Forecast value. Used in QnRecordingStatsModel */
 
         LastItemDataRole
     };

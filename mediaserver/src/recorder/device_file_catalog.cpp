@@ -931,7 +931,9 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 startTime, qint64 e
         }
     }
     result.recordedSecs /= 1000;
-    result.averageBitrate = result.recordedBytes / (qreal) result.recordedSecs;
+    if (result.recordedBytes > 0 && result.recordedSecs > 0)
+        result.averageBitrate = result.recordedBytes / (qreal) result.recordedSecs;
+    Q_ASSERT(result.averageBitrate >= 0);
     return result;
 }
 
