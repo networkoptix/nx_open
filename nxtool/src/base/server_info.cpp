@@ -160,10 +160,6 @@ const rtu::ExtraServerInfo &rtu::ServerInfo::extraInfo() const
 
 rtu::ExtraServerInfo &rtu::ServerInfo::writableExtraInfo()
 {
-    if (m_extra.isNull())
-    {
-        int i = 0;
-    }
     Q_ASSERT(!m_extra.isNull());
     return *m_extra;
 }

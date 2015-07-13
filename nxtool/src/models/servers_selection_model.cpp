@@ -14,11 +14,13 @@ namespace
 {
     struct ServerModelInfo
     {
+        qint64 updateTimestamp;
         Qt::CheckState selectedState;
         rtu::ServerInfo serverInfo;
         
         ServerModelInfo();
-        explicit ServerModelInfo(Qt::CheckState initSelectedState
+        explicit ServerModelInfo(qint64 initUpdateTimestamp 
+            , Qt::CheckState initSelectedState
             , const rtu::ServerInfo initServerInfo);
     };
 
@@ -27,9 +29,11 @@ namespace
         , serverInfo()
     {}
 
-    ServerModelInfo::ServerModelInfo(Qt::CheckState initSelectedState
+    ServerModelInfo::ServerModelInfo(qint64 initUpdateTimestamp 
+        , Qt::CheckState initSelectedState
         , const rtu::ServerInfo initServerInfo)
-        : selectedState(initSelectedState)
+        : updateTimestamp(initUpdateTimestamp)
+        , selectedState(initSelectedState)
         , serverInfo(initServerInfo)
     {}
     
@@ -451,8 +455,6 @@ QVariant rtu::ServersSelectionModel::Impl::data(const QModelIndex &index
         case kSystemNameRoleId:
             return systemInfo.name;
         case kNameRoleId:
-            //TODO: #gdm #nx2 make correct implementation later on, when we will adopt the tool to the nx2 
-            //with several network interfaces.
             return QString("%1 (%2)").arg(info.baseInfo().name).arg(info.baseInfo().displayAddress);
         case kIdRoleId:
             return info.baseInfo().id;
@@ -911,8 +913,17 @@ void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &ba
     if (!findServer(baseInfo.id, searchInfo))
         return;
 
+    enum { kUpdatePeriod = 60 * 1000};
+
+    /// TODO: #ynikitenkov change for QElapsedTimer implementation
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    const qint64 msSinceLastUpdate = (now - searchInfo.serverInfoIterator->updateTimestamp);
+    if (msSinceLastUpdate < kUpdatePeriod)
+        return;
+    searchInfo.serverInfoIterator->updateTimestamp = now;
+
     const ServerInfo &foundInfo = searchInfo.serverInfoIterator->serverInfo;
-    ServerInfo tmp = (!foundInfo.hasExtraInfo() ? ServerInfo(baseInfo)
+    const ServerInfo tmp = (!foundInfo.hasExtraInfo() ? ServerInfo(baseInfo)
         : ServerInfo(baseInfo, foundInfo.extraInfo()));
 
     m_serverInfoManager->updateServerInfos(ServerInfoContainer(1, tmp)
@@ -941,7 +952,8 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
         exist = false;
     }
 
-    systemModelInfo->servers.push_back(ServerModelInfo(selected, info));
+    /// TODO: #ynikitenkov change for QElapsedTimer implementation
+    systemModelInfo->servers.push_back(ServerModelInfo(QDateTime::currentMSecsSinceEpoch(), selected, info));
     systemModelInfo->loggedServers += (info.hasExtraInfo() ? 1 : 0);
 
     if (selected != Qt::Unchecked)
