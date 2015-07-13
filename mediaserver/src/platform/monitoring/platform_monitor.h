@@ -76,6 +76,9 @@ public:
         PartitionSpace(const QString &path, qint64 freeBytes, qint64 sizeBytes):
             path(path), type(UnknownPartition), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
 
+        /** System-dependent name of device */
+        QString devName;
+
         /** Partition's root path. */
         QString path;
 

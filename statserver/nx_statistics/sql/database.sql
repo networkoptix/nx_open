@@ -143,7 +143,7 @@ CREATE TABLE `mediaservers` (
   `version` varchar(45) DEFAULT NULL,
   `beta` tinyint(1) DEFAULT NULL,
   `country` varchar(45) DEFAULT NULL,
-  `statisticsReportAllowed` varchar(10) DEFAULT NULL
+  `statisticsReportAllowed` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

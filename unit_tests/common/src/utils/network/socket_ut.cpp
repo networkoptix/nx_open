@@ -260,3 +260,32 @@ TEST_F( SocketAsyncModeTest, HostNameResolveCancellation )
         connection->cancelAsyncIO();
     }
 }
+
+TEST_F( SocketAsyncModeTest, BadHostNameResolve )
+{
+    static const int TEST_RUNS = 10000;
+
+    for( int i = 0; i < TEST_RUNS; ++i )
+    {
+        std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
+        //SystemError::ErrorCode connectErrorCode = SystemError::noError;
+        //std::condition_variable cond;
+        //std::mutex mutex;
+        //bool done = false;
+        //HostAddress resolvedAddress;
+        int iBak = i;
+        ASSERT_TRUE( connection->setNonBlockingMode( true ) );
+        ASSERT_TRUE( connection->connectAsync(
+            SocketAddress( QString::fromLatin1( "hx.hz" ), nx_http::DEFAULT_HTTP_PORT ),
+            [&i, iBak/*&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection*/]( SystemError::ErrorCode errorCode ) mutable {
+                //std::unique_lock<std::mutex> lk( mutex );
+                //connectErrorCode = errorCode;
+                //cond.notify_all();
+                //done = true;
+                //resolvedAddress = connection->getForeignAddress().address;
+                ASSERT_EQ( i, iBak );
+                int x = 0;
+            } ) );
+        connection->cancelAsyncIO();
+    }
+}

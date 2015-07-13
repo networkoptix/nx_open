@@ -25,7 +25,7 @@
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
-static const int CONNECT_TIMEOUT = 1000 * 2;
+static const int CONNECT_TIMEOUT = 1000 * 5;
 static const int MAX_PROXY_TTL = 8;
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
@@ -112,15 +112,17 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
 {
     Q_D(QnProxyConnectionProcessor);
 
-    if (route.reverseConnect)
-        d->dstSocket = d->owner->getProxySocket(route.id.toString(), CONNECT_TIMEOUT,
+    if (route.reverseConnect) {
+        const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
+        d->dstSocket = d->owner->getProxySocket(target.toString(), CONNECT_TIMEOUT,
                                                 [&](int socketCount)
         {
             ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(ec2::ApiCommand::openReverseConnection);
             tran.params.targetServer = qnCommon->moduleGUID();
             tran.params.socketCount = socketCount;
-            qnTransactionBus->sendTransaction(tran, route.id);
+            qnTransactionBus->sendTransaction(tran, target);
         });
+    }
 
     if (!d->dstSocket) {
 

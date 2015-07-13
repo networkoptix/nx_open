@@ -611,7 +611,7 @@
                 <modification>rpi</modification>
             </properties>
             <modules>
-                <module>plugins/rpi_cam</module>
+                <!--<module>plugins/rpi_cam</module>-->
                 <module>edge_firmware/rpi</module>
             </modules>
         </profile>
