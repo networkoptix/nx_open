@@ -3,8 +3,8 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
-    <Product Id="*" Name="${display.product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+    <Product Id="*" Name="${product.name} Server Configuration Tool" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${nxtoolUpgradeCode}">
+        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Server Configuration Tool Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
@@ -17,7 +17,7 @@
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
-        <?define LaunchClientChecBoxText="!(loc.Product_LaunchClient)" ?>
+        <?define LaunchNxtoolChecBoxText="!(loc.Product_LaunchNxtool)" ?>
         
         <?if $(var.arch) = x86 ?>
         <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">
@@ -28,13 +28,13 @@
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
-        <Property Id="INSTALL_CLIENT" Secure="yes"/>
-        <SetProperty Id="INSTALL_CLIENT" Value="1" After="ResetPreselected" Sequence="ui">
-            <![CDATA[ $(var.VmsInstalling) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
+        <Property Id="INSTALL_NXTOOL" Secure="yes"/>
+        <SetProperty Id="INSTALL_NXTOOL" Value="1" After="ResetPreselected" Sequence="ui">
+            <![CDATA[ $(var.VmsInstalling) OR &NxtoolFeature = 3 OR !NxtoolFeature = 3 ]]>
         </SetProperty>
 
-        <SetProperty Id="CLIENT_DIRECTORY_REG" Value="[CLIENT_DIRECTORY_REG32]" After="AppSearch">
-            <![CDATA[ CLIENT_DIRECTORY_REG = "" ]]>
+        <SetProperty Id="NXTOOL_DIRECTORY_REG" Value="[NXTOOL_DIRECTORY_REG32]" After="AppSearch">
+            <![CDATA[ NXTOOL_DIRECTORY_REG = "" ]]>
         </SetProperty>        
 
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
@@ -52,17 +52,14 @@
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
 
         <!-- Properties -->
-        <Property Id="WelcomeDlg_Title" Value="${display.product.name} Installer Setup" />
+        <Property Id="WelcomeDlg_Title" Value="${product.name} Server Configuration Tool Installer Setup" />
 
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
-        <!-- Client properties-->
-        <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
-        <Property Id="CLIENT_APPSERVER_PORT" Secure="yes" Value="7001"/>
-        <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
-        <Property Id="CLIENT_VMS_MODE" Value="1"/>
-        <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
-            <RegistrySearch Id="ClientDirectoryReg"
+        <!-- NXTOOL properties-->
+        <Property Id="NXTOOL_VMS_MODE" Value="1"/>
+        <Property Id="NXTOOL_DIRECTORY_REG" Secure="yes">
+            <RegistrySearch Id="NxtoolDirectoryReg"
                             Root="HKCU"
                             Key="Software\[Manufacturer]\${product.name}"
                             Name="mediaRoot"
@@ -70,10 +67,10 @@
                             Win64="yes"/>
         </Property>
 
-        <Property Id="CLIENT_DIRECTORY_REG32" Secure="yes">
-            <RegistrySearch Id="ClientDirectoryReg32"
+        <Property Id="NXTOOL_DIRECTORY_REG32" Secure="yes">
+            <RegistrySearch Id="NxtoolDirectoryReg32"
                             Root="HKCU"
-                            Key="Software\[Manufacturer]\${client.name}"
+                            Key="Software\[Manufacturer]\${product.name}"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="no"/>
@@ -83,23 +80,8 @@
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
-        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
+        <CustomAction Id="LaunchNxtool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="$(var.nxtoolName).exe" ExeCommand=""/>
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
-
-        <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[$(var.clientDirId)]$(var.applauncherName).exe&quot; &quot;quit&quot;" Execute="immediate" />
-        <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" />
-
-        <CustomAction Id="CloseAppLauncherAction2_Cmd" Property="CloseAppLauncherAction2"
-                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "${display.product.name} Launcher.exe"' Execute="immediate" />
-        <CustomAction Id="CloseAppLauncherAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" />
-
-        <CustomAction Id="CloseAppLauncherAction3_Cmd" Property="CloseAppLauncherAction3"
-                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "${product.name} Launcher.exe"' Execute="immediate" />
-        <CustomAction Id="CloseAppLauncherAction3" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" />
 
         <MajorUpgrade AllowSameVersionUpgrades="yes"
             Schedule="afterInstallInitialize"
@@ -112,36 +94,9 @@
             <AppSearch Before="LaunchConditions" />
         </InstallUISequence>
 
-        <InstallExecuteSequence>
-            <FindRelatedProducts Before="AppSearch" />
-            <AppSearch Before="LaunchConditions" />
-
-            <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction" Before="CloseAppLauncherAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction2_Cmd" Before="CloseAppLauncherAction2">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction2" Before="CloseAppLauncherAction3_Cmd">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction3_Cmd" Before="CloseAppLauncherAction3">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction3" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
-        </InstallExecuteSequence>
-
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
-        <Media Id="2" Cabinet="media2.cab" EmbedCab="yes" />
-        <Media Id="3" Cabinet="media3.cab" EmbedCab="yes" />
-        <Media Id="4" Cabinet="media4.cab" EmbedCab="yes" />
-        <Media Id="5" Cabinet="media5.cab" EmbedCab="yes" />
-        <Media Id="6" Cabinet="media6.cab" EmbedCab="yes" />
-        <Media Id="7" Cabinet="media7.cab" EmbedCab="yes" />
-        <Media Id="8" Cabinet="media8.cab" EmbedCab="yes" />
-        <Media Id="9" Cabinet="media9.cab" EmbedCab="yes" />
-        <Media Id="10" Cabinet="media10.cab" EmbedCab="yes" />
-        <Media Id="11" Cabinet="media11.cab" EmbedCab="yes" />
-        <Media Id="12" Cabinet="media12.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="MyPicturesFolder">
-                <Directory Id="${customization}BgDir" Name="${product.name} Backgrounds"/>
-            </Directory>
-
             <Directory Id="$(var.ProgramFilesFolder)">
                 <Directory Id="NetworkOptix" Name="${company.name}">
                     <Directory Id="INSTALLDIR" Name="${display.product.name}">
@@ -152,7 +107,7 @@
             <Directory Id="ProgramMenuFolder" Name="Programs">
                 <Directory Id="ProgramMenuDir" Name="${company.name}">
                     <Component Id="UninstallProgramMenuFolder" DiskId="1">
-                        <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
+                        <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
                         <RemoveFolder Id='DashMenuDirRem' On='uninstall' />
                     </Component>
                 </Directory>
@@ -200,15 +155,14 @@
 
         <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentRef Id="AlwaysFiles"/>
+            <ComponentRef Id="ARPAltRegistryEntries"/>    
             <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
 
-        <FeatureRef Id="ClientFeature"/>
+        <FeatureRef Id="NxtoolFeature"/>
 
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-        <Property Id="WIXUI_CLIENT_DIRECTORY" Value="CLIENT_DIRECTORY"/>
-        <Property Id="WIXUI_SERVER_ALLOWCHANGEIP" Value="SERVER_ALLOWCHANGEIP"/>
-
+        <Property Id="WIXUI_NXTOOL_DIRECTORY" Value="NXTOOL_DIRECTORY"/>
 
         <UIRef Id="WixUI_Common" />
         <UIRef Id="WixUI_ErrorProgressText" />
@@ -238,38 +192,38 @@
 
             <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
             <Publish Dialog="MyExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-            <Publish Dialog="MyExitDialog" Control="Finish" Order="1" Event="DoAction" Value="LaunchClient">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>
+            <Publish Dialog="MyExitDialog" Control="Finish" Order="1" Event="DoAction" Value="LaunchNxtool">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>
 
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED AND NOT LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="ClientDlg">NOT PREVIOUSVERSIONSINSTALLED AND LICENSE_ALREADY_ACCEPTED</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="NxtoolDlg">NOT PREVIOUSVERSIONSINSTALLED AND LICENSE_ALREADY_ACCEPTED</Publish>
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
 
             <Publish Dialog="UpgradeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="ClientDlg">LicenseAccepted = "1"</Publish>
+            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="NxtoolDlg">LicenseAccepted = "1"</Publish>
 
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" Order="2">NOT LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
+            <Publish Dialog="NxtoolDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" Order="2">NOT LICENSE_ALREADY_ACCEPTED</Publish>
+            <Publish Dialog="NxtoolDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">LICENSE_ALREADY_ACCEPTED</Publish>
+            <Publish Dialog="NxtoolDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">NOT $(var.VmsRemoving)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="NxtoolDlg">NOT $(var.VmsRemoving)</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg" Order="2">$(var.VmsRemoving)</Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="NxtoolFeature">INSTALL_NXTOOL</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="NxtoolFeature">NOT INSTALL_NXTOOL</Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="AddLocal" Value="NxtoolFeature">INSTALL_NXTOOL</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="Remove" Value="NxtoolFeature">NOT INSTALL_NXTOOL</Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="Change" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Change" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Change" Event="AddLocal" Value="NxtoolFeature">INSTALL_NXTOOL</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Change" Event="Remove" Value="NxtoolFeature">NOT INSTALL_NXTOOL</Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="AddLocal" Value="NxtoolFeature">INSTALL_NXTOOL</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="NxtoolFeature">NOT INSTALL_NXTOOL</Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="Install" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)">1</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Install" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchNxtoolChecBoxText)">1</Publish>
 
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="REMOVE" Value="ALL">1</Publish>

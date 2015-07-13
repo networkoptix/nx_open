@@ -3,7 +3,7 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
-    <Product Id="*" Name="${display.product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
+    <Product Id="*" Name="${display.product.name} Server Configuration Tool" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${nxtoolUpgradeCode}">
         <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>

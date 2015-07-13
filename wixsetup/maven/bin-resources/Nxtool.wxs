@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+    <Fragment Id='FragmentNxtool'>
+        <?include BuildVars.wxi ?>
+
+        <DirectoryRef Id="INSTALLDIR">
+            <Directory Id="$(var.customization)NxtoolDir" Name="Nxtool">
+                <Component Id="DefaultLanguage">
+                    <RegistryKey Root="HKCU"
+                             Key="Software\[Manufacturer]\$(var.nxtoolName)">
+                        <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_$(var.translation1).qm"/>
+                    </RegistryKey>
+                </Component>
+
+                <Component Id="nxtoolShortcutDesktop">
+                    <Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
+
+                    <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\$(var.nxtoolName)" Name="nxtoolShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
+
+                    <Shortcut Id="DesktopNxtool" Directory="DesktopFolder" Name="$(var.productName)"
+                      WorkingDirectory='$(var.customization)NxtoolDir' Target="NxtoolExecutable" Icon="icon_desktop.exe">
+                    </Shortcut>
+                </Component>                            
+
+                <Directory Id="Platforms" Name="platforms">
+                </Directory>                    
+
+                <Component Id="NxtoolExecutable">
+                    <File Id="nxtool.exe" Name="$(var.nxtoolName).exe" Source="$(var.NxtoolSourceDir)/nxtool.exe" KeyPath="yes" DiskId="1">
+                        <fire:FirewallException Id="FirewallExceptionNxtool" Name="$(var.productName)" Scope="any" IgnoreFailure="yes"/>
+                    </File>
+                </Component>                                
+
+                <Component Id="NxtoolConfiguration">
+                    <Condition>
+                    NOT PREVIOUSVERSIONSINSTALLED
+                    </Condition>
+
+                    <RegistryKey Root="HKCU"
+                             Key="Software\[Manufacturer]\$(var.nxtoolName)">
+                        <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
+                    </RegistryKey>
+                </Component>
+        </DirectoryRef>
+
+        <ComponentGroup Id="NxtoolQTLibraries" Directory="$(var.customization)NxtoolDir">
+            <Component>
+                <File Id="NxtoolQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\Qt5Core$(var.suffix).dll" DiskId="1"/>
+            </Component>
+            <Component>
+                <File Id="NxtoolQt5Gui$(var.suffix).dll" Name="Qt5Gui$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\Qt5Gui$(var.suffix).dll" DiskId="1"/>
+            </Component>
+            <Component>
+                <File Id="NxtoolQt5Network$(var.suffix).dll" Name="Qt5Network$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\Qt5Network$(var.suffix).dll" DiskId="1" />
+            </Component>     
+            <Component>
+                <File Id="NxtoolQt5Qml$(var.suffix).dll" Name="Qt5Qml$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\Qt5Qml$(var.suffix).dll" DiskId="1"  />                
+            </Component>       
+            <Component>
+                <File Id="NxtoolQt5Quick$(var.suffix).dll" Name="Qt5Quick$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\Qt5Quick$(var.suffix).dll" DiskId="1"  />                
+            </Component>
+            <Component>            
+                <File Id="NxtoolQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\Qt5Widgets$(var.suffix).dll" DiskId="1"  />
+            </Component>             
+        </ComponentGroup>
+
+        <ComponentGroup Id="Platforms" Directory="Platforms">
+            <Component>
+                <File Id="qwindows$(var.suffix).dll" Name="qwindows.dll" Source="$(var.NxtoolSourceDir)\platforms\qwindows$(var.suffix).dll" DiskId="1" />
+            </Component>
+        </ComponentGroup>            
+
+        <Feature Id="NxtoolFeature" Title="$(var.productName) Server Configuration Utility" Level="1"
+                 ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
+
+            <ComponentRef Id="DefaultLanguage" />                                         
+            <ComponentRef Id="NxtoolExecutable" />
+            <ComponentRef Id="nxtoolShortcutDesktop"/>
+            <ComponentRef Id="NxtoolConfiguration" />
+            <ComponentGroupRef Id="NxtoolQTLibraries" />
+            <ComponentGroupRef Id="Platforms" />
+        </Feature>
+    </Fragment>
+</Wix>
