@@ -32,8 +32,9 @@ QtControls.TextField
     
     Timer  {
         id: updateSecondsTimer
+
         interval: 1000;
-        running: true;
+        running: !changed;
         repeat: true;
         onTriggered: impl.tick()
     }

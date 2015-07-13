@@ -78,14 +78,18 @@ Expandable.MaskedSettingsPanel
                         
                         var newDate = datePicker.date;
                         var newTime = timePicker.time;
+                        var timeZoneId = timeZonePicker.model.timeZoneIdByIndex(timeZonePicker.currentIndex)
+
                         if (useCurrentTimeCheckbox.checked)
                         {
                             var now = new Date();
-                            newDate = now;
-                            newTime = now;
+                            var nowConverted = rtuContext.applyTimeZone(now, now
+                                , ""    /// Use empty time zone to point to current zone id
+                                , timeZoneId);
+                            newDate = nowConverted;
+                            newTime = nowConverted;
                         }
 
-                        var timeZoneId = timeZonePicker.model.timeZoneIdByIndex(timeZonePicker.currentIndex)
                         rtuContext.changesManager().addDateTimeChange(newDate, newTime, timeZoneId);
                         return true;
                     }
