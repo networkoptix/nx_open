@@ -19,8 +19,7 @@ Item {
         id: backgroundGradient
         anchors.fill: parent
         anchors.topMargin: -dp(24)
-        source: "qrc:///images/timeline_gradient.png"
-        rotation: 180
+        source: "qrc:///images/toolbar_gradient.png"
     }
 
     Rectangle {
