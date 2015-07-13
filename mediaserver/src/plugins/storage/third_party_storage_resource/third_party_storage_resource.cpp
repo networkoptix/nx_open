@@ -197,11 +197,11 @@ QnThirdPartyStorageResource::QnThirdPartyStorageResource(
     if (!m_lib)
         throw std::runtime_error("Couldn't load storage plugin");
 
-    m_csf = static_cast<create_qn_storage_factory_function>(
+    m_csf = reinterpret_cast<create_qn_storage_factory_function>(
         m_lib.symbol("create_qn_storage_factory")
     );
     
-    m_emf = static_cast<qn_storage_error_message_function>(
+    m_emf = reinterpret_cast<qn_storage_error_message_function>(
         m_lib.symbol("qn_storage_error_message")
     );
 

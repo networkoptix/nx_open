@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
+
     A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
+    It should also be possible to have one maven project per solution project,
     and have a parent pom to deletegate the build.
   -->
     <parent>
@@ -21,24 +21,24 @@
     <name>HD Witness Media Server</name>
 
     <properties>
-        <product.title>${mediaserver.name}</product.title>  
+        <product.title>${mediaserver.name}</product.title>
         <product.display.title>${mediaserver.display.name}</product.display.title>
-        <!--Global libs-->		
+        <!--Global libs-->
         <qt.libs>core network xml sql concurrent multimedia</qt.libs>
         <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc -lonvif -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis</linux.oslibs>
+        <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl</linux.oslibs>
         <linux.arm.oslibs>-lssl -lcrypto -lsigar</linux.arm.oslibs>
         <windows.oslibs.release/>
-        <windows.oslibs.debug/>                
+        <windows.oslibs.debug/>
         <mac.oslibs>-lssl -lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
-        <mac.defines/>      
+        <mac.defines/>
 
     </properties>
 
@@ -55,7 +55,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
@@ -64,13 +64,13 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>appserver2</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
-        </dependency>			
+        </dependency>
     </dependencies>
     <build>
-        <plugins>  
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -96,10 +96,10 @@
                                 </artifactItem>
                             </artifactItems>
                             <stripVersion>true</stripVersion>
-                        </configuration>                          
-                    </execution>                            
+                        </configuration>
+                    </execution>
                 </executions>
-            </plugin>         
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -115,16 +115,16 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
                             <overwrite>true</overwrite>
-                            <resources>          
+                            <resources>
                                 <resource>
                                     <directory>${root.dir}/webadmin</directory>
                                     <filtering>true</filtering>
-                                </resource>                                                                          
-                            </resources>              
-                        </configuration>            
+                                </resource>
+                            </resources>
+                        </configuration>
                     </execution>
                 </executions>
-            </plugin>              
-        </plugins>          
+            </plugin>
+        </plugins>
     </build>
 </project>
