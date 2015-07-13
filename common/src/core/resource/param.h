@@ -49,12 +49,13 @@ namespace Qn
     /* Whether statistics gathering is allowed on the current server. */
     static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
 
-    // Hardware information  
+    // Hardware information
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
     static const QString CPU_MODEL_NAME = lit("cpuModelName");
     static const QString PHISICAL_MEMORY = lit("phisicalMemory");
     static const QString BETA = lit("beta");
     static const QString PUBLIC_IP = lit("publicIp");
+    static const QString NETWORK_INTERFACES = lit("networkInterfaces");
 }
 
 #endif // QN_PARAM_H

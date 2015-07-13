@@ -638,7 +638,23 @@ void QnMain::dumpSystemUsageStats()
     qnPlatform->monitor()->totalCpuUsage();
     qnPlatform->monitor()->totalRamUsage();
     qnPlatform->monitor()->totalHddLoad();
-    qnPlatform->monitor()->totalNetworkLoad();
+
+    // TODO: #mu
+    //  - Add some more fields that might be interesting
+    //  - Make and use JSON serializable struct rather than just a string
+    QStringList networkIfList;
+    for (const auto& iface : qnPlatform->monitor()->totalNetworkLoad())
+        if (iface.type != QnPlatformMonitor::LoopbackInterface)
+            networkIfList.push_back(lit("%1: %2 bps").arg(iface.interfaceName)
+                                                     .arg(iface.bytesPerSecMax));
+
+    const auto networkIfInfo = networkIfList.join(lit(", "));
+    if (!networkIfInfo.isEmpty() &&
+        m_mediaServer->getProperty(Qn::NETWORK_INTERFACES) != networkIfInfo)
+    {
+        m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo);
+        propertyDictionary->saveParams(m_mediaServer->getId());
+    }
 
     QMutexLocker lk( &m_mutex );
     if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
@@ -1817,7 +1833,7 @@ void QnMain::run()
             server->setNetAddrList(serverIfaceList);
             isModified = true;
         }
-        
+
         bool needUpdateAuthKey = false;
         if (server->getSystemName() != qnCommon->localSystemName())
         {

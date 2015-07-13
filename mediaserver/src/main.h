@@ -11,11 +11,11 @@
 
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
+#include "platform/monitoring/global_monitor.h"
 
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
-
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
