@@ -113,11 +113,13 @@ namespace aio
         //!Call \a handler from within aio thread \a sock is bound to
         /*!
             \note Call will always be queued. I.e., if called from handler running in aio thread, it will be called after handler has returned
+            \warning Currently, there is no way to find out whether call has been posted or being executed currently
         */
         template<class SocketType, class Handler>
         bool post( SocketType* sock, Handler&& handler )
         {
             QMutexLocker lk( &m_mutex );
+
             //if sock is not still bound to aio thread, binding it
             typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load( std::memory_order_relaxed );
             if( !threadToUse )  //socket has not been bound to aio thread yet
@@ -254,17 +256,6 @@ namespace aio
             cancelPostedCallsNonSafe( sock, waitForRunningHandlerCompletion );
         }
 
-        template<class SocketType>
-        void cancelPostedCallsNonSafe(
-            SocketType* const sock,
-            bool waitForRunningHandlerCompletion = true )
-        {
-            typename SocketAIOContext<SocketType>::AIOThreadType* aioThread = sock->impl()->aioThread.load( std::memory_order_relaxed );
-            if( !aioThread )
-                return;
-            aioThread->cancelPostedCalls( sock, waitForRunningHandlerCompletion );
-        }
-
     private:
         template<class SocketType>
         struct SocketAIOContext
@@ -281,6 +272,17 @@ namespace aio
 
         template<class SocketType> SocketAIOContext<SocketType>& getAIOHandlingContext();
         template<class SocketType> const SocketAIOContext<SocketType>& getAIOHandlingContext() const;// { static_assert( false, "Bad socket type" ); }
+
+        template<class SocketType>
+        void cancelPostedCallsNonSafe(
+            SocketType* const sock,
+            bool waitForRunningHandlerCompletion = true )
+        {
+            typename SocketAIOContext<SocketType>::AIOThreadType* aioThread = sock->impl()->aioThread.load( std::memory_order_relaxed );
+            if( !aioThread )
+                return;
+            aioThread->cancelPostedCalls( sock, waitForRunningHandlerCompletion );
+        }
 
         template<class SocketType>
         aio::AIOThread<SocketType>* bindSocketToAioThread( SocketType* const sock )
