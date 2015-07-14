@@ -27,6 +27,9 @@
         <!--Specific os defines-->
         <android.defines/>
         <linux.defines/>
+
+        <project.version.code>${buildNumber}</project.version.code>
+        <project.version.name>${release.version}</project.version.name>
     </properties>
 
     <build>
