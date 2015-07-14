@@ -5,6 +5,15 @@
 
 #include "host_system_password_synchronizer.h"
 
+#include <array>
+
+#ifdef __linux__
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#endif
+
 #include <QtCore/QMutexLocker>
 
 #include <core/resource/resource.h>
@@ -43,6 +52,29 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
                 if( partitions[i].devName.indexOf( lit( "rootfs" ) ) != -1 ||
                     partitions[i].devName == lit( "/dev/root" ) )
                 {
+                    struct stat st;
+                    memset( &st, 0, sizeof( st ) );
+                    if( stat( "/dev/root", &st ) == -1 )
+                    {
+                        //failure
+                        return;
+                    }
+
+                    if( !(st.st_mode & S_IFLNK) )
+                        return; //OS is on SD card or some internal memory
+
+                    //checking that root is really on SD card
+                    std::array<char, PATH_MAX> realPath;
+                    const auto realPathLen = readlink( "/dev/root", realPath.data(), realPath.size() );
+                    if( realPathLen == -1 )
+                    {
+                        //failure
+                        return;
+                    }
+
+                    if( QString::fromLocal8Bit( realPath.data(), realPathLen ).indexOf( lit("sd") ) != -1 )
+                        break;  //OS is on regular drive. Can change root password
+
                     return; //OS is on SD card or some internal memory
                 }
                 else

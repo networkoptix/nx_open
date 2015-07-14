@@ -26,7 +26,7 @@ void* GenericRTSPDiscoveryManager::queryInterface( const nxpl::NX_GUID& interfac
     if( memcmp( &interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager) ) == 0 )
     {
         addRef();
-        return this;
+        return static_cast<nxcip::CameraDiscoveryManager*>(this);
     }
     if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
     {
