@@ -9,9 +9,13 @@
 #include <array>
 #include <atomic>
 
+#include <stdint.h>
+
 #include "aio/pollset.h"
 #include "aio/aiothread.h"
 
+
+static std::atomic<uint64_t> socketSequenceCounter;
 
 template<class SocketType>
 class CommonSocketImpl
@@ -20,11 +24,14 @@ public:
     std::atomic<aio::AIOThread<SocketType>*> aioThread;
     std::array<void*, aio::etMax> eventTypeToUserData;
     std::atomic<bool> terminated;
+    //!This socket sequence is unique even after socket destruction (socket pointer is not unique after delete call)
+    uint64_t socketSequence;
 
     CommonSocketImpl()
     :
         aioThread( nullptr ),
-        terminated( false )
+        terminated( false ),
+        socketSequence( ++socketSequenceCounter )
     {
         eventTypeToUserData.fill( nullptr );
     }
