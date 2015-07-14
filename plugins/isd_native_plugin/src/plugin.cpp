@@ -76,7 +76,7 @@ const char* IsdNativePlugin::name() const
     return "isd_edge";
 }
 
-void IsdNativePlugin::setSettings( const nxpl::Setting* settings, size_t count )
+void IsdNativePlugin::setSettings( const nxpl::Setting* settings, int count )
 {
     const auto settingsEnd = settings + count;
     for( const nxpl::Setting*
@@ -85,14 +85,14 @@ void IsdNativePlugin::setSettings( const nxpl::Setting* settings, size_t count )
         ++curSetting )
     {
         if( strncmp(
-                curSetting.name,
+                curSetting->name,
                 isd_edge_settings::paramGroup,
                 sizeof(isd_edge_settings::paramGroup )-1 ) != 0 )
         {
             continue;
         }
         //saving setting
-        m_settings.emplace( curSetting.name, curSetting.value );
+        m_settings.emplace( curSetting->name, curSetting->value );
     }
 }
 

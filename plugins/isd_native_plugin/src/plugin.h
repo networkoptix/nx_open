@@ -43,7 +43,7 @@ public:
     //!Implementation of nxpl::Plugin::name
     virtual const char* name() const override;
     //!Implementation of nxpl::Plugin::setSettings
-    virtual void setSettings( const nxpl::Setting* settings, size_t count ) override;
+    virtual void setSettings( const nxpl::Setting* settings, int count ) override;
 
     nxpt::CommonRefManager* refManager();
 

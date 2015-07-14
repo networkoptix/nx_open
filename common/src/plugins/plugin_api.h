@@ -102,7 +102,7 @@ namespace nxpl
             \param settings This memory cannot be relied on after method returns
             \param count Size of \a settings array
         */
-        virtual void setSettings( const nxpl::Setting* settings, size_t count ) = 0;
+        virtual void setSettings( const nxpl::Setting* settings, int count ) = 0;
     };
 
     //!Type of plugin entry-point function

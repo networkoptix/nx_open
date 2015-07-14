@@ -80,7 +80,7 @@ const char* GenericRTSPPlugin::name() const
     return "GENERIC_RTSP";
 }
 
-void GenericRTSPPlugin::setSettings( const nxpl::Setting* settings, size_t count )
+void GenericRTSPPlugin::setSettings( const nxpl::Setting* /*settings*/, int /*count*/ )
 {
 }
 
