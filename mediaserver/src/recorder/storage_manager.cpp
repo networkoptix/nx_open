@@ -1338,6 +1338,20 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
     return ret;
 }
 
+QnStorageResourcePtr QnStorageManager::getStorageByUrlExact(const QString& storageUrl)
+{
+    QMutexLocker lock(&m_mutexStorages);
+    QnStorageResourcePtr ret;
+    int matchLen = 0;
+    for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    {
+        QString root = (*itr)->getUrl();
+        if (storageUrl == root)
+            return *itr;
+    }
+    return ret;
+}
+
 QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 {
     QMutexLocker lock(&m_mutexStorages);
