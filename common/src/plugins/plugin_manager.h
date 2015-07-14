@@ -104,13 +104,13 @@ private:
     mutable QMutex m_mutex;
 
     void loadPluginsFromDir(
-        const QSettings* settings,
+        const std::vector<nxpl::Setting>& settingsForPlugin,
         const QString& dirToSearchIn,
         PluginType pluginsToLoad );
     bool loadQtPlugin( const QString& fullFilePath );
     //!Loads \a nxpl::PluginInterface based plugin
     bool loadNxPlugin(
-        const QSettings* settings,
+        const std::vector<nxpl::Setting>& settingsForPlugin,
         const QString& fullFilePath );
 };
 
