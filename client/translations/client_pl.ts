@@ -4,8152 +4,10130 @@
 <context>
     <name>AboutDialog</name>
     <message>
+        <location filename="ui/dialogs/about_dialog.ui"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>O programie</translation>
     </message>
     <message>
+        <location/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacje</translation>
     </message>
     <message>
+        <location/>
         <source>Credits</source>
-        <translation type="unfinished"></translation>
+        <translation>Użyte zewnętrzne źródła</translation>
     </message>
     <message>
+        <location/>
         <source>GPU Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacje o GPU</translation>
     </message>
     <message>
+        <location/>
         <source>Connected servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Podłączone serwery</translation>
     </message>
     <message>
+        <location/>
         <source>Support</source>
-        <translation type="unfinished"></translation>
+        <translation>Wsparcie</translation>
     </message>
 </context>
 <context>
     <name>AdjustVideoDialog</name>
     <message>
+        <location filename="ui/dialogs/adjust_video_dialog.ui"/>
         <source>Image Enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Regulacja Wyświetlania</translation>
     </message>
     <message>
+        <location/>
         <source>Enable image enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz regulację wyświetlania</translation>
     </message>
     <message>
+        <location/>
         <source>Gamma</source>
-        <translation type="unfinished"></translation>
+        <translation>Gamma</translation>
     </message>
     <message>
+        <location/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto</translation>
     </message>
     <message>
+        <location/>
         <source>Black level</source>
-        <translation type="unfinished"></translation>
+        <translation>Poziom czerni</translation>
     </message>
     <message>
+        <location/>
         <source>White level</source>
-        <translation type="unfinished"></translation>
+        <translation>Poziom bieli</translation>
     </message>
 </context>
 <context>
     <name>AggregationWidget</name>
     <message>
+        <location filename="ui/widgets/business/aggregation_widget.ui"/>
         <source>Check to set aggregation period</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia okresu połączeń</translation>
     </message>
     <message>
+        <location/>
         <source>Interval of action :</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstęp działania:</translation>
     </message>
     <message>
+        <location/>
         <source>No more than once per</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie więcej niż raz na</translation>
     </message>
     <message>
+        <location/>
         <source>Instant</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>BusinessRuleWidget</name>
     <message>
+        <location filename="ui/widgets/business/business_rule_widget.ui"/>
         <source>Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Zdarzenie</translation>
     </message>
     <message>
+        <location/>
         <source>When</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiedy</translation>
     </message>
     <message>
+        <location/>
         <source>at</source>
-        <translation type="unfinished"></translation>
+        <translation>na</translation>
     </message>
     <message>
+        <location/>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Dowolnej Kamerze&gt;</translation>
     </message>
     <message>
+        <location/>
         <source>Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Harmonogram...</translation>
     </message>
     <message>
+        <location/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Akcja</translation>
     </message>
     <message>
+        <location/>
         <source>Do</source>
-        <translation type="unfinished"></translation>
+        <translation>Zrób</translation>
     </message>
     <message>
+        <location/>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Wybierz co najmniej jedną kamerę&gt;</translation>
     </message>
     <message>
+        <location/>
         <source>Comments:</source>
-        <translation type="unfinished"></translation>
+        <translation>Komentarz:</translation>
     </message>
 </context>
 <context>
     <name>BusinessRulesDialog</name>
     <message>
+        <location filename="ui/dialogs/business_rules_dialog.ui"/>
         <source>Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarm/Reguły zdarzeń</translation>
     </message>
     <message>
+        <location/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj</translation>
     </message>
     <message>
+        <location/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń</translation>
     </message>
     <message>
+        <location/>
         <source>Event log</source>
-        <translation type="unfinished"></translation>
+        <translation>Logi zdarzeń</translation>
     </message>
     <message>
+        <location/>
         <source>Advanced...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaawansowane...</translation>
     </message>
     <message>
+        <location/>
         <source>Filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortowanie wg kamer...</translation>
     </message>
     <message>
+        <location/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>CameraAdditionDialog</name>
     <message>
+        <location filename="ui/dialogs/camera_addition_dialog.ui"/>
         <source>Add cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj kamery...</translation>
     </message>
     <message>
+        <location/>
         <source>Selected server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybrany serwer:</translation>
     </message>
     <message>
+        <location/>
         <source>Server is offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer jest niedostępny</translation>
     </message>
     <message>
+        <location/>
         <source>Ca&amp;mera Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>Adres Ka&amp;mery:</translation>
     </message>
     <message>
+        <location/>
         <source>IP, hostname, RTSP link...</source>
-        <translation type="unfinished"></translation>
+        <translation>IP, nazwa hosta, link RTSP...</translation>
     </message>
     <message>
+        <location/>
         <source>S&amp;tart IP:</source>
-        <translation type="unfinished"></translation>
+        <translation>P&amp;oczątkowy adres IP:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;End IP:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Końcowy adres IP:</translation>
     </message>
     <message>
+        <location/>
         <source>S&amp;ubnet scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanowanie p&amp;odsieci</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Login:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Hasło:</translation>
     </message>
     <message>
+        <location/>
         <source>auto</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Discovery Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Port:</translation>
     </message>
     <message>
+        <location/>
         <source>Discovered Cameras:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wykryte kamery:</translation>
     </message>
     <message>
+        <location/>
         <source>Manuf.</source>
-        <translation type="unfinished"></translation>
+        <translation>Producent.</translation>
     </message>
     <message>
+        <location/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa</translation>
     </message>
     <message>
+        <location/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresy</translation>
     </message>
     <message>
+        <location/>
         <source>Scanning...</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanowanie...</translation>
     </message>
     <message>
+        <location/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Skanuj</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Add selected</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dodaj zaznaczone</translation>
     </message>
     <message>
+        <location/>
         <source>New scan...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowe skanowanie...</translation>
     </message>
 </context>
 <context>
     <name>CameraAdvancedSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>Advanced settings for this camera cannot be loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaawansowane ustawienia dla tej kamery są niedostępne</translation>
     </message>
     <message>
+        <location/>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta kamera nie ma zaawansowanych ustawień</translation>
     </message>
     <message>
+        <location/>
         <source>Warning: all changes are applied instantly</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwaga: wszystkie zmiany zostaną zastosowane natychmiast</translation>
     </message>
     <message>
+        <location/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategoria</translation>
     </message>
     <message>
+        <location/>
         <source>about:blank</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
+        <location filename="camera/camera_diagnose_tool.cpp" line="+185"/>
         <source>No connection to Server %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak połączenia z serwerem %1.</translation>
     </message>
 </context>
 <context>
     <name>CameraDiagnosticsDialog</name>
     <message>
+        <location filename="ui/dialogs/camera_diagnostics_dialog.ui"/>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostyka kamery</translation>
     </message>
     <message>
+        <location/>
         <source>Diagnostics for camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostyka kamery</translation>
     </message>
 </context>
 <context>
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
+        <location filename="ui/widgets/business/camera_disconnected_business_event_widget.ui"/>
         <source>Event will be raised when any camera goes offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Zdarzenie zostanie wywołane gdy dowolna kamera będzie offline</translation>
     </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/properties/expert_settings_widget.ui"/>
         <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapoznałem się z instrukcją i rozumiem ryzyko</translation>
     </message>
     <message>
+        <location/>
         <source>Camera Settings Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Usatwienia kamery</translation>
     </message>
     <message>
+        <location/>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Zachowaj ustawienia profili i strumieni z kamery</translation>
     </message>
     <message>
+        <location/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwaga! FPS i ustawienia jakosci w Harmonogramie Rejestracji nie będą działać!</translation>
     </message>
     <message>
+        <location/>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcja &quot;Zezwól na optymalizację ustawień kamery przez system&quot; jest wyłączona w Administratorze Systemu.</translation>
     </message>
     <message>
+        <location/>
         <source>Secondary Stream Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia drugiego strumienia</translation>
     </message>
     <message>
+        <location/>
         <source>Override secondary stream quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Jakośc drugiego strumienia</translation>
     </message>
     <message>
+        <location/>
         <source>Don&apos;t use</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie używaj</translation>
     </message>
     <message>
+        <location/>
         <source>Low quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Niska jakość</translation>
     </message>
     <message>
+        <location/>
         <source>Medium quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Średnia jakość</translation>
     </message>
     <message>
+        <location/>
         <source>High quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Wysoka jakość</translation>
     </message>
     <message>
+        <location/>
         <source>Warning! Low quality may result in low resolution image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwaga! Niska jakość może spowodować niską rozdzielczość obrazu.</translation>
     </message>
     <message utf8="true">
+        <location/>
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwaga! Wysoka jakość może spowodować przeładowanie Procesora, błędy w połączeniu sieciowym lub inne problemy.</translation>
     </message>
     <message>
+        <location/>
         <source>Archive control</source>
-        <translation type="unfinished"></translation>
+        <translation>Zarządzanie archiwum</translation>
     </message>
     <message>
+        <location/>
         <source>Do not archive primary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie rejestruj strumienia pierwszego</translation>
     </message>
     <message>
+        <location/>
         <source>Do not archive secondary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie rejestruj strumienia drugiego</translation>
     </message>
     <message>
+        <location/>
         <source>Media streaming control</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrola strumieniowania</translation>
     </message>
     <message>
+        <location/>
         <source>RTP transport:</source>
-        <translation type="unfinished"></translation>
+        <translation>RTP transport:</translation>
     </message>
     <message>
+        <location/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto</translation>
     </message>
     <message>
+        <location/>
         <source>TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP</translation>
     </message>
     <message>
+        <location/>
         <source>UDP</source>
-        <translation type="unfinished"></translation>
+        <translation>UDP</translation>
     </message>
     <message>
+        <location/>
         <source>Warning! Please read documentation before changing these settings!</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwaga! Proszę przeczytać dokumentację przed zmianą ustawień!</translation>
     </message>
     <message>
+        <location/>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
+        <translation>Przywróć domyślne</translation>
     </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
+        <location filename="ui/widgets/business/camera_input_business_event_widget.ui"/>
         <source>Input ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>ID Wejścia:</translation>
     </message>
 </context>
 <context>
     <name>CameraListDialog</name>
     <message>
+        <location filename="ui/dialogs/camera_list_dialog.ui"/>
         <source>Camera list</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista kamery</translation>
     </message>
     <message>
+        <location/>
         <source>Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtr:</translation>
     </message>
 </context>
 <context>
     <name>CameraManagementWidget</name>
     <message>
+        <location filename="ui/widgets/settings/camera_management_widget.ui"/>
+        <source>Enable camera auto discovery</source>
+        <translation>Włącz auto wykrywanie kamer</translation>
+    </message>
+    <message>
+        <location/>
         <source>Allow system to optimize camera settings (Recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozwól systemowi na optymalizację ustawień kamery (Zalecane)</translation>
     </message>
     <message>
+        <location/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwaga! FPS i ustawienia jakosci w Harmonogramie Rejestracji nie będą działać!</translation>
     </message>
 </context>
 <context>
     <name>CameraOutputBusinessActionWidget</name>
     <message>
+        <location filename="ui/widgets/business/camera_output_business_action_widget.ui"/>
         <source>&amp;Output ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>ID &amp;Wyjścia:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Auto-reset in (sec):</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Automatyczny reset (sek):</translation>
     </message>
 </context>
 <context>
     <name>CameraScheduleWidget</name>
     <message>
+        <location filename="ui/widgets/properties/camera_schedule_widget.ui"/>
         <source>Camera Schedule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytor harmonogramu kamery</translation>
     </message>
     <message>
+        <location/>
         <source>Enable Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz nagrywanie</translation>
     </message>
     <message>
+        <location/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobierz więcej licencji...</translation>
     </message>
     <message>
+        <location/>
         <source>Schedule Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Siatka harmonogramu</translation>
     </message>
     <message>
+        <location/>
         <source>Display Quality on Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyświetlaj Poziom Jakości na schemacie</translation>
     </message>
     <message>
+        <location/>
         <source>Panic Mode: </source>
-        <translation type="unfinished"></translation>
+        <translation>Tryb Paniki:</translation>
     </message>
     <message>
+        <location/>
         <source>Display FPS on Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyświetlaj liczbę FPS na schemacie</translation>
     </message>
     <message>
+        <location/>
         <source>Note: Recording Schedule is based on Server Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwaga: Harmonogram rejestracji jest oparty na Serwerze Czasu</translation>
     </message>
     <message>
+        <location/>
         <source>Schedule Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia harmonogramu</translation>
     </message>
     <message>
+        <location/>
         <source>FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>FPS</translation>
     </message>
     <message>
+        <location/>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Jakość</translation>
     </message>
     <message>
+        <location/>
         <source>Record Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj zawsze</translation>
     </message>
     <message>
+        <location/>
         <source>Motion Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Tylko ruch</translation>
     </message>
     <message>
+        <location/>
         <source>Motion+ Lo-Res Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruch plus niska rozdzielczośc zawsze</translation>
     </message>
     <message>
+        <location/>
         <source>Do not Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie nagrywaj</translation>
     </message>
     <message>
+        <location/>
         <source>Fixed Archive Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Długość archiwum</translation>
     </message>
     <message>
+        <location/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto</translation>
     </message>
     <message>
+        <location/>
         <source>Warning! High value may prevent other cameras from recording!</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwaga! Wysoka wartość może uniemożliwić rejestrację innym kamerom!</translation>
     </message>
     <message>
+        <location/>
         <source>Min days:</source>
-        <translation type="unfinished"></translation>
+        <translation>Min dni:</translation>
     </message>
     <message>
+        <location/>
         <source>Max days:</source>
-        <translation type="unfinished"></translation>
+        <translation>Max dni:</translation>
     </message>
     <message>
+        <location/>
         <source>Motion Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywanie ruchu</translation>
     </message>
     <message>
+        <location/>
         <source>Pre-Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Rejestracja przed</translation>
     </message>
     <message>
+        <location/>
         <source> s</source>
         <extracomment>Short for &quot;seconds&quot;
 ----------
 Short for &quot;seconds&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>s</translation>
     </message>
     <message>
+        <location/>
         <source>Post-Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Rejestarcja po</translation>
     </message>
     <message>
+        <location/>
         <source>Apply changes before copying schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Zachowaj zmiany przed skopiowaniem harmonogramu</translation>
     </message>
     <message>
+        <location/>
         <source>Copy Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopuj harmonogram...</translation>
     </message>
 </context>
 <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
+        <location filename="ui/dialogs/compatibility_version_installation_dialog.cpp" line="+60"/>
+        <location line="+84"/>
         <source>Installing version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalacja wersji %1</translation>
     </message>
     <message>
+        <location line="-77"/>
+        <location line="+37"/>
         <source>Installation completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalacja zakończona</translation>
     </message>
     <message>
+        <location line="-32"/>
+        <location line="+40"/>
         <source>Installation failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalacjia nie powiodła się</translation>
     </message>
     <message>
+        <location line="-37"/>
+        <location line="+34"/>
         <source>Installation has been cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalacja została anulowana</translation>
     </message>
     <message>
+        <location line="-31"/>
         <source>Could not cancel installation</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można anulować instalacji</translation>
     </message>
 </context>
 <context>
     <name>ConnectionNameDialog</name>
     <message>
+        <location filename="ui/dialogs/connection_name_dialog.ui"/>
         <source>Save connection as...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz połączenie jako...</translation>
     </message>
     <message>
+        <location/>
         <source>Enter name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz nazwę:</translation>
     </message>
     <message>
+        <location/>
         <source>Save password</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz hasło</translation>
     </message>
 </context>
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
+        <location filename="ui/dialogs/connection_testing_dialog.ui"/>
         <source>Connection Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Test połączenia</translation>
     </message>
     <message>
+        <location/>
         <source>Testing connection...</source>
-        <translation type="unfinished"></translation>
+        <translation>Testowanie połączenia...</translation>
     </message>
 </context>
 <context>
     <name>DatabaseManagementWidget</name>
     <message>
+        <location filename="ui/widgets/settings/database_management_widget.ui"/>
         <source>Create Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Stwórz kopię zapasową...</translation>
     </message>
     <message>
+        <location/>
         <source>Restore from Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Przywróć z kopii zapasowej...</translation>
     </message>
 </context>
 <context>
     <name>EventLogDialog</name>
     <message>
+        <location filename="ui/dialogs/event_log_dialog.ui"/>
         <source>Event log</source>
-        <translation type="unfinished"></translation>
+        <translation>Logi zdarzeń</translation>
     </message>
     <message>
+        <location/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
     <message>
+        <location/>
         <source>Clear filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyczyść filtr</translation>
     </message>
     <message>
+        <location/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Odśwież</translation>
     </message>
     <message>
+        <location/>
         <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Dowolna kamera&gt;</translation>
     </message>
     <message>
+        <location/>
         <source>Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarm/Reguły</translation>
     </message>
     <message>
+        <location/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszytkie serwery są wyłączone. Logi są niedostępne.</translation>
     </message>
 </context>
 <context>
     <name>FisheyeSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/properties/fisheye_settings_widget.ui"/>
         <source>Vertical mount (camera on the ceiling)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pionowy montaż (kamera na suficie)</translation>
     </message>
     <message>
+        <location/>
         <source>Horizontal mount (camera on the wall)</source>
-        <translation type="unfinished"></translation>
+        <translation>Montaż poziomy (kamera na ścianie)</translation>
     </message>
     <message>
+        <location/>
         <source>Vertical mount (camera on the floor)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pionowy montaż (kamera na podłodze)</translation>
     </message>
     <message>
+        <location/>
         <source>Camera view angle correction:</source>
-        <translation type="unfinished"></translation>
+        <translation>Korekcja kąta widzenia kamry:</translation>
     </message>
     <message>
+        <location/>
         <source>Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibracja</translation>
     </message>
 </context>
 <context>
     <name>GeneralPreferencesWidget</name>
     <message>
+        <location filename="ui/widgets/settings/general_preferences_widget.ui"/>
         <source>Main Media Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Główny folder mediów</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Przeglądaj...</translation>
     </message>
     <message>
+        <location/>
         <source>Extra Media Folders</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodatkowe foldery mediów</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Add...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dodaj...</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Usuń</translation>
     </message>
     <message>
+        <location/>
         <source>Misc</source>
-        <translation type="unfinished"></translation>
+        <translation>Misc</translation>
     </message>
     <message>
+        <location/>
         <source>Downmix audio from 5.1 to 2.1:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień audio z 5.1 na 2.1:</translation>
     </message>
     <message>
+        <location/>
         <source>Restart required</source>
-        <translation type="unfinished"></translation>
+        <translation>Wymagany restart</translation>
     </message>
     <message>
+        <location/>
         <source>Auto pause video:</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatycznie zatrzymaj video:</translation>
     </message>
     <message>
+        <location/>
         <source>after</source>
-        <translation type="unfinished"></translation>
+        <translation>po</translation>
     </message>
     <message>
+        <location/>
         <source>minutes of inactivity</source>
-        <translation type="unfinished"></translation>
+        <translation>minutach bezczynności</translation>
     </message>
     <message>
+        <location/>
         <source>Run application when PC boots up:</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom aplikację przy starcie komputera:</translation>
     </message>
     <message>
+        <location/>
         <source>Double buffering:</source>
-        <translation type="unfinished"></translation>
+        <translation>Podwójne buforowanie:</translation>
     </message>
     <message>
+        <location/>
         <source>Browse logs</source>
-        <translation type="unfinished"></translation>
+        <translation>Przeglądaj logi</translation>
     </message>
     <message>
+        <location/>
         <source>Clear local cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyczyść lokalny cache</translation>
     </message>
 </context>
 <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
+        <location filename="ui/widgets/settings/general_system_administration_widget.ui"/>
         <source>Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>Administracja</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Alarm/Reguły</translation>
     </message>
     <message>
+        <location/>
         <source>Ctrl+E</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+E</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Logi zdarzeń</translation>
     </message>
     <message>
+        <location/>
         <source>Ctrl+L</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Lista kamer</translation>
     </message>
     <message>
+        <location/>
         <source>Ctrl+M</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+M</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Health Monitoring</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Monitor zasobów</translation>
     </message>
     <message>
+        <location/>
         <source>Open all servers statistics on one layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz statystyki wszytkich serwerów w jednym widoku</translation>
     </message>
     <message>
+        <location/>
+        <source>Camera Management</source>
+        <translation>Zarządzanie kamerą</translation>
+    </message>
+    <message>
+        <location/>
         <source>System Configuration Backup and Restore</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>System Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopia zapasowa i przywracanie ustawień systemu</translation>
     </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
     <message>
+        <location filename="ui/graphics/items/standard/graphics_scroll_bar.cpp" line="+191"/>
         <source>Scroll here</source>
-        <translation type="unfinished"></translation>
+        <translation>Przewiń tu</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Left edge</source>
-        <translation type="unfinished"></translation>
+        <translation>Lewa krawędź</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Top</source>
-        <translation type="unfinished"></translation>
+        <translation>Góra</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Right edge</source>
-        <translation type="unfinished"></translation>
+        <translation>Prawa krawędź</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Bottom</source>
-        <translation type="unfinished"></translation>
+        <translation>Poniżej</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Page left</source>
-        <translation type="unfinished"></translation>
+        <translation>Strona w lewo</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Page up</source>
-        <translation type="unfinished"></translation>
+        <translation>Strona w górę</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Page right</source>
-        <translation type="unfinished"></translation>
+        <translation>Strona w prawo</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Page down</source>
-        <translation type="unfinished"></translation>
+        <translation>Strona w dół</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Scroll left</source>
-        <translation type="unfinished"></translation>
+        <translation>Przewiń w lewo</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Scroll up</source>
-        <translation type="unfinished"></translation>
+        <translation>Przewiń w górę</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Scroll right</source>
-        <translation type="unfinished"></translation>
+        <translation>Przewiń w prawo</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Scroll down</source>
-        <translation type="unfinished"></translation>
+        <translation>Przewiń w dół</translation>
     </message>
 </context>
 <context>
     <name>ImagePreviewDialog</name>
     <message>
+        <location filename="ui/dialogs/image_preview_dialog.ui"/>
         <source>Image View</source>
-        <translation type="unfinished"></translation>
+        <translation>Widok obrazu</translation>
     </message>
     <message>
+        <location/>
         <source>&lt;No image&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;brak obrazu&gt;</translation>
     </message>
     <message>
+        <location/>
         <source>Loading image... Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ładowanie obrazu... Proszę czekać.</translation>
     </message>
 </context>
 <context>
     <name>LayoutSettingsDialog</name>
     <message>
+        <location filename="ui/dialogs/layout_settings_dialog.ui"/>
         <source>Layout Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia widoku</translation>
     </message>
     <message>
+        <location/>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia główne</translation>
     </message>
     <message>
+        <location/>
         <source>Layout is locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Widok zablokowany</translation>
     </message>
     <message>
+        <location/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Tło</translation>
     </message>
     <message>
+        <location/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Przeglądaj...</translation>
     </message>
     <message>
+        <location/>
         <source>View...</source>
-        <translation type="unfinished"></translation>
+        <translation>Widok...</translation>
     </message>
     <message>
+        <location/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyczyść</translation>
     </message>
     <message>
+        <location/>
         <source>Processing image... Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Przetwarzanie obrazu... Proszę czekać.</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Crop to monitor aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Przytnij do proporcji monitora</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Width:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location/>
         <source> cells</source>
-        <translation type="unfinished"></translation>
+        <translation>komórki</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Height:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Wysokość:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Opacity:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Nieprzezroczystość:</translation>
     </message>
     <message>
+        <location/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation>%</translation>
     </message>
     <message>
+        <location/>
         <source>Keep aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Zachowaj proporcje</translation>
     </message>
 </context>
 <context>
     <name>LicenseDetailsDialog</name>
     <message>
+        <location filename="ui/dialogs/license_details_dialog.ui"/>
         <source>License Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Szczegóły licecnji</translation>
     </message>
     <message>
+        <location/>
         <source>Generic</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogólne</translation>
     </message>
     <message>
+        <location/>
         <source>License Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ licecnji:</translation>
     </message>
     <message>
+        <location/>
         <source>License Key:</source>
-        <translation type="unfinished"></translation>
+        <translation>Klucz licecnji:</translation>
     </message>
     <message>
+        <location/>
         <source>Locked to Hardware ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Przypisana do ID sprzętu:</translation>
     </message>
     <message>
+        <location/>
         <source>Features</source>
-        <translation type="unfinished"></translation>
+        <translation>Cechy</translation>
     </message>
 </context>
 <context>
     <name>LicenseManagerWidget</name>
     <message>
+        <location filename="ui/widgets/settings/license_manager_widget.ui"/>
         <source>Active Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywne licencje</translation>
     </message>
     <message>
+        <location/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń</translation>
     </message>
     <message>
+        <location/>
         <source>Selected License Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Szczegóły wybranych licecnji</translation>
     </message>
     <message>
+        <location/>
         <source>New License</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowe licecnje</translation>
     </message>
 </context>
 <context>
     <name>LicenseNotificationDialog</name>
     <message>
+        <location filename="ui/dialogs/license_notification_dialog.ui"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrzeżenie</translation>
     </message>
 </context>
 <context>
     <name>LicenseWidget</name>
     <message>
+        <location filename="ui/widgets/settings/license_widget.ui"/>
         <source>Automatic Activation via Internet</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatyczna aktywacja pezez internet</translation>
     </message>
     <message>
+        <location/>
         <source>Manual Activation</source>
-        <translation type="unfinished"></translation>
+        <translation>Ręczna aktywacja</translation>
     </message>
     <message>
+        <location/>
         <source>License Key:</source>
-        <translation type="unfinished"></translation>
+        <translation>Klucz licencji:</translation>
     </message>
     <message>
+        <location/>
         <source>Paste from Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Wklej ze schowka</translation>
     </message>
     <message>
+        <location/>
         <source>License key is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Klucz licecnji jest nieprawidłowy</translation>
     </message>
     <message>
+        <location/>
         <source>Hardware ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>ID sprzetu:</translation>
     </message>
     <message>
+        <location/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiuj do schowka</translation>
     </message>
     <message>
+        <location/>
         <source>Activation Key File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik aktywacji:</translation>
     </message>
     <message>
+        <location/>
         <source>Select license file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz plik licencji...</translation>
     </message>
     <message>
+        <location/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Przeglądaj...</translation>
     </message>
     <message>
+        <location/>
         <source>License will be bound to the current server</source>
-        <translation type="unfinished"></translation>
+        <translation>Licecnja będzie przypisana do bieżącego serwera</translation>
     </message>
     <message>
+        <location/>
         <source>Activate Free License</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywuj darmową licecnję</translation>
     </message>
     <message>
+        <location/>
         <source>Activate License</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywuj licencje</translation>
     </message>
 </context>
 <context>
     <name>LoginDialog</name>
     <message>
+        <location filename="ui/dialogs/login_dialog.ui"/>
         <source>Connect to Server</source>
         <comment>Groupbox Title</comment>
-        <translation type="unfinished"></translation>
+        <translation>Podłącz do serwera</translation>
     </message>
     <message>
+        <location/>
         <source>Save...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz...</translation>
     </message>
     <message>
+        <location/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Connection options:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Opcje połączenia:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Login:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Hasło:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Test</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Test</translation>
     </message>
     <message>
+        <location/>
         <source>P&amp;ort:</source>
-        <translation type="unfinished"></translation>
+        <translation>P&amp;ort:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Auto-Login</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Auto-Logowanie</translation>
     </message>
 </context>
 <context>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
+        <location filename="ui/widgets/settings/look_and_feel_preferences_widget.ui"/>
         <source>Look and Feel</source>
-        <translation type="unfinished"></translation>
+        <translation>Wygląd</translation>
     </message>
     <message>
+        <location/>
         <source>Timeline mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tryb lini czasu:</translation>
     </message>
     <message>
+        <location/>
         <source>Language:</source>
-        <translation type="unfinished"></translation>
+        <translation>Język:</translation>
     </message>
     <message>
+        <location/>
         <source>Show IP in tree:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaz IP w drzewie:</translation>
     </message>
     <message>
+        <location/>
         <source>Skin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Skóra:</translation>
     </message>
     <message>
+        <location/>
         <source>Tour sequence cycle time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas cyklu sekwencji:</translation>
     </message>
     <message>
+        <location/>
         <source>Restart required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wymagany restart.</translation>
     </message>
     <message>
+        <location/>
         <source> seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>sekund</translation>
     </message>
     <message>
+        <location/>
         <source>Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>Animacja tła</translation>
     </message>
     <message>
+        <location/>
         <source>Enable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz animację tła</translation>
     </message>
     <message>
+        <location/>
         <source>Color:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolor:</translation>
     </message>
     <message>
+        <location/>
         <source>Select color...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz kolor...</translation>
     </message>
     <message>
+        <location/>
         <source>Intensity:</source>
-        <translation type="unfinished"></translation>
+        <translation>Intensywność:</translation>
     </message>
     <message>
+        <location/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation>%</translation>
     </message>
     <message>
+        <location/>
         <source>Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Obraz tła</translation>
     </message>
     <message>
+        <location/>
         <source>Enable Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz obraz tła</translation>
     </message>
     <message>
+        <location/>
         <source>Image:</source>
-        <translation type="unfinished"></translation>
+        <translation>Obraz:</translation>
     </message>
     <message>
+        <location/>
         <source>&lt;No image&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Brak obrazu&gt;</translation>
     </message>
     <message>
+        <location/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Przeglądaj...</translation>
     </message>
     <message>
+        <location/>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tryb:</translation>
     </message>
 </context>
 <context>
     <name>MultipleCameraSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/properties/multiple_camera_settings_widget.ui"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Główne</translation>
     </message>
     <message>
+        <location/>
         <source>Authentication</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwierzytelnianie</translation>
     </message>
     <message>
+        <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło:</translation>
     </message>
     <message>
+        <location/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>Login:</translation>
     </message>
     <message>
+        <location/>
         <source>Image Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Zarządzanie obrazem</translation>
     </message>
     <message>
+        <location/>
         <source>Force aspect ratio to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Współczynnik kształtu:</translation>
     </message>
     <message>
+        <location/>
         <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Domyślny obrót:</translation>
     </message>
     <message>
+        <location/>
         <source>Licensing</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencjonowanie</translation>
     </message>
     <message>
+        <location/>
         <source>Use an analog license to view this camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Użyj licecnji analogowj do oglądania tej kamery</translation>
     </message>
     <message>
+        <location/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobierz więcej licencji...</translation>
     </message>
     <message>
+        <location/>
         <source>Enable audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz audio</translation>
     </message>
     <message>
+        <location/>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished"></translation>
+        <translation>To jest kamera z obiektywem fish-eye</translation>
     </message>
     <message>
+        <location/>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Rejestracja</translation>
     </message>
     <message>
+        <location/>
         <source>Expert</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekspert</translation>
     </message>
 </context>
 <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
+        <location filename="ui/widgets/business/play_sound_business_action_widget.ui"/>
         <source>Manage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zarządzaj...</translation>
     </message>
     <message>
+        <location/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>Głośność:</translation>
     </message>
     <message>
+        <location/>
         <source>Test...</source>
-        <translation type="unfinished"></translation>
+        <translation>Test...</translation>
     </message>
 </context>
 <context>
     <name>PopupBusinessActionWidget</name>
     <message>
+        <location filename="ui/widgets/business/popup_business_action_widget.ui"/>
         <source>Show to Administrators only</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż tylko administratorowi</translation>
     </message>
     <message>
+        <location/>
         <source>Global Notification Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Globalne ustawienia powiadomień...</translation>
     </message>
 </context>
 <context>
     <name>PopupSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/settings/popup_settings_widget.ui"/>
         <source>Show all notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż wszytkie powiadomienia</translation>
     </message>
     <message>
+        <location/>
         <source>Alarms/Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarmy/Zdarzenia</translation>
     </message>
     <message>
+        <location/>
         <source>System Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Powiadomienia systemu</translation>
     </message>
 </context>
 <context>
     <name>PreferencesDialog</name>
     <message>
+        <location filename="ui/dialogs/preferences_dialog.ui"/>
         <source>Local Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia lokalne</translation>
     </message>
 </context>
 <context>
     <name>PtzManageDialog</name>
     <message>
+        <location filename="ui/dialogs/ptz_manage_dialog.ui"/>
         <source>Save Current Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz bieżącą pozycję</translation>
     </message>
     <message>
+        <location/>
         <source>Go To Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Idź do pozycji</translation>
     </message>
     <message>
+        <location/>
         <source>Create Tour</source>
-        <translation type="unfinished"></translation>
+        <translation>Stwórz trasę</translation>
     </message>
     <message>
+        <location/>
         <source>Start Tour</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom trasę</translation>
     </message>
     <message>
+        <location/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń</translation>
     </message>
     <message>
+        <location/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Szczegóły</translation>
     </message>
     <message>
+        <location/>
         <source>No tour selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Trasa nie wybrana</translation>
     </message>
     <message>
+        <location/>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Podgląd</translation>
     </message>
     <message>
+        <location/>
         <source>No preview available</source>
-        <translation type="unfinished"></translation>
+        <translation>Podgląd niedostępny</translation>
     </message>
     <message>
+        <location/>
         <source>Get Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Podgląd</translation>
     </message>
 </context>
 <context>
     <name>PtzOverlayWidget</name>
     <message>
+        <location filename="ui/graphics/instruments/ptz_instrument_p.h" line="+210"/>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>Powiększ</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Pomniejsz</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Focus Far</source>
-        <translation type="unfinished"></translation>
+        <translation>Daleka ostrość</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Focus Near</source>
-        <translation type="unfinished"></translation>
+        <translation>Bliska ostrość</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Auto Focus</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto Focus</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Change Dewarping Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień tryb dewrapingu</translation>
     </message>
 </context>
 <context>
     <name>PtzPresetDialog</name>
     <message>
+        <location filename="ui/dialogs/ptz_preset_dialog.ui"/>
         <source>Save position</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz pozycję</translation>
     </message>
     <message>
+        <location/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa:</translation>
     </message>
     <message>
+        <location/>
         <source>Hotkey:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hotkey:</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
+        <location filename="ui/customization/customizer.cpp" line="+215"/>
         <source>Parameter 1 is null.</source>
-        <translation type="unfinished"></translation>
+        <translation>Parametr 1 jest pusty.</translation>
     </message>
     <message>
+        <location filename="ui/screen_recording/video_recorder_settings.cpp" line="+101"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nic</translation>
     </message>
     <message>
+        <location filename="ui/widgets/business/business_rule_widget.cpp" line="+48"/>
         <source>Stops</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Starts</source>
-        <translation type="unfinished"></translation>
+        <translation>Start</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Starts/Stops</source>
-        <translation type="unfinished"></translation>
+        <translation>Start/Stop</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Occurs</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpienie</translation>
     </message>
 </context>
 <context>
     <name>QTimeSpanPrivate</name>
     <message numerus="yes">
+        <location filename="utils/common/qtimespan.cpp" line="+281"/>
         <source>%n millisecond(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n milisekunda(y)</numerusform>
+            <numerusform>% milisekunda</numerusform>
+            <numerusform>% milisekund(y)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>%n second(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n sekunda(y)</numerusform>
+            <numerusform>% sekunda</numerusform>
+            <numerusform>% sekund(y)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>%n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n minuta(y)</numerusform>
+            <numerusform>% minuta</numerusform>
+            <numerusform>% minut(y)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>%n hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n godzina(y)</numerusform>
+            <numerusform>% godzina</numerusform>
+            <numerusform>% godzin(y)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>%n day(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n dzień(dni)</numerusform>
+            <numerusform>% dzień</numerusform>
+            <numerusform>% dni</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>%n week(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n tydzień(tygodnie)</numerusform>
+            <numerusform>%n tydzień</numerusform>
+            <numerusform>%n tygodnie(dni)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>%n month(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n miesiąc(ce)</numerusform>
+            <numerusform>%n miesiąc</numerusform>
+            <numerusform>%n miesiące(y)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>%n year(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n rok(lata)</numerusform>
+            <numerusform>%n rok</numerusform>
+            <numerusform>%n lat(a)</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnAboutDialog</name>
     <message>
+        <location filename="ui/dialogs/about_dialog.cpp" line="+103"/>
         <source>Server at %2: v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer na %2: v%1</translation>
     </message>
     <message>
+        <location line="+20"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiuj do schowka</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>%1 version %2 (%3).</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 wersja %2 (%3).</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Built for %1-%2 with %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zbudowany dla %1-%2 z %3.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Client is not connected to any server</source>
-        <translation type="unfinished"></translation>
+        <translation>Klient nie jest podłączony do żadnego serwera</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>%1 uses the following external libraries:</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 używa następujących zewnętrznych bibliotek:</translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>OpenGL version</source>
-        <translation type="unfinished"></translation>
+        <translation>Wersja OpenGL</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>OpenGL renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>Odtwarzacz OpenGL </translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>OpenGL vendor</source>
-        <translation type="unfinished"></translation>
+        <translation>Dostawca OpenGL</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>OpenGL max texture size</source>
-        <translation type="unfinished"></translation>
+        <translation> Maksymalny rozmiar tekstur OpenGL</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Support</source>
-        <translation type="unfinished"></translation>
+        <translation>Wsparcie</translation>
     </message>
 </context>
 <context>
     <name>QnAbstractPtzDialog</name>
     <message>
+        <location filename="ui/dialogs/abstract_ptz_dialog.cpp" line="+52"/>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ładowanie...</translation>
     </message>
     <message>
+        <location line="+158"/>
         <source>Saving...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisywanie...</translation>
     </message>
 </context>
 <context>
     <name>QnActionManager</name>
     <message>
+        <location filename="ui/actions/action_manager.cpp" line="+386"/>
         <source>Show FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż FPS</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Hide FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj FPS</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+Alt+F</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Show Debug</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż Debug</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Hide Debug</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj Debug</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+Alt+D</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+5"/>
+        <location line="+285"/>
         <source>Drop Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Upuść</translation>
     </message>
     <message>
+        <location line="-281"/>
         <source>Drop Resources into a New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Upuść do nowej zakładki</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Delayed Open Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>Opóżnienie otwarcia ściany wideo</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Delayed Drop Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Opóźnienie upuszczenia zasobów</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Instant Drop Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Natychmiast zwolnij zasoby</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Move Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Przesuń kamery</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Next Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Następny układ</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+Tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Previous Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Poprzedni układ</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+Shift+Tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaznacz wszystko</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+A</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Selection Changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybór zmian</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>Filter...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtr...</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Reconnect to Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Podłącz ponownie z serwerem</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Go to Freespace Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Przejdź do trybu Freespace</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>F11</source>
-        <translation type="unfinished"></translation>
+        <translation>F11</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Pomoc</translation>
     </message>
     <message>
+        <location line="+5"/>
+        <location line="+799"/>
         <source>Check Camera Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdź problemy kamery</translation>
     </message>
     <message>
+        <location line="-792"/>
+        <location line="+313"/>
         <source>Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>Logi zdarzeń...</translation>
     </message>
     <message>
+        <location line="-308"/>
+        <location line="+300"/>
         <source>Alarm/Event Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarm/Reguły zdarzeń...</translation>
     </message>
     <message>
+        <location line="-295"/>
         <source>Control Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>Zarządzaj ścianą wideo</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Push my screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż mój ekran</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Restart application</source>
-        <translation type="unfinished"></translation>
+        <translation>Restart aplikacji</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Select time server</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaznacz serwer czasu</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Go To Saved Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Idź do zapisanej pozycji</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Activate PTZ Tour</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywuj Trasę PTZ</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Activate PTZ object</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywuj obiekt PTZ</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Fit in View</source>
-        <translation type="unfinished"></translation>
+        <translation>Dopasuj w widoku</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu główne</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Alt+Space</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Połącz z serwerem...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+Shift+C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Logout</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyloguj</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Start Panic Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom tryb nagrywania paniki</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Stop Panic Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj tryb nagrywania paniki</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Ctrl+P</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>New...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy...</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Układ...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>New Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy układ...</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakładka</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowa zakładka</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+T</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Okno</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowe okno</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+N</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>User...</source>
-        <translation type="unfinished"></translation>
+        <translation>Użytkownik...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>New User...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy użytkownik...</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ściana Wideo...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>New Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowa Ściana Wideo...</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Open Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz układ...</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Open...</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz...</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>File(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik(i)...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+O</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Layout(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Układ(y)...</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Folder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Folder...</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Save Current Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz bieżący układ</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+16"/>
+        <location line="+283"/>
         <source>Ctrl+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="-292"/>
         <source>Save Current Layout As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz bieżący układ jako...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+Alt+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
+        <location line="+283"/>
         <source>Save Video Wall View</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz widok Ściany Wideo</translation>
     </message>
     <message>
+        <location line="-267"/>
         <source>Start Screen Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom nagrywanie ekranu</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Stop Screen Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj nagrywanie ekranu</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Alt+R</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Esc</source>
-        <translation type="unfinished"></translation>
+        <translation>Esc</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Stop current action</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj bieżącą akcję</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Go to Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Pełny ekran</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Exit Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Opuść pełny ekran</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Minimize</source>
-        <translation type="unfinished"></translation>
+        <translation>Zminimalizuj</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Maximize</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksymalizuj</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Restore Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Przywróć w dół</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Alt+Enter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Alt+Return</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+951"/>
         <source>Ctrl+F</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="-945"/>
         <source>Show Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż wiadomość</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Show Version Mismatch Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż wiadomość o niezgodności wersji</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Show Beta Version Warning Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż ostrzeżenie o wersji Beta</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Open in Browser...</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz w przeglądarce...</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>System Administration...</source>
-        <translation type="unfinished"></translation>
+        <translation>Administracja systemem...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Open Web Client...</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz klienta web...</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>System Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja systemu...</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Local Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia lokalne...</translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>Ctrl+E</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Camera List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista kamer...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+M</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Merge Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>Połącz systemy...</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>How-to Videos and FAQ...</source>
-        <translation type="unfinished"></translation>
+        <translation>How-to i FAQ...</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>About...</source>
-        <translation type="unfinished"></translation>
+        <translation>O...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>F1</source>
-        <translation type="unfinished"></translation>
+        <translation>F1</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyjście</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Alt+F4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer...</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>Open in Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz w układzie</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation>Monitor systemu</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Open in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz w nowej zakładca</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Monitor in a New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Monitor systemu w nowej zakładce</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Open in New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz w nowym oknie</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Monitor in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Monitor systemu w nowym oknie</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Open Layout in a New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz układ w nowej zakładce</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Open Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz układy</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Open Layout(s) in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz układ w nowym oknie</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Open Current Layout in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz bieżący układ w nowym oknie</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Open Layout(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz układ(y)</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Open Video Wall(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz Scianę wideo</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Open Containing Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz folder zawierający</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+Enter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+Return</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Identify</source>
-        <translation type="unfinished"></translation>
+        <translation>Identyfikacja</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Attach to Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>Dołącz do ściany Wideo...</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Switch to Video Wall mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz w tryb Ściany Wideo...</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Save Current Matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz bieżącą matrycę</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Load Matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>Załaduj Matrycę</translation>
     </message>
     <message>
+        <location line="+5"/>
+        <location line="+54"/>
+        <location line="+190"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń</translation>
     </message>
     <message>
+        <location line="-243"/>
+        <location line="+235"/>
+        <location line="+9"/>
         <source>Del</source>
-        <translation type="unfinished"></translation>
+        <translation>Del</translation>
     </message>
     <message>
+        <location line="-238"/>
         <source>Update Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizuj układ</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Stop Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj Ścianę wideo</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Detach Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Odłącz układ</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Save Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz układ</translation>
     </message>
     <message>
+        <location line="+6"/>
+        <location line="+6"/>
         <source>Save Layout As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz układ jako...</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Maximize Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksymalizuj element</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+8"/>
         <source>Enter</source>
-        <translation type="unfinished"></translation>
+        <translation>Enter</translation>
     </message>
     <message>
+        <location line="-7"/>
+        <location line="+8"/>
         <source>Return</source>
-        <translation type="unfinished"></translation>
+        <translation>Powrót</translation>
     </message>
     <message>
+        <location line="-2"/>
         <source>Restore Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Przywróć element</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Show Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż Informacje</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+6"/>
+        <location line="+6"/>
+        <location line="+60"/>
         <source>Alt+I</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="-67"/>
         <source>Hide Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj informacje</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Toggle Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz Info</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Change Resolution...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień rozdzielczość...</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Wysoki</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>PTZ...</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ...</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Save Current Position...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz bieżącą pozycję...</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Manage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zarządzaj...</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Calibrate Fisheye</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibracja Fisheye</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Toggle Resolution Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz tryb rozdzielczości</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Show Motion/Smart Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż Ruch/Wyszukiwanie inteligentne</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Show Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż ruch</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+7"/>
+        <location line="+11"/>
         <source>Alt+G</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="-13"/>
         <source>Hide Motion/Smart Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj Ruch/Inteligentne przeszukiwanie</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Hide Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj ruch</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Clear Motion Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyczyść zaznaczenie ruchu</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Toggle Smart Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz inteligentne wyszukiwanie</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Check File Watermark</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdź znak wodny pliku</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Take Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Zrób zrzut ekranu</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Alt+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Image Enhancement...</source>
-        <translation type="unfinished"></translation>
+        <translation>Regulacja Wyświetlania...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Alt+J</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Create Zoom Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Stwórz okno z powiększeniem</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Rotate to...</source>
-        <translation type="unfinished"></translation>
+        <translation>Obróc do...</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>0 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>0 stopni</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>90 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>90 stopni</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>180 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>180 stopni</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>270 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>270 stopni</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Remove from Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń z układu</translation>
     </message>
     <message>
+        <location line="+23"/>
+        <location line="+8"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień nazwę</translation>
     </message>
     <message>
+        <location line="-7"/>
+        <location line="+8"/>
         <source>F2</source>
-        <translation type="unfinished"></translation>
+        <translation>F2</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Delete from Disk</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń z dysku</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Set as Layout Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustaw jako układ tła</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>User Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia użytkownika...</translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Reguły kamer...</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia kamery...</translation>
     </message>
     <message>
+        <location line="+14"/>
+        <location line="+140"/>
         <source>Layout Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia układu...</translation>
     </message>
     <message>
+        <location line="-134"/>
         <source>Video Wall Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia Ściany wideo...</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Open in Camera Settings Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz w oknie ustawień kamery</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Add Camera(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj kamerę(y)...</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Camera(s) List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista kamer z serwera</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Ping...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ping...</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Server Logs...</source>
-        <translation type="unfinished"></translation>
+        <translation>Logi serwera...</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Server Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostyka serwera...</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Server Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia serwera...</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>Scal z aktualnie podłączonym systemem...</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Change Cell Aspect Ratio...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień proporcjie  komórek...</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Change Cell Spacing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień odstępy między komórkami...</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nic</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Small</source>
-        <translation type="unfinished"></translation>
+        <translation>Mały</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Średni</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Large</source>
-        <translation type="unfinished"></translation>
+        <translation>Duży</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>Start Tour</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchhom trasę</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Stop Tour</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj trasę</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Alt+T</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+21"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamknij</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Ctrl+W</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+W</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Close All But This</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaknij wszytko, ale to</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Mark Selection Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaznacz początek</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>[</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Mark Selection End</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaznacz koniec</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>]</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Clear Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyczyść zaznaczenie</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Zoom to Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom do zaznaczenia</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Bookmark Selection...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybór zakładki...</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Edit Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj zakładkę...</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Remove Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń zakładkę...</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Export Selected Area...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksport wybranego obszaru...</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Export Multi-Video...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksport multiwidoku...</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Preview Search...</source>
-        <translation type="unfinished"></translation>
+        <translation>Przeszukiwanie na podglądzie...</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Ctrl+Alt+Shift++</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Increment Debug Counter</source>
-        <translation type="unfinished"></translation>
+        <translation>Wzrost licznika Debug</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Ctrl+Alt+Shift+-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Decrement Debug Counter</source>
-        <translation type="unfinished"></translation>
+        <translation>Obniżenie licznika Debug</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Ctrl+Alt+Shift+R</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Show Resource Pool</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż zasoby</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Calibrate PTZ</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibracja PTZ</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Get PTZ Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobierz pozycję PTZ</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Ctrl+Alt+Shift+D</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Debug Control Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>Panel kontrolny Debug</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Przestrzeń</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Pauza</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Ctrl+-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Speed Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwolnij</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Ctrl++</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Speed Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Przyśpiesz</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Ctrl+Left</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Previous Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Poprzednia klatka</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Ctrl+Right</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Next Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Następna klatka</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Z</source>
-        <translation type="unfinished"></translation>
+        <translation>Z</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>To Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Zacznij</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>To End</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Ctrl+Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Up</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Volume Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Ścisz</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Ctrl+Down</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Volume Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Podgłoś</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>M</source>
-        <translation type="unfinished"></translation>
+        <translation>M</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Toggle Mute</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz wyciszenie</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>L</source>
-        <translation type="unfinished"></translation>
+        <translation>L</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Jump to Live</source>
-        <translation type="unfinished"></translation>
+        <translation>Skocz do Na Żywo</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation>S</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Synchronize Streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronizuj strumienie</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Disable Stream Synchronization</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłącz synchronizację strumieni</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Show Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż miniatury</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Hide Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj miniatury</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Show Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż kalendarz</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Hide Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj Kalendarz</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Show Title Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż pasek tytułowy</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Hide Title Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj pasek tytułowy</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Pin Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Przypnij drzewo</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Unpin Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Odłącz drzewo</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Show Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż drzewo</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Hide Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj drzewo</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Show Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż oś czasu</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Hide Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj linie czasu</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Pin Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Przypnij powiadomienia</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Unpin Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Odłącz powiadomienia</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Ctrl+Alt+T</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Disable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłącz animację tła</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Enable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>Włacz animacje tła</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Show Search Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż panel przeszukiwania</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Hide Search Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj panel przeszukiwania</translation>
     </message>
     <message>
+        <location line="-383"/>
         <source>File Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ask About Statistics Reporting</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia pliku...</translation>
     </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
     <message>
+        <location filename="ui/dialogs/adjust_video_dialog.cpp" line="+63"/>
         <source>Image Enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Wzmocnienie obrazu</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Image Enhancement - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Wzmocnienie obrazu - %1</translation>
     </message>
 </context>
 <context>
     <name>QnAggregationWidget</name>
     <message>
+        <location filename="ui/widgets/business/aggregation_widget.cpp" line="+18"/>
         <source>sec</source>
-        <translation type="unfinished"></translation>
+        <translation>sek</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>min</source>
-        <translation type="unfinished"></translation>
+        <translation>min</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>hrs</source>
-        <translation type="unfinished"></translation>
+        <translation>godz</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>days</source>
-        <translation type="unfinished"></translation>
+        <translation>dni</translation>
     </message>
 </context>
 <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
+        <location filename="ui/dialogs/attach_to_videowall_dialog.ui"/>
         <source>Attach to Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>Dołącz do ściany Wideo...</translation>
     </message>
     <message>
+        <location/>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Podgląd</translation>
     </message>
 </context>
 <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message>
+        <location filename="ui/graphics/items/notifications/notifications_collection_widget.cpp" line="+71"/>
         <source>You have new notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Masz nowe powiadomienia</translation>
     </message>
     <message numerus="yes">
+        <location line="+51"/>
         <source>You have %n notifications</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Masz %n powiadomień</numerusform>
+            <numerusform>Masz %n powiadomienie</numerusform>
+            <numerusform>Masz %n powiadomień</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnBuildNumberDialog</name>
     <message>
+        <location filename="ui/dialogs/build_number_dialog.ui"/>
         <source>Install specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>Instaluj własną kompilację</translation>
     </message>
     <message>
+        <location/>
         <source>Build number:</source>
-        <translation type="unfinished"></translation>
+        <translation>Numer kompilacji:</translation>
     </message>
     <message>
+        <location/>
         <source>99990</source>
-        <translation type="unfinished"></translation>
+        <translation>99990</translation>
     </message>
     <message>
+        <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło:</translation>
     </message>
     <message>
+        <location filename="ui/dialogs/build_number_dialog.cpp" line="+47"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>The password you have entered is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Podane hasło jest błędne</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
     <message>
+        <location filename="business/business_resource_validation.cpp" line="+15"/>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Dowolna Kamera&gt;</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz co najmniej jedną kamerę</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Kamera(y)</numerusform>
+            <numerusform>%n Kamera</numerusform>
+            <numerusform>%n Kamery</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>%n of %1 cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n of %1 kamer</numerusform>
+            <numerusform>%n of %1 kamera</numerusform>
+            <numerusform>%n of %1 kamer</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
+        <location filename="ui/delegates/business_rule_item_delegate.cpp" line="+165"/>
         <source>For All Users</source>
-        <translation type="unfinished"></translation>
+        <translation>Dla wszystkich użytkowników</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>For Administrators Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Tylko dla Administratorów</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
+        <location filename="ui/models/business_rule_view_model.cpp" line="+644"/>
         <source>Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd:%1</translation>
     </message>
     <message>
+        <location line="+176"/>
+        <location line="+70"/>
         <source>&lt;System&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;System&gt;</translation>
     </message>
     <message>
+        <location line="-65"/>
         <source>&lt;Any Server&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;dowolny serwer&gt;</translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>%n Server(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Serwer(y)</numerusform>
+            <numerusform>%n Serwer</numerusform>
+            <numerusform>%n Serwery</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;dowolna kamera&gt;</translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
+        <location line="+65"/>
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Kamer(y)</numerusform>
+            <numerusform>%n Kamera</numerusform>
+            <numerusform>%n Kamery</numerusform>
         </translation>
     </message>
     <message>
+        <location line="-42"/>
         <source>Administrators only</source>
-        <translation type="unfinished"></translation>
+        <translation>Tylko administrator</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>All users</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszyscy użytkownicy</translation>
     </message>
     <message>
+        <location line="+16"/>
         <source>Select a sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz dźwiek</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Enter text</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz tekst</translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>Select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz co najmniej jedną kamerę</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>Not Applied</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie zastosowano</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Instant</source>
-        <translation type="unfinished"></translation>
+        <translation>Natychmiast</translation>
     </message>
     <message numerus="yes">
+        <location line="+3"/>
         <source>Every %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Co</numerusform>
+            <numerusform>%n dzień</numerusform>
+            <numerusform>%n dni</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+3"/>
         <source>Every %n hours</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Co</numerusform>
+            <numerusform>%n godzinę</numerusform>
+            <numerusform>%n godziny</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+3"/>
         <source>Every %n minutes</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Co</numerusform>
+            <numerusform>%n minutę</numerusform>
+            <numerusform>%n minuty</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>Every %n seconds</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Co </numerusform>
+            <numerusform>%n sekundę</numerusform>
+            <numerusform>%n sekundy</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Stops</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Starts</source>
-        <translation type="unfinished"></translation>
+        <translation>Start</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Starts/Stops</source>
-        <translation type="unfinished"></translation>
+        <translation>Start/Stop</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>start</source>
-        <translation type="unfinished"></translation>
+        <translation>start</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>stop</source>
-        <translation type="unfinished"></translation>
+        <translation>stop</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>While %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Podczas %1</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>On %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>On %1 %2</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
     <message>
+        <location filename="ui/widgets/business/business_rule_widget.cpp" line="+110"/>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>do</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>at</source>
-        <translation type="unfinished"></translation>
+        <translation>na</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRulesDialog</name>
     <message>
+        <location filename="ui/dialogs/business_rules_dialog.cpp" line="+62"/>
         <source>Reset Default Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Przywróć domyślne reguły</translation>
     </message>
     <message>
+        <location line="+150"/>
         <source>Confirm rules reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Potwierdź reset ustawień</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Are you sure you want to reset rules to the defaults?</source>
-        <translation type="unfinished"></translation>
+        <translation>Czy jesteś pewny  że chcesz zresetować reguły do ustawień domyślnych?</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta akcja nie może być cofnięta!</translation>
     </message>
     <message>
+        <location line="+17"/>
+        <location line="+3"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="-3"/>
         <source>Error while receiving rules.</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd podczas przyjęcia reguł.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Error while saving rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd podczas zapisu reguły.</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>Error while deleting rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd podczas usuwania reguły</translation>
     </message>
     <message>
+        <location line="+38"/>
         <source>Hide Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukryj Zaawansowane</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Show Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż zaawansowane</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>&amp;New...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Nowy...</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>&amp;Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Usuń</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>&amp;Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Harmonogram...</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>Confirm save</source>
-        <translation type="unfinished"></translation>
+        <translation>Potwierdź zapis</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Some rules are not valid. Should they be disabled?</source>
-        <translation type="unfinished"></translation>
+        <translation>Niektóre reguły są niedostepne. Czy powinny być wyłączone?</translation>
     </message>
     <message>
+        <location line="+155"/>
         <source>Confirm exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Potwierdź wyjście</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Unsaved changes will be lost. Save?</source>
-        <translation type="unfinished"></translation>
+        <translation>Niezapisane zmiany zostaną utracone. Zapisać?</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRulesViewModel</name>
     <message>
+        <location filename="ui/models/business_rules_view_model.cpp" line="+140"/>
         <source>#</source>
-        <translation type="unfinished"></translation>
+        <translation>#</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Na</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Zdarzenie</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Źródło</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>-&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>-&gt;</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Akcja</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Target</source>
-        <translation type="unfinished"></translation>
+        <translation>Cel</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Interval of Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Przerwa w akcji</translation>
     </message>
 </context>
 <context>
     <name>QnCameraAdditionDialog</name>
     <message>
+        <location filename="ui/dialogs/camera_addition_dialog.cpp" line="+128"/>
         <source>Examples:</source>
-        <translation type="unfinished"></translation>
+        <translation>Przykłady:</translation>
     </message>
     <message>
+        <location line="+123"/>
+        <location line="+505"/>
         <source>Initializing scan...</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchamianie skanowania...</translation>
     </message>
     <message>
+        <location line="-354"/>
+        <location line="+252"/>
+        <location line="+91"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="-342"/>
         <source>Server is offline.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer jest wyłączony.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Camera addition is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodanie kamery jest mozliwe tylko do aktywnego serwera.</translation>
     </message>
     <message>
+        <location line="+157"/>
         <source>First address in range is greater than the last one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pierwszy adres w zakresie jest wiekszy niż ostatni.</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Specified IP address range contains more than 255 addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Określony zakres adresów IP zawiera ponad 255 adresów.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Camera address field must contain valid URL, IP address or RTSP link.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pole adresu kamery musi zawierać poprawny URL, adres IP lub link RTSP.</translation>
     </message>
     <message>
+        <location line="+23"/>
         <source>Finishing search...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kończenie wyszukiwania...</translation>
     </message>
     <message>
+        <location line="+25"/>
         <source>No cameras selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie wybrano kamer.</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Please select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz co najmniej jedną kamerę</translation>
     </message>
     <message>
+        <location line="+22"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Powodzenie</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>%n cameras added successfully.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n kamer zostało dodanych.</numerusform>
+            <numerusform>%n kamea została dodana.</numerusform>
+            <numerusform>%n kamer zostało dodanych.</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>It might take a few moments to populate them in the tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>To może potrwać kilka chwil, aby rozpropagować je w drzewie.</translation>
     </message>
     <message numerus="yes">
+        <location line="+8"/>
         <source>Error while adding %n cameras.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Błąd podczas dodawania %n kamer.</numerusform>
+            <numerusform>Błąd podczas dodawania %n kamery.</numerusform>
+            <numerusform>Błąd podczas dodawania %n kamer.</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+41"/>
         <source>Server went offline, search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer jest offline, wyszukiwanie przerwane.</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Server went offline, cameras can be added when the server will be available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer jest offline, kamery mogą być dodane kiedy serwer będzie dostępny.</translation>
     </message>
     <message>
+        <location line="+26"/>
         <source>Server was removed, search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer został usunięty, wyszukiwanie przerwane.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Server was removed, cameras cannot be added anymore.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer został usunięty, nie można dodać kamer.</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Error while searching cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd podczas wyszukiwania kamer.</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Scanning online hosts...</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanowanie hostów online...</translation>
     </message>
     <message numerus="yes">
+        <location line="+5"/>
         <source>Scanning hosts... (%1)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Skanowanie hostów... (%1)</numerusform>
+            <numerusform>Skanowanie hosta... (%1)</numerusform>
+            <numerusform>Skanowanie hostów... (%1)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>%n cameras found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n kamer zostało znalezionych</numerusform>
+            <numerusform>%n kameara została znaleziona</numerusform>
+            <numerusform>%n kamer zostało znalezionych</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+11"/>
+        <location line="+3"/>
         <source>Finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakończono</translation>
     </message>
     <message>
+        <location line="-3"/>
         <source>All cameras are already in the resource tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszytkie kamery znajdują się w drzewie.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>No cameras found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie odnaleziono kamer.</translation>
     </message>
     <message>
+        <location line="+37"/>
         <source>Add cameras to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj kamery do %1</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Add cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj kamery...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Select target server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz docelowy serwer...</translation>
     </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/properties/camera_advanced_settings_widget.cpp" line="+51"/>
         <source>Please wait while settings are being loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę czekać ustawienia są ładowane.</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>This can take a lot of time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Może to zająć dużo czasu.</translation>
     </message>
     <message>
+        <location line="+208"/>
         <source>Applying settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zastosowywanie usatwień...</translation>
     </message>
     <message>
+        <location line="+82"/>
         <source>Possibly, appropriate camera&apos;s service is unavailable now</source>
-        <translation type="unfinished"></translation>
+        <translation>Możliwe, że właściwe ustawienia kamery są niedostępne teraz</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Server returned the following error code : </source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer zwrócił następujący kod błędu:</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Could not save parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można zapisać parametrów</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd zapisu następujących parametrów (%1): %2</translation>
     </message>
 </context>
 <context>
     <name>QnCameraBookmarkDialog</name>
     <message>
+        <location filename="ui/dialogs/camera_bookmark_dialog.ui"/>
         <source>Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakładka</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Name</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Nazwa</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Description</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Opis</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Koniec czasu</translation>
     </message>
     <message>
+        <location/>
         <source>T&amp;ags</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Znacznik</translation>
     </message>
     <message>
+        <location/>
         <source>List of tags divided by commas or spaces</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista znaczników rozdzielona przecinkami lub spacjami</translation>
     </message>
     <message>
+        <location filename="ui/dialogs/camera_bookmark_dialog.cpp" line="+70"/>
         <source>Do not lock archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie blokuj archiwum</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>1 month</source>
-        <translation type="unfinished"></translation>
+        <translation>1 miesiąc</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>3 month</source>
-        <translation type="unfinished"></translation>
+        <translation>3 miesiące</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>6 month</source>
-        <translation type="unfinished"></translation>
+        <translation>6 miesięcy</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>year</source>
-        <translation type="unfinished"></translation>
+        <translation>rok</translation>
     </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
+        <location filename="ui/dialogs/camera_diagnostics_dialog.cpp" line="+30"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiuj do schowka</translation>
     </message>
     <message>
+        <location line="+69"/>
         <source>Diagnostics for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnozowanie kamery %1.</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Checking Server availability</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzanie dostępności serwera</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Checking that camera is accessible</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzanie czy kamera jest dostępna</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Checking that camera provides media stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzanie czy kamera dostarcza strumień</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Checking media stream for errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzanie strumienia </translation>
     </message>
     <message>
+        <location line="+16"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>FAILED: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>BŁĄD: %1</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Diagnostics finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakończenie diagnostyki</translation>
     </message>
 </context>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
+        <location filename="ui/widgets/business/camera_input_business_event_widget.cpp" line="+50"/>
         <source>&lt;automatic&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;automatyczne&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
+        <location filename="business/business_resource_validation.cpp" line="+43"/>
         <source>%1 have no input ports</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 nie mają portów wejściowych</numerusform>
+            <numerusform>%1 nie ma portów wejściowych</numerusform>
+            <numerusform>%1 nie mają portów wejściowych</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnCameraListDialog</name>
     <message>
+        <location filename="ui/dialogs/camera_list_dialog.cpp" line="+54"/>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiuj zaznaczenie do schowka</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksportuj zaznaczenie do Pliku...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaznacz wszystko</translation>
     </message>
     <message numerus="yes">
+        <location line="+40"/>
         <source>Camera List - %n camera(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Lista Kamer- %n kamer znaleziono</numerusform>
+            <numerusform>Lista Kamer- %n kamera znaleziona</numerusform>
+            <numerusform>Lista Kamer- %n kamer znaleziono</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Lista Kamer dla &apos;%1&apos;- %n kamer znaleziono</numerusform>
+            <numerusform>Lista Kamer dla &apos;%1&apos;- %n kamerę znaleziono</numerusform>
+            <numerusform>Lista Kamer dla &apos;%1&apos;- %n kamer znaleziono</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+53"/>
         <source>Export selected cameras to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksportuj zaznaczone kamery do pliku</translation>
     </message>
 </context>
 <context>
     <name>QnCameraListModel</name>
     <message>
+        <location filename="ui/models/camera_list_model.cpp" line="+124"/>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywanie</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Vendor</source>
-        <translation type="unfinished"></translation>
+        <translation>Producent</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Model</source>
-        <translation type="unfinished"></translation>
+        <translation>Model</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Firmware</source>
-        <translation type="unfinished"></translation>
+        <translation>Firmware</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>IP/Name</source>
-        <translation type="unfinished"></translation>
+        <translation>IP/Nazwa</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>MAC address</source>
-        <translation type="unfinished"></translation>
+        <translation>MAC adres</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMotionMaskWidget</name>
     <message>
+        <location filename="ui/widgets/properties/camera_motion_mask_widget.cpp" line="+190"/>
+        <location line="+9"/>
+        <location line="+9"/>
         <source>Too many motion windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Zbyt wiele okien ruchu</translation>
     </message>
     <message>
+        <location line="-17"/>
         <source>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksymalna liczba okien ruchu dla bieżącej kamery wynosi %1, ale %2 okna ruchu są teraz zaznaczone.</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksymalna liczba różnych czułości ruchu dla bieżącej kamery wynosi %1, ale %2 czułuści ruchu są teraz zaznaczone.</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksymalna liczba masek ruchu dla bieżącej kamery wynosi %1, ale %2 maskii ruchu są teraz zaznaczone.</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMotionPolicy</name>
     <message numerus="yes">
+        <location filename="business/business_resource_validation.cpp" line="+20"/>
         <source>Recording or motion detection is disabled for %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nagrywanie lub detekcja ruchu jest wyłączona dla %1</numerusform>
+            <numerusform>Nagrywanie lub detekcja ruchu jest wyłączona dla %1</numerusform>
+            <numerusform>Nagrywanie lub detekcja ruchu jest wyłączona dla %1</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
+        <location filename="ui/widgets/business/camera_output_business_action_widget.cpp" line="+71"/>
         <source>&lt;automatic&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;automatyczne&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
+        <location filename="business/business_resource_validation.cpp" line="-10"/>
         <source>%1 have no output relays</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 nie mają portów wyjściowych</numerusform>
+            <numerusform>%1 nie ma portów wyjściowych</numerusform>
+            <numerusform>%1 nie mają portów wyjściowych</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
+        <location line="+20"/>
         <source>Recording is disabled for %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nagrywanie jest wyłączone dla %1</numerusform>
+            <numerusform>Nagrywanie jest wyłączone dla %1</numerusform>
+            <numerusform>Nagrywanie jest wyłączone dla %1</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnCameraScheduleWidget</name>
     <message>
+        <location filename="ui/widgets/properties/camera_schedule_widget.cpp" line="+401"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłącz</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz</translation>
     </message>
     <message>
+        <location line="+178"/>
+        <location line="+5"/>
+        <source>FPS value is too high</source>
+        <translation>Liczba klatek (FPS) jest za duża</translation>
+    </message>
+    <message>
+        <location line="-4"/>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation>Aktualny liczba fps w siatce jest %1. Liczba fps została obniżona do maksymalnej liczby fps kamery %2.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation>Dla programowej detekcji ruchu 2 fps są zarezerwowane dla drugiego strumienia. Aktualna liczba fps w siatce harmonogramu wynosi %1. Liczba fps została obniżona do %2.</translation>
+    </message>
+    <message>
+        <location line="+266"/>
+        <location line="+3"/>
+        <location line="+2"/>
+        <location line="+2"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrzeżenie</translation>
     </message>
     <message>
+        <location line="-7"/>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rejsetsracja na detekcję ruchu jest wyłączona llub nie jest obsługiwana przez niektóre z wybranych kamer. Proszę przejść do zakładki z ustawieniami detekcji ruchu i upewnić czy jest wspierana i włączona.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Dual-Streaming is not supported by this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dual-Streaming  nie jest wpierany przez  kamerę.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dual-Streaming i detekcja ruchu nie są dostępne dla kamery.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detekcja ruchu jest wyłączona. Proszę przejść do ustawień detekcji i ruchu kamery.</translation>
     </message>
 </context>
 <context>
     <name>QnCameraSettingsDialog</name>
     <message>
+        <location filename="ui/dialogs/camera_settings_dialog.cpp" line="+35"/>
         <source>Camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia kamery</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Open in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz w nowej Karcie</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostyka kamer</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Camera Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Reguły kamer</translation>
     </message>
     <message>
+        <location line="+110"/>
         <source>Camera(s) not Saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera(y) nie zapisana(e)</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>Save changes to the following %n camera(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Zapisać zmiany do następującej %n kamery?</numerusform>
+            <numerusform>Zapisać zmiany do następującej %n kamery?</numerusform>
+            <numerusform>Zapisać zmiany do następujących %n kamer?</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmiany nagrywania nie zostały zapisane. Wybierz  rodzaj zapisu, FPS,jakość i zaznacz zmiany na harmonogrami.</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+9"/>
         <source>Changes are not applied</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmiany nie zostały zastosowane.</translation>
     </message>
     <message>
+        <location line="-1"/>
         <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Czułość ruchu nie została zmieniona. Aby zmienić czułość ruchu narysuj prostokąty na obrazie.</translation>
     </message>
     <message>
+        <location line="+36"/>
         <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Przekroczono limit licencji. Zmiany zostaną zapisane, ale nie będą aktywne.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Could not apply changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można zastosować zmian</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>Could not save the following %n cameras to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nie można zapisać następujących %n kamer na serwerze.</numerusform>
+            <numerusform>Nie można zapisać następującej %n kamery na serwerze.</numerusform>
+            <numerusform>Nie można zapisać następujących %n kamer na serwerze.</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnCameraSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/properties/camera_settings_widget.cpp" line="+22"/>
         <source>Cannot edit properties for items of different types.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można edytować właściwości elementów różnych typów.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>No cameras selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie wybrano kamery.</translation>
     </message>
 </context>
 <context>
     <name>QnCheckableMessageBox</name>
     <message>
+        <location filename="ui/dialogs/checkable_message_box.cpp" line="+44"/>
         <source>Do not ask again</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie pytaj ponownie.</translation>
     </message>
 </context>
 <context>
     <name>QnClientVideoCamera</name>
     <message>
+        <location filename="camera/client_video_camera.cpp" line="+18"/>
         <source>Invalid resource type for data export.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowy typ źródłau dla eksportu danych.</translation>
     </message>
 </context>
 <context>
     <name>QnClockLabel</name>
     <message>
+        <location filename="ui/graphics/items/controls/clock_label.cpp" line="+92"/>
         <source>Server time</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer czasu</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Local system time</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemowy czas lokalny</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
+        <location filename="update/connect_to_current_system_tool.cpp" line="+70"/>
         <source>Configuring server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfiguracja serwera(ów)</translation>
     </message>
     <message>
+        <location line="+54"/>
         <source>Updating server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacj serwera(ów)</translation>
     </message>
 </context>
 <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
+        <location filename="utils/connection_diagnostics_helper.cpp" line="+68"/>
+        <location line="+237"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Login lub hasło jest niepoprawne, spróbuj ponownie.</translation>
     </message>
     <message>
+        <location line="-235"/>
+        <location line="+239"/>
         <source>Connection to the Server could not be established.</source>
-        <translation type="unfinished"></translation>
+        <translation>Połączenie z serwerm nie może być zrealizowane.</translation>
     </message>
     <message>
+        <location line="-238"/>
+        <location line="+239"/>
         <source>Connection details that you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Podane parametry połączenia są niepoprawne, spróbuj ponownie.</translation>
     </message>
     <message>
+        <location line="-238"/>
+        <location line="+239"/>
         <source>If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeśli błąd będzie się powtarzał, skontaktuj się z administratorem systemu.</translation>
     </message>
     <message>
+        <location line="-237"/>
+        <location line="+241"/>
         <source>You are trying to connect to incompatible Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Próbujesz się połączyć z niekompatybilnym serwerem.</translation>
     </message>
     <message>
+        <location line="-234"/>
+        <location line="+44"/>
+        <location line="+12"/>
+        <location line="+14"/>
+        <location line="+18"/>
+        <location line="+10"/>
+        <location line="+19"/>
+        <location line="+27"/>
         <source>Could not connect to Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można połączyć się z serwerem</translation>
     </message>
     <message>
+        <location line="-137"/>
+        <location line="+112"/>
+        <location line="+97"/>
         <source> - Client version: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>- Wersja klienta: %1.</translation>
     </message>
     <message>
+        <location line="-208"/>
+        <location line="+112"/>
+        <location line="+97"/>
         <source> - Server version: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>- Wersja serwera: %1.</translation>
     </message>
     <message>
+        <location line="-184"/>
+        <location line="+220"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer</translation>
     </message>
     <message>
+        <location line="-219"/>
+        <location line="+220"/>
         <source>Client</source>
-        <translation type="unfinished"></translation>
+        <translation>Klient</translation>
     </message>
     <message>
+        <location line="-219"/>
+        <location line="+22"/>
+        <location line="+61"/>
+        <location line="+27"/>
         <source>You are about to connect to Server which has a different version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Próbujesz połączyć się z serwerem, który ma inną wersję:</translation>
     </message>
     <message>
+        <location line="-108"/>
         <source>These versions are not compatible. Please update your %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta wersja jest niekompatybilna. Proszę zaktualizować swój %1.</translation>
     </message>
     <message>
+        <location line="+22"/>
+        <location line="+184"/>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tryb zgodności w wersjach niższych niż %1 nie jest obsługiwany.</translation>
     </message>
     <message>
+        <location line="-172"/>
+        <location line="+18"/>
+        <location line="+10"/>
         <source>Selected Server has a different version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybrany serwer ma inną wersję:</translation>
     </message>
     <message>
+        <location line="-26"/>
+        <location line="+28"/>
         <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inna werja Klienta jest potrzebna  w celu nawiązania połączenia z tym serwerem.</translation>
     </message>
     <message>
+        <location line="-10"/>
         <source>An error has occurred while trying to restart in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpił błąd podczas próby ponownego uruchomienia w trybie zgodności.</translation>
     </message>
     <message>
+        <location line="+30"/>
         <source>Client version %1 is required to connect to this Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wersja %1 klienta jest wymagana do podłączenia do tego Serwera.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Download version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobrać wersję %1?</translation>
     </message>
     <message>
+        <location line="+25"/>
         <source>Would you like to restart the Client in compatibility mode?</source>
-        <translation type="unfinished"></translation>
+        <translation>Czy chcesz  ponownie uruchomić klienta w trybie zgodności?</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Launcher process is not found</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Cannot restart the Client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można ponownie uruchomić klienta w trybie zgodności.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę zamknąć aplikację i uruchomić ją ponownie za pomocą skrótu w menu Start.</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Niepowodzenie</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Failed to launch compatibility version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Failed to launch compatibility version %1</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Try to restore version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Spróbować przywrócić wersję %1?</translation>
     </message>
     <message>
+        <location line="+65"/>
+        <location line="+6"/>
+        <location line="+8"/>
         <source>Server has a different version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer posiada inną wersję:</translation>
     </message>
     <message>
+        <location line="-6"/>
         <source>You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zostaniesz poproszony o ponowne uruchomienie klienta w trybie zgodności.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>You will be asked to update your %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Zostaniesz poproszony, aby zaktualizować%1</translation>
     </message>
 </context>
 <context>
     <name>QnConnectionTestingDialog</name>
     <message>
+        <location filename="ui/dialogs/connection_testing_dialog.cpp" line="+73"/>
         <source>Request timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation>Upłynął limit czasu żądania.</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Powodzenie</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Niepowodzenie</translation>
     </message>
 </context>
 <context>
     <name>QnCredentialsDialog</name>
     <message>
+        <location filename="ui/dialogs/credentials_dialog.ui"/>
         <source>Enter user name and password...</source>
-        <translation type="unfinished"></translation>
+        <translation>Podaj nazwę użytkownika i hasło...</translation>
     </message>
     <message>
+        <location/>
         <source>User:</source>
-        <translation type="unfinished"></translation>
+        <translation>Użytkownik:</translation>
     </message>
     <message>
+        <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło:</translation>
     </message>
 </context>
 <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
+        <location filename="ui/widgets/settings/database_management_widget.cpp" line="+34"/>
         <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>Możesz utworzyć kopię zapasową konfiguracji systemu, która może być przywrócona w przypadku awarii.</translation>
     </message>
     <message>
+        <location line="+16"/>
         <source>Save Database Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz kopię bazy danych...</translation>
     </message>
     <message>
+        <location line="+2"/>
+        <location line="+57"/>
         <source>Database Backup Files (*.db)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pliki kopi zapasowej bazy danych (*.db)</translation>
     </message>
     <message>
+        <location line="-39"/>
+        <location line="+51"/>
+        <location line="+48"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="-99"/>
         <source>Could not open file &apos;%1&apos; for writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można otworzyć pliku &apos;%1&apos; do zapisu.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Downloading Database Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobieranie kopi bazy danych</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Database backup is being downloaded from the server. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopia bazy danych jest pobierana z serwera. Proszę czekać.</translation>
     </message>
     <message>
+        <location line="+19"/>
+        <location line="+7"/>
+        <location line="+47"/>
+        <location line="+12"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacja</translation>
     </message>
     <message>
+        <location line="-66"/>
         <source>Failed to dump Server database to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się zrzucić do serwera bazy danych &apos;%1&apos;</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Database was successfully backed up into file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Baza dancyh została pomyślnie skopiowana do pliku &apos;%1&apos;.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Open Database Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz kopię bazy danych...</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>Could not open file &apos;%1&apos; for reading.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można otworzyć pliku &apos;%1&apos; do odczytu.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrzeżenie</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Are you sure you want to start restoring database? All current data will be lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>Czy na pewno chcesz przywrócić bazę danych? Wszystkie dane zostaną utracone.</translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>Restoring Database Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Przywracanie bazy danych</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Database backup is being uploaded to the server. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopii zapasowaj bazy danych jest wysyłana do serwera. Proszę czekać.</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>You need to connect to a server before doing backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Musisz połączyć się z serwerem przed wykonaniem kopii zapasowej</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Baza danych zaostała pomyślnie przywrócona z pliku &apos;%1&apos;. Media server zostanie uruchomiony ponownie.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpił błąd podczas przywracania bazy danych z pliku &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
     <message>
+        <location filename="plugins/resource/desktop_win/desktop_data_provider.cpp" line="+248"/>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Formaty audio 44,1 kHz i 48kHz, nie są obsługiwane przez urządzenie przechwytujące! Proszę wybrać inne urządzenie audio lub wartość &quot;brak&quot; w ustawieniach nagrywania ekranu</translation>
     </message>
     <message>
+        <location line="+146"/>
         <source>Could not find video encoder %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można znaleźć kodera wideo%1.</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Screen width must be a multiplier of 8.</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerokość ekranu musi być wielokrotnością 8.</translation>
     </message>
     <message>
+        <location line="+77"/>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można zainicjować kodera wideo.</translation>
     </message>
     <message>
+        <location line="+19"/>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można znaleźć kodera audio%1.</translation>
     </message>
     <message>
+        <location line="+19"/>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można zainicjować kodera audio.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można zainicjować urządzenia audio &apos;%1&apos;.</translation>
     </message>
     <message>
+        <location line="+21"/>
         <source>Could not start primary audio device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można uruchomić podstawowego urządzenia audio.</translation>
     </message>
 </context>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
+        <location filename="plugins/resource/desktop_win/desktop_file_encoder.cpp" line="+317"/>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Formaty audio 44,1 kHz i 48kHz, nie są obsługiwane przez urządzenie przechwytujące! Proszę wybrać inne urządzenie audio lub wartość &quot;brak&quot; w ustawieniach nagrywania ekranu.</translation>
     </message>
     <message>
+        <location line="+167"/>
         <source>Could not find video encoder %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można znaleźć kodera wideo%1.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można utworzyć  pliku tymczasowego w folderze &apos;%1&apos;. Proszę skonfigurować  &apos;Główny Folder Mediów&apos; w ustawieniach nagrywania ekranu.</translation>
     </message>
     <message>
+        <location line="+24"/>
         <source>Could not allocate output stream for video codec.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można przydzielić strumienia wyjściowego dla kodeka wideo.</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Screen width must be a multiplier of 8.</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerokość ekranu musi być wielokrotnością 8.</translation>
     </message>
     <message>
+        <location line="+75"/>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można zainicjować kodera wideo.</translation>
     </message>
     <message>
+        <location line="+24"/>
         <source>Could not allocate output audio stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można przydzielić wyjsciowego strumienia audio.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można znaleźć kodera audio%1.</translation>
     </message>
     <message>
+        <location line="+18"/>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można zainicjować kodera audio.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można zainicjować urządzenia audio &apos;%1&apos;.</translation>
     </message>
     <message>
+        <location line="+23"/>
         <source>Could not start primary audio device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można uruchomić podstawowego urządzenia audio.</translation>
     </message>
 </context>
 <context>
     <name>QnEventLogDialog</name>
     <message>
+        <location filename="ui/dialogs/event_log_dialog.cpp" line="+81"/>
         <source>Any action</source>
-        <translation type="unfinished"></translation>
+        <translation>Dowolna akcja</translation>
     </message>
     <message>
+        <location line="+18"/>
         <source>Filter Similar Rows</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtruj podobne wiersze</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiuj zaznaczenie do schowka</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksportuj zaznaczenie do Pliku...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaznacz wszystko</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Clear Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyczyść filtr</translation>
     </message>
     <message numerus="yes">
+        <location line="+254"/>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Logi  zdarzeń w okresie od %1 do %2 - %n zdarzeń znaleziono</numerusform>
+            <numerusform>Logi  zdarzeń w okresie od %1 do %2 - %n zdarzenie znaleziono</numerusform>
+            <numerusform>Logi  zdarzeń w okresie od %1 do %2 - %n zdarzeń znaleziono</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+4"/>
         <source>Event log for %1 - %n event(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Logi zdarzeń dla%1 -%n zdarzeń znaleziono</numerusform>
+            <numerusform>Logi zdarzeń dla%1 -%n zdarzenie znaleziono</numerusform>
+            <numerusform>Logi zdarzeń dla%1 -%n zdarzeń znaleziono</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+38"/>
         <source>&lt;Any camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Dowolna Kamera&gt;</translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;%n Kamera(y)&gt;</numerusform>
+            <numerusform>&lt;%n Kamera&gt;</numerusform>
+            <numerusform>&lt;%n Kamery&gt;</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+109"/>
         <source>Export selected events to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksportuj zaznaczone zdarzenia do Pliku...</translation>
     </message>
 </context>
 <context>
     <name>QnEventLogModel</name>
     <message>
+        <location filename="ui/models/event_log_model.cpp" line="+373"/>
         <source>All users</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszyscy użytkownicy</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Administrators Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Tylko administrator</translation>
     </message>
     <message>
+        <location line="+35"/>
         <source>Motion video</source>
-        <translation type="unfinished"></translation>
+        <translation>Motion video</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>%1 times</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 razy</translation>
     </message>
     <message>
+        <location line="+64"/>
         <source>Date/Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Data/Czas</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Zdarzenie</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Źródło</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Akcja</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Target</source>
-        <translation type="unfinished"></translation>
+        <translation>Cel</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Opis</translation>
     </message>
 </context>
 <context>
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message>
+        <location filename="ui/widgets/properties/camera_schedule_widget.cpp" line="-804"/>
         <source>Copy archive length settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia długości archiwum</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Schedule motion type is not supported by some cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Harmonogram  ruchu nie jest wspierany przez część kamer</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Recording cannot be enabled for some cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywanie nie może być włączone dla niektórych kamer</translation>
     </message>
 </context>
 <context>
     <name>QnFisheyeCalibrationWidget</name>
     <message>
+        <location filename="ui/widgets/fisheye/fisheye_calibration_widget.ui"/>
         <source>Auto Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibracja automatyczna</translation>
     </message>
     <message>
+        <location filename="ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="+30"/>
         <source>Loading preview, please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ładowanie podglądu, proszę czekać...</translation>
     </message>
     <message>
+        <location line="+122"/>
+        <location line="+3"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="-3"/>
         <source>Auto calibration failed. Image is not round.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatyczna kalibracja nie powiodła się. Obraz nie jest okrągły.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Auto calibration failed. The image might be too dim.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatyczna kalibracja nie powiodła się. Obraz może być zbyt ciemny.</translation>
     </message>
 </context>
 <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
+        <location filename="ui/widgets/settings/general_preferences_widget.cpp" line="+36"/>
         <source>Disable only if the client takes too much CPU</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłączyć tylko wtedy, gdy klient zużywa za dużo zasobów CPU</translation>
     </message>
     <message>
+        <location line="+94"/>
+        <location line="+13"/>
         <source>Select folder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz folder...</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Folder is already added</source>
-        <translation type="unfinished"></translation>
+        <translation>Folder jest już dodany</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>This folder is already added.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ten Folder jest już dodany.</translation>
     </message>
     <message>
+        <location line="+20"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacja</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Folder &apos;%1&apos; does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Folder &apos;%1&apos; nie istnieje.</translation>
     </message>
 </context>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
+        <location filename="ui/widgets/settings/general_system_administration_widget.cpp" line="+35"/>
         <source>Open Alarm/Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz zarządzanie Alarmami/Zdarzeniami i Regułami</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Open Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz logi zdarzeń</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz listę kamer</translation>
     </message>
 </context>
 <context>
     <name>QnGenericTabbedDialog</name>
     <message>
+        <location filename="ui/dialogs/generic_tabbed_dialog.cpp" line="+155"/>
         <source>* %1</source>
-        <translation type="unfinished"></translation>
+        <translation>* %1</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Confirm exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Potwierdź wyjście</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Unsaved changes will be lost. Save the following pages?</source>
-        <translation type="unfinished"></translation>
+        <translation>Niezapisane zmiany zostaną utracone. Zapisać następujące strony?</translation>
     </message>
 </context>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
+        <location filename="ui/graphics/opengl/gl_hardware_checker.cpp" line="+38"/>
+        <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
+        <translation>Wykryto, że karta graficzna nie jest wspierana. Możesz używać  na własne ryzyko.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Installing and/or updating your video drivers may resolve the problem.</source>
+        <translation>Instalacja lub aktualizacja sterowników karty graficznej może rozwiązać problem.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Critical Performance Tip</source>
+        <translation>Krytyczna wskazówka dotycząca wydajności</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wykryto, że sterowniki karty graficznej  mogą nie być zainstalowane lub są nieaktualne.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalacja lub aktualizacja sterowników karty graficznej może znacznie zwiększyć wydajność systemu podczas pracy.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Important Performance Tip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This could lead to client software malfunction including crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ważna wskazówka dotycząca wydajności</translation>
     </message>
 </context>
 <context>
     <name>QnGridWidgetHelper</name>
     <message>
+        <location filename="ui/common/grid_widget_helper.cpp" line="+26"/>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik HTML (*.html);;Plik tekstowy (*.csv)</translation>
     </message>
     <message>
+        <location line="+16"/>
         <source>Save As</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz jako</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik &apos;%1&apos; już istnieje. Chcesz nadpisać?</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>Could not overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się nadpisać pliku</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik &apos;%1&apos; jest używany przez inny proces. Proszę wpisać inną nazwę.</translation>
     </message>
 </context>
 <context>
     <name>QnHelpHandler</name>
     <message>
+        <location filename="ui/help/help_handler.cpp" line="+88"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
 </context>
 <context>
     <name>QnHistogramWidget</name>
     <message>
+        <location filename="ui/widgets/histogram_widget.cpp" line="+85"/>
         <source>Gamma %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Gamma %1</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
+        <location filename="ui/workbench/extensions/workbench_layout_export_tool.cpp" line="+75"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik &apos;%1&apos; jest używany przez inny proces. Proszę wpisać inną nazwę.</translation>
     </message>
     <message>
+        <location line="+18"/>
         <source>Could not create output file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się stworzyć pliku wyjściowego %1</translation>
     </message>
     <message>
+        <location line="+236"/>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksportowanie do &quot;%1&quot;...</translation>
     </message>
     <message>
+        <location line="+53"/>
         <source>Could not export camera %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można wyeksportować kamery %1</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
+        <location filename="ui/dialogs/layout_settings_dialog.cpp" line="+323"/>
         <source>&lt;No picture&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Brak obrazu&gt;</translation>
     </message>
     <message>
+        <location line="+118"/>
         <source>&lt;Error while loading picture&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Błąd podczas ładowania obrazu&gt;</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>&lt;Error while uploading picture&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Błąd podczas  przesyłania obrazu&gt;</translation>
     </message>
     <message>
+        <location line="+57"/>
         <source>Select file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz plik...</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Pictures %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Obrazy %1</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>&lt;Picture cannot be read&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Obraz nie może być odczytany&gt;</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Obraz jest za duży. Maksymalny rozmiar to %1 Mb&gt;</translation>
     </message>
     <message>
+        <location line="+25"/>
         <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Obraz nie może być  załadowany&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QnLayoutTabBar</name>
+    <message>
+        <location filename="ui/widgets/layout_tab_bar.cpp" line="+118"/>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation>Ekran %1 </translation>
     </message>
 </context>
 <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
+        <location filename="ui/dialogs/license_details_dialog.cpp" line="+26"/>
+        <location line="+34"/>
         <source>Screens Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dozwolone ekrany:</translation>
     </message>
     <message>
+        <location line="-33"/>
+        <location line="+34"/>
         <source>Control Sessions Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dozwolone sesje sterujące:</translation>
     </message>
     <message>
+        <location line="-32"/>
+        <location line="+34"/>
         <source>Archive Streams Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dozwolone strumienie archiwum:</translation>
     </message>
     <message>
+        <location line="-28"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiuj do schowka</translation>
     </message>
     <message>
+        <location line="+18"/>
         <source>Generic:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogólne:</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>License Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ licecnji</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>License Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Klucz licecnji</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Locked to Hardware ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Przypisana do ID sprzętu</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Features:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cechy:</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseListModel</name>
     <message>
+        <location filename="ui/models/license_list_model.cpp" line="+67"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Ilość</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>License Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Klucz licecnji</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Expiration Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Data wygaśnięcia</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Status</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer</translation>
     </message>
     <message>
+        <location line="+25"/>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Nigdy</translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>Expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Wygasła</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Today</source>
-        <translation type="unfinished"></translation>
+        <translation>Dziś</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Tomorrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Jutro</translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>In %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>W %n dni</numerusform>
+            <numerusform>W %n dzień</numerusform>
+            <numerusform>W %n dni</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>&lt;Server not found&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;nie odnaleziono serwera&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
     <message>
+        <location filename="ui/widgets/settings/license_manager_widget.cpp" line="+124"/>
         <source>The software is licensed to: </source>
-        <translation type="unfinished"></translation>
+        <translation>Oprogramowanie jest licencjonowane:</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>%1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
+        <location line="+10"/>
         <source>At least %n %2 are required</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Co najmniej%n %2  są wymagane</numerusform>
+            <numerusform>Co najmniej%n %2  jest wymagana</numerusform>
+            <numerusform>Co najmniej%n %2  są wymagane</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+6"/>
         <source>%n %2 are currently in use</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 są aktualnie w użyciu</numerusform>
+            <numerusform>%n %2 jest aktualnie w użyciu</numerusform>
+            <numerusform>%n %2 są aktualnie w użyciu</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Obtaining licenses from Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Uzyskiwanie licecnji z serwera...</translation>
     </message>
     <message>
+        <location line="+4"/>
+        <location line="+1"/>
         <source>You do not have a valid license installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie masz zainstalowanej ważnej licencji.</translation>
     </message>
     <message>
+        <location line="-1"/>
         <source>Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę aktywować licencję próbną lub komercyjną.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Please activate your commercial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę aktywować licencję komercyjną</translation>
     </message>
     <message>
+        <location line="+19"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiuj do schowka</translation>
     </message>
     <message>
+        <location line="+16"/>
+        <location line="+96"/>
+        <location line="+5"/>
+        <location line="+49"/>
+        <location line="+35"/>
+        <location line="+111"/>
         <source>License Activation</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywacja licencji</translation>
     </message>
     <message>
+        <location line="-295"/>
         <source>Network error has occurred during automatic license activation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pojawił się błąd sieci poczas aktywacji automatycznej.</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Try to activate your license manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Spróbuj aktywować licecnję ręcznie.</translation>
     </message>
     <message>
+        <location line="+96"/>
+        <location line="+192"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Próbujesz aktywować niezgodną licecnję ze swoim oprogramowaniem. Skontaktuj się z pomocą techniczną by uzyskać prawidłowy klucz licencji.</translation>
     </message>
     <message>
+        <location line="-187"/>
         <source>The license is already activated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencja jest już aktywowana.</translation>
     </message>
     <message>
+        <location line="+38"/>
         <source>There was a problem activating your license key. Network error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpił problem npodczas aktywacji klucza licencyjnego. Wystąpił błąd sieci.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>License was successfully activated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Licecnja została pomyślnie aktywowana.</translation>
     </message>
     <message>
+        <location line="+21"/>
         <source>License Activation </source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywacja licencji</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Network error has occurred during automatic license activation. Please contact support team to activate your license key manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pojawił się błąd sieci poczas aktywacji automatycznej. Proszę o kontakt z zespołem pomocy techniczxnej w celu aktywacji ręcznej.</translation>
     </message>
     <message>
+        <location line="+41"/>
         <source>License activation</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywacja licencji</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Can&apos;t activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można aktywować licecnji: %1</translation>
     </message>
     <message>
+        <location line="+53"/>
         <source>Remove license</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń licecnję</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Can&apos;t remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można usunąć licecnji z serwera: %1</translation>
     </message>
     <message>
+        <location line="+22"/>
         <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybrany klucz do aktywacji ręcznej jest błędny. Wybierz poprawny plik z kluczem. Jeśli problem się pojawia dalej, skontaktuj się z zespołem pomocy technicznej.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ten klucz licencyjny został wcześniej aktywowanyna sprzęcie o numerze ID %1. Proszę skontaktować się z zespołem pomocy technicznej, aby uzyskać prawidłowy klucz licencyjny.</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseNotificationDialog</name>
     <message>
+        <location filename="ui/dialogs/license_notification_dialog.cpp" line="+41"/>
         <source>Some of your licenses are unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Część z twoich licencji jest niedostepna.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Some of your licenses will soon expire.</source>
-        <translation type="unfinished"></translation>
+        <translation>Część z twoich licencji wkrótce wygaśnie.</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseWidget</name>
     <message>
+        <location filename="ui/widgets/settings/license_widget.cpp" line="+38"/>
         <source>Activate Trial License</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywuj licecnję próbną</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Activate Free License</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywuj darmową licencję</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę wysłać e-mail z kluczem seryjnym i Hardware ID  do%1, aby uzyskać plik klucza aktywacyjnego.</translation>
     </message>
     <message>
+        <location line="+21"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Powodzenie</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Hardware ID copied to clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skopiowano Hardware ID do schowka.</translation>
     </message>
     <message>
+        <location line="+71"/>
         <source>Activate License</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywuj Licecnje</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Activating...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywacja...</translation>
     </message>
     <message>
+        <location line="+26"/>
         <source>Open License File</source>
-        <translation type="unfinished"></translation>
+        <translation>Open License File</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>All files (*.*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszytkie pliki (*.*)</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Could not open the file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można otworzyć pliku %1</translation>
     </message>
 </context>
 <context>
     <name>QnLoginDialog</name>
     <message>
+        <location filename="ui/dialogs/login_dialog.cpp" line="+82"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Łączenie do serwera...</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Wersja %1</translation>
     </message>
     <message>
+        <location line="+32"/>
         <source>Saved Sessions</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisane sesje</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Auto-Discovered Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Autowykrywanie serwerów</translation>
     </message>
     <message>
+        <location line="+54"/>
         <source>Invalid Login Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowe Informacje Logowania</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>The login information you have entered is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Podane informacje logowania nie są prawidłowe.</translation>
     </message>
     <message>
+        <location line="+85"/>
         <source>* Last used connection *</source>
-        <translation type="unfinished"></translation>
+        <translation>* Ostatnio używane połączenie *</translation>
     </message>
     <message>
+        <location line="+33"/>
         <source>&lt;none&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;nic&gt;</translation>
     </message>
     <message>
+        <location line="+106"/>
+        <location line="+15"/>
+        <location line="+6"/>
         <source>Invalid parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowe parametry</translation>
     </message>
     <message>
+        <location line="-21"/>
         <source>The information you have entered is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Podane informacje nie są prawidłowe.</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Entered hostname is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisana nazwa hosta jest niepoprawna.</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Host field cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pole Host nie może być pusta.</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>%1 at %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 z %2</translation>
     </message>
     <message>
+        <location line="+21"/>
         <source>Connection already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Połaczenie już istnieje</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Connection with this name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Połączenie o tej nazwie już istnieje. Czy chcesz nadpisać?</translation>
     </message>
     <message>
+        <location line="+40"/>
         <source>Delete connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń połączenia</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Are you sure you want to delete this connection: %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Czy na pewno chcesz usunąć to połączenie: %1?</translation>
     </message>
 </context>
 <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
+        <location filename="ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="+44"/>
         <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opcja nie bedzie mieć wpływu na Harmonogram nagrywania. Harmonogram nagrywania działa w oparciu o serwer czasu.</translation>
     </message>
     <message>
+        <location line="+138"/>
         <source>Select file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz plik...</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Pictures %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Obrazy %1</translation>
     </message>
     <message>
+        <location line="+19"/>
         <source>Preparing Image...</source>
-        <translation type="unfinished"></translation>
+        <translation>Przygotowanie obrazu...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Please wait while image is being prepared...</source>
-        <translation type="unfinished"></translation>
+        <translation>Prosze czekać  obraz jest przygotowywany...</translation>
     </message>
     <message>
+        <location line="+36"/>
         <source>Dark</source>
-        <translation type="unfinished"></translation>
+        <translation>Ciemny</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Light</source>
-        <translation type="unfinished"></translation>
+        <translation>Jasny</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Server Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer czasu</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Client Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas klienta</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Domyślny</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Rainbow</source>
-        <translation type="unfinished"></translation>
+        <translation>Tęcza</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Custom...</source>
-        <translation type="unfinished"></translation>
+        <translation>Niestandardowy...</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozciągnąć</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Fit</source>
-        <translation type="unfinished"></translation>
+        <translation>Dopasowany</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Crop</source>
-        <translation type="unfinished"></translation>
+        <translation>Przyciąć</translation>
     </message>
 </context>
 <context>
     <name>QnMediaFileSettingsDialog</name>
     <message>
+        <location filename="ui/dialogs/media_file_settings_dialog.ui"/>
         <source>File Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia pliku</translation>
     </message>
     <message>
+        <location/>
         <source>Picture is not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Obraz nie jest załadowany</translation>
     </message>
     <message>
+        <location/>
         <source>This is a fish-eye lens file</source>
-        <translation type="unfinished"></translation>
+        <translation>To jest plik z fish-eye</translation>
     </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
     <message>
+        <location filename="ui/graphics/items/resource/media_resource_widget.cpp" line="+187"/>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Screenshot</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Smart Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Inteligentne wyszukiwanie</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>PTZ</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>Dewarping</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>Create Zoom Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Stwórz okno z powiększeniem</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Image Enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Wzmocnienie obrazu</translation>
     </message>
     <message>
+        <location line="+323"/>
         <source>Zoom window</source>
-        <translation type="unfinished"></translation>
+        <translation>Okno Zoom</translation>
     </message>
     <message>
+        <location line="+361"/>
         <source>Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>Niska rozdzielczość</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Hi-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>Wysoka rozdzielczość</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>LIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>NA ŻYWO</translation>
     </message>
     <message>
+        <location line="+19"/>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (Trasa &quot;%2&quot; jest aktywna)</translation>
     </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
     <message>
+        <location filename="ui/dialogs/merge_systems_dialog.ui"/>
         <source>Merge Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>Połącz systemy...</translation>
     </message>
     <message>
+        <location/>
         <source>Server URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>Adres URL Serwera:</translation>
     </message>
     <message>
+        <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło:</translation>
     </message>
     <message>
+        <location/>
+        <source>Find System</source>
+        <translation>Znajdź system</translation>
+    </message>
+    <message>
+        <location/>
         <source>The new system will have password and name from the system:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy system będzie miał hasło i nazwę z systemu:</translation>
     </message>
     <message>
+        <location filename="ui/dialogs/merge_systems_dialog.cpp" line="+28"/>
         <source>Success!</source>
-        <translation type="unfinished"></translation>
+        <translation>Powodzenie!</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>The system was configured successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>System został skonfigurowany pomyślnie.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>The servers from the remote system should appear in your system soon.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwery z systemu zdalnego powinien pojawić się wkrótce w twoim  systemie.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>http(s)://host:port</source>
-        <translation type="unfinished"></translation>
+        <translation>http(s)://host:port</translation>
     </message>
     <message>
+        <location line="+61"/>
         <source>You are about to merge the current system %1 with the system</source>
-        <translation type="unfinished"></translation>
+        <translation>Masz zamiar połączyć obecny system z systemem %1</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>%1 (current)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (bieżący)</translation>
     </message>
     <message>
+        <location line="+40"/>
         <source>The URL is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Adres URL jest nieprawidłowy.</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>The password cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło nie może być puste.</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>testing...</source>
-        <translation type="unfinished"></translation>
+        <translation>testowanie...</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>merging systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>łączenie systemów...</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Use a specific hostname or IP address rather than %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Użyj nazwę hosta lub adres IP zamiast  %1.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>This is the current system URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>To jest aktualny adres URL systemu.</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Merge with %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Połącz z %1</translation>
     </message>
     <message>
+        <location line="+7"/>
+        <location line="+28"/>
         <source>The password is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło niepoprawne.</translation>
     </message>
     <message>
+        <location line="-25"/>
+        <location line="+28"/>
         <source>The found system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Znaleziony system %1 ma niezgodną wersję z %2.</translation>
     </message>
     <message>
+        <location line="-25"/>
         <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>System nie został znaleziony.</translation>
     </message>
     <message>
+        <location line="+28"/>
         <source>Could not create a backup of the server database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można utworzyć kopii zapasowej bazy danych serwera.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>System was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie odnaleziono systemu.</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Cannot merge systems.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można połączyć systemów.</translation>
     </message>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/properties/multiple_camera_settings_widget.cpp" line="+95"/>
         <source>4:3</source>
-        <translation type="unfinished"></translation>
+        <translation>4:3</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>16:9</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>1:1</source>
-        <translation type="unfinished"></translation>
+        <translation>1:1</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>0 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>0 stopni</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>90 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>90 stopni</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>180 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>180 stopni</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>270 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>270 stopni</translation>
     </message>
     <message>
+        <location line="+189"/>
         <source>Invalid schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowy harmonogram</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Drugi strumień jest wyłączony na tej kamerze. Opcja Ruch + LQ  nie działa.Wciśnij  &quot;Tak&quot;, aby zmienić typ nagrywania na &quot;Ciągły&quot; lub &quot;Nie&quot;, aby ponownie włączyć drugi strumień.</translation>
     </message>
     <message>
+        <location line="+204"/>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
-        <translation type="unfinished"></translation>
+        <translation>&lt;wiele wartości&gt;</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>&lt;multiple values&gt;</source>
         <comment>PasswordEdit</comment>
-        <translation type="unfinished"></translation>
+        <translation>&lt;wiele wartości&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnNavigationItem</name>
     <message>
+        <location filename="ui/graphics/items/controls/navigation_item.cpp" line="+373"/>
         <source>Speed Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwolnij</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Previous Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Poprzednia klatka</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Speed Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Przyśpiesz</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Next Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Następna klatka</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>Previuos Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation>Poprzedni kawałek</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>To Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Zacznij</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Next Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation>Następny kawałek</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>To End</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj</translation>
     </message>
 </context>
 <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
+        <location filename="ui/graphics/items/resource/server_resource_widget.cpp" line="+42"/>
         <source>b/s</source>
-        <translation type="unfinished"></translation>
+        <translation>b/s</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Kb/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Kb/s</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Mb/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Mb/s</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
+        <location filename="ui/graphics/items/notifications/notification_list_widget.cpp" line="+178"/>
         <source>%n more item(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n więcej elementów</numerusform>
+            <numerusform>%n element więcej</numerusform>
+            <numerusform>%n  elementów więcej</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
+        <location filename="ui/dialogs/notification_sound_manager_dialog.ui"/>
         <source>Notification Sounds</source>
-        <translation type="unfinished"></translation>
+        <translation>Dźwięki powiadomień</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Play</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Włącz</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Add...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dodaj...</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Zmień nazwę...</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Delete...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Usuń...</translation>
     </message>
     <message>
+        <location filename="ui/dialogs/notification_sound_manager_dialog.cpp" line="+65"/>
         <source>Sound files</source>
-        <translation type="unfinished"></translation>
+        <translation>Pliki dźwiękowe</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Select file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz plik...</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Clip sound up to %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Odtwarzaj dźwięk przez %1 sekund</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Custom title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Niestandardowy tytuł:</translation>
     </message>
     <message>
+        <location line="+14"/>
+        <location line="+25"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="-24"/>
         <source>File cannot be added.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik nie może być dodany.</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Rename sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień nazwę dźwięku</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Enter new title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz nowy tytuł:</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>New title could not be set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy tytuł nie może być ustawiony.</translation>
     </message>
     <message>
+        <location line="+16"/>
         <source>Confirm file deletion</source>
-        <translation type="unfinished"></translation>
+        <translation>Potwierdź usuwanie pliku</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation type="unfinished"></translation>
+        <translation>Jesteś pewny czy usunąć &apos;%1&apos;?</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
+        <location filename="ui/models/notification_sound_model.cpp" line="+13"/>
         <source>&lt;Downloading sound list...&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;pobieranie listy dźwięków&gt;</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>&lt;No Sound&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;brak dźwięku&gt;</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>&lt;Downloading sound...&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;pobieranie dźwięku&gt;</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>&lt;Uploading sound...&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;przesyłanie dźwięku&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationToolTipWidget</name>
     <message>
+        <location filename="ui/graphics/items/notifications/notification_widget.cpp" line="+49"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamknij</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Right Click</source>
-        <translation type="unfinished"></translation>
+        <translation>Kliknij prawym przyciskiem myszy</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationsCollectionWidget</name>
     <message>
+        <location filename="ui/graphics/items/notifications/notifications_collection_widget.cpp" line="+60"/>
         <source>DEBUG</source>
-        <translation type="unfinished"></translation>
+        <translation>DEBUG</translation>
     </message>
     <message>
+        <location line="+111"/>
         <source>Browse Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Przeglądaj archiwum</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Open Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz kamerę</translation>
     </message>
     <message>
+        <location line="+10"/>
+        <location line="+19"/>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia kamery</translation>
     </message>
     <message>
+        <location line="-9"/>
+        <location line="+173"/>
         <source>Server settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia serwera</translation>
     </message>
     <message>
+        <location line="-152"/>
         <source>Open camera web page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz stronę WWW kamery...</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia</translation>
     </message>
     <message>
+        <location line="+83"/>
+        <location line="+22"/>
         <source>User Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia użytkownika</translation>
     </message>
     <message>
+        <location line="-14"/>
         <source>Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencje</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>SMTP Settin gs</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia SMTP</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Connect to server</source>
-        <translation type="unfinished"></translation>
+        <translation>Podłącz do serwera</translation>
     </message>
     <message>
+        <location line="+21"/>
         <source>SMTP Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia SMTP</translation>
     </message>
 </context>
 <context>
     <name>QnPerformanceTest</name>
     <message>
+        <location filename="utils/performance_test.cpp" line="+58"/>
         <source>Performance of this computer allows running %1 in configuration mode only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wydajność komputera pozwala na uruchomienie%1 tylko w trybie konfiguracji.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>For full-featured mode please use another computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Użyj innego komputera by pracować w pełnym trybie.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrzeżenie</translation>
     </message>
 </context>
 <context>
     <name>QnPreferencesDialog</name>
     <message>
+        <location filename="ui/dialogs/preferences_dialog.cpp" line="+29"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Główne</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Look and Feel</source>
-        <translation type="unfinished"></translation>
+        <translation>Wygląd</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Screen Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywanie ekranu</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Powiadomienia</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Settings file is read-only. Please contact your system administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik ustawień jest tylko do odczytu. Proszę skontaktować się z administratorem systemu.</translation>
     </message>
     <message>
+        <location line="+0"/>
+        <location line="+2"/>
         <source>All changes will be lost after program exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszystkie zmiany zostaną utracone po wyjściu z programu.</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Settings cannot be saved. Please contact your system administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia nie mogą być zapisane.Proszę skontaktować się z administratorem systemu.</translation>
     </message>
     <message>
+        <location line="+29"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacje</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Niektóre zamiany przyniosą efekt po ponownym uruchomieniu aplikacji. Czy chcesz teraz zrestartować aplikację?</translation>
     </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
     <message>
+        <location filename="ui/dialogs/progress_dialog.cpp" line="+196"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Anuluj</translation>
     </message>
 </context>
 <context>
     <name>QnPtzManageDialog</name>
     <message>
+        <location filename="ui/dialogs/ptz_manage_dialog.cpp" line="+379"/>
         <source>Could not get position from camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można pobrać  pozycj z kamery</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpił błąd podczas próby pobrania aktualnej pozycji z kamery %1.</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+22"/>
+        <location line="+41"/>
         <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę czekać aż kamera będzie dostepna.</translation>
     </message>
     <message>
+        <location line="-43"/>
+        <location line="+41"/>
         <source>Could not set position for camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można ustawić pozycji kamery</translation>
     </message>
     <message>
+        <location line="-40"/>
+        <location line="+41"/>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpił błąd podczas próby ustawienia aktualnej pozycji  kamery %1.</translation>
     </message>
     <message>
+        <location line="+54"/>
         <source>Remove preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń preset</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>This preset is used in some tours.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ten preset jest używany w niektórych trasach</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>These tours will become invalid if you remove it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Te trasy będą nieaktywne jeśli go usuniesz.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Do not show again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie pokazuj ponownie.</translation>
     </message>
     <message>
+        <location line="+137"/>
         <source>Manage PTZ for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Zarządzaj PTZ na %1</translation>
     </message>
     <message>
+        <location line="+52"/>
         <source>PTZ configuration is not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfiguracja PTZ nie została zapisana</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Changes are not saved. Do you want to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmiany nie zostały zapisane. Zapisać?</translation>
     </message>
 </context>
 <context>
     <name>QnPtzManageModel</name>
     <message>
+        <location filename="ui/models/ptz_manage_model.cpp" line="+53"/>
         <source>New tour %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowa trasa %1</translation>
     </message>
     <message>
+        <location line="+64"/>
         <source>Saved position %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisana pozycja %1</translation>
     </message>
     <message>
+        <location line="+233"/>
         <source>#</source>
-        <translation type="unfinished"></translation>
+        <translation>#</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Hotkey</source>
-        <translation type="unfinished"></translation>
+        <translation>Skrót klawiszowy</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozycja startowa</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Szczegóły</translation>
     </message>
     <message>
+        <location line="+156"/>
         <source>Tours</source>
-        <translation type="unfinished"></translation>
+        <translation>Trasy</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Positions</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozycje</translation>
     </message>
     <message>
+        <location line="+36"/>
+        <location line="+46"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Żadne</translation>
     </message>
     <message numerus="yes">
+        <location line="-42"/>
         <source>This preset will be activated after %n minutes of inactivity</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ten preset będzie aktywowany po%n minutach bezczynności</numerusform>
+            <numerusform>Ten preset będzie aktywowany po%n minucie bezczynności</numerusform>
+            <numerusform>Ten preset będzie aktywowany po%n minutach bezczynności</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+97"/>
         <source>Tour should contain at least 2 positions</source>
-        <translation type="unfinished"></translation>
+        <translation>Trasa powinna się składać z co najmniej 2 presetów</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Invalid tour</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowa trasa</translation>
     </message>
     <message numerus="yes">
+        <location line="+14"/>
         <source>Tour has %n identical positions</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Trasa posiada %n identyczne pozycje</numerusform>
+            <numerusform>Trasa posiada %n identyczną pozycję</numerusform>
+            <numerusform>Trasa posiada %n identyczne pozycje</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Tour time: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas trwania trasy: %1</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>less than a minute</source>
-        <translation type="unfinished"></translation>
+        <translation>Mniej niż minutę</translation>
     </message>
     <message numerus="yes">
+        <location line="+0"/>
         <source>about %n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>około %n minut</numerusform>
+            <numerusform>około %n minuta</numerusform>
+            <numerusform>około %n minut</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetDialog</name>
     <message>
+        <location filename="ui/dialogs/ptz_preset_dialog.cpp" line="+33"/>
         <source>Saved Position %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisana pozycja %1</translation>
     </message>
     <message>
+        <location line="+25"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Żadne</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
+        <location filename="ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="+47"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Żadne</translation>
     </message>
     <message>
+        <location line="+55"/>
         <source>This hotkey is used by preset &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ten skrót klawiszowy jest używany przez preset &quot;%1&quot;</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>This hotkey is used by tour &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ten skrót klawiszowy jest używany przez trasę &quot;%1&quot;</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Change hotkey</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień skrót klawiszowy</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Reassign</source>
-        <translation type="unfinished"></translation>
+        <translation>Przypisanie</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetsToursActionFactory</name>
     <message>
+        <location filename="ui/actions/action_factories.cpp" line="+94"/>
         <source>%1 (active)</source>
         <comment>Template for active PTZ preset</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 (aktywny)</translation>
     </message>
     <message>
+        <location line="+31"/>
         <source>%1 (active)</source>
         <comment>Template for active PTZ tour</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 (aktywny)</translation>
     </message>
 </context>
 <context>
     <name>QnPtzTourSpotsModel</name>
     <message>
+        <location filename="ui/models/ptz_tour_spots_model.cpp" line="+80"/>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>Najniższy</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Niski</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Normalny</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Wysoki</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Highest</source>
-        <translation type="unfinished"></translation>
+        <translation>Najwyższy</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Instant</source>
-        <translation type="unfinished"></translation>
+        <translation>Natychmiastowy</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>%n seconds</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n sekund</numerusform>
+            <numerusform>%n sekunda</numerusform>
+            <numerusform>%n sekund</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+129"/>
         <source>&lt;Invalid&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;błędny&gt;</translation>
     </message>
     <message>
+        <location line="+59"/>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozycja</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Stay Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas przebywania</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Prędkość</translation>
     </message>
 </context>
 <context>
     <name>QnReconnectInfoDialog</name>
     <message>
+        <location filename="ui/dialogs/reconnect_info_dialog.cpp" line="+33"/>
         <source>Canceling...</source>
-        <translation type="unfinished"></translation>
+        <translation>Anulowanie...</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/settings/recording_settings_widget.cpp" line="+50"/>
         <source>Screen %1 - %2x%3</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekran %1 - %2x%3</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>%1 (Primary)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (Podstawowy)</translation>
     </message>
     <message>
+        <location line="+255"/>
         <source>Select folder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz folder...</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
     <message>
+        <location filename="ui/common/recording_status_helper.cpp" line="+37"/>
+        <location line="+17"/>
         <source>Not recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie nagrywać</translation>
     </message>
     <message>
+        <location line="-15"/>
         <source>Recording everything</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywanie wszytskiego</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Recording motion only</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywanie tylko ruchu</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Recording motion and low quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywanie ruchu oraz niskiej jakości</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>Continuous</source>
-        <translation type="unfinished"></translation>
+        <translation>Ciągłe</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Motion only</source>
-        <translation type="unfinished"></translation>
+        <translation>Tylko ruch</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Motion + Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruch + Lo-Res</translation>
     </message>
 </context>
 <context>
     <name>QnResourceBrowserWidget</name>
     <message>
+        <location filename="ui/widgets/resource_browser_widget.cpp" line="+168"/>
         <source>Any Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Dowolny rodzaj</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Video Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Pliki wideo</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Image Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Pliki obrazu</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Live Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamery na żywo</translation>
     </message>
 </context>
 <context>
     <name>QnResourcePoolModelNode</name>
     <message>
+        <location filename="ui/models/resource_pool_model_node.cpp" line="+46"/>
         <source>Root</source>
-        <translation type="unfinished"></translation>
+        <translation>Root</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Local</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokalny</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>System</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Other Systems</source>
-        <translation type="unfinished"></translation>
+        <translation>Inne systemy</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Users</source>
-        <translation type="unfinished"></translation>
+        <translation>Użytkownicy</translation>
+    </message>
+    <message>
+        <location line="+156"/>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation>Ekran %1 </translation>
     </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
     <message>
+        <location filename="ui/dialogs/resource_selection_dialog.cpp" line="+87"/>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz użytkowników...</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Select cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz kamery...</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Select resources...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz zasoby...</translation>
     </message>
 </context>
 <context>
     <name>QnResourceTreeWidget</name>
     <message>
+        <location filename="ui/widgets/resource_tree_widget.ui"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtr</translation>
     </message>
     <message>
+        <location/>
         <source>Reset Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Resetuj filtry</translation>
     </message>
     <message>
+        <location/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
     <name>QnResourceWidget</name>
     <message>
+        <location filename="ui/graphics/items/resource/resource_widget.cpp" line="+139"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamknij</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacja</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Rotate</source>
-        <translation type="unfinished"></translation>
+        <translation>Obróć</translation>
     </message>
 </context>
 <context>
     <name>QnRoutingManagementWidget</name>
     <message>
+        <location filename="ui/widgets/routing_management_widget.ui"/>
         <source>Available Server Addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>Dostępne adresy serwera</translation>
     </message>
     <message>
+        <location/>
         <source>Add URL</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj URL</translation>
     </message>
     <message>
+        <location/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń</translation>
     </message>
     <message>
+        <location/>
         <source>Removing this connection option could lead to system malfunction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Usunięcie tej opcji połączenia może doprowadzić do awarii systemu.</translation>
     </message>
     <message>
+        <location filename="ui/widgets/routing_management_widget.cpp" line="+316"/>
         <source>Enter URL</source>
-        <translation type="unfinished"></translation>
+        <translation>Podaj adres URL</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL</translation>
     </message>
     <message>
+        <location line="+84"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>You have entered an invalid URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>Podałeś błędny adres URL.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrzeżenie</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>This URL is already in the address list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ten adres już istnieje na liście.</translation>
     </message>
 </context>
 <context>
     <name>QnScreenRecorder</name>
     <message>
+        <location filename="ui/screen_recording/screen_recorder.cpp" line="+70"/>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Podsystem przechwytywania ekranu nie jest jeszcze zainicjowany. Proszę spróbuj ponownie później.</translation>
     </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
     <message>
+        <location filename="ui/widgets/search_line_edit.cpp" line="+135"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Szukaj</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Poprzedni</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Następny</translation>
     </message>
 </context>
 <context>
     <name>QnServerAddressesModel</name>
     <message>
+        <location filename="ui/models/server_addresses_model.cpp" line="+216"/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adres</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>In Use</source>
-        <translation type="unfinished"></translation>
+        <translation>W użyciu</translation>
     </message>
 </context>
 <context>
     <name>QnServerResourceWidget</name>
     <message>
+        <location filename="ui/graphics/items/resource/server_resource_widget.cpp" line="+460"/>
         <source>Show Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż wpis</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Check Issues</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdź błędy</translation>
     </message>
     <message numerus="yes">
+        <location line="+251"/>
         <source>%1 (up %n days, %2)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 (up %n dni, %2)</numerusform>
+            <numerusform>%1 (up %n dzień, %2)</numerusform>
+            <numerusform>%1 (up %n dni, %2)</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>%1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1</translation>
     </message>
 </context>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
+        <location filename="ui/dialogs/server_settings_dialog.cpp" line="+138"/>
         <source>Remove Storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń przestrzeń do zapisu</translation>
     </message>
     <message>
+        <location line="+37"/>
         <source>Open Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz stronę web...</translation>
     </message>
     <message>
+        <location line="+55"/>
         <source>Not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Niedostępny</translation>
     </message>
     <message>
+        <location line="+98"/>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ładowanie...</translation>
     </message>
     <message>
+        <location line="+175"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrzeżenie</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation type="unfinished"></translation>
+        <translation>Masz zamiar ponownie uruchomić algorytm re- synchronizacji archiwum.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation type="unfinished"></translation>
+        <translation>UWAGA!  Użycie dysku zostanie zwiększone w trakcie procesu ponownej synchronizacji! W zależności od całkowitej wielkości archiwum może potrwać to kilka godzin.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ten proces jest konieczny tylko w przypadku tych folderów archiwum, którezostały przeniesione, zamienione  lub zmieniono im nazwy. Możesz anulować operację przebudowy w dowolnym momencie bez utraty danych.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Jesteś pewny że chcesz kontynuować?</translation>
     </message>
     <message>
+        <location line="+33"/>
+        <location line="+5"/>
+        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
+        <translation>Odbudowa indeksu archiwum dla przestrzeni &apos;%1&apos; jest w toku</translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <location line="+5"/>
+        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
+        <translation>Szybkie skanowanie archiwum dla przestrzeni &apos;%1&apos; jest w toku</translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>Finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakończono</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Rebuilding archive index is completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Odbudowa indeksu archiwum jest zakończona.</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>At least two servers are required for this feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Co najmniej dwa serwery są wymagane do tej funkcji.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>This server already has more than max cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Ten serwer posiada już więcej kamer niż maksymalna liczba</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Aby uniknąć wadliwego działania ustawi maksymalną liczbę kamer</translation>
     </message>
     <message>
+        <location line="+28"/>
         <source>Could not load storages from server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można załadować przestrzeni do zapisu z serwera.</translation>
     </message>
     <message>
+        <location line="+25"/>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj zewnętrzną przestrzeń dyskową...</translation>
     </message>
 </context>
 <context>
     <name>QnServerUpdatesModel</name>
     <message>
+        <location filename="ui/models/server_updates_model.cpp" line="+114"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Status</translation>
     </message>
 </context>
 <context>
     <name>QnServerUpdatesWidget</name>
     <message>
+        <location filename="ui/widgets/server_updates_widget.ui"/>
         <source>Cannot check updates via the internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można sprawdzić aktualizacji za pośrednictwem internetu.</translation>
     </message>
     <message>
+        <location/>
         <source>Available version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dostępna wersja:</translation>
     </message>
     <message>
+        <location/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieznany</translation>
     </message>
     <message>
+        <location/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualziacja</translation>
     </message>
     <message>
+        <location/>
         <source>Update from file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja z pliku:</translation>
     </message>
     <message>
+        <location/>
         <source>Archive url:</source>
-        <translation type="unfinished"></translation>
+        <translation>Adres URL archiwum:</translation>
     </message>
     <message>
+        <location/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Skopiuj do schowka</translation>
     </message>
     <message>
+        <location/>
         <source>To update manually, download an archive with the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation>W celu aktualziacji ręcznej pobierz archiwum z następującego linku:</translation>
     </message>
     <message>
+        <location/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
+        <location/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Anuluj</translation>
     </message>
     <message>
+        <location/>
         <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wygląda na to, że proces aktualizacji trwa dłużej niż zwykle. Proszę zaczekać.</translation>
     </message>
     <message>
+        <location/>
         <source>Check for updates automatically</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzaj automatycznie czy są aktualizacje</translation>
     </message>
     <message>
+        <location filename="ui/widgets/server_updates_widget.cpp" line="+106"/>
         <source>Select Update File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz plik aktualizacji...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Update Files (*.zip)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pliki aktualizacji (*.zip)</translation>
     </message>
     <message>
+        <location line="+18"/>
         <source>As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.</source>
-        <translation type="unfinished"></translation>
+        <translation>Co do zasady, dla utrzymania  wsparcia, nie zalecamy aktualizacji systemu pod koniec tygodnia :).</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>O wersji</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobierz konkretną wersję</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobierz ostatnią wersję</translation>
     </message>
     <message>
+        <location line="+39"/>
         <source>Update from Internet...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizuj z internetu...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Update from local source...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizuj z lokalnego źródła...</translation>
     </message>
     <message>
+        <location line="+9"/>
+        <location line="+19"/>
         <source>Update from Internet</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja z internetu</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Update from local source</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja z lokalnego źródła</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Powodzenie</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>URL copied to clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skopiowano URL do schowka.</translation>
     </message>
     <message>
+        <location line="+24"/>
         <source>Latest version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostatnia wersja:</translation>
     </message>
     <message>
+        <location line="+18"/>
         <source>Target version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wersja docelowa:</translation>
     </message>
     <message>
+        <location line="+29"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacja</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Update is in process now.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja jest w toku.</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Cannot cancel update at this state.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można anulować aktualizacji.</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Please wait until update is finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Prosze czekać do zakończenia aktualziacji</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Update finished... 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualziacja zakończona... 100%</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Update has been successfully finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja zakończyła się powodzeniem.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Now you have to update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Musisz ręcznie zaktualizować klienta.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Now you have to update the client manually using an installer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Musisz ręcznie zaktualizować klienta używając installera.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>The client will be restarted to the updated version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Klient zostanie uruchomiony ponownie w celu aktualizacji.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Update is successful</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja się powiodła</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Launcher process is not found</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Cannot restart the client.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można zrestartować klienta.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę zamknąć aplikację i uruchomić ją ponownie za pomocą skrótu w menu Start.</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>Update cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja anulowana</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Update has been cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualziacja została anulowana.</translation>
     </message>
     <message>
+        <location line="+3"/>
+        <location line="+3"/>
+        <location line="+3"/>
+        <location line="+10"/>
+        <location line="+4"/>
+        <location line="+8"/>
+        <location line="+8"/>
+        <location line="+8"/>
+        <location line="+4"/>
         <source>Update failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualziacja się niepowiodła</translation>
     </message>
     <message>
+        <location line="-48"/>
         <source>Someone has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ktoś uruchomił aktualizację.</translation>
     </message>
     <message>
+        <location line="+3"/>
+        <location line="+3"/>
         <source>Could not download updates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się pobrać aktualizacji.</translation>
     </message>
     <message>
+        <location line="+0"/>
+        <location line="+204"/>
         <source>No free space left on the disk.</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak wolnego miejsca na dysku.</translation>
     </message>
     <message>
+        <location line="-201"/>
+        <location line="+12"/>
+        <location line="+8"/>
+        <location line="+8"/>
         <source>Could not push updates to servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się dostarczyć aktualizacji do sewrwerów.</translation>
     </message>
     <message numerus="yes">
+        <location line="-25"/>
         <source>The problem is caused by %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Problem spowodowany jest przez serwery%n:</numerusform>
+            <numerusform>Problem spowodowany jest przez serwer%n:</numerusform>
+            <numerusform>Problem spowodowany jest przez serwery%n:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+11"/>
         <source>No free space left on %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nie ma wolnego miejsca na %n serwerach:</numerusform>
+            <numerusform>Nie ma wolnego miejsca na %n serwerze:</numerusform>
+            <numerusform>Nie ma wolnego miejsca na %n serwerach:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+8"/>
         <source>%n servers are not responding:</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n serwer nie odpowiada:</numerusform>
+            <numerusform>%n serwery nie odpowiadają:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+8"/>
         <source>%n servers have gone offline:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n serwery są offline:</numerusform>
+            <numerusform>%n serwer jest offline:</numerusform>
+            <numerusform>%n serwery są offline:</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Could not install an update to the client.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się zainstalować aktualizacji na kliencie.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Could not install updates on one or more servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się zainstalować aktualizacji na jednym lub kilku serwerach.</translation>
     </message>
     <message>
+        <location line="+33"/>
+        <location line="+89"/>
         <source>Checking for updates...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzanie aktualziacji...</translation>
     </message>
     <message>
+        <location line="-62"/>
         <source>Internet connection problem</source>
-        <translation type="unfinished"></translation>
+        <translation>Problem połączenia z Internetem</translation>
     </message>
     <message>
+        <location line="+5"/>
+        <location line="+81"/>
         <source>There is no such build on the update server</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie ma takiej wersji na serwerze aktualizacji</translation>
     </message>
     <message>
+        <location line="-75"/>
+        <location line="+79"/>
         <source>Cannot start update. An update for one or more servers was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można rozpocząć aktualizacji. Aktualizacja dla serwerów nie została znaleziona.</translation>
     </message>
     <message>
+        <location line="-74"/>
+        <location line="+78"/>
         <source>Cannot start update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można rozpocząć aktualizacji. Aktualizacja dla klienta nie została odnaleziona.</translation>
     </message>
     <message>
+        <location line="-21"/>
         <source>Newer version found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Znaleziono nowszą wersję.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>You will have to update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Musisz ręcznie zaktualizować klienta.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>You will have to update the client manually using an installer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Musisz ręcznie zaktualizować klienta używając installera.</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>All components in your system are up to date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszystkie elementy systemu są aktualne.</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Cannot update from this file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można zaktualizować z tego pliku.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Cannot extract the update file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można rozpakować  pliku aktualizacji.</translation>
     </message>
     <message>
+        <location line="+80"/>
         <source>Checking for updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzanie aktualziacji... %1%</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Downloading updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobieranie aktualizacji... %1%</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Installing client update... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalowanie aktualizacji klienta... %1%</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Installing updates to incompatible servers... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalowanie aktualizacji do niezgodnych serwerów... %1%</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Pushing updates to servers... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Dostarczanie aktualizacji do serwerów... %1%</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Installing updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalowanie aktualizacji... %1%</translation>
     </message>
 </context>
 <context>
     <name>QnSignInfo</name>
     <message>
+        <location filename="ui/dialogs/sign_info.cpp" line="+68"/>
         <source>Analyzing: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Analizowanie: %1%</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Watermark not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie znaleziono znaku wodnego</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Watermark matched</source>
-        <translation type="unfinished"></translation>
+        <translation>Znak wodny dopasowany</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Invalid watermark</source>
-        <translation type="unfinished"></translation>
+        <translation>Błędny znak wodny</translation>
     </message>
 </context>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/properties/single_camera_settings_widget.cpp" line="+141"/>
         <source>4:3</source>
-        <translation type="unfinished"></translation>
+        <translation>4:3</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>16:9</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>1:1</source>
-        <translation type="unfinished"></translation>
+        <translation>1:1</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>0 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>0 stopni</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>90 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>90 stopni</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>180 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>180 stopni</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>270 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>270 stopni</translation>
     </message>
     <message>
+        <location line="+277"/>
         <source>Hardware (Camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprzęt (wbudowana kamera)</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Do not record motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie nagrywaj ruchu</translation>
     </message>
     <message>
+        <location line="+268"/>
         <source>Invalid schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowy harmonogram</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Drugi strumień jest wyłączony na tej kamerze. Opcja Ruch + LQ  nie działa.Wciśnij  &quot;Tak&quot;, aby zmienić typ nagrywania na &quot;Ciągły&quot; lub &quot;Nie&quot;, aby ponownie włączyć drugi strumień.</translation>
     </message>
     <message>
+        <location line="+138"/>
         <source>Confirm motion regions reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Potwierdź reset ustawień obszaru detekcji</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translation type="unfinished"></translation>
+        <translation>Czy jesteś pewny  że chcesz zresetować strefy detekcji do ustawień domyślnych?</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FPS value is too high</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta akcja nie może być cofnięta!</translation>
     </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/settings/smtp_settings_widget.cpp" line="+124"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto</translation>
     </message>
     <message>
+        <location line="+179"/>
         <source>Invalid data</source>
-        <translation type="unfinished"></translation>
+        <translation>Błędne dane</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Provided parameters are not valid. Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation>Parametry są niepoprawne. Nie udało się przeprowadzić testu.</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>Network Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd sieci</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się przeprowadzić testu. Żaden z serwerów nie jest podłączony do Internetu.</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>TLS</source>
-        <translation type="unfinished"></translation>
+        <translation>TLS</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>SSL</source>
-        <translation type="unfinished"></translation>
+        <translation>SSL</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Unsecured</source>
-        <translation type="unfinished"></translation>
+        <translation>Niezabezpieczone</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>In Progress...</source>
-        <translation type="unfinished"></translation>
+        <translation>W toku...</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Niepowodzenie</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Powodzenie</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Canceled</source>
-        <translation type="unfinished"></translation>
+        <translation>Anulowano</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Timed out</source>
-        <translation type="unfinished"></translation>
+        <translation>Limit czasu</translation>
     </message>
     <message>
+        <location line="+13"/>
+        <location line="+23"/>
         <source>Email is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation>Email jest niepoprawny</translation>
     </message>
     <message>
+        <location line="-21"/>
         <source>No preset found. Use &apos;Advanced&apos; option</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie znaleziono presetu. Użyj opcji Zaawansowanych</translation>
     </message>
     <message>
+        <location line="+6"/>
+        <location line="+21"/>
         <source>Support email is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation>Obsługa emaili jest niedostępna</translation>
     </message>
 </context>
 <context>
     <name>QnSpeedSlider</name>
     <message>
+        <location filename="ui/graphics/items/controls/speed_slider.cpp" line="+177"/>
         <source>%1x</source>
-        <translation type="unfinished"></translation>
+        <translation>%1x</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymano</translation>
     </message>
 </context>
 <context>
     <name>QnStatusOverlayWidget</name>
     <message>
+        <location filename="ui/graphics/items/overlays/resource_status_overlay_widget.cpp" line="+58"/>
         <source>NO DATA</source>
-        <translation type="unfinished"></translation>
+        <translation>BRAK DANYCH</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>NO SIGNAL</source>
-        <translation type="unfinished"></translation>
+        <translation>BRAK SYGNAŁU</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer odłączony</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Unauthorized</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieautoryzowany</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <source>Please check authentication information&lt;br/&gt;in camera settings</source>
+        <translation>Sprawdź dane uwierzytelniania&lt;br/&gt; w ustawieniach kamery</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Activate analog license to remove this message</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywuj licencję analog by usunąć tę wiadomość</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Activate Video Wall license to remove this message</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktywuj licencję Ściany Wideo by usunąć tę wiadomość</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ładowanie...</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Diagnose...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnozowanie...</translation>
     </message>
 </context>
 <context>
     <name>QnStorageSpaceSlider</name>
     <message>
+        <location filename="ui/widgets/storage_space_slider.h" line="+54"/>
         <source>%1%</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
     <name>QnStorageUrlDialog</name>
     <message>
+        <location filename="ui/dialogs/storage_url_dialog.cpp" line="+73"/>
         <source>Windows Network Shared Resource</source>
-        <translation type="unfinished"></translation>
+        <translation>Udostępniony zasób sieciowy systemu Windows</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>\\&lt;nazwa komputera&gt;\&lt;Folder&gt;</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Coldstore Network Storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Coldstore Network Storage</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>coldstore://&lt;Address&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>coldstore://&lt;Adres&gt;</translation>
     </message>
     <message>
+        <location line="+37"/>
         <source>Invalid Storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowa przestrzeń do zapisu</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Provided storage path does not define a valid external storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Śceiżka dostępu nie wskazuje prawidłowego zewnętrznego zasobu.</translation>
     </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
+        <location filename="ui/dialogs/system_administration_dialog.ui"/>
         <source>System Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>Administracja systemem</translation>
     </message>
     <message>
+        <location filename="ui/dialogs/system_administration_dialog.cpp" line="+32"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Główne</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencje</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Email</source>
-        <translation type="unfinished"></translation>
+        <translation>Email</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacje</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Routing Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Zarządzanie Routingiem</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Time Synchronization</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronizacja czasu</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Cannot cancel update at this state.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można anulować aktualizacji.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacje</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Update is in process now.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja jest już w toku.</translation>
     </message>
 </context>
 <context>
     <name>QnTimeServerSelectionModel</name>
     <message>
+        <location filename="ui/models/time_server_selection_model.cpp" line="+183"/>
+        <location line="+25"/>
+        <location line="+104"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer</translation>
     </message>
     <message>
+        <location line="-127"/>
         <source>Server Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer czasu</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Offset</translation>
     </message>
     <message>
+        <location line="+34"/>
         <source>Synchronizing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronizacja...</translation>
     </message>
 </context>
 <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
+        <location filename="ui/widgets/settings/time_server_selection_widget.cpp" line="+53"/>
         <source>Time is taken from the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas jest pobierany z Internetu.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Time is taken from %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas jest pobierany z %1.</translation>
     </message>
 </context>
 <context>
     <name>QnTimeSlider</name>
     <message>
+        <location filename="ui/graphics/items/controls/time_slider.cpp" line="+540"/>
         <source>auto</source>
         <comment>AM/PM usage based on user&apos;s system locale.</comment>
         <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>dd MMMM yyyy hh:mm ap</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>dd MMMM yyyy h ap</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>dd MMMM yyyy</source>
         <comment>Format for displaying day caption in timeline&apos;s header.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>MMMM yyyy</source>
         <comment>Format for displaying month caption in timeline&apos;s header.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location line="+676"/>
         <source>NO THUMBNAILS AVAILABLE</source>
-        <translation type="unfinished"></translation>
+        <translation>MINIATURKI NIEDOSTĘPNE</translation>
     </message>
 </context>
 <context>
     <name>QnTwoStepFileDialog</name>
     <message>
+        <location filename="ui/dialogs/two_step_file_dialog.ui"/>
         <source>Folder:</source>
-        <translation type="unfinished"></translation>
+        <translation>Folder:</translation>
     </message>
     <message>
+        <location/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Przeglądaj...</translation>
     </message>
     <message>
+        <location/>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa pliku:</translation>
     </message>
     <message>
+        <location/>
         <source>Format:</source>
-        <translation type="unfinished"></translation>
+        <translation>Format:</translation>
     </message>
     <message>
+        <location/>
         <source>Warning: file with same name already exists!</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwaga: plik o tej samej nazwie juz istnieje!</translation>
     </message>
     <message>
+        <location/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje</translation>
     </message>
     <message>
+        <location filename="ui/dialogs/two_step_file_dialog.cpp" line="+188"/>
         <source>Select folder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz folder...</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Select file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz plik...</translation>
     </message>
 </context>
 <context>
     <name>QnUpdateDialog</name>
     <message>
+        <location filename="ui/dialogs/update_dialog.ui"/>
         <source>Update Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja serwerów</translation>
     </message>
 </context>
 <context>
     <name>QnUpdateStatusItemDelegate</name>
     <message>
+        <location filename="ui/delegates/update_status_item_delegate.cpp" line="+45"/>
         <source>%1%</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
     <name>QnUserEmailPolicy</name>
     <message>
+        <location filename="business/business_resource_validation.cpp" line="+11"/>
         <source>Select at least one user</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz co najmniej jednego użytkownika</translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>User %1 has invalid email address</source>
-        <translation type="unfinished"></translation>
+        <translation>Użytkownik %1 posaida niepoprawny adres email</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>%n of %1 users have invalid email address</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n z %1 użytkowników posiada zły adres email</numerusform>
+            <numerusform>%n z %1 użytkowników posiada zły adres email</numerusform>
+            <numerusform>%n z %1 użytkowników posiadają zły adres email</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>Invalid email address %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Błędny adres email %1</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>%n of %1 additional email addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n z %1 dodatkowe adresy są nieprawidłowe</numerusform>
+            <numerusform>%n z %1 dodatkowy adres jest nieprawidłowy</numerusform>
+            <numerusform>%n z %1 dodatkowe adresy są nieprawidłowe</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Send email to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyślij email do %1</translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>%n User(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Użytkowników</numerusform>
+            <numerusform>%n Użytkownik</numerusform>
+            <numerusform>%n Użytkowników</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+2"/>
         <source>%1, %n additional</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1, %n dodatkowe</numerusform>
+            <numerusform>%1, %n dodatkowy</numerusform>
+            <numerusform>%1, %n dodatkowe</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnUserSettingsDialog</name>
     <message>
+        <location filename="ui/dialogs/user_settings_dialog.cpp" line="+126"/>
         <source>New Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowe Hasło</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło</translation>
     </message>
     <message>
+        <location line="+186"/>
         <source>Login cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Login nie może być pusty.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>User with specified login already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Użytkownik o podanym loginie już istnieje.</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>To change your password, please enter your current password.</source>
-        <translation type="unfinished"></translation>
+        <translation>By zmienić hasło, wpisz swoje aktualne hasło.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Invalid current password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Błędne bieżące hasło.</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>User was renamed. Password must be updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Użytkownik zmienił nazwę. Hasło musi być zaktualizowane.</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Passwords do not match.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasła nie pasują do siebie.</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Password cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło nie może być puste.</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Choose access rights.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz prawa dostępu.</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>Invalid email address.</source>
-        <translation type="unfinished"></translation>
+        <translation>Błędny adres email.</translation>
     </message>
     <message>
+        <location line="+96"/>
+        <location line="+21"/>
         <source>Owner</source>
-        <translation type="unfinished"></translation>
+        <translation>Właściciel</translation>
     </message>
     <message>
+        <location line="-17"/>
+        <location line="+19"/>
         <source>Administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>Administrator</translation>
     </message>
     <message>
+        <location line="-17"/>
         <source>Advanced Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaawansowany Operator</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Operator</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Live Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Dostęp Live</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Custom...</source>
-        <translation type="unfinished"></translation>
+        <translation>Niestandardowy...</translation>
     </message>
     <message>
+        <location line="+16"/>
         <source>Can adjust camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Może zmieniać ustawienia kamer</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Can use PTZ controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Może sterować PTZ</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Can view video archives</source>
-        <translation type="unfinished"></translation>
+        <translation>Może przeglądać zapisane wideo</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Can export video</source>
-        <translation type="unfinished"></translation>
+        <translation>Może eksportować nagrania</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Can edit Video Walls</source>
-        <translation type="unfinished"></translation>
+        <translation>Może edytować Ścianę Wideo</translation>
     </message>
 </context>
 <context>
     <name>QnVideowallItemWidget</name>
     <message>
+        <location filename="ui/graphics/items/resource/videowall_item_widget.cpp" line="+121"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacje</translation>
     </message>
 </context>
 <context>
     <name>QnVideowallManageWidgetPrivate</name>
     <message>
+        <location filename="ui/widgets/videowall_manage_widget_p.cpp" line="+342"/>
         <source>Desktop %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pulpit %1</translation>
     </message>
     <message>
+        <location line="+232"/>
         <source>Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekran</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Screen %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekran %1</translation>
     </message>
     <message>
+        <location line="+143"/>
         <source>New Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowa pozycja</translation>
     </message>
     <message>
+        <location line="+19"/>
         <source>Delete Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń ekran</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Are you sure you want to delete %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Jesteś pewny czy usunąć %1?</translation>
     </message>
 </context>
 <context>
     <name>QnVideowallScreenWidget</name>
     <message>
+        <location filename="ui/graphics/items/resource/videowall_screen_widget.cpp" line="+97"/>
         <source>Pc %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pc %1</translation>
     </message>
     <message numerus="yes">
+        <location line="+10"/>
         <source>Pc %1 - Screens %2</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Pc %1 - Ekrany %2</numerusform>
+            <numerusform>Pc %1 - Ekran %2</numerusform>
+            <numerusform>Pc %1 - Ekrany %2</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnVideowallSettingsDialog</name>
     <message>
+        <location filename="ui/dialogs/videowall_settings_dialog.ui"/>
         <source>Video Wall Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia Ściany wideo</translation>
     </message>
     <message>
+        <location/>
         <source>Start Video Wall when the Windows starts</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom Ścianę wideo przy starcie systemu</translation>
     </message>
     <message>
+        <location/>
         <source>Shortcut on the desktop</source>
-        <translation type="unfinished"></translation>
+        <translation>Umieść skrót na pulpicie</translation>
     </message>
 </context>
 <context>
     <name>QnVolumeSlider</name>
     <message>
+        <location filename="ui/graphics/items/controls/volume_slider.cpp" line="+64"/>
         <source>Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyciszony</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>%1%</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchActionHandler</name>
     <message>
+        <location filename="ui/workbench/handlers/workbench_action_handler.cpp" line="+816"/>
         <source>New layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy układ</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>New layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy  %1 układ</translation>
     </message>
     <message>
+        <location line="+23"/>
+        <location line="+23"/>
+        <location line="+1287"/>
+        <location line="+6"/>
+        <location line="+66"/>
+        <location line="+31"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="-1412"/>
         <source>Can&apos;t move camera(s) to other server. Server %1 doesn&apos;t answer to request.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można przenieść kamer na inny serwer. Serwer%1 nie odpowiedział na żądanie.</translation>
     </message>
     <message>
+        <location line="+23"/>
         <source>Server %1 cannot discover these cameras so far. Are you sure you want to move them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer%1 nie może odnaleźć tych kamer. Czy na pewno chcesz je przenieść?</translation>
     </message>
     <message>
+        <location line="+78"/>
         <source>Layout is locked and cannot be changed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Układ jest zablokowany i nie może być zmieniony.</translation>
     </message>
     <message>
+        <location line="+21"/>
         <source>Cannot add item</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie mozna dodać pozycji</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Cannot add a local file to Multi-Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można dodać pliku lokalnego do Multi-Wideo</translation>
     </message>
     <message>
+        <location line="+53"/>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszytkie obsługiwane formaty (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wideo (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation type="unfinished"></translation>
+        <translation>Obrazy (*.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
+        <location line="+2"/>
+        <location line="+17"/>
         <source>All files (*.*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszytkie pliki (*.*)</translation>
     </message>
     <message>
+        <location line="-14"/>
+        <location line="+17"/>
         <source>Open file</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz plik</translation>
     </message>
     <message>
+        <location line="-5"/>
         <source>All Supported (*.layout)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszystkie obsługiwane (*.layout)</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Layouts (*.layout)</source>
-        <translation type="unfinished"></translation>
+        <translation>Układy (*.layout)</translation>
     </message>
     <message>
+        <location line="+16"/>
         <source>Select folder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz folder...</translation>
     </message>
     <message>
+        <location line="+223"/>
         <source>Could not perform preview search</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można wykonać wyszukiwania podglądu</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybrany okres jest zbyt krótki, aby wykonać wyszukiwanie podglądu. Wybierz dłuższy okres.</translation>
     </message>
     <message>
+        <location line="+77"/>
         <source>Preview Search for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Przeszukiwanie dla %1</translation>
     </message>
     <message>
+        <location line="+119"/>
         <source>Process is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Proces jest w toku</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodawanie kamery w jest w toku. Czy chcesz przerwać proces?</translation>
     </message>
     <message>
+        <location line="+103"/>
         <source>Delete Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń pliki</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Jesteś pewny czy trwale usunąć %n plik(i)?</numerusform>
+            <numerusform>Jesteś pewny czy trwale usunąć %n plik?</numerusform>
+            <numerusform>Jesteś pewny czy trwale usunąć %n pliki?</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>Remove Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuwanie elementów</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Jesteś pewny czy  usunąć te %n element(y) z układu?</numerusform>
+            <numerusform>Jesteś pewny czy  usunąć ten %n element z układu?</numerusform>
+            <numerusform>Jesteś pewny czy  usunąć te %n elementy z układu?</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+49"/>
         <source>User already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Użytkownik juz istnieje.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Video Wall already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Ściana wideo już istnieje</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>User with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Użytkownik o tej samej nazwie już istnieje</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Video Wall with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Ściana wideo o takiej nazwie już istnieje</translation>
     </message>
     <message>
+        <location line="+49"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień nazwę</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Enter new name for the selected item:</source>
-        <translation type="unfinished"></translation>
+        <translation>Podaj nową nazwę dla zaznaczonych elementów:</translation>
     </message>
     <message numerus="yes">
+        <location line="+155"/>
         <source>These %n cameras are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Te kamery %n zostały automatycznie wykryte.</numerusform>
+            <numerusform>Ta kamera %n została automatycznie wykryta.</numerusform>
+            <numerusform>Te kamery %n zostały automatycznie wykryte.</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+8"/>
         <source>They may be auto-discovered again after removing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mogą być ponownie automatycznie wykryte  po usunięciu.</translation>
     </message>
     <message>
+        <location line="-7"/>
+        <location line="+8"/>
         <source>Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Jesteś pewny czy usunąć?</translation>
     </message>
     <message numerus="yes">
+        <location line="-2"/>
         <source>%n of these %1 cameras are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n z tych %1 kamer zostało autokmatycznie wykrytych.</numerusform>
+            <numerusform>%n z tych %1 kamer została autokmatycznie wykryta.</numerusform>
+            <numerusform>%n z tych %1 kamer zostało autokmatycznie wykrytych.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+7"/>
         <source>Do you really want to delete the following %n item(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Czy na pewno chcesz usunąć następujące%n  pozycje?</numerusform>
+            <numerusform>Czy na pewno chcesz usunąć następującą%n  pozycję?</numerusform>
+            <numerusform>Czy na pewno chcesz usunąć następujące%n  pozycje?</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+23"/>
         <source>Delete Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń zasoby</translation>
     </message>
     <message>
+        <location line="+77"/>
         <source>User Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia użytkownika</translation>
     </message>
     <message>
+        <location line="+164"/>
         <source>Updating background</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja tła</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation>Przetwarzanie obrazu może zająć dużo czasu. Proszę o cierpliwość.</translation>
     </message>
     <message>
+        <location line="+16"/>
         <source>Picture is too big. Maximum size is %1 Mb</source>
-        <translation type="unfinished"></translation>
+        <translation>Obraz jest za duży. Maksymalny rozmiar to %1 Mb</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Error while uploading picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd podczas ładowania obrazu.</translation>
     </message>
     <message numerus="yes">
+        <location line="+67"/>
         <source>Could not save the following %n items.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nie można zapisać następujących elementów%n.</numerusform>
+            <numerusform>Nie można zapisać następującego elementu %n.</numerusform>
+            <numerusform>Nie można zapisać następujących elementów%n.</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+18"/>
         <source>Could not delete resource</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można usunąć zasobu</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>An error has occurred while trying to delete a resource from Server. </source>
-        <translation type="unfinished"></translation>
+        <translation>Wystapił błąd podczas usuwania zasobu z serwera.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Error description: &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Opis błędu: &apos;%1&apos;</translation>
     </message>
     <message numerus="yes">
+        <location line="+11"/>
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nie można zapisać zmian  dokonanych w następujących %n zasobach.</numerusform>
+            <numerusform>Nie można zapisać zmian  dokonanych w następującym %n zasobie.</numerusform>
+            <numerusform>Nie można zapisać zmian  dokonanych w następujących %n zasobach.</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+144"/>
+        <source>Client v%1&lt;br/&gt;</source>
+        <translation>Klient v%1&lt;br/&gt;</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Server v%1 at %2&lt;br/&gt;</source>
+        <translation>Serwert v%1  %2 &lt;br/&gt;</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Server v%1&lt;br/&gt;</source>
+        <translation>Serwert v%1 &lt;br/&gt;</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
+        <translation>Niektóre elementy systemu nie są zaktualizowane: &lt;br/&gt;%1 &lt;br/&gt; Proszę zaktualizować wszystkie komponenty do najnowszej wersji%2.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <source>Version Mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>Niezgodność wersji</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja...</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Beta version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Wersja beta %1</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>You are running beta version of %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Używasz wersji beta%1.</translation>
     </message>
     <message>
+        <location line="+25"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Proces Launcher nie został odnaleziony</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Cannot restart the client.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można ponownie uruchomić klienta.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some components of the system are not updated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Client v%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server v%1 at %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server v%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please update all components to the latest version %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Anonymous Usage Statistics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
-If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę zamknąć aplikację i uruchomić ją ponownie za pomocą skrótu w menu Start.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
+        <location filename="ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="+103"/>
+        <location line="+33"/>
+        <location line="+27"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="-59"/>
         <source>Bookmark can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakładka może być dodana tylko do aktywnego serwera.</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakładka</translation>
     </message>
     <message>
+        <location line="+27"/>
         <source>Bookmark can only be edited on an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakładka może być edytowana tylko na aktywnym serwerze.</translation>
     </message>
     <message>
+        <location line="+27"/>
         <source>Bookmark can only be deleted from an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakładka może być usunieta tylko na aktywnym serwerze.</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Confirm delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Potwierdź usuwanie</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Czy jesteś pewny czy usunąć tę zakładkę %1?</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchConnectHandler</name>
     <message>
+        <location filename="ui/workbench/handlers/workbench_connect_handler.cpp" line="+127"/>
         <source>Connect to Another Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Podłącz do innego serwera...</translation>
     </message>
     <message>
+        <location line="+58"/>
         <source>Could not connect to server. Closing in %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można połączyć się z serwerem. Zamykanie w%1...</translation>
     </message>
     <message>
+        <location line="+69"/>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Łączenie...</translation>
     </message>
     <message>
+        <location line="+101"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Połącz z serwerem...</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
     <message>
+        <location filename="ui/workbench/workbench_controller.cpp" line="+609"/>
         <source>Recording in...%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywanie w...%1</translation>
     </message>
     <message>
+        <location line="+36"/>
+        <location line="+28"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrzeżenie</translation>
     </message>
     <message>
+        <location line="-28"/>
         <source>Can&apos;t start recording due to the following error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można uruchomić nagrywania z powodu następującego błędu:%1</translation>
     </message>
     <message>
+        <location line="+6"/>
         <source>Recorded Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrane wideo</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Save Recording As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz wideo jako...</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-        <translation type="unfinished"></translation>
+        <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się nadpisać pliku &apos;%1&apos;. Wybierz inną nazwę.</translation>
     </message>
     <message>
+        <location line="+774"/>
         <source>Press any key to stop the tour</source>
-        <translation type="unfinished"></translation>
+        <translation>Wciśnij dowolny klawisz by zatrzymać trasę</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchExportHandler</name>
     <message>
+        <location filename="ui/workbench/handlers/workbench_export_handler.cpp" line="+90"/>
         <source>Executable %1 Media File (x64) (*.exe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik wykonywalny%1 media (64) (* .exe)</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Executable %1 Media File (x86) (*.exe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik wykonywalny%1 media (x86) (* .exe)</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>File is in use</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik jest w użyciu</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik &quot;%1&quot; jest używany do nagrywania. Proszę podać inną nazwę.</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Could not overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się nadpisać pliku</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik &apos;%1&apos; jest używany przez inny proces. Proszę wpisać inną nazwę.</translation>
     </message>
     <message>
+        <location line="+37"/>
         <source>Exporting Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksportowanie układu</translation>
     </message>
     <message>
+        <location line="+41"/>
         <source>Could not export file</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się wyeksportować pliku</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Dokładnie jeden element musi być wybrany do eksportu, pozycje %n są aktualnie wybrane.</numerusform>
+            <numerusform>Dokładnie jeden element musi być wybrany do eksportu, pozycja %n jest aktualnie wybrana.</numerusform>
+            <numerusform>Dokładnie jeden element musi być wybrany do eksportu, pozycje %n są aktualnie wybrane.</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+19"/>
+        <location line="+442"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrzeżenie</translation>
     </message>
     <message>
+        <location line="-441"/>
         <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamierzasz wyeksportować sekwencję wideo, która jest dłuższa niż 30 minut.</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+442"/>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>Może to zając ponad gigabajt przestrzeni na dysku twardym i w zależności od szybkości połączenia, może również zająć kilka minut.</translation>
     </message>
     <message>
+        <location line="-441"/>
+        <location line="+442"/>
         <source>Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Czy chcesz kontynuować?</translation>
     </message>
     <message>
+        <location line="-426"/>
         <source>AVI (*.avi)</source>
-        <translation type="unfinished"></translation>
+        <translation>AVI (*.avi)</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Matroska (*.mkv)</source>
-        <translation type="unfinished"></translation>
+        <translation>Matroska (*.mkv)</translation>
     </message>
     <message>
+        <location line="+43"/>
         <source>Export Video As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksportuj wideo jako...</translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>No timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak znacznika czasu</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Top left corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Górny lewy róg (wymaga transkodowania)</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Top right corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Górny prawy róg (wymaga transkodowania)</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Bottom left corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Dolny lewy róg (wymaga transkodowania)</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Bottom right corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Dolny prawy róg (wymaga transkodowania)</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Timestamps:</source>
-        <translation type="unfinished"></translation>
+        <translation>Znaczniki czasu:</translation>
     </message>
     <message>
+        <location line="+40"/>
         <source>AVI format is not recommended</source>
-        <translation type="unfinished"></translation>
+        <translation>Format AVI jest zalecany</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Format AVI nie jest zalecany dla eksportu nieciągłego nagrania, gdy ścieżka dźwiękowa jest obecna. Czy chcesz kontynuować?</translation>
     </message>
     <message>
+        <location line="+13"/>
+        <location line="+22"/>
+        <location line="+228"/>
         <source>Save As</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz jako</translation>
     </message>
     <message>
+        <location line="-249"/>
         <source>You are about to export video with filters that require transcoding, which can take a long time. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamierzasz eksportować wideo z filtrami, które wymagają transkodowania, może to zająć dużo czasu. Chcesz kontynuować?</translation>
     </message>
     <message>
+        <location line="+22"/>
+        <location line="+228"/>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik &apos;%1&apos; już istnieje. Chcesz nadpisać?</translation>
     </message>
     <message>
+        <location line="-184"/>
         <source>Exporting Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksportowanie wideo</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksportowanie do &quot;%1&quot;...</translation>
     </message>
     <message>
+        <location line="+42"/>
+        <location line="+228"/>
         <source>Export finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksport zakończony</translation>
     </message>
     <message>
+        <location line="-228"/>
         <source>Export successfully finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksport zakończony powodzeniem</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Could not export layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można wyeksportować układu</translation>
     </message>
     <message>
+        <location line="+24"/>
+        <location line="+13"/>
         <source>Could not save a layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie możńa zapisać układu</translation>
     </message>
     <message>
+        <location line="-12"/>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bieżący układ zawiera pliki graficzne. Pliki graficzne nie są dopuszczone do multiexportu wideo.</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bieżący układ zawiera pliki lokalne. Pliki lokalne nie są dopuszczone do multiexportu wideo.</translation>
     </message>
     <message>
+        <location line="+35"/>
         <source>Save local layout As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz lokalny układ jako...</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Export Layout As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksportuj układ jako...</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>%1 Media File (*.nov)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Plik mediów (*.nov)</translation>
     </message>
     <message>
+        <location line="+21"/>
         <source>Make file read-only</source>
-        <translation type="unfinished"></translation>
+        <translation>Oznacz plik tylko do odczytu</translation>
     </message>
     <message>
+        <location line="+80"/>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamierzasz wyeksportować kilka sekwencji wideo, które są dłuższe niż 30 minut.</translation>
     </message>
     <message>
+        <location line="+32"/>
         <source>Export successfully finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksport został pomyślnie zakończony.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Could not export video</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się wyeksportować wideo</translation>
     </message>
     <message>
+        <location line="-388"/>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>exported</source>
-        <translation type="unfinished"></translation>
+        <translation>Zastosowanie filtrów: rotacja, Dewarping, wyostrzanie obrazu, współczynnik proporcji (wymaga transkodowania)</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
+        <location filename="ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="+34"/>
+        <location line="+37"/>
+        <location line="+42"/>
+        <location line="+9"/>
+        <location line="+3"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="-91"/>
         <source>Please, wait before the previously requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę czekać, zanim wymagane serwery zostaną dodane do systemu.</translation>
     </message>
     <message>
+        <location line="+25"/>
         <source>Enter Password...</source>
-        <translation type="unfinished"></translation>
+        <translation>Podaj hasło...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Administrator Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło Administratora</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Password cannot be empty!</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło nie może być puste!</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Connecting to the current system...</source>
-        <translation type="unfinished"></translation>
+        <translation>Podłączanie do bieżącego systemu...</translation>
     </message>
     <message>
+        <location line="+29"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacja</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>The selected servers has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybrany serwer został pomyślnie dołączony do twojego systemu!</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Authentication failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwierzytelnianie nie powiodło się.</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Please, check the password you have entered.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę sprawdzić wpisane hasło.</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Could not configure the selected servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się skonfigurować wybranych serwerów.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Could not update the selected servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie zaktualizowano wybranych serwerów.</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>You can try to update the servers again in the System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Możesz spróbować uaktualnić serwery w panelu administracyjnym systemu.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchLayoutsHandler</name>
     <message>
+        <location filename="ui/workbench/handlers/workbench_layouts_handler.cpp" line="+72"/>
+        <location line="+119"/>
+        <location line="+22"/>
+        <location line="+81"/>
+        <location line="+228"/>
         <source>Layout already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Układ już istnieje</translation>
     </message>
     <message>
+        <location line="-449"/>
+        <location line="+119"/>
+        <location line="+22"/>
+        <location line="+309"/>
         <source>Layout with the same name already exists and you do not have the rights to overwrite it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Układ o tej samej nazwie już istnieje, nie masz uprawnień by go nadpisać.</translation>
     </message>
     <message>
+        <location line="-380"/>
         <source>Save Layout As</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz układ jako</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Enter layout name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz nazwę układu:</translation>
     </message>
     <message>
+        <location line="+151"/>
         <source>Layout with the same name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Układ o tej nazwie istnieje. Czy chcesz nadpisać?</translation>
     </message>
     <message>
+        <location line="+67"/>
         <source>Close Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamknij układ</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Następujące %n układy nie zostały zapisane. Czy chcesz zapisać?</numerusform>
+            <numerusform>Następujący %n układ nie został zapisany. Czy chcesz zapisać?</numerusform>
+            <numerusform>Następujące %n układy nie zostały zapisane. Czy chcesz zapisać?</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+38"/>
         <source>Saving Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisywanie układu</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>The following %n layout(s) are being saved.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Następujące %n układy są zapisywane.</numerusform>
+            <numerusform>Następujący %n układ jest zapisywany.</numerusform>
+            <numerusform>Następujące %n układy są zapisywane.</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę czekać.</translation>
     </message>
     <message>
+        <location line="+103"/>
         <source>New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy układ</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Enter the name of the layout to create:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz nazwę układu który chcesz stworzyć:</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>New layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy układ</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>New layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowy  %1 układ</translation>
     </message>
     <message>
+        <location line="+122"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>Could not save the following %n layout(s) to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nie można zapisać następujących %n układów  na serwerze.</numerusform>
+            <numerusform>Nie można zapisać następującego %n układu  na serwerze.</numerusform>
+            <numerusform>Nie można zapisać następujących %n układów  na serwerze.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Czy chcesz  przywrócić te układ (y)%n?</numerusform>
+            <numerusform>Czy chcesz przywrócić ten układ (y)%n?</numerusform>
+            <numerusform>Czy chcesz przywrócić te układ (y)%n?</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchNavigator</name>
     <message>
+        <location filename="ui/workbench/workbench_navigator.cpp" line="+1102"/>
         <source>All Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszystkie kamery</translation>
     </message>
     <message>
+        <location line="+315"/>
         <source>yyyy MMM dd</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>yyyy MMM dd</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>hh:mm:ss</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>mm:ss</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Live</source>
         <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Na żywo</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
     <message>
+        <location filename="ui/workbench/handlers/workbench_ptz_handler.cpp" line="+108"/>
         <source>Could not get position from camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się pobrać  pozycji z kamery</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpił błąd podczas próby pobrania aktualnej pozycji z kamery %1.</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+42"/>
+        <location line="+53"/>
         <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
+        <translation>Poczekaj aż kamera będzie online.</translation>
     </message>
     <message>
+        <location line="-55"/>
         <source>Could not set position for camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można ustawić pozycji kamery</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+53"/>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpił błąd podczas próby ustawienia aktualnej pozycji  kamery %1.</translation>
     </message>
     <message>
+        <location line="-1"/>
         <source>Could not set position to camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można ustawić pozycji kamery</translation>
     </message>
     <message>
+        <location line="+80"/>
         <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
+        <location filename="ui/workbench/handlers/workbench_screenshot_handler.cpp" line="+367"/>
         <source>PNG Image (*.png)</source>
-        <translation type="unfinished"></translation>
+        <translation>Obraz PNG (*.png)</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>JPEG Image (*.jpg)</source>
-        <translation type="unfinished"></translation>
+        <translation>Obraz JPEG (*.jpg)</translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>Save Screenshot As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz screenshot jako...</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>No timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak znacznika czasu</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Top left corner</source>
-        <translation type="unfinished"></translation>
+        <translation>Górny lewy róg</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Top right corner</source>
-        <translation type="unfinished"></translation>
+        <translation>Górny prawy róg</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Bottom left corner</source>
-        <translation type="unfinished"></translation>
+        <translation>Dolny lewy róg</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Bottom right corner</source>
-        <translation type="unfinished"></translation>
+        <translation>Dolny prawy róg</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Timestamp:</source>
-        <translation type="unfinished"></translation>
+        <translation>Znacznik czasu:</translation>
     </message>
     <message>
+        <location line="+26"/>
         <source>Save As</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz jako</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik &apos;%1&apos; już istnieje. Chcesz nadpisać?</translation>
     </message>
     <message>
+        <location line="+16"/>
         <source>Could not overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można nadpisać pliku</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik &apos;%1&apos; jest używany przez inny proces. Proszę wpisać inną nazwę.</translation>
     </message>
     <message>
+        <location line="+67"/>
         <source>Could not save screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie możńa zapisać screenshota</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>An error has occurred while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpił błąd podczas zapisu screenshota &apos;%1&apos;.</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Saving Screenshot...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisywanie screenshota...</translation>
     </message>
     <message>
+        <location line="+84"/>
         <source>Saving %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisywanie %1</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
+        <location filename="ui/workbench/watchers/workbench_update_watcher.cpp" line="+82"/>
         <source>Would you like to update?</source>
-        <translation type="unfinished"></translation>
+        <translation>Czy chcesz dokonać aktualizacji?</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Newer version is available</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowsza wersja jest dostępna</translation>
     </message>
     <message>
+        <location line="+1"/>
+        <location line="+4"/>
         <source>New version %1 is available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowa wersja %1 jest dostępna.</translation>
     </message>
     <message>
+        <location line="-1"/>
         <source>Update is recommended</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja jest zalecana</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Major issues have been fixed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ważne problemy zostały rozwiązane.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Update is strongly recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizacja jest KONIECZNA.</translation>
     </message>
     <message>
+        <location line="+18"/>
         <source>Please update %1 Client.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę zaktualizować %1 Klienta.</translation>
     </message>
     <message>
+        <location line="+10"/>
         <source>Don&apos;t notify again about this update.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie powiadamiaj ponownie o tej aktualizacji.</translation>
     </message>
     <message>
+        <location line="+4"/>
         <source>Release Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Infoemacje o wersji</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
+        <location filename="ui/workbench/handlers/workbench_videowall_handler.cpp" line="+334"/>
+        <location line="+592"/>
         <source>Control session is already running</source>
-        <translation type="unfinished"></translation>
+        <translation>Sesja sterowaniai jest już uruchomiona</translation>
     </message>
     <message>
+        <location line="-591"/>
+        <location line="+592"/>
         <source>Could not start control session.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można uruchomić sesji sterowania.</translation>
     </message>
     <message>
+        <location line="-592"/>
+        <location line="+592"/>
         <source>Another user is already controlling this screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inny użytkownik już steruje tym ekranem.</translation>
     </message>
     <message>
+        <location line="-501"/>
+        <location line="+40"/>
+        <location line="+47"/>
+        <location line="+756"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
+        <location line="-843"/>
+        <location line="+40"/>
         <source>Unexpected error has occurred. Changes cannot be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpił nieoczekiwany błąd. Zmiany nie zostaną zapisane.</translation>
     </message>
     <message>
+        <location line="+48"/>
         <source>There are no offline videowall items attached to this pc.</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak zalogowany ścian wideo dołączonych do tego PC.</translation>
     </message>
     <message>
+        <location line="+8"/>
         <source>Switch to Video Wall Mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz w tryb Ściany Wideo...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ściana Wideo zostanie uruchomiona teraz. Czy chcesz zamknąć  %1 instancjei klienta?</translation>
     </message>
     <message>
+        <location line="+385"/>
+        <location line="+308"/>
+        <location line="+1399"/>
         <source>More licenses required</source>
-        <translation type="unfinished"></translation>
+        <translation>Wymagana większa liczba  licencji</translation>
     </message>
     <message>
+        <location line="-1706"/>
         <source>To enable the feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aby włączyć tę funkcję należy aktywować co najmniej jedną licencję Ściany Wideo.</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Could not start Video Wall control session.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można uruchomić sesji sterowania Sciany Wideol.</translation>
     </message>
     <message>
+        <location line="+262"/>
+        <source>%1 (%2)</source>
+        <translation>%1 (%2)</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>New layout</source>
+        <translation>Nowy układ</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>New layout %1</source>
+        <translation>Nowy  %1</translation>
+    </message>
+    <message>
+        <location line="+35"/>
         <source>To enable the feature please activate at least one Video Wall license</source>
-        <translation type="unfinished"></translation>
+        <translation>Aby włączyć tę funkcję należy aktywować co najmniej jedną licencję Ściany Wideo</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>Ściana Wideo</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Video Wall %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ściana Wideo %1</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>New Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak Ściany Wideo...</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Enter the name of the Video Wall to create:</source>
-        <translation type="unfinished"></translation>
+        <translation>Podaj nazwę Ściany Wideo:</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>Video Wall already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Ściana Wideo już isteniej</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Video Wall with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Ściana Wideo o tej samej nazwie  już isteniej</translation>
     </message>
     <message numerus="yes">
+        <location line="+24"/>
         <source>Could not save the following %n items to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nie można zapisać następujących pozycji %n na serwerze.</numerusform>
+            <numerusform>Nie można zapisać następujących pozycji %n na serwerze.</numerusform>
+            <numerusform>Nie można zapisać następującej pozycji %n na serwerze.</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+71"/>
         <source>Delete Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń elementy</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Jesteś pewny czy trwale usunąć %n element(y)?</numerusform>
+            <numerusform>Jesteś pewny czy trwale usunąć %n element?</numerusform>
+            <numerusform>Jesteś pewny czy trwale usunąć %n elemeny?</numerusform>
         </translation>
     </message>
     <message>
+        <location line="+22"/>
         <source>Could not start Video Wall.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można uruchomić Ściany Wideo.</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>Confirm Video Wall stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Potwierdź wyłączenie Ściany Wideo</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Are you sure you want to stop the Video Wall?</source>
-        <translation type="unfinished"></translation>
+        <translation>Jesteś pewny czy wyłączyć Ścianę Wideo?</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>You&apos;ll have to start it manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Musisz uruchomić  ręcznie.</translation>
     </message>
     <message>
+        <location line="+309"/>
         <source>New Matrix %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowa Matryca %1</translation>
     </message>
     <message>
+        <location line="+11"/>
         <source>Invalid matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowa Matryca</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>You have no layouts on the screens. Matrix cannot be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie masz układów na ekranach. Matryca nie może być zapisana.</translation>
     </message>
     <message>
+        <location line="+69"/>
         <source>Delete Matrices</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń Matryce</translation>
     </message>
     <message numerus="yes">
+        <location line="+1"/>
         <source>Are you sure you want to permanently delete these %n matrices?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Jesteś pewny czy trwale usunąć %n matryc(ę)?</numerusform>
+            <numerusform>Jesteś pewny czy trwale usunąć %n matrycę?</numerusform>
+            <numerusform>Jesteś pewny czy trwale usunąć %n matryc?</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%n cameras</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ReconnectInfoDialog</name>
     <message>
+        <location filename="ui/dialogs/reconnect_info_dialog.ui"/>
         <source>Reconnecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ponowne łączenie...</translation>
     </message>
     <message>
+        <location/>
         <source>Please wait while connection is being restored...</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę czekać, połączenie jest przywracane...</translation>
     </message>
 </context>
 <context>
     <name>RecordingBusinessActionWidget</name>
     <message>
+        <location filename="ui/widgets/business/recording_business_action_widget.ui"/>
         <source>Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jakość:</translation>
     </message>
     <message>
+        <location/>
         <source>FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>FPS</translation>
     </message>
     <message>
+        <location/>
         <source>Pre-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rejestracja przed:</translation>
     </message>
     <message>
+        <location/>
         <source>s</source>
-        <translation type="unfinished"></translation>
+        <translation>s</translation>
     </message>
     <message>
+        <location/>
         <source>Post-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rejestarcja po:</translation>
     </message>
     <message>
+        <location/>
         <source>max</source>
-        <translation type="unfinished"></translation>
+        <translation>max</translation>
     </message>
 </context>
 <context>
     <name>RecordingSettings</name>
     <message>
+        <location filename="ui/widgets/settings/recording_settings_widget.ui"/>
         <source>Video Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywanie wideo</translation>
     </message>
     <message>
+        <location/>
         <source>Temporary Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Folder tymczasowy</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Przeglądaj...</translation>
     </message>
     <message>
+        <location/>
         <source>Capture Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Tryb przechwytywania</translation>
     </message>
     <message>
+        <location/>
         <source>Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Pełny ekran</translation>
     </message>
     <message>
+        <location/>
         <source>Application Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Okno aplikacji</translation>
     </message>
     <message>
+        <location/>
         <source>Additional Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje dodatkowe</translation>
     </message>
     <message>
+        <location/>
         <source>Disable Aero</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłącz Aero</translation>
     </message>
     <message>
+        <location/>
         <source>Capture Cursor</source>
-        <translation type="unfinished"></translation>
+        <translation>Przechwyć kursor</translation>
     </message>
     <message>
+        <location/>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Jakość</translation>
     </message>
     <message>
+        <location/>
         <source>Resolution:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozdzielczość:</translation>
     </message>
     <message>
+        <location/>
         <source>Native</source>
-        <translation type="unfinished"></translation>
+        <translation>Natywna</translation>
     </message>
     <message>
+        <location/>
         <source>Quarter Native</source>
-        <translation type="unfinished"></translation>
+        <translation>1/4 Natywnej</translation>
     </message>
     <message>
+        <location/>
         <source>1920x1080</source>
-        <translation type="unfinished"></translation>
+        <translation>1920x1080</translation>
     </message>
     <message>
+        <location/>
         <source>1280x720</source>
-        <translation type="unfinished"></translation>
+        <translation>1280x720</translation>
     </message>
     <message>
+        <location/>
         <source>640x480</source>
-        <translation type="unfinished"></translation>
+        <translation>640x480</translation>
     </message>
     <message>
+        <location/>
         <source>320x240</source>
-        <translation type="unfinished"></translation>
+        <translation>320x240</translation>
     </message>
     <message>
+        <location/>
         <source>Recording Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jakość nagrywania:</translation>
     </message>
     <message>
+        <location/>
         <source>Best</source>
-        <translation type="unfinished"></translation>
+        <translation>Najlepsza</translation>
     </message>
     <message>
+        <location/>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation>Średnia</translation>
     </message>
     <message>
+        <location/>
         <source>Performance</source>
-        <translation type="unfinished"></translation>
+        <translation>Wydajność</translation>
     </message>
     <message>
+        <location/>
         <source>Audio Grabber</source>
-        <translation type="unfinished"></translation>
+        <translation>Przechwytywanie dźwięku</translation>
     </message>
     <message>
+        <location/>
         <source>Primary Device:</source>
-        <translation type="unfinished"></translation>
+        <translation>Główne urządzenie:</translation>
     </message>
     <message>
+        <location/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Żadne</translation>
     </message>
     <message>
+        <location/>
         <source>External Device:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zewnętrzne urządzenie:</translation>
     </message>
     <message>
+        <location/>
         <source>Very powerful machine is required for Best quality and high resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dla osiągnięcia najlepszej jakości i wysokiej rozdzielczości wymagany jest mocniejszy komputer.</translation>
     </message>
 </context>
 <context>
     <name>ResourceBrowserWidget</name>
     <message>
+        <location filename="ui/widgets/resource_browser_widget.ui"/>
         <source>Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Źródła</translation>
     </message>
     <message>
+        <location/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Szukaj</translation>
     </message>
     <message>
+        <location/>
         <source>Reset Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Resetuj filtry</translation>
     </message>
     <message>
+        <location/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
     <name>ResourceListDialog</name>
     <message>
+        <location filename="ui/dialogs/resource_list_dialog.ui"/>
         <source>Never suggest saving layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Nigdy nie sugerują zapisywania układów widoków</translation>
     </message>
 </context>
 <context>
     <name>SayTextBusinessActionWidget</name>
     <message>
+        <location filename="ui/widgets/business/say_text_business_action_widget.ui"/>
         <source>Speak the following:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mów co następuje:</translation>
     </message>
     <message>
+        <location/>
         <source>Type any text here</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz dowolny tekst</translation>
     </message>
     <message>
+        <location/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>Głośność:</translation>
     </message>
     <message>
+        <location/>
         <source>Test...</source>
-        <translation type="unfinished"></translation>
+        <translation>Test...</translation>
     </message>
 </context>
 <context>
     <name>SendmailBusinessActionWidget</name>
     <message>
+        <location filename="ui/widgets/business/sendmail_business_action_widget.ui"/>
         <source>&amp;Additional Recipients:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Dodatkowi Odbiorcy:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Global Email Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Globalne ustawienia poczty Email...</translation>
     </message>
 </context>
 <context>
     <name>ServerSettingsDialog</name>
     <message>
+        <location filename="ui/dialogs/server_settings_dialog.ui"/>
         <source>Server settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia serwera</translation>
     </message>
     <message>
+        <location/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa:</translation>
     </message>
     <message>
+        <location/>
         <source>IP Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>Adres IP:</translation>
     </message>
     <message>
+        <location/>
         <source>Ping</source>
-        <translation type="unfinished"></translation>
+        <translation>Ping</translation>
     </message>
     <message>
+        <location/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Port:</translation>
     </message>
     <message>
+        <location/>
         <source>9000</source>
-        <translation type="unfinished"></translation>
+        <translation>9000</translation>
     </message>
     <message>
+        <location/>
         <source>Failover</source>
-        <translation type="unfinished"></translation>
+        <translation>Failover</translation>
     </message>
     <message>
+        <location/>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz failover (serwer automatycznie przejmie kamery z uszkodzonego innego serwera)</translation>
     </message>
     <message>
+        <location/>
         <source>Max. cameras on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Max.liczba kamer na tym serwerze:</translation>
     </message>
     <message>
+        <location/>
         <source>Storages</source>
-        <translation type="unfinished"></translation>
+        <translation>Dyski</translation>
     </message>
     <message>
+        <location/>
         <source>In Use</source>
-        <translation type="unfinished"></translation>
+        <translation>W użyciu</translation>
     </message>
     <message>
+        <location/>
         <source>Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Ścieżka</translation>
     </message>
     <message>
+        <location/>
         <source>Capacity</source>
-        <translation type="unfinished"></translation>
+        <translation>Pojemność</translation>
     </message>
     <message>
+        <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Login</translation>
     </message>
     <message>
+        <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło</translation>
     </message>
     <message>
+        <location/>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Przestrzeń</translation>
     </message>
     <message>
+        <location/>
         <source>Rebuild archive index</source>
-        <translation type="unfinished"></translation>
+        <translation>Odbuduj index archiwum</translation>
     </message>
     <message>
+        <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Start</translation>
     </message>
     <message>
+        <location/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Anuluj</translation>
     </message>
 </context>
 <context>
     <name>SignDialog</name>
     <message>
+        <location filename="ui/dialogs/sign_dialog.ui"/>
         <source>Watermark check</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzenie Znaku Wodnego</translation>
     </message>
     <message>
+        <location/>
         <source>Checked file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzony plik:</translation>
     </message>
     <message>
+        <location/>
         <source>Check result:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyniki testu:</translation>
     </message>
 </context>
 <context>
     <name>SingleCameraSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/properties/single_camera_settings_widget.ui"/>
         <source>Camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia kamery</translation>
     </message>
     <message>
+        <location/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Główne</translation>
     </message>
     <message>
+        <location/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa:</translation>
     </message>
     <message>
+        <location/>
         <source>Model:</source>
-        <translation type="unfinished"></translation>
+        <translation>Model:</translation>
     </message>
     <message>
+        <location/>
         <source>Firmware:</source>
-        <translation type="unfinished"></translation>
+        <translation>Firmware:</translation>
     </message>
     <message>
+        <location/>
         <source>Vendor:</source>
-        <translation type="unfinished"></translation>
+        <translation>Producent:</translation>
     </message>
     <message>
+        <location/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adres</translation>
     </message>
     <message>
+        <location/>
         <source>Ping</source>
-        <translation type="unfinished"></translation>
+        <translation>Ping</translation>
     </message>
     <message>
+        <location/>
         <source>Web Page:</source>
-        <translation type="unfinished"></translation>
+        <translation>Strona WWW:</translation>
     </message>
     <message>
+        <location/>
         <source>IP Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>Adres IP:</translation>
     </message>
     <message>
+        <location/>
         <source>MAC Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>MAC adres:</translation>
     </message>
     <message>
+        <location/>
         <source>Authentication</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwierzytelnianie</translation>
     </message>
     <message>
+        <location/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>Login:</translation>
     </message>
     <message>
+        <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło:</translation>
     </message>
     <message>
+        <location/>
         <source>Image Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Zarządzanie obrazem</translation>
     </message>
     <message>
+        <location/>
         <source>Force aspect ratio to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Współczynnik kształtu:</translation>
     </message>
     <message>
+        <location/>
         <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Domyślny obrót:</translation>
     </message>
     <message>
+        <location/>
         <source>Licensing</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencjonowanie</translation>
     </message>
     <message>
+        <location/>
         <source>Use an analog license to view this camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Użyj licecnji analogowj do oglądania tej kamery</translation>
     </message>
     <message>
+        <location/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobierz więcej licencji...</translation>
     </message>
     <message>
+        <location/>
         <source>Enable audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz audio</translation>
     </message>
     <message>
+        <location/>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished"></translation>
+        <translation>To jest kamera z obiektywem fish-eye</translation>
     </message>
     <message>
+        <location/>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywanie</translation>
     </message>
     <message>
+        <location/>
         <source>Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruch</translation>
     </message>
     <message>
+        <location/>
         <source>Motion is not available for this camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Detekcja ruchu nie jest dostępna dla tej kamery</translation>
     </message>
     <message>
+        <location/>
         <source>Motion settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia ruchu</translation>
     </message>
     <message>
+        <location/>
         <source>Motion detection:</source>
-        <translation type="unfinished"></translation>
+        <translation>Detekcja ruchu:</translation>
     </message>
     <message>
+        <location/>
         <source>Hardware (Camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprzęt (wbudowana kamera)</translation>
     </message>
     <message>
+        <location/>
         <source>Software (Max FPS may be slightly decreased on Server)</source>
-        <translation type="unfinished"></translation>
+        <translation>Oprogramowanie (Max liczba FPS może być nieznacznie zmniejszona na serwerze)</translation>
     </message>
     <message>
+        <location/>
         <source>Sensitivity:</source>
-        <translation type="unfinished"></translation>
+        <translation>Czułość:</translation>
     </message>
     <message>
+        <location/>
         <source>Motion mask (0)</source>
-        <translation type="unfinished"></translation>
+        <translation>MAska ruchu (0)</translation>
     </message>
     <message>
+        <location/>
         <source>Maximum sensitivity (9)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksymalna czułość (9)</translation>
     </message>
     <message>
+        <location/>
         <source>Camera motion web page:</source>
-        <translation type="unfinished"></translation>
+        <translation>Strona wwwcamery:</translation>
     </message>
     <message>
+        <location/>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL</translation>
     </message>
     <message>
+        <location/>
         <source>Reset motion regions</source>
-        <translation type="unfinished"></translation>
+        <translation>Resetuj obszar detekcji</translation>
     </message>
     <message>
+        <location/>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>Dewarping</translation>
     </message>
     <message>
+        <location/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaawansowane</translation>
     </message>
     <message>
+        <location/>
         <source>Expert</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekspert</translation>
     </message>
 </context>
 <context>
     <name>SmtpSettingsWidget</name>
     <message>
+        <location filename="ui/widgets/settings/smtp_settings_widget.ui"/>
         <source>Outgoing Email Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia poczty wychodzącej</translation>
     </message>
     <message>
+        <location/>
         <source>Advanced settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia zaawansowane...</translation>
     </message>
     <message>
+        <location/>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Test</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Email:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Hasło:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Opis systemu:</translation>
     </message>
     <message>
+        <location/>
         <source>Enter short system description here...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wpisz tutaj krótki opis systemu...</translation>
     </message>
     <message>
+        <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>Podpis:</translation>
     </message>
     <message>
+        <location/>
         <source>SMTP &amp;Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Serwer SMTP:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;User:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Użytkownik:</translation>
     </message>
     <message>
+        <location/>
         <source>Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>Email:</translation>
     </message>
     <message>
+        <location/>
         <source>P&amp;ort:</source>
-        <translation type="unfinished"></translation>
+        <translation>P&amp;ort:</translation>
     </message>
     <message>
+        <location/>
         <source>Unsecure connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Połączenie niezabezpieczone</translation>
     </message>
     <message>
+        <location/>
         <source>(recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>(zalecane)</translation>
     </message>
     <message>
+        <location/>
         <source>Secure connection using TLS</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezpieczne połączenie przy użyciu protokołu TLS</translation>
     </message>
     <message>
+        <location/>
         <source>Secure connection using SSL</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezpieczne połączenie przy użyciu protokołu SSl</translation>
     </message>
     <message>
+        <location/>
         <source>Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwer:</translation>
     </message>
     <message>
+        <location/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Port:</translation>
     </message>
     <message>
+        <location/>
         <source>User:</source>
-        <translation type="unfinished"></translation>
+        <translation>Użytkownik:</translation>
     </message>
     <message>
+        <location/>
         <source>Security:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezpieczeństwo:</translation>
     </message>
     <message>
+        <location/>
         <source>Progress:</source>
-        <translation type="unfinished"></translation>
+        <translation>Postęp:</translation>
     </message>
     <message>
+        <location/>
         <source>Result:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wynik:</translation>
     </message>
     <message>
+        <location/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
+        <location/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Anuluj</translation>
     </message>
 </context>
 <context>
     <name>StatisticsOverlayWidget</name>
     <message>
+        <location filename="ui/graphics/items/resource/server_resource_widget.cpp" line="-314"/>
         <source>%1%</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
     <name>StorageUrlDialog</name>
     <message>
+        <location filename="ui/dialogs/storage_url_dialog.ui"/>
         <source>Add External Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj zewnętrzną przestrzeń dyskową...</translation>
     </message>
     <message>
+        <location/>
         <source>Protocol:</source>
-        <translation type="unfinished"></translation>
+        <translation>Protokół:</translation>
     </message>
     <message>
+        <location/>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL:</translation>
     </message>
     <message>
+        <location/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
+        <location/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>Login:</translation>
     </message>
     <message>
+        <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło:</translation>
     </message>
 </context>
 <context>
     <name>TimeServerSelectionWidget</name>
     <message>
+        <location filename="ui/widgets/settings/time_server_selection_widget.ui"/>
         <source>Current system time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bieżący czas systemu:</translation>
     </message>
     <message>
+        <location/>
         <source>Synchronizing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronizacja...</translation>
     </message>
     <message>
+        <location/>
         <source>Choose the server which is going to be used as a time server if the system has no internet access:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz serwer, który ma być używany jako serwer czasu, jeśli system nie ma dostępu do internetu:</translation>
     </message>
 </context>
 <context>
     <name>UserSettingsDialog</name>
     <message>
+        <location filename="ui/dialogs/user_settings_dialog.ui"/>
         <source>Create New User</source>
-        <translation type="unfinished"></translation>
+        <translation>Stwórz nowego użytkownika</translation>
     </message>
     <message>
+        <location/>
         <source>User Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>Właściwości użytkownika</translation>
     </message>
     <message>
+        <location/>
         <source>Advanced...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaawansowane...</translation>
     </message>
     <message>
+        <location/>
         <source>C&amp;urrent Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Bieżące hasło:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Confirm Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Potwierdź hasło:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Access Rights:</source>
-        <translation type="unfinished"></translation>
+        <translation>P&amp;rawa dostępu:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Hasło:</translation>
     </message>
     <message>
+        <location/>
         <source>Access rights</source>
-        <translation type="unfinished"></translation>
+        <translation>Prawa dostępu</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Login:</translation>
     </message>
     <message>
+        <location/>
         <source>&amp;Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Email:</translation>
     </message>
 </context>
 <context>
     <name>WeekTimeScheduleDialog</name>
     <message>
+        <location filename="ui/dialogs/week_time_schedule_dialog.ui"/>
         <source>Schedule Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Siatka harmonogramu</translation>
     </message>
     <message>
+        <location/>
         <source>Note: Schedule is based on Server Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Uwaga: Harmonogram  jest oparty na Serwerze Czasu</translation>
     </message>
     <message>
+        <location/>
         <source>Schedule Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia harmonogramu</translation>
     </message>
     <message>
+        <location/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz</translation>
     </message>
     <message>
+        <location/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłącz</translation>
     </message>
 </context>
 </TS>

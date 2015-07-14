@@ -57,8 +57,23 @@ namespace
 
         ItfChangeRequest(rtu::ServerInfo *info
             , const rtu::ItfUpdateInfoContainer &initItfUpdateInfo);
+        int changesCount;
     };
 
+    int changesFromUpdateInfos(const rtu::ItfUpdateInfoContainer &itfUpdateInfos)
+    {
+        int result = 0;
+        for (const rtu::ItfUpdateInfo &updateInfo: itfUpdateInfos)
+        {
+            result += (updateInfo.useDHCP ? 1 : 0)
+                + (updateInfo.ip ? 1 : 0)
+                + (updateInfo.mask ? 1 : 0)
+                + (updateInfo.dns ? 1 : 0)
+                + (updateInfo.gateway ? 1 : 0);
+        }
+        return result;
+    }
+    
     ItfChangeRequest::ItfChangeRequest(rtu::ServerInfo *initInfo
         , const rtu::ItfUpdateInfoContainer &initItfUpdateInfo)
         : inProgress(false)
@@ -66,6 +81,7 @@ namespace
         , timestamp(QDateTime::currentMSecsSinceEpoch())
         , info(initInfo)
         , itfUpdateInfo(initItfUpdateInfo)
+        , changesCount(changesFromUpdateInfos(initItfUpdateInfo))
     {
     }
 
@@ -108,7 +124,7 @@ public:
     void serverDiscovered(const rtu::BaseServerInfo &info);
     
 private:
-    void onChangeApplied();
+    void onChangesetApplied(int changesCount);
 
     void sendRequests();
 
@@ -157,8 +173,11 @@ private:
     RequestContainer m_requests;
     ItfChangesContainer m_itfChanges;
 
-    int m_applied;
-    int m_current;
+    int m_appliedChangesIndex;
+    int m_lastChangesetIndex;
+
+    int m_totalChangesCount;
+    int m_appliedChangesCount;
 };
 
 ///
@@ -181,8 +200,8 @@ rtu::ChangesManager::Impl::Impl(rtu::ChangesManager *owner
     , m_changeset()
     , m_requests()
     
-    , m_applied(0)
-    , m_current(0)
+    , m_appliedChangesIndex(0)
+    , m_lastChangesetIndex(0)
 {
 }
 
@@ -251,12 +270,19 @@ void rtu::ChangesManager::Impl::applyChanges()
     }(m_serverValues);
 
     m_requests.clear();
+
+    m_totalChangesCount = 0;
+    m_appliedChangesCount = 0;
+
     addDateTimeChangeRequests();
     addSystemNameChangeRequests();
     addIpChangeRequests();
     addPortChangeRequests();
     addPasswordChangeRequests();
     
+    emit m_owner->totalChangesCountChanged();
+    emit m_owner->appliedChangesCountChanged();
+
     if (m_succesfulChangesModel)
         m_succesfulChangesModel->deleteLater();
     if (m_failedChangesModel)
@@ -265,10 +291,8 @@ void rtu::ChangesManager::Impl::applyChanges()
     m_succesfulChangesModel = new ChangesSummaryModel(true, this);
     m_failedChangesModel = new ChangesSummaryModel(false, this);
     
-    m_current = 0;
-    m_applied = 0;
-    emit m_owner->totalChangesCountChanged();
-    emit m_owner->appliedChangesCountChanged();
+    m_lastChangesetIndex = 0;
+    m_appliedChangesIndex = 0;
     
     m_context->setCurrentPage(Constants::ProgressPage);
     
@@ -277,12 +301,12 @@ void rtu::ChangesManager::Impl::applyChanges()
 
 int rtu::ChangesManager::Impl::totalChangesCount() const
 {
-    return m_requests.size();
+    return m_totalChangesCount;
 }
 
 int rtu::ChangesManager::Impl::appliedChangesCount() const
 {
-    return m_applied;
+    return m_appliedChangesCount;
 }
 
 rtu::InterfaceInfoList::const_iterator changeAppliedPos(const rtu::InterfaceInfoList &itf
@@ -329,13 +353,14 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
     if (request.inProgress)
         return;
 
+    /*
     //TODO: #ynikitenkov #high invalid scenario
     if (!request.info->hasExtraInfo()) {
         m_itfChanges.erase(it);
-        onChangeApplied();
+        onChangesetApplied(0);
         return;
     }
-    
+    */
     const qint64 current = QDateTime::currentMSecsSinceEpoch();
     if ((current - request.timestamp) < kIfListRequestsPeriod)
         return;
@@ -379,8 +404,8 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
                 , baseInfo.hostAddress, newInterfaces);
         }
         
+        onChangesetApplied(request.changesCount);
         m_itfChanges.erase(it);
-        onChangeApplied();
     };
     
     const auto &successful =
@@ -410,12 +435,14 @@ Changeset &rtu::ChangesManager::Impl::getChangeset()
     return *m_changeset;
 }
 
-void rtu::ChangesManager::Impl::onChangeApplied()
+void rtu::ChangesManager::Impl::onChangesetApplied(int changesCount)
 {
-    ++m_applied;
+    m_appliedChangesCount += changesCount;
     emit m_owner->appliedChangesCountChanged();
+
+    ++m_appliedChangesIndex;
     
-    if (m_requests.size() != m_applied)
+    if (m_requests.size() != m_appliedChangesIndex)
     {
         sendRequests();
         return;
@@ -429,15 +456,15 @@ void rtu::ChangesManager::Impl::sendRequests()
 {
     while(true)
     {
-        if (m_current >= m_requests.size())
+        if (m_lastChangesetIndex >= m_requests.size())
             return;
 
-        const RequestData &request = m_requests.at(m_current);
-        if ((request.first == kBlockingRequest) && (m_applied < m_current))
+        const RequestData &request = m_requests.at(m_lastChangesetIndex);
+        if ((request.first == kBlockingRequest) && (m_appliedChangesIndex < m_lastChangesetIndex))
             return;
 
         request.second();
-        ++m_current;
+        ++m_lastChangesetIndex;
     }
 }
 
@@ -450,6 +477,7 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
     const DateTime &change = *m_changeset->dateTime;
     for (ServerInfo *info: m_targetServers)
     {
+        enum { kDateTimeChangesetSize = 2};
         const auto request = [this, info, change, timestampMs]()
         {
             const auto &callback = 
@@ -478,12 +506,13 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
                     extraInfo.utcDateTimeMs = change.utcDateTimeMs;
                 }
                 
-                onChangeApplied();
+                onChangesetApplied(kDateTimeChangesetSize);
             };
 
             sendSetTimeRequest(m_client, *info, change.utcDateTimeMs, change.timeZoneId, callback);
         };
 
+        m_totalChangesCount += kDateTimeChangesetSize;
         m_requests.push_back(RequestData(kNonBlockingRequest, request));
     }
 }
@@ -496,6 +525,7 @@ void rtu::ChangesManager::Impl::addSystemNameChangeRequests()
     const QString &systemName = *m_changeset->systemName;
     for (ServerInfo *info: m_targetServers)
     {
+        enum { kSystemNameChangesetSize = 1 };
         const auto request = [this, info, systemName]()
         {
             const auto &callback = 
@@ -509,12 +539,14 @@ void rtu::ChangesManager::Impl::addSystemNameChangeRequests()
                     m_model->updateSystemNameInfo(info->baseInfo().id, systemName);
                     info->writableBaseInfo().systemName = systemName;
                 }
-                onChangeApplied();
+                
+                onChangesetApplied(kSystemNameChangesetSize);
             };
 
             sendSetSystemNameRequest(m_client, *info, systemName, callback);
         };
 
+        m_totalChangesCount += kSystemNameChangesetSize;
         m_requests.push_back(RequestData(kNonBlockingRequest, request));
     }
 }
@@ -527,6 +559,7 @@ void rtu::ChangesManager::Impl::addPortChangeRequests()
     const int port = *m_changeset->port;
     for (ServerInfo *info: m_targetServers)
     {
+        enum { kPortChangesetCapacity = 1 };
         const auto request = [this, info, port]()
         {
             const auto &callback = 
@@ -541,12 +574,14 @@ void rtu::ChangesManager::Impl::addPortChangeRequests()
                     m_model->updatePortInfo(info->baseInfo().id, port);
                     info->writableBaseInfo().port = port;
                 }
-                onChangeApplied();
+
+                onChangesetApplied(kPortChangesetCapacity);
             };
 
             sendSetPortRequest(m_client, *info, port, callback);
         };
 
+        m_totalChangesCount += kPortChangesetCapacity;
         m_requests.push_back(RequestData(kBlockingRequest, request));
     }
 }
@@ -559,8 +594,10 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
     const auto &addRequest = 
         [this](ServerInfo *info, const ItfUpdateInfoContainer &changes)
     {
+        const ItfChangeRequest changeRequest(info, changes);
+            
         const auto &request = 
-            [this, info, changes]()
+            [this, info, changes, changeRequest]()
         {
             const auto &failedCallback = 
                 [this, info, changes](const QString &errorReason, AffectedEntities affected)
@@ -569,11 +606,12 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
                 if (it == m_itfChanges.end())
                     return;
 
-                m_itfChanges.erase(it);
                 for (const auto &change: changes)
                     addUpdateInfoSummaryItem(*info, errorReason, change, affected);
 
-                onChangeApplied();
+                onChangesetApplied(it.value().changesCount);
+                m_itfChanges.erase(it);
+
             };
 
             const auto &callback = 
@@ -595,10 +633,11 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
                 
             };
 
-            m_itfChanges.insert(info->baseInfo().id, ItfChangeRequest(info, changes));
+            m_itfChanges.insert(info->baseInfo().id, changeRequest);
             sendChangeItfRequest(m_client, *info, changes, callback);
         };
         
+        m_totalChangesCount += changeRequest.changesCount;
         m_requests.push_back(RequestData(kBlockingRequest, request));
     };
 
@@ -634,6 +673,7 @@ void rtu::ChangesManager::Impl::addPasswordChangeRequests()
     const QString &password = *m_changeset->password;
     for (ServerInfo *info: m_targetServers)
     {
+        enum { kPasswordChangesetSize = 1 };
         const auto request = [this, info, password]()
         {
             const auto finalCallback = 
@@ -648,7 +688,7 @@ void rtu::ChangesManager::Impl::addPasswordChangeRequests()
                     m_model->updatePasswordInfo(info->baseInfo().id, password);
                 }
                 
-                onChangeApplied();
+                onChangesetApplied(kPasswordChangesetSize);
             };
             
             const auto &callback = 
@@ -667,6 +707,7 @@ void rtu::ChangesManager::Impl::addPasswordChangeRequests()
             sendSetPasswordRequest(m_client, *info, password, false, callback );
         };
 
+        m_totalChangesCount += kPasswordChangesetSize;
         m_requests.push_back(RequestData(kBlockingRequest, request));
     }
 }
