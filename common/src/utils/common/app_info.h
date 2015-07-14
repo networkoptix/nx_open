@@ -59,15 +59,6 @@ struct QnAppInfo {
                 .arg(applicationRevision())
                 .arg(QLatin1String(beta() ? "-beta" : ""));
     }
-
-    inline
-    static QString applicationSystemInfo()
-    {
-        return QString(QLatin1String("%1-%2-%3"))
-                .arg(applicationPlatform())
-                .arg(applicationArch())
-                .arg(applicationPlatformModification());
-    }
 };
 
 #endif // QN_APPINFO_H
