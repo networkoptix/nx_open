@@ -38,23 +38,34 @@ bool QnSystemInformation::isValid() const {
 
     #include <windows.h>
 
+    static QString platformModificationResolve(DWORD min, DWORD maj, bool ws)
+    {
+        if (min == 5 && maj == 0) return lit("2000");
+        if (min == 5 && maj == 1) return lit("XP");
+        if (min == 5 && maj == 2) 
+            return GetSystemMetrics(SM_SERVERR2) ? lit("Server 2003") : lit("Server 2003 R2");
+
+        if (min == 6 && maj == 0) return ws ? lit("Vista")  : lit("Server 2008");
+        if (min == 6 && maj == 1) return ws ? lit("7")      : lit("Server 2008 R2");
+        if (min == 6 && maj == 2) return ws ? lit("8")      : lit("Server 2012");
+        if (min == 6 && maj == 3) return ws ? lit("8.1")    : lit("Server 2012 R2");
+
+        if (min == 10 && maj == 0) 
+            return ws ? lit("10 Insider Preview") : lit("Server Technical Preview");
+        
+        return lit("Unknown %1.%2").arg(min).arg(maj);
+    }
+
     static QString platformModification() {
-        /*
-        OSVERSIONINFO osvi;
-        ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-        osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+        OSVERSIONINFOEX osvi;
+        ZeroMemory(&osvi, sizeof(osvi));
+        osvi.dwOSVersionInfoSize = sizeof(osvi);
 
-        if (GetVersionEx(&osvi))
-        {
-            const std::string sp(osvi.szCSDVersion);
-            const auto version = lit("%1.%2").arg(osvi.dwMajorVersion)
-                                             .arg(osvi.dwMinorVersion);
-            if (sp.size())
-                return lit("%1 %2").arg(version).arg(QString::fromStdString(sp));
-
-            return version;
-        }
-        */
+        if (GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&osvi)))
+            return lit("Windows %1").arg(
+                platformModificationResolve(
+                    osvi.dwMajorVersion, osvi.dwMinorVersion,
+                    osvi.wProductType == VER_NT_WORKSTATION));
 
         return QnAppInfo::applicationPlatformModification();
     }
@@ -91,13 +102,11 @@ bool QnSystemInformation::isValid() const {
     #include <sys/sysctl.h>
 
     static QString platformModification() {
-        /*
         char osrelease[256];
         int mibMem[2] = { CTL_KERN, KERN_OSRELEASE };
         size_t size = sizeof(osrelease);
         if (sysctl(mibMem, 2, osrelease, &size, NULL, 0) != -1)
             return QString::fromStdString(osrelease);
-        */
 
         return QnAppInfo::applicationPlatformModification();
     }
