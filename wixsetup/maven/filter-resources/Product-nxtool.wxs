@@ -3,8 +3,8 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
-    <Product Id="*" Name="${product.name} Server Configuration Tool" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${nxtoolUpgradeCode}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Server Configuration Tool Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+    <Product Id="*" Name="${display.product.name} Server Configuration Tool" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${nxtoolUpgradeCode}">
+        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Server Configuration Tool Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
@@ -52,9 +52,9 @@
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
 
         <!-- Properties -->
-        <Property Id="WelcomeDlg_Title" Value="${product.name} Server Configuration Tool Installer Setup" />
+        <Property Id="WelcomeDlg_Title" Value="${display.product.name} Server Configuration Tool Installer Setup" />
 
-        <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
+        <Property Id="INSTALL_NXTOOL_DESKTOP" Value="1"/>
 
         <!-- NXTOOL properties-->
         <Property Id="NXTOOL_VMS_MODE" Value="1"/>
@@ -80,7 +80,7 @@
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
-        <CustomAction Id="LaunchNxtool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="$(var.nxtoolName).exe" ExeCommand=""/>
+        <CustomAction Id="LaunchNxtool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="nxtool.exe" ExeCommand=""/>
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
 
         <MajorUpgrade AllowSameVersionUpgrades="yes"
@@ -155,7 +155,6 @@
 
         <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentRef Id="AlwaysFiles"/>
-            <ComponentRef Id="ARPAltRegistryEntries"/>    
             <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
 

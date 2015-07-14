@@ -14,21 +14,39 @@
                 </Component>
 
                 <Component Id="nxtoolShortcutDesktop">
-                    <Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
+                    <Condition>INSTALL_NXTOOL_DESKTOP</Condition>
 
                     <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\$(var.nxtoolName)" Name="nxtoolShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
 
-                    <Shortcut Id="DesktopNxtool" Directory="DesktopFolder" Name="$(var.productName)"
+                    <Shortcut Id="DesktopNxtool" Directory="DesktopFolder" Name="$(var.productName) Server Configuration Tool"
                       WorkingDirectory='$(var.customization)NxtoolDir' Target="NxtoolExecutable" Icon="icon_desktop.exe">
-                    </Shortcut>
+                    </Shortcut>                
                 </Component>                            
 
                 <Directory Id="Platforms" Name="platforms">
                 </Directory>                    
 
+                <Directory Id="Qml" Name="qml">
+                    <Directory Id="QtQuick" Name="QtQuick">
+                        <Directory Id="QtQuickControls" Name="Controls">                        
+                        </Directory> 
+                        <Directory Id="QtQuickDialogs" Name="Dialogs">                        
+                        </Directory> 
+                        <Directory Id="QtQuickLayouts" Name="Layouts">                        
+                        </Directory>  
+                        <Directory Id="QtQuickWindow2" Name="Window.2">                        
+                        </Directory> 
+                    </Directory>   
+                    <Directory Id="QtQuick2" Name="QtQuick.2">
+                    </Directory>                      
+                </Directory>    
+                
                 <Component Id="NxtoolExecutable">
                     <File Id="nxtool.exe" Name="$(var.nxtoolName).exe" Source="$(var.NxtoolSourceDir)/nxtool.exe" KeyPath="yes" DiskId="1">
                         <fire:FirewallException Id="FirewallExceptionNxtool" Name="$(var.productName)" Scope="any" IgnoreFailure="yes"/>
+                        <Shortcut Id="StartmenuNxtool" Directory="ProgramMenuDir" Name="$(var.productName)  Server Configuration Tool"
+                        WorkingDirectory='$(var.customization)NxtoolDir' Advertise="yes" Icon="icon_menu.exe" >                    
+                        </Shortcut>      
                     </File>
                 </Component>                                
 
@@ -42,6 +60,7 @@
                         <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
                     </RegistryKey>
                 </Component>
+            </Directory>    
         </DirectoryRef>
 
         <ComponentGroup Id="NxtoolQTLibraries" Directory="$(var.customization)NxtoolDir">
@@ -64,7 +83,52 @@
                 <File Id="NxtoolQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\Qt5Widgets$(var.suffix).dll" DiskId="1"  />
             </Component>             
         </ComponentGroup>
+        
+        <ComponentGroup Id="QtQuickControlsFiles" Directory="QtQuickControls">
+            <Component>
+                <File Id="qtquickcontrolsplugin$(var.suffix).dll" Name="qtquickcontrolsplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Controls\qtquickcontrolsplugin$(var.suffix).dll" DiskId="1"/>
+            </Component>  
+            <Component>
+                <File Id="qtquickcontrolsplugin_qmldir" Name="qtquickcontrolsplugin_qmldir" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Controls\qmldir" DiskId="1"/>
+            </Component>          
+        </ComponentGroup>      
 
+        <ComponentGroup Id="QtQuickDialogsFiles" Directory="QtQuickDialogs">
+            <Component>
+                <File Id="dialogplugin$(var.suffix).dll" Name="dialogplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Dialogs\dialogplugin$(var.suffix).dll" DiskId="1"/>
+            </Component>  
+            <Component>
+                <File Id="qquicklayoutsplugin_qmldir" Name="qquicklayoutsplugin_qmldir" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Dialogs\qmldir" DiskId="1"/>
+            </Component>          
+        </ComponentGroup>  
+
+        <ComponentGroup Id="QtQuickLayoutsFiles" Directory="QtQuickLayouts">
+            <Component>
+                <File Id="qquicklayoutsplugin$(var.suffix).dll" Name="qquicklayoutsplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Layouts\qquicklayoutsplugin$(var.suffix).dll" DiskId="1"/>
+            </Component>  
+            <Component>
+                <File Id="qtquickcontrols_qmldir" Name="qtquickcontrols_qmldir" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Layouts\qmldir" DiskId="1"/>
+            </Component>          
+        </ComponentGroup>  
+
+        <ComponentGroup Id="QtQuickWindow2Files" Directory="QtQuickWindow2">
+            <Component>
+                <File Id="windowplugin$(var.suffix).dll" Name="windowplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Window.2\windowplugin$(var.suffix).dll" DiskId="1"/>
+            </Component>  
+            <Component>
+                <File Id="windowplugin_qmldir" Name="windowplugin_qmldir" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Window.2\qmldir" DiskId="1"/>
+            </Component>          
+        </ComponentGroup>   
+
+        <ComponentGroup Id="QtQuick2Files" Directory="QtQuick2">
+            <Component>
+                <File Id="qtquick2plugin$(var.suffix).dll" Name="qtquick2plugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick.2\qtquick2plugin$(var.suffix).dll" DiskId="1"/>
+            </Component>  
+            <Component>
+                <File Id="qtquick2plugin_qmldir" Name="qtquick2plugin_qmldir" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick.2\qmldir" DiskId="1"/>
+            </Component>          
+        </ComponentGroup>           
+        
         <ComponentGroup Id="Platforms" Directory="Platforms">
             <Component>
                 <File Id="qwindows$(var.suffix).dll" Name="qwindows.dll" Source="$(var.NxtoolSourceDir)\platforms\qwindows$(var.suffix).dll" DiskId="1" />
@@ -79,6 +143,11 @@
             <ComponentRef Id="nxtoolShortcutDesktop"/>
             <ComponentRef Id="NxtoolConfiguration" />
             <ComponentGroupRef Id="NxtoolQTLibraries" />
+            <ComponentGroupRef Id="QtQuickControlsFiles" />
+            <ComponentGroupRef Id="QtQuickDialogsFiles" />
+            <ComponentGroupRef Id="QtQuickLayoutsFiles" />
+            <ComponentGroupRef Id="QtQuickWindow2Files" />
+            <ComponentGroupRef Id="QtQuick2Files" />
             <ComponentGroupRef Id="Platforms" />
         </Feature>
     </Fragment>

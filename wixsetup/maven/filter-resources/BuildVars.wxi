@@ -12,14 +12,14 @@
 
     <?define ECRegPath="Software\${company.name}\${appserver.name}"?>    
     
-    <?define productName = "${display.product.name}"?>
+    <?define productName = "${product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
     <?define clientName = "${product.name}"?>
-    <?define nxtoolName = "${product.name} Server Configuration Tool"?>
+    <?define nxtoolName = "${display.product.name} Server Configuration Tool"?>
 
     <?define productExeName = "${product_name}"?>
     <?define clientExeName = "${product.name}"?>
-    <?define nxtoolExeName = "${product.name} Server Configuration Tool"?>
+    <?define nxtoolExeName = "${display.product.name} Server Configuration Tool"?>
 
     <?define mirrorListUrl = "${mirrorListUrl}"?>
     <?define quicksync = "${quicksync}"?>
