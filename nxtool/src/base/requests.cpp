@@ -18,6 +18,7 @@ namespace
 {
     const QString kApiNamespaceTag = "/api/";
 
+    const QString kModuleInformationCommand = kApiNamespaceTag + "moduleInformation";
     const QString kConfigureCommand = kApiNamespaceTag + "configure";
     const QString kIfConfigCommand = kApiNamespaceTag + "ifconfig";
     const QString kSetTimeCommand = kApiNamespaceTag + "settime";
@@ -25,7 +26,16 @@ namespace
     const QString kIfListCommand = kApiNamespaceTag + "iflist";
     const QString kGetServerExtraInfoCommand = kApiNamespaceTag + "aggregator";
 
-    const QString &kErrorDesc = "Invalid response";
+    const QString kInvalidRequest = "Invalid request parameters";
+    const QString kErrorDesc = "Invalid response";
+
+    const QString kIDTag = "id";
+    const QString kSeedTag = "seed";
+    const QString kNameTag = "name";
+    const QString kSystemNameTag = "systemName";
+    const QString kPortTag = "port";
+    const QString kFlagsTag = "flags";
+    const QString kLocalTimeFlagTag = "local";
 
     QUrl makeUrl(const QString &host
         , const int port
@@ -90,8 +100,7 @@ namespace
             }
             else
             {
-                //TODO: #ynikitenkov #High Describe why no entities are affected here?
-                callback(QString(), affected /*rtu::kNoEntitiesAffected*/ );
+                callback(QString(), affected);
             }
         };
         
@@ -111,6 +120,44 @@ namespace
         
         return result;
     }
+
+    typedef QHash<QString, std::function<void (const QJsonObject &object
+        , rtu::BaseServerInfo &info)> > KeyParserContainer;
+    const KeyParserContainer parser = []() -> KeyParserContainer
+    {
+        KeyParserContainer result;
+        result.insert(kIDTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.id = QUuid(object.value(kIDTag).toString()); });
+        result.insert(kSeedTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.id = QUuid(object.value(kSeedTag).toString()); });
+        result.insert(kNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.name = object.value(kNameTag).toString(); });
+        result.insert(kSystemNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.systemName = object.value(kSystemNameTag).toString(); });
+        result.insert(kPortTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            { info.port = object.value(kPortTag).toInt(); });
+
+
+        result.insert(kFlagsTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            {
+                typedef QPair<QString, rtu::Constants::ServerFlag> TextFlagsInfo;
+                static const TextFlagsInfo kKnownFlags[] =
+                {
+                    TextFlagsInfo("SF_timeCtrl", rtu::Constants::ServerFlag::AllowChangeDateTimeFlag)
+                    , TextFlagsInfo("SF_IfListCtrl", rtu::Constants::ServerFlag::AllowIfConfigFlag)
+                    , TextFlagsInfo("SF_AutoSystemName" , rtu::Constants::ServerFlag::IsFactoryFlag)
+                };
+
+                info.flags = rtu::Constants::ServerFlag::NoFlags;
+                const QString textFlags = object.value(kFlagsTag).toString();
+                for (const TextFlagsInfo &flagInfo: kKnownFlags)
+                {
+                    if (textFlags.contains(flagInfo.first))
+                        info.flags |= flagInfo.second;
+                }
+            });
+        return result;
+    }();
 }
 
 /// Forward declarations
@@ -139,6 +186,18 @@ const QStringList &rtu::defaultAdminPasswords()
     }();
 
     return result;
+}
+
+void rtu::parseModuleInformationReply(const QJsonObject &reply
+    , rtu::BaseServerInfo &baseInfo)
+{
+    const QStringList &keys = reply.keys();
+    for (const auto &key: keys)
+    {
+        const auto itHandler = parser.find(key);
+        if (itHandler != parser.end())
+            (*itHandler)(reply, baseInfo);
+    }
 }
 
 ///
@@ -281,17 +340,81 @@ bool parseExtraInfoCommand(const QString &cmdName
 
 ///
 
-bool rtu::getServerExtraInfo(HttpClient *client
+void rtu::getTime(HttpClient *client
     , const BaseServerInfo &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
-    , const OperationCallback &failed)
+    , const OperationCallback &failed
+    , int timeout)
 {
+    static const AffectedEntities affected = (kTimeZoneAffected | kDateTimeAffected);
+
     if (!client)
-        return false;
-    
+    {
+        if (failed)
+            failed(kInvalidRequest, affected);
+        return;
+    }
+
+    QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port
+        , password, kGetTimeCommand);
+
+    if (baseInfo.flags & Constants::AllowChangeDateTimeFlag)
+    {
+        QUrlQuery query;
+        query.addQueryItem(kLocalTimeFlagTag, QString());
+        url.setQuery(query);
+    }
+
+    const QUuid &id = baseInfo.id;
+    const auto &localSuccessful = [id, password, successful, failed](const QByteArray &data)
+    {
+        rtu::ExtraServerInfo extraInfo;
+        const bool parsed = parseGetTimeCmd(
+            QJsonDocument::fromJson(data.data()).object(), extraInfo);
+                
+        if (parsed)
+        {
+            if (successful)
+            {
+                extraInfo.password = password;
+                successful(id, extraInfo);
+            }
+        }
+        else if (failed)
+        {
+            failed(kErrorDesc, affected);
+        }
+    };
+
+    client->sendGet(url, localSuccessful
+        , makeErrorCallback(failed, affected), timeout);
+}
+
+void rtu::getServerExtraInfo(HttpClient *client
+    , const BaseServerInfo &baseInfo
+    , const QString &password
+    , const ExtraServerInfoSuccessCallback &successful
+    , const OperationCallback &failed
+    , int timeout)
+{
+    static const AffectedEntities affected = (kAllAddressFlagsAffected 
+        | kTimeZoneAffected | kDateTimeAffected);
+
+    if (!client)
+    {
+        if (failed)
+            failed(kInvalidRequest, affected);
+        return;
+    }
+
+    if (!(baseInfo.flags & Constants::AllowChangeDateTimeFlag)
+        || !(baseInfo.flags & Constants::AllowIfConfigFlag))
+    {
+        return getTime(client, baseInfo, password, successful, failed, timeout);
+    }
+
     static const QString kCmdTag = "exec_cmd";
-    static const QString kLocalTimeFlagTag = "local";
 
     QUrlQuery query;
     query.addQueryItem(kCmdTag, kGetTimeCommand);
@@ -304,11 +427,11 @@ bool rtu::getServerExtraInfo(HttpClient *client
 
     const QUuid &id = baseInfo.id;
     
-    const auto &handleSuccessfullResult = 
-        [id, successful, failed, password](const QByteArray &data, const QString &cmdName)
+    const auto &successfulCallback = 
+        [id, successful, failed, password, timeout](const QByteArray &data)
     {
         rtu::ExtraServerInfo extraInfo;
-        const bool parsed = parseExtraInfoCommand(cmdName
+        const bool parsed = parseExtraInfoCommand(kGetServerExtraInfoCommand
             , QJsonDocument::fromJson(data.data()).object(), extraInfo);
                 
         if (parsed)
@@ -321,156 +444,29 @@ bool rtu::getServerExtraInfo(HttpClient *client
         }
         else if (failed)
         {
-            failed(kErrorDesc, kAllAddressFlagsAffected 
-                | kTimeZoneAffected | kDateTimeAffected);
+            failed(kErrorDesc, affected);
         }
     };
 
-    const auto &successfulCallback = [handleSuccessfullResult](const QByteArray &data)
-    {
-        handleSuccessfullResult(data, kGetServerExtraInfoCommand);
-    };
-
-    const auto failedCallback = 
-        [client, baseInfo, failed, password, handleSuccessfullResult](const QString &, int)
-    {
-        const auto &succesful = 
-            [handleSuccessfullResult](const QByteArray &data)
-        {
-            handleSuccessfullResult(data, kGetTimeCommand);
-        };
-
-        const QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port
-            , password, kGetTimeCommand);
-        client->sendGet(url, succesful
-            , makeErrorCallback(failed, kAllEntitiesAffected));
-    };
-    
-    client->sendGet(url, successfulCallback, failedCallback);
-    return true;
+    client->sendGet(url, successfulCallback
+        , makeErrorCallback(failed, affected), timeout);
 }
 
 ///
 
-bool rtu::sendSetTimeRequest(HttpClient *client
-    , const ServerInfo &info
-    , qint64 utcDateTimeMs
-    , const QByteArray &timeZoneId
-    , const OperationCallback &callback)
-{
-    if (!info.hasExtraInfo() || utcDateTimeMs <= 0
-        || !QTimeZone(timeZoneId).isValid() || !client)
-    {
-        qDebug() << timeZoneId << QTimeZone(timeZoneId).isValid();
-        return false;
-    }
-    
-    static const QString &kDateTimeTag = "datetime";
-    static const QString &kTimeZoneTag = "timezone";
-    
-    QUrl url = makeUrl(info, kSetTimeCommand);
-    
-    QUrlQuery query;
-    query.addQueryItem(kDateTimeTag, QString::number(utcDateTimeMs));
-    query.addQueryItem(kTimeZoneTag, timeZoneId);
-    url.setQuery(query);
-    
-    const AffectedEntities affected = (kDateTimeAffected | kTimeZoneAffected);
-    
-    client->sendGet(url, makeReplyCallback(callback, affected)
-        , makeErrorCallback(callback, affected));
-    return true;
-}
-
-///
-
-bool rtu::sendSetSystemNameRequest(HttpClient *client
-    , const ServerInfo &info
-    , const QString &systemName
-    , const OperationCallback &callback)
-{
-    if (!client || !info.hasExtraInfo() || systemName.isEmpty())
-        return false;
-
-    static const QString kSystemNameTag = "systemName";
-    static const QString oldPasswordTag = "oldPassword";
-
-    QUrlQuery query;
-    query.addQueryItem(kSystemNameTag, systemName);
-    query.addQueryItem(oldPasswordTag, info.extraInfo().password);
-
-    QUrl url = makeUrl(info, kConfigureCommand);
-    url.setQuery(query);
-
-    client->sendGet(url, makeReplyCallback(callback, kSystemNameAffected)
-        , makeErrorCallback(callback, kSystemNameAffected));
-    return true;
-}
-
-///
-
-bool rtu::sendSetPasswordRequest(HttpClient *client
-    , const ServerInfo &info
-    , const QString &password
-    , bool useNewPassword
-    , const OperationCallback &callback)
-{
-    if (!client || !info.hasExtraInfo() || password.isEmpty())
-        return false;
-
-    static const QString newPasswordTag = "password";
-    static const QString oldPasswordTag = "oldPassword";
-    
-    const QString authPass = (useNewPassword ? password : info.extraInfo().password);
-    QUrlQuery query;
-    query.addQueryItem(newPasswordTag, password);
-    query.addQueryItem(oldPasswordTag, authPass);
-    
-    QUrl url = makeUrl(info.baseInfo().hostAddress, info.baseInfo().port, authPass, kConfigureCommand);
-    url.setQuery(query);
-    
-    client->sendGet(url, makeReplyCallback(callback, kPasswordAffected)
-        , makeErrorCallback(callback, kPasswordAffected));
-    
-    return true;    
-}
-
-///
-
-bool rtu::sendSetPortRequest(HttpClient *client
-    , const ServerInfo &info
-    , int port
-    , const OperationCallback &callback)
-{
-    if (!client || !info.hasExtraInfo() || !port)
-        return false;
-
-    static const QString kPortTag = "port";
-    static const QString oldPasswordTag = "oldPassword";
-
-    QUrlQuery query;
-    query.addQueryItem(kPortTag, QString::number(port));
-    query.addQueryItem(oldPasswordTag, info.extraInfo().password);
-
-    QUrl url = makeUrl(info, kConfigureCommand);
-    url.setQuery(query);
-
-    client->sendGet(url, makeReplyCallback(callback, kPortAffected)
-        , makeErrorCallback(callback, kPortAffected));
-    
-    return true;
-}
-
-///
-
-bool rtu::sendIfListRequest(HttpClient *client
+void rtu::sendIfListRequest(HttpClient *client
     , const BaseServerInfo &info
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
-    , const OperationCallback &failed)
+    , const OperationCallback &failed
+    , int timeout)
 {
-    if (!client)
-        return false;
+    if (!client || !(info.flags & Constants::AllowIfConfigFlag))
+    {
+        if (failed)
+            failed(kInvalidRequest, kAllEntitiesAffected);
+        return;
+    }
     
     const QUrl url = makeUrl(info.hostAddress, info.port
         , password, kIfListCommand);
@@ -494,8 +490,125 @@ bool rtu::sendIfListRequest(HttpClient *client
     };
 
    client->sendGet(url, successfullCallback
-        , makeErrorCallback(failed, kAllAddressFlagsAffected));
-    return true;
+        , makeErrorCallback(failed, kAllAddressFlagsAffected), timeout);
+}
+
+///
+
+void rtu::sendSetTimeRequest(HttpClient *client
+    , const ServerInfo &info
+    , qint64 utcDateTimeMs
+    , const QByteArray &timeZoneId
+    , const OperationCallback &callback)
+{
+    if (!info.hasExtraInfo() || utcDateTimeMs <= 0
+        || !QTimeZone(timeZoneId).isValid() || !client)
+    {
+        if (callback)
+            callback(kInvalidRequest, kDateTimeAffected | kTimeZoneAffected);
+        return;
+    }
+    
+    static const QString &kDateTimeTag = "datetime";
+    static const QString &kTimeZoneTag = "timezone";
+    
+    QUrl url = makeUrl(info, kSetTimeCommand);
+    
+    QUrlQuery query;
+    query.addQueryItem(kDateTimeTag, QString::number(utcDateTimeMs));
+    query.addQueryItem(kTimeZoneTag, timeZoneId);
+    url.setQuery(query);
+    
+    const AffectedEntities affected = (kDateTimeAffected | kTimeZoneAffected);
+    
+    client->sendGet(url, makeReplyCallback(callback, affected)
+        , makeErrorCallback(callback, affected));
+}
+
+///
+
+void rtu::sendSetSystemNameRequest(HttpClient *client
+    , const ServerInfo &info
+    , const QString &systemName
+    , const OperationCallback &callback)
+{
+    if (!client || !info.hasExtraInfo() || systemName.isEmpty())
+    {
+        if (callback)
+            callback(kInvalidRequest, kSystemNameAffected);
+        return;
+    }
+
+    static const QString kSystemNameTag = "systemName";
+    static const QString oldPasswordTag = "oldPassword";
+
+    QUrlQuery query;
+    query.addQueryItem(kSystemNameTag, systemName);
+    query.addQueryItem(oldPasswordTag, info.extraInfo().password);
+
+    QUrl url = makeUrl(info, kConfigureCommand);
+    url.setQuery(query);
+
+    client->sendGet(url, makeReplyCallback(callback, kSystemNameAffected)
+        , makeErrorCallback(callback, kSystemNameAffected));
+}
+
+///
+
+void rtu::sendSetPasswordRequest(HttpClient *client
+    , const ServerInfo &info
+    , const QString &password
+    , bool useNewPassword
+    , const OperationCallback &callback)
+{
+    if (!client || !info.hasExtraInfo() || password.isEmpty())
+    {
+        if (callback)
+            callback(kInvalidRequest, kPasswordAffected);
+
+        return;
+    }
+
+    static const QString newPasswordTag = "password";
+    static const QString oldPasswordTag = "oldPassword";
+    
+    const QString authPass = (useNewPassword ? password : info.extraInfo().password);
+    QUrlQuery query;
+    query.addQueryItem(newPasswordTag, password);
+    query.addQueryItem(oldPasswordTag, authPass);
+    
+    QUrl url = makeUrl(info.baseInfo().hostAddress, info.baseInfo().port, authPass, kConfigureCommand);
+    url.setQuery(query);
+    
+    client->sendGet(url, makeReplyCallback(callback, kPasswordAffected)
+        , makeErrorCallback(callback, kPasswordAffected));
+}
+
+///
+
+void rtu::sendSetPortRequest(HttpClient *client
+    , const ServerInfo &info
+    , int port
+    , const OperationCallback &callback)
+{
+    if (!client || !info.hasExtraInfo() || !port)
+    {
+        if (callback)
+            callback(kInvalidRequest, kPortAffected);
+       return;
+    }
+
+    static const QString oldPasswordTag = "oldPassword";
+
+    QUrlQuery query;
+    query.addQueryItem(kPortTag, QString::number(port));
+    query.addQueryItem(oldPasswordTag, info.extraInfo().password);
+
+    QUrl url = makeUrl(info, kConfigureCommand);
+    url.setQuery(query);
+
+    client->sendGet(url, makeReplyCallback(callback, kPortAffected)
+        , makeErrorCallback(callback, kPortAffected));
 }
 
 ///
@@ -553,6 +666,13 @@ void rtu::sendChangeItfRequest(HttpClient *client
         jsonInfoChanges.append(jsonInfoChange);   
     }
 
+    if (!client || !info.hasExtraInfo())
+    {
+        if (callback)
+            callback(kInvalidRequest, affected);
+        return;
+    }
+
     QUrl url = makeUrl(info, kIfConfigCommand);
     
     client->sendPost(url, QJsonDocument(jsonInfoChanges).toJson()
@@ -574,7 +694,7 @@ rtu::ItfUpdateInfo::ItfUpdateInfo()
 
 rtu::ItfUpdateInfo::ItfUpdateInfo(const ItfUpdateInfo &other)
     : name(other.name)
-    , useDHCP(other.useDHCP) //TODO: #ynikitenkov what's this? 
+    , useDHCP(other.useDHCP ? new bool (*other.useDHCP) : nullptr)
     , ip(other.ip ? new QString(*other.ip) : nullptr)
     , mask(other.mask ? new QString(*other.mask) : nullptr)
     , dns(other.dns ? new QString(*other.dns) : nullptr)
@@ -594,9 +714,8 @@ rtu::ItfUpdateInfo::ItfUpdateInfo(const QString &initName)
 
 rtu::ItfUpdateInfo &rtu::ItfUpdateInfo::operator =(const ItfUpdateInfo &other)
 {
-    //TODO: #ynikitenkov what's this? 
     name = other.name;
-    useDHCP = other.useDHCP;
+    useDHCP = BoolPointer(other.useDHCP ? new bool (*other.useDHCP) : nullptr);
     ip = StringPointer(other.ip ? new QString(*other.ip) : nullptr);
     mask = StringPointer(other.mask ? new QString(*other.mask) : nullptr);
     dns = StringPointer(other.dns ? new QString(*other.dns) : nullptr);

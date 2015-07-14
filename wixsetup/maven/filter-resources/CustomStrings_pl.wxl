@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-US" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${product.title}</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">${product.title}</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">${product.title}</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">${product.title}</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">${product.title}</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">${product.title}</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">${product.title}</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">${product.title}</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">${product.title}</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">${product.title}</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">${product.title}</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">${product.title}</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">${product.title}</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">${product.title}</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">${product.title}</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">${product.title}</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">${product.title}</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">${product.title}</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">${product.title}</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">${product.title}</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">${product.title}</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">${product.title}</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">${product.title}</String>
+
+    <!-- Standard Strings (Common Buttons, Labels etc) -->
+    <String Id="StdString_Ok"                                       Overridable="yes">Ok</String>
+    <String Id="StdString_Warning"                                  Overridable="yes">Warning</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Setup</String>
+
+    <!-- AllFieldsAreMandatoryDlg -->
+    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">All fields are mandatory</String>
+
+    <!-- AppServerDlg -->
+    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Enterprise Controller Configuration</String>
+    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">Please Specify Enterprise Controller Parameters</String>
+    <String Id="AppServerDlg_Port"                                  Overridable="yes">Port</String>
+    <String Id="AppServerDlg_Login"                                 Overridable="yes">Login</String>
+    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">Create Password</String>
+    <String Id="AppServerDlg_Network"                               Overridable="yes">Network</String>    
+    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Proxy Port</String>
+    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Confirm Password</String>   
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Extra parameters</String>   
+    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Allow system to optimize cameras settings (Recommended)</String>   
+
+    <!-- Associations -->
+    <String Id="Associations_PlayWith"                              Overridable="yes">Play with ${display.product.name}</String>
+
+    <!-- ClientDlg -->
+    <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Shortcuts</String>
+    <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">Place Shortcut on Desktop</String>
+    
+    <!-- DowngradeWarningDlg -->
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">A latter version of [ProductName] is already installed.</String> 
+
+    <!-- EmptyPasswordDlg -->
+    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Invalid Password</String>
+    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">Password should not be empty</String>     
+    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Warning</String>     
+
+    <!-- InstallTypeDlg -->
+    <String Id="InstallTypeDlg_Full"                                Overridable="yes">Full</String>
+    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">Server Only</String>
+    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Client Only</String>
+    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Advanced</String>
+    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Please select installation type</String>
+    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Installation Type</String>       
+
+    <!-- InvalidPasswordDlg -->
+    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">Passwords should be the same and not empty</String>    
+
+    <!-- MediaDirDlg -->
+    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Click Next to use default folder or click Change to choose another-one.</String>
+    <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">Media Root Folder</String>
+    <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Please Select Media Root Folder:</String>
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Login</String>    
+
+    <!-- MediaServerDlg -->
+    <String Id="MediaServerDlg_Host"                                Overridable="yes">Host</String>
+    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Port</String>
+    <String Id="MediaServerDlg_Login"                               Overridable="yes">Login</String>
+    <String Id="MediaServerDlg_Password"                            Overridable="yes">Password</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Confirm Password</String>  
+    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Server Port</String>
+    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Connection Settings</String>
+    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Server Configuration</String>
+    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Server</String>  
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">System Name</String>  
+
+    <!-- MyExitDialog -->
+
+    <!-- MyFeaturesDlg -->
+    <String Id="MyFeaturesDlg_Components"                           Overridable="yes">Components</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.display.name} (I want to view video recorded elsewhere)</String>
+    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (I want to record locally on this PC)</String>
+    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Database management. Should not be installed more than once in a network)</String>    
+
+    <!-- PasswordDlg -->
+    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">Please enter administrator password</String>
+    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">Administrator credentials</String>
+    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">Administrator credentials</String>
+    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">Login</String>
+    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">Create Password</String>
+    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Confirm Password</String>    
+    <String Id="PasswordDlg_SystemNameLabel"                        Overridable="yes">System Name</String>    
+
+    <!-- PasswordShouldMatchDlg -->
+    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Configuration error</String>    
+    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">Warning</String>    
+    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">Passwords should be equal</String>    
+
+    <!-- PortDuplicateDlg -->
+    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Invalid ports specified</String>    
+    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Warning</String>    
+    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Can't set the same port twice. Please recheck your configuration.</String>    
+
+    <!-- PortIsBusyDlg -->
+    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Port [BUSYPORT] is occupied.</String>    
+    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Warning</String>    
+    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Port you specified is already occupied. Press 'Next' only if you know what you're doing.</String>    
+
+    <!-- Product -->
+    <String Id="Product_LaunchClient"                               Overridable="yes">Launch ${display.product.name} when setup exits.</String>    
+    <String Id="Product_ArchMismatch"                               Overridable="yes">This package is designed for 32-bit OS. Setup will now exit.</String>
+
+    <!-- SelectionWarningDlg -->
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">At least one component should be selected</String>    
+
+    <!-- UninstallOptionsDlg -->
+    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Uninstall options</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Keep ${display.product.name} Database</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Remove ${display.product.name} Database</String>
+    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Current</String>  
+    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Version to keep:</String>   
+    
+    <!-- UpgradeDlg -->
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Previous version detected</String>    
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Installation Type</String>    
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Your system is going to be upgraded</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Your database has been corrupted and cannot be recovered. The fresh database has been installed. To access the system use login "admin" and password "123". Please change the credentials after the first login.</String>    
+
+    <!-- WixSchedFirewallExceptions -->
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>    
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Configuring Windows Firewall</String>    
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Configuring Windows Firewall</String>    
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Rolling back Windows Firewall configuration</String>    
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Installing Windows Firewall configuration</String>    
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Rolling back Windows Firewall configuration</String>    
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Uninstalling Windows Firewall configuration</String>    
+    
+    <!-- WixInstallDirDlgTitle -->
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductName] Setup</String>
+    <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Change...</String>
+    <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Destination Folder</String>
+    <String Id="InstallDirDlgDescription"                           Overridable="yes">Click Next to install by default or Change to choose another.</String>
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Install [ProductName] to:</String>    
+</WixLocalization>

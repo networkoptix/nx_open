@@ -44,7 +44,7 @@ namespace
     enum { kSingleSelection = 1 };
     rtu::InterfaceInfoList extractFromSelectionModel(rtu::ServersSelectionModel *model)
     {
-        const rtu::ServerInfoList &servers = model->selectedServers();
+        const rtu::ServerInfoPtrContainer &servers = model->selectedServers();
         
         if (servers.empty())
             return rtu::InterfaceInfoList();

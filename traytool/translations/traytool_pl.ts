@@ -5,113 +5,113 @@
     <name>QObject</name>
     <message>
         <source>System Tray</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemowy pasek zadań</translation>
     </message>
     <message>
         <source>There is no system tray on this system.</source>
-        <translation type="unfinished"></translation>
+        <translation>W systemie nie ma paska zadań.</translation>
     </message>
     <message>
         <source>Application will now quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aplikacja zostanie zamknięta.</translation>
     </message>
 </context>
 <context>
     <name>QnElevationChecker</name>
     <message>
         <source>Insufficient privileges to manage services</source>
-        <translation type="unfinished"></translation>
+        <translation>Za słabe uprawnienia by zarządzać usługami</translation>
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation type="unfinished"></translation>
+        <translation>UAC musi być włączony, by żądać uprawnień dla użytkowników non-admin</translation>
     </message>
 </context>
 <context>
     <name>QnSystrayWindow</name>
     <message>
         <source>Access denied.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dostęp zabroniony.</translation>
     </message>
     <message>
         <source>Specified database does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Podana baza danych nie istnieje.</translation>
     </message>
     <message>
         <source>Specified parameter is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Podany parametr jest niepoprawny.</translation>
     </message>
     <message>
         <source>Could not access installed services</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak dostępu do zainstalowanej usługi</translation>
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wystąpił błąd podczas próby dostępu do zainstalownaych usług:</translation>
     </message>
     <message>
         <source>No %1 services installed</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 zainstalowanych usług</translation>
     </message>
     <message>
         <source>Media server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Media serwer został zatrzymany</translation>
     </message>
     <message>
         <source>Media server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>Media serwer został uruchomiony</translation>
     </message>
     <message>
         <source> (stopped)</source>
-        <translation type="unfinished"></translation>
+        <translation>(zatrzymany)</translation>
     </message>
     <message>
         <source> (starting)</source>
-        <translation type="unfinished"></translation>
+        <translation>(uruchamianie)</translation>
     </message>
     <message>
         <source> (stopping)</source>
-        <translation type="unfinished"></translation>
+        <translation>(zatrzymywanie)</translation>
     </message>
     <message>
         <source> (started)</source>
-        <translation type="unfinished"></translation>
+        <translation>(uruchomiony)</translation>
     </message>
     <message>
         <source> (resuming)</source>
-        <translation type="unfinished"></translation>
+        <translation>(wznawianie)</translation>
     </message>
     <message>
         <source> (paused)</source>
-        <translation type="unfinished"></translation>
+        <translation>(wstrzymany)</translation>
     </message>
     <message>
         <source> (pausing)</source>
-        <translation type="unfinished"></translation>
+        <translation>(wstrzymywanie)</translation>
     </message>
     <message>
         <source>Media server is going to be stopped. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Media serwer zostanie zatrzymany.Czy kKontynuoawć?</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Wyjście</translation>
     </message>
     <message>
         <source>Show &amp;Media Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż Logi &amp;Media Serwera</translation>
     </message>
     <message>
         <source>Start Media Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom Media Serwer</translation>
     </message>
     <message>
         <source>Stop Media Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj Media Serwer</translation>
     </message>
     <message>
         <source>Media Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Strona Web Media Serwera</translation>
     </message>
 </context>
 </TS>

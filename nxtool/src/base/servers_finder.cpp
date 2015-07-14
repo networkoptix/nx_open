@@ -25,19 +25,13 @@ namespace
     
     const QString kApplicationTypeTag = "application";
     const QString kTypeTag = "type";
-    const QString kIDTag = "id";
-    const QString kSeedTag = "seed";
-    const QString kNameTag = "name";
-    const QString kSystemNameTag = "systemName";
-    const QString kPortTag = "port";
-    const QString kRemoteAddressesTag = "remoteAddresses";
     const QString kReplyTag = "reply";
-    const QString kFlagsTag = "flags";
       
     enum 
     {
-        kUpdateServersInfoInterval = 1000
-        , kServerAliveTimeout = 10 * 1000
+        kUpdateServersInfoInterval = 2000
+        , kVisibleAddressTimeout = kUpdateServersInfoInterval * 2
+        , kServerAliveTimeout = 12 * 1000
     };
 
     enum { kInvalidOpSize = -1 };
@@ -51,44 +45,6 @@ namespace
     
     const QByteArray kSearchRequestBody("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
     const int kSearchRequestSize = kSearchRequestBody.size();
-    
-    typedef QHash<QString, std::function<void (const QJsonObject &object
-        , rtu::BaseServerInfo &info)> > KeyParserContainer;
-    const KeyParserContainer parser = []() -> KeyParserContainer
-    {
-        KeyParserContainer result;
-        result.insert(kIDTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.id = QUuid(object.value(kIDTag).toString()); });
-        result.insert(kSeedTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.id = QUuid(object.value(kSeedTag).toString()); });
-        result.insert(kNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.name = object.value(kNameTag).toString(); });
-        result.insert(kSystemNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.systemName = object.value(kSystemNameTag).toString(); });
-        result.insert(kPortTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.port = object.value(kPortTag).toInt(); });
-            
-            
-        result.insert(kFlagsTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            {
-                typedef QPair<QString, rtu::Constants::ServerFlag> TextFlagsInfo;
-                static const TextFlagsInfo kKnownFlags[] = 
-                {
-                    TextFlagsInfo("SF_timeCtrl", rtu::Constants::ServerFlag::AllowChangeDateTimeFlag)
-                    , TextFlagsInfo("SF_IfListCtrl", rtu::Constants::ServerFlag::AllowIfConfigFlag)
-                    , TextFlagsInfo("SF_AutoSystemName" , rtu::Constants::ServerFlag::IsFactoryFlag)
-                };
-                
-                info.flags = rtu::Constants::ServerFlag::NoFlags;
-                const QString textFlags = object.value(kFlagsTag).toString();
-                for (const TextFlagsInfo &flagInfo: kKnownFlags)
-                {
-                    if (textFlags.contains(flagInfo.first))
-                        info.flags |= flagInfo.second;
-                }
-            });
-        return result;
-    }();
 }
 
 namespace 
@@ -110,16 +66,32 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
-        const QStringList &keys = jsonObject.keys();
-        for (const auto &key: keys)
-        {
-            const auto itHandler = parser.find(key);
-            if (itHandler != parser.end())
-                (*itHandler)(jsonObject, info);
-        }
-        
+        // if (!jsonObject.value("systemName").toString().contains("nx1_"))
+        //    return false;
+
+        rtu::parseModuleInformationReply(jsonObject, info);
+
         return true;
     }
+
+    struct ServerInfoData
+    {
+        qint64 timestamp;
+        qint64 visibleAddressTimestamp;
+        rtu::BaseServerInfo info;
+
+        ServerInfoData(qint64 newTimestamp
+            , rtu::BaseServerInfo newInfo);
+    };
+
+    ServerInfoData::ServerInfoData(qint64 newTimestamp
+        , rtu::BaseServerInfo newInfo)
+        : timestamp(newTimestamp)
+        , visibleAddressTimestamp(- newTimestamp * 2) /// for correct first initialization 
+        , info(newInfo)
+    {
+    }
+
 }
 
 ///
@@ -142,9 +114,10 @@ private:
     typedef QSharedPointer<QUdpSocket> SocketPtr;
     bool readData(const SocketPtr &socket);
 
+    void readAllSocketData(const SocketPtr &socket);
+
 private:
     typedef QHash<QHostAddress, SocketPtr> SocketsContainer;
-    typedef QPair<qint64, rtu::BaseServerInfo> ServerInfoData;
     typedef QHash<QUuid, ServerInfoData> ServerDataContainer;
 
     rtu::ServersFinder *m_owner;
@@ -188,8 +161,8 @@ void rtu::ServersFinder::Impl::checkOutdatedServers()
     IDsVector forRemove;
     for(const auto &infoData: m_infos)
     {
-        const qint64 lastUpdateTime = infoData.first;
-        const BaseServerInfo &info = infoData.second;
+        const qint64 lastUpdateTime = infoData.timestamp;
+        const BaseServerInfo &info = infoData.info;
         if ((currentTime - lastUpdateTime) > kServerAliveTimeout)
             forRemove.push_back(info.id);
     }
@@ -216,7 +189,13 @@ void rtu::ServersFinder::Impl::updateServers()
 
         SocketsContainer::iterator &it = m_sockets.find(address);
         if (it == m_sockets.end())
+        {
             it = m_sockets.insert(address, SocketPtr(new QUdpSocket()));
+            QObject::connect(it->data(), &QUdpSocket::readyRead, this, [this, it]
+            {
+                readAllSocketData(*it);
+            });
+        }
         
         const SocketPtr &socket = *it;
         if (socket->state() != QAbstractSocket::BoundState)
@@ -226,9 +205,7 @@ void rtu::ServersFinder::Impl::updateServers()
                 continue;
         }
 
-        while(socket->hasPendingDatagrams() && readData(socket))
-        {
-        }
+        readAllSocketData(socket);
 
         int written = 0;
         while(written < kSearchRequestBody.size())
@@ -244,6 +221,13 @@ void rtu::ServersFinder::Impl::updateServers()
 
         if (written != kSearchRequestSize)
             socket->close();
+    }
+}
+
+void rtu::ServersFinder::Impl::readAllSocketData(const SocketPtr &socket)
+{
+    while(socket->hasPendingDatagrams() && readData(socket))
+    {
     }
 }
 
@@ -279,8 +263,8 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     if (!parseUdpPacket(data, info) )
         return true;
 
-
-    info.hostAddress = sender.toString();
+    const QString &host = sender.toString();
+    info.hostAddress = host;
 
     emit m_owner->serverDiscovered(info);
 
@@ -294,12 +278,29 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     }
     else
     {
-        it.value().first = timestamp; /// Update alive info
-        if (info != it->second)
+        it->timestamp = timestamp; /// Update alive info
+        BaseServerInfo &oldInfo = it->info;
+
+        bool displayAddressOutdated = false;
+        info.displayAddress = oldInfo.displayAddress;
+        if (oldInfo.displayAddress == host)
         {
-            it.value().second.name = info.name;
-            it.value().second.systemName = info.systemName;
-            it.value().second.port = info.port;
+            it->visibleAddressTimestamp = timestamp;
+        }
+        else if ((timestamp - it->visibleAddressTimestamp) > kVisibleAddressTimeout)
+        {
+            it->visibleAddressTimestamp = timestamp;
+            info.displayAddress = host;
+            displayAddressOutdated = true;
+        }
+
+        if ((info != it->info) || displayAddressOutdated)
+        {
+            oldInfo.name = info.name;
+            oldInfo.systemName = info.systemName;
+            oldInfo.port = info.port;
+            oldInfo.displayAddress = info.displayAddress;
+
             emit m_owner->serverChanged(info);
         }
     }

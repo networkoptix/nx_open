@@ -119,7 +119,9 @@ void rtu::ChangesSummaryModel::Impl::addRequestResult(const ServerInfo &info
     , const QString &value
     , const QString &errorReason)
 {
-    const QString &newId = (info.baseInfo().id.toString() + info.baseInfo().name);
+    static const QString kTemplate = "%1%2 (%3)";
+    const QString &newId = kTemplate.arg(info.baseInfo().id.toString()
+        , info.baseInfo().name, info.baseInfo().displayAddress);
     const RequestResults::iterator it = std::upper_bound(m_results.begin(), m_results.end(), newId
         , [](const QString &nId, const RequestResultInfo &resultInfo)
     {

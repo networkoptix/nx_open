@@ -4,8 +4,9 @@ import "../common" as Common;
 import "../controls/base" as Base;
 import "../controls/rtu" as Rtu;
 import "../controls/expandable" as Expandable;
+import "../dialogs" as Dialogs;
 
-import networkoptix.rtu 1.0 as Utils;
+import networkoptix.rtu 1.0 as NxRtu;
 
 Expandable.MaskedSettingsPanel
 {
@@ -37,7 +38,7 @@ Expandable.MaskedSettingsPanel
             id: flagged;
                 
             message: qsTr("Can not change date and time for some selected servers");
-            showItem: ((Utils.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+            showItem: ((NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
                 || (rtuContext.selection.count === 1));
             
             anchors
@@ -77,20 +78,24 @@ Expandable.MaskedSettingsPanel
                         
                         var newDate = datePicker.date;
                         var newTime = timePicker.time;
+                        var timeZoneId = timeZonePicker.model.timeZoneIdByIndex(timeZonePicker.currentIndex)
+
                         if (useCurrentTimeCheckbox.checked)
                         {
                             var now = new Date();
-                            newDate = now;
-                            newTime = now;
+                            var nowConverted = rtuContext.applyTimeZone(now, now
+                                , ""    /// Use empty time zone to point to current zone id
+                                , timeZoneId);
+                            newDate = nowConverted;
+                            newTime = nowConverted;
                         }
 
-                        var timeZoneId = timeZonePicker.model.timeZoneIdByIndex(timeZonePicker.currentIndex)
                         rtuContext.changesManager().addDateTimeChange(newDate, newTime, timeZoneId);
                         return true;
                     }
 
                     property bool changed: (timeZonePicker.changed || timePicker.changed || datePicker.changed);
-                    enabled: (Utils.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
+                    enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
     
                     verticalItemAlignment: Grid.AlignVCenter;
                     
@@ -115,7 +120,7 @@ Expandable.MaskedSettingsPanel
                         thin: false;
                         text: qsTr("Date");
                     }
-    
+
                     Base.Text
                     {
                         thin: false;
@@ -145,13 +150,47 @@ Expandable.MaskedSettingsPanel
                         }
                     }
 
-                    Base.DatePicker
+                    Row
                     {
-                        id: datePicker;
-                        
-                        initDate: (rtuContext.selection && rtuContext.selection !== null ?
-                            rtuContext.selection.dateTime : undefined);
+                        spacing: Common.SizeManager.spacing.small;
+
+                        Base.DatePicker
+                        {
+                            id: datePicker;
+
+                            initDate: (rtuContext.selection && rtuContext.selection !== null ?
+                                rtuContext.selection.dateTime : new Date());
+                        }
+
+                        Base.Button
+                        {
+                            width: datePicker.height;
+                            height: datePicker.height;
+
+                            enabled: !useCurrentTimeCheckbox.checked;
+
+                            Dialogs.CalendarDialog
+                            {
+                                id: calendarDialog;
+
+                                onDateChanged: { datePicker.setDate(newDate); }
+                            }
+
+                            onClicked:
+                            {
+                                calendarDialog.initDate = isNaN(datePicker.date) ? new Date() : datePicker.date;
+                                calendarDialog.show();
+                            }
+
+                            Image
+                            {
+                                id: name
+                                anchors.centerIn: parent;
+                                source: "qrc:/resources/calendar.png";
+                            }
+                        }
                     }
+
                     Base.TimePicker
                     {
                         id: timePicker;

@@ -31,3 +31,4 @@ DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
 
 export(INSTALLS)
 
+RC_FILE = ${project.build.directory}/nxtool.rc
