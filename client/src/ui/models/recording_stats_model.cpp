@@ -37,17 +37,9 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
     case QnRecordingStatsModel::BytesColumn:
         return leftData.recordedBytes < rightData.recordedBytes;
     case QnRecordingStatsModel::DurationColumn:
-        return leftData.recordedSecs < rightData.recordedSecs;
+        return leftData.archiveDurationSecs < rightData.archiveDurationSecs;
     case QnRecordingStatsModel::BitrateColumn:
-        {
-            qreal leftBitrate = 0;
-            qreal rightBitrate = 0;
-            if (leftData.recordedSecs > 0)
-                leftBitrate = leftData.recordedBytes / (qreal) leftData.recordedSecs;
-            if (rightData.recordedSecs > 0)
-                rightBitrate = rightData.recordedBytes / (qreal) rightData.recordedSecs;
-            return leftBitrate < rightBitrate;
-        }
+        return leftData.averageBitrate < rightData.averageBitrate;
     default:
         return false;
     }
@@ -96,7 +88,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
                 return QString::number(value.recordedBytes  / BYTES_IN_GB, 'f', PREC) + lit(" Gb");
         case DurationColumn:
         {
-            qint64 tmpVal = value.recordedSecs;
+            qint64 tmpVal = value.archiveDurationSecs;
             int years = tmpVal / SECS_PER_YEAR;
             tmpVal -= years * SECS_PER_YEAR;
             int months = tmpVal / SECS_PER_MONTH;
@@ -123,22 +115,10 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
                     result += DELIM;
                 result += tr("%n hours", "", hours);
             }
-
             return result;
-            /*
-            if (years > 0)
-                return tr("%n year(s) %n month(s) %n day(s)").arg(years).arg(months).arg(days);
-            else if (months > 0)
-                return tr("%n month(s) %n day(s)").arg(months).arg(days);
-            else if (days > 0)
-                return tr("%n day(s) %n hour(s)").arg(days).arg(hours);
-            else
-                return tr("%n hour(s)").arg(hours);
-            */
-            //return QString::number(value.recordedSecs / SECS_PER_DAY, 'f', PREC);
         }
         case BitrateColumn:
-            if (value.recordedSecs > 0)
+            if (value.averageBitrate > 0)
                 return QString::number(value.averageBitrate / BYTES_IN_MB * 8, 'f', PREC) + lit(" Mbps"); // *8 == value in bits
             else
                 return lit("-");
@@ -153,7 +133,7 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
     switch(index.column())
     {
     case CameraNameColumn:
-        return tr("Total:");
+        return tr("Total %1 camera(s)").arg(m_data.size()-1);
     case BytesColumn:
     case DurationColumn:
         return displayData(index);
@@ -192,7 +172,7 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex &index, bool isForecast
         result = value.recordedBytes / (qreal) footer.recordedBytes;
         break;
     case DurationColumn:
-        result = value.recordedSecs / (qreal) footer.recordedSecs;
+        result = value.archiveDurationSecs / (qreal) footer.archiveDurationSecs;
         break;
     case BitrateColumn:
         if (footer.averageBitrate > 0)
@@ -313,11 +293,13 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
         summ += value;
         maxValue.recordedBytes = qMax(maxValue.recordedBytes, value.recordedBytes);
         maxValue.recordedSecs = qMax(maxValue.recordedSecs, value.recordedSecs);
+        maxValue.archiveDurationSecs = qMax(maxValue.archiveDurationSecs, value.archiveDurationSecs);
         maxValue.averageBitrate = qMax(maxValue.averageBitrate, value.averageBitrate);
     }
     QnRecordingStatsData footer;
     footer.recordedBytes = summ.recordedBytes;
     footer.recordedSecs = summ.recordedSecs;
+    footer.archiveDurationSecs = summ.archiveDurationSecs;
     footer.averageBitrate = maxValue.averageBitrate;
     result.push_back(std::move(footer)); // add footer
 

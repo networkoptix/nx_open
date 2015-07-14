@@ -139,7 +139,7 @@ public:
     void addChunks(const std::deque<Chunk>& chunk);
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
-    QnRecordingStatsData getStatistics(qint64 startTime, qint64 endTime) const;
+    QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);

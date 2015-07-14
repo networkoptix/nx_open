@@ -71,7 +71,7 @@ public:
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
 
     QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs, int limit);
-    QnRecordingStatsReply getChunkStatistics(qint64 startTime, qint64 endTime);
+    QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalizePeriodMs);
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
@@ -154,8 +154,10 @@ private:
     void backupFolderRecursive(const QString& src, const QString& dst);
     void testStoragesDone();
     //QMap<QnUuid, QnRecordingStatsData> getChunkStatisticsInternal(qint64 startTime, qint64 endTime, QnServer::ChunksCatalog catalog);
-    QnRecordingStatsData getChunkStatisticsByCamera(qint64 startTime, qint64 endTime, const QString& uniqueId);
-    QnRecordingStatsData mergeStatsFromCatalogs(qint64 startTime, qint64 endTime, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
+    QnRecordingStatsData getChunkStatisticsByCamera(qint64 bitrateAnalizePeriodMs, const QString& uniqueId);
+
+    // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalizePeriodMs
+    QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalizePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];

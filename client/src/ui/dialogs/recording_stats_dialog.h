@@ -39,7 +39,6 @@ public:
 
     void disableUpdateData();
     void enableUpdateData();
-    void setDateRange(const QDate& from, const QDate& to);
 
 protected:
     void setVisible(bool value) override;
@@ -65,7 +64,7 @@ private:
      * \param fromMsec start date. UTC msecs
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
      */
-    void query(qint64 fromMsec, qint64 toMsec);
+    void query(qint64 bitrateAnalizePeriodMs);
 private:
     QScopedPointer<Ui::RecordingStatsDialog> ui;
     QnRecordingStatsModel *m_model;
@@ -87,15 +86,13 @@ private:
     // forecast related data
     struct ForecastDataPerCamera
     {
-        ForecastDataPerCamera(): archiveDays(0.0), averegeScheduleUsing(0.0), expand(false), maxDays(0), bytesPerStep(0), secsPerStep(0) {}
+        ForecastDataPerCamera(): expand(false), maxDays(0), bytesPerStep(0), usageCoeff(0.0) {}
         
-        qreal archiveDays;                     // archive duration in calendar days
-        qreal averegeScheduleUsing;            // how many hours per week camera is recording in range [0..1]
         QnCamRecordingStatsData stats;         // forecasted statistics
         bool expand;                           // do expand archive for that camera in the forecast
-        int maxDays;
-        qint64 bytesPerStep;
-        qint64 secsPerStep;
+        int maxDays;                           // cached camera 'maxDays' value
+        qint64 bytesPerStep;                   // how may bytes camera gives per calendar hour
+        qreal usageCoeff;                      // how many time camera is actually recording in range [0..1]
     };
 
     struct ForecastData

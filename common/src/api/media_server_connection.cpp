@@ -839,11 +839,9 @@ int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &use
     return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }
 
-int QnMediaServerConnection::getRecordingStatisticsAsync(qint64 startTime, qint64 endTime, QObject *target, const char *slot) {
+int QnMediaServerConnection::getRecordingStatisticsAsync(qint64 bitrateAnalizePeriodMs, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("startTime", startTime);
-    params << QnRequestParam("endTime", endTime);
-
+    params << QnRequestParam("bitrateAnalizePeriodMs", bitrateAnalizePeriodMs);
     return sendAsyncGetRequest(RecordingStatsObject, params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
 }
 
