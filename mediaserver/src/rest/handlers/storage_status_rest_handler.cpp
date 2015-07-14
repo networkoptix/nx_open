@@ -23,7 +23,7 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     if(!requireParameter(params, lit("path"), result, &storageUrl))
         return CODE_INVALID_PARAMETER;
 
-    QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(storageUrl, true);
+    QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(storageUrl);
     bool exists = storage;
     if (!storage) {
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));

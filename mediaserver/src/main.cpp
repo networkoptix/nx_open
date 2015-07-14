@@ -764,21 +764,6 @@ int serverMain(int argc, char *argv[])
     qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     ffmpegInit();
-    using namespace std::placeholders;
-    for (const auto storagePlugin : 
-         PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
-    {
-        QnStoragePluginFactory::instance()->registerStoragePlugin(
-            storagePlugin->storageType(),
-            std::bind(
-                &QnThirdPartyStorageResource::instance,
-                _1,
-                storagePlugin
-            ),
-            false
-        );                    
-    }
-
     // ------------------------------------------
 #ifdef TEST_RTSP_SERVER
     addTestData();
@@ -1722,6 +1707,21 @@ void QnMain::run()
 
     //Initializing plugin manager
     PluginManager::instance()->loadPlugins();
+
+    using namespace std::placeholders;
+    for (const auto storagePlugin : 
+         PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+    {
+        QnStoragePluginFactory::instance()->registerStoragePlugin(
+            storagePlugin->storageType(),
+            std::bind(
+                &QnThirdPartyStorageResource::instance,
+                _1,
+                storagePlugin
+            ),
+            false
+        );                    
+    }
 
     if (needToStop())
         return;

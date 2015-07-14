@@ -1309,42 +1309,53 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 
     storageIndex = -1;
     const StorageMap storages = getAllStorages();
+    QnStorageResourcePtr ret;
+    int matchLen = 0;
+    QString storageUrl;
     for(StorageMap::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QString root = closeDirPath(itr.value()->getUrl());
-        QString separator = getPathSeparator(root);
         if (fileName.startsWith(root))
         {
-            int qualityLen = fileName.indexOf(separator, root.length()+1) - root.length();
-            quality = fileName.mid(root.length(), qualityLen);
-            int idPos = root.length() + qualityLen;
-            uniqueId = fileName.mid(idPos+1, fileName.indexOf(separator, idPos+1) - idPos-1);
-
-            storageIndex = getStorageIndex(itr.value());
-            return *itr;
+            if (matchLen < root.size())
+            {
+                matchLen = root.size();
+                ret = *itr;
+                storageUrl = root;
+            }
         }
     }
-    return QnStorageResourcePtr();
+
+    if (ret)
+    {
+        QString separator = getPathSeparator(storageUrl);
+        int qualityLen = fileName.indexOf(separator, storageUrl.length()+1) - storageUrl.length();
+        quality = fileName.mid(storageUrl.length(), qualityLen);
+        int idPos = storageUrl.length() + qualityLen;
+        uniqueId = fileName.mid(idPos+1, fileName.indexOf(separator, idPos+1) - idPos-1);
+        storageIndex = getStorageIndex(ret);
+    }
+    return ret;
 }
 
-QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName, bool exact)
+QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 {
     QMutexLocker lock(&m_mutexStorages);
+    QnStorageResourcePtr ret;
+    int matchLen = 0;
     for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
-        QString root = itr.value()->getUrl();
-        if (!exact)
+        QString root = (*itr)->getUrl();
+        if (fileName.startsWith(root))
         {
-            if (fileName.startsWith(root))
-                return itr.value();
-        }
-        else
-        {
-            if (fileName == root)
-                return itr.value();
+            if (matchLen < root.size())
+            {
+                matchLen = root.size();
+                ret = *itr;
+            }
         }
     }
-    return QnStorageResourcePtr();
+    return ret;
 }
 
 bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
