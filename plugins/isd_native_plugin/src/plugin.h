@@ -6,9 +6,13 @@
 #ifndef ISD_NATIVE_PLUGIN_H
 #define ISD_NATIVE_PLUGIN_H
 
-#include <plugins/plugin_tools.h>
 #include <memory>
+#include <string>
+
+#include <plugins/plugin_tools.h>
 #include <plugins/plugin_api.h>
+
+#include "string_conversions.h"
 
 
 /*! 
@@ -20,7 +24,7 @@ class DiscoveryManager;
 //!Main plugin class. Hosts and initializes necessary internal data
 class IsdNativePlugin
 :
-    public nxpl::PluginInterface
+    public nxpl::Plugin
 {
 public:
     IsdNativePlugin();
@@ -36,13 +40,28 @@ public:
     //!Implementaion of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
+    //!Implementation of nxpl::Plugin::name
+    virtual const char* name() const override;
+    //!Implementation of nxpl::Plugin::setSettings
+    virtual void setSettings( const nxpl::Setting* settings, size_t count ) override;
+
     nxpt::CommonRefManager* refManager();
+
+    template<class T> T getSetting( const std::string& name, T defaultValue = T() ) const
+    {
+        auto valIter = m_settings.find( name );
+        if( valIter == m_settings.end() )
+            return defaultValue;
+
+        return convert<T>(valIter->second);
+    }
 
     static IsdNativePlugin* instance();
 
 private:
     nxpt::CommonRefManager m_refManager;
     std::auto_ptr<DiscoveryManager> m_discoveryManager;
+    std::map<std::string, std::string> m_settings;
 };
 
 #endif  //ISD_NATIVE_PLUGIN_H

@@ -4,7 +4,9 @@
 ***********************************************************/
 
 #include "plugin.h"
+
 #include "discovery_manager.h"
+#include "settings.h"
 
 
 extern "C"
@@ -45,6 +47,11 @@ void* IsdNativePlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
         m_discoveryManager->addRef();
         return m_discoveryManager.get();
     }
+    if( memcmp( &interfaceID, &nxpl::IID_Plugin, sizeof( nxpl::IID_Plugin ) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::Plugin*>(this);
+    }
     if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
     {
         addRef();
@@ -62,6 +69,31 @@ unsigned int IsdNativePlugin::addRef()
 unsigned int IsdNativePlugin::releaseRef()
 {
     return m_refManager.releaseRef();
+}
+
+const char* IsdNativePlugin::name() const
+{
+    return "isd_edge";
+}
+
+void IsdNativePlugin::setSettings( const nxpl::Setting* settings, size_t count )
+{
+    const auto settingsEnd = settings + count;
+    for( const nxpl::Setting*
+        curSetting = settings;
+        curSetting < settingsEnd;
+        ++curSetting )
+    {
+        if( strncmp(
+                curSetting.name,
+                isd_edge_settings::paramGroup,
+                sizeof(isd_edge_settings::paramGroup )-1 ) != 0 )
+        {
+            continue;
+        }
+        //saving setting
+        m_settings.emplace( curSetting.name, curSetting.value );
+    }
 }
 
 nxpt::CommonRefManager* IsdNativePlugin::refManager()
