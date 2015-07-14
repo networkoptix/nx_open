@@ -258,7 +258,7 @@ QIODevice *QnThirdPartyStorageResource::open(
         ioFlags |= nx_spl::io::WriteOnly;
 
     nx_spl::IODevice* ioRaw = m_storage->open(
-        QUrl(fileName).path().toLatin1().data(), 
+        QUrl(fileName).path().toLatin1().constData(), 
         ioFlags, 
         &ecode
     );
@@ -367,7 +367,10 @@ bool QnThirdPartyStorageResource::removeFile(const QString& url)
         return false;
 
     int ecode;
-    m_storage->removeFile(urlToPath(url).toLatin1().data(), &ecode);
+    m_storage->removeFile(
+        urlToPath(url).toLatin1().constData(), 
+        &ecode
+    );
     if (ecode != nx_spl::error::NoError)
         return false;
     return true;
@@ -379,7 +382,10 @@ bool QnThirdPartyStorageResource::removeDir(const QString& url)
         return false;
 
     int ecode;
-    m_storage->removeDir(urlToPath(url).toLatin1().data(), &ecode);
+    m_storage->removeDir(
+        urlToPath(url).toLatin1().constData(), 
+        &ecode
+    );
     if (ecode != nx_spl::error::NoError)
         return false;
     return true;
@@ -395,8 +401,8 @@ bool QnThirdPartyStorageResource::renameFile(
 
     int ecode;
     m_storage->renameFile(
-        urlToPath(oldName).toLatin1().data(), 
-        urlToPath(newName).toLatin1().data(), 
+        urlToPath(oldName).toLatin1().constData(), 
+        urlToPath(newName).toLatin1().constData(), 
         &ecode
     );
     if (ecode != nx_spl::error::NoError)
@@ -414,7 +420,7 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
     QMutexLocker lock(&m_mutex);
     int ecode;
     nx_spl::FileInfoIterator* fitRaw = m_storage->getFileIterator(
-        urlToPath(dirName).toLatin1().data(), 
+        urlToPath(dirName).toLatin1().constData(), 
         &ecode
     );
     if (fitRaw == nullptr)
@@ -474,7 +480,10 @@ bool QnThirdPartyStorageResource::isFileExists(const QString& url)
 
     QMutexLocker lock(&m_mutex);
     int ecode;
-    int result = m_storage->fileExists(url.toLatin1().constData(), &ecode);
+    int result = m_storage->fileExists(
+        urlToPath(url).toLatin1().constData(), 
+        &ecode
+    );
     if (ecode != nx_spl::error::NoError)
         return false;
     return result;
@@ -487,7 +496,10 @@ bool QnThirdPartyStorageResource::isDirExists(const QString& url)
 
     QMutexLocker lock(&m_mutex);
     int ecode;
-    int result = m_storage->dirExists(url.toLatin1().constData(), &ecode);
+    int result = m_storage->dirExists(
+        urlToPath(url).toLatin1().constData(), 
+        &ecode
+    );
     if (ecode != nx_spl::error::NoError)
         return false;
     return result;
@@ -500,7 +512,10 @@ qint64 QnThirdPartyStorageResource::getFileSize(const QString& url) const
 
     QMutexLocker lock(&m_mutex);
     int ecode;
-    qint64 fsize = m_storage->fileSize(url.toLatin1().constData(), &ecode);
+    qint64 fsize = m_storage->fileSize(
+        urlToPath(url).toLatin1().constData(), 
+        &ecode
+    );
 
     if (ecode != nx_spl::error::NoError)
         return -1;
