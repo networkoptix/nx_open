@@ -15,7 +15,14 @@
 #include "aio/aiothread.h"
 
 
-static std::atomic<uint64_t> socketSequenceCounter;
+#ifdef __arm__
+//ISD Jaguar requires kernel update to support 64-bit atomics
+typedef int SocketSequenceType;
+#else
+typedef uint64_t SocketSequenceType;
+#endif
+
+static std::atomic<SocketSequenceType> socketSequenceCounter;
 
 template<class SocketType>
 class CommonSocketImpl
@@ -25,7 +32,7 @@ public:
     std::array<void*, aio::etMax> eventTypeToUserData;
     std::atomic<bool> terminated;
     //!This socket sequence is unique even after socket destruction (socket pointer is not unique after delete call)
-    uint64_t socketSequence;
+    SocketSequenceType socketSequence;
 
     CommonSocketImpl()
     :

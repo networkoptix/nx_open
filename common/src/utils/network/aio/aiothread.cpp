@@ -99,7 +99,7 @@ namespace aio
             TaskType type;
             SocketType* socket;
             //!Socket number that is still unique after socket has been destroyed
-            uint64_t socketSequence;
+            SocketSequenceType socketSequence;
             aio::EventType eventType;
             AIOEventHandler<SocketType>* eventHandler;
             //!0 means no timeout
@@ -157,7 +157,7 @@ namespace aio
         {
         public:
             CancelPostedCallsTask(
-                uint64_t socketSequence,
+                SocketSequenceType socketSequence,
                 std::atomic<int>* const _taskCompletionEvent = nullptr )
             :
                 SocketAddRemoveTask(
@@ -592,7 +592,7 @@ namespace aio
                 PeriodicTaskData( handlingData, _socket, eventType ) ) );
         }
 
-        void cancelPostedCallsInternal( uint64_t socketSequence )
+        void cancelPostedCallsInternal( SocketSequenceType socketSequence )
         {
             for( typename std::deque<SocketAddRemoveTask>::iterator
                 it = pollSetModificationQueue.begin();
