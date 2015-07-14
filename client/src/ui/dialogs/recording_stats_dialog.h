@@ -87,21 +87,22 @@ private:
     // forecast related data
     struct ForecastDataPerCamera
     {
-        ForecastDataPerCamera(): archiveDays(0.0), averegeScheduleUsing(0.0), expand(false), maxDays(0) {}
+        ForecastDataPerCamera(): archiveDays(0.0), averegeScheduleUsing(0.0), expand(false), maxDays(0), bytesPerStep(0), secsPerStep(0) {}
         
         qreal archiveDays;                     // archive duration in calendar days
         qreal averegeScheduleUsing;            // how many hours per week camera is recording in range [0..1]
-        QnCamRecordingStatsData srcStats;      // src statistics
-        QnCamRecordingStatsData forecastStats; // forecasted statistics
+        QnCamRecordingStatsData stats;         // forecasted statistics
         bool expand;                           // do expand archive for that camera in the forecast
         int maxDays;
+        qint64 bytesPerStep;
+        qint64 secsPerStep;
     };
 
     struct ForecastData
     {
         ForecastData(): extraSpace(0) {}
         qint64 extraSpace; // extra space in bytes 
-        QVector<ForecastDataPerCamera> camerasByServer; // camera list by server
+        QVector<ForecastDataPerCamera> cameras; // camera list by server
     };
 
 

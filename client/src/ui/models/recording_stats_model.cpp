@@ -5,7 +5,11 @@
 
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
-    const qreal SECS_PER_DAY = 3600 * 24;
+    const qreal BYTES_IN_TB = 1000.0 * BYTES_IN_GB;
+    const qreal SECS_PER_HOUR = 3600.0;
+    const qreal SECS_PER_DAY = SECS_PER_HOUR * 24;
+    const qreal SECS_PER_YEAR = SECS_PER_DAY * 365.0;
+    const qreal SECS_PER_MONTH = SECS_PER_YEAR / 12.0;
     const qreal BYTES_IN_MB = 1000000.0;
     const int PREC = 2;
 }
@@ -86,9 +90,53 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
         case CameraNameColumn:
             return getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId));
         case BytesColumn:
-            return QString::number(value.recordedBytes  / BYTES_IN_GB, 'f', PREC) + lit(" Gb");
+            if (value.recordedBytes > BYTES_IN_TB)
+                return QString::number(value.recordedBytes  / BYTES_IN_TB, 'f', PREC) + lit(" Tb");
+            else
+                return QString::number(value.recordedBytes  / BYTES_IN_GB, 'f', PREC) + lit(" Gb");
         case DurationColumn:
-            return QString::number(value.recordedSecs / SECS_PER_DAY, 'f', PREC);
+        {
+            qint64 tmpVal = value.recordedSecs;
+            int years = tmpVal / SECS_PER_YEAR;
+            tmpVal -= years * SECS_PER_YEAR;
+            int months = tmpVal / SECS_PER_MONTH;
+            tmpVal -= months * SECS_PER_MONTH;
+            int days = tmpVal / SECS_PER_DAY;
+            tmpVal -= days * SECS_PER_DAY;
+            int hours = tmpVal / SECS_PER_HOUR;
+            QString result;
+            static const QString DELIM(lit(" "));
+            if (years > 0)
+                result += tr("%n years", "", years);
+            if (months > 0) {
+                if (!result.isEmpty())
+                    result += DELIM;
+                result += tr("%n months", "", months);
+            }
+            if (days > 0) {
+                if (!result.isEmpty())
+                    result += DELIM;
+                result += tr("%n days", "", days);
+            }
+            if (hours > 0 && years == 0) {
+                if (!result.isEmpty())
+                    result += DELIM;
+                result += tr("%n hours", "", hours);
+            }
+
+            return result;
+            /*
+            if (years > 0)
+                return tr("%n year(s) %n month(s) %n day(s)").arg(years).arg(months).arg(days);
+            else if (months > 0)
+                return tr("%n month(s) %n day(s)").arg(months).arg(days);
+            else if (days > 0)
+                return tr("%n day(s) %n hour(s)").arg(days).arg(hours);
+            else
+                return tr("%n hour(s)").arg(hours);
+            */
+            //return QString::number(value.recordedSecs / SECS_PER_DAY, 'f', PREC);
+        }
         case BitrateColumn:
             if (value.recordedSecs > 0)
                 return QString::number(value.averageBitrate / BYTES_IN_MB * 8, 'f', PREC) + lit(" Mbps"); // *8 == value in bits

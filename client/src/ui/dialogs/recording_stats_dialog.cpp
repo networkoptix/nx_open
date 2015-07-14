@@ -33,6 +33,7 @@ namespace {
     const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
     const qint64 SECS_PER_DAY = 3600 * 24;
     const qint64 SECS_PER_WEEK = SECS_PER_DAY * 7;
+    const qreal FORECAST_STEP = 3600ll; // 1 hour
 }
 
 void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
@@ -70,15 +71,18 @@ void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionV
             forecastColor = shiftColor(forecastColor, shift, shift, shift);
         }
         painter->fillRect(opt.rect, baseColor);
+
+        opt.rect.setWidth(opt.rect.width() - 4);
         
         painter->fillRect(QRect(0,0, opt.rect.width() * forecastData, opt.rect.height()), forecastColor);
         painter->fillRect(QRect(0,0, opt.rect.width() * realData, opt.rect.height()), realColor);
-        QString text = index.data().toString();
-        QFontMetrics fm(opt.font);
-        QSize textSize = fm.size(Qt::TextSingleLine, text);
-        painter->setFont(opt.font);
 
-        painter->drawText(opt.rect.width() - textSize.width() - 4, (opt.rect.height()+fm.ascent())/2, text);
+        painter->setFont(opt.font);
+        //QString text = index.data().toString();
+        //QFontMetrics fm(opt.font);
+        //QSize textSize = fm.size(Qt::TextSingleLine, text);
+        //painter->drawText(opt.rect.width() - textSize.width() - 4, (opt.rect.height()+fm.ascent())/2, text);
+        painter->drawText(opt.rect, Qt::AlignRight | Qt::AlignVCenter, index.data().toString());
 
     }
     else {
@@ -385,9 +389,8 @@ void QnRecordingStatsDialog::at_forecastParamsChanged()
 
 QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBytes)
 {
-    QnRecordingStatsReply modelData = m_model->modelData();
+    const QnRecordingStatsReply modelData = m_model->modelData();
     ForecastData forecastData;
-
     qint64 currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
 
     // 1. collect camera related forecast params
@@ -402,14 +405,17 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
         ForecastDataPerCamera cameraForecast;
         cameraForecast.archiveDays =  (currentTimeMs - cameraStats.archiveStartTimeMs + MSECS_PER_DAY/2) / (qreal) MSECS_PER_DAY;
         cameraForecast.averegeScheduleUsing = cameraAvaregaScheduleUsage(camRes);
-        cameraForecast.srcStats = cameraStats;
-        cameraForecast.forecastStats = cameraStats;
-        cameraForecast.expand = !camRes->isScheduleDisabled() && (camRes->getStatus() == Qn::Online || camRes->getStatus() == Qn::Recording);
+        cameraForecast.stats = cameraStats;
+        cameraForecast.expand = !camRes->isScheduleDisabled();
+        cameraForecast.expand &= (camRes->getStatus() == Qn::Online || camRes->getStatus() == Qn::Recording);
+        cameraForecast.expand &= !qFuzzyIsNull(cameraForecast.averegeScheduleUsing);
         cameraForecast.maxDays = camRes->maxDays();
-        forecastData.camerasByServer.push_back(std::move(cameraForecast));
+        qint64 bitrate = cameraForecast.stats.recordedBytes / cameraForecast.stats.recordedSecs; // bitrate in bytes/sec
+        cameraForecast.bytesPerStep = bitrate * FORECAST_STEP * cameraForecast.averegeScheduleUsing;
+        cameraForecast.secsPerStep = FORECAST_STEP * cameraForecast.averegeScheduleUsing;
+        forecastData.cameras.push_back(std::move(cameraForecast));
     }
 
-    // 2. collect extra space value. How many space we will have taking into account full storage usage and extraSize variable
     // 2.1 add extra space
     for (const auto& storageSpaceData: m_availStorages) 
     {
@@ -426,46 +432,34 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
     // 2.3 add user extra data
     forecastData.extraSpace += extraSizeBytes;
 
-    // 3. Start spend extraSpace  (do forecast)
-    modelData = doForecastMainStep(forecastData);
-
-    return modelData;
+    return doForecastMainStep(forecastData);;
 }
 
 QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ForecastData& forecastData)
 {
-    static const qreal FORECAST_STEP = 3600ll; // 1 hour
-
     // Go to the future, one step is a one day and spend extraSpace
     qint64 prevExtraSpace = -1;
     while (forecastData.extraSpace > 0 && forecastData.extraSpace != prevExtraSpace)
     {
         prevExtraSpace = forecastData.extraSpace;
-        for (ForecastDataPerCamera& cameraForecast: forecastData.camerasByServer)
+        for (ForecastDataPerCamera& cameraForecast: forecastData.cameras)
         {
             if (!cameraForecast.expand)
                 continue;
-            if (cameraForecast.maxDays > 0 && cameraForecast.maxDays > cameraForecast.archiveDays)
+            if (cameraForecast.maxDays > 0 && cameraForecast.archiveDays >= cameraForecast.maxDays)
                 continue; // this camera reached the limit of max recorded archive days
             cameraForecast.archiveDays += FORECAST_STEP / SECS_PER_DAY; // spend one more calendar day
-            qint64 bitrate = cameraForecast.srcStats.recordedBytes / cameraForecast.srcStats.recordedSecs; // bitrate in bytes/sec
-            qint64 bytesPerStep = bitrate * FORECAST_STEP;
-            qreal recCoeff = cameraForecast.averegeScheduleUsing; // it's addition coeff corresponding to camera schedule. If camera writes 1 hour per day, it'll give 1/24.0 value
-            if (!qFuzzyIsNull(recCoeff)) 
-            {
-                bytesPerStep *= recCoeff;
-
-                cameraForecast.forecastStats.recordedBytes += bytesPerStep;
-                cameraForecast.forecastStats.recordedSecs += FORECAST_STEP / recCoeff;
-            }
-            forecastData.extraSpace -= bytesPerStep;
+            cameraForecast.stats.recordedBytes += cameraForecast.bytesPerStep;
+            cameraForecast.stats.recordedSecs += cameraForecast.secsPerStep;
+            
+            forecastData.extraSpace -= cameraForecast.bytesPerStep;
             if (forecastData.extraSpace <= 0)
                 break;
         }
     }
 
     QnRecordingStatsReply result;
-    for (const auto& value: forecastData.camerasByServer)
-        result << value.forecastStats;
+    for (const auto& value: forecastData.cameras)
+        result << value.stats;
     return result;
 }
