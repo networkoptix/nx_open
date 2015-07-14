@@ -5,7 +5,11 @@
 
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
-    const qreal SECS_PER_DAY = 3600 * 24;
+    const qreal BYTES_IN_TB = 1000.0 * BYTES_IN_GB;
+    const qreal SECS_PER_HOUR = 3600.0;
+    const qreal SECS_PER_DAY = SECS_PER_HOUR * 24;
+    const qreal SECS_PER_YEAR = SECS_PER_DAY * 365.0;
+    const qreal SECS_PER_MONTH = SECS_PER_YEAR / 12.0;
     const qreal BYTES_IN_MB = 1000000.0;
     const int PREC = 2;
 }
@@ -33,17 +37,9 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
     case QnRecordingStatsModel::BytesColumn:
         return leftData.recordedBytes < rightData.recordedBytes;
     case QnRecordingStatsModel::DurationColumn:
-        return leftData.recordedSecs < rightData.recordedSecs;
+        return leftData.archiveDurationSecs < rightData.archiveDurationSecs;
     case QnRecordingStatsModel::BitrateColumn:
-        {
-            qreal leftBitrate = 0;
-            qreal rightBitrate = 0;
-            if (leftData.recordedSecs > 0)
-                leftBitrate = leftData.recordedBytes / (qreal) leftData.recordedSecs;
-            if (rightData.recordedSecs > 0)
-                rightBitrate = rightData.recordedBytes / (qreal) rightData.recordedSecs;
-            return leftBitrate < rightBitrate;
-        }
+        return leftData.averageBitrate < rightData.averageBitrate;
     default:
         return false;
     }
@@ -79,17 +75,50 @@ int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const {
 
 QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
 {
-    const QnCamRecordingStatsData& value = m_data.at(index.row());
+    const QnRecordingStatsReply& data = m_forecastData.isEmpty() ? m_data : m_forecastData;
+    const QnCamRecordingStatsData& value = data.at(index.row());
     switch(index.column())
     {
         case CameraNameColumn:
             return getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId));
         case BytesColumn:
-            return QString::number(value.recordedBytes  / BYTES_IN_GB, 'f', PREC) + lit(" Gb");
+            if (value.recordedBytes > BYTES_IN_TB)
+                return QString::number(value.recordedBytes  / BYTES_IN_TB, 'f', PREC) + lit(" Tb");
+            else
+                return QString::number(value.recordedBytes  / BYTES_IN_GB, 'f', PREC) + lit(" Gb");
         case DurationColumn:
-            return QString::number(value.recordedSecs / SECS_PER_DAY, 'f', PREC);
+        {
+            qint64 tmpVal = value.archiveDurationSecs;
+            int years = tmpVal / SECS_PER_YEAR;
+            tmpVal -= years * SECS_PER_YEAR;
+            int months = tmpVal / SECS_PER_MONTH;
+            tmpVal -= months * SECS_PER_MONTH;
+            int days = tmpVal / SECS_PER_DAY;
+            tmpVal -= days * SECS_PER_DAY;
+            int hours = tmpVal / SECS_PER_HOUR;
+            QString result;
+            static const QString DELIM(lit(" "));
+            if (years > 0)
+                result += tr("%n years", "", years);
+            if (months > 0) {
+                if (!result.isEmpty())
+                    result += DELIM;
+                result += tr("%n months", "", months);
+            }
+            if (days > 0) {
+                if (!result.isEmpty())
+                    result += DELIM;
+                result += tr("%n days", "", days);
+            }
+            if (hours > 0 && years == 0) {
+                if (!result.isEmpty())
+                    result += DELIM;
+                result += tr("%n hours", "", hours);
+            }
+            return result;
+        }
         case BitrateColumn:
-            if (value.recordedSecs > 0)
+            if (value.averageBitrate > 0)
                 return QString::number(value.averageBitrate / BYTES_IN_MB * 8, 'f', PREC) + lit(" Mbps"); // *8 == value in bits
             else
                 return lit("-");
@@ -104,7 +133,7 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
     switch(index.column())
     {
     case CameraNameColumn:
-        return tr("Total:");
+        return tr("Total %1 camera(s)").arg(m_data.size()-1);
     case BytesColumn:
     case DurationColumn:
         return displayData(index);
@@ -132,17 +161,18 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex &index, bool isForecast
 {
     if (m_forecastData.size() != m_data.size() && isForecast)
         return 0.0;
-    const QnRecordingStatsReply& data = isForecast ? m_forecastData : m_data;
+    bool useForecast = !m_forecastData.isEmpty() && index.column() != BitrateColumn;
+    const QnRecordingStatsReply& data = isForecast && useForecast ? m_forecastData : m_data;
     const QnCamRecordingStatsData& value = data.at(index.row());
     qreal result = 0.0;
-    const QnCamRecordingStatsData& footer = m_forecastData.isEmpty() ? m_data.last() : m_forecastData.last();
+    const QnCamRecordingStatsData& footer = useForecast ? m_forecastData.last() : m_data.last();
     switch(index.column())
     {
     case BytesColumn:
         result = value.recordedBytes / (qreal) footer.recordedBytes;
         break;
     case DurationColumn:
-        result = value.recordedSecs / (qreal) footer.recordedSecs;
+        result = value.archiveDurationSecs / (qreal) footer.archiveDurationSecs;
         break;
     case BitrateColumn:
         if (footer.averageBitrate > 0)
@@ -244,28 +274,34 @@ void QnRecordingStatsModel::setForecastData(const QnRecordingStatsReply& data)
 
 QnRecordingStatsReply QnRecordingStatsModel::modelData() const
 {
-    return m_data;
+    QnRecordingStatsReply result = m_data;
+    result.remove(result.size()-1); // remove footer
+    return result;
 }
 
 void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& data, QnRecordingStatsReply& result)
 {
     beginResetModel();
     result = data;
+    if (result.isEmpty())
+        return;
 
     QnRecordingStatsData summ;
     QnRecordingStatsData maxValue;
 
-    for(const QnCamRecordingStatsData& value: m_data) {
+    for(const QnCamRecordingStatsData& value: result) {
         summ += value;
         maxValue.recordedBytes = qMax(maxValue.recordedBytes, value.recordedBytes);
         maxValue.recordedSecs = qMax(maxValue.recordedSecs, value.recordedSecs);
+        maxValue.archiveDurationSecs = qMax(maxValue.archiveDurationSecs, value.archiveDurationSecs);
         maxValue.averageBitrate = qMax(maxValue.averageBitrate, value.averageBitrate);
     }
     QnRecordingStatsData footer;
     footer.recordedBytes = summ.recordedBytes;
     footer.recordedSecs = summ.recordedSecs;
+    footer.archiveDurationSecs = summ.archiveDurationSecs;
     footer.averageBitrate = maxValue.averageBitrate;
-    result.push_back(std::move(footer));
+    result.push_back(std::move(footer)); // add footer
 
     endResetModel();
 }

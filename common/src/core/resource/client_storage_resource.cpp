@@ -69,6 +69,6 @@ qint64 QnClientStorageResource::getFreeSpace()
 
 qint64 QnClientStorageResource::getTotalSpace()
 {
-    assert(false);
+    //assert(false);
     return 0;
 }

@@ -12,13 +12,8 @@ int QnRecordingStatsRestHandler::executeGet(const QString &path, const QnRequest
 {
     Q_UNUSED(path)
 
-    qint64 startTime = params.value("startTime").toLongLong();
-    qint64 endTime;
-    if (params.contains("endTime"))
-        endTime = params.value("endTime").toLongLong();
-    else
-        endTime = DATETIME_NOW;
+    qint64 bitrateAnalizePeriodMs = params.value("bitrateAnalizePeriodMs").toLongLong();
 
-    result.setReply( qnStorageMan->getChunkStatistics(startTime, endTime));
+    result.setReply( qnStorageMan->getChunkStatistics(bitrateAnalizePeriodMs));
     return nx_http::StatusCode::ok;
 }

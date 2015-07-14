@@ -39,7 +39,6 @@ public:
 
     void disableUpdateData();
     void enableUpdateData();
-    void setDateRange(const QDate& from, const QDate& to);
 
 protected:
     void setVisible(bool value) override;
@@ -53,9 +52,8 @@ private slots:
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
-
+    void at_forecastParamsChanged();
 private:
-    void updateHeaderWidth();
     void requestFinished();
     QList<QnMediaServerResourcePtr> getServerList() const;
     QnRecordingStatsReply getForecastData(qint64 extraSizeBytes);
@@ -66,7 +64,7 @@ private:
      * \param fromMsec start date. UTC msecs
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
      */
-    void query(qint64 fromMsec, qint64 toMsec);
+    void query(qint64 bitrateAnalizePeriodMs);
 private:
     QScopedPointer<Ui::RecordingStatsDialog> ui;
     QnRecordingStatsModel *m_model;
@@ -80,31 +78,33 @@ private:
     QAction *m_exportAction;
     QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
-    QMap<QnUuid, QnRecordingStatsReply> m_allData; // key - serverId
-    QMap<QnUuid, QnRecordingStatsReply> m_hidenCameras; // hidden cameras by server
+    QnRecordingStatsReply m_allData;
+    QnRecordingStatsReply m_hidenCameras;
 
     QVector<QnStorageSpaceData> m_availStorages;
 private:
     // forecast related data
-    struct ForecastDataPerServer
-    {
-        ForecastDataPerServer(): extraSpace(0) {}
-
-        qint64 extraSpace; // extra space in bytes per server
-        QVector<QnCamRecordingStatsData> camerasByServer; // camera list by server
-    };
-    typedef QMap<QnUuid, ForecastDataPerServer> ServerForecast;
-
     struct ForecastDataPerCamera
     {
-        ForecastDataPerCamera(): archiveDays(0), averegeScheduleUsing(0.0) {}
-
-        int archiveDays;             // archive duration in calendar days
-        qreal averegeScheduleUsing;  // how many hours per week camera is recording in range [0..1]
+        ForecastDataPerCamera(): expand(false), maxDays(0), bytesPerStep(0), usageCoeff(0.0) {}
+        
+        QnCamRecordingStatsData stats;         // forecasted statistics
+        bool expand;                           // do expand archive for that camera in the forecast
+        int maxDays;                           // cached camera 'maxDays' value
+        qint64 bytesPerStep;                   // how may bytes camera gives per calendar hour
+        qreal usageCoeff;                      // how many time camera is actually recording in range [0..1]
     };
-    typedef QMap<QnUuid, ForecastDataPerCamera> CameraForecast;
+
+    struct ForecastData
+    {
+        ForecastData(): extraSpace(0) {}
+        qint64 extraSpace; // extra space in bytes 
+        QVector<ForecastDataPerCamera> cameras; // camera list by server
+    };
+
+
 private:
-    void doForecastMainStep(ServerForecast& serverStats, CameraForecast& cameraStats, QnRecordingStatsReply& modelData);
+    QnRecordingStatsReply doForecastMainStep(ForecastData& forecastData);
 
 };
 

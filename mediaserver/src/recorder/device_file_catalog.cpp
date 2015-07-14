@@ -914,16 +914,21 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
     return true;
 }
 
-QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 startTime, qint64 endTime) const
+QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePeriodMs) const
 {
     QnRecordingStatsData result;
+    QnRecordingStatsData bitrateStats;
     QMutexLocker lock(&m_mutex);
 
     if (!m_chunks.empty())
-        result.archiveStartTimeMs = m_chunks[0].startTimeMs;
+        result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch() -  m_chunks[0].startTimeMs) / 1000);
 
-    auto itrLeft = qLowerBound(m_chunks.cbegin(), m_chunks.cend(), startTime);
-    auto itrRight = qUpperBound(itrLeft, m_chunks.cend(), endTime);
+    auto itrLeft = m_chunks.cbegin();
+    auto itrRight = m_chunks.cend();
+
+    qint64 bitrateThreshold = bitrateAnalizePeriodMs ? m_chunks[m_chunks.size()-1].startTimeMs - bitrateAnalizePeriodMs : 0;
+
+    auto itrBitrate = m_chunks.cend()-1;
     
     for (auto itr = itrLeft; itr != itrRight; ++itr)
     {
@@ -931,11 +936,16 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 startTime, qint64 e
         if (chunk.durationMs != Chunk::UnknownDuration) {
             result.recordedBytes += chunk.getFileSize();
             result.recordedSecs += chunk.durationMs;
+
+            if (chunk.startTimeMs >= bitrateThreshold) {
+                bitrateStats.recordedBytes += chunk.getFileSize();
+                bitrateStats.recordedSecs += chunk.durationMs;
+            }
         }
     }
     result.recordedSecs /= 1000;
-    if (result.recordedBytes > 0 && result.recordedSecs > 0)
-        result.averageBitrate = result.recordedBytes / (qreal) result.recordedSecs;
+    if (bitrateStats.recordedBytes > 0 && bitrateStats.recordedSecs > 0)
+        result.averageBitrate = bitrateStats.recordedBytes / (qreal) bitrateStats.recordedSecs;
     Q_ASSERT(result.averageBitrate >= 0);
     return result;
 }
