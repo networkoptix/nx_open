@@ -63,7 +63,12 @@ namespace nxpl
     //!Setting
     struct Setting
     {
+        //!\0-terminated setting name
+        /*!
+            Param groups are separated using /. Example of valid names: param1, group1/param1, group1/param2
+        */
         char* name;
+        //!\0-terminated setting value
         char* value;
 
         Setting()
