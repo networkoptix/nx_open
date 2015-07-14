@@ -39,12 +39,12 @@ namespace ec2 {
         (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
 
     struct ApiStorageDataStatistics
-		: ApiStorageData
+        : ApiStorageData
     {
         ApiStorageDataStatistics();
         ApiStorageDataStatistics(ApiStorageData&& data);
     };
-#define ApiStorageDataStatistics_Fields (id)(parentId)(space)(spaceLimit)(usedForWriting)(storageType)
+#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)(storageType)(addParams)
 
     struct ApiMediaServerDataStatistics
 		: ApiMediaServerDataEx

@@ -56,6 +56,9 @@ namespace Qn
     static const QString BETA = lit("beta");
     static const QString PUBLIC_IP = lit("publicIp");
     static const QString NETWORK_INTERFACES = lit("networkInterfaces");
+
+    // Storage
+    static const QString SPACE = lit("space");
 }
 
 #endif // QN_PARAM_H

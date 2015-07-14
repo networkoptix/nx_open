@@ -11,12 +11,13 @@ namespace ec2
     {
         ApiStorageData(): spaceLimit(0), usedForWriting(0) {}
 
-        qint64          space;
         qint64          spaceLimit;
         bool            usedForWriting;
         QString         storageType;
+
+        std::vector<ApiResourceParamData> addParams;
     };
-#define ApiStorageData_Fields ApiResourceData_Fields (space)(spaceLimit)(usedForWriting)(storageType)
+#define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)(storageType)(addParams)
 
 
     struct ApiMediaServerData: ApiResourceData

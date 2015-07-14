@@ -9,6 +9,7 @@
 #include <utils/common/log.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -31,7 +32,6 @@
 #include "common/common_module.h"
 #include "media_server/settings.h"
 #include "utils/serialization/lexical_enum.h"
-
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -218,11 +218,23 @@ public:
         {
             if (needToStop())
                 break;
+
             QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
             Qn::ResourceStatus status = fileStorage->isAvailable() ? Qn::Online : Qn::Offline;
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
+
+            if (fileStorage->isAvailable())
+            {
+                const auto space = QString::number(fileStorage->getTotalSpace());
+                if (fileStorage->getProperty(Qn::SPACE) != space)
+                {
+                    fileStorage->setProperty(Qn::SPACE, space);
+                    propertyDictionary->saveParams(fileStorage->getId());
+                }
+            }
         }
+
         m_owner->testStoragesDone();
 
     }
