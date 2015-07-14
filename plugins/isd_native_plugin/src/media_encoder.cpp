@@ -209,8 +209,8 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
     QString result;
     QTextStream t(&result);
     t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateControl=vbr\r\n";
-    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMin=" << (bitrateKbps * vbrMinCoeff) << "\r\n";
-    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMax=" << (bitrateKbps * vbrMaxCoeff) << "\r\n";    //*1.2
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMin=" << (int)(bitrateKbps * vbrMinCoeff) << "\r\n";
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMax=" << (int)(bitrateKbps * vbrMaxCoeff) << "\r\n";    //*1.2
     t.flush();
     return setCameraParam( result );
 }
