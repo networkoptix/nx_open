@@ -66,6 +66,7 @@ namespace nxpl
         //!\0-terminated setting name
         /*!
             Param groups are separated using /. Example of valid names: param1, group1/param1, group1/param2
+            \warning Settings, defined by plugin, MUST be prefixed with plugin_name/. Plugin name is returned by \a Plugin::name()
         */
         char* name;
         //!\0-terminated setting value
@@ -101,6 +102,7 @@ namespace nxpl
             Called before plugin functionality is used
             \param settings This memory cannot be relied on after method returns
             \param count Size of \a settings array
+            \warning Settings, defined by plugin, MUST be prefixed with plugin_name/. Plugin name is returned by \a Plugin::name()
         */
         virtual void setSettings( const nxpl::Setting* settings, int count ) = 0;
     };
