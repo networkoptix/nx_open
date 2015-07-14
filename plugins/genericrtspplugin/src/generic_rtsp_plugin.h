@@ -26,7 +26,7 @@ class GenericRTSPDiscoveryManager;
 //!Main plugin class. Hosts and initializes necessary internal data
 class GenericRTSPPlugin
 :
-    public nxpl::PluginInterface
+    public nxpl::Plugin
 {
 public:
     GenericRTSPPlugin();
@@ -41,6 +41,11 @@ public:
     virtual unsigned int addRef() override;
     //!Implementation of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
+
+    //!Implementation of nxpl::Plugin::name
+    virtual const char* name() const override;
+    //!Implementation of nxpl::Plugin::setSettings
+    virtual void setSettings( const nxpl::Setting* settings, size_t count ) override;
 
     nxpt::CommonRefManager* refManager();
 

@@ -83,7 +83,9 @@ PluginManager* PluginManager::instance( const QString& pluginDir )
     return pluginManagerWrapper()->getPluginManager( pluginDir );
 }
 
-void PluginManager::loadPlugins( PluginManager::PluginType pluginsToLoad )
+void PluginManager::loadPlugins(
+    const QSettings* settings,
+    PluginManager::PluginType pluginsToLoad )
 {
     QMutexLocker lk( &m_mutex );
 
@@ -107,13 +109,16 @@ void PluginManager::loadPlugins( PluginManager::PluginType pluginsToLoad )
         it != directoriesToSearchForPlugins.end();
         ++it )
     {
-        loadPluginsFromDir( *it, pluginsToLoad );
+        loadPluginsFromDir( settings, *it, pluginsToLoad );
     }
 
     //loadPluginsFromDir( QCoreApplication::applicationDirPath(), pluginsToLoad );
 }
 
-void PluginManager::loadPluginsFromDir( const QString& dirToSearchIn, PluginType pluginsToLoad )
+void PluginManager::loadPluginsFromDir(
+    const QSettings* settings,
+    const QString& dirToSearchIn,
+    PluginType pluginsToLoad )
 {
     QDir pluginDir( dirToSearchIn );
     const QStringList& entries = pluginDir.entryList( QStringList(), QDir::Files | QDir::Readable );
@@ -126,7 +131,7 @@ void PluginManager::loadPluginsFromDir( const QString& dirToSearchIn, PluginType
             loadQtPlugin( pluginDir.path() + lit("/") + entry );
 
         if( pluginsToLoad & NxPlugin )
-            loadNxPlugin( pluginDir.path() + lit("/") + entry );
+            loadNxPlugin( settings, pluginDir.path() + lit("/") + entry );
     }
 }
 
@@ -154,7 +159,9 @@ bool PluginManager::loadQtPlugin( const QString& fullFilePath )
     return true;
 }
 
-bool PluginManager::loadNxPlugin( const QString& fullFilePath )
+bool PluginManager::loadNxPlugin(
+    const QSettings* settings,
+    const QString& fullFilePath )
 {
     QLibrary lib( fullFilePath );
     if( !lib.load() )
@@ -176,6 +183,41 @@ bool PluginManager::loadNxPlugin( const QString& fullFilePath )
 
     NX_LOG( lit("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING );
     m_nxPlugins.push_back( obj );
+
+    //checking, whther plugin supports nxpl::Plugin interface
+    nxpl::Plugin* pluginObj = static_cast<nxpl::Plugin*>(obj->queryInterface( nxpl::IID_Plugin ));
+    if( pluginObj )
+    {
+        //reporting settings to plugin
+        if( settings )
+        {
+            const auto& keys = settings->allKeys();
+            std::vector<nxpl::Setting> settingsForPlugin;
+            for( const auto& key: keys )
+            {
+                const auto& keyUtf8 = key.toUtf8();
+                const auto& valueUtf8 = settings->value( key ).toString().toUtf8();
+
+                nxpl::Setting setting;
+                setting.name = new char[keyUtf8.size() + 1];
+                strcpy( setting.name, keyUtf8.constData() );
+                setting.value = new char[valueUtf8.size() + 1];;
+                strcpy( setting.value, valueUtf8.constData() );
+                settingsForPlugin.push_back( std::move(setting) );
+            }
+
+            if( !settingsForPlugin.empty() )
+                pluginObj->setSettings( &settingsForPlugin[0], settingsForPlugin.size() );
+
+            for( nxpl::Setting& setting: settingsForPlugin )
+            {
+                delete[] setting.name;
+                delete[] setting.value;
+            }
+        }
+
+        pluginObj->releaseRef();
+    }
 
     emit pluginLoaded();
     return true;

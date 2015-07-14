@@ -60,6 +60,46 @@ namespace nxpl
         virtual unsigned int releaseRef() = 0;
     };
 
+    //!Setting
+    struct Setting
+    {
+        char* name;
+        char* value;
+
+        Setting()
+        :
+            name( nullptr ),
+            value( nullptr )
+        {
+        }
+    };
+
+    // {E53CF93D-61D3-4261-9D25-9B7B3F3A812B}
+    static const NX_GUID IID_Plugin = { 0xe5, 0x3c, 0xf9, 0x3d, 0x61, 0xd3, 0x42, 0x61, 0x9d, 0x25, 0x9b, 0x7b, 0x3f, 0x3a, 0x81, 0x2b };
+
+    //!Optional interface with general plugin functions (plugin name, plugin settings)
+    /*!
+        Server tries to cast initial pointer received from \a createNXPluginInstance to this type just after plugin load
+    */
+    class Plugin
+    :
+        public nxpl::PluginInterface
+    {
+    public:
+        //!Name of plugin
+        /*!
+            This name is used for information purpose only
+        */
+        virtual const char* name() const = 0;
+        //!Used by server to report settings to plugin
+        /*!
+            Called before plugin functionality is used
+            \param settings This memory cannot be relied on after method returns
+            \param count Size of \a settings array
+        */
+        virtual void setSettings( const nxpl::Setting* settings, size_t count ) = 0;
+    };
+
     //!Type of plugin entry-point function
     typedef PluginInterface* (*CreateNXPluginInstanceProc)();
 }
