@@ -14,10 +14,26 @@
     <name>HD Witness Unit Tests</name>
 
     <properties>
-        <root.dir>${basedir}/../..</root.dir>
-<!--
-        <libtype>plugin</libtype>
-        <buildLib>sharedlib</buildLib>
--->
+        <root.dir>${basedir}/..</root.dir>
+
     </properties>
+    
+    <modules>
+        <module>common</module>
+        <module>traytool</module>
+    </modules>       
+    
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>            
+            <properties>
+                <template>lib</template>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>    
 </project>

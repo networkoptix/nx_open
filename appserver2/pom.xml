@@ -24,6 +24,7 @@
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${appserver2.name}</product.title>  
         <!--Global libs-->		
+        <template>lib</template>
         <qt.libs>core network xml sql concurrent</qt.libs>
         <global.libs>-lcommon -lpostproc</global.libs>
         <!--Specific os libs used-->

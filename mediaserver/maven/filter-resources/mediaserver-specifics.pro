@@ -1,4 +1,3 @@
-TEMPLATE = app
 CONFIG += console
 QT += xmlpatterns
 

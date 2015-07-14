@@ -25,6 +25,7 @@
     <properties>
         <product.title>${nxtool.name}</product.title>  
         <product.display.title>${nxtool.display.name}</product.display.title>
+        <template>app</template>
         <!--Global libs-->      
         <qt.libs>qml quick core gui network</qt.libs>
         <qt.dir>${env.ENVIRONMENT}/qt542/${arch}</qt.dir>

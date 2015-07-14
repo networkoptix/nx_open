@@ -35,6 +35,7 @@
         <product.title>${applauncher.name}</product.title>  
         <product.display.title>${applauncher.display.name}</product.display.title>
         <!--Global libs-->      
+        <template>app</template>
         <qt.libs>core gui network xml widgets</qt.libs>
         <global.libs>-lcommon -lquazip</global.libs>
         <!--Specific os libs used-->
