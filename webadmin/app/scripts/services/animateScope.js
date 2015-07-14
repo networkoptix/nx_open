@@ -8,7 +8,7 @@ angular.module('webadminApp')
         var updationLimit = null;// Limit animations to stop process at some point
         var defaultDuration = 1000;
         var defaultScope = null;
-        function Animation(scope,value,target,duration){
+        function Animation(scope,value,target,duration,dependency){
             this.scope = scope;
             this.value = value;
             this.targetValue = target;
@@ -16,10 +16,24 @@ angular.module('webadminApp')
             this.started = (new Date()).getTime();
             this.initialValue = scope[value];
             this.isFinished = false;
+            this.dependency = dependency;
 
             this.deferred = $q.defer();
 
         }
+
+        Animation.prototype.interpolate = function(start,stop,time,duration, dependency) {
+            switch(dependency){
+                case "smooth":
+                default:
+                    return this.smooth(start,stop,time,duration);
+                case "fading":
+                    return this.fading(start,stop,time,duration);
+                case "linear":
+                    return this.linear(start,stop,time,duration);
+            }
+        };
+
         Animation.prototype.linear = function(start,stop,time,duration){
             if(time > duration) {
                 time = duration;
@@ -38,7 +52,15 @@ angular.module('webadminApp')
             var result =start + (stop - start) *delta;
             return  result;
         };
-        Animation.prototype.break = function(){
+
+        Animation.prototype.fading = function(start,stop,time,duration){
+            if(time > duration) {
+                time = duration;
+            }
+            var delta = 1 - Math.cos(time/duration * Math.PI / 2);
+            return  start + (stop - start) *delta;
+        };
+        Animation.prototype.breakAnimation = function(){
             this.isFinished = true;
 
             this.deferred.reject(this.scope[this.value]);
@@ -48,7 +70,7 @@ angular.module('webadminApp')
                 return;
             }
             var time = (new Date()).getTime() - this.started;
-            this.scope[this.value] = this.linear(this.initialValue, this.targetValue, time, this.duration);
+            this.scope[this.value] = this.interpolate(this.initialValue, this.targetValue, time, this.duration,this.dependency);
 
             this.deferred.notify(this.scope[this.value]);
             this.isFinished = time > this.duration;
@@ -127,7 +149,13 @@ angular.module('webadminApp')
             stop:function(){
                 animationRunning = false;
             },
-            animate:function(scope,value,target,duration){
+            animating:function(scope,value){
+                var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
+                    return anim.scope === scope && anim.value === value;
+                });
+                return targetAnimation;
+            },
+            animate:function(scope,value,target,duration,dependency){
 
                 if(typeof(duration) === 'undefined')
                 {
@@ -138,15 +166,15 @@ angular.module('webadminApp')
                     return anim.scope === scope && anim.value === value;
                 });
                 if(targetAnimation){
-                    targetAnimation.break();
+                    targetAnimation.breakAnimation();
                 }
-                var animation = new Animation(scope,value,target,duration);
+                var animation = new Animation(scope,value,target,duration,dependency);
                 animations.push(animation);
                 return animation.deferred.promise;
             },
-            progress:function(scope,value,duration){ // Animate progress from 0 to 1
+            progress:function(scope,value,duration,dependency){ // Animate progress from 0 to 1
                 scope[value] = 0;
-                return this.animate(scope,value,1,duration);
+                return this.animate(scope,value,1,duration,dependency);
             },
             setDuration:function(duration){
                 defaultDuration = duration;
