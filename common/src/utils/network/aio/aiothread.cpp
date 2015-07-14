@@ -276,6 +276,8 @@ namespace aio
                     case TaskType::tCallFunc:
                     {
                         assert( task.postHandler );
+                        //TODO #ak why just moving task from one container to another? 
+                        //  Why not store it in postedCalls only?
                         postedCalls.push_back( std::move(task) );
                         break;
                     }

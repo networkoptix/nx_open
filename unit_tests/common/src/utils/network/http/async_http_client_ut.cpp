@@ -28,4 +28,16 @@ TEST( AsyncHttpClient, FastRemove )
     testHttpClientForFastRemove( lit( "http://doestNotExist.host/" ) );
 }
 
+TEST( AsyncHttpClient, FastRemoveBadHost )
+{
+    QUrl url( lit( "http://doestNotExist.host/" ) );
+
+    for( int i = 0; i < 1000; ++i )
+    {
+        const auto client = nx_http::AsyncHttpClient::create();
+        EXPECT_TRUE( client->doGet( url ) );
+        QThread::usleep( 100 );
+    }
+}
+
 } // namespace nx_http
