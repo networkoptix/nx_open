@@ -141,8 +141,11 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnRecordingStatsDialog::at_eventsGrid_customContextMenuRequested);
     connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
 
+    connect(ui->checkBoxForecast,   &QCheckBox::stateChanged, this, &QnRecordingStatsDialog::at_forecastParamsChanged);
+    connect(ui->extraSpaceSlider,   &QSlider::valueChanged,   this, &QnRecordingStatsDialog::at_forecastParamsChanged);
+    
+
     ui->mainGridLayout->activate();
-    updateHeaderWidth();
 }
 
 QnRecordingStatsDialog::~QnRecordingStatsDialog() {
@@ -196,6 +199,7 @@ void QnRecordingStatsDialog::query(qint64 fromMsec, qint64 toMsec)
 {
     m_requests.clear();
     m_allData.clear();
+    m_availStorages.clear();
 
     QList<QnMediaServerResourcePtr> mediaServerList = getServerList();
     foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
@@ -211,10 +215,6 @@ void QnRecordingStatsDialog::query(qint64 fromMsec, qint64 toMsec)
             m_requests.insert(handle, mserver->getId());
         }
     }
-}
-
-void QnRecordingStatsDialog::updateHeaderWidth()
-{
 }
 
 void QnRecordingStatsDialog::at_gotStatiscits(int httpStatus, const QnRecordingStatsReply& data, int requestNum)
@@ -261,12 +261,10 @@ void QnRecordingStatsDialog::requestFinished()
 
     }
     m_model->setModelData(existsCameras);
-    m_allData.clear();
 
-    m_availStorages.clear();
+    
     ui->gridEvents->setDisabled(false);
     setCursor(Qt::ArrowCursor);
-    updateHeaderWidth();
     if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
         ui->statusLabel->setText(tr("Recording statistics for period from %1 to %2 - %n camera(s) found", "", m_model->rowCount())
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
@@ -373,6 +371,21 @@ qreal cameraAvaregaScheduleUsage(const QnSecurityCamResourcePtr& cameRes)
     return coeff;
 }
 
+void QnRecordingStatsDialog::at_forecastParamsChanged()
+{
+    ui->gridEvents->setEnabled(false);
+    static const qint64 gb = 1000000000ll;
+    static const qint64 tb = 1000ll * gb;
+    static const qint64 EXTRA_DATA[] = {0, 100 * gb, tb, 10 * tb, 100 * tb};
+    if (ui->checkBoxForecast->isChecked()) {
+        int idx = ui->extraSpaceSlider->value();
+        m_model->setForecastData(getForecastData(EXTRA_DATA[idx]));
+    }
+    else
+        m_model->setForecastData(QnRecordingStatsReply());
+    ui->gridEvents->setEnabled(true);
+}
+
 QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBytes)
 {
     QnRecordingStatsReply modelData = m_model->modelData();
@@ -389,7 +402,7 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
         if (!camRes)
             continue;
 
-        cameraStats[camRes->getId()].archiveDays = (currentTimeMs - camera.archiveStartTimeMs + MSECS_PER_DAY/2) / MSECS_PER_DAY;
+        cameraStats[camRes->getId()].archiveDays = (currentTimeMs - camera.archiveStartTimeMs + MSECS_PER_DAY/2) / (qreal) MSECS_PER_DAY;
         cameraStats[camRes->getId()].averegeScheduleUsing = cameraAvaregaScheduleUsage(camRes);
         serverStats[camRes->getParentId()].camerasByServer << camera;
     }
@@ -405,17 +418,15 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
         {
             auto itr = serverStats.find(storageRes->getParentId());
             if (itr != serverStats.end())
-                itr.value().extraSpace = qMax(0ll, storageSpaceData.freeSpace - storageSpaceData.reservedSpace);
+                itr.value().extraSpace += qMax(0ll, storageSpaceData.freeSpace - storageSpaceData.reservedSpace);
         }
     }
     // 2.2 take into account archive of removed cameras
     for (auto itr = serverStats.begin(); itr != serverStats.end(); ++itr)
     {
-        ForecastDataPerServer& serverStats = itr.value();
-        for (const auto& hiddenCam: m_hidenCameras.value(itr.key())) {
-            serverStats.extraSpace += hiddenCam.recordedBytes;
-        }
-
+        ForecastDataPerServer& record = itr.value();
+        for (const auto& hiddenCam: m_hidenCameras.value(itr.key()))
+            record.extraSpace += hiddenCam.recordedBytes;
     }
 
     // 2.3 add user extra data
@@ -424,13 +435,16 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
 
     
     // 3. Start spend extraSpace  (do forecast)
-    doForecastMainStep(serverStats, cameraStats, modelData);
+    modelData = doForecastMainStep(serverStats, cameraStats, modelData);
 
     return modelData;
 }
 
-void QnRecordingStatsDialog::doForecastMainStep(ServerForecast& serverStats, CameraForecast& cameraStats, QnRecordingStatsReply& modelData)
+QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ServerForecast& serverStats, CameraForecast& cameraStats, const QnRecordingStatsReply& modelData)
 {
+    QnRecordingStatsReply result = modelData;
+
+    static const qreal FORECAST_STEP = 3600ll; // 1 hour
     for (auto& forecastData: serverStats)
     {
         // Go to the future, one step is a one day and spend extraSpace
@@ -449,21 +463,27 @@ void QnRecordingStatsDialog::doForecastMainStep(ServerForecast& serverStats, Cam
                     continue; // this camera reached the limit of max recorded archive days
                 if (camRes->getStatus() != Qn::Online && camRes->getStatus() != Qn::Recording)
                     continue; // this camera doesn't recording and doesn't spend archive also
-                cameraStats[camRes->getId()].archiveDays++; // spend one more calendar day
+                cameraStats[camRes->getId()].archiveDays += FORECAST_STEP / SECS_PER_DAY; // spend one more calendar day
                 qint64 bitrate = camera.recordedBytes / camera.recordedSecs; // bitrate in bytes/sec
-                qint64 bytesPerDay = bitrate * SECS_PER_DAY;
+                qint64 bytesPerStep = bitrate * FORECAST_STEP;
                 qreal recCoeff = cameraStats[camRes->getId()].averegeScheduleUsing; // it's addition coeff corresponding to camera schedule. If camera writes 1 hour per day, it'll give 1/24.0 value
-                bytesPerDay *= recCoeff;
-                for (auto& cameraStats: modelData) {
-                    if (cameraStats.uniqueId == camera.uniqueId) {
-                        modelData[0].recordedBytes += bytesPerDay;
-                        modelData[0].recordedSecs += 1.0 / recCoeff;
-                        break;
+                if (!qFuzzyIsNull(recCoeff)) 
+                {
+                    bytesPerStep *= recCoeff;
+                    for (auto& cameraStats: result) {
+                        if (cameraStats.uniqueId == camera.uniqueId) {
+                            cameraStats.recordedBytes += bytesPerStep;
+                            cameraStats.recordedSecs += FORECAST_STEP / recCoeff;
+                            break;
+                        }
                     }
                 }
-
-                forecastData.extraSpace -= bytesPerDay;
+                forecastData.extraSpace -= bytesPerStep;
+                if (forecastData.extraSpace <= 0)
+                    break;
             }
         }
     }
+    
+    return result;
 }

@@ -855,7 +855,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 startTime, 
         }
 
         qint64 nextTime = qMin(nextHiTime, nextLowTime);
-        Q_ASSERT(nextTime > currentTime);
+        Q_ASSERT(nextTime >= currentTime);
         qint64 blockDuration = nextTime - currentTime;
         
         if (hasHi) 

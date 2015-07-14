@@ -79,7 +79,8 @@ int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const {
 
 QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
 {
-    const QnCamRecordingStatsData& value = m_data.at(index.row());
+    const QnRecordingStatsReply& data = m_forecastData.isEmpty() ? m_data : m_forecastData;
+    const QnCamRecordingStatsData& value = data.at(index.row());
     switch(index.column())
     {
         case CameraNameColumn:
@@ -132,10 +133,11 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex &index, bool isForecast
 {
     if (m_forecastData.size() != m_data.size() && isForecast)
         return 0.0;
-    const QnRecordingStatsReply& data = isForecast ? m_forecastData : m_data;
+    bool useForecast = !m_forecastData.isEmpty() && index.column() != BitrateColumn;
+    const QnRecordingStatsReply& data = isForecast && useForecast ? m_forecastData : m_data;
     const QnCamRecordingStatsData& value = data.at(index.row());
     qreal result = 0.0;
-    const QnCamRecordingStatsData& footer = m_forecastData.isEmpty() ? m_data.last() : m_forecastData.last();
+    const QnCamRecordingStatsData& footer = useForecast ? m_forecastData.last() : m_data.last();
     switch(index.column())
     {
     case BytesColumn:
@@ -244,18 +246,22 @@ void QnRecordingStatsModel::setForecastData(const QnRecordingStatsReply& data)
 
 QnRecordingStatsReply QnRecordingStatsModel::modelData() const
 {
-    return m_data;
+    QnRecordingStatsReply result = m_data;
+    result.remove(result.size()-1); // remove footer
+    return result;
 }
 
 void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& data, QnRecordingStatsReply& result)
 {
     beginResetModel();
     result = data;
+    if (result.isEmpty())
+        return;
 
     QnRecordingStatsData summ;
     QnRecordingStatsData maxValue;
 
-    for(const QnCamRecordingStatsData& value: m_data) {
+    for(const QnCamRecordingStatsData& value: result) {
         summ += value;
         maxValue.recordedBytes = qMax(maxValue.recordedBytes, value.recordedBytes);
         maxValue.recordedSecs = qMax(maxValue.recordedSecs, value.recordedSecs);
@@ -265,7 +271,7 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
     footer.recordedBytes = summ.recordedBytes;
     footer.recordedSecs = summ.recordedSecs;
     footer.averageBitrate = maxValue.averageBitrate;
-    result.push_back(std::move(footer));
+    result.push_back(std::move(footer)); // add footer
 
     endResetModel();
 }

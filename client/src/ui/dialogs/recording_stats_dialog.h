@@ -53,9 +53,8 @@ private slots:
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
-
+    void at_forecastParamsChanged();
 private:
-    void updateHeaderWidth();
     void requestFinished();
     QList<QnMediaServerResourcePtr> getServerList() const;
     QnRecordingStatsReply getForecastData(qint64 extraSizeBytes);
@@ -97,14 +96,14 @@ private:
 
     struct ForecastDataPerCamera
     {
-        ForecastDataPerCamera(): archiveDays(0), averegeScheduleUsing(0.0) {}
+        ForecastDataPerCamera(): archiveDays(0.0), averegeScheduleUsing(0.0) {}
 
-        int archiveDays;             // archive duration in calendar days
+        qreal archiveDays;             // archive duration in calendar days
         qreal averegeScheduleUsing;  // how many hours per week camera is recording in range [0..1]
     };
     typedef QMap<QnUuid, ForecastDataPerCamera> CameraForecast;
 private:
-    void doForecastMainStep(ServerForecast& serverStats, CameraForecast& cameraStats, QnRecordingStatsReply& modelData);
+    QnRecordingStatsReply doForecastMainStep(ServerForecast& serverStats, CameraForecast& cameraStats, const QnRecordingStatsReply& modelData);
 
 };
 
