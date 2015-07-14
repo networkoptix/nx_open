@@ -29,6 +29,68 @@
         <linux.defines/>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <!-- Workaround for androiddeployqt bug! It can't handle correctly paths containing "/../". -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>regex-property</id>
+                        <goals>
+                            <goal>regex-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>qt.plaindir</name>
+                            <value>${basedir}</value>
+                            <regex>(.*)/[^/]+^{0,1}</regex>
+                            <replacement>$1/build_environment/target</replacement>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>build-apk</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <chmod file="${project.build.directory}/deploy.sh" perm="755"/>
+                                <exec dir="${project.build.directory}" executable="${project.build.directory}/deploy.sh" failifexecutionfails="true" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-apk</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>${project.build.directory}/apk/bin/QtApp-release-signed.apk</sourceFile>
+                            <destinationFile>${project.build.directory}/${product.name.short}-release-signed.apk</destinationFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -70,6 +132,10 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
+                <google.keystore>${customization.dir}/android-main/key.store</google.keystore>
+                <google.storepass>${android.storepass}</google.storepass>
+                <google.keypass>${android.keypass}</google.keypass>
+                <google.alias>${namespace.additional}</google.alias>
             </properties>
         </profile>
     </profiles>

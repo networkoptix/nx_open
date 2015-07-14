@@ -312,6 +312,9 @@
                 <os>
                     <family>!mac</family>
                 </os>
+                <property>
+                    <name>!mobile</name>
+                </property>
             </activation>
             <modules>
                 <!--<module>plugins/axiscamplugin</module>-->
@@ -769,6 +772,10 @@
                 <compiler>gcc</compiler>
                 <additional.compiler>gcc</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
+                <android.sdk>${environment.dir}/android/android-sdk</android.sdk>
+                <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
+                <android.ndk.host>linux-x86_64</android.ndk.host>
+                <android.toolchain.version>4.8</android.toolchain.version>
             </properties>
         </profile>
         <profile>

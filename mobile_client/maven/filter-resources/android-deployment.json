@@ -1,6 +1,6 @@
 {
    "description": "Configuration file for androiddeployqt.",
-   "qt": "${libdir}",
+   "qt": "${qt.plaindir}",
    "sdk": "${env.environment}/android/android-sdk",
    "ndk": "${env.environment}/android/android-ndk",
    "toolchain-prefix": "arm-linux-androideabi",

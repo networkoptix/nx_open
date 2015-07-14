@@ -95,6 +95,10 @@
                                 <argument>${project.build.directory}/gen_resources.py</argument>
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>     
+                            <environmentVariables>
+                                <ANDROID_SDK_ROOT>${android.sdk}</ANDROID_SDK_ROOT>
+                                <ANDROID_NDK_ROOT>${android.ndk}</ANDROID_NDK_ROOT>
+                            </environmentVariables>
                         </configuration>
                     </execution>
                     <execution>
