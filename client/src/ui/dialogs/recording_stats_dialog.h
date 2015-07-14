@@ -79,31 +79,34 @@ private:
     QAction *m_exportAction;
     QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
-    QMap<QnUuid, QnRecordingStatsReply> m_allData; // key - serverId
-    QMap<QnUuid, QnRecordingStatsReply> m_hidenCameras; // hidden cameras by server
+    QnRecordingStatsReply m_allData;
+    QnRecordingStatsReply m_hidenCameras;
 
     QVector<QnStorageSpaceData> m_availStorages;
 private:
     // forecast related data
-    struct ForecastDataPerServer
-    {
-        ForecastDataPerServer(): extraSpace(0) {}
-
-        qint64 extraSpace; // extra space in bytes per server
-        QVector<QnCamRecordingStatsData> camerasByServer; // camera list by server
-    };
-    typedef QMap<QnUuid, ForecastDataPerServer> ServerForecast;
-
     struct ForecastDataPerCamera
     {
-        ForecastDataPerCamera(): archiveDays(0.0), averegeScheduleUsing(0.0) {}
-
-        qreal archiveDays;             // archive duration in calendar days
-        qreal averegeScheduleUsing;  // how many hours per week camera is recording in range [0..1]
+        ForecastDataPerCamera(): archiveDays(0.0), averegeScheduleUsing(0.0), expand(false), maxDays(0) {}
+        
+        qreal archiveDays;                     // archive duration in calendar days
+        qreal averegeScheduleUsing;            // how many hours per week camera is recording in range [0..1]
+        QnCamRecordingStatsData srcStats;      // src statistics
+        QnCamRecordingStatsData forecastStats; // forecasted statistics
+        bool expand;                           // do expand archive for that camera in the forecast
+        int maxDays;
     };
-    typedef QMap<QnUuid, ForecastDataPerCamera> CameraForecast;
+
+    struct ForecastData
+    {
+        ForecastData(): extraSpace(0) {}
+        qint64 extraSpace; // extra space in bytes 
+        QVector<ForecastDataPerCamera> camerasByServer; // camera list by server
+    };
+
+
 private:
-    QnRecordingStatsReply doForecastMainStep(ServerForecast& serverStats, CameraForecast& cameraStats, const QnRecordingStatsReply& modelData);
+    QnRecordingStatsReply doForecastMainStep(ForecastData& forecastData);
 
 };
 

@@ -223,8 +223,10 @@ void QnRecordingStatsDialog::at_gotStatiscits(int httpStatus, const QnRecordingS
         return;
     QnUuid serverId = m_requests.value(requestNum);
     m_requests.remove(requestNum);
-    if (httpStatus == 0 && !data.isEmpty())
-        m_allData.insert(serverId, data);
+    if (httpStatus == 0 && !data.isEmpty()) {
+        for (const auto& value: data)
+            m_allData << value;
+    }
     if (m_requests.isEmpty()) {
         requestFinished();
     }
@@ -248,17 +250,12 @@ void QnRecordingStatsDialog::requestFinished()
 {
     QnRecordingStatsReply existsCameras;
     m_hidenCameras.clear();
-    for (auto itr = m_allData.begin(); itr != m_allData.end(); ++itr)
+    for (const auto& camera: m_allData) 
     {
-        const QnRecordingStatsReply& reply = itr.value();
-        for (const auto& camera: reply) 
-        {
-            if (qnResPool->hasSuchResource(camera.uniqueId))
-                existsCameras << camera;
-            else
-                m_hidenCameras[itr.key()] << camera;
-        }
-
+        if (qnResPool->hasSuchResource(camera.uniqueId))
+            existsCameras << camera;
+        else
+            m_hidenCameras << camera;
     }
     m_model->setModelData(existsCameras);
 
@@ -389,22 +386,27 @@ void QnRecordingStatsDialog::at_forecastParamsChanged()
 QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBytes)
 {
     QnRecordingStatsReply modelData = m_model->modelData();
-    ServerForecast serverStats; // key is a server
-    CameraForecast cameraStats; // key is a camera
+    ForecastData forecastData;
+
     qint64 currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
 
-    // 1. collect primary stats: how many days and archive spend per server
-    for(const auto& camera: modelData) 
+    // 1. collect camera related forecast params
+    for(const auto& cameraStats: modelData) 
     {
-        if (camera.uniqueId.isNull())
+        if (cameraStats.uniqueId.isNull())
             continue;
-        QnSecurityCamResourcePtr camRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(camera.uniqueId);
+        QnSecurityCamResourcePtr camRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraStats.uniqueId);
         if (!camRes)
             continue;
 
-        cameraStats[camRes->getId()].archiveDays = (currentTimeMs - camera.archiveStartTimeMs + MSECS_PER_DAY/2) / (qreal) MSECS_PER_DAY;
-        cameraStats[camRes->getId()].averegeScheduleUsing = cameraAvaregaScheduleUsage(camRes);
-        serverStats[camRes->getParentId()].camerasByServer << camera;
+        ForecastDataPerCamera cameraForecast;
+        cameraForecast.archiveDays =  (currentTimeMs - cameraStats.archiveStartTimeMs + MSECS_PER_DAY/2) / (qreal) MSECS_PER_DAY;
+        cameraForecast.averegeScheduleUsing = cameraAvaregaScheduleUsage(camRes);
+        cameraForecast.srcStats = cameraStats;
+        cameraForecast.forecastStats = cameraStats;
+        cameraForecast.expand = !camRes->isScheduleDisabled() && (camRes->getStatus() == Qn::Online || camRes->getStatus() == Qn::Recording);
+        cameraForecast.maxDays = camRes->maxDays();
+        forecastData.camerasByServer.push_back(std::move(cameraForecast));
     }
 
     // 2. collect extra space value. How many space we will have taking into account full storage usage and extraSize variable
@@ -415,75 +417,55 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
         if (!storageRes)
             continue;
         if (storageSpaceData.isUsedForWriting && storageSpaceData.isWritable) 
-        {
-            auto itr = serverStats.find(storageRes->getParentId());
-            if (itr != serverStats.end())
-                itr.value().extraSpace += qMax(0ll, storageSpaceData.freeSpace - storageSpaceData.reservedSpace);
-        }
+            forecastData.extraSpace += qMax(0ll, storageSpaceData.freeSpace - storageSpaceData.reservedSpace);
     }
     // 2.2 take into account archive of removed cameras
-    for (auto itr = serverStats.begin(); itr != serverStats.end(); ++itr)
-    {
-        ForecastDataPerServer& record = itr.value();
-        for (const auto& hiddenCam: m_hidenCameras.value(itr.key()))
-            record.extraSpace += hiddenCam.recordedBytes;
-    }
+    for (const auto& hiddenCam: m_hidenCameras)
+        forecastData.extraSpace += hiddenCam.recordedBytes;
 
     // 2.3 add user extra data
-    for (auto& serverStats: serverStats)
-        serverStats.extraSpace += extraSizeBytes;
+    forecastData.extraSpace += extraSizeBytes;
 
-    
     // 3. Start spend extraSpace  (do forecast)
-    modelData = doForecastMainStep(serverStats, cameraStats, modelData);
+    modelData = doForecastMainStep(forecastData);
 
     return modelData;
 }
 
-QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ServerForecast& serverStats, CameraForecast& cameraStats, const QnRecordingStatsReply& modelData)
+QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ForecastData& forecastData)
 {
-    QnRecordingStatsReply result = modelData;
-
     static const qreal FORECAST_STEP = 3600ll; // 1 hour
-    for (auto& forecastData: serverStats)
+
+    // Go to the future, one step is a one day and spend extraSpace
+    qint64 prevExtraSpace = -1;
+    while (forecastData.extraSpace > 0 && forecastData.extraSpace != prevExtraSpace)
     {
-        // Go to the future, one step is a one day and spend extraSpace
-        qint64 prevExtraSpace = -1;
-        while (forecastData.extraSpace > 0 && forecastData.extraSpace != prevExtraSpace)
+        prevExtraSpace = forecastData.extraSpace;
+        for (ForecastDataPerCamera& cameraForecast: forecastData.camerasByServer)
         {
-            prevExtraSpace = forecastData.extraSpace;
-            for (const auto& camera: forecastData.camerasByServer)
+            if (!cameraForecast.expand)
+                continue;
+            if (cameraForecast.maxDays > 0 && cameraForecast.maxDays > cameraForecast.archiveDays)
+                continue; // this camera reached the limit of max recorded archive days
+            cameraForecast.archiveDays += FORECAST_STEP / SECS_PER_DAY; // spend one more calendar day
+            qint64 bitrate = cameraForecast.srcStats.recordedBytes / cameraForecast.srcStats.recordedSecs; // bitrate in bytes/sec
+            qint64 bytesPerStep = bitrate * FORECAST_STEP;
+            qreal recCoeff = cameraForecast.averegeScheduleUsing; // it's addition coeff corresponding to camera schedule. If camera writes 1 hour per day, it'll give 1/24.0 value
+            if (!qFuzzyIsNull(recCoeff)) 
             {
-                QnSecurityCamResourcePtr camRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(camera.uniqueId);
-                if (!camRes)
-                    continue;
-                if (camRes->isScheduleDisabled())
-                    continue; // this camera not recording, so it doesn't spend extra archive
-                if (camRes->maxDays() > 0 && camRes->maxDays() > cameraStats[camRes->getId()].archiveDays)
-                    continue; // this camera reached the limit of max recorded archive days
-                if (camRes->getStatus() != Qn::Online && camRes->getStatus() != Qn::Recording)
-                    continue; // this camera doesn't recording and doesn't spend archive also
-                cameraStats[camRes->getId()].archiveDays += FORECAST_STEP / SECS_PER_DAY; // spend one more calendar day
-                qint64 bitrate = camera.recordedBytes / camera.recordedSecs; // bitrate in bytes/sec
-                qint64 bytesPerStep = bitrate * FORECAST_STEP;
-                qreal recCoeff = cameraStats[camRes->getId()].averegeScheduleUsing; // it's addition coeff corresponding to camera schedule. If camera writes 1 hour per day, it'll give 1/24.0 value
-                if (!qFuzzyIsNull(recCoeff)) 
-                {
-                    bytesPerStep *= recCoeff;
-                    for (auto& cameraStats: result) {
-                        if (cameraStats.uniqueId == camera.uniqueId) {
-                            cameraStats.recordedBytes += bytesPerStep;
-                            cameraStats.recordedSecs += FORECAST_STEP / recCoeff;
-                            break;
-                        }
-                    }
-                }
-                forecastData.extraSpace -= bytesPerStep;
-                if (forecastData.extraSpace <= 0)
-                    break;
+                bytesPerStep *= recCoeff;
+
+                cameraForecast.forecastStats.recordedBytes += bytesPerStep;
+                cameraForecast.forecastStats.recordedSecs += FORECAST_STEP / recCoeff;
             }
+            forecastData.extraSpace -= bytesPerStep;
+            if (forecastData.extraSpace <= 0)
+                break;
         }
     }
-    
+
+    QnRecordingStatsReply result;
+    for (const auto& value: forecastData.camerasByServer)
+        result << value.forecastStats;
     return result;
 }
