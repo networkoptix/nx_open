@@ -136,6 +136,14 @@ client/contrib/qtcolorpicker/examples/simple/debug
 client/contrib/qtcolorpicker/lib/*.ilk
 client/src/*.vsp
 
+client.core/x86
+client.core/x64
+client.core/arm
+
+client.bin/x86
+client.bin/x64
+client.bin/arm
+
 common/bin
 common/build
 common/src/common.pro
@@ -224,6 +232,10 @@ traytool/traytool.mak*
 traytool/x86
 traytool/x64
 traytool/arm
+
+nxtool/x86
+nxtool/x64
+nxtool/arm
 
 wixsetup/CustomStrings.wxl
 wixsetup/AppServerFiles.wxs
