@@ -17,7 +17,7 @@ namespace isd_edge_settings
     static const int vbrMinPercentDefault = 20;
 
     static const char vbrMaxPercent[] = "isd_edge/vbrMaxPercent";
-    static const int vbrMaxPercentDefault = 120;
+    static const int vbrMaxPercentDefault = 80;
 }
 
 #endif  //NX_ISD_EDGE_SETTINGS_H
