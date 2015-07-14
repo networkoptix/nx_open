@@ -98,10 +98,14 @@ Item {
             var x = contentX
             var y = contentY
 
-            var scale = Math.min(cw / w, ch / h)
-
-            w *= scale
-            h *= scale
+            if (w > 0 && h > 0) {
+                var scale = Math.min(cw / w, ch / h)
+                w *= scale
+                h *= scale
+            } else {
+                w = cw
+                h = ch
+            }
 
             var xMargin = Math.max(0, (width - w) / 2)
             var yMargin = Math.max(0, (height - h) / 2)
