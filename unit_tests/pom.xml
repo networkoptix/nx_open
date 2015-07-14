@@ -15,12 +15,11 @@
 
     <properties>
         <root.dir>${basedir}/..</root.dir>
-
     </properties>
     
     <modules>
-        <module>common</module>
-        <module>traytool</module>
+        <module>common_ut</module>
+        <module>image_library_plugin_ut</module>
     </modules>       
     
     <profiles>
@@ -34,6 +33,7 @@
             <properties>
                 <template>lib</template>
                 <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>    
+            </properties>          
+        </profile>
+    </profiles>        
 </project>
