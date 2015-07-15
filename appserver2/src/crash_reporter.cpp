@@ -90,6 +90,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
 
         crashes.pop_back();
     }
+
     return false;
 }
 
@@ -161,6 +162,9 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
                  << "to" << httpClient->url() << "has failed";
         return;
     }
+
+    qDebug() << "CrashReporter::finishReport: crash" << m_crashFile.absoluteFilePath()
+             << "has been sent successfully";
 
     const auto now = qnSyncTime->currentDateTime().toUTC();
     QFile::remove(m_crashFile.absoluteFilePath());

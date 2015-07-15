@@ -831,13 +831,11 @@ namespace aio
         else if( waitForRunningHandlerCompletion )
         {
             //posting cancellation task
-            std::atomic<int> taskCompletedCondition( 0 );
-            //we MUST remove socket from pollset before returning from here
             m_impl->pollSetModificationQueue.push_back(
                 typename AIOThreadImplType::CancelPostedCallsTask(
                     sock->impl()->socketSequence,   //not passing socket here since it is allowed to be removed
                                                     //before posted call is actually cancelled
-                    &taskCompletedCondition ) );
+                    nullptr ) );
             m_impl->pollSet.interrupt();
 
             //we can be sure that socket will be removed before next poll
