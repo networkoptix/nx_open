@@ -17,6 +17,8 @@ QnDialog {
     Column {
         id: content
 
+        property real selectedY: 0
+
         width: qualityDialog.width
 
         Repeater {
@@ -27,6 +29,7 @@ QnDialog {
 
     Component {
         id: qualityItemDelegate
+
 
         Item {
             id: wrapper
@@ -58,6 +61,20 @@ QnDialog {
                 color: current ? QnTheme.dialogSelectedText : QnTheme.dialogText
                 font.pixelSize: sp(14)
             }
+
+            onCurrentChanged: {
+                if (current)
+                    content.selectedY = y
+            }
+
+            onYChanged: {
+                if (current)
+                    content.selectedY = y
+            }
         }
+    }
+
+    onOpened: {
+        ensureVisible(content.selectedY, content.selectedY + dp(56))
     }
 }

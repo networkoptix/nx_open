@@ -12,6 +12,23 @@ QnPopup {
 
     default property alias data: contentItem.data
 
+    property real maxContentHeight: parent.height - dp(56 * 3)
+
+    function ensureVisible(y1, y2) {
+        var cy = flickable.contentY
+
+        if (y2 + flickable.height > flickable.contentHeight)
+            cy = flickable.contentHeight - flickable.height
+
+        if (y1 < cy)
+            cy = y1
+
+        if (cy < 0)
+            cy = 0
+
+        flickable.contentY = cy
+    }
+
     centered: true
     width: dp(56 * 5)
     height: content.height + dp(32)
@@ -40,9 +57,32 @@ QnPopup {
         }
 
         Item {
-            id: contentItem
-            width: childrenRect.width
-            height: childrenRect.height
+            id: wrapper
+
+            clip: true
+
+            x: -content.x
+            width: dialog.width
+            height: Math.min(maxContentHeight, contentItem.height)
+
+            Flickable {
+                id: flickable
+
+                x: content.x
+                width: content.width
+                height: parent.height
+
+                contentWidth: width
+                contentHeight: contentItem.height
+
+                flickableDirection: Flickable.VerticalFlick
+
+                Item {
+                    id: contentItem
+                    width: flickable.width
+                    height: childrenRect.height
+                }
+            }
         }
     }
 }
