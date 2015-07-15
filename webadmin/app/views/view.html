@@ -54,13 +54,10 @@
                     </div>
                 </div>
 
-                <videogular
-                        vg-player-ready="playerReady($API)"
-                        vg-update-time="updateTime($currentTime, $duration)"
-                        vg-autoplay="true">
-                    <vg-media vg-src="acitveVideoSource"></vg-media>
-                    <vg-buffering></vg-buffering>
-                </videogular>
+                <videowindow vg-player-ready="playerReady($API)"
+                             vg-update-time="updateTime($currentTime, $duration)"
+                             vg-src="acitveVideoSource">
+                </videowindow>
 
             </td>
         </tr>
