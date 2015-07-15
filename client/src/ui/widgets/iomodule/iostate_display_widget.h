@@ -5,11 +5,7 @@
 #include "plugins/resource/server_camera/server_camera.h"
 #include "api/model/api_ioport_data.h"
 #include <ui/workbench/workbench_context_aware.h>
-
-namespace Ui
-{
-    class IOStateDisplayWidget;
-}
+#include "ui_iostate_display_widget.h"
 
 class QnIOStateDisplayWidget: public QDialog, public QnWorkbenchContextAware
 {
