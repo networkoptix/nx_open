@@ -21,7 +21,6 @@ Feature #5750 - Changed warning for PC with bad video card
 
 Bugs:
 Bug #4011 - Video wall. Auto-created videowall layouts are hided and removed.
-Bug #5565 - Timeline twitches on speed changing from 1x to -1x and back. Fixed.
 Bug #5583 - If user disables all addresses from the specific subnet, servers from this subnet should go offline. Fixed
 Bug #5608 - AVI export from AV20185 panoramic is broken. Fixed
 Bug #5584 - Http-link is not available after camera's reboot. Fixed
@@ -29,7 +28,6 @@ Bug #5731 - Motion didn't work for mjpeg stream. Fixed.
 Bug #5747 - Fixed authentication issue if server time has been changed.
 Bug #5749 - Server should not send multicast packets for cameras discovery if enable camera auto discovery is disabled and server has no failover enabled or only one server in the system.
 Bug #5766 - Login dialog displays servers with different protocol version as compatible. Fixed
-Bug #5784 - Fixed small memory leak in client
 
 
 ----------------------------------------------2.3.1.xxxx-------------------------------------------

@@ -92,11 +92,14 @@ namespace aio
     class AIOThreadImpl
     {
     public:
+        //!TODO #ak better to split this class to multiple ones containing only desired data
         class SocketAddRemoveTask
         {
         public:
             TaskType type;
             SocketType* socket;
+            //!Socket number that is still unique after socket has been destroyed
+            SocketSequenceType socketSequence;
             aio::EventType eventType;
             AIOEventHandler<SocketType>* eventHandler;
             //!0 means no timeout
@@ -117,6 +120,7 @@ namespace aio
             :
                 type( _type ),
                 socket( _socket ),
+                socketSequence( 0 ),
                 eventType( _eventType ),
                 eventHandler( _eventHandler ),
                 timeout( _timeout ),
@@ -143,6 +147,7 @@ namespace aio
                     nullptr )
             {
                 this->postHandler = std::move(_postHandler);
+                this->socketSequence = _socket->impl()->socketSequence;
             }
         };
 
@@ -152,17 +157,18 @@ namespace aio
         {
         public:
             CancelPostedCallsTask(
-                SocketType* const _socket,
+                SocketSequenceType socketSequence,
                 std::atomic<int>* const _taskCompletionEvent = nullptr )
             :
                 SocketAddRemoveTask(
                     TaskType::tCancelPostedCalls,
-                    _socket,
+                    nullptr,
                     aio::etNone,
                     nullptr,
                     0,
                     _taskCompletionEvent )
             {
+                this->socketSequence = socketSequence;
             }
         };
 
@@ -197,7 +203,11 @@ namespace aio
         //TODO #ak too many mutexes here. Refactoring required
 
         PollSetType pollSet;
+        //TODO #ak MUST remove this mutex from here
         QMutex* const aioServiceMutex;
+        /*!
+            \note This variable is accessed with \a aioServiceMutex locked
+        */
         std::deque<SocketAddRemoveTask> pollSetModificationQueue;
         unsigned int newReadMonitorTaskCount;
         unsigned int newWriteMonitorTaskCount;
@@ -205,13 +215,18 @@ namespace aio
         //TODO #ak get rid of map here to avoid undesired allocations
         std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
         //TODO #ak use cyclic array here to minimize allocations
+        /*!
+            \note This variable is accessed within aio thread only
+        */
         std::deque<SocketAddRemoveTask> postedCalls;
+        std::atomic<int> processingPostedCalls;
 
         AIOThreadImpl( QMutex* const _aioServiceMutex )
         :
             aioServiceMutex( _aioServiceMutex ),
             newReadMonitorTaskCount( 0 ),
-            newWriteMonitorTaskCount( 0 )
+            newWriteMonitorTaskCount( 0 ),
+            processingPostedCalls( 0 )
         {
         }
 
@@ -284,7 +299,7 @@ namespace aio
 
                     case TaskType::tCancelPostedCalls:
                     {
-                        cancelPostedCallsInternal( task.socket );
+                        cancelPostedCallsInternal( task.socketSequence );
                         break;
                     }
 
@@ -577,14 +592,14 @@ namespace aio
                 PeriodicTaskData( handlingData, _socket, eventType ) ) );
         }
 
-        void cancelPostedCallsInternal( SocketType* const sock )
+        void cancelPostedCallsInternal( SocketSequenceType socketSequence )
         {
             for( typename std::deque<SocketAddRemoveTask>::iterator
                 it = pollSetModificationQueue.begin();
                 it != pollSetModificationQueue.end();
                  )
             {
-                if( it->socket == sock && it->type == TaskType::tCallFunc )
+                if( it->type == TaskType::tCallFunc && it->socketSequence == socketSequence )
                     it = pollSetModificationQueue.erase( it );
                 else
                     ++it;
@@ -597,7 +612,7 @@ namespace aio
                 it != postedCalls.end();
                  )
             {
-                if( it->socket == sock )
+                if( it->socketSequence == socketSequence )
                     it = postedCalls.erase( it );
                 else
                     ++it;
@@ -811,7 +826,7 @@ namespace aio
         if( inAIOThread )
         {
             //removing postedCall tasks and posted calls
-            m_impl->cancelPostedCallsInternal( sock );
+            m_impl->cancelPostedCallsInternal( sock->impl()->socketSequence );
         }
         else if( waitForRunningHandlerCompletion )
         {
@@ -819,23 +834,31 @@ namespace aio
             std::atomic<int> taskCompletedCondition( 0 );
             //we MUST remove socket from pollset before returning from here
             m_impl->pollSetModificationQueue.push_back(
-                typename AIOThreadImplType::CancelPostedCallsTask( sock, &taskCompletedCondition ) );
+                typename AIOThreadImplType::CancelPostedCallsTask(
+                    sock->impl()->socketSequence,   //not passing socket here since it is allowed to be removed
+                                                    //before posted call is actually cancelled
+                    &taskCompletedCondition ) );
             m_impl->pollSet.interrupt();
 
             //we can be sure that socket will be removed before next poll
 
             m_impl->aioServiceMutex->unlock();
-
-            //waiting for socket to be removed from pollset
-            while( taskCompletedCondition.load( std::memory_order_relaxed ) == 0 )
+            
+            //waiting for posted calls processing to finish
+            while( m_impl->processingPostedCalls == 1 )
                 msleep( 0 );    //yield. TODO #ak Better replace it with conditional_variable
+            //TODO #ak must wait for target call only, not for any call!
+
+            //here we can be sure that posted call for socket will never be triggered.
+            //  Although, it may still be in the queue.
+            //  But, socket can be safely removed, since we use socketSequence
 
             m_impl->aioServiceMutex->lock();
         }
         else
         {
             m_impl->pollSetModificationQueue.push_back(
-                typename AIOThreadImplType::CancelPostedCallsTask( sock ) );
+                typename AIOThreadImplType::CancelPostedCallsTask( sock->impl()->socketSequence ) );
             m_impl->pollSet.interrupt();
         }
     }
@@ -857,10 +880,16 @@ namespace aio
 
         while( !needToStop() )
         {
+            //setting processingPostedCalls flag before processPollSetModificationQueue 
+            //  to be able to atomically add "cancel posted call" task and check for tasks to complete
+            m_impl->processingPostedCalls = 1;
+
             m_impl->processPollSetModificationQueue( TaskType::tAll );
 
             //making calls posted with post and dispatch
             m_impl->processPostedCalls();
+
+            m_impl->processingPostedCalls = 0;
 
             //processing tasks that have been added from within \a processPostedCalls() call
             m_impl->processPollSetModificationQueue( TaskType::tAll );
