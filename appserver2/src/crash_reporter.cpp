@@ -90,6 +90,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
 
         crashes.pop_back();
     }
+
     return false;
 }
 
@@ -119,7 +120,7 @@ bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSetting
         return false;
     }
 
-    auto httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    auto httpClient = nx_http::AsyncHttpClient::create();
     auto report = new ReportData(crash, settings, *this, httpClient.get());
     QObject::connect(httpClient.get(), &nx_http::AsyncHttpClient::done,
                     report, &ReportData::finishReport, Qt::DirectConnection);
@@ -161,6 +162,9 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
                  << "to" << httpClient->url() << "has failed";
         return;
     }
+
+    qDebug() << "CrashReporter::finishReport: crash" << m_crashFile.absoluteFilePath()
+             << "has been sent successfully";
 
     const auto now = qnSyncTime->currentDateTime().toUTC();
     QFile::remove(m_crashFile.absoluteFilePath());

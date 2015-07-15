@@ -95,7 +95,6 @@ private:
         QnSoftwareVersion version;
         int protoVersion;
         QString systemName;
-        QString brand;
 
         QnEcData();
 

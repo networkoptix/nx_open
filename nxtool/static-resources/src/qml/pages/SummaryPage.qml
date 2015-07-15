@@ -125,6 +125,7 @@ Item
             text: qsTr("Ok");
             onClicked:
             {
+                rtuContext.selectionModel().selectionChanged();
                 rtuContext.currentPage = NxRtu.Constants.SettingsPage;
             }
         }

@@ -107,7 +107,7 @@ private:
     std::map<QString, unsigned int> m_outputPortNameToIndex;
     mutable QMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
-    std::shared_ptr<nx_http::AsyncHttpClient> m_inputPortHttpMonitor;
+    nx_http::AsyncHttpClientPtr m_inputPortHttpMonitor;
     nx_http::MultipartContentParserHelper m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];

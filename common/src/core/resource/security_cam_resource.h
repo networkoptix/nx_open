@@ -233,6 +233,7 @@ public:
      * Implemented in QnDesktopCameraResource.
      */
     virtual bool isReadyToDetach() const {return true;}
+    virtual Qn::BitratePerGopType bitratePerGopType() const;
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -291,7 +292,6 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
-    virtual bool isBitratePerGOP() const;
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;

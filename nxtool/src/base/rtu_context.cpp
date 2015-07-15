@@ -8,6 +8,7 @@
 #include <models/ip_settings_model.h>
 #include <models/servers_selection_model.h>
 
+#include <helpers/time_helper.h>
 #include <helpers/http_client.h>
 
 class rtu::RtuContext::Impl : public QObject
@@ -78,6 +79,8 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
 
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
         , m_changesManager, &ChangesManager::serverDiscovered);
+    QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
+        , m_selectionModel, &ServersSelectionModel::serverDiscovered);
 }
 
 rtu::RtuContext::Impl::~Impl()
@@ -155,17 +158,17 @@ QObject *rtu::RtuContext::changesManager()
     return m_impl->changesManager();
 }
 
-#include <helpers/time_helper.h>
-
 QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     , const QTime &time
     , const QByteArray &prevTimeZoneId
     , const QByteArray &newTimeZoneId)
 {
-    if (prevTimeZoneId.isEmpty() || newTimeZoneId.isEmpty())
+    if (newTimeZoneId.isEmpty())
         return QDateTime();
 
-    const QTimeZone prevTimeZone(prevTimeZoneId);
+    const QTimeZone prevTimeZone(!prevTimeZoneId.isEmpty() ? QTimeZone(prevTimeZoneId)
+        : QDateTime::currentDateTime().timeZone());
+
     const QTimeZone nextTimeZone(newTimeZoneId);
     if (date.isNull() || time.isNull() || !prevTimeZone.isValid()
         || !nextTimeZone.isValid() || !date.isValid() || !time.isValid())
@@ -176,9 +179,14 @@ QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     return convertDateTime(date, time, prevTimeZone, nextTimeZone).toLocalTime();
 }
 
-void rtu::RtuContext::tryLoginWith(const QString &password)
+void rtu::RtuContext::tryLoginWith(const QString &primarySystem
+    , const QString &password)
 {
-    return m_impl->selectionModel()->tryLoginWith(password);
+    return m_impl->selectionModel()->tryLoginWith(primarySystem, password
+        , [this, primarySystem]() 
+    {
+        emit this->loginOperationFailed(primarySystem);
+    });
 }
 
 void rtu::RtuContext::setCurrentPage(int pageId)

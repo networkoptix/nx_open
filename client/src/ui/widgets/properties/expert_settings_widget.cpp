@@ -96,6 +96,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     int secondaryRecorderDisabled = -1;
     bool samePrimaryRec = true;
     bool sameBitratePerGOP = true;
+    bool enableBitratePerGop = true;
     bool sameSecRec = true;
 
     bool sameRtpTransport = true;
@@ -137,8 +138,11 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
             primaryRecorderDisabled = primaryRecDisabled;
         else if (primaryRecorderDisabled != primaryRecDisabled)
             samePrimaryRec = false;
-
-        int bitratePerGop = camera->getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt();
+        
+        Qn::BitratePerGopType bpgType = camera->bitratePerGopType();
+        if (bpgType == Qn::BPG_Predefined)
+            enableBitratePerGop = false;
+        int bitratePerGop = bpgType == Qn::BPG_None ? 0 : 1;
         if (bitratePerGopPresent == -1)
             bitratePerGopPresent = bitratePerGop;
         else if (bitratePerGopPresent != bitratePerGop)
@@ -174,6 +178,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         ui->checkBoxBitratePerGOP->setChecked(bitratePerGopPresent);
     else
         ui->checkBoxBitratePerGOP->setCheckState(Qt::PartiallyChecked);
+    ui->checkBoxBitratePerGOP->setEnabled(enableBitratePerGop);
 
     ui->checkBoxSecondaryRecorder->setEnabled(anyHasDualStreaming);
     if (anyHasDualStreaming) {
@@ -204,7 +209,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
             && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
             && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
-            && ui->checkBoxBitratePerGOP->checkState() == Qt::Unchecked
+            && (ui->checkBoxBitratePerGOP->checkState() == Qt::Unchecked || !ui->checkBoxBitratePerGOP->isEnabled())
             && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
             && ui->comboBoxTransport->currentIndex() == 0;
 

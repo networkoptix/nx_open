@@ -19,6 +19,23 @@ rtu::InterfaceInfo::InterfaceInfo(bool initUseDHCP)
     , useDHCP(initUseDHCP ? Qt::Checked : Qt::Unchecked)
 {}
 
+bool rtu::operator == (const rtu::InterfaceInfo &first
+    , const rtu::InterfaceInfo &second)
+{
+    return ((first.ip == second.ip)
+        && (first.macAddress == second.macAddress)
+        && (first.mask == second.mask)
+        && (first.gateway == second.gateway)
+        && (first.dns == second.dns)
+        && (first.useDHCP == second.useDHCP));
+}
+
+bool rtu::operator != (const rtu::InterfaceInfo &first
+    , const rtu::InterfaceInfo &second)
+{
+    return !(first == second);
+}
+
 rtu::InterfaceInfo::InterfaceInfo(const QString &initName
     , const QString &initIp
     , const QString &initMacAddress
@@ -38,7 +55,7 @@ rtu::InterfaceInfo::InterfaceInfo(const QString &initName
 bool rtu::operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {
-    /// Do not compare hostAddress and flags - it is Ok
+    /// Do not compare flags, hostAddress and visibleAddress - it is Ok
     return ((first.id == second.id)
         && (first.name == second.name)
         && (first.port == second.port)
@@ -96,6 +113,13 @@ rtu::ServerInfo::ServerInfo(const BaseServerInfo &baseInfo)
 {
 }
 
+rtu::ServerInfo::ServerInfo(const BaseServerInfo &baseInfo
+    , const ExtraServerInfo &extraInfo)
+    : m_base(baseInfo)
+    , m_extra(new ExtraServerInfo(extraInfo))
+{
+}
+
 rtu::ServerInfo::~ServerInfo()
 {
 }
@@ -130,20 +154,12 @@ bool rtu::ServerInfo::hasExtraInfo() const
 
 const rtu::ExtraServerInfo &rtu::ServerInfo::extraInfo() const
 {
-    if (m_extra.isNull())
-    {
-        int i = 0;
-    }
     Q_ASSERT(!m_extra.isNull());
     return *m_extra;
 }
 
 rtu::ExtraServerInfo &rtu::ServerInfo::writableExtraInfo()
 {
-    if (m_extra.isNull())
-    {
-        int i = 0;
-    }
     Q_ASSERT(!m_extra.isNull());
     return *m_extra;
 }

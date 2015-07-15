@@ -119,7 +119,7 @@ void QnPublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpCli
 
 void QnPublicIPDiscovery::sendRequest(const QString &url) 
 {
-    nx_http::AsyncHttpClientPtr httpRequest = std::make_shared<nx_http::AsyncHttpClient>();
+    nx_http::AsyncHttpClientPtr httpRequest = nx_http::AsyncHttpClient::create();
 
     auto at_reply_finished = [this, httpRequest] ( const nx_http::AsyncHttpClientPtr& httpClient ) mutable
     {

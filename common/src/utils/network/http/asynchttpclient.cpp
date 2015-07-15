@@ -20,7 +20,6 @@
 #include "auth_tools.h"
 #include "version.h"
 
-
 //TODO: #ak persistent connection support
 //TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
 //TODO: #ak reconnect support
@@ -106,6 +105,9 @@ namespace nx_http
     */
     bool AsyncHttpClient::doGet( const QUrl& url )
     {
+        if( !url.isValid() )
+            return false;
+
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::GET );
@@ -117,6 +119,9 @@ namespace nx_http
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody)
     {
+        if( !url.isValid() )
+            return false;
+
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::POST );
@@ -133,6 +138,9 @@ namespace nx_http
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody )
     {
+        if( !url.isValid() )
+            return false;
+
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::PUT );
@@ -248,10 +256,10 @@ namespace nx_http
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
         QMutexLocker lk( &m_mutex );
-
-        Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
             return;
+
+        Q_ASSERT( sock == m_socket.data() );
 
         if( m_state != sWaitingConnectToHost )
         {
@@ -293,10 +301,10 @@ namespace nx_http
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
         QMutexLocker lk( &m_mutex );
-
-        Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
             return;
+
+        Q_ASSERT( sock == m_socket.data() );
 
         if( m_state != sSendingRequest )
         {
@@ -355,10 +363,10 @@ namespace nx_http
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
         QMutexLocker lk( &m_mutex );
-
-        Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
             return;
+
+        Q_ASSERT( sock == m_socket.data() );
 
         if( errorCode != SystemError::noError )
         {
@@ -900,6 +908,11 @@ namespace nx_http
         return true;
     }
 
+    AsyncHttpClientPtr AsyncHttpClient::create()
+    {
+        return AsyncHttpClientPtr( std::shared_ptr<AsyncHttpClient>( new AsyncHttpClient() ) );
+    }
+
     bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
@@ -1067,7 +1080,7 @@ namespace nx_http
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler )
     {
-        nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();
+        nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
             ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {

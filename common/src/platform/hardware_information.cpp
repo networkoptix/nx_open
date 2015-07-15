@@ -86,12 +86,15 @@ const QString& compileCpuArchicture()
         std::ifstream cpu("/proc/cpuinfo");
         std::string line;
         while(std::getline(cpu, line))
-            if (line.find("model name") == 0)
+        {
+            if (line.find("model name") == 0 ||
+                line.find("Processor") == 0 /* NX1 (bananapi) */)
             {
                 auto model = line.substr(line.find(":") + 2);
                 cpuModelName = QString::fromStdString(model);
                 break;
             }
+        }
     }
 
 #elif defined(Q_OS_OSX)

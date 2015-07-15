@@ -62,7 +62,7 @@ bool InstallationProcess::start( const QString& mirrorListUrl )
 {
     if( !m_httpClient )
     {
-        m_httpClient.reset( new nx_http::AsyncHttpClient() );
+        m_httpClient = nx_http::AsyncHttpClient::create();
         connect(
             m_httpClient.get(), &nx_http::AsyncHttpClient::done,
             this, &InstallationProcess::onHttpDone,

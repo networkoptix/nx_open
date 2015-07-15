@@ -141,7 +141,6 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/common/system_information.h>
-#include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
@@ -186,6 +185,7 @@
 #include "media_server/resource_status_watcher.h"
 #include "nx_ec/dummy_handler.h"
 #include "ec2_statictics_reporter.h"
+#include "server/host_system_password_synchronizer.h"
 
 #include "version.h"
 #include "core/resource_management/resource_properties.h"
@@ -1229,27 +1229,6 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
     }
 }
 
-void QnMain::at_adminUserChanged( const QnResourcePtr& resource )
-{
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if( !user )
-        return;
-
-    if( !user->isAdmin() )
-        return;
-
-#ifdef __linux__
-    if( QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1" )
-    {
-        //changing root password in system
-        if( !setRootPasswordDigest( "root", user->getCryptSha512Hash() ) )
-        {
-            qWarning()<<"Failed to set root password on current system";
-        }
-    }
-#endif
-}
-
 void QnMain::at_localInterfacesChanged()
 {
     if (isStopping())
@@ -1514,12 +1493,14 @@ void QnMain::run()
 
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
+    std::unique_ptr<QnResourcePropertyDictionary> dictionary(new QnResourcePropertyDictionary());
+    std::unique_ptr<QnResourceStatusDictionary> statusDict(new QnResourceStatusDictionary());
+    std::unique_ptr<QnServerAdditionalAddressesDictionary> serverAdditionalAddressesDictionary(new QnServerAdditionalAddressesDictionary());
+
     std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
-    connect(
-        resourcePool.get(), &QnResourcePool::resourceChanged,
-        this, &QnMain::at_adminUserChanged );
-    
+    std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
+
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
@@ -1639,9 +1620,6 @@ void QnMain::run()
     ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
-    QnResourcePropertyDictionary dictionary;
-    QnResourceStatusDictionary statusDict;
-    QnServerAdditionalAddressesDictionary serverAdditionalAddressesDictionary;
 
     while (!needToStop())
     {
@@ -1707,7 +1685,7 @@ void QnMain::run()
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
 
     //Initializing plugin manager
-    PluginManager::instance()->loadPlugins();
+    PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
 
     using namespace std::placeholders;
     for (const auto storagePlugin : 
@@ -1882,10 +1860,10 @@ void QnMain::run()
         const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
         if (!confStats.isNull()) // if present
         {
-            const bool normStats = confStats.toBool();
-            const bool msStats = QnLexical::deserialized(server->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true);
+            const auto normStats = QnLexical::serialized(confStats.toBool());
+            const auto msStats = server->getProperty(Qn::STATISTICS_REPORT_ALLOWED);
             if (normStats != msStats)
-                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(normStats));
+                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, normStats);
 
             MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
             MSSettings::roSettings()->sync();
@@ -2059,6 +2037,8 @@ void QnMain::run()
     if (adminUser) {
         qnCommon->bindModuleinformation(adminUser);
         qnCommon->updateModuleInformation();
+
+        hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
     }
 
     typedef ec2::Ec2StaticticsReporter stats;

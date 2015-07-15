@@ -4,6 +4,7 @@ import QtQuick.Controls 1.1;
 import "../common" as Common
 import "../settings" as Settings;
 import "../controls/base" as Base;
+import "../controls/rtu" as Rtu;
 
 FocusScope
 {
@@ -43,12 +44,22 @@ FocusScope
         }
     }
     
+    Rtu.OutdatedWarningPanel
+    {
+        id: outdatedWarning;
+
+        show: rtuContext.selectionModel().selectionOutdated;
+        width: parent.width;
+
+        onUpdateClicked: { rtuContext.selectionModel().selectionChanged(); }
+    }
+
     ScrollView
     {
         width: parent.width;
         anchors
         {
-            top: parent.top;
+            top: outdatedWarning.bottom;
             bottom: buttonsPanel.top;
         }
         
@@ -59,10 +70,15 @@ FocusScope
             flickableDirection: Flickable.VerticalFlick;
             contentHeight: settingsColumn.height;
 
-            topMargin: Common.SizeManager.fontSizes.base;
-            bottomMargin: Common.SizeManager.spacing.base;
-            leftMargin: Common.SizeManager.spacing.medium;
-            rightMargin: Common.SizeManager.spacing.medium;
+            anchors
+            {
+                fill: parent;
+
+                topMargin: Common.SizeManager.fontSizes.base;
+                bottomMargin: Common.SizeManager.spacing.base;
+                leftMargin: Common.SizeManager.spacing.medium;
+                rightMargin: Common.SizeManager.spacing.medium;
+            }
 
             Column
             {
@@ -85,6 +101,8 @@ FocusScope
                 {
                     id: systemAndPasswordSettings;
                 }
+
+                Base.EmptyCell {}
             }
         }
     }

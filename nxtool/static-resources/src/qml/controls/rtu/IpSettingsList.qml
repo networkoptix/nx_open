@@ -81,12 +81,17 @@ Base.Column
                 var name = item.adapterNameValue;
                 
                 var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
-                if (item.useDHCPControl.changed)
-                    rtuContext.changesManager().addDHCPChange(name, useDHCP);
 
-                if (item.ipAddressControl.changed || !useDHCP)
+                /// Always send dhcp state due to serialization issue on the server side
+                rtuContext.changesManager().addDHCPChange(name, useDHCP);
+
+                if (!useDHCP)   /// do not send address and mask if dhcp is on
                 {
-                    if (!item.ipAddressControl.acceptableInput)
+                    if (item.ipAddressControl.acceptableInput)
+                    {
+                        rtuContext.changesManager().addAddressChange(name, item.ipAddressControl.text);
+                    }
+                    else
                     {
                         errorDialog.message = errorTemplate.arg(qsTr("ip address")).arg(name);
                         errorDialog.show();
@@ -94,12 +99,12 @@ Base.Column
                         item.ipAddressControl.focus = true;
                         return false;
                     }
-                    rtuContext.changesManager().addAddressChange(name, item.ipAddressControl.text);
-                }
-                
-                if (!item.subnetMaskControl.changed || !useDHCP)
-                {
-                    if (!item.subnetMaskControl.acceptableInput)
+
+                    if (item.subnetMaskControl.acceptableInput)
+                    {
+                        rtuContext.changesManager().addMaskChange(name, item.subnetMaskControl.text);
+                    }
+                    else
                     {
                         errorDialog.message = errorTemplate.arg(qsTr("mask")).arg(name);
                         errorDialog.show();
@@ -107,7 +112,6 @@ Base.Column
                         item.subnetMaskControl.focus = true;
                         return false;
                     }
-                    rtuContext.changesManager().addMaskChange(name, item.subnetMaskControl.text);
                 }
                 
                 if (item.dnsControl.changed)
