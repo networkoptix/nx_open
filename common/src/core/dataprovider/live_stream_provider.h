@@ -9,6 +9,7 @@
 #include <QtCore/QObject>
 
 #include "motion/motion_estimation.h"
+#include "core/datapacket/audio_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource/resource_fwd.h"
 #include "media_streamdataprovider.h"
@@ -69,6 +70,8 @@ public:
                                  const QnLiveStreamParams& currentLiveParams,
                                  bool isCameraControlRequired);
 
+    virtual void onGotAudioFrame(const QnCompressedAudioDataPtr& audioData);
+
     void setUseSoftwareMotion(bool value);
 
     virtual void updateSoftwareMotion();
@@ -112,6 +115,7 @@ private:
     bool m_prevCameraControlDisabled;
     bool m_qualityUpdatedAtLeastOnce;
     unsigned int m_framesSinceLastMetaData;
+    unsigned int m_audioSinceLastMetaData;
     QTime m_timeSinceLastMetaData;
 
     QMutex m_motionRoleMtx;
