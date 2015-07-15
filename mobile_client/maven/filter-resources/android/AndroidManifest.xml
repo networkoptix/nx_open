@@ -37,8 +37,7 @@
             <!-- Splash screen -->
         </activity>
     </application>
-    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="14"/>
-    <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
+    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="22"/>
 
     <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
          Remove the comment if you do not require these default permissions. -->
