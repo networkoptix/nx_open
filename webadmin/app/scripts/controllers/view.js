@@ -9,6 +9,17 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.activeResolution = '320p';
         $scope.availableResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
 
+        $scope.activeFormat = 'Auto';
+        $scope.availableFormats = [
+            'Auto',
+            'video/webm',
+            'video/mp4',
+            'application/x-mpegURL',
+            'video/MP2T',
+            'video/3gpp',
+            'video/x-motion-jpeg'
+        ];
+
         $scope.settings = {id: null};
         mediaserver.getSettings().then(function (r) {
             $scope.settings = {
@@ -64,15 +75,19 @@ angular.module('webadminApp').controller('ViewCtrl',
             var positionMedia = !live ? "&pos=" + (playing) : "";
             var positionHls = !live ? "&startTimestamp=" + (playing) : "";
 
-            $scope.acitveVideoSource = [
+            $scope.acitveVideoSource = _.filter([
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + extParam ), type: 'video/webm' },
                 { src: ( serverUrl + '/media/' + cameraId + '.mp4?resolution='    + $scope.activeResolution + positionMedia + extParam ), type: 'video/mp4' },
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u?resolution='    + $scope.activeResolution + positionHls   + extParam )},
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls   + extParam )},
-                { src: ( serverUrl + '/media/' + cameraId + '.mpegts?resolution=' + $scope.activeResolution + positionMedia + extParam )},
-                { src: ( serverUrl + '/media/' + cameraId + '.3gp?resolution='    + $scope.activeResolution + positionMedia + extParam )},
-                { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam )}
-            ];
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls   + extParam ), type: 'application/x-mpegURL'},
+                { src: ( serverUrl + '/media/' + cameraId + '.mpegts?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: 'video/MP2T'},
+                { src: ( serverUrl + '/media/' + cameraId + '.3gp?resolution='    + $scope.activeResolution + positionMedia + extParam ), type: 'video/3gpp'},
+                { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: 'video/x-motion-jpeg'}
+            ],function(src){
+                return $scope.activeFormat == 'Auto'|| $scope.activeFormat == src.type;
+            });
+
+            console.log("video source", $scope.activeFormat, $scope.acitveVideoSource[0].src );
+
 
             console.log($scope.acitveVideoSource);
         }
@@ -230,6 +245,11 @@ angular.module('webadminApp').controller('ViewCtrl',
                 console.error('network problem');
             });
         }
+
+        $scope.selectFormat = function(format){
+            $scope.activeFormat = format;
+            updateVideoSource($scope.positionProvider.playedPosition);
+        };
 
         $scope.selectResolution = function(resolution){
             if(resolution == "auto" || resolution == "Auto" || resolution == "AUTO"){
