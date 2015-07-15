@@ -15,6 +15,8 @@ QnZoomableFlickable {
     maxContentWidth: d.sourceWidth * maxZoomFactor
     maxContentHeight: d.sourceHeight * maxZoomFactor
 
+    clip: true
+
     QtObject {
         id: d
 
