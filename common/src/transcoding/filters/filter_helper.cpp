@@ -93,6 +93,9 @@ QSize QnImageFilterHelper::updatedResolution(const QList<QnAbstractImageFilterPt
 
 QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSize& srcResolution) const
 {
+    static const float MIN_STEP_CHANGE_COEFF = 0.95;
+    static const float ASPECT_RATIO_COMPARISION_PRECISION = 0.01;
+
     QList<QnAbstractImageFilterPtr> result;
 
     if (!qFuzzyIsNull(m_customAR)) {
@@ -151,8 +154,8 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
         if( resizeRatio >= 1.0 )
             break;  //done. resolution is OK
 
-        if( resizeRatio >= prevResizeRatio )
-            resizeRatio = prevResizeRatio * 0.95;   //this is needed for the loop to be finite
+        if( resizeRatio >= prevResizeRatio - ASPECT_RATIO_COMPARISION_PRECISION )
+            resizeRatio = prevResizeRatio * MIN_STEP_CHANGE_COEFF;   //this is needed for the loop to be finite
         prevResizeRatio = resizeRatio;
 
         //adjusting scale filter
