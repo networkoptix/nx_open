@@ -73,11 +73,20 @@ QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(
         result.name = tr("Windows Network Shared Resource");
         result.urlTemplate = tr("\\\\<Computer Name>\\<Folder>");
         result.urlPattern = lit("\\\\\\\\%1\\\\.+").arg(validHostnamePattern);
-    } else if(protocol == lit("coldstore")) {
+    } 
+    //else if(protocol == lit("coldstore")) 
+    //{
+    //    result.protocol = protocol;
+    //    result.name = tr("Coldstore Network Storage");
+    //    result.urlTemplate = tr("coldstore://<Address>");
+    //    result.urlPattern = lit("coldstore://%1/?").arg(validHostnamePattern);
+    //}
+    else if (protocol != lit("file") && protocol != lit("local"))
+    {
         result.protocol = protocol;
-        result.name = tr("Coldstore Network Storage");
-        result.urlTemplate = tr("coldstore://<Address>");
-        result.urlPattern = lit("coldstore://%1/?").arg(validHostnamePattern);
+        result.name = protocol.toUpper();
+        result.urlTemplate = lit("%1://<Address>/path").arg(protocol);
+        result.urlPattern = lit("%1://%2").arg(protocol).arg(validHostnamePattern);
     }
 
     return result;
