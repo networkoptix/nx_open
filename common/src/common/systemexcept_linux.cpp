@@ -232,7 +232,7 @@ void linux_exception::setSignalHandlingDisabled(bool isDisabled)
     isSignalHandlingEnabled = !isDisabled;
     pthread_mutex_unlock(&mutex);
 
-    qDebug() << "linux_exception::setSignalHandlingDisabled" << isDisaled;
+    qDebug() << "linux_exception::setSignalHandlingDisabled" << isDisabled;
 }
 
 std::string linux_exception::getCrashDirectory()

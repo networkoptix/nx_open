@@ -141,17 +141,19 @@ namespace ec2
 
     bool Ec2StaticticsReporter::isAllowed(const QnMediaServerResourceList &servers)
     {
-        int result = 0;
-        for (const QnMediaServerResourcePtr &server: servers) {
-            if (!server->hasProperty(Qn::STATISTICS_REPORT_ALLOWED))
-                continue;
-            bool allowedForServer = QnLexical::deserialized(server->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true);
-            if (allowedForServer)
-                ++result;
-            else
-                --result;
+        int overweight = 0;
+        for (const QnMediaServerResourcePtr &server: servers)
+        {
+            const auto allowedForServer = server->getProperty(Qn::STATISTICS_REPORT_ALLOWED);
+            if (!allowedForServer.isEmpty())
+                overweight += QnLexical::deserialized<bool>(allowedForServer) ? 1 : -1;
         }
-        return result >= 0;
+
+        const bool allowed = (overweight >= 0);
+        NX_LOG(lit("Ec2StaticticsReporter::isAllowed = %1 (%2 of %3 overweight)")
+               .arg(allowed).arg(overweight).arg(servers.size()), cl_logDEBUG2);
+
+        return allowed;
     }
 
     bool Ec2StaticticsReporter::isAllowed(const AbstractMediaServerManagerPtr& msManager)
