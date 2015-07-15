@@ -16,6 +16,7 @@ public:
         SessionSettings,
         CamerasAspectRatios,
         ShowOfflineCameras,
+        LastUsedQuality,
         VariableCount
     };
 
@@ -41,6 +42,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QVariantMap,                 sessionSettings,            setSessionSettings,         SessionSettings,            QVariantMap())
         QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           camerasAspectRatios,        setCamerasAspectRatios,     CamerasAspectRatios,        QnAspectRatioHash())
         QN_DECLARE_RW_PROPERTY(bool,                        showOfflineCameras,         setShowOfflineCameras,      ShowOfflineCameras,         true)
+        QN_DECLARE_RW_PROPERTY(QString,                     lastUsedQuality,            setLastUsedQuality,         LastUsedQuality,            QString())
     QN_END_PROPERTY_STORAGE()
 
 private:

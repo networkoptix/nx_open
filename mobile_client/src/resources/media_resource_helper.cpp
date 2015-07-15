@@ -15,6 +15,7 @@
 #include "common/common_module.h"
 #include "utils/common/model_functions.h"
 #include "watchers/user_watcher.h"
+#include <mobile_client/mobile_client_settings.h>
 
 namespace {
 
@@ -62,7 +63,6 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     QObject(parent),
     m_position(-1),
     m_protocol(Http),
-    m_standardResolution(-1),
     m_nativeStreamIndex(-1),
     m_transcodingSupported(true)
 {
@@ -96,8 +96,11 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
         emit resourceIdChanged();
         emit resourceNameChanged();
 
-        updateUrl();
+        m_resolution = qnSettings->lastUsedQuality();
+        emit resolutionChanged();
     }
+
+    updateUrl();
 }
 
 QUrl QnMediaResourceHelper::mediaUrl() const {
@@ -214,6 +217,9 @@ void QnMediaResourceHelper::setResolution(const QString &resolution) {
     emit resolutionChanged();
 
     updateUrl();
+
+    if (m_transcodingSupported)
+        qnSettings->setLastUsedQuality(m_resolution);
 }
 
 QSize QnMediaResourceHelper::screenSize() const {

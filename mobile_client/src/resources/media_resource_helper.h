@@ -69,7 +69,6 @@ private:
     Protocol m_protocol;
     CameraMediaStreams m_supportedStreams;
     QString m_resolution;
-    int m_standardResolution;
     QList<int> m_standardResolutions;
     QSize m_screenSize;
     qreal m_aspectRatio;
