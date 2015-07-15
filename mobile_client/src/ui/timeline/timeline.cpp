@@ -457,6 +457,21 @@ void QnTimeline::setAutoPlay(bool autoPlay) {
         update();
 }
 
+qint64 QnTimeline::timeZoneShift() const {
+    return d->timeZoneShift;
+}
+
+void QnTimeline::setTimeZoneShift(qint64 timeZoneShift) {
+    if (d->timeZoneShift == timeZoneShift)
+        return;
+
+    d->timeZoneShift = timeZoneShift;
+
+    emit timeZoneShiftChanged();
+
+    update();
+}
+
 qint64 QnTimeline::startBound() const {
     return d->startBoundTime;
 }

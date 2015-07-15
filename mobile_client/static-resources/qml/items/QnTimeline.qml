@@ -48,6 +48,8 @@ Item {
         textColor: QnTheme.timelineText
         chunkColor: QnTheme.timelineChunk
 
+        timeZoneShift: -(new Date()).getTimezoneOffset() * 60 * 1000
+
         font.pixelSize: sp(16)
 
         onMoveFinished: {
