@@ -738,8 +738,8 @@ bool rtu::ChangesManager::Impl::addUpdateInfoSummaryItem(const rtu::ServerInfo &
     if (change.useDHCP)
     {
         static const QString &kDHCPDescription = "dhcp";
-        static const QString &kYes = "yes";
-        static const QString &kNo = "no";
+        static const QString &kYes = "on";
+        static const QString &kNo = "off";
         const QString useDHCPValue = (*change.useDHCP? kYes : kNo);
         success &= addSummaryItem(info, kDHCPDescription, useDHCPValue, error
             , kDHCPUsageAffected, affected);

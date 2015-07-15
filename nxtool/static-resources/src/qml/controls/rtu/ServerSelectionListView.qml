@@ -21,7 +21,7 @@ ListView
     spacing: 1
 
     model: rtuContext.selectionModel();
-    
+
     header: Rtu.SelectionHeader 
     {
         selectAllCheckedState: impl.selectAllCheckedState;
@@ -37,7 +37,7 @@ ListView
 
         onSelectAllServers: { impl.selectAllServers(select); }
     }
-    
+
     delegate: Loader
     {
         id: meatLoader;
@@ -53,6 +53,16 @@ ListView
                 systemName: model.systemName;
                 loggedState: model.loggedState;
                 selectedState: model.selectedState;
+
+                onSelectionStateShouldBeChanged:
+                {
+                    var selectedIndex = index;
+                    impl.tryChangeSelectedServers( function()
+                    {
+                        thisComponent.model.changeItemSelectedState(index);
+                    });
+                }
+
             }
         }
     
@@ -75,22 +85,55 @@ ListView
                         thisComponent.model.setItemSelected(index);
                     });
                 }
+
+                onSelectionStateShouldBeChanged:
+                {
+                    var selectedIndex = index;
+                    impl.tryChangeSelectedServers( function()
+                    {
+                        thisComponent.model.changeItemSelectedState(index);
+                    });
+                }
+
+            }
+        }
+
+        Component
+        {
+            id: unknownGroupDeletate;
+
+            Rtu.UnknownGroupDelegate
+            {
+                caption: model.name;
+            }
+        }
+
+        Component
+        {
+            id: unknownItemDelegate;
+
+            Rtu.UnknownItemDelegate
+            {
+                address: model.ipAddress;
             }
         }
 
         width: parent.width;
 
-        sourceComponent: (model.isSystem ? systemDelegate : serverDelegate);
-        Connections
+        sourceComponent:
         {
-            target: meatLoader.item;
-            onSelectionStateShouldBeChanged: 
+            switch(model.itemType)
             {
-                var selectedIndex = index;
-                impl.tryChangeSelectedServers( function() 
-                {
-                    thisComponent.model.changeItemSelectedState(index);
-                });
+            case NxRtu.Constants.SystemItemType:
+                return systemDelegate;
+            case NxRtu.Constants.ServerItemType:
+                return serverDelegate;
+            case NxRtu.Constants.UnknownGroupType:
+                return unknownGroupDeletate;
+            case NxRtu.Constants.UnknownEntityType:
+                return unknownItemDelegate;
+            default:
+                return undefined;
             }
         }
     }
