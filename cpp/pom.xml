@@ -160,7 +160,9 @@
                                     <!-- <excludes>
                                         <exclude>**/vmaxproxy-x64.vcproj</exclude>
                                     </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
+                                    <ignoreMissingFile>true</ignoreMissingFile>   
+									<escape>true</escape>
+									<regex>false</regex>									
                                     <replacements>
                                         <replacement>
                                             <token>Win32</token>
@@ -169,7 +171,11 @@
                                         <replacement>
                                             <token>Name="VCLibrarianTool"</token>
                                             <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
-                                        </replacement>         
+                                        </replacement>  
+                                        <replacement>
+                                            <token>;c:\Qt\5.4.2\qt-5.4.2-x64-msvc2012-opengl\lib\Qt5Core.lib;</token>
+                                            <value>;</value>
+                                        </replacement>  										
                                     </replacements>
                                 </configuration>                                
                             </execution>
@@ -194,6 +200,10 @@
                                         <replacement>
                                             <token>Name="VCLibrarianTool"</token>
                                             <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
+                                        </replacement> 
+                                        <replacement>
+                                            <token>;c:\Qt\5.4.2\qt-5.4.2-x86-msvc2012-opengl\lib\Qt5Core.lib;</token>
+                                            <value>;</value>
                                         </replacement>         
                                     </replacements>
                                 </configuration>                                
@@ -466,8 +476,8 @@
                                     <goal>replace</goal>
                                 </goals>
                                 <configuration>
-   				    <escape>true</escape>
-    				    <regex>false</regex>
+                                    <escape>true</escape>
+                                    <regex>false</regex>
                                     <encoding>utf-8</encoding>
                                     <file>${project.build.directory}/Makefile.release</file>
                                     <ignoreMissingFile>true</ignoreMissingFile>                                    

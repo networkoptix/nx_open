@@ -166,3 +166,5 @@ zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..
 rm -Rf zip
+rm -Rf $BUILD_DIR
+rm -Rf $DEBUG_DIR

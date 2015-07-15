@@ -1709,7 +1709,7 @@ void QnMain::run()
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
 
     //Initializing plugin manager
-    PluginManager::instance()->loadPlugins();
+    PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
 
     if (needToStop())
         return;
