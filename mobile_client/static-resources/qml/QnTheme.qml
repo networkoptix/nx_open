@@ -22,6 +22,10 @@ QtObject {
     property color inputTextError
     property color inputPlaceholderError
 
+    property color checkBoxText
+    property color checkBoxBoxOn
+    property color checkBoxBoxOff
+
     property color listSectionText
     property color listText
     property color listSubText
@@ -80,6 +84,9 @@ QtObject {
         inputBorderActiveError  = colorTheme.color("input.borderActiveError")
         inputTextError          = colorTheme.color("input.textError")
         inputPlaceholderError   = colorTheme.color("input.placeholderError")
+        checkBoxText            = colorTheme.color("checkBox.text")
+        checkBoxBoxOff          = colorTheme.color("checkBox.boxOff")
+        checkBoxBoxOn           = colorTheme.color("checkBox.boxOn")
         listSectionText         = colorTheme.color("list.sectionText")
         listText                = colorTheme.color("list.text")
         listSubText             = colorTheme.color("list.subText")
