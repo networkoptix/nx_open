@@ -16,15 +16,7 @@ class QnMediaResourceHelper : public QObject {
     Q_PROPERTY(QString resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
     Q_PROPERTY(QSize screenSize READ screenSize WRITE setScreenSize NOTIFY screenSizeChanged)
 
-    Q_ENUMS(Protocol)
-
 public:
-    enum Protocol {
-        Http,
-        Rtsp,
-        UnknownProtocol
-    };
-
     explicit QnMediaResourceHelper(QObject *parent = 0);
 
     QString resourceId() const;
@@ -55,24 +47,23 @@ signals:
 
 private:
     void at_resourcePropertyChanged(const QnResourcePtr &resource, const QString &key);
+    void at_resource_parentIdChanged(const QnResourcePtr &resource);
 
 private:
     void setStardardResolutions();
     void setUrl(const QUrl &url);
     void updateUrl();
+    int nativeStreamIndex(const QString &resolution) const;
 
 private:
     QnResourcePtr m_resource;
     QUrl m_url;
     qint64 m_position;
-    QDateTime m_dateTime;
-    Protocol m_protocol;
-    CameraMediaStreams m_supportedStreams;
     QString m_resolution;
     QList<int> m_standardResolutions;
     QSize m_screenSize;
-    qreal m_aspectRatio;
     int m_nativeStreamIndex;
+    QMap<int, QString> m_nativeResolutions;
     bool m_transcodingSupported;
 };
 
