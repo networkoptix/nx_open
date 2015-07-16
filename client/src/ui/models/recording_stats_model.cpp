@@ -243,16 +243,22 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
 
 QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientation, int role) const 
 {
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section < ColumnCount) {
+    if (orientation != Qt::Horizontal || section >= ColumnCount)
+        return base_type::headerData(section, orientation, role);
+
+    if (role == Qt::DisplayRole) {
         switch(section) {
         case CameraNameColumn: return tr("Camera");
         case BytesColumn:      return tr("Space");
         case DurationColumn:   return tr("Days");
-        case BitrateColumn:    return tr("Bitrate");
+        case BitrateColumn:    return QVariant(); //return tr("Bitrate");
         default:
             break;
         }
     }
+    //else if (role == Qt::TextAlignmentRole)
+    //    return Qt::AlignLeft; // it's broken at our style and value is ignored
+
     return base_type::headerData(section, orientation, role);
 }
 

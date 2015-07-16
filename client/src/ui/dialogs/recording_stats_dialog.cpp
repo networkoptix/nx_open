@@ -5,6 +5,7 @@
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
+#include <QShowEvent>
 
 #include <core/resource_management/resource_pool.h>
 #include <client/client_globals.h>
@@ -33,8 +34,66 @@ namespace {
     const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
     const qint64 SECS_PER_DAY = 3600 * 24;
     const qint64 SECS_PER_WEEK = SECS_PER_DAY * 7;
-    const qreal FORECAST_STEP = 3600ll; // 1 hour
+    static const qint64 BYTES_IN_GB = 1000000000ll;
+    static const qint64 BYTES_IN_TB = 1000ll * BYTES_IN_GB;
+    
+    static const qint64 EXTRA_DATA_BASE[] = {10 * BYTES_IN_GB, 1 * BYTES_IN_TB, 10 * BYTES_IN_TB, 100 * BYTES_IN_TB, 1000 * BYTES_IN_TB};
+    static const int EXTRA_DATA_ARRAY_SIZE = sizeof(EXTRA_DATA_BASE) / sizeof(EXTRA_DATA_BASE[0]);
+    static const int TICKS_PER_INTERVAL = 100;
 }
+
+class CustomHorizontalHeader: public QHeaderView
+{
+private:
+    QComboBox* m_comboBox;
+    static const int spacer = 4;
+private:
+    void updateComboBox() 
+    {
+        QRect rect(sectionViewportPosition(QnRecordingStatsModel::BitrateColumn), 0,  sectionSize(QnRecordingStatsModel::BitrateColumn), height());
+        int width = m_comboBox->minimumSizeHint().width();
+        rect.adjust(qMax(spacer, rect.width() - width), 0, -spacer, 0);
+        m_comboBox->setGeometry(rect);
+    }
+public:
+    CustomHorizontalHeader(QWidget *parent = 0) : QHeaderView(Qt::Horizontal, parent)
+    {
+        m_comboBox = new QComboBox(this);
+        m_comboBox->addItem(tr("5 minutes"), 5 * 60);
+        m_comboBox->addItem(tr("Hour"),  60 * 60);
+        m_comboBox->addItem(tr("Day"),   3600 * 24);
+        m_comboBox->addItem(tr("Week"),  3600 * 24 * 7);
+        m_comboBox->addItem(tr("Month"), 3600 * 24 * 30);
+        m_comboBox->addItem(tr("All data"), 0);
+        m_comboBox->setCurrentIndex(m_comboBox->count()-1);
+
+        connect(this, &QHeaderView::sectionResized, this, [this]() { updateComboBox();}, Qt::DirectConnection);
+        connect(this, &QHeaderView::sectionResized, this, [this]() { updateComboBox();}, Qt::QueuedConnection);
+    }
+
+    virtual void showEvent(QShowEvent *e) override
+    {
+        QHeaderView::showEvent(e);
+        updateComboBox();
+        m_comboBox->show();
+    }
+
+    virtual void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override
+    {
+        QHeaderView::paintSection(painter, rect, logicalIndex);
+        if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
+        {
+            int width = m_comboBox->minimumSizeHint().width();
+            QRect r(rect);
+            r.adjust(0, 0, -(width + spacer), 0);
+            painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last:"));
+        }
+    }
+    QComboBox* comboBox() const { return m_comboBox; }
+    int durationForBitrate() const {
+        return m_comboBox->itemData(m_comboBox->currentIndex()).toInt();
+    }
+};
 
 void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
@@ -72,16 +131,13 @@ void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionV
         }
         painter->fillRect(opt.rect, baseColor);
 
-        opt.rect.setWidth(opt.rect.width() - 4);
+        //opt.rect.setWidth(opt.rect.width() - 4);
+        opt.rect.adjust(2, 1, -2, -1);
         
-        painter->fillRect(QRect(0,0, opt.rect.width() * forecastData, opt.rect.height()), forecastColor);
-        painter->fillRect(QRect(0,0, opt.rect.width() * realData, opt.rect.height()), realColor);
+        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), forecastColor);
+        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), realColor);
 
         painter->setFont(opt.font);
-        //QString text = index.data().toString();
-        //QFontMetrics fm(opt.font);
-        //QSize textSize = fm.size(Qt::TextSingleLine, text);
-        //painter->drawText(opt.rect.width() - textSize.width() - 4, (opt.rect.height()+fm.ascent())/2, text);
         painter->drawText(opt.rect, Qt::AlignRight | Qt::AlignVCenter, index.data().toString());
 
     }
@@ -109,9 +165,17 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     ui->gridEvents->setModel(sortModel);
     ui->gridEvents->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
-    QHeaderView* headers = ui->gridEvents->horizontalHeader();
+    
+    CustomHorizontalHeader* headers = new CustomHorizontalHeader(this);
+    ui->gridEvents->setHorizontalHeader(headers);
+    connect(headers->comboBox(), QnComboboxCurrentIndexChanged, this, &QnRecordingStatsDialog::updateData);
+
+    headers->setSectionsClickable(true);
+    headers->setStretchLastSection(true);
     headers->setSectionResizeMode(QHeaderView::Interactive);
     headers->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::ResizeToContents);
+    headers->setMinimumSectionSize(160);
+    headers->setSortIndicatorShown(true);
 
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
     m_exportAction      = new QAction(tr("Export Selection to File..."), this);
@@ -141,7 +205,7 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
 
     connect(ui->checkBoxForecast,   &QCheckBox::stateChanged, this, &QnRecordingStatsDialog::at_forecastParamsChanged);
     connect(ui->extraSpaceSlider,   &QSlider::valueChanged,   this, &QnRecordingStatsDialog::at_forecastParamsChanged);
-    
+    connect(ui->extraSizeSpinBox,   SIGNAL(valueChanged(double)),   this, SLOT(at_forecastParamsChanged()));
 
     ui->mainGridLayout->activate();
 }
@@ -157,8 +221,8 @@ void QnRecordingStatsDialog::updateData()
     }
     m_updateDisabled = true;
 
-    static const int bitrateAnalizePeriodMs = 1000 * 60 * 5; // todo: fill me!
-    query(bitrateAnalizePeriodMs);
+    qint64 durationForBitrate = static_cast<CustomHorizontalHeader*>(ui->gridEvents->horizontalHeader())->durationForBitrate();
+    query(durationForBitrate * 1000ll);
 
     // update UI
 
@@ -337,18 +401,74 @@ void QnRecordingStatsDialog::setVisible(bool value)
     QDialog::setVisible(value);
 }
 
+qint64 QnRecordingStatsDialog::sliderPositionToBytes(int value) const
+{
+    if (value == 0)
+        return 0;
+
+    int idx = value / TICKS_PER_INTERVAL;
+    if (idx == EXTRA_DATA_ARRAY_SIZE - 1)
+        return EXTRA_DATA_BASE[EXTRA_DATA_ARRAY_SIZE  -1];
+
+    qint64 k1 = EXTRA_DATA_BASE[idx];
+    qint64 k2 = EXTRA_DATA_BASE[idx+1];
+    int intervalTicks = value % TICKS_PER_INTERVAL;
+    
+    qint64 step = (k2 - k1) / TICKS_PER_INTERVAL;
+    return k1 + step * intervalTicks;
+}
+
+int QnRecordingStatsDialog::bytesToSliderPosition (qint64 value) const
+{
+    int idx = 0;
+    for (; idx < EXTRA_DATA_ARRAY_SIZE-1; ++idx)
+    {
+        if (EXTRA_DATA_BASE[idx+1] >= value)
+            break;
+    }
+    qint64 step = (EXTRA_DATA_BASE[idx+1] - EXTRA_DATA_BASE[idx]) / TICKS_PER_INTERVAL;
+    value -= EXTRA_DATA_BASE[idx];
+    return idx * TICKS_PER_INTERVAL + value / step;
+}
+
 void QnRecordingStatsDialog::at_forecastParamsChanged()
 {
+    if (!ui->gridEvents->isEnabled())
+        return;
     ui->gridEvents->setEnabled(false);
-    static const qint64 gb = 1000000000ll;
-    static const qint64 tb = 1000ll * gb;
-    static const qint64 EXTRA_DATA[] = {0, 100 * gb, tb, 10 * tb, 100 * tb};
-    if (ui->checkBoxForecast->isChecked()) {
-        int idx = ui->extraSpaceSlider->value();
-        m_model->setForecastData(getForecastData(EXTRA_DATA[idx]));
+
+    bool fcEnabled = ui->checkBoxForecast->isChecked();
+    ui->extraSpaceSlider->setEnabled(fcEnabled);
+    for (int i = 0; i < ui->gridLayoutForecast->count(); ++i)
+    //for (const auto& object: ui->gridLayoutForecast->getItemPosition() ())
+    {
+        QWidget* object = ui->gridLayoutForecast->itemAt(i)->widget();
+        if (QSlider* slider = dynamic_cast<QSlider*>(object))
+            slider->setEnabled(fcEnabled);
+        else if (QLabel* label = dynamic_cast<QLabel*>(object))
+            label->setEnabled(fcEnabled);
+        else if (QDoubleSpinBox* spinbox = dynamic_cast<QDoubleSpinBox*>(object))
+            spinbox->setEnabled(fcEnabled);
+    }
+
+    if (ui->checkBoxForecast->isChecked()) 
+    {
+        qint64 forecastedSize = 0;
+        QObject* gg = sender();
+        if (sender() == ui->extraSpaceSlider) {
+            forecastedSize = sliderPositionToBytes(ui->extraSpaceSlider->value());
+            ui->extraSizeSpinBox->setValue(forecastedSize / (qreal) BYTES_IN_TB);
+        }
+        else {
+            forecastedSize = ui->extraSizeSpinBox->value() * BYTES_IN_TB;
+            ui->extraSpaceSlider->setValue(bytesToSliderPosition(forecastedSize));
+        }
+
+        m_model->setForecastData(getForecastData(forecastedSize));
     }
     else
         m_model->setForecastData(QnRecordingStatsReply());
+
     ui->gridEvents->setEnabled(true);
 }
 
@@ -357,6 +477,8 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
     const QnRecordingStatsReply modelData = m_model->modelData();
     ForecastData forecastData;
     qint64 currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    const qreal forecastStep = extraSizeBytes < 50 * BYTES_IN_TB ? 3600 : 3600 * 24;
+
 
     // 1. collect camera related forecast params
     for(const auto& cameraStats: modelData) 
@@ -375,7 +497,7 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
         cameraForecast.expand &= cameraForecast.stats.archiveDurationSecs > 0 && cameraForecast.stats.recordedBytes > 0;
         cameraForecast.maxDays = camRes->maxDays();
         qint64 calendarBitrate = cameraForecast.stats.recordedBytes / cameraForecast.stats.archiveDurationSecs;
-        cameraForecast.bytesPerStep = calendarBitrate * FORECAST_STEP;
+        cameraForecast.bytesPerStep = calendarBitrate * forecastStep;
         cameraForecast.usageCoeff = cameraForecast.stats.recordedSecs / (qreal) cameraForecast.stats.archiveDurationSecs;
         Q_ASSERT(qBetween(0.0, cameraForecast.usageCoeff, 1.00001));
         forecastData.cameras.push_back(std::move(cameraForecast));
@@ -397,10 +519,10 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
     // 2.3 add user extra data
     forecastData.extraSpace += extraSizeBytes;
 
-    return doForecastMainStep(forecastData);;
+    return doForecastMainStep(forecastData, forecastStep);
 }
 
-QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ForecastData& forecastData)
+QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ForecastData& forecastData, qint64 forecastStep)
 {
     // Go to the future, one step is a one day and spend extraSpace
     qint64 prevExtraSpace = -1;
@@ -413,9 +535,9 @@ QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ForecastData& f
                 continue;
             if (cameraForecast.maxDays > 0 && cameraForecast.stats.archiveDurationSecs * SECS_PER_DAY >= cameraForecast.maxDays)
                 continue; // this camera reached the limit of max recorded archive days
-            cameraForecast.stats.archiveDurationSecs += FORECAST_STEP;
+            cameraForecast.stats.archiveDurationSecs += forecastStep;
             cameraForecast.stats.recordedBytes += cameraForecast.bytesPerStep;
-            cameraForecast.stats.recordedSecs += FORECAST_STEP * cameraForecast.usageCoeff;
+            cameraForecast.stats.recordedSecs += forecastStep * cameraForecast.usageCoeff;
             
             forecastData.extraSpace -= cameraForecast.bytesPerStep;
             if (forecastData.extraSpace <= 0)

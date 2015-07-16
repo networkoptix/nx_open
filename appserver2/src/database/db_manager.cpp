@@ -2954,7 +2954,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
         FROM vms_resource r \
         JOIN vms_storage s on s.resource_ptr_id = r.id \
         %1 \
-        ORDER BY r.parent_guid\
+        ORDER BY r.guid\
     ").arg(filterStr));
 
     if (!queryStorage.exec()) {

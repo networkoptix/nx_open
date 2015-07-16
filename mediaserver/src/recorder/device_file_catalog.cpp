@@ -920,8 +920,10 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePerio
     QnRecordingStatsData bitrateStats;
     QMutexLocker lock(&m_mutex);
 
-    if (!m_chunks.empty())
-        result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch() -  m_chunks[0].startTimeMs) / 1000);
+    if (m_chunks.empty())
+        return QnRecordingStatsData();
+
+    result.archiveDurationSecs = qMax(0ll, (qnSyncTime->currentMSecsSinceEpoch() -  m_chunks[0].startTimeMs) / 1000);
 
     auto itrLeft = m_chunks.cbegin();
     auto itrRight = m_chunks.cend();

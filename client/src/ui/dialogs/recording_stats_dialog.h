@@ -65,6 +65,8 @@ private:
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
      */
     void query(qint64 bitrateAnalizePeriodMs);
+    qint64 sliderPositionToBytes(int value) const;
+    int bytesToSliderPosition (qint64 value) const;
 private:
     QScopedPointer<Ui::RecordingStatsDialog> ui;
     QnRecordingStatsModel *m_model;
@@ -104,7 +106,7 @@ private:
 
 
 private:
-    QnRecordingStatsReply doForecastMainStep(ForecastData& forecastData);
+    QnRecordingStatsReply doForecastMainStep(ForecastData& forecastData, qint64 forecastStep);
 
 };
 
