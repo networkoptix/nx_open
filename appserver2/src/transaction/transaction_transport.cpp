@@ -627,13 +627,7 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
     switch( m_remotePeer.dataFormat )
     {
         case Qn::JsonFormat:
-            if (m_localPeer.isMobileClient()) {
-                transportHeader.sender = m_remotePeer.id;
-                transportHeader.processedPeers.insert(m_localPeer.id);
-                transportHeader.processedPeers.insert(m_remotePeer.id);
-                transportHeader.dstPeers.insert(m_localPeer.id);
-                serializedTran = tranData;
-            } else if( !QnJsonTransactionSerializer::deserializeTran(
+            if( !QnJsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.constData()),
                     tranData.size(),
                     transportHeader,
