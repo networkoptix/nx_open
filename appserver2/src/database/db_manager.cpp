@@ -2970,12 +2970,18 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     ApiResourceParamWithRefDataList params;
     const auto result = fetchResourceParams( filter, params );
     if( result != ErrorCode::ok )
-     return result;
+        return result;
 
     mergeObjectListData<ApiStorageData>(
-     storageList, params,
-     &ApiStorageData::addParams,
-     &ApiResourceParamWithRefData::resourceId);
+        storageList, params,
+        &ApiStorageData::addParams,
+        &ApiResourceParamWithRefData::resourceId);
+
+    // Storages are generally bound to MediaServers,
+    // so it's required to be sorted by parent id
+    std::sort(storageList.begin(), storageList.end(),
+              [](const ApiStorageData& lhs, const ApiStorageData& rhs)
+              { return lhs.parentId < rhs.parentId; });
 
     return ErrorCode::ok;
 }

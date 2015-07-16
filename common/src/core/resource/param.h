@@ -32,6 +32,7 @@ namespace Qn
     static const QString CAMERA_CAPABILITIES_PARAM_NAME = lit("cameraCapabilities");
     static const QString CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = lit("mediaStreams");
     static const QString CAMERA_BITRATE_INFO_LIST_PARAM_NAME = lit("bitrateInfos");
+    static const QString CAMERA_AUDIO_CODEC_PARAM_NAME = lit("audioCodec");
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
     //!Contains XML describing camera parameteres. If empty, :camera_settings/camera_settings.xml file is used
     static const QString PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME = lit("physicalCameraSettingsXml");
