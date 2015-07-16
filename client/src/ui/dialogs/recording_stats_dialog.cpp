@@ -546,8 +546,20 @@ QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ForecastData& f
             cameraForecast.stats.archiveDurationSecs += forecastStep;
             cameraForecast.stats.recordedBytes += cameraForecast.bytesPerStep;
             cameraForecast.stats.recordedSecs += forecastStep * cameraForecast.usageCoeff;
-            
             forecastData.extraSpace -= cameraForecast.bytesPerStep;
+
+            if (cameraForecast.maxDays > 0)
+            {
+                qint64 overheadSecs = cameraForecast.stats.archiveDurationSecs - cameraForecast.maxDays  * SECS_PER_DAY;                
+                if (overheadSecs > 0) {
+                    qreal k = (qreal) overheadSecs / forecastStep;
+                    cameraForecast.stats.archiveDurationSecs -= overheadSecs;
+                    cameraForecast.stats.recordedBytes -= cameraForecast.bytesPerStep * k;
+                    cameraForecast.stats.recordedSecs -= overheadSecs * cameraForecast.usageCoeff;
+                    forecastData.extraSpace -= cameraForecast.bytesPerStep * k;
+                }
+            }
+
             if (forecastData.extraSpace <= 0)
                 break;
         }
