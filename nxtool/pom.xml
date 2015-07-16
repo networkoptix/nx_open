@@ -30,7 +30,7 @@
         <qt.dir>${env.ENVIRONMENT}/qt542/${arch}</qt.dir>
         <global.libs/>
         <!--Specific os libs used-->
-        <windows.oslibs/>
+        <windows.oslibs>Ws2_32.lib</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs/>

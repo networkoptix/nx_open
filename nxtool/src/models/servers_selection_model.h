@@ -53,6 +53,10 @@ namespace rtu
 
         void removeServers(const IDsVector &removed);
 
+        void unknownAdded(const QString &address);
+
+        void unknownRemoved(const QString &address);
+
         void updateTimeDateInfo(const QUuid &id
             , qint64 utcDateTimeMs
             , const QByteArray &timeZoneId
@@ -79,6 +83,7 @@ namespace rtu
         void serversCountChanged();
         
         void serverLogged(const ServerInfo &info);
+
     private:
         int rowCount(const QModelIndex &parent = QModelIndex()) const;
         

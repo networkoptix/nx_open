@@ -77,6 +77,11 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
     QObject::connect(m_serversFinder.data(), &ServersFinder::serversRemoved
         , m_selectionModel, &ServersSelectionModel::removeServers);
 
+    QObject::connect(m_serversFinder.data(), &ServersFinder::unknownAdded
+        , m_selectionModel, &ServersSelectionModel::unknownAdded);
+    QObject::connect(m_serversFinder.data(), &ServersFinder::unknownRemoved
+        , m_selectionModel, &ServersSelectionModel::unknownRemoved);
+
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
         , m_changesManager, &ChangesManager::serverDiscovered);
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered

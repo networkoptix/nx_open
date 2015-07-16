@@ -22,7 +22,6 @@ namespace rtu
             
             , AllFlags                 = 0xFFFF
         };
-        
         Q_ENUMS(ServerFlag)
         Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 
@@ -40,8 +39,16 @@ namespace rtu
             , PartiallyLogged
             , NotLogged
         };
-        
         Q_ENUMS(LoggedState)
+
+        enum ItemType
+        {
+            SystemItemType
+            , ServerItemType
+            , UnknownGroupType
+            , UnknownEntityType
+        };
+        Q_ENUMS(ItemType)
     };
 }
 

@@ -251,9 +251,11 @@ void rtu::ChangesManager::Impl::applyChanges()
     {
         ServerInfoValueContainer result;
         result.reserve(infos.size());
+
         for(const ServerInfo *info: infos)
         {
-            result.push_back(*info);
+            if (info->hasExtraInfo())
+                result.push_back(*info);
         }
         return result;
     }(m_model->selectedServers());
@@ -276,9 +278,9 @@ void rtu::ChangesManager::Impl::applyChanges()
 
     addDateTimeChangeRequests();
     addSystemNameChangeRequests();
-    addIpChangeRequests();
-    addPortChangeRequests();
     addPasswordChangeRequests();
+    addPortChangeRequests();
+    addIpChangeRequests();
     
     emit m_owner->totalChangesCountChanged();
     emit m_owner->appliedChangesCountChanged();
@@ -353,14 +355,6 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
     if (request.inProgress)
         return;
 
-    /*
-    //TODO: #ynikitenkov #high invalid scenario
-    if (!request.info->hasExtraInfo()) {
-        m_itfChanges.erase(it);
-        onChangesetApplied(0);
-        return;
-    }
-    */
     const qint64 current = QDateTime::currentMSecsSinceEpoch();
     if ((current - request.timestamp) < kIfListRequestsPeriod)
         return;
@@ -651,9 +645,6 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
     /// In case of multiple selection, it is allowed to turn on DHCP only
     for (ServerInfo *info: m_targetServers)
     {
-        if (!info->hasExtraInfo())
-            return;
-        
         ItfUpdateInfoContainer changes;
         for (const InterfaceInfo &itfInfo: info->extraInfo().interfaces)
         {
@@ -738,8 +729,8 @@ bool rtu::ChangesManager::Impl::addUpdateInfoSummaryItem(const rtu::ServerInfo &
     if (change.useDHCP)
     {
         static const QString &kDHCPDescription = "dhcp";
-        static const QString &kYes = "yes";
-        static const QString &kNo = "no";
+        static const QString &kYes = "on";
+        static const QString &kNo = "off";
         const QString useDHCPValue = (*change.useDHCP? kYes : kNo);
         success &= addSummaryItem(info, kDHCPDescription, useDHCPValue, error
             , kDHCPUsageAffected, affected);
