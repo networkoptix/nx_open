@@ -1,6 +1,8 @@
 
 #include "rtu_context.h"
 
+#include <version.h>
+
 #include <base/selection.h>
 #include <base/servers_finder.h>
 #include <base/changes_manager.h>
@@ -192,6 +194,36 @@ void rtu::RtuContext::tryLoginWith(const QString &primarySystem
     {
         emit this->loginOperationFailed(primarySystem);
     });
+}
+
+QString rtu::RtuContext::toolDisplayName() const
+{
+    return QString(QN_APPLICATION_DISPLAY_NAME);
+}
+
+bool rtu::RtuContext::isBeta() const
+{
+    return (QN_BETA == "true");
+}
+
+QString rtu::RtuContext::toolVersion() const
+{
+    return QString(QN_APPLICATION_VERSION);
+}
+
+QString rtu::RtuContext::toolRevision() const
+{
+    return QString(QN_APPLICATION_REVISION);
+}
+
+QString rtu::RtuContext::toolSupportMail() const
+{
+    return QString(QN_SUPPORT_MAIL_ADDRESS);
+}
+
+QString rtu::RtuContext::toolCompanyUrl() const
+{
+    return QString(QN_COMPANY_URL);
 }
 
 void rtu::RtuContext::setCurrentPage(int pageId)
