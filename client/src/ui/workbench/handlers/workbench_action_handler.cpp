@@ -1211,6 +1211,10 @@ void QnWorkbenchActionHandler::at_openRecordingStatsAction_triggered()
 {
     QnNonModalDialogConstructor<QnRecordingStatsDialog> dialogConstructor(m_recordingStatsDialog, mainWindow());
     QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaServerResourcePtr server;
+    if (!parameters.resources().isEmpty())
+        server = parameters.resource().dynamicCast<QnMediaServerResource>();
+    recordingStatsDialog()->setServer(server);
 }
 
 void QnWorkbenchActionHandler::at_cameraListAction_triggered() {

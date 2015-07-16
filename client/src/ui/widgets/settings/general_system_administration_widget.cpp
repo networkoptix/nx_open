@@ -34,7 +34,6 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
     ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log")));
-    ui->recordingStatsLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Recording statistics")));
     ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open Camera List")));
 
     setHelpTopic(ui->businessRulesButton,   Qn::EventsActions_Help);
@@ -45,7 +44,6 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     connect(ui->businessRulesButton,    &QPushButton::clicked,  this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
     connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(Qn::CameraListAction); } );
     connect(ui->eventLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::BusinessEventsLogAction); } );
-    connect(ui->recordingStatsButton,   &QPushButton::clicked, this, [this] { menu()->trigger(Qn::RecordingStatisticsAction); } );
     connect(ui->healthMonitorButton,    &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); } );
 }
 

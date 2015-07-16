@@ -39,7 +39,7 @@ public:
 
     void disableUpdateData();
     void enableUpdateData();
-
+    void setServer(QnMediaServerResourcePtr mserver);
 protected:
     void setVisible(bool value) override;
 
@@ -84,6 +84,7 @@ private:
     QnRecordingStatsReply m_hidenCameras;
 
     QVector<QnStorageSpaceData> m_availStorages;
+    QnMediaServerResourcePtr m_mserver;
 private:
     // forecast related data
     struct ForecastDataPerCamera

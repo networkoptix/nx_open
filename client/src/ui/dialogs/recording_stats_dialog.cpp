@@ -174,8 +174,11 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     headers->setStretchLastSection(true);
     headers->setSectionResizeMode(QHeaderView::Interactive);
     headers->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::ResizeToContents);
-    headers->setMinimumSectionSize(160);
+    headers->setMinimumSectionSize(180);
     headers->setSortIndicatorShown(true);
+
+    for (int i = QnRecordingStatsModel::BytesColumn; i < QnRecordingStatsModel::ColumnCount; ++i)
+        ui->gridEvents->setColumnWidth(i, headers->minimumSectionSize());
 
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
     m_exportAction      = new QAction(tr("Export Selection to File..."), this);
@@ -254,25 +257,29 @@ QList<QnMediaServerResourcePtr> QnRecordingStatsDialog::getServerList() const
     return result;
 }
 
+void QnRecordingStatsDialog::setServer(QnMediaServerResourcePtr mserver)
+{
+    m_mserver = mserver;
+}
+
 void QnRecordingStatsDialog::query(qint64 bitrateAnalizePeriodMs)
 {
     m_requests.clear();
     m_allData.clear();
     m_availStorages.clear();
 
-    QList<QnMediaServerResourcePtr> mediaServerList = getServerList();
-    foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
+    if (!m_mserver)
+        return;
+
+    if (m_mserver->getStatus() == Qn::Online)
     {
-        if (mserver->getStatus() == Qn::Online)
-        {
-            int handle = mserver->apiConnection()->getRecordingStatisticsAsync(
-                bitrateAnalizePeriodMs,
-                this, SLOT(at_gotStatiscits(int, const QnRecordingStatsReply&, int)));
-            m_requests.insert(handle, mserver->getId());
-            handle = mserver->apiConnection()->getStorageSpaceAsync(
-                this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
-            m_requests.insert(handle, mserver->getId());
-        }
+        int handle = m_mserver->apiConnection()->getRecordingStatisticsAsync(
+            bitrateAnalizePeriodMs,
+            this, SLOT(at_gotStatiscits(int, const QnRecordingStatsReply&, int)));
+        m_requests.insert(handle, m_mserver->getId());
+        handle = m_mserver->apiConnection()->getStorageSpaceAsync(
+            this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
+        m_requests.insert(handle, m_mserver->getId());
     }
 }
 
@@ -322,6 +329,7 @@ void QnRecordingStatsDialog::requestFinished()
     ui->gridEvents->setDisabled(false);
     setCursor(Qt::ArrowCursor);
     ui->loadingProgressBar->hide();
+    at_forecastParamsChanged();
 }
 
 void QnRecordingStatsDialog::at_eventsGrid_clicked(const QModelIndex& idx)
