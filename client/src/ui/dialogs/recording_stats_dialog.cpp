@@ -541,7 +541,7 @@ QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ForecastData& f
         {
             if (!cameraForecast.expand)
                 continue;
-            if (cameraForecast.maxDays > 0 && cameraForecast.stats.archiveDurationSecs * SECS_PER_DAY >= cameraForecast.maxDays)
+            if (cameraForecast.maxDays > 0 && cameraForecast.stats.archiveDurationSecs >= cameraForecast.maxDays  * SECS_PER_DAY)
                 continue; // this camera reached the limit of max recorded archive days
             cameraForecast.stats.archiveDurationSecs += forecastStep;
             cameraForecast.stats.recordedBytes += cameraForecast.bytesPerStep;
