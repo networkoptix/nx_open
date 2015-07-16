@@ -1137,7 +1137,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     emit peerIdDiscovered(remoteAddr(), m_remotePeer.id);
 
-    if (statusCode != nx_http::StatusCode::ok)
+    if( (statusCode/100) != (nx_http::StatusCode::ok/100) )
     {
         cancelConnecting();
         return;
