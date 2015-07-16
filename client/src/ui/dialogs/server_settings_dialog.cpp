@@ -236,13 +236,20 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    pathItem->setData(Qt::DisplayRole, item.url);
+    pathItem->setData(Qn::StorageUrlRole, item.url);
+
+    QUrl url(item.url);
+    if (item.storageType == lit("file"))
+        pathItem->setData(Qt::DisplayRole, url.path().mid(1));
+    else if (item.storageType == lit("local"))
+        pathItem->setData(Qt::DisplayRole, item.url);
+    else 
+        pathItem->setData(Qt::DisplayRole, url.host() + url.path());
 
     QTableWidgetItem *capacityItem = new QTableWidgetItem();
     capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     capacityItem->setData(Qt::DisplayRole, item.totalSpace == -1 ? tr("Not available") : QnStorageSpaceSlider::formatSize(item.totalSpace));
 
-    QUrl url(item.url);
     QTableWidgetItem *loginItem = new QTableWidgetItem();
     loginItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     loginItem->setData(Qt::DisplayRole, url.userName());
@@ -301,13 +308,13 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
-    result.storageType = typeItem->text();/*checkBoxItem->data(StorageType).value<QString>();*/
+    result.storageType = typeItem->text();
     result.storageId = checkBoxItem->data(StorageIdRole).value<QnUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
     QString login = ui->storagesTable->item(row, LoginColumn)->text();
     QString password = ui->storagesTable->item(row, PasswordColumn)->text();
-    result.url = pathItem->text();
+    result.url = qvariant_cast<QString>(pathItem->data(Qn::StorageUrlRole));
 
     result.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();
     result.freeSpace = archiveSpaceItem->data(FreeSpaceRole).toLongLong();

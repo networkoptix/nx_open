@@ -119,7 +119,15 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
 void QnStorageUrlDialog::accept() 
 {
     QnConnectionRequestResult result;
-    QString url = makeUrl(ui->urlEdit->text(), ui->loginLineEdit->text(), ui->passwordLineEdit->text());
+    QString protocol = qvariant_cast<QString>(ui->protocolComboBox->currentData());
+    QString urlText = ui->urlEdit->text();
+    
+    if (protocol == lit("smb") && !urlText.startsWith(lit("\\\\")))
+        urlText = lit("\\\\") + urlText;
+    else if (!urlText.toUpper().startsWith(protocol + lit("://")))
+        urlText = protocol.toLower() + lit("://") + urlText;
+
+    QString url = makeUrl(urlText, ui->loginLineEdit->text(), ui->passwordLineEdit->text());
     m_server->apiConnection()->getStorageStatusAsync(url,  &result, SLOT(processReply(int, const QVariant &, int)));
 
     QEventLoop loop;
@@ -145,8 +153,8 @@ void QnStorageUrlDialog::updateComboBox() {
 
     ui->protocolComboBox->clear();
     for(const ProtocolDescription &description: m_descriptions) {
-        ui->protocolComboBox->addItem(description.name);
-
+        ui->protocolComboBox->addItem(description.name, description.protocol);
+        
         if(description.protocol == lastProtocol)
             ui->protocolComboBox->setCurrentIndex(ui->protocolComboBox->count() - 1);
     }

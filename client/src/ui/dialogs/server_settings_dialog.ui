@@ -199,7 +199,7 @@
         </column>
         <column>
          <property name="text">
-          <string>URL</string>
+          <string>Path</string>
          </property>
         </column>
         <column>
