@@ -15,6 +15,7 @@
 
     <properties>
         <root.dir>${basedir}/..</root.dir>
+        <template>lib</template>
     </properties>
     
     <modules>
@@ -31,9 +32,19 @@
                 </os>
             </activation>            
             <properties>
-                <template>lib</template>
                 <buildLib>staticlib</buildLib>
-            </properties>          
+            </properties>
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os> 
+            </activation>
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
         </profile>
     </profiles>        
 </project>
