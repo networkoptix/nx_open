@@ -523,7 +523,9 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
         Qn::EC2_CONNECTION_STATE_HEADER_NAME,
         toString(getState()).toLatin1() );
 
-    if (!m_httpClient->doGet(remoteAddr())) {
+    QUrl url = remoteAddr();
+    url.setPath( url.path() + lit("/") + toString( getState() ) );
+    if (!m_httpClient->doGet( url )) {
         qWarning() << Q_FUNC_INFO << "Failed to execute m_httpClient->doGet. Reconnect transaction transport";
         setState(Error);
     }
@@ -590,7 +592,9 @@ void QnTransactionTransport::repeatDoGet()
 {
     m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
     m_httpClient->addAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
-    if (!m_httpClient->doGet(remoteAddr()))
+    QUrl url = remoteAddr();
+    url.setPath( url.path() + lit( "/" ) + toString( getState() ) );
+    if (!m_httpClient->doGet( url ))
         cancelConnecting();
 }
 
