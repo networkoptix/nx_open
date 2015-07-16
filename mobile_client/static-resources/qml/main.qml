@@ -94,9 +94,16 @@ Window {
     }
 
     QnOverlayLayer {
+        id: toastLayer
+        objectName: "toastLayer"
+        z: 15.0
+        blocking: false
+    }
+
+    QnOverlayLayer {
         id: popupLayer
         objectName: "popupLayer"
-        z: 15.0
+        z: 20.0
     }
 
     Component {

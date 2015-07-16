@@ -6,6 +6,7 @@ Item {
     anchors.fill: parent
 
     property alias color: background.color
+    property alias blocking: mouseArea.enabled
 
     signal dismiss()
 
@@ -19,6 +20,7 @@ Item {
     }
 
     MouseArea {
+        id: mouseArea
         anchors.fill: parent
         onClicked: overlayLayer.dismiss()
     }
@@ -35,6 +37,9 @@ Item {
     focus: true
 
     Keys.onReleased: {
+        if (!blocking)
+            return
+
         if (event.key === Qt.Key_Back) {
             if (visible) {
                 hide()

@@ -14,87 +14,149 @@ Item {
     property alias thumbnailWidth: thumbnail.sourceSize.width
     property alias thumbnailHeight: thumbnail.sourceSize.height
 
+    readonly property alias hidden: d.hidden
+
     signal clicked
     signal pressAndHold
-    signal swyped
 
     width: content.width
     height: content.height
 
-    property bool _offline: status == QnCameraListModel.Offline || status == QnCameraListModel.NotDefined || status == QnCameraListModel.Unauthorized
-    property bool _unauthorized: status == QnCameraListModel.Unauthorized
+    QtObject {
+        id: d
 
-    Rectangle {
-        anchors.fill: content
-        color: QnTheme.windowBackground
-        anchors.margins: -dp(8)
+        property bool hidden: false
+        property bool offline: status == QnCameraListModel.Offline || status == QnCameraListModel.NotDefined || status == QnCameraListModel.Unauthorized
+        property bool unauthorized: status == QnCameraListModel.Unauthorized
+
+        onHiddenChanged: {
+            if (hidden)
+                return
+
+            content.x = 0
+        }
     }
 
-    Column {
+    Rectangle {
         id: content
-        spacing: dp(8)
 
-        width: thumbnail.width
+        width: contentColumn.width
+        height: contentColumn.height
+        color: QnTheme.windowBackground
+        anchors.margins: -dp(8)
 
-        Item {
-            id: thumbnailContainer
+        opacity: Math.max(0.0, 1.0 - Math.abs(content.x) / content.width)
 
-            width: thumbnailWidth
-            height: thumbnailDummy.visible ? thumbnailDummy.height : thumbnail.height
+        Column {
+            id: contentColumn
+            spacing: dp(8)
 
-            Rectangle {
-                id: thumbnailDummy
+            width: thumbnail.width
+
+            Item {
+                id: thumbnailContainer
+
                 width: thumbnailWidth
-                height: thumbnailWidth * 3 / 4
-                border.color: QnTheme.cameraBorder
-                border.width: dp(1)
-                color: "transparent"
-                visible: thumbnail.status != Image.Ready
+                height: thumbnailDummy.visible ? thumbnailDummy.height : thumbnail.height
 
-                Text {
-                    anchors.centerIn: parent
-                    text: _unauthorized ? qsTr("Unauthorized") : qsTr("Offline")
-                    font.capitalization: Font.AllUppercase
-                    font.pixelSize: sp(18)
-                    font.weight: Font.Light
-                    color: QnTheme.cameraOfflineText
+                Rectangle {
+                    id: thumbnailDummy
+                    width: thumbnailWidth
+                    height: thumbnailWidth * 3 / 4
+                    border.color: QnTheme.cameraBorder
+                    border.width: dp(1)
+                    color: "transparent"
+                    visible: thumbnail.status != Image.Ready
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: d.unauthorized ? qsTr("Unauthorized") : qsTr("Offline")
+                        font.capitalization: Font.AllUppercase
+                        font.pixelSize: sp(18)
+                        font.weight: Font.Light
+                        color: QnTheme.cameraOfflineText
+                    }
+                }
+
+                Image {
+                    id: thumbnail
+                    anchors.fill: parent
+                    fillMode: Qt.KeepAspectRatio
                 }
             }
 
-            Image {
-                id: thumbnail
-                anchors.fill: parent
-                fillMode: Qt.KeepAspectRatio
-            }
-        }
+            Row {
+                width: parent.width
+                spacing: dp(8)
 
-        Row {
-            width: parent.width
-            spacing: dp(8)
+                QnStatusIndicator {
+                    id: statusIndicator
+                    status: cameraItem.status
+                    y: dp(2)
+                }
 
-            QnStatusIndicator {
-                id: statusIndicator
-                status: cameraItem.status
-                y: dp(2)
-            }
-
-            Text {
-                id: label
-                width: parent.width - statusIndicator.width - 2 * anchors.margins
-                maximumLineCount: 2
-                font.pixelSize: sp(15)
-                font.weight: Font.DemiBold
-                elide: Text.ElideRight
-                wrapMode: Text.WordWrap
-                color: _offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
+                Text {
+                    id: label
+                    width: parent.width - statusIndicator.width - 2 * anchors.margins
+                    maximumLineCount: 2
+                    font.pixelSize: sp(15)
+                    font.weight: Font.DemiBold
+                    elide: Text.ElideRight
+                    wrapMode: Text.WordWrap
+                    color: d.offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
+                }
             }
         }
 
         Behavior on x { NumberAnimation { duration: 200 } }
     }
 
+    Rectangle {
+        id: hiddenDummy
+
+        width: thumbnailWidth
+        height: thumbnailWidth * 3 / 4
+        border.color: QnTheme.cameraBorder
+        border.width: dp(1)
+        color: QnTheme.windowBackground
+
+        opacity: 1.0 - Math.min(0.5, content.opacity) * 2
+
+        Column {
+            width: parent.width
+            anchors.centerIn: parent
+            spacing: dp(8)
+
+            Text {
+                width: parent.width
+
+                text: qsTr("Camera hidden")
+
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: sp(15)
+                font.weight: Font.Light
+                maximumLineCount: 2
+                wrapMode: Text.WordWrap
+                color: QnTheme.cameraOfflineText
+            }
+
+            QnButton {
+                id: undoButton
+
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                flat: true
+                text: qsTr("Undo")
+
+                onClicked: d.hidden = false
+            }
+        }
+    }
+
     QnMaterialSurface {
         id: materialSurface
+
+        enabled: !d.hidden
 
         anchors.fill: content
         anchors.margins: -dp(8)
@@ -110,7 +172,7 @@ Item {
 
             if (Math.abs(content.x) > content.width / 2) {
                 content.x = content.x > 0 ? content.width : -content.width
-                cameraItem.swyped()
+                d.hidden = true
             } else {
                 content.x = 0
             }
@@ -119,7 +181,5 @@ Item {
     }
 
     z: materialSurface.drag.active ? 5 : 0
-
-    opacity: Math.max(0.0, 1.0 - Math.abs(content.x) / content.width)
 }
 

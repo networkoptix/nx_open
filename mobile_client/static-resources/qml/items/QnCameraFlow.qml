@@ -1,4 +1,5 @@
 import QtQuick 2.4
+import QtQuick.Controls 1.2
 
 import com.networkoptix.qml 1.0
 
@@ -17,6 +18,20 @@ QnFlickable {
     leftMargin: dp(16)
     rightMargin: dp(16)
     bottomMargin: dp(16)
+
+    QtObject {
+        id: d
+
+        property var pendingHiddenItems: []
+
+        function hidePendingItems() {
+            if (pendingHiddenItems.length == 0)
+                return
+
+            settings.hiddenCameras = settings.hiddenCameras.concat(settings.hiddenCameras, pendingHiddenItems)
+            pendingHiddenItems = []
+        }
+    }
 
     Column {
         id: content
@@ -56,8 +71,19 @@ QnFlickable {
                         thumbnailWidth: flow.width / 2 - flow.spacing / 2
 
                         onClicked: Main.openMediaResource(model.uuid)
-                        onSwyped: {
-                            settings.hiddenCameras.push(model.uuid)
+                        onHiddenChanged: {
+                            // use temporary object to update QML property correctly
+                            var items = d.pendingHiddenItems
+
+                            if (hidden) {
+                                items.push(model.uuid)
+                            } else {
+                                var index = items.indexOf(model.uuid)
+                                if (index != -1)
+                                    items.splice(index, 1)
+                            }
+
+                            d.pendingHiddenItems = items
                         }
                     }
                 }
@@ -174,7 +200,9 @@ QnFlickable {
                             onShowClicked: {
                                 var originalList = settings.hiddenCameras
 
-                                var hiddenCameras = []
+                                var hiddenCameras = d.pendingHiddenItems
+                                d.pendingHiddenItems = []
+
                                 for (var i = 0; i < originalList.length; i++) {
                                     if (originalList[i] !== model.uuid)
                                         hiddenCameras.push(originalList[i])
@@ -214,6 +242,36 @@ QnFlickable {
         }
     }
 
+    QnToast {
+        id: hiddenCamerasPopup
+
+        property bool shown: d.pendingHiddenItems.length > 0
+
+        text: qsTr("%n cameras hidden", "", d.pendingHiddenItems.length)
+        mainButton {
+            icon: "image://icon/done.png"
+            color: "transparent"
+            width: dp(48)
+            iconic: true
+            onClicked: d.hidePendingItems()
+        }
+
+        onShownChanged: {
+            if (shown)
+                open(0, 0)
+            else
+                close()
+        }
+
+        Connections {
+            target: resourcesPage
+            onPageStatusChanged: {
+                if (pageStatus != Stack.Active && pageStatus != Stack.Activating)
+                    hiddenCamerasPopup.close()
+            }
+        }
+    }
+
 //    Scrollbar { flickableItem: rootItem }
 
     Timer {
@@ -231,6 +289,11 @@ QnFlickable {
     }
 
     onWidthChanged: updateLayout()
+
+    onVisibleChanged: {
+        if (!visible)
+            d.hidePendingItems()
+    }
 
     Timer {
         id: loadedTimer

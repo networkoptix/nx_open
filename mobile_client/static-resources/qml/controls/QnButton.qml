@@ -10,14 +10,15 @@ Item {
     property bool flat: false
     property bool iconic: false
 
-    property alias text: label.text
+    property alias text: textLabel.text
+    property alias icon: icon.source
 
     readonly property alias pressed: materialSurface.pressed
 
     signal clicked()
 
     height: dp(48)
-    width: label.width + dp(24)
+    width: textLabel.width + dp(24)
 
     Rectangle {
         id: background
@@ -45,13 +46,27 @@ Item {
         }
     }
 
-    Text {
+    Row {
         id: label
 
         anchors.centerIn: parent
-        color: textColor
-        font.pixelSize: sp(14)
-        font.weight: Font.DemiBold
-        font.capitalization: Font.AllUppercase
+        spacing: dp(8)
+
+        Image {
+            id: icon
+            visible: status == Image.Ready
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+            id: textLabel
+
+            visible: text != ""
+            anchors.verticalCenter: parent.verticalCenter
+            color: textColor
+            font.pixelSize: sp(14)
+            font.weight: Font.DemiBold
+            font.capitalization: Font.AllUppercase
+        }
     }
 }
