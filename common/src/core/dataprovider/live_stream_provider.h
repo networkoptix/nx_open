@@ -115,8 +115,9 @@ private:
     bool m_prevCameraControlDisabled;
     bool m_qualityUpdatedAtLeastOnce;
     unsigned int m_framesSinceLastMetaData;
-    unsigned int m_audioSinceLastMetaData;
     QTime m_timeSinceLastMetaData;
+    size_t m_totalVideoFrames;
+    size_t m_totalAudioFrames;
 
     QMutex m_motionRoleMtx;
     Qn::ConnectionRole m_softMotionRole;
