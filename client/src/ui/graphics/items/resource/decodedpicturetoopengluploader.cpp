@@ -1277,6 +1277,8 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     m_asyncUploadUsed( false ),
     m_initializedCtx( NULL )
 {
+    QN_UNUSED(asyncDepth);
+
 #ifdef ASYNC_UPLOADING_USED
     const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& 
         pool = DecodedPictureToOpenGLUploaderContextPool::instance()->getPoolOfContextsSharedWith( mainContext );
@@ -1697,7 +1699,7 @@ void DecodedPictureToOpenGLUploader::ensureQueueLessThen(int maxSize)
 
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     //MUST wait till all references to frames, supplied via uploadDecodedPicture are not needed anymore
-    while( !m_terminated && m_framesWaitingUploadInGUIThread.size() >= maxSize)
+    while( !m_terminated && m_framesWaitingUploadInGUIThread.size() >= static_cast<size_t>(maxSize))
         m_cond.wait( lk.mutex() );
 
     //for( std::deque<AVPacketUploader*>::iterator

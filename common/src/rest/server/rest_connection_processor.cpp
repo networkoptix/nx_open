@@ -119,7 +119,7 @@ void QnRestConnectionProcessor::run()
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"));
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Cache-Control", "post-check=0, pre-check=0"));
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Pragma", "no-cache"));
-    sendResponse(rez, contentType, contentEncoding, false);
+    sendResponse(rez, contentType, contentEncoding);
     if (handler)
         handler->afterExecute(url.path(), params, uncompressedResponse, this);
 }

@@ -23,6 +23,7 @@ public:
 QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
     QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, socket)
 {
+    QN_UNUSED(owner);
 }
 
 QnIOMonitorConnectionProcessor::~QnIOMonitorConnectionProcessor()
@@ -97,6 +98,8 @@ void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr &reso
 
 void QnIOMonitorConnectionProcessor::onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead )
 {
+    QN_UNUSED(sock, bytesRead);
+
     Q_D(QnIOMonitorConnectionProcessor);
     QMutexLocker lock(&d->waitMutex); // just in case to prevent socket simultaneous calls while send / read async
 
@@ -113,6 +116,8 @@ void QnIOMonitorConnectionProcessor::at_cameraIOStateChanged(
     bool value,
     qint64 timestamp )
 {
+    QN_UNUSED(resource);
+
     Q_D(QnIOMonitorConnectionProcessor);
     QMutexLocker lock(&d->waitMutex);
     addData(QnIOStateData(inputPortID, value, timestamp));

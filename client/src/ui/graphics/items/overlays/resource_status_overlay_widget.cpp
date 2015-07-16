@@ -67,7 +67,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[LoadingText] = tr("Loading...");
     m_staticTexts[NoVideoStreamText] = tr("No video stream");
     
-    for(int i = 0; i < m_staticTexts.size(); i++) {
+    for(size_t i = 0; i < m_staticTexts.size(); i++) {
         m_staticTexts[i].setPerformanceHint(QStaticText::AggressiveCaching);
         m_staticTexts[i].setTextOption(QTextOption(Qt::AlignCenter));
         m_staticTexts[i].prepare(QTransform(), m_staticFont);

@@ -342,10 +342,13 @@ void QnServerSettingsDialog::updateFromResources()
     ui->nameLineEdit->setText(m_server->getName());
     int currentMaxCamerasValue = m_server->getMaxCameras();
     if( currentMaxCamerasValue == 0 )
+    {
         if( !m_server->getServerFlags().testFlag(Qn::SF_Edge) )
             currentMaxCamerasValue = PC_SERVER_MAX_CAMERAS; //not an edge server
         else
             currentMaxCamerasValue = EDGE_SERVER_MAX_CAMERAS;   //edge server
+    }
+
     ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
     ui->failoverCheckBox->setChecked(m_server->isRedundancy());
     ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
@@ -611,7 +614,8 @@ void QnServerSettingsDialog::updateFailoverLabel() {
 
 void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle)
 {
-    Q_UNUSED(handle)
+    Q_UNUSED(status);
+    Q_UNUSED(handle);
     updateRebuildUi(reply);
 
     if (reply.state > Qn::RebuildState_None)

@@ -15,7 +15,7 @@ namespace
     void splitToLines( const nx::Buffer& sourceText, std::vector<nx::Buffer>* const lines )
     {
         nx_http::LineSplitter lineSplitter;
-        for( size_t pos = 0; pos < sourceText.size(); )
+        for( int pos = 0; pos < sourceText.size(); )
         {
             QnByteArrayConstRef readLine;
             size_t bytesRead = 0;
@@ -75,7 +75,7 @@ TEST( LineSplitter, TrailingLFTest )
         done
     }
     state = readingLines;
-    size_t pos = 0;
+    int pos = 0;
     for( ; (pos < testData.size()) && (state != done); )
     {
         size_t bytesRead = 0;

@@ -52,7 +52,7 @@ TEST( HttpMultipartContentParser, genericTest )
         +frame4+
         "\r\n";
 
-    for( size_t dataStep = 1; dataStep < testData.size(); ++dataStep )
+    for( int dataStep = 1; dataStep < testData.size(); ++dataStep )
     {
         nx_http::MultipartContentParser parser;
         parser.setContentType( "multipart/x-mixed-replace;boundary=fbdr" );
@@ -129,7 +129,7 @@ TEST( HttpMultipartContentParser, onlySizedData )
         +frame4+
         "\r\n";
 
-    for( size_t dataStep = 1; dataStep < testData.size(); ++dataStep )
+    for( int dataStep = 1; dataStep < testData.size(); ++dataStep )
     {
         nx_http::MultipartContentParser parser;
         parser.setContentType( "multipart/x-mixed-replace;boundary=fbdr" );
@@ -143,7 +143,7 @@ TEST( HttpMultipartContentParser, onlySizedData )
             std::make_shared<CustomOutputStream<decltype(decodedFramesProcessor)> >(
                 decodedFramesProcessor) );
 
-        for( size_t pos = 0; pos < testData.size(); pos += dataStep )
+        for( int pos = 0; pos < testData.size(); pos += dataStep )
             parser.processData( QnByteArrayConstRef(
                 testData,
                 pos,

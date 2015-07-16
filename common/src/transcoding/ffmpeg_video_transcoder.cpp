@@ -145,7 +145,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     if (auto ret = transcodePacketImpl(video, result))
         return ret;
     
-    if (m_lastEncodedTime != AV_NOPTS_VALUE)
+    if (m_lastEncodedTime != qint64(AV_NOPTS_VALUE))
         movigAverage(m_averageVideoTimePerFrame, video->timestamp - m_lastEncodedTime);
     m_lastEncodedTime = video->timestamp;
 

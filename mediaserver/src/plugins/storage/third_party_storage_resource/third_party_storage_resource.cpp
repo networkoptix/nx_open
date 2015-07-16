@@ -35,6 +35,7 @@ namespace aux
 
             int ecode;
             uint32_t fsize = m_io->size(&ecode);
+            QN_UNUSED(fsize);
             
             if (ecode != Qn::error::NoError)
                 return -1;
@@ -144,6 +145,8 @@ namespace aux
 
         virtual bool truncate( qint64 newFileSize) override
         {
+            QN_UNUSED(newFileSize);
+
             // Generally, third-party storages aren't supposed to
             // support truncating.
             assert(false);
@@ -252,8 +255,7 @@ void QnThirdPartyStorageResource::openStorage(const char *storageUrl)
             }
         );
 
-    void* queryResult = nullptr;
-    if (queryResult = sp->queryInterface(Qn::IID_Storage))
+    if (void* queryResult = sp->queryInterface(Qn::IID_Storage))
     {
         m_storage.reset(
             static_cast<Qn::Storage*>(queryResult),

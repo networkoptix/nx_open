@@ -175,7 +175,7 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTime(QnMediaResourceWidget *widge
     QnResourceDisplayPtr display = widget->display();
 
     qint64 time = display->camDisplay()->getCurrentTime();
-    if (time == AV_NOPTS_VALUE)
+    if (time == qint64(AV_NOPTS_VALUE))
         return latestScreenshotTime;
 
     if (!adjust)

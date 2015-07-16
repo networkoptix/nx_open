@@ -550,14 +550,14 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         QnConstCompressedVideoDataPtr vd = std::dynamic_pointer_cast<const QnCompressedVideoData>(mediaData);
         for (int i = 0; i < videoChannels && vd; ++i) 
         {
-            // TODO: #vasilenko avoid using deprecated methods
-            AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
+            AVStream* videoStream = avformat_new_stream(m_formatCtx, nullptr);
             if (videoStream == 0) {
                 m_lastError = VideoStreamAllocationError;
                 NX_LOG(lit("Can't allocate output stream for recording."), cl_logERROR);
                 return false;
             }
 
+            videoStream->id = DEFAULT_VIDEO_STREAM_ID + i;
             AVCodecContext* videoCodecCtx = videoStream->codec;
             videoCodecCtx->codec_id = mediaData->compressionType;
             videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
@@ -623,14 +623,14 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         for (int i = 0; i < audioLayout->channelCount(); ++i) 
         {
             m_isAudioPresent = true;
-            // TODO: #vasilenko avoid using deprecated methods
-            AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
+            AVStream* audioStream = avformat_new_stream(m_formatCtx, nullptr);
             if (!audioStream) {
                 m_lastError = AudioStreamAllocationError;
                 NX_LOG(lit("Can't allocate output audio stream."), cl_logERROR);
                 return false;
             }
 
+            audioStream->id = DEFAULT_AUDIO_STREAM_ID + i;
             CodecID srcAudioCodec = CODEC_ID_NONE;
             QnMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(i).codecContext.dynamicCast<QnMediaContext>();
             if (!mediaContext) {

@@ -1,3 +1,4 @@
+#define QN_NO_KEYWORD_UNUSED
 #include <gtest/gtest.h>
 
 #include <core/resource_management/resource_pool_scaffold.h>

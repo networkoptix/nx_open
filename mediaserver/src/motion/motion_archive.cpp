@@ -397,7 +397,8 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
     }
 
-    if (m_detailedMotionFile.write(data->data(), data->dataSize()) != data->dataSize())
+    if (m_detailedMotionFile.write(data->data(), data->dataSize())
+            != static_cast<qint64>(data->dataSize()))
     {
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
     }

@@ -17,6 +17,7 @@
 #include <iomanip>
 #include <mutex>
 
+#define QN_NO_KEYWORD_UNUSED
 #include <gtest/gtest.h>
 
 #include <QtCore/QUuid>
@@ -31,7 +32,7 @@
 #include "file_socket.h"
 
 
-static const size_t MAX_BYTES_TO_READ = 25*1024*1024;
+static const qint64 MAX_BYTES_TO_READ = 25*1024*1024;
 
 //static const QString rtspUrl( QLatin1String("rtsp://192.168.0.27:554/axis-media/media.amp?streamprofile=hdwitnessSecondary") );
 static const QString rtspUrl( QLatin1String("rtsp://192.168.0.27:554/axis-media/media.amp?streamprofile=hdwitnessPrimary") );
@@ -107,7 +108,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP2 )
     quint8 buf[4*1024];
     qint64 totalBytesRead = 0;
     size_t readsCount = 0;
-    for( ; totalBytesRead< MAX_BYTES_TO_READ; )
+    for( ; static_cast<size_t>(totalBytesRead) < MAX_BYTES_TO_READ; )
     {
         int bytesRead = rtspSession.readBinaryResponce( buf, sizeof(buf) );
         if( bytesRead <= 0 )
@@ -145,7 +146,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
     pollset[0].events |= POLLIN;
 #endif
 
-    for( ; totalBytesRead < MAX_BYTES_TO_READ; )
+    for( ; static_cast<size_t>(totalBytesRead) < MAX_BYTES_TO_READ; )
     {
 #ifdef USE_POLL
         pollset[0].revents = 0;
@@ -190,7 +191,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverHTTP )
     ASSERT_TRUE( client.doGet( QUrl("http://192.168.0.1/valgrind-arm-linaro-multilib-2013.09.tar.gz") ) );
     qint64 totalBytesRead = 0;
     size_t readsCount = 0;
-    while( !client.eof() && (totalBytesRead< MAX_BYTES_TO_READ) )
+    while( !client.eof() && (static_cast<size_t>(totalBytesRead) < MAX_BYTES_TO_READ) )
     {
         const auto& buf = client.fetchMessageBodyBuffer();
         totalBytesRead += buf.size();
@@ -208,7 +209,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverHTTP2 )
     char buf[4*1024];
     qint64 totalBytesRead = 0;
     size_t readsCount = 0;
-    for( ; totalBytesRead< MAX_BYTES_TO_READ; )
+    for( ; static_cast<size_t>(totalBytesRead) < MAX_BYTES_TO_READ; )
     {
         //QThread::msleep( 5 );
 
@@ -270,7 +271,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
     pollset[0].fd = rtspSession.tcpSock()->handle();
     pollset[0].events |= POLLIN;
 
-    for( ; totalBytesRead < MAX_BYTES_TO_READ; )
+    for( ; static_cast<size_t>(totalBytesRead) < MAX_BYTES_TO_READ; )
     {
         ////QThread::msleep( 5 );
         //pollset[0].revents = 0;
@@ -350,7 +351,7 @@ namespace
 
             if( (errorCode != SystemError::noError) ||
                 (bytesRead == 0) ||
-                (totalBytesRead > MAX_BYTES_TO_READ) )
+                (static_cast<size_t>(totalBytesRead) > MAX_BYTES_TO_READ) )
             {
                 //std::unique_lock<std::mutex> lk( m_mutex );
                 m_done = true;

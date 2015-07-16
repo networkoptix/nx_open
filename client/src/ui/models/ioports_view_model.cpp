@@ -87,7 +87,7 @@ QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const
     /* Check invalid indices. */
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
-    if (index.row() >= m_data.size())
+    if (static_cast<size_t>(index.row()) >= m_data.size())
         return false;
 
 
@@ -121,7 +121,7 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
     /* Check invalid indices. */
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return false;
-    if (index.row() >= m_data.size())
+    if (static_cast<size_t>(index.row()) >= m_data.size())
         return false;
 
     if (role != Qt::EditRole)
@@ -219,7 +219,6 @@ Qt::ItemFlags QnIOPortsViewModel::flags(const QModelIndex &index) const
 
 bool QnIOPortsViewModel::isDisabledData(const QModelIndex &index) const 
 {
-    Qt::ItemFlags flags = base_type::flags(index);
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return false;
     const QnIOPortData& value = m_data.at(index.row());

@@ -10,7 +10,9 @@
 
 int QnTestEmailSettingsHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
-    Q_UNUSED(path)
+    Q_UNUSED(path);
+    Q_UNUSED(params);
+
     QnTestEmailSettingsReply reply;
     ec2::ApiEmailSettingsData apiData = QJson::deserialized(body, ec2::ApiEmailSettingsData());
     QnEmailSettings settings;

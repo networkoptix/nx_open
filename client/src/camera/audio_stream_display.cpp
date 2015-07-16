@@ -54,10 +54,10 @@ int QnAudioStreamDisplay::msInBuffer() const
 
 qint64 QnAudioStreamDisplay::getCurrentTime() const
 {
-    if (m_blockedTimeValue != AV_NOPTS_VALUE)
+    if (m_blockedTimeValue != qint64(AV_NOPTS_VALUE))
         return m_blockedTimeValue;
-    else if (m_lastAudioTime == AV_NOPTS_VALUE)
-        return AV_NOPTS_VALUE;
+    else if (m_lastAudioTime == qint64(AV_NOPTS_VALUE))
+        return qint64(AV_NOPTS_VALUE);
     else
         return m_lastAudioTime - msInBuffer();
 }
@@ -69,7 +69,7 @@ void QnAudioStreamDisplay::blockTimeValue(qint64 value)
 
 void QnAudioStreamDisplay::unblockTimeValue()
 {
-    m_blockedTimeValue = AV_NOPTS_VALUE;
+    m_blockedTimeValue = qint64(AV_NOPTS_VALUE);
 }
 
 void QnAudioStreamDisplay::suspend()
@@ -90,7 +90,7 @@ void QnAudioStreamDisplay::resume()
 
 qint64 QnAudioStreamDisplay::startBufferingTime() const
 {
-    return m_tooFewDataDetected ? m_startBufferingTime : AV_NOPTS_VALUE;
+    return m_tooFewDataDetected ? m_startBufferingTime : qint64(AV_NOPTS_VALUE);
 }
 
 bool QnAudioStreamDisplay::isFormatSupported() const
@@ -118,7 +118,7 @@ void QnAudioStreamDisplay::clearAudioBuffer()
 
     clearDeviceBuffer();
     m_tooFewDataDetected = true;
-    m_lastAudioTime = AV_NOPTS_VALUE;
+    m_lastAudioTime = qint64(AV_NOPTS_VALUE);
 }
 
 void QnAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 minTime)

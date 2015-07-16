@@ -929,8 +929,6 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePerio
     auto itrRight = m_chunks.cend();
 
     qint64 bitrateThreshold = bitrateAnalizePeriodMs ? m_chunks[m_chunks.size()-1].startTimeMs - bitrateAnalizePeriodMs : 0;
-
-    auto itrBitrate = m_chunks.cend()-1;
     
     for (auto itr = itrLeft; itr != itrRight; ++itr)
     {

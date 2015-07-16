@@ -11,7 +11,7 @@ QnIOPortsActualModel::QnIOPortsActualModel(QObject *parent):
     //connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::resourceParamChanged, this, &QnIOPortsActualModel::at_propertyChanged);
 }
 
-void QnIOPortsActualModel::at_propertyChanged(const QnResourcePtr& res, const QString& key)
+void QnIOPortsActualModel::at_propertyChanged(const QnResourcePtr& /*res*/, const QString& /*key*/)
 {
 
 }

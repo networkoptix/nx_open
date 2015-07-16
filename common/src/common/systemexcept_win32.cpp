@@ -20,7 +20,7 @@
 #define MAX_SYMBOL_SIZE 1024
 
 static const bool isBeta = strcmp(QN_BETA, "true") == 0;
-static const std::string versionId = QN_ENGINE_VERSION"-"QN_APPLICATION_REVISION;
+static const std::string versionId = QN_ENGINE_VERSION "-" QN_APPLICATION_REVISION;
 static const std::string fullVersionId = versionId + (isBeta ? "-beta" : "");
 
 class GlobalCrashDumpSettings

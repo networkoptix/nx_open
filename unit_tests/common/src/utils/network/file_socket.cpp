@@ -35,14 +35,14 @@ bool FileSocket::connect(
     return m_file.is_open();
 }
 
-int FileSocket::recv( void* buffer, unsigned int bufferLen, int flags )
+int FileSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
 {
     m_file.read( (char*)buffer, bufferLen );
     m_bytesRead += m_file.gcount();
     return m_file.gcount();
 }
 
-int FileSocket::send( const void* buffer, unsigned int bufferLen )
+int FileSocket::send( const void* /*buffer*/, unsigned int bufferLen )
 {
     return bufferLen;
 }

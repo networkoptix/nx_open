@@ -7,7 +7,8 @@ QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
    setCameraCount(count);
 }
 
-bool QnLicenseStub::isValid(ErrorCode* errCode /* = 0 */, ValidationMode mode /* = VM_Regular */) const {
+bool QnLicenseStub::isValid(ErrorCode* /*errCode = 0 */,
+                            ValidationMode /*mode = VM_Regular */) const {
     return true;
 }
 

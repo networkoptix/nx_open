@@ -69,6 +69,8 @@ bool ResTypeXmlParser::processResource(const QString& localName, const QXmlAttri
 
 bool ResTypeXmlParser::processParam(const QString& localName, const QXmlAttributes& attrs)
 {
+    QN_UNUSED(localName);
+
     ApiPropertyTypeData p;
     if (!m_resTypeFound) {
         qWarning() << "Invalid XML format. You should specify resource type before params";

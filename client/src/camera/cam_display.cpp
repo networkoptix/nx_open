@@ -635,7 +635,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_nextReverseTime[channel] = m_display[channel]->nextReverseTime();
 
             m_timeMutex.lock();
-            if (m_buffering && m_executingJump == 0 && !m_afterJump && m_skippingFramesTime == AV_NOPTS_VALUE)
+            if (m_buffering && m_executingJump == 0 && !m_afterJump &&
+                m_skippingFramesTime == qint64(AV_NOPTS_VALUE))
             {
                 m_buffering &= ~(1 << vd->channelNumber);
                 m_timeMutex.unlock();
@@ -885,18 +886,18 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     m_totalFrames = 0;
     m_iFrames = 0;
     m_lastSleepInterval = 0;
-    if (!m_afterJump && m_skippingFramesTime == AV_NOPTS_VALUE) // if not more (not handled yet) jumps expected
+    if (!m_afterJump && m_skippingFramesTime == qint64(AV_NOPTS_VALUE)) // if not more (not handled yet) jumps expected
     {
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
             if (media && !(media->flags & QnAbstractMediaData::MediaFlags_Ignore)) {
                 m_display[i]->blockTimeValue(media->timestamp);
             }
-            m_nextReverseTime[i] = AV_NOPTS_VALUE;
+            m_nextReverseTime[i] = qint64(AV_NOPTS_VALUE);
             m_display[i]->unblockTimeValue();
         }
     }
     m_audioDisplay->clearAudioBuffer();
-    m_firstAfterJumpTime = AV_NOPTS_VALUE;
+    m_firstAfterJumpTime = qint64(AV_NOPTS_VALUE);
     m_prevLQ = -1;
     clearMetaDataInfo();
 }
@@ -1062,7 +1063,7 @@ bool QnCamDisplay::needBuffering(qint64 vTime) const
 {
     
     qint64 aTime = m_audioDisplay->startBufferingTime();
-    if (aTime == (qint64)AV_NOPTS_VALUE)
+    if (aTime == qint64(AV_NOPTS_VALUE))
         return false;
 
     return vTime > aTime;
@@ -1072,11 +1073,11 @@ bool QnCamDisplay::needBuffering(qint64 vTime) const
 void QnCamDisplay::processSkippingFramesTime()
 {
     QMutexLocker lock(&m_timeMutex);
-    if (m_skippingFramesTime != AV_NOPTS_VALUE)
+    if (m_skippingFramesTime != qint64(AV_NOPTS_VALUE))
     {
         for (int i = 0; i < CL_MAX_CHANNELS; ++i)
             markIgnoreBefore(m_videoQueue[i], m_skippingFramesTime);
-        m_skippingFramesTime = AV_NOPTS_VALUE;
+        m_skippingFramesTime = qint64(AV_NOPTS_VALUE);
     }
 }
 

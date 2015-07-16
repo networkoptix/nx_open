@@ -11,6 +11,8 @@
 
 int QnRebuildArchiveRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
+    Q_UNUSED(path);
+
     QString method = params.value("action");
     auto reply = QnStorageManager::instance()->rebuildInfo();
     if (method == "start")

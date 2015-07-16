@@ -277,7 +277,8 @@ TEST_F( SocketAsyncModeTest, BadHostNameResolve )
         ASSERT_TRUE( connection->setNonBlockingMode( true ) );
         ASSERT_TRUE( connection->connectAsync(
             SocketAddress( QString::fromLatin1( "hx.hz" ), nx_http::DEFAULT_HTTP_PORT ),
-            [&i, iBak/*&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection*/]( SystemError::ErrorCode errorCode ) mutable {
+            [&i, iBak/*&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection*/]
+            ( SystemError::ErrorCode /*errorCode*/ ) mutable {
                 //std::unique_lock<std::mutex> lk( mutex );
                 //connectErrorCode = errorCode;
                 //cond.notify_all();
@@ -285,6 +286,7 @@ TEST_F( SocketAsyncModeTest, BadHostNameResolve )
                 //resolvedAddress = connection->getForeignAddress().address;
                 ASSERT_EQ( i, iBak );
                 int x = 0;
+                static_cast< void >( x );
             } ) );
         connection->cancelAsyncIO();
     }

@@ -141,10 +141,10 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
         return;
 
     qint64 startTime = otherRtspSession.startTime();
-    if ((quint64)startTime != AV_NOPTS_VALUE && startTime != DATETIME_NOW) 
+    if (startTime != qint64(AV_NOPTS_VALUE) && startTime != DATETIME_NOW)
     {
         QMutexLocker lock(&m_timeMutex);
-        if (startTime < *result || *result == AV_NOPTS_VALUE)
+        if (startTime < *result || *result == qint64(AV_NOPTS_VALUE))
             *result = startTime;
     }
 }
@@ -159,21 +159,21 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
 {
     if (!camera) {
         QMutexLocker lock(&m_timeMutex);
-        m_globalMinArchiveTime = AV_NOPTS_VALUE;
+        m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
     if (!history) {
         QMutexLocker lock(&m_timeMutex);
-        m_globalMinArchiveTime = AV_NOPTS_VALUE;
+        m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
 
     QnServerHistoryMap mediaServerList = history->getOnlineTimePeriods();
     QList<ArchiveTimeCheckInfo> checkList;
-    qint64 currentMinTime  = AV_NOPTS_VALUE;
-    qint64 otherMinTime  = AV_NOPTS_VALUE;
+    qint64 currentMinTime  = qint64(AV_NOPTS_VALUE);
+    qint64 otherMinTime  = qint64(AV_NOPTS_VALUE);
     for (const QnUuid &serverId: mediaServerList.values().toSet()) 
     {
         QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverId));
@@ -182,10 +182,10 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
     }
     QtConcurrent::blockingFilter(checkList, checkGlobalMinTime);
     QMutexLocker lock(&m_timeMutex);
-    if ((otherMinTime != AV_NOPTS_VALUE) && (currentMinTime == AV_NOPTS_VALUE || otherMinTime < currentMinTime))
+    if ((otherMinTime != qint64(AV_NOPTS_VALUE)) && (currentMinTime == qint64(AV_NOPTS_VALUE) || otherMinTime < currentMinTime))
         m_globalMinArchiveTime = otherMinTime;
     else
-        m_globalMinArchiveTime = AV_NOPTS_VALUE;
+        m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
 }
 
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 timeUsec) {
@@ -239,7 +239,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
         m_server = getServerOnTime(m_position); // try to update server
         if (m_server == 0 || m_server->getStatus() == Qn::Offline) 
         {
-            if (m_isMultiserverAllowed && m_globalMinArchiveTime == AV_NOPTS_VALUE)
+            if (m_isMultiserverAllowed && m_globalMinArchiveTime == qint64(AV_NOPTS_VALUE))
                 checkMinTimeFromOtherServer(m_camera);
             return false;
         }
@@ -336,15 +336,15 @@ void QnRtspClientArchiveDelegate::lockTime(qint64 value)
 void QnRtspClientArchiveDelegate::unlockTime()
 {
     QMutexLocker lock(&m_timeMutex);
-    m_lockedTime = AV_NOPTS_VALUE;
+    m_lockedTime = qint64(AV_NOPTS_VALUE);
 }
 
 qint64 QnRtspClientArchiveDelegate::startTime()
 {
     QMutexLocker lock(&m_timeMutex);
-    if(m_lockedTime != AV_NOPTS_VALUE)
+    if(m_lockedTime != qint64(AV_NOPTS_VALUE))
         return m_lockedTime;
-    qint64 result = m_globalMinArchiveTime != AV_NOPTS_VALUE ? m_globalMinArchiveTime : m_rtspSession.startTime();
+    qint64 result = m_globalMinArchiveTime != qint64(AV_NOPTS_VALUE) ? m_globalMinArchiveTime : m_rtspSession.startTime();
 
     if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
         return result;
@@ -482,7 +482,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             rtpChannelNum = m_rtpData->getMediaSocket()->getLocalAddress().port;
         }
         const QString format = m_rtspSession.getTrackFormatByRtpChannelNum(rtpChannelNum).toLower();
-        qint64 parserPosition = AV_NOPTS_VALUE;
+        qint64 parserPosition = qint64(AV_NOPTS_VALUE);
         if (format.isEmpty()) {
             //qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
         }
@@ -499,7 +499,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
 
         if (result && m_sendedCSec != result->opaque)
             result.reset(); // ignore old archive data
-        if (result && parserPosition != AV_NOPTS_VALUE)
+        if (result && parserPosition != qint64(AV_NOPTS_VALUE))
             m_position = parserPosition;
         /*
         if (result && m_waitBOF)

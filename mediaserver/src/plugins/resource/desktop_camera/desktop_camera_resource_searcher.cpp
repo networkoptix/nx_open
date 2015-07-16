@@ -201,6 +201,8 @@ void QnDesktopCameraResourceSearcher::releaseConnection(const TCPSocketPtr& sock
 void QnDesktopCameraResourceSearcher::log(const QByteArray &message, const ClientConnectionInfo &info) const {
 #ifdef DESKTOP_CAMERA_DEBUG
     qDebug() << "QnDesktopCameraResourceSearcher::" << message << info.userName << info.userId << info.useCount;
+#else
+    QN_UNUSED(message, info);
 #endif
 }
 

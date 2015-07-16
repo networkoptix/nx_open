@@ -1,3 +1,5 @@
+#define QN_NO_KEYWORD_UNUSED
+
 #include <common/common_globals.h>
 #include <utils/network/http/asynchttpclient.h>
 

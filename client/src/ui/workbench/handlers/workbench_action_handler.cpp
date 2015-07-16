@@ -2510,7 +2510,7 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-    auto result = QMessageBox::information(
+    QMessageBox::information(
         mainWindow(),
         tr("Anonymous Usage Statistics"),                                   
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"

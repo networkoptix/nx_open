@@ -353,6 +353,8 @@ int QnPtzRestHandler::executeGetHomeObject(const QnPtzControllerPtr &controller,
 }
 
 int QnPtzRestHandler::executeGetAuxilaryTraits(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    Q_UNUSED(params);
+
     QnPtzAuxilaryTraitList traits;
     if(!controller->getAuxilaryTraits(&traits))
         return CODE_INTERNAL_ERROR;

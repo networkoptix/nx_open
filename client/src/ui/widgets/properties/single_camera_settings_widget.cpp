@@ -666,7 +666,7 @@ void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
 }
 
 void QnSingleCameraSettingsWidget::updateMotionCapabilities() {
-    m_cameraSupportsMotion = m_camera ? m_cameraSupportsMotion = m_camera->hasMotion() : false;
+    m_cameraSupportsMotion = m_camera ? m_camera->hasMotion() : false;
     ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
     ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
 }

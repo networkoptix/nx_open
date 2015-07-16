@@ -22,6 +22,7 @@ public:
 
     virtual QList<QNetworkCookie> cookiesForUrl ( const QUrl & url ) const override 
     {
+        QN_UNUSED(url);
         QList<QNetworkCookie> result;
         if (m_camRes)
             result << QNetworkCookie(Qn::CAMERA_GUID_HEADER_NAME, m_camRes->getId().toByteArray());

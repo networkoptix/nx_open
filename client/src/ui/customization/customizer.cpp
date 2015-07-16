@@ -358,10 +358,9 @@ QnCustomizerPrivate::~QnCustomizerPrivate() {
 
 QnCustomizationAccessor *QnCustomizerPrivate::accessor(QObject *object) const {
     const QMetaObject *metaObject = object->metaObject();
-    
-    QnCustomizationAccessor *result = NULL;
+
     while(metaObject) {
-        if(result = accessorByClassName.value(QLatin1String(metaObject->className())))
+        if(const auto result = accessorByClassName.value(QLatin1String(metaObject->className())))
             return result;
         metaObject = metaObject->superClass();
     }

@@ -7,6 +7,7 @@
 #include <mutex>
 #include <vector>
 
+#define QN_NO_KEYWORD_UNUSED
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>

@@ -94,7 +94,7 @@ QnPropertyStorage::UpdateStatus QnPropertyStorage::updateValue(int id, const QVa
     QVariant newValue = value;
 
     int type = m_typeById.value(id, QMetaType::UnknownType);
-    if(type != QMetaType::UnknownType && value.type() != type) {
+    if(type != QMetaType::UnknownType && int(value.type()) != type) {
         if(!newValue.convert(static_cast<QVariant::Type>(type))) {
             qnWarning("Cannot assign a value of type '%1' to a property '%2' of type '%3'.", QMetaType::typeName(value.userType()), name(id), QMetaType::typeName(type));
             return Failed;

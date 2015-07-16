@@ -432,7 +432,7 @@ static char *sdp_write_media_attributes(
                 config = extradata2psets(c);
             if( config )
             {
-                av_strlcatf( buff, size, config );
+                av_strlcpy( buff, config, size );
             }
             else
             {

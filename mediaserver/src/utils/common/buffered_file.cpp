@@ -261,7 +261,6 @@ void QBufferedFile::close()
         }
 
         if (bufferingWriteSize) {
-            int dataRestLen = m_cycleBuffer.size() - bufferingWriteSize;
             m_fileEngine->seek(m_filePos);
             int writed = writeBuffer(bufferingWriteSize);
             if (writed > 0)

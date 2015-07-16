@@ -47,6 +47,7 @@ class CustomHorizontalHeader: public QHeaderView
 private:
     QComboBox* m_comboBox;
     static const int spacer = 4;
+
 private:
     void updateComboBox() 
     {
@@ -55,6 +56,7 @@ private:
         rect.adjust(qMax(spacer, rect.width() - width), 0, -spacer, 0);
         m_comboBox->setGeometry(rect);
     }
+
 public:
     CustomHorizontalHeader(QWidget *parent = 0) : QHeaderView(Qt::Horizontal, parent)
     {
@@ -94,6 +96,8 @@ public:
         return m_comboBox->itemData(m_comboBox->currentIndex()).toInt();
     }
 };
+
+const int CustomHorizontalHeader::spacer; // C++ STD 9.4.2/4
 
 void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
@@ -332,7 +336,7 @@ void QnRecordingStatsDialog::requestFinished()
     at_forecastParamsChanged();
 }
 
-void QnRecordingStatsDialog::at_eventsGrid_clicked(const QModelIndex& idx)
+void QnRecordingStatsDialog::at_eventsGrid_clicked(const QModelIndex& /*idx*/)
 {
 }
 
@@ -462,7 +466,6 @@ void QnRecordingStatsDialog::at_forecastParamsChanged()
     if (ui->checkBoxForecast->isChecked()) 
     {
         qint64 forecastedSize = 0;
-        QObject* gg = sender();
         if (sender() == ui->extraSpaceSlider) {
             forecastedSize = sliderPositionToBytes(ui->extraSpaceSlider->value());
             ui->extraSizeSpinBox->setValue(forecastedSize / (qreal) BYTES_IN_TB);
@@ -484,9 +487,7 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
 {
     const QnRecordingStatsReply modelData = m_model->modelData();
     ForecastData forecastData;
-    qint64 currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     const qreal forecastStep = extraSizeBytes < 50 * BYTES_IN_TB ? 3600 : 3600 * 24;
-
 
     // 1. collect camera related forecast params
     for(const auto& cameraStats: modelData) 

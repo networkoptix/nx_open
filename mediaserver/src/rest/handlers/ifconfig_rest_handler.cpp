@@ -259,7 +259,9 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
 void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
+    Q_UNUSED(params);
     Q_UNUSED(owner);
+
     QnJsonRestResult reply;
     if (!QJson::deserialize(body, &reply) || reply.error() !=  QnJsonRestResult::NoError)
         return;

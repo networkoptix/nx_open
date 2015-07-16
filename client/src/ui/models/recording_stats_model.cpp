@@ -129,7 +129,6 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
 
 QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
 {
-    const QnCamRecordingStatsData& value = m_data.at(index.row());
     switch(index.column())
     {
     case CameraNameColumn:

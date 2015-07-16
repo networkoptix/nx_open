@@ -87,7 +87,8 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     return CODE_OK;
 }
 
-void QnConfigureRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
+void QnConfigureRestHandler::afterExecute(const QString& /*path*/, const QnRequestParamList& /*params*/,
+                                          const QByteArray& /*body*/, const QnRestConnectionProcessor* /*owner*/)
 {
     /*
     QnJsonRestResult reply;
