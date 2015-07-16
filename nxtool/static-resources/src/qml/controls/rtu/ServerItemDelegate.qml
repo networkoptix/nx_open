@@ -12,7 +12,7 @@ Item
     id: thisComponent;
 
     property int selectedState;
-    property bool logged;
+    property bool loggedIn;
     property string serverName;
     property string macAddress;
     
@@ -21,7 +21,7 @@ Item
     
     height: column.height;
 
-    opacity: (logged ? 1 : 0.3);
+    opacity: (loggedIn ? 1 : 0.3);
     
     Column
     {
@@ -144,7 +144,7 @@ Item
 
         onClicked:
         {
-            if (!thisComponent.logged)
+            if (!thisComponent.loggedIn)
                 return;
 
             if (prevClicked)
@@ -165,7 +165,7 @@ Item
         {
             prevClicked = false;
             clickFilterTimer.stop();
-            if (thisComponent.logged)
+            if (thisComponent.loggedIn)
                 thisComponent.explicitSelectionCalled(index);
         }
 
@@ -180,7 +180,7 @@ Item
 
     Rtu.Mark
     {
-        enabled: logged;
+        enabled: loggedIn;
         selected: (selectedState === Qt.Checked);
         anchors.fill: parent;
     }

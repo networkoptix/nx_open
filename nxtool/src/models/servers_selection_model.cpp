@@ -204,7 +204,7 @@ namespace
         , kMacAddressRoleId
         , kIpAddressRoleId
         , kPortRoleId
-        , kLogged
+        , kLoggedIn
         , kDefaultPassword
         
         , kLastCustomRoleId
@@ -226,7 +226,7 @@ namespace
         result.insert(kMacAddressRoleId, "macAddress");
         result.insert(kIpAddressRoleId, "ipAddress");
         result.insert(kPortRoleId, "port");
-        result.insert(kLogged, "logged");
+        result.insert(kLoggedIn, "loggedIn");
         result.insert(kDefaultPassword, "defaultPassword");
         return result;
     }();
@@ -484,15 +484,12 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kMacAddressRoleId:
             return (info.hasExtraInfo() && !info.extraInfo().interfaces.empty() ?
                 info.extraInfo().interfaces.front().macAddress : "");//QString("--:--:--:--:--:--"));
-        case kLogged:
+        case kLoggedIn:
             return info.hasExtraInfo();
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
             return (info.hasExtraInfo() && rtu::defaultAdminPasswords().contains(info.extraInfo().password));
-        case kIpAddressRoleId:
-            return (!info.hasExtraInfo() || (info.extraInfo().interfaces.empty())
-                ? QVariant() : QVariant::fromValue(info.extraInfo().interfaces));
         }
     }
     else
@@ -626,7 +623,9 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
 
     if (searchInfo.serverInfoIterator != searchInfo.systemInfoIterator->servers.end())
     {
-        searchInfo.serverInfoIterator->serverInfo.hasExtraInfo();
+        if (!searchInfo.serverInfoIterator->serverInfo.hasExtraInfo())  /// Not logged in - do nothing
+            return; 
+
         const ServerModelInfo &serverInfo = *searchInfo.serverInfoIterator;
         const bool wasSelected = (serverInfo.selectedState != Qt::Unchecked);
 
@@ -673,7 +672,7 @@ void rtu::ServersSelectionModel::Impl::changeItemSelectedState(int rowIndex
             }
         }
         m_changeHelper->dataChanged(searchInfo.systemRowIndex
-            , searchInfo.systemInfoIterator->servers.size() + 1);
+            , searchInfo.systemRowIndex + searchInfo.systemInfoIterator->servers.size());
     }
 
     if (updateSelection)

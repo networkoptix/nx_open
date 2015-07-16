@@ -72,7 +72,7 @@ ListView
             
             Rtu.ServerItemDelegate
             {
-                logged: model.logged;
+                loggedIn: model.loggedIn;
                 serverName: model.name;
                 macAddress: model.macAddress;
                 selectedState: model.selectedState;
