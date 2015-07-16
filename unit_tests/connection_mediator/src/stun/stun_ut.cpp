@@ -40,7 +40,7 @@ private:
     Result m_result;
 };
 
-TEST( Stun, DISABLED_Simple )
+TEST( Stun, Simple )
 {
     SocketAddress localhost( lit( "127.0.0.1"), 3345 );
 

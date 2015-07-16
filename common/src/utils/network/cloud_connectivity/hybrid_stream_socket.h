@@ -10,8 +10,8 @@
 
 #include "../abstract_socket.h"
 #include "cc_common.h"
+#include "cloud_tunnel.h"
 #include "dns_table.h"
-
 
 namespace nx_cc
 {
