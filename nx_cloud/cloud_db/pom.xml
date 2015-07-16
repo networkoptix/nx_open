@@ -17,15 +17,15 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>2.5.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>libcloud_db</artifactId>
+    <artifactId>cloud_db</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Cloud libcloud_db</name>
+    <name>Nx Cloud cloud_db</name>
 
     <properties>
-        <product.title>${company.name} libcloud_db</product.title>
+        <product.title>${company.name} cloud_db</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon -ludt</global.libs>
+        <global.libs>-lcommon -ludt -lcloud_db</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
         <windows.oslibs.release/>
@@ -39,32 +39,4 @@
         <linux.defines/>
         <mac.defines/>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>            
-            <properties>
-                <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>unix</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                </os> 
-            </activation>            
-            <properties>
-                <buildLib>sharedlib</buildLib>
-            </properties>
-        </profile>  
-
-    </profiles> 
-
 </project>

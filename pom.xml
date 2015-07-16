@@ -288,6 +288,7 @@
                 <module>build_variables</module>
                 <module>common</module>
                 <module>nx_cloud/cloud_db</module>
+                <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/connection_mediator</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>appserver2</module>

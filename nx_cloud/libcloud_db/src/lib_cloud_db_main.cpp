@@ -30,7 +30,7 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 }
 #endif
 
-int main(int argc, char* argv[])
+int libCloudDBMain(int argc, char* argv[])
 {
 #ifdef _WIN32
     SetConsoleCtrlHandler(stopServer_WIN, TRUE);

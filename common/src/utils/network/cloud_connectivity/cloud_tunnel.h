@@ -28,7 +28,7 @@ namespace nx_cc
         /*!
             \param handler void( nx_cc::ErrorDescription, std::unique_ptr<AbstractStreamSocket> )
         */
-        template<class Handler> bool connectAsync( Handler handler ) { return false; }
+        template<class Handler> bool connectAsync( Handler /*handler*/ ) { return false; }
         virtual HostAddress remoteHost() const = 0;
 
     private:
