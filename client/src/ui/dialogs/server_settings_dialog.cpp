@@ -244,7 +244,10 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     else if (item.storageType == lit("local"))
         pathItem->setData(Qt::DisplayRole, item.url);
     else 
-        pathItem->setData(Qt::DisplayRole, url.host() + url.path());
+        pathItem->setData(
+            Qt::DisplayRole, 
+            url.host() + (url.port() != -1 ? lit(":") + QString::number(url.port()) : lit(""))  + url.path()
+        );
 
     QTableWidgetItem *capacityItem = new QTableWidgetItem();
     capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
