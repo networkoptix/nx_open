@@ -20,7 +20,9 @@ namespace {
     const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
 
     bool isCompatibleProducts(const QString &product1, const QString &product2) {
-        return product1.left(product1.indexOf(lit("_"))) == product2.left(product2.indexOf(lit("_")));
+        return  product1.isEmpty() ||
+                product2.isEmpty() ||
+                product1.left(product1.indexOf(lit("_"))) == product2.left(product2.indexOf(lit("_")));
     }
 
 }
@@ -72,7 +74,7 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
     } else if (errorCode != ec2::ErrorCode::ok) {
         status = NetworkError;
         statusMessage = tr("Server or network is not available");
-    } else if (!connectionInfo.brand.isEmpty() && !isCompatibleProducts(connectionInfo.brand, QnAppInfo::productNameShort())) {
+    } else if (!isCompatibleProducts(connectionInfo.brand, QnAppInfo::productNameShort())) {
         status = InvalidServer;
         statusMessage = tr("Incompatible server");
     } else if (connectionInfo.version < minimalSupportedVersion) {
