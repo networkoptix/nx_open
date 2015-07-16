@@ -62,12 +62,6 @@ Item
                     verticalCenter: parent.verticalCenter;                    
                 }
 
-                onClicked: 
-                {
-                    if (logged)
-                        thisComponent.selectionStateShouldBeChanged(index); 
-                }
-
                 Binding
                 {
                     target: selectionCheckbox;
@@ -144,11 +138,32 @@ Item
     {
         id: explicitSelectionMouseArea;
 
+        property bool prevClicked: false;
+
         anchors.fill: parent;
 
-        onClicked: { clickFilterTimer.start(); }
+        onClicked:
+        {
+            if (!thisComponent.logged)
+                return;
+
+            if (prevClicked)
+            {
+                /// it is double click
+                prevClicked = false;
+                thisComponent.explicitSelectionCalled(index);
+            }
+            else
+            {
+                prevClicked = true;
+                clickFilterTimer.start();
+                thisComponent.selectionStateShouldBeChanged(index);
+            }
+        }
+
         onDoubleClicked:
         {
+            prevClicked = false;
             clickFilterTimer.stop();
             if (thisComponent.logged)
                 thisComponent.explicitSelectionCalled(index);
@@ -159,11 +174,7 @@ Item
             id: clickFilterTimer;
 
             interval: 150;
-            onTriggered: 
-            {
-                if (thisComponent.logged)
-                    thisComponent.selectionStateShouldBeChanged(index); 
-            }
+            onTriggered: { explicitSelectionMouseArea.prevClicked = false; }
         }
     }
 

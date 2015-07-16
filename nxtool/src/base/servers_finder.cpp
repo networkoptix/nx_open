@@ -191,8 +191,6 @@ rtu::ServersFinder::Impl::Impl(rtu::ServersFinder *owner)
     , m_knownHosts()
     , m_unknownHosts()
 {
-    updateServers();
-    
     QObject::connect(&m_timer, &QTimer::timeout, this, &Impl::updateServers);
     m_timer.setInterval(kUpdateServersInfoInterval);
     m_timer.start();
@@ -264,7 +262,7 @@ void rtu::ServersFinder::Impl::updateServers()
     if (!m_serverSocket)
     {
         m_serverSocket.reset(new QUdpSocket());
-        if (!m_serverSocket->bind(QHostAddress::AnyIPv4, kMulticastGroupPort))
+        if (!m_serverSocket->bind(QHostAddress::AnyIPv4, kMulticastGroupPort, QAbstractSocket::ReuseAddressHint))
             m_serverSocket.reset();
 
         QObject::connect(m_serverSocket.data(), &QUdpSocket::readyRead, this, [this]

@@ -50,8 +50,6 @@ QtControls.TextField
             return;
         
         thisComponent.changed = initDate && date && (impl.stringFromDate(initDate) !== impl.stringFromDate(date));
-        
-        console.log("acc: " + acceptableInput);
     }
 
     validator: RegExpValidator

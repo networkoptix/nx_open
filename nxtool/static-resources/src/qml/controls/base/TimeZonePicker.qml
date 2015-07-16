@@ -30,7 +30,6 @@ ComboBox
     
     onCurrentIndexChanged:
     {
-        console.log("----------------- " + initIndex + ":" + currentIndex);
         if ((currentIndex == initIndex) && firstTimeChange)
         {
             firstTimeChange = false;
