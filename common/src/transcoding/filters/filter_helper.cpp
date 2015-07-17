@@ -14,6 +14,7 @@ QnImageFilterHelper::QnImageFilterHelper():
     m_customAR(0.0),
     m_rotAngle(0),
     m_timestampCorner(Qn::NoCorner),
+    m_codecID(CODEC_ID_NONE),
     m_onscreenDateOffset(0),
     m_timeMs(0)
 {
@@ -57,6 +58,11 @@ void QnImageFilterHelper::setTimeCorner(Qn::Corner corner, qint64 onscreenDateOf
     m_timeMs = timeMsec;
 }
 
+void QnImageFilterHelper::setCodec( CodecID codecID )
+{
+    m_codecID = codecID;
+}
+
 bool QnImageFilterHelper::isEmpty() const
 {
     if (!qFuzzyIsNull(m_customAR))
@@ -87,6 +93,9 @@ QSize QnImageFilterHelper::updatedResolution(const QList<QnAbstractImageFilterPt
 
 QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSize& srcResolution) const
 {
+    static const float MIN_STEP_CHANGE_COEFF = 0.95;
+    static const float ASPECT_RATIO_COMPARISION_PRECISION = 0.01;
+
     QList<QnAbstractImageFilterPtr> result;
 
     if (!qFuzzyIsNull(m_customAR)) {
@@ -115,6 +124,56 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
 
     if (m_timestampCorner != Qn::NoCorner) 
         result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_layout, m_timestampCorner, m_onscreenDateOffset, m_timeMs));
+
+    //verifying that output resolution is supported by codec
+    const QSize resolutionLimit( 8192, 8192 );
+
+    //adjusting output resolution if needed
+    for( qreal prevResizeRatio = 1.0; prevResizeRatio > 0.07; )
+    {
+        //we can't be sure the way input image scale affects output, so adding a loop...
+
+        const QSize resultResolution = updatedResolution( result, srcResolution );
+        qreal resizeRatio = 1.0;
+
+        Q_ASSERT( resultResolution.width() > 0 && resultResolution.height() > 0 );
+
+        if( resultResolution.width() > resolutionLimit.width() &&
+            resultResolution.width() > 0 )
+        {
+            resizeRatio = (qreal)resolutionLimit.width() / resultResolution.width();
+        }
+        if( resultResolution.height() > resolutionLimit.height() &&
+            resultResolution.height() > 0 )
+        {
+            resizeRatio = std::min<qreal>(
+                resizeRatio,
+                (qreal)resolutionLimit.height() / resultResolution.height() );
+        }
+
+        if( resizeRatio >= 1.0 )
+            break;  //done. resolution is OK
+
+        if( resizeRatio >= prevResizeRatio - ASPECT_RATIO_COMPARISION_PRECISION )
+            resizeRatio = prevResizeRatio * MIN_STEP_CHANGE_COEFF;   //this is needed for the loop to be finite
+        prevResizeRatio = resizeRatio;
+
+        //adjusting scale filter
+        const QSize resizeToSize = QnCodecTranscoder::roundSize(
+            QSize( srcResolution.width() * resizeRatio, srcResolution.height() * resizeRatio ) );
+
+        auto scaleFilter = result.front().dynamicCast<QnScaleImageFilter>();
+        if( !scaleFilter )
+        {
+            //adding scale filter
+            scaleFilter.reset( new QnScaleImageFilter( resizeToSize ) );
+            result.push_front( scaleFilter );
+        }
+        else
+        {
+            scaleFilter->setOutputImageSize( resizeToSize );
+        }
+    }
 
     return result;
 }
