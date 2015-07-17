@@ -234,6 +234,10 @@ void QnTcpListener::run()
                 NX_LOG( lit("TCPListener (%1:%2). Switched to port %3").arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort), cl_logINFO );
             }
 
+            if (d->localPort == 0 && d->serverSocket)
+                d->localPort = d->serverSocket->getLocalAddress().port;
+
+
             AbstractStreamSocket* clientSocket = d->serverSocket->accept();
             if( clientSocket )
             {
