@@ -67,6 +67,7 @@ private:
     void query(qint64 bitrateAnalizePeriodMs);
     qint64 sliderPositionToBytes(int value) const;
     int bytesToSliderPosition (qint64 value) const;
+    void updateColumnWidth();
 private:
     QScopedPointer<Ui::RecordingStatsDialog> ui;
     QnRecordingStatsModel *m_model;

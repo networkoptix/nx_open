@@ -40,20 +40,21 @@ namespace {
     static const qint64 EXTRA_DATA_BASE[] = {10 * BYTES_IN_GB, 1 * BYTES_IN_TB, 10 * BYTES_IN_TB, 100 * BYTES_IN_TB, 1000 * BYTES_IN_TB};
     static const int EXTRA_DATA_ARRAY_SIZE = sizeof(EXTRA_DATA_BASE) / sizeof(EXTRA_DATA_BASE[0]);
     static const int TICKS_PER_INTERVAL = 100;
+    static const int SPACE_INTERVAL = 4;
+
 }
 
 class CustomHorizontalHeader: public QHeaderView
 {
 private:
     QComboBox* m_comboBox;
-    static const int spacer = 4;
 
 private:
     void updateComboBox() 
     {
         QRect rect(sectionViewportPosition(QnRecordingStatsModel::BitrateColumn), 0,  sectionSize(QnRecordingStatsModel::BitrateColumn), height());
         int width = m_comboBox->minimumSizeHint().width();
-        rect.adjust(qMax(spacer, rect.width() - width), 0, -spacer, 0);
+        rect.adjust(qMax(SPACE_INTERVAL, rect.width() - width), 0, -SPACE_INTERVAL, 0);
         m_comboBox->setGeometry(rect);
     }
 
@@ -87,7 +88,7 @@ public:
         {
             int width = m_comboBox->minimumSizeHint().width();
             QRect r(rect);
-            r.adjust(0, 0, -(width + spacer), 0);
+            r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
             painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last:"));
         }
     }
@@ -178,7 +179,7 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     headers->setStretchLastSection(true);
     headers->setSectionResizeMode(QHeaderView::Interactive);
     headers->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::ResizeToContents);
-    headers->setMinimumSectionSize(180);
+    headers->setMinimumSectionSize(120);
     headers->setSortIndicatorShown(true);
 
     for (int i = QnRecordingStatsModel::BytesColumn; i < QnRecordingStatsModel::ColumnCount; ++i)
@@ -479,8 +480,42 @@ void QnRecordingStatsDialog::at_forecastParamsChanged()
     }
     else
         m_model->setForecastData(QnRecordingStatsReply());
-
+    updateColumnWidth();
     ui->gridEvents->setEnabled(true);
+}
+
+void QnRecordingStatsDialog::updateColumnWidth()
+{
+    int minWidth = 0;
+    auto* headers = ui->gridEvents->horizontalHeader();
+    headers->setMinimumSectionSize(0);
+
+    for (int j = 1; j < QnRecordingStatsModel::BitrateColumn; ++j)
+    {
+        for (int i = 0; i < m_model->rowCount(); ++i)
+        {
+            QModelIndex index = m_model->index(i, j);
+            QString txt = index.data(Qt::DisplayRole).toString();
+
+            QVariant value = index.data(Qt::FontRole);
+            if (value.isValid() && value.canConvert<QFont>()) {
+                QFont font = qvariant_cast<QFont>(value);
+                QFontMetrics fm(font);
+                minWidth = qMax(minWidth, fm.width(txt));
+            }
+            else {
+                QFontMetrics fm(ui->gridEvents->font());
+                minWidth = qMax(minWidth, fm.width(txt));
+            }
+        }
+    }
+
+    minWidth += SPACE_INTERVAL * 2;
+    headers->setMinimumSectionSize(minWidth);
+    for (int j = 1; j < QnRecordingStatsModel::BitrateColumn; ++j) {
+        if (headers->sectionSize(j) < minWidth)
+            headers->resizeSection(j, minWidth);
+    }
 }
 
 QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBytes)
