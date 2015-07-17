@@ -34,6 +34,8 @@
         <storage_plugin_test_client.name>${company.name} storage plugin testing client program</storage_plugin_test_client.name>
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
         <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
+        <mediaserver_core.name>${company.name} Media Server Core</mediaserver_core.name>
+        <mediaserver_core.display.name>${display.product.name} Media Server Core</mediaserver_core.display.name>
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
         <mediaproxy.display.name>${company.name} Media Proxy</mediaproxy.display.name>
         <nxtool.name>${company.name} ${product.name} Server Configuration Tool</nxtool.name>
@@ -245,7 +247,7 @@
                 </property>
                 <file>
                     <missing>customization/${customization}/mobile.skip</missing>
-                </file>                
+                </file>
             </activation>
             <modules>
                 <module>android-client/protobuf-classes</module>
@@ -265,7 +267,7 @@
                 </property>
                 <file>
                     <missing>customization/${customization}/mobile.skip</missing>
-                </file>                 
+                </file>
             </activation>
             <modules>
                 <module>ios-client</module>
@@ -325,10 +327,11 @@
                 <module>nx_sdk</module>
                 <module>plugins/genericrtspplugin</module>
                 <module>storage_plugins/ftpstorageplugin</module>
-                <module>storage_plugins/storage_plugin_test_client</module>                
+                <module>storage_plugins/storage_plugin_test_client</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>
+                <module>mediaserver_core</module>
                 <!--<module>mediaproxy</module> -->
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -416,14 +419,14 @@
             </activation>
             <modules>
                 <module>axclient</module>
-                <module>plugins/nxinterface</module>     
-                <module>plugins/nxcontrol</module>     
-                <module>plugins/acs/paxton</module>     
-                <module>plugins/acs/paxton-installer</module>     
+                <module>plugins/nxinterface</module>
+                <module>plugins/nxcontrol</module>
+                <module>plugins/acs/paxton</module>
+                <module>plugins/acs/paxton-installer</module>
                 <!-- Uncomment this when 2.3.1_paxton is merged -->
                 <!-- <module>plugins/acs/paxton</module>
                 <module>plugins/acs/paxton-installer</module> -->
-            </modules>            
+            </modules>
         </profile>
 
         <profile>
