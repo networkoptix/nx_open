@@ -64,6 +64,8 @@ private:
     QMap<QString, QString> m_presetTokenById;
     QMap<QString, QString> m_presetNameByToken;
     bool m_ptzPresetsReaded;
+    char m_floatFormat[16];
+    char m_doubleFormat[16];
 
     mutable QMutex m_mutex;
 };
