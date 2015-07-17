@@ -47,5 +47,7 @@ void QnWorkbenchServerAddressWatcher::at_ec_connection_established()
 {
     QUrl url = QnAppServerConnectionFactory::url();
     url.setPath( QString() );
-    QnModuleFinder::instance()->directModuleFinderHelper()->addForcedUrl( url );
+
+    auto dmf = QnModuleFinder::instance()->directModuleFinderHelper();
+    dmf->addForcedUrl( std::move( url ) );
 }

@@ -55,6 +55,11 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     m_elapsedTimer.start();
 }
 
+void QnDirectModuleFinderHelper::addForcedUrl(const QUrl url) {
+    m_forcedUrls.insert(url);
+    updateModuleFinder();
+}
+
 void QnDirectModuleFinderHelper::setForcedUrls(const QSet<QUrl> &forcedUrls) {
     m_forcedUrls = forcedUrls;
     updateModuleFinder();

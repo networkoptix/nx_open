@@ -9,7 +9,7 @@
 #endif
 
 #include <qtsinglecoreapplication.h>
-#include "qtservice.h"
+#include <qtservice.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>

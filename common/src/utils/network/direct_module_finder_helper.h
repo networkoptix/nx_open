@@ -23,6 +23,7 @@ class QnDirectModuleFinderHelper : public Connective<QObject> {
 public:
     explicit QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder, bool clientMode = false);
 
+    void addForcedUrl(const QUrl url);
     void setForcedUrls(const QSet<QUrl> &forcedUrls);
 
 private slots:
