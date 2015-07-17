@@ -1,4 +1,3 @@
-TEMPLATE = app
 CONFIG += console
 
 include( ${libdir}/gtest.pri )

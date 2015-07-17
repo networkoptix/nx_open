@@ -17,7 +17,8 @@
         <root.dir>${basedir}/../..</root.dir>
     </properties>
 
-    <build>
+<!-- The following section is to rebuild the required artifact as lib. As soon as everything will be built as lib, this may be deleted -->
+<!--    <build>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -38,7 +39,7 @@
                             <arguments>
                                 <argument>-U</argument>
                                 <argument>package</argument>
-                                <argument>-Dtemplate=${template}</argument>
+                                <argument>-Dtemplate=lib</argument>
                                 <argument>-Darch=${arch}</argument>
                                 <argument>-Dbox=${box}</argument>
                                 <argument>-Dplatform=${platform}</argument>                             
@@ -52,5 +53,5 @@
                 </executions>
             </plugin>
         </plugins>
-    </build>  
+    </build>  -->
 </project>
