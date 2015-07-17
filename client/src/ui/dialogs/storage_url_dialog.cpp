@@ -122,8 +122,11 @@ void QnStorageUrlDialog::accept()
     QString protocol = qvariant_cast<QString>(ui->protocolComboBox->currentData());
     QString urlText = ui->urlEdit->text();
     
-    if (protocol == lit("smb") && !urlText.startsWith(lit("\\\\")))
-        urlText = lit("\\\\") + urlText;
+    if (protocol == lit("smb"))
+    {
+        if(!urlText.startsWith(lit("\\\\")))
+            urlText = lit("\\\\") + urlText;
+    }
     else if (!urlText.toUpper().startsWith(protocol.toUpper() + lit("://")))
         urlText = protocol.toLower() + lit("://") + urlText;
 
