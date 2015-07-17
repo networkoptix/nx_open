@@ -8,7 +8,7 @@ Item {
     property color color: QnTheme.buttonBackground
     property color textColor: QnTheme.buttonText
     property bool flat: false
-    property bool iconic: false
+    property bool iconic: icon != "" && text == ""
 
     property alias text: textLabel.text
     property alias icon: icon.source
@@ -18,7 +18,7 @@ Item {
     signal clicked()
 
     height: dp(48)
-    width: textLabel.width + dp(24)
+    width: label.width + dp(24)
 
     Rectangle {
         id: background

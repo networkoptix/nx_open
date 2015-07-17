@@ -251,8 +251,6 @@ QnFlickable {
         mainButton {
             icon: "image://icon/done.png"
             color: "transparent"
-            width: dp(48)
-            iconic: true
             onClicked: d.hidePendingItems()
         }
 

@@ -147,6 +147,7 @@ Item {
 
                 flat: true
                 text: qsTr("Undo")
+                icon: "image://icon/undo.png"
 
                 onClicked: d.hidden = false
             }
