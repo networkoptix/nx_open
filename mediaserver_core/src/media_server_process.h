@@ -1,5 +1,5 @@
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef MEDIA_SERVER_PROCESS_H
+#define MEDIA_SERVER_PROCESS_H
 
 #include <QtCore/QTimer>
 #include <QtCore/QStringList>
@@ -24,20 +24,24 @@ struct QnModuleInformation;
 class QnModuleFinder;
 struct QnPeerRuntimeInfo;
 
-class QnMain : public QnLongRunnable
+class MediaServerProcess : public QnLongRunnable
 {
     Q_OBJECT
 
 public:
-    QnMain(int argc, char* argv[]);
-    ~QnMain();
+    MediaServerProcess(int argc, char* argv[]);
+    ~MediaServerProcess();
 
     void stopObjects();
     void run();
 
+    /** Entry point */
+    static int main(int argc, char* argv[]);
+
 public slots:
     void stopAsync();
     void stopSync();
+
 private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
     void at_localInterfacesChanged();
@@ -88,4 +92,4 @@ private:
     ec2::CrashReporter m_crashReporter;
 };
 
-#endif // MAIN_H
+#endif // MEDIA_SERVER_PROCESS_H

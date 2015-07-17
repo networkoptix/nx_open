@@ -29,8 +29,9 @@
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 #include "transaction/runtime_transaction_log.h"
-#include "../../mediaserver/src/media_server/settings.h"
 
+// TODO: #r WTF?
+#include "../../mediaserver_core/src/media_server/settings.h"
 
 namespace ec2
 {
