@@ -65,6 +65,7 @@ namespace
         result.insert(rtu::Buttons::Cancel, ButtonInfo("Cancel", false, kShortButtonAspect));
         result.insert(rtu::Buttons::ApplyChanges, ButtonInfo("Apply changes", false, kMediumButtonAspect));
         result.insert(rtu::Buttons::DiscardChanges, ButtonInfo("Discard changes", false, kMediumButtonAspect));
+        result.insert(rtu::Buttons::Update, ButtonInfo("Update", false, kShortButtonAspect));
         return result;
     }();
 }

@@ -12,7 +12,7 @@ Item
     id: thisComponent;
 
     property int selectedState;
-    property bool logged;
+    property bool loggedIn;
     property string serverName;
     property string macAddress;
     
@@ -21,7 +21,7 @@ Item
     
     height: column.height;
 
-    opacity: (logged ? 1 : 0.3);
+    opacity: (loggedIn ? 1 : 0.3);
     
     Column
     {
@@ -60,12 +60,6 @@ Item
                 {
                     left: parent.left;
                     verticalCenter: parent.verticalCenter;                    
-                }
-
-                onClicked: 
-                {
-                    if (logged)
-                        thisComponent.selectionStateShouldBeChanged(index); 
                 }
 
                 Binding
@@ -144,13 +138,34 @@ Item
     {
         id: explicitSelectionMouseArea;
 
+        property bool prevClicked: false;
+
         anchors.fill: parent;
 
-        onClicked: { clickFilterTimer.start(); }
+        onClicked:
+        {
+            if (!thisComponent.loggedIn)
+                return;
+
+            if (prevClicked)
+            {
+                /// it is double click
+                prevClicked = false;
+                thisComponent.explicitSelectionCalled(index);
+            }
+            else
+            {
+                prevClicked = true;
+                clickFilterTimer.start();
+                thisComponent.selectionStateShouldBeChanged(index);
+            }
+        }
+
         onDoubleClicked:
         {
+            prevClicked = false;
             clickFilterTimer.stop();
-            if (thisComponent.logged)
+            if (thisComponent.loggedIn)
                 thisComponent.explicitSelectionCalled(index);
         }
 
@@ -159,17 +174,13 @@ Item
             id: clickFilterTimer;
 
             interval: 150;
-            onTriggered: 
-            {
-                if (thisComponent.logged)
-                    thisComponent.selectionStateShouldBeChanged(index); 
-            }
+            onTriggered: { explicitSelectionMouseArea.prevClicked = false; }
         }
     }
 
     Rtu.Mark
     {
-        enabled: logged;
+        enabled: loggedIn;
         selected: (selectedState === Qt.Checked);
         anchors.fill: parent;
     }

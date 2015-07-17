@@ -15,7 +15,7 @@ namespace rtu
         Q_PROPERTY(int currentTimeZoneIndex READ currentTimeZoneIndex NOTIFY currentTimeZoneIndexChanged)
 
     public:
-        explicit TimeZonesModel(const ServerInfoList &selectedServers
+        explicit TimeZonesModel(const ServerInfoPtrContainer &selectedServers
             , QObject *parent = nullptr);
         
         virtual ~TimeZonesModel();

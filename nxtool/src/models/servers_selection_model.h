@@ -15,7 +15,8 @@ namespace rtu
 
         Q_PROPERTY(int selectedCount READ selectedCount NOTIFY selectionChanged)
         Q_PROPERTY(int serversCount READ serversCount NOTIFY serversCountChanged)
-        
+        Q_PROPERTY(bool selectionOutdated READ selectionOutdated NOTIFY selectionOutdatedChanged)
+
     public:
         ServersSelectionModel(QObject *parent = nullptr);
         
@@ -28,23 +29,33 @@ namespace rtu
 
         void setAllItemSelected(bool selected);
         
-        void tryLoginWith(const QString &password);
+        void tryLoginWith(const QString &primarySystem
+            , const QString &password
+            , const Callback &callback);
 
         ///
 
+        bool selectionOutdated() const;
+
         int selectedCount() const;
         
-        ServerInfoList selectedServers();
+        ServerInfoPtrContainer selectedServers();
 
         int serversCount() const;
         
         ///
+
+        void serverDiscovered(const BaseServerInfo &baseInfo);
 
         void addServer(const BaseServerInfo &baseInfo);
 
         void changeServer(const BaseServerInfo &baseInfo);
 
         void removeServers(const IDsVector &removed);
+
+        void unknownAdded(const QString &address);
+
+        void unknownRemoved(const QString &address);
 
         void updateTimeDateInfo(const QUuid &id
             , qint64 utcDateTimeMs
@@ -65,11 +76,14 @@ namespace rtu
             , const QString &password);
 
     signals:
+        void selectionOutdatedChanged();
+
         void selectionChanged();
         
         void serversCountChanged();
         
         void serverLogged(const ServerInfo &info);
+
     private:
         int rowCount(const QModelIndex &parent = QModelIndex()) const;
         

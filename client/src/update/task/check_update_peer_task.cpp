@@ -378,13 +378,13 @@ void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value) 
     }
 
     QnCheckForUpdateResult result(value);
-    result.latestVersion = m_target.version;
+    result.version = m_target.version;
     result.systems = m_updateFiles.keys().toSet();
     result.clientInstallerRequired = m_clientRequiresInstaller;
     result.releaseNotesUrl = m_releaseNotesUrl;
 
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Check finished [%1, %2].")
-           .arg(value).arg(result.latestVersion.toString()), cl_logDEBUG1);
+           .arg(value).arg(result.version.toString()), cl_logDEBUG1);
 
     emit checkFinished(result);
     finish(static_cast<int>(value));
