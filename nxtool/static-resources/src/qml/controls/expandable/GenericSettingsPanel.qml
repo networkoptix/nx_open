@@ -44,43 +44,47 @@ Expandable.ExpandableItem
                 right: parent.right;
             }
 
+            spacing: Common.SizeManager.spacing.small;
+
             FocusScope
             {
                 id: header;
 
-                height: headerRow.height;
+                height: Math.max(captionText.height, unsavedChangesMarker.height);
                 anchors
                 {
                     left: parent.left;
                     right: parent.right;
                 }
 
-                Row
+                Base.Text
                 {
-                    id: headerRow;
+                    id: captionText;
 
-                    spacing: Common.SizeManager.spacing.base;
                     anchors
                     {
+                        verticalCenter: parent.verticalCenter;
                         left: parent.left;
-                        top: parent.top;
+                        right: unsavedChangesMarker.left;
 
                         leftMargin: Common.SizeManager.spacing.base;
+                        rightMargin: Common.SizeManager.spacing.base;
                     }
 
-                    Base.Text
-                    {
-                        id: captionText;
+                    thin: false;
+                    font.pixelSize: Common.SizeManager.fontSizes.medium;
+                    text: propertiesGroupName;
+                }
 
-                        thin: false;
-                        font.pixelSize: Common.SizeManager.fontSizes.medium;
-                        text: propertiesGroupName;
-                    }
+                Rtu.UnsavedChangesMarker
+                {
+                    id: unsavedChangesMarker;
 
-                    Rtu.UnsavedChangesMarker
+                    visible: thisComponent.changed;
+                    anchors
                     {
-                        visible: thisComponent.changed;
-                        anchors.verticalCenter: captionText.verticalCenter;
+                        verticalCenter: parent.verticalCenter;
+                        right: parent.right;
                     }
                 }
             }
