@@ -98,8 +98,6 @@ public:
     }
 };
 
-const int CustomHorizontalHeader::spacer; // C++ STD 9.4.2/4
-
 void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     Q_ASSERT(index.isValid());
