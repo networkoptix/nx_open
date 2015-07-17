@@ -14,6 +14,7 @@ public:
 
 private slots:
     void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void at_ec_connection_established();
 
 private:
     QSet<QUrl> m_urls;
