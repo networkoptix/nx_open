@@ -247,7 +247,7 @@ namespace nx_spl
           private aux::NonCopyable,
           private aux::PluginRefCounter<FtpStorageFactory>
     {
-        friend class aux::PluginRefCounter<FtpStorage>;
+        friend class aux::PluginRefCounter<FtpStorageFactory>;
     public:
         // currently unimplemented
         virtual const char** STORAGE_METHOD_CALL findAvailable() const override;

@@ -15,6 +15,12 @@
 
 #include "ftp_library.h"
 
+#ifdef _MSC_VER
+#   define NOEXCEPT
+#elif defined __GNUC__
+#   define NOEXCEPT noexcept
+#endif
+
 namespace nx_spl
 {   // auxillary data structures/functions
     namespace aux
@@ -28,7 +34,7 @@ namespace nx_spl
                 : runtime_error(s)
             {}
             
-            virtual const char* what() const
+            virtual const char* what() const NOEXCEPT
             {
                 return runtime_error::what();
             }
@@ -42,7 +48,7 @@ namespace nx_spl
                 : runtime_error(s)
             {}
             
-            virtual const char* what() const
+            virtual const char* what() const NOEXCEPT
             {
                 return runtime_error::what();
             }
@@ -56,7 +62,7 @@ namespace nx_spl
                 : runtime_error(s)
             {}
             
-            virtual const char* what() const
+            virtual const char* what() const NOEXCEPT
             {
                 return runtime_error::what();
             }
@@ -71,7 +77,7 @@ namespace nx_spl
                 : runtime_error(s)
             {}
             
-            virtual const char* what() const
+            virtual const char* what() const NOEXCEPT
             {
                 return runtime_error::what();
             }
@@ -1224,6 +1230,7 @@ namespace nx_spl
     ) const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
+        uint32_t readSize = 0;
         if (ecode)
             *ecode = error::NoError;
 
@@ -1237,7 +1244,7 @@ namespace nx_spl
         if (f == NULL)
             goto bad_end;
 
-        uint32_t readSize = (uint32_t)(m_pos + size > m_localsize ? m_localsize - m_pos : size);
+         readSize = (uint32_t)(m_pos + size > m_localsize ? m_localsize - m_pos : size);
 
         if (fseek(f, (int)m_pos, SEEK_SET) != 0)
             goto bad_end;

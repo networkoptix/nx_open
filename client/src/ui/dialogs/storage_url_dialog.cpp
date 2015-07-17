@@ -124,7 +124,7 @@ void QnStorageUrlDialog::accept()
     
     if (protocol == lit("smb") && !urlText.startsWith(lit("\\\\")))
         urlText = lit("\\\\") + urlText;
-    else if (!urlText.toUpper().startsWith(protocol + lit("://")))
+    else if (!urlText.toUpper().startsWith(protocol.toUpper() + lit("://")))
         urlText = protocol.toLower() + lit("://") + urlText;
 
     QString url = makeUrl(urlText, ui->loginLineEdit->text(), ui->passwordLineEdit->text());
