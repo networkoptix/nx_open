@@ -7,10 +7,10 @@
     and have a parent pom to deletegate the build.
   -->
     <parent>
-        <artifactId>unit_tests</artifactId>
+        <artifactId>build_ut</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
         <version>2.4-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <relativePath>../build_ut</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
@@ -22,8 +22,11 @@
 
     <properties>
         <product.title>HD Witness Common Library Unit Tests</product.title>
+        <root.dir>${basedir}/../..</root.dir>
+        <!--Specify the project to test-->      
+        <master.project.directory>common</master.project.directory>
         <!--Global libs-->
-        <qt.libs>core network xml concurrent sql multimedia</qt.libs>
+        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc -lonvif -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
@@ -38,5 +41,6 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
         <linux.defines/>
         <mac.defines/>
+        <path>${env.PATH}</path>
     </properties>
 </project>

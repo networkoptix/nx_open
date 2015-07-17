@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>unit_tests</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.3.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.3.2-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>build_ut</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness Unit Tests Common Build Steps</name>
+
+    <properties>
+        <root.dir>${basedir}/../..</root.dir>
+    </properties>
+
+<!-- The following section is to rebuild the required artifact as lib. As soon as everything will be built as lib, this may be deleted -->
+<!--    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                    <id>build_lib_for_test</id>
+                    <phase>compile</phase>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                        <configuration>
+                            <executable>${environment.dir}/maven/bin/mvn</executable>
+                            <environmentVariables>
+                                <PATH>${path}</PATH>
+                            </environmentVariables>                            
+                            <arguments>
+                                <argument>-U</argument>
+                                <argument>package</argument>
+                                <argument>-Dtemplate=lib</argument>
+                                <argument>-Darch=${arch}</argument>
+                                <argument>-Dbox=${box}</argument>
+                                <argument>-Dplatform=${platform}</argument>                             
+                                <argument>-Denvironment.dir=${environment.dir}</argument>								
+                                <argument>-Dmaven.repo.local=${environment.dir}/maven/repository</argument>		
+                            </arguments>
+                            <skip>buildenv.skip</skip>
+                            <workingDirectory>${root.dir}/${master.project.directory}</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>  -->
+</project>

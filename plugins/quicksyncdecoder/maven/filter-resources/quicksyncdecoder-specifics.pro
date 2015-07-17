@@ -1,4 +1,3 @@
-TEMPLATE = lib
 QT += core opengl
 
 

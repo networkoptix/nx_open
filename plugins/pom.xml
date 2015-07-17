@@ -15,6 +15,7 @@
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
+        <template>lib</template>
         <libtype>plugin</libtype>
         <buildLib>sharedlib</buildLib>
     </properties>

@@ -1,13 +1,6 @@
-QT += xmlpatterns
+CONFIG += console
 
-include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsinglecoreapplication.pri)
-include($$ADDITIONAL_QT_INCLUDES/qtservice/src/qtservice.pri)
-
-exists( ${libdir}/libcreateprocess.pri ) {
-  include(${libdir}/libcreateprocess.pri)
-}
-
-INCLUDEPATH += ${root.dir}/appserver2/src/
+include( ${libdir}/gtest.pri )
 
 !win32 {
   ext_debug2.target  = $(TARGET).debug

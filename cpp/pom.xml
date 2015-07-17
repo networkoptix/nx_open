@@ -211,7 +211,7 @@
                                 </configuration>                                
                             </execution>
 
-                            <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unneccessary (when qmake is fixed) -->
+                            <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unnecessary (when qmake is fixed) -->
                             <execution>
                                 <id>fix-vcxproj-QMAKE-SUCKS!!!!!!!!!!</id>
                                 <phase>process-resources</phase>

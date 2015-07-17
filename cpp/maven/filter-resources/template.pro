@@ -3,6 +3,7 @@ cache()
 NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
 LIBTYPE = ${libtype}
+TEMPLATE = ${template}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
 QT += ${qt.libs}
