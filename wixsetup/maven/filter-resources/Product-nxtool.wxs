@@ -38,8 +38,8 @@
         </SetProperty>        
 
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
-        <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
-        <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
+        <WixVariable Id="WixUIBannerBmp" Value="nxtool\logo_493x58.bmp" />
+        <WixVariable Id="WixUIDialogBmp" Value="nxtool\logo_493x312.bmp" />
 
         <!-- Logo -->
         <Icon Id="icon_menu.exe" SourceFile="${root.dir}/customization/${customization}/icons/nxtool.ico"/>
