@@ -91,6 +91,15 @@ namespace rtu
         , const OperationCallback &failed
         , int timeout = HttpClient::kUseDefaultTimeout);
 
+    void getIfList(HttpClient *client
+        , const BaseServerInfo &baseInfo
+        , const QString &password
+        , const ExtraServerInfoSuccessCallback &successful
+        , const OperationCallback &failed
+        , int timeout = HttpClient::kUseDefaultTimeout);
+
+    /// Sends getTime and getIfList consequentially. 
+    /// If getTime is successful, calls successfull callback anyway
     void getServerExtraInfo(HttpClient *client
         , const BaseServerInfo &baseInfo
         , const QString &password
