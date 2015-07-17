@@ -64,7 +64,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     int changePortResult = changePort(port);
     if (changePortResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("PORT"));
+        result.setErrorString(lit("Port is busy"));
         port = 0;   //not switching port
     }
 

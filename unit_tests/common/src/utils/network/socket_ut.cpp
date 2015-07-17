@@ -5,6 +5,7 @@
 
 #include <condition_variable>
 #include <deque>
+#include <future>
 #include <mutex>
 #include <thread>
 
@@ -289,3 +290,48 @@ TEST_F( SocketAsyncModeTest, BadHostNameResolve )
         connection->cancelAsyncIO();
     }
 }
+
+#if 0
+TEST_F( SocketAsyncModeTest, postCancellation )
+{
+    static const int TEST_RUNS = 200;
+
+    std::atomic<size_t> postCalls( 0 );
+
+    auto testFunctor = [&postCalls]()
+    {
+        std::atomic<size_t> counter( 0 );
+
+        for( int i = 0; i < TEST_RUNS; ++i )
+        {
+            size_t curCounterVal = ++counter;
+
+            std::vector<std::unique_ptr<AbstractStreamSocket>> sockets( 50 );
+            std::for_each(
+                sockets.begin(),
+                sockets.end(),
+                []( std::unique_ptr<AbstractStreamSocket>& ptr ){ ptr.reset( SocketFactory::createStreamSocket() ); } );
+            //std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
+
+            for( const auto& sock: sockets )
+                sock->post( [curCounterVal, &counter, &postCalls]() {
+                    ASSERT_EQ( curCounterVal, (size_t)counter );
+                    ++postCalls;
+                    QThread::usleep( 10 );
+                } );
+
+            for( const auto& sock : sockets )
+                sock->cancelAsyncIO();
+
+            //QThread::usleep( 100 );
+        }
+    };
+
+    std::vector<std::future<void>> futures;
+    for( int i = 0; i < 25; ++i )
+        futures.emplace_back( std::async( std::launch::async, testFunctor ) );
+
+    for( auto& f: futures )
+        f.wait();
+}
+#endif
