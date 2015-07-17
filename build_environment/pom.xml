@@ -537,6 +537,29 @@
                 </dependency>
             </dependencies>
         </profile>
-
+        
+        <profile>
+            <id>linux-x64</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>amd64</arch>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.google</groupId>
+                    <artifactId>gtest</artifactId>
+                    <version>1.7.0-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+            </dependencies>        
+        </profile>
     </profiles>
 </project>

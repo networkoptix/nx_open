@@ -6,157 +6,162 @@
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
+#include "utils/common/app_info.h"
 
-QnNetworkAddressEntryList readNetworSettings(bool* ok)
+
+namespace 
 {
-    QnNetworkAddressEntryList result;
-#ifdef Q_OS_WIN
-    QFile netSettings(lit("c:/etc/network/interfaces"));
-#else
-    QFile netSettings(lit("/etc/network/interfaces"));
-#endif
-    *ok = true;
-    if (!netSettings.open(QFile::ReadOnly))
+    QnNetworkAddressEntryList readNetworSettings(bool* ok)
     {
-        qWarning() << "Can't read network settings file";
-        *ok = false;
+        QnNetworkAddressEntryList result;
+    #ifdef Q_OS_WIN
+        QFile netSettings(lit("c:/etc/network/interfaces"));
+    #else
+        QFile netSettings(lit("/etc/network/interfaces"));
+    #endif
+        *ok = true;
+        if (!netSettings.open(QFile::ReadOnly))
+        {
+            qWarning() << "Can't read network settings file";
+            *ok = false;
+            return result;
+        }
+        const QByteArray data = netSettings.readAll();
+
+        nx_http::LineSplitter lineSplitter;
+        QnByteArrayConstRef line;
+        size_t bytesRead = 0;
+        size_t dataOffset = 0;
+        QByteArray lastIfName;
+        while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(data, dataOffset), &line, &bytesRead) )
+        {
+            dataOffset += bytesRead;
+
+            QByteArray data = line.toByteArrayWithRawData().trimmed();
+            QList<QByteArray> worlds = data.split(' ');
+            if (worlds.size() < 2)
+                continue;
+
+            if (data.startsWith("iface")) 
+            {
+                result.push_back(QnNetworkAddressEntry());
+                result.last().name = worlds[1].trimmed();
+                result.last().dhcp = data.contains("dhcp");
+            }
+            else {
+                if (result.isEmpty())
+                    continue;
+
+                if (data.startsWith("address"))
+                    result.last().ipAddr = worlds[1].trimmed();
+                else if (data.startsWith("netmask"))
+                    result.last().netMask = worlds[1].trimmed();
+                else if (data.startsWith("gateway"))
+                    result.last().gateway = worlds[1].trimmed();
+                else if (data.startsWith("dns-nameservers"))
+                    result.last().dns_servers = worlds[1].trimmed();
+                else if (data.startsWith("auto"))
+                    ;
+                else
+                    result.last().extraParams.insert(worlds[0], worlds[1]);
+            }
+        }
+    
         return result;
     }
-    const QByteArray data = netSettings.readAll();
 
-    nx_http::LineSplitter lineSplitter;
-    QnByteArrayConstRef line;
-    size_t bytesRead = 0;
-    size_t dataOffset = 0;
-    QByteArray lastIfName;
-    while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(data, dataOffset), &line, &bytesRead) )
+    bool writeNetworSettings(const QnNetworkAddressEntryList& settings)
     {
-        dataOffset += bytesRead;
-
-        QByteArray data = line.toByteArrayWithRawData().trimmed();
-        QList<QByteArray> worlds = data.split(' ');
-        if (worlds.size() < 2)
-            continue;
-
-        if (data.startsWith("iface")) 
+        static const char ENDL = '\n';
+    #ifdef Q_OS_WIN
+        QFile netSettingsFile(lit("c:/etc/network/interfaces"));
+    #else
+        QFile netSettingsFile(lit("/etc/network/interfaces"));
+    #endif
+        if (!netSettingsFile.open(QFile::WriteOnly | QFile::Truncate))
         {
-            result.push_back(QnNetworkAddressEntry());
-            result.last().name = worlds[1].trimmed();
-            result.last().dhcp = data.contains("dhcp");
+            qWarning() << "Can't write network settings file";
+            return false;
         }
-        else {
-            if (result.isEmpty())
-                continue;
-
-            if (data.startsWith("address"))
-                result.last().ipAddr = worlds[1].trimmed();
-            else if (data.startsWith("netmask"))
-                result.last().netMask = worlds[1].trimmed();
-            else if (data.startsWith("gateway"))
-                result.last().gateway = worlds[1].trimmed();
-            else if (data.startsWith("dns-nameservers"))
-                result.last().dns_servers = worlds[1].trimmed();
-            else if (data.startsWith("auto"))
-                ;
+    
+        QTextStream out(&netSettingsFile);
+        for(const auto& value: settings)
+        {
+            out << "auto " << value.name << ENDL;
+            out << "iface " << value.name << " inet ";
+            if (value.name == "lo")
+                out << "loopback" << ENDL;
+            else if (value.dhcp)
+                out << "dhcp" << ENDL;
             else
-                result.last().extraParams.insert(worlds[0], worlds[1]);
+                out << "static" << ENDL;
+            if (!value.ipAddr.isEmpty())
+                out << "    address " << value.ipAddr << ENDL;
+            if (!value.netMask.isEmpty())
+                out << "    netmask " << value.netMask << ENDL;
+            if (!value.gateway.isEmpty())
+                out << "    gateway " << value.gateway << ENDL;
+            if (!value.dns_servers.isEmpty())
+                out << "    dns-nameservers " << value.dns_servers << ENDL;
+            for(auto itr = value.extraParams.constBegin(); itr != value.extraParams.constEnd(); ++itr)
+                out << "    " << itr.key() << " " << itr.value() << ENDL;
+            out << ENDL;
         }
+        return true;
     }
-    
-    return result;
-}
 
-bool writeNetworSettings(const QnNetworkAddressEntryList& settings)
-{
-    static const char ENDL = '\n';
-#ifdef Q_OS_WIN
-    QFile netSettingsFile(lit("c:/etc/network/interfaces"));
-#else
-    QFile netSettingsFile(lit("/etc/network/interfaces"));
-#endif
-    if (!netSettingsFile.open(QFile::WriteOnly | QFile::Truncate))
+    void updateSettings(QnNetworkAddressEntryList& currentSettings, QnNetworkAddressEntryList& newSettings)
     {
-        qWarning() << "Can't write network settings file";
-        return false;
-    }
-    
-    QTextStream out(&netSettingsFile);
-    for(const auto& value: settings)
-    {
-        out << "auto " << value.name << ENDL;
-        out << "iface " << value.name << " inet ";
-        if (value.name == "lo")
-            out << "loopback" << ENDL;
-        else if (value.dhcp)
-            out << "dhcp" << ENDL;
-        else
-            out << "static" << ENDL;
-        if (!value.ipAddr.isEmpty())
-            out << "    address " << value.ipAddr << ENDL;
-        if (!value.netMask.isEmpty())
-            out << "    netmask " << value.netMask << ENDL;
-        if (!value.gateway.isEmpty())
-            out << "    gateway " << value.gateway << ENDL;
-        if (!value.dns_servers.isEmpty())
-            out << "    dns-nameservers " << value.dns_servers << ENDL;
-        for(auto itr = value.extraParams.constBegin(); itr != value.extraParams.constEnd(); ++itr)
-            out << "    " << itr.key() << " " << itr.value() << ENDL;
-        out << ENDL;
-    }
-    return true;
-}
-
-void updateSettings(QnNetworkAddressEntryList& currentSettings, QnNetworkAddressEntryList& newSettings)
-{
-    // merge existing data
-    for(auto& value :currentSettings) 
-    {
-        for (auto itr = newSettings.begin(); itr != newSettings.end(); ++itr)
+        // merge existing data
+        for(auto& value :currentSettings) 
         {
-            const auto& newValue = *itr;
-            if (newValue.name != value.name)
-                continue;
-            if (!newValue.ipAddr.isNull())
-                value.ipAddr = newValue.ipAddr;
-            if (!newValue.netMask.isNull())
-                value.netMask = newValue.netMask;
-            if (!newValue.gateway.isNull())
-                value.gateway = newValue.gateway;
-            if (!newValue.dns_servers.isNull())
-                value.dns_servers = newValue.dns_servers;
-            value.dhcp = newValue.dhcp;
-            newSettings.erase(itr);
-            break;
+            for (auto itr = newSettings.begin(); itr != newSettings.end(); ++itr)
+            {
+                const auto& newValue = *itr;
+                if (newValue.name != value.name)
+                    continue;
+                if (!newValue.ipAddr.isNull())
+                    value.ipAddr = newValue.ipAddr;
+                if (!newValue.netMask.isNull())
+                    value.netMask = newValue.netMask;
+                if (!newValue.gateway.isNull())
+                    value.gateway = newValue.gateway;
+                if (!newValue.dns_servers.isNull())
+                    value.dns_servers = newValue.dns_servers;
+                value.dhcp = newValue.dhcp;
+                newSettings.erase(itr);
+                break;
+            }
         }
+    #if 0
+        // add new data
+        for (const auto& newValue :newSettings)
+            currentSettings.push_back(newValue);
+    #endif
     }
-#if 0
-    // add new data
-    for (const auto& newValue :newSettings)
-        currentSettings.push_back(newValue);
-#endif
-}
 
 
-bool isValidIP(const QString& ipAddr)
-{
-    return !QHostAddress(ipAddr).isNull();
-}
+    bool isValidIP(const QString& ipAddr)
+    {
+        return !QHostAddress(ipAddr).isNull();
+    }
 
-bool isValidMask(const QString& ipAddr)
-{
-    if (!isValidIP(ipAddr))
-        return false;
-    quint32 value = QHostAddress(ipAddr).toIPv4Address();
-    value = ~value;
-    return (value & (value+1)) == 0;
-}
+    bool isValidMask(const QString& ipAddr)
+    {
+        if (!isValidIP(ipAddr))
+            return false;
+        quint32 value = QHostAddress(ipAddr).toIPv4Address();
+        value = ~value;
+        return (value & (value+1)) == 0;
+    }
 
-quint32 getNetworkAddr(const QString& addrStr, const QString& maskStr)
-{
-    quint32 addr = QHostAddress(addrStr).toIPv4Address();
-    quint32 mask = QHostAddress(maskStr).toIPv4Address();
+    quint32 getNetworkAddr(const QString& addrStr, const QString& maskStr)
+    {
+        quint32 addr = QHostAddress(addrStr).toIPv4Address();
+        quint32 mask = QHostAddress(maskStr).toIPv4Address();
 
-    return addr & mask;
+        return addr & mask;
+    }
 }
 
 bool QnIfConfigRestHandler::checkData(const QnNetworkAddressEntryList& newSettings, QString* errString)
@@ -272,10 +277,19 @@ void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestPar
         return;
     
 #ifndef Q_OS_WIN
-    if (system("/etc/init.d/networking restart") != 0)
-        qWarning() << "Failed to restart networking service";
-    for(const auto& value: currentSettings)
-        if (system(lit("ifconfig %1 up").arg(value.name).toLatin1().data()) != 0)
-            qWarning() << "Failed to restart network interface " << value.name;
+    if( QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1" )
+    {
+        //network restart on nx1 sometimes fails, so rebooting
+        if( system("/sbin/reboot") != 0 )
+            qWarning() << "Failed to reboot";
+    }
+    else
+    {
+        if (system("/etc/init.d/networking restart") != 0)
+            qWarning() << "Failed to restart networking service";
+        for(const auto& value: currentSettings)
+            if (system(lit("ifconfig %1 up").arg(value.name).toLatin1().data()) != 0)
+                qWarning() << "Failed to restart network interface " << value.name;
+    }
 #endif
 }

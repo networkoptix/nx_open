@@ -191,7 +191,9 @@
                                     <!-- <excludes>
                                         <exclude>**/vmaxproxy-x64.vcproj</exclude>
                                     </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
+                                    <ignoreMissingFile>true</ignoreMissingFile>          
+									<escape>true</escape>
+									<regex>false</regex>	                                    
                                     <replacements>
                                         <replacement>
                                             <token>x64</token>

@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
+
     A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
+    It should also be possible to have one maven project per solution project,
     and have a parent pom to deletegate the build.
   -->
     <parent>
@@ -21,8 +21,8 @@
     <name>HD Witness Common Library Unit Tests</name>
 
     <properties>
-        <product.title>HD Witness Common Library Unit Tests</product.title>  
-        <!--Global libs-->      
+        <product.title>HD Witness Common Library Unit Tests</product.title>
+        <!--Global libs-->
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
         <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc -lonvif -lquazip</global.libs>
         <!--Specific os libs used-->
@@ -30,13 +30,13 @@
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis</linux.oslibs>
         <linux.arm.oslibs>-lssl -lcrypto -lsigar</linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>                
+        <windows.oslibs.debug></windows.oslibs.debug>
         <mac.oslibs>-lssl -lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>
         <!--Global defines-->
         <global.defines></global.defines>
         <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
         <linux.defines/>
-        <mac.defines/>      
+        <mac.defines/>
     </properties>
 </project>
