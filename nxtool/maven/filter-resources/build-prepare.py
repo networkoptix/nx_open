@@ -72,12 +72,12 @@ if __name__ == '__main__':
                     else:
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))
         
-        print(join(target_dir, 'qml'))
-        if os.path.exists(join(target_dir, 'qml')):
-            shutil.rmtree(join(target_dir, 'qml'))
-        shutil.copytree(join(qtbasedir, 'qml'),join(target_dir, 'qml'))
-        
-        #copyDirectory(join(qtbasedir, 'qml'),join(target_dir))
+        for config in ('debug', 'release'):
+            print(join(target_dir, 'qml'))
+            if os.path.exists(join(target_dir, config, 'qml')):
+                shutil.rmtree(join(target_dir, config, 'qml'))
+            shutil.copytree(join(qtbasedir, 'qml'),join(target_dir, config, 'qml'))
+            #copyDirectory(join(qtbasedir, 'qml'),join(target_dir))
     else:     
         lib_source_dir = '${qt.dir}/lib'
         lib_target_dir = join('${project.build.directory}', 'lib')
