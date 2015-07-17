@@ -56,6 +56,10 @@
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Shortcuts</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">Place Shortcut on Desktop</String>
+
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">Shortcuts</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">Place Shortcut on Desktop</String>
     
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">A latter version of [ProductName] is already installed.</String> 
@@ -127,7 +131,8 @@
     <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Port you specified is already occupied. Press 'Next' only if you know what you're doing.</String>    
 
     <!-- Product -->
-    <String Id="Product_LaunchClient"                               Overridable="yes">Launch ${display.product.name} when setup exits.</String>    
+    <String Id="Product_LaunchClient"                               Overridable="yes">Launch ${display.product.name} when setup exits.</String>
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">Launch ${display.product.name} Server Configuration Tool when setup exits.</String>
     <String Id="Product_ArchMismatch"                               Overridable="yes">This package is designed for 32-bit OS. Setup will now exit.</String>
 
     <!-- SelectionWarningDlg -->

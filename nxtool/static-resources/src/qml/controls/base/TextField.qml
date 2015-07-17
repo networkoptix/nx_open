@@ -9,7 +9,8 @@ TextField
     id: thisComponent;
 
     property bool revertOnEmpty: false;
-    property bool changed: (text !== initialText);
+    property bool changed: changedBase;
+    property bool changedBase: (text !== initialText);
     
     property string initialText: "";
 

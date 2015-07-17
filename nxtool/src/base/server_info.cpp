@@ -55,7 +55,7 @@ rtu::InterfaceInfo::InterfaceInfo(const QString &initName
 bool rtu::operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {
-    /// Do not compare hostAddress and flags - it is Ok
+    /// Do not compare flags, hostAddress and visibleAddress - it is Ok
     return ((first.id == second.id)
         && (first.name == second.name)
         && (first.port == second.port)
@@ -113,6 +113,13 @@ rtu::ServerInfo::ServerInfo(const BaseServerInfo &baseInfo)
 {
 }
 
+rtu::ServerInfo::ServerInfo(const BaseServerInfo &baseInfo
+    , const ExtraServerInfo &extraInfo)
+    : m_base(baseInfo)
+    , m_extra(new ExtraServerInfo(extraInfo))
+{
+}
+
 rtu::ServerInfo::~ServerInfo()
 {
 }
@@ -153,10 +160,6 @@ const rtu::ExtraServerInfo &rtu::ServerInfo::extraInfo() const
 
 rtu::ExtraServerInfo &rtu::ServerInfo::writableExtraInfo()
 {
-    if (m_extra.isNull())
-    {
-        int i = 0;
-    }
     Q_ASSERT(!m_extra.isNull());
     return *m_extra;
 }

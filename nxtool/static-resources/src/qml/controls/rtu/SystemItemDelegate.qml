@@ -19,7 +19,7 @@ Item
     property int selectedState;
     
     signal selectionStateShouldBeChanged(int currentItemIndex);
-  
+
     height: column.height + buttonSpacer.height;
 
     Base.Column
@@ -36,6 +36,8 @@ Item
         }
         
         spacing: 2;
+        enabled: (loggedState != NxRtu.Constants.NotLogged);
+        opacity: (enabled ? 1.0 : 0.6);
         Item
         {
             id: headerSpacer;
@@ -65,8 +67,6 @@ Item
                     verticalCenter: parent.verticalCenter;
                 }
                 
-                onClicked: { thisComponent.selectionStateShouldBeChanged(itemIndex); }
-        
                 Binding
                 {
                     target: selectionCheckbox;
@@ -119,7 +119,14 @@ Item
     {
         id: selectionMouseArea;
 
-        anchors.fill: column;
+        anchors
+        {
+            left: parent.left;
+            right: parent.right;
+            top: column.top;
+            bottom: column.bottom;
+        }
+
         onClicked: { thisComponent.selectionStateShouldBeChanged(index); }
     }
     
@@ -154,11 +161,13 @@ Item
         
             text: qsTr("enter password");
             fontSize: Common.SizeManager.fontSizes.base;
-            onClicked: { loginDialog.visible = true; }    
+            onClicked: { loginDialog.show(); }
             
             Dialogs.LoginToSystemDialog
             {
                 id: loginDialog;
+
+                onLoginClicked: { rtuContext.tryLoginWith(thisComponent.systemName, password); }
             }
         }
     }

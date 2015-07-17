@@ -9,9 +9,7 @@ Window
 {
     id: thisComponent;
 
-    property var serverId;
-
-    signal okClicked();
+    signal loginClicked(string password);
     signal cancelClicked();
     
     flags: Qt.WindowTitleHint | Qt.MSWindowsFixedSizeDialogHint;
@@ -59,7 +57,7 @@ Window
                 echoMode: (showPasswordCheckbox.checked ? TextInput.Normal : TextInput.Password);
                 onAccepted:
                 {
-                    okClicked();
+                    loginClicked(password.text);
                     thisComponent.close();
                 }
             }
@@ -90,7 +88,7 @@ Window
                 
                 onClicked:
                 {
-                    okClicked();
+                    loginClicked(password.text);
                     thisComponent.close();
                 }                    
             }
@@ -108,9 +106,4 @@ Window
             }
         }
     }     
-    
-    onOkClicked: 
-    {
-        rtuContext.tryLoginWith(password.text);
-    }
 }

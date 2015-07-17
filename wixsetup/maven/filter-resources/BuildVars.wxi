@@ -12,12 +12,14 @@
 
     <?define ECRegPath="Software\${company.name}\${appserver.name}"?>    
     
-    <?define productName = "${display.product.name}"?>
+    <?define productName = "${product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
     <?define clientName = "${product.name}"?>
+    <?define nxtoolName = "${display.product.name} Server Configuration Tool"?>
 
     <?define productExeName = "${product_name}"?>
     <?define clientExeName = "${product.name}"?>
+    <?define nxtoolExeName = "${display.product.name} Server Configuration Tool"?>
 
     <?define mirrorListUrl = "${mirrorListUrl}"?>
     <?define quicksync = "${quicksync}"?>
@@ -54,7 +56,8 @@
     <?define archSuffix = "x86_x64" ?>
     <?endif?>
 
-    <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>                
+    <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
+    <?define NxtoolSourceDir="${root.dir}/nxtool/${arch}/bin/${build.configuration}"?>    
     <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
 
     <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
