@@ -21,8 +21,10 @@ namespace
     enum 
     {
         kIfListRequestsPeriod = 2 * 1000
-        , kWaitTriesCount = 15
-        , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount
+        , kWaitTriesCount = 45
+
+        /// Accepted wait time is 90 seconds due to restart on network interface parameters change
+        , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount   
     };
 
     struct DateTime
@@ -89,7 +91,7 @@ namespace
 
 namespace
 {
-    const bool kNonBlockingRequest = true;
+    const bool kNonBlockingRequest = false;
     const bool kBlockingRequest = true;
 }
 
@@ -507,7 +509,7 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
         };
 
         m_totalChangesCount += kDateTimeChangesetSize;
-        m_requests.push_back(RequestData(kNonBlockingRequest, request));
+        m_requests.push_back(RequestData(kBlockingRequest, request));
     }
 }
 
@@ -541,7 +543,7 @@ void rtu::ChangesManager::Impl::addSystemNameChangeRequests()
         };
 
         m_totalChangesCount += kSystemNameChangesetSize;
-        m_requests.push_back(RequestData(kNonBlockingRequest, request));
+        m_requests.push_back(RequestData(kBlockingRequest, request));
     }
 }
 
@@ -632,7 +634,10 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
         };
         
         m_totalChangesCount += changeRequest.changesCount;
-        m_requests.push_back(RequestData(kBlockingRequest, request));
+
+        /// Request is non blocking due to restart on interface parameters change. 
+        // I.e. we send multiple unqued requests and not wait until they complete before next send.
+        m_requests.push_back(RequestData(kNonBlockingRequest, request));
     };
 
     enum { kSingleSelection = 1 };
