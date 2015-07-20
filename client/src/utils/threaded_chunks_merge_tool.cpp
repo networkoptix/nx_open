@@ -76,10 +76,10 @@ void QnThreadedChunksMergeTool::processData() {
         auto syncedAppending = QnTimePeriodList::mergeTimePeriods(intersectedPeriods);
         QnTimePeriodList::overwriteTail(result, syncedAppending, startTimeMs);
 
-#ifdef _DEBUG
-        auto test = QnTimePeriodList::mergeTimePeriods(periodsList);
-        Q_ASSERT_X(test == result, Q_FUNC_INFO, "Check that merging was correct");
-#endif
+//#ifdef _DEBUG
+//        auto test = QnTimePeriodList::mergeTimePeriods(periodsList);
+//        Q_ASSERT_X(test == result, Q_FUNC_INFO, "Check that merging was correct");
+//#endif
         
         emit finished(handle, result);
     }

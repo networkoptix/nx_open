@@ -15,6 +15,7 @@
 #include <QtCore/QPluginLoader>
 #include <QSharedPointer>
 #include <QtCore/QString>
+#include <QtCore/QSettings>
 
 #include "plugin_api.h"
 
@@ -82,9 +83,12 @@ public:
     }
 
     /*!
+        \param settings This settings are reported to each plugin (if supported by plugin of course)
         This method must be called implicitly
     */
-    void loadPlugins( PluginType pluginsToLoad = AllPlugins );
+    void loadPlugins(
+        const QSettings* settings,
+        PluginType pluginsToLoad = AllPlugins );
 
     //!Guess what
     static PluginManager* instance( const QString& pluginDir = QString() );
@@ -99,10 +103,15 @@ private:
     QList<nxpl::PluginInterface*> m_nxPlugins;
     mutable QMutex m_mutex;
 
-    void loadPluginsFromDir( const QString& dirToSearchIn, PluginType pluginsToLoad );
+    void loadPluginsFromDir(
+        const std::vector<nxpl::Setting>& settingsForPlugin,
+        const QString& dirToSearchIn,
+        PluginType pluginsToLoad );
     bool loadQtPlugin( const QString& fullFilePath );
     //!Loads \a nxpl::PluginInterface based plugin
-    bool loadNxPlugin( const QString& fullFilePath );
+    bool loadNxPlugin(
+        const std::vector<nxpl::Setting>& settingsForPlugin,
+        const QString& fullFilePath );
 };
 
 #endif /* PLUGIN_MANAGER_H */
