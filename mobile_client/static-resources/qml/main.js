@@ -1,3 +1,5 @@
+.import QtQuick.Window 2.2 as QtWindow
+
 function findRootItem(item) {
     while (item.parent)
         item = item.parent
@@ -20,6 +22,10 @@ function findRootChild(item, objectName) {
     }
 
     return null
+}
+
+function isMobile() {
+    return Qt.platform.os == "android" || Qt.platform.os == "ios" || Qt.platform.os == "winphone" || Qt.platform.os == "blackberry"
 }
 
 function openDiscoveredSession(_host, _port, _systemName) {
@@ -112,6 +118,7 @@ function gotoResources() {
 function gotoMainScreen() {
     toolBar.opacity = 1.0
     toolBar.backgroundOpacity = 1.0
+    exitFullscreen()
 
     if (connectionManager.connected)
         gotoResources()

@@ -23,6 +23,7 @@
 #include "ui/resolution_util.h"
 #include "ui/camera_thumbnail_provider.h"
 #include "ui/icon_provider.h"
+#include "ui/window_utils.h"
 #include "camera/camera_thumbnail_cache.h"
 
 #include "version.h"
@@ -72,6 +73,8 @@ int runUi(QGuiApplication *application) {
         qWarning() << mainComponent.errorString();
 
     QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
+
+    prepareWindow();
 
     return application->exec();
 }

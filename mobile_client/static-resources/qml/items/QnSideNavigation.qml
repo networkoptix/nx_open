@@ -34,6 +34,11 @@ QnNavigationDrawer {
 
                 width: parent.width
 
+                Item {
+                    width: parent.width
+                    height: getStatusBarHeight()
+                }
+
                 Text {
                     id: sectionLabel
                     height: dp(48)
@@ -125,6 +130,12 @@ QnNavigationDrawer {
                     text: qsTr("© 2015 Network Optix")
                     font.pixelSize: sp(12)
                     color: QnTheme.sideNavigationCopyright
+                }
+
+                Item {
+                    width: parent.width
+                    height: navigationBarPlaceholder.height + dp(8)
+                    visible: navigationBarPlaceholder.height > 1
                 }
             }
         }

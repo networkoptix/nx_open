@@ -1,4 +1,5 @@
 import QtQuick 2.2
+import QtQuick.Window 2.2
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
 import QtMultimedia 5.0
@@ -21,7 +22,7 @@ QnPage {
     }
 
     QnIconButton {
-        parent: toolBar
+        parent: toolBar.contentItem
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: dp(8)
@@ -47,7 +48,7 @@ QnPage {
         id: video
 
         anchors.fill: parent
-        anchors.topMargin: -toolBar.height
+        anchors.topMargin: -toolBar.fullHeight
         anchors.bottomMargin: videoNavigation.videoBottomMargin
         Behavior on anchors.bottomMargin { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
@@ -82,13 +83,18 @@ QnPage {
     function hideUi() {
         videoNavigation.opacity = 0.0
         toolBar.opacity = 0.0
-        video.anchors.bottomMargin = 0
+        video.anchors.bottomMargin = Qt.binding(function() { return -navigationBarPlaceholder.height })
+        video.anchors.rightMargin = Qt.binding(function() { return -navigationBarPlaceholder.width })
+        if (Main.isMobile())
+            enterFullscreen()
     }
 
     function showUi() {
+        exitFullscreen()
         videoNavigation.opacity = 1.0
         toolBar.opacity = 1.0
-        video.anchors.bottomMargin = Qt.binding(function() { return videoNavigation.videoBottomMargin; })
+        video.anchors.bottomMargin = Qt.binding(function() { return videoNavigation.videoBottomMargin })
+        video.anchors.rightMargin = 0
     }
 
     focus: true

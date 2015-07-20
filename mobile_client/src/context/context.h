@@ -49,6 +49,13 @@ public:
     Q_INVOKABLE int dp(qreal dpix) const;
     Q_INVOKABLE int sp(qreal dpix) const;
 
+    Q_INVOKABLE void enterFullscreen();
+    Q_INVOKABLE void exitFullscreen();
+
+    Q_INVOKABLE int getStatusBarHeight() const;
+    Q_INVOKABLE int getNavigationBarHeight() const;
+    Q_INVOKABLE bool getDeviceIsPhone() const;
+
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
     void connectionManagerChanged();

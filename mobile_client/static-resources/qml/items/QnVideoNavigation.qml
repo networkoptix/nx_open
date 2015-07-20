@@ -12,8 +12,10 @@ Item {
     property var mediaPlayer
 
     width: parent.width
-    height: navigator.height + navigationPanel.height
+    height: navigator.height + navigationPanel.height + cursorTickMargin
     anchors.bottom: parent.bottom
+
+    clip: true
 
     property real cursorTickMargin: dp(10)
     property real timelineTextMargin: timeline.height - timeline.chunkBarHeight
@@ -27,7 +29,7 @@ Item {
         id: navigator
         width: parent.width
         height: timeline.height + playbackController.height
-        y: navigationPanel.height
+        y: navigationPanel.height + cursorTickMargin
         Behavior on y { SmoothedAnimation { duration: 200; reversingMode: SmoothedAnimation.Sync } }
 
         MouseArea {
@@ -36,8 +38,8 @@ Item {
             anchors.fill: navigator
             drag.target: navigator
             drag.axis: Drag.YAxis
-            drag.minimumY: 0
-            drag.maximumY: navigationPanel.height
+            drag.minimumY: cursorTickMargin
+            drag.maximumY: navigationPanel.height + cursorTickMargin
             drag.filterChildren: true
 
             property real _prevY

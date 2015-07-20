@@ -7,6 +7,7 @@
 #include "ui/resolution_util.h"
 #include "login_session_manager.h"
 #include "context_settings.h"
+#include "ui/window_utils.h"
 
 namespace {
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
@@ -36,6 +37,26 @@ int QnContext::dp(qreal dpix) const {
 
 int QnContext::sp(qreal dpix) const {
     return m_resolutionUtil->sp(dpix);
+}
+
+void QnContext::exitFullscreen() {
+    showSystemUi();
+}
+
+int QnContext::getStatusBarHeight() const {
+    return statusBarHeight();
+}
+
+int QnContext::getNavigationBarHeight() const {
+    return navigationBarHeight();
+}
+
+bool QnContext::getDeviceIsPhone() const {
+    return !isTablet();
+}
+
+void QnContext::enterFullscreen() {
+    hideSystemUi();
 }
 
 void QnContext::at_connectionManager_connectedChanged() {

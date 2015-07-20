@@ -24,7 +24,7 @@ QnPage {
 
     QnSearchItem {
         id: searchItem
-        parent: toolBar
+        parent: toolBar.contentItem
         onOpenedChanged: {
             searchListLoader.sourceComponent = opened ? searchListComponent : undefined
             if (opened) {

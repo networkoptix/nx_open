@@ -23,18 +23,21 @@ Window {
     property string currentPasswrod
     property string currentSessionId
 
-    Rectangle {
-        anchors.fill: parent
-        color: QnTheme.windowBackground
-    }
+    readonly property bool isPhone: getDeviceIsPhone()
+
+    color: QnTheme.windowBackground
 
     QnToolBar {
         id: toolBar
 
         z: 5.0
 
+        width: mainWindow.width - navigationBarPlaceholder.width
+
         QnMenuBackButton {
             id: menuBackButton
+
+            parent: toolBar.contentItem
 
             property bool transitionAnimated: false
 
@@ -68,6 +71,13 @@ Window {
         }
     }
 
+    Item {
+        id: navigationBarPlaceholder
+
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+    }
+
     QnSideNavigation {
         id: sideNavigation
         activeSessionId: currentSessionId
@@ -75,9 +85,10 @@ Window {
 
     StackView {
         id: stackView
-        width: parent.width
         anchors.top: toolBar.bottom
-        anchors.bottom: parent.bottom
+        anchors.bottom: navigationBarPlaceholder.top
+        anchors.left: parent.left
+        anchors.right: navigationBarPlaceholder.left
 
         onCurrentItemChanged: {
             if (currentItem) {
@@ -87,23 +98,34 @@ Window {
         }
     }
 
-    QnOverlayLayer {
-        id: dialogLayer
-        objectName: "dialogLayer"
+    Item {
+        id: overlayBound
+        anchors.top: parent.top
+        anchors.topMargin: toolBar.statusBarHeight
+        anchors.bottom: navigationBarPlaceholder.top
+        anchors.left: parent.left
+        anchors.right: navigationBarPlaceholder.left
+
         z: 10.0
-    }
 
-    QnOverlayLayer {
-        id: toastLayer
-        objectName: "toastLayer"
-        z: 15.0
-        blocking: false
-    }
+        QnOverlayLayer {
+            id: dialogLayer
+            objectName: "dialogLayer"
+            z: 10.0
+        }
 
-    QnOverlayLayer {
-        id: popupLayer
-        objectName: "popupLayer"
-        z: 20.0
+        QnOverlayLayer {
+            id: toastLayer
+            objectName: "toastLayer"
+            z: 15.0
+            blocking: false
+        }
+
+        QnOverlayLayer {
+            id: popupLayer
+            objectName: "popupLayer"
+            z: 20.0
+        }
     }
 
     Component {
@@ -173,6 +195,7 @@ Window {
     }
 
     Component.onCompleted: {
+        updateNavigationBarPlaceholderSize()
         currentSessionId = loginSessionManager.lastUsedSessionId
         if (currentSessionId) {
             stackView.push(resourcesPageComponent)
@@ -184,4 +207,21 @@ Window {
             stackView.push([resourcesPageComponent, loginPageComponent])
         }
     }
+
+    function updateNavigationBarPlaceholderSize() {
+        if (Qt.platform.os != "android")
+            return
+
+        var navBarSize = getNavigationBarHeight()
+
+        if (isPhone && Screen.primaryOrientation == Qt.LandscapeOrientation) {
+            navigationBarPlaceholder.width = navBarSize
+            navigationBarPlaceholder.height = 1
+        } else {
+            navigationBarPlaceholder.width = 1
+            navigationBarPlaceholder.height = navBarSize
+        }
+    }
+
+    Screen.onPrimaryOrientationChanged: updateNavigationBarPlaceholderSize()
 }
