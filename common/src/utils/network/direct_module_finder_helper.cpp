@@ -55,13 +55,13 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     m_elapsedTimer.start();
 }
 
-void QnDirectModuleFinderHelper::addForcedUrl(const QUrl url) {
-    m_forcedUrls.insert(url);
+void QnDirectModuleFinderHelper::addForcedUrl(QUrl url) {
+    m_forcedUrls.insert(std::move(url));
     updateModuleFinder();
 }
 
-void QnDirectModuleFinderHelper::setForcedUrls(const QSet<QUrl> &forcedUrls) {
-    m_forcedUrls = forcedUrls;
+void QnDirectModuleFinderHelper::setForcedUrls(QSet<QUrl> forcedUrls) {
+    m_forcedUrls.swap(forcedUrls);
     updateModuleFinder();
 }
 
