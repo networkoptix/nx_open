@@ -783,11 +783,6 @@ int serverMain(int argc, char *argv[])
     qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     ffmpegInit();
-    QnStoragePluginFactory::instance()->registerStoragePlugin(
-        "ftp",
-        QnThirdPartyStorageResource::instance,
-        false
-    );
     // ------------------------------------------
 #ifdef TEST_RTSP_SERVER
     addTestData();
