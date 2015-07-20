@@ -148,9 +148,10 @@ QnAuditRecordList QnEventsDB::getAuditData(const QnTimePeriod& period, const QnU
     QnAuditRecordList result;
     QString request;
     if (sessionId.isNull())
-        request = (lit("SELECT * from audit_log WHERE timestamp BETWEEN ? and ? AND session_id = ? order by timestamp"));
-    else
         request = (lit("SELECT * from audit_log WHERE timestamp BETWEEN ? and ? order by timestamp"));
+    else
+        request = (lit("SELECT * from audit_log WHERE timestamp BETWEEN ? and ? AND session_id = ? order by timestamp"));
+        
 
     QWriteLocker lock(&m_mutex);
     QSqlQuery query(m_sdb);
