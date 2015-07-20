@@ -192,7 +192,7 @@ Item {
                     icon: "image://icon/calendar.png"
                     onClicked: {
                         calendarPanel.date = timeline.positionDate
-                        calendarPanel.open(0, 0)
+                        calendarPanel.open()
                     }
                 }
 

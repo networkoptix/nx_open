@@ -20,6 +20,12 @@ FocusScope {
     visible: false
 
     function open(x, y) {
+        if (x === undefined)
+            x = 0
+
+        if (y === undefined)
+            y = 0
+
         _lastFocusedItem = Window.activeFocusItem
 
         parent = Main.findRootChild(popup, overlayLayer)

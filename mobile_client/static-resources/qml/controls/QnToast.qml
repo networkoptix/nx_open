@@ -50,7 +50,7 @@ QnPopup {
 
             QnButton {
                 id: mainButton
-                visible: text != "" && icon != ""
+                visible: text != "" || icon != ""
             }
         }
     }

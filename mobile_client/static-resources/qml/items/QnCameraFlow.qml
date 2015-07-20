@@ -256,7 +256,7 @@ QnFlickable {
 
         onShownChanged: {
             if (shown)
-                open(0, 0)
+                open()
             else
                 close()
         }
