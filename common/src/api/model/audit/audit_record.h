@@ -4,25 +4,34 @@
 #include "utils/common/uuid.h"
 #include "common/common_globals.h"
 #include <utils/common/model_functions_fwd.h>
+#include "auth_session.h"
 
 struct QnAuditRecord
 {
     QnAuditRecord(): timestamp(0), endTimestamp(0), eventType(Qn::AR_NotDefined) {}
 
+    void fillAuthInfo(const QnAuthSession& authInfo) 
+    {
+        sessionId = authInfo.sessionId;
+        userName = authInfo.userName;
+        userHost = authInfo.userHost;
+    }
+
     int timestamp; // start timestamp in seconds
     int endTimestamp; // end timestamp in seconds
     Qn::AuditRecordType eventType;
+    //QString description;
+    std::vector<QnUuid> resources;
+    QString extraParams;
+
     QnUuid sessionId;
     QString userName;
     QString userHost;
-    QString description;
-    std::vector<QnUuid> resources;
-    QString params;
 };
 typedef std::vector<QnAuditRecord> QnAuditRecordList;
 
 
-#define QnAuditRecord_Fields (timestamp)(endTimestamp)(eventType)(sessionId)(userName)(userHost)(description)(resources)(params)
+#define QnAuditRecord_Fields (timestamp)(endTimestamp)(eventType)(resources)(extraParams)(sessionId)(userName)(userHost)
 Q_DECLARE_METATYPE(QnAuditRecord)
 
 

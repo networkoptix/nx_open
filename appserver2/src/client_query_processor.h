@@ -26,6 +26,7 @@
 #include "transaction/transaction.h"
 #include "utils/serialization/ubjson.h"
 #include "http/custom_headers.h"
+#include "api/model/audit/auth_session.h"
 
 
 namespace ec2

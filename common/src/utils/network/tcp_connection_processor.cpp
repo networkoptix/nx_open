@@ -16,6 +16,8 @@
 #ifndef Q_OS_WIN
 #   include <netinet/tcp.h>
 #endif
+#include "core/resource_management/resource_pool.h"
+#include "http/custom_headers.h"
 
 // we need enough size for updates
 #ifdef __arm__
@@ -478,4 +480,16 @@ bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
         return nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
     else    //e.g., RTSP
         return false;
+}
+
+QnAuthSession QnTCPConnectionProcessor::authSession() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    QnAuthSession result;
+    if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
+        result.userName = userRes->getName();
+    result.sessionId = nx_http::getHeaderValue(d->request.headers, Qn::EC2_CONNECTION_GUID_HEADER_NAME);
+    result.userHost = d->socket->getForeignAddress().address.toString();
+
+    return result;
 }
