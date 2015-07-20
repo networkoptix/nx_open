@@ -556,13 +556,13 @@
                 "fromCamera": {
                     "x": {
                         "extrapolationMode": "PeriodicExtrapolation",
-                        "device":  [   1,  -1],
+                        "device":  [  -1,   1],
                         "logical": [-180, 180]
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "_TODO": "Actual tilt range is [0, -180].",
-                        "device":  [-1,   1],
+                        "device":  [1,   -1],
                         "logical": [0,   90]
                     },
                     "z": {
@@ -573,7 +573,8 @@
                         "space": "35MmEquiv"
                     }
                 }
-            }
+            },
+			"onvifPtzDigitsAfterDecimalPoint": 2
         },        
         {
             "keys": [
