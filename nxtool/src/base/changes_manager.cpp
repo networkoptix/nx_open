@@ -21,9 +21,9 @@ namespace
     enum 
     {
         kIfListRequestsPeriod = 2 * 1000
-        , kWaitTriesCount = 45
+        , kWaitTriesCount = 60
 
-        /// Accepted wait time is 90 seconds due to restart on network interface parameters change
+        /// Accepted wait time is 120 seconds due to restart on network interface parameters change
         , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount   
     };
 
