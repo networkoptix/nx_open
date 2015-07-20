@@ -57,6 +57,10 @@
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">捷徑</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">新增捷徑至桌面</String>
     
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">捷徑</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">新增捷徑至桌面</String>
+    
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">更新的版本 [ProductName] 已經安裝</String> 
 
@@ -126,6 +130,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">退出安裝時執行 ${product.name} </String>    
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">退出安裝時執行 ${nxtool.name} </String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">此安裝檔為 32 位元專用. 安裝即將結束. </String>
 
     <!-- SelectionWarningDlg -->
