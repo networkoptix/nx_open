@@ -56,7 +56,7 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
 }
 
 void QnDirectModuleFinderHelper::addForcedUrl(QUrl url) {
-    m_forcedUrls.insert(url);
+    m_forcedUrls.insert(std::move(url));
     updateModuleFinder();
 }
 
