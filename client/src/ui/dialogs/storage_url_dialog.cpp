@@ -73,11 +73,20 @@ QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(
         result.name = tr("Windows Network Shared Resource");
         result.urlTemplate = tr("\\\\<Computer Name>\\<Folder>");
         result.urlPattern = lit("\\\\\\\\%1\\\\.+").arg(validHostnamePattern);
-    } else if(protocol == lit("coldstore")) {
+    } 
+    //else if(protocol == lit("coldstore")) 
+    //{
+    //    result.protocol = protocol;
+    //    result.name = tr("Coldstore Network Storage");
+    //    result.urlTemplate = tr("coldstore://<Address>");
+    //    result.urlPattern = lit("coldstore://%1/?").arg(validHostnamePattern);
+    //}
+    else if (protocol != lit("file") && protocol != lit("local"))
+    {
         result.protocol = protocol;
-        result.name = tr("Coldstore Network Storage");
-        result.urlTemplate = tr("coldstore://<Address>");
-        result.urlPattern = lit("coldstore://%1/?").arg(validHostnamePattern);
+        result.name = protocol.toUpper();
+        result.urlTemplate = lit("%1://<Address>/path").arg(protocol);
+        result.urlPattern = lit("%1://%2").arg(protocol).arg(validHostnamePattern);
     }
 
     return result;
@@ -110,7 +119,18 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
 void QnStorageUrlDialog::accept() 
 {
     QnConnectionRequestResult result;
-    QString url = makeUrl(ui->urlEdit->text(), ui->loginLineEdit->text(), ui->passwordLineEdit->text());
+    QString protocol = qvariant_cast<QString>(ui->protocolComboBox->currentData());
+    QString urlText = ui->urlEdit->text();
+    
+    if (protocol == lit("smb"))
+    {
+        if(!urlText.startsWith(lit("\\\\")))
+            urlText = lit("\\\\") + urlText;
+    }
+    else if (!urlText.toUpper().startsWith(protocol.toUpper() + lit("://")))
+        urlText = protocol.toLower() + lit("://") + urlText;
+
+    QString url = makeUrl(urlText, ui->loginLineEdit->text(), ui->passwordLineEdit->text());
     m_server->apiConnection()->getStorageStatusAsync(url,  &result, SLOT(processReply(int, const QVariant &, int)));
 
     QEventLoop loop;
@@ -136,8 +156,8 @@ void QnStorageUrlDialog::updateComboBox() {
 
     ui->protocolComboBox->clear();
     for(const ProtocolDescription &description: m_descriptions) {
-        ui->protocolComboBox->addItem(description.name);
-
+        ui->protocolComboBox->addItem(description.name, description.protocol);
+        
         if(description.protocol == lastProtocol)
             ui->protocolComboBox->setCurrentIndex(ui->protocolComboBox->count() - 1);
     }

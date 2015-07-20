@@ -45,7 +45,7 @@ class ArchiveScanPosition
 public:
     ArchiveScanPosition(): m_catalog(QnServer::LowQualityCatalog) {}
     ArchiveScanPosition(const QnStorageResourcePtr& storage, QnServer::ChunksCatalog catalog, const QString& cameraUniqueId):
-        m_storagePath(storage->getPath()),
+        m_storagePath(storage->getUrl()),
         m_catalog(catalog), 
         m_cameraUniqueId(cameraUniqueId) 
     {}
@@ -179,7 +179,7 @@ public:
                 int currentStep = 0;
                 for(auto itr = catalogToScan.begin(); itr != catalogToScan.end(); ++itr) 
                 {
-                    m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getPath(), currentStep / (qreal) totalStep));
+                    m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getUrl(), currentStep / (qreal) totalStep));
                     DeviceFileCatalog::ScanFilter filter;
                     filter.scanPeriod.startTimeMs = itr.value();
                     qint64 endScanTime = qnSyncTime->currentMSecsSinceEpoch();
@@ -189,17 +189,17 @@ public:
                         return;
                     ++currentStep;
                 }
-                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getPath(), 1.0));
+                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getUrl(), 1.0));
             }
             else 
             {
                 QElapsedTimer t;
                 t.restart();
-                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 0.0));
+                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getUrl(), 0.0));
                 m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::LowQualityCatalog, 0.5);
                 m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::HiQualityCatalog, 0.5);
-                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 1.0));
-                qDebug() << "rebuild archive time for storage" << scanData.storage->getPath() << "is:" << t.elapsed() << "msec";
+                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getUrl(), 1.0));
+                qDebug() << "rebuild archive time for storage" << scanData.storage->getUrl() << "is:" << t.elapsed() << "msec";
             }
             m_scanTasks.removeFirst(1);
         }
@@ -414,7 +414,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
     QnAbstractStorageResource::FileInfoList list = 
         storage->getFileList(
             closeDirPath(
-                storage->getPath()
+                storage->getUrl()
             ) + DeviceFileCatalog::prefixByCatalog(catalog)
         );
 
@@ -453,14 +453,15 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
 
 int QnStorageManager::getStorageIndex(const QnStorageResourcePtr& storage)
 {
-    return detectStorageIndex(storage->getPath());
+    return detectStorageIndex(storage->getUrl());
 }
 
 // determine storage index (aka 16 bit hash)
 int QnStorageManager::detectStorageIndex(const QString& p)
 {
     QMutexLocker lock(&m_mutexStorages);
-    QString path = toCanonicalPath(p);
+    QString path = p;
+    //QString path = toCanonicalPath(p);
 
     if (m_storageIndexes.contains(path))
     {
@@ -494,10 +495,10 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
     QString storagePath = storage->getPath();
     QString dbRefFilePath;
     
-    if (storagePath.indexOf(lit("://")) != -1)
-        dbRefFilePath = dbRefFileName.arg(getLocalGuid());
-    else
-        dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
+    //if (storagePath.indexOf(lit("://")) != -1)
+    //    dbRefFilePath = dbRefFileName.arg(getLocalGuid());
+    //else
+    dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
 
     QByteArray dbRefGuidStr;
     //checking for file db_ref.guid existence
@@ -505,12 +506,12 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
     {
         //have to use db from data directory, not from storage
         //reading guid from file
-        QIODevice *dbGuidFile = storage->open(dbRefFilePath, QIODevice::ReadOnly);
+        auto dbGuidFile = std::unique_ptr<QIODevice>(storage->open(dbRefFilePath, QIODevice::ReadOnly));
 
-        if (dbGuidFile == nullptr)
+        if (!dbGuidFile)
             return false;
         dbRefGuidStr = dbGuidFile->readAll();
-        dbGuidFile->close();
+        //dbGuidFile->close();
     }
 
     if( !dbRefGuidStr.isEmpty() )
@@ -558,7 +559,7 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 {
     QMutexLocker lock(&m_sdbMutex);
 
-    QnStorageDbPtr sdb = m_chunksDB[storage->getPath()];
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb) 
     {
         QString simplifiedGUID = getLocalGuid();
@@ -576,14 +577,14 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
             if (storage->isFileExists(oldFileName) && !storage->isFileExists(fileName))
                 storage->renameFile(oldFileName, fileName);
 
-            sdb = m_chunksDB[storage->getPath()] = 
+            sdb = m_chunksDB[storage->getUrl()] = 
                 QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
         }
         else
         {
             if (QFile::exists(oldFileName) && !QFile::exists(fileName))
                 QFile::rename(oldFileName, fileName);
-            sdb = m_chunksDB[storage->getPath()] = 
+            sdb = m_chunksDB[storage->getUrl()] = 
                 QnStorageDbPtr(new QnStorageDb(QnStorageResourcePtr(), getStorageIndex(storage)));
         }
 
@@ -599,11 +600,11 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     {
-        int storageIndex = detectStorageIndex(storage->getPath());
+        int storageIndex = detectStorageIndex(storage->getUrl());
         QMutexLocker lock(&m_mutexStorages);
         m_storagesStatisticsReady = false;
     
-        NX_LOG(QString("Adding storage. Path: %1").arg(storage->getPath()), cl_logINFO);
+        NX_LOG(QString("Adding storage. Path: %1").arg(storage->getUrl()), cl_logINFO);
 
         removeStorage(storage); // remove existing storage record if exists
         //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
@@ -997,7 +998,7 @@ QnStorageResourceList QnStorageManager::getStoragesInLexicalOrder() const
     std::sort(result.begin(), result.end(),
               [](const QnStorageResourcePtr& storage1, const QnStorageResourcePtr& storage2)
     {
-        return storage1->getPath() < storage2->getPath();
+        return storage1->getUrl() < storage2->getUrl();
     });
     return result;
 }
@@ -1135,7 +1136,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         return; // unlimited
 
 
-    QString dir = storage->getPath();
+    QString dir = storage->getUrl();
 
     if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile))
         return;
@@ -1255,7 +1256,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
     //QMutexLocker lock(&m_mutexStorages);
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
         NX_LOG(QString("Storage. Path: %1. Goes to the online state. SpaceLimit: %2MiB. Currently available: %3MiB").
-            arg(fileStorage->getPath()).arg(fileStorage->getSpaceLimit() / 1024 / 1024).arg(fileStorage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+            arg(fileStorage->getUrl()).arg(fileStorage->getSpaceLimit() / 1024 / 1024).arg(fileStorage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
         // add data before storage goes to the writable state
         doMigrateCSVCatalog(fileStorage);
@@ -1335,7 +1336,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnStorageResourcePtr storage = *itr;
-        qDebug() << "QnFileStorageResource " << storage->getPath() << "current bitrate=" << storage->bitrate() << "coeff=" << storage->getStorageBitrateCoeff();
+        qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate() << "coeff=" << storage->getStorageBitrateCoeff();
         float bitrate = storage->bitrate() / storage->getStorageBitrateCoeff();
         minBitrate = qMin(minBitrate, bitrate);
         bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
@@ -1382,7 +1383,7 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
         return QString();
     }
     Q_ASSERT(camera != 0);
-    QString base = closeDirPath(storage->getPath());
+    QString base = closeDirPath(storage->getUrl());
     QString separator = getPathSeparator(base);
 
     if (!prefix.isEmpty())
@@ -1463,20 +1464,44 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 
     storageIndex = -1;
     const StorageMap storages = getAllStorages();
+    QnStorageResourcePtr ret;
+    int matchLen = 0;
+    QString storageUrl;
     for(StorageMap::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-        QString root = closeDirPath(itr.value()->getPath());
-        QString separator = getPathSeparator(root);
+        QString root = closeDirPath(itr.value()->getUrl());
         if (fileName.startsWith(root))
         {
-            int qualityLen = fileName.indexOf(separator, root.length()+1) - root.length();
-            quality = fileName.mid(root.length(), qualityLen);
-            int idPos = root.length() + qualityLen;
-            uniqueId = fileName.mid(idPos+1, fileName.indexOf(separator, idPos+1) - idPos-1);
-
-            storageIndex = getStorageIndex(itr.value());
-            return *itr;
+            if (matchLen < root.size())
+            {
+                matchLen = root.size();
+                ret = *itr;
+                storageUrl = root;
+            }
         }
+    }
+
+    if (ret)
+    {
+        QString separator = getPathSeparator(storageUrl);
+        int qualityLen = fileName.indexOf(separator, storageUrl.length()+1) - storageUrl.length();
+        quality = fileName.mid(storageUrl.length(), qualityLen);
+        int idPos = storageUrl.length() + qualityLen;
+        uniqueId = fileName.mid(idPos+1, fileName.indexOf(separator, idPos+1) - idPos-1);
+        storageIndex = getStorageIndex(ret);
+    }
+    return ret;
+}
+
+QnStorageResourcePtr QnStorageManager::getStorageByUrlExact(const QString& storageUrl)
+{
+    QMutexLocker lock(&m_mutexStorages);
+    int matchLen = 0;
+    for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    {
+        QString root = (*itr)->getUrl();
+        if (storageUrl == root)
+            return *itr;
     }
     return QnStorageResourcePtr();
 }
@@ -1484,13 +1509,21 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 {
     QMutexLocker lock(&m_mutexStorages);
+    QnStorageResourcePtr ret;
+    int matchLen = 0;
     for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
-        QString root = itr.value()->getPath();
+        QString root = (*itr)->getUrl();
         if (fileName.startsWith(root))
-            return itr.value();
+        {
+            if (matchLen < root.size())
+            {
+                matchLen = root.size();
+                ret = *itr;
+            }
+        }
     }
-    return QnStorageResourcePtr();
+    return ret;
 }
 
 bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)

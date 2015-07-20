@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <functional>
 #include <signal.h>
 #ifdef __linux__
 #include <signal.h>
@@ -426,7 +427,8 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
         { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
     const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
-    storage->setStorageType(QnLexical::serialized(storageType));
+    if (storage->getStorageType().isEmpty())
+        storage->setStorageType(QnLexical::serialized(storageType));
 
     return storage;
 }
@@ -786,7 +788,6 @@ int serverMain(int argc, char *argv[])
         QnThirdPartyStorageResource::instance,
         false
     );
-
     // ------------------------------------------
 #ifdef TEST_RTSP_SERVER
     addTestData();
@@ -1710,6 +1711,21 @@ void MediaServerProcess::run()
 
     //Initializing plugin manager
     PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
+
+    using namespace std::placeholders;
+    for (const auto storagePlugin : 
+         PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+    {
+        QnStoragePluginFactory::instance()->registerStoragePlugin(
+            storagePlugin->storageType(),
+            std::bind(
+                &QnThirdPartyStorageResource::instance,
+                _1,
+                storagePlugin
+            ),
+            false
+        );                    
+    }
 
     if (needToStop())
         return;

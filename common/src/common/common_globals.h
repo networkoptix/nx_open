@@ -515,6 +515,8 @@ public:
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
+        StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
+
         IOPortDataRole,                             /**< Return QnIOPortData object. Used in IOPortDataModel */
         
         RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */

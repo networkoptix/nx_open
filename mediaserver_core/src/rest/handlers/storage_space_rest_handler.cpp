@@ -6,6 +6,8 @@
 #include <core/resource/storage_plugin_factory.h>
 
 #include <platform/platform_abstraction.h>
+#include <plugins/plugin_manager.h>
+#include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
 
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
 #include <utils/serialization/json.h>
@@ -91,7 +93,8 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         if (storage) {
             storage->setUrl(data.url); /* createStorage does not fill url. */
             storage->setSpaceLimit(defaultStorageSpaceLimit);
-            storage->setStorageType(data.storageType);
+            if (storage->getStorageType().isEmpty())
+                storage->setStorageType(data.storageType);
             data.isWritable = storage->getCapabilities() & 
                               QnAbstractStorageResource::cap::WriteFile;
         } else {
@@ -100,7 +103,12 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
 
         reply.storages.push_back(data);
     }
-
+    
+    for (const auto storagePlugin : 
+         PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+    {
+        reply.storageProtocols.push_back(storagePlugin->storageType());
+    }
 #ifdef Q_OS_WIN
     reply.storageProtocols.push_back(lit("smb"));
     /* Coldstore is not supported for now as nobody uses it. */

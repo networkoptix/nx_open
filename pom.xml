@@ -31,7 +31,7 @@
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
         <ftpstorageplugin.name>${company.name} Ftp storage plugin</ftpstorageplugin.name>
-        <storage_plugin_test_client.name>${company.name} storage plugin testing client program</storage_plugin_test_client.name>
+        <!--storage_plugin_test_client.name>${company.name} storage plugin testing client program</storage_plugin_test_client.name-->
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
         <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
         <mediaserver_core.name>${company.name} Media Server Core</mediaserver_core.name>
@@ -327,7 +327,7 @@
                 <module>nx_sdk</module>
                 <module>plugins/genericrtspplugin</module>
                 <module>storage_plugins/ftpstorageplugin</module>
-                <module>storage_plugins/storage_plugin_test_client</module>
+                <!--module>storage_plugins/storage_plugin_test_client</module-->                
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>

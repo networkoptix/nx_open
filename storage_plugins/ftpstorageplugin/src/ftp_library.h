@@ -10,7 +10,7 @@
 #include "plugins/storage/third_party/third_party_storage.h"
 #include "impl/ftplib.h"
 
-namespace Qn 
+namespace nx_spl 
 {
     namespace aux
     {   // Generic reference counter Mix-In. Private inherit it.
@@ -247,7 +247,7 @@ namespace Qn
           private aux::NonCopyable,
           private aux::PluginRefCounter<FtpStorageFactory>
     {
-        friend class aux::PluginRefCounter<FtpStorage>;
+        friend class aux::PluginRefCounter<FtpStorageFactory>;
     public:
         // currently unimplemented
         virtual const char** STORAGE_METHOD_CALL findAvailable() const override;
@@ -258,6 +258,7 @@ namespace Qn
         ) override;
  
         virtual const char* STORAGE_METHOD_CALL storageType() const override;
+        virtual const char* lastErrorMessage(int ecode) const override;
 
     public: // plugin interface implementation
         virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;

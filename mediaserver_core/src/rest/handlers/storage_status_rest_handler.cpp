@@ -23,7 +23,7 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     if(!requireParameter(params, lit("path"), result, &storageUrl))
         return CODE_INVALID_PARAMETER;
 
-    QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(storageUrl);
+    QnStorageResourcePtr storage = qnStorageMan->getStorageByUrlExact(storageUrl);
     bool exists = storage;
     if (!storage) {
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
@@ -38,7 +38,8 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
                 { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
     
             const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
-            storage->setStorageType(QnLexical::serialized(storageType));
+            if (storage->getStorageType().isEmpty())
+                storage->setStorageType(QnLexical::serialized(storageType));
         }
         else
             return CODE_INVALID_PARAMETER;

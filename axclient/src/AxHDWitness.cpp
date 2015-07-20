@@ -37,6 +37,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include "core/resource/resource_directory_browser.h"
+#include <core/resource/storage_plugin_factory.h>
 
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"

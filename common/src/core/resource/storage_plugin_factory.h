@@ -1,12 +1,13 @@
 #ifndef __STORAGE_PLUGIN_FACTORY_RESOURCE_H__
 #define __STORAGE_PLUGIN_FACTORY_RESOURCE_H__
 
+#include <functional>
 #include "storage_resource.h"
 
 class QnStoragePluginFactory
 {
 public:
-    typedef QnStorageResource *(*StorageFactory)(const QString&);
+    typedef std::function<QnStorageResource *(const QString &)> StorageFactory;
 
     QnStoragePluginFactory();
     virtual ~QnStoragePluginFactory();
