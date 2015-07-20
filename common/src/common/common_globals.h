@@ -33,7 +33,7 @@ namespace Qn
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            ServerFlag CameraStatusFlag IOPortType IODefaultState)
+            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
@@ -360,6 +360,20 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(IOPortTypes)
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IOPortType)
 
+    enum AuditRecordType
+    {
+        AR_NotDefined,
+        AR_UnauthorizedLogin,
+        AR_Login,
+        AR_SystemNameChanged,
+        AR_SystemmMerge,
+        AR_CameraUpdate,
+        AR_ServerUpdate,
+        AR_GeneralSettingsChange,
+        AR_PlaybackControl
+    };
+
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuditRecordType)
     
     enum IODefaultState {
         IO_OpenCircuit,
@@ -691,7 +705,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
-        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState),
+        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType),
     (metatype)(lexical)
 )
 
@@ -713,6 +727,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::IOPortTypes),
     (metatype)(numeric)(lexical)
+
 )
 
 #endif // QN_COMMON_GLOBALS_H

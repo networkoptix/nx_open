@@ -15,14 +15,16 @@
 #include <recording/time_period.h>
 #include <media_server/settings.h>
 #include "core/resource/network_resource.h"
+#include "utils/serialization/sql_functions.h"
 
 
-static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
+static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
 static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; // 30 days
 QnEventsDB* QnEventsDB::m_instance = 0;
 
 QnEventsDB::QnEventsDB():
     m_lastCleanuptime(0),
+    m_auditCleanuptime(0),
     m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD),
     m_tran(m_sdb, m_mutex)
 {
@@ -82,7 +84,89 @@ bool QnEventsDB::createDatabase()
             return false;
     }
 
+    if (!isObjectExists(lit("table"), lit("audit_log"), m_sdb))
+    {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(
+            "CREATE TABLE \"audit_log\" ("
+            "id INTEGER NOT NULL PRIMARY KEY autoincrement,"
+            "timestamp INTEGER NOT NULL,"
+            "end_timestamp INTEGER NOT NULL,"
+            "event_type SMALLINT NOT NULL,"
+            "session_id BLOB(16),"
+            "user_name TEXT,"
+            "user_host TEXT,"
+            "description TEXT,"
+            "resources BLOB,"
+            "params TEXT)"
+        );
+        if (!ddlQuery.exec())
+            return false;
+    }
+
+    if (!isObjectExists(lit("index"), lit("auditTimeIdx"), m_sdb)) {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(
+            "CREATE INDEX \"auditTimeIdx\" ON \"audit_log\" (timestamp, session_id)"
+            );
+        if (!ddlQuery.exec())
+            return false;
+    }
+
+
     return true;
+}
+
+bool QnEventsDB::addAuditRecord(const QnAuditRecord& data)
+{
+    QWriteLocker lock(&m_mutex);
+
+    if (!m_sdb.isOpen())
+        return false;
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO audit_log"
+        "(timestamp, end_timestamp, event_type, session_id, user_name,"
+        "user_host, description, resources, params)"
+        "values ("
+        "(:timestamp, :endTimestamp, :eventType, :sessionId, :userName,"
+        ":userHost, :description, :resources, :params)"
+        );
+    QnSql::bind(data, &insQuery);
+
+    if (!insQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return false;
+    }
+
+    cleanupAuditLog();
+    return true;
+}
+
+QnAuditRecordList QnEventsDB::getAuditData(const QnTimePeriod& period, const QnUuid& sessionId)
+{
+    QnAuditRecordList result;
+    QString request;
+    if (sessionId.isNull())
+        request = (lit("SELECT * from audit_log WHERE timestamp BETWEEN ? and ? AND session_id = ? order by timestamp"));
+    else
+        request = (lit("SELECT * from audit_log WHERE timestamp BETWEEN ? and ? order by timestamp"));
+
+    QWriteLocker lock(&m_mutex);
+    QSqlQuery query(m_sdb);
+    query.prepare(request);
+    query.addBindValue(period.startTimeMs / 1000);
+    query.addBindValue(period.endTimeMs() == DATETIME_NOW ? INT_MAX : period.endTimeMs() / 1000);
+    if (!sessionId.isNull())
+        query.addBindValue(QnSql::serialized_field(sessionId));
+    
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return result;
+    }
+    QnSql::fetch_many(query, &result);
+
+    return result;
 }
 
 bool QnEventsDB::cleanupEvents()
@@ -90,11 +174,28 @@ bool QnEventsDB::cleanupEvents()
     bool rez = true;
 
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-    if (currentTime - m_lastCleanuptime > EVENTS_CLEANUP_INTERVAL)
+    if (currentTime - m_lastCleanuptime > CLEANUP_INTERVAL)
     {
         m_lastCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
-        delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp;");
+        delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp");
+        int utc = (currentTime - m_eventKeepPeriod)/1000000ll;
+        delQuery.bindValue(":timestamp", utc);
+        rez = delQuery.exec();
+    }
+    return rez;
+}
+
+bool QnEventsDB::cleanupAuditLog()
+{
+    bool rez = true;
+
+    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
+    if (currentTime - m_auditCleanuptime > CLEANUP_INTERVAL)
+    {
+        m_auditCleanuptime = currentTime;
+        QSqlQuery delQuery(m_sdb);
+        delQuery.prepare("DELETE FROM audit_log where timestamp < :timestamp");
         int utc = (currentTime - m_eventKeepPeriod)/1000000ll;
         delQuery.bindValue(":timestamp", utc);
         rez = delQuery.exec();
@@ -227,7 +328,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     QList<QnAbstractBusinessActionPtr> result;
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QReadLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     QSqlQuery query(request);
     if (!query.exec())
@@ -285,7 +386,7 @@ void QnEventsDB::getAndSerializeActions(
 
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QReadLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     QSqlQuery actionsQuery(request);
     if (!actionsQuery.exec())

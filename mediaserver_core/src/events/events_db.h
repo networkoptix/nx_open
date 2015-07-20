@@ -5,6 +5,7 @@
 #include "business/actions/abstract_business_action.h"
 #include "business/events/abstract_business_event.h"
 #include "utils/db/db_helper.h"
+#include "api/model/audit/audit_record.h"
 
 class QnTimePeriod;
 
@@ -35,6 +36,9 @@ public:
         const QnUuid& businessRuleId) const;
 
 
+    QnAuditRecordList getAuditData(const QnTimePeriod& period, const QnUuid& sessionId = QnUuid());
+    bool addAuditRecord(const QnAuditRecord& data);
+
     static QnEventsDB* instance();
     static void init();
     static void fini();
@@ -47,6 +51,7 @@ protected:
     QnEventsDB();
 private:
     bool cleanupEvents();
+    bool cleanupAuditLog();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,
@@ -55,6 +60,7 @@ private:
         const QnUuid& businessRuleId) const;
 private:
     qint64 m_lastCleanuptime;
+    qint64 m_auditCleanuptime;
     qint64 m_eventKeepPeriod;
     static QnEventsDB* m_instance;
     QnDbTransaction m_tran;
