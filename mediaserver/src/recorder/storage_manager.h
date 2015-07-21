@@ -22,6 +22,7 @@
 #include "utils/common/uuid.h"
 #include <set>
 #include "api/model/rebuild_archive_reply.h"
+#include "api/model/recording_stats_reply.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
@@ -71,6 +72,7 @@ public:
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
 
     QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs, int limit);
+    QnRecordingStatsReply getChunkStatistics(qint64 startTime, qint64 endTime);
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
@@ -158,6 +160,9 @@ private:
     void backupFolderRecursive(const QString& src, const QString& dst);
     void getCamerasWithArchiveInternal(std::set<QString>& result,  const FileCatalogMap& catalog) const;
     void testStoragesDone();
+    //QMap<QnUuid, QnRecordingStatsData> getChunkStatisticsInternal(qint64 startTime, qint64 endTime, QnServer::ChunksCatalog catalog);
+    QnRecordingStatsData getChunkStatisticsByCamera(qint64 startTime, qint64 endTime, const QString& uniqueId);
+    QnRecordingStatsData mergeStatsFromCatalogs(qint64 startTime, qint64 endTime, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];

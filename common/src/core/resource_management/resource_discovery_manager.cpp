@@ -619,11 +619,15 @@ QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
 
 bool QnResourceDiscoveryManager::isRedundancyUsing() const
 {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    if (!server || !server->isRedundancy())
+    auto servers = qnResPool->getAllServers();
+    if (servers.size() < 2)
         return false;
-    
-    return qnResPool->getAllServers().count() > 1;
+    for (const auto& server: servers)
+    {
+        if (server->isRedundancy())
+            return true;
+    }
+    return false;
 }
 
 void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable) {

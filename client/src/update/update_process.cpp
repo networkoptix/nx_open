@@ -211,9 +211,9 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
         return;
     }
 
-    m_id = result.latestVersion.toString();
+    m_id = result.version.toString();
 
-    m_target.version = result.latestVersion; /* Version can be updated if loading from local file or seeking for latest version. */
+    m_target.version = result.version; /* Version can be updated if loading from local file or seeking for latest version. */
     m_clientRequiresInstaller = result.clientInstallerRequired;
     m_updateFiles = task->updateFiles();
     m_clientUpdateFile = task->clientUpdateFile();

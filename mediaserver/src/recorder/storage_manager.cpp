@@ -774,6 +774,149 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
     return QnTimePeriodList::mergeTimePeriods(periods, limit);
 }
 
+QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 startTime, qint64 endTime)
+{
+    QnRecordingStatsReply result;
+    
+    QnResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID());
+    QnVirtualCameraResourceList cameras = qnResPool->getAllCameras(server, true);
+    for (const auto& camera: cameras) {
+        QnRecordingStatsData stats = getChunkStatisticsByCamera(startTime, endTime, camera->getUniqueId());
+        QnCamRecordingStatsData data(stats);
+        data.id = camera->getId();
+        result.push_back(data);
+    }
+/*    
+
+    // 1. obtain data
+    QMap<QnUuid, QnRecordingStatsData> resultHi = getChunkStatisticsInternal(startTime, endTime, QnServer::HiQualityCatalog);
+    QMap<QnUuid, QnRecordingStatsData> resulLow = getChunkStatisticsInternal(startTime, endTime, QnServer::LowQualityCatalog);
+
+    // 2. merge data
+    for (auto itr = resulLow.constBegin(); itr != resulLow.constEnd(); ++itr) {
+        auto mainItr = resultHi.find(itr.key());
+        if (mainItr != resultHi.end()) 
+        {
+            // merge HQ and LQ data
+            QnRecordingStatsData& left = mainItr.value();
+            const QnRecordingStatsData& right = itr.value();
+            left += right;
+        }
+        else {
+            // join new data from LQ
+            mainItr = resultHi.insert(itr.key(), itr.value());
+        }
+    }
+
+    // 2. full avg bitrate
+    for (auto itr = resultHi.begin(); itr != resultHi.end(); ++itr) 
+    {
+        QnRecordingStatsData& data = itr.value();
+        QnCamRecordingStatsData outputData(data);
+        if (outputData.recordedSecs > 0)
+            outputData.averageBitrate = data.recordedBytes / (data.recordedSecs);
+        outputData.id = itr.key();
+
+        result.push_back(std::move(outputData));
+    }
+*/
+    return result;
+}
+
+QnRecordingStatsData QnStorageManager::getChunkStatisticsByCamera(qint64 startTime, qint64 endTime, const QString& uniqueId)
+{
+    QMutexLocker lock(&m_mutexCatalog);
+    auto catalogHi = m_devFileCatalog[QnServer::HiQualityCatalog].value(uniqueId);
+    auto catalogLow = m_devFileCatalog[QnServer::LowQualityCatalog].value(uniqueId);
+
+    if (catalogHi && catalogLow)
+        return mergeStatsFromCatalogs(startTime, endTime, catalogHi, catalogLow);
+    else if (catalogHi)
+        return catalogHi->getStatistics(startTime, endTime);
+    else if (catalogLow)
+        return catalogLow->getStatistics(startTime, endTime);
+    else
+        return QnRecordingStatsData();
+}
+
+QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 startTime, qint64 endTime, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow)
+{
+    QnRecordingStatsData result;
+    QnRecordingStatsData tmpStats; // temp stats for virtual bitrate calculation
+    
+    QMutexLocker lock1(&catalogHi->m_mutex);
+    QMutexLocker lock2(&catalogLow->m_mutex);
+
+    auto itrHiLeft = qLowerBound(catalogHi->m_chunks.cbegin(), catalogHi->m_chunks.cend(), startTime);
+    auto itrHiRight = qUpperBound(itrHiLeft, catalogHi->m_chunks.cend(), endTime);
+
+    auto itrLowLeft = qLowerBound(catalogLow->m_chunks.cbegin(), catalogLow->m_chunks.cend(), startTime);
+    auto itrLowRight = qUpperBound(itrLowLeft, catalogLow->m_chunks.cend(), endTime);
+
+    qint64 hiTime = itrHiLeft < itrHiRight ? itrHiLeft->startTimeMs : DATETIME_NOW;
+    qint64 lowTime = itrLowLeft < itrLowRight ? itrLowLeft->startTimeMs : DATETIME_NOW;
+    qint64 currentTime = qMin(hiTime, lowTime);
+
+    while (itrHiLeft < itrHiRight || itrLowLeft < itrLowLeft)
+    {
+        qint64 nextHiTime = DATETIME_NOW;
+        qint64 nextLowTime = DATETIME_NOW;
+        bool hasHi = false;
+        bool hasLow = false;
+        if (itrHiLeft != itrHiRight) {
+            nextHiTime = itrHiLeft->containsTime(currentTime) ? itrHiLeft->endTimeMs() : itrHiLeft->startTimeMs;
+            hasHi = itrHiLeft->durationMs > 0 && itrHiLeft->containsTime(currentTime);
+        }
+        if (itrLowLeft != itrLowRight) {
+            nextLowTime = itrLowLeft->containsTime(currentTime) ? itrLowLeft->endTimeMs() : itrLowLeft->startTimeMs;
+            hasLow = itrLowLeft->durationMs > 0 && itrLowLeft->containsTime(currentTime);
+        }
+
+        qint64 nextTime = qMin(nextHiTime, nextLowTime);
+        Q_ASSERT(nextTime > currentTime);
+        qint64 blockDuration = nextTime - currentTime;
+        
+        if (hasHi) 
+        {
+            qreal persentUsage = blockDuration / (qreal) itrHiLeft->durationMs;
+            Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            result.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
+            tmpStats.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
+
+            result.recordedSecs += itrHiLeft->durationMs * persentUsage;
+            tmpStats.recordedSecs += itrHiLeft->durationMs * persentUsage;
+        }
+
+        if (hasLow) 
+        {
+            qreal persentUsage = blockDuration / (qreal) itrLowLeft->durationMs;
+            Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            result.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
+
+            if (hasHi) 
+            {
+                // do not include bitrate calculation if only LQ quality
+                tmpStats.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
+            }
+            else {
+                // inc time if no HQ
+                result.recordedSecs += itrLowLeft->durationMs * persentUsage;
+            }
+        }
+
+        while (itrHiLeft < itrHiRight && nextTime >= itrHiLeft->endTimeMs())
+            ++itrHiLeft;
+        while (itrLowLeft < itrLowRight && nextTime >= itrLowLeft->endTimeMs())
+            ++itrLowLeft;
+        currentTime = nextTime;
+    }
+    
+    result.recordedSecs /= 1000;   // msec to sec
+    tmpStats.recordedSecs /= 1000; // msec to sec
+    result.averageBitrate = tmpStats.recordedBytes / (qreal) tmpStats.recordedSecs;
+    return result;
+}
+
 void QnStorageManager::clearSpace()
 {
     testOfflineStorages();

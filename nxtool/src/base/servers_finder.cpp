@@ -25,19 +25,12 @@ namespace
     
     const QString kApplicationTypeTag = "application";
     const QString kTypeTag = "type";
-    const QString kIDTag = "id";
-    const QString kSeedTag = "seed";
-    const QString kNameTag = "name";
-    const QString kSystemNameTag = "systemName";
-    const QString kPortTag = "port";
-    const QString kRemoteAddressesTag = "remoteAddresses";
     const QString kReplyTag = "reply";
-    const QString kFlagsTag = "flags";
       
     enum 
     {
-        kUpdateServersInfoInterval = 1000
-        , kServerAliveTimeout = 10 * 1000
+        kUpdateServersInfoInterval = 2000
+        , kServerAliveTimeout = 12 * 1000
     };
 
     enum { kInvalidOpSize = -1 };
@@ -51,44 +44,6 @@ namespace
     
     const QByteArray kSearchRequestBody("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
     const int kSearchRequestSize = kSearchRequestBody.size();
-    
-    typedef QHash<QString, std::function<void (const QJsonObject &object
-        , rtu::BaseServerInfo &info)> > KeyParserContainer;
-    const KeyParserContainer parser = []() -> KeyParserContainer
-    {
-        KeyParserContainer result;
-        result.insert(kIDTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.id = QUuid(object.value(kIDTag).toString()); });
-        result.insert(kSeedTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.id = QUuid(object.value(kSeedTag).toString()); });
-        result.insert(kNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.name = object.value(kNameTag).toString(); });
-        result.insert(kSystemNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.systemName = object.value(kSystemNameTag).toString(); });
-        result.insert(kPortTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.port = object.value(kPortTag).toInt(); });
-            
-            
-        result.insert(kFlagsTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            {
-                typedef QPair<QString, rtu::Constants::ServerFlag> TextFlagsInfo;
-                static const TextFlagsInfo kKnownFlags[] = 
-                {
-                    TextFlagsInfo("SF_timeCtrl", rtu::Constants::ServerFlag::AllowChangeDateTimeFlag)
-                    , TextFlagsInfo("SF_IfListCtrl", rtu::Constants::ServerFlag::AllowIfConfigFlag)
-                    , TextFlagsInfo("SF_AutoSystemName" , rtu::Constants::ServerFlag::IsFactoryFlag)
-                };
-                
-                info.flags = rtu::Constants::ServerFlag::NoFlags;
-                const QString textFlags = object.value(kFlagsTag).toString();
-                for (const TextFlagsInfo &flagInfo: kKnownFlags)
-                {
-                    if (textFlags.contains(flagInfo.first))
-                        info.flags |= flagInfo.second;
-                }
-            });
-        return result;
-    }();
 }
 
 namespace 
@@ -110,14 +65,11 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
-        const QStringList &keys = jsonObject.keys();
-        for (const auto &key: keys)
-        {
-            const auto itHandler = parser.find(key);
-            if (itHandler != parser.end())
-                (*itHandler)(jsonObject, info);
-        }
-        
+        //if (!jsonObject.value("systemName").toString().contains("nx1"))
+        //    return false;
+
+        rtu::parseModuleInformationReply(jsonObject, info);
+
         return true;
     }
 }

@@ -1,4 +1,3 @@
-
 #include "time_helper.h"
 
 #include <QDebug>
@@ -30,13 +29,6 @@ QDateTime rtu::convertUtcToTimeZone(qint64 utcTimeMs
     return QDateTime(pseudoDateTime.date(), pseudoDateTime.time());
 }
 
-qint64 rtu::utcMsFromTimeZone(const QDate &date
-    , const QTime &time
-    , const QTimeZone &timeZone)
-{
-    return msecondsFromEpoch(date, time, timeZone);
-}
-
 qint64 rtu::msecondsFromEpoch(const QDate &date
     , const QTime &time
     , const QTimeZone &timeZone)
@@ -59,7 +51,7 @@ QString rtu::timeZoneNameWithOffset(const QTimeZone &timeZone, const QDateTime &
     }
 
     // Constructing format manually
-    QString tzTemplate("(%1) %2");
-    QString baseName(timeZone.id());      
+    static const QString tzTemplate("(%1) %2");
+    const QString baseName(timeZone.id());      
     return tzTemplate.arg(timeZone.displayName(atDateTime, QTimeZone::OffsetName), baseName);
 }

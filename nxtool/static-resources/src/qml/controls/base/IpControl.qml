@@ -15,5 +15,19 @@ Base.TextField
     }
 
     text: initialText;
+
+    onTextChanged: 
+    {
+        //maximum value of the first two digits is 25, otherwise appending dot
+        var maximumOctetIntermediateValue = 25;
+
+        var octet = text.substring(text.lastIndexOf('.') + 1, text.length);       
+        // check if we can append any symbol - or already have valid ip
+        if (octet.length < 2 || acceptableInput)
+            return;
+        
+        if (parseInt(octet) > maximumOctetIntermediateValue)
+            text = text + '.';
+    }
 }
 

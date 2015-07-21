@@ -19,7 +19,7 @@ ComboBox
     property int fontSize: Common.SizeManager.fontSizes.base;
     
     height: Common.SizeManager.clickableSizes.medium;
-    width: height * 4;
+    width: height * 5;
     opacity: enabled ? 1.0 : 0.5;
 
     currentIndex: initIndex;
