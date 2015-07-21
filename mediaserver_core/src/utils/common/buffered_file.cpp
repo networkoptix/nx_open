@@ -358,7 +358,7 @@ qint64 QBufferedFile::writeData ( const char * data, qint64 len )
 
 bool QBufferedFile::prepareBuffer(int bufferSize)
 {
-    if (m_filePos == 0 && (int) m_cachedBuffer.size() > bufferSize)
+    if ((m_filePos == 0 && (int) m_cachedBuffer.size() > bufferSize) || !m_isDirectIO)
     {
         m_cycleBuffer.push_back(m_cachedBuffer.data(), m_cachedBuffer.size());
     }
