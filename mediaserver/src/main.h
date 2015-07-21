@@ -85,7 +85,7 @@ private:
     quint64 m_dumpSystemResourceUsageTaskID;
     bool m_stopping;
     mutable QMutex m_stopMutex;
-    ec2::CrashReporter m_crashReporter;
+    std::unique_ptr<ec2::CrashReporter> m_crashReporter;
 };
 
 #endif // MAIN_H

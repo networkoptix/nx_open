@@ -2120,10 +2120,13 @@ void QnMain::run()
         m_moduleFinder->start();
     }
 #endif
+    m_crashReporter.reset(new ec2::CrashReporter);
 
     exec();
 
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
+
+    m_crashReporter.reset();
 
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;
@@ -2226,7 +2229,7 @@ void QnMain::at_appStarted()
         return;
 
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
-    m_crashReporter.scanAndReportAsync(MSSettings::runTimeSettings());
+    m_crashReporter->scanAndReportByTimer(MSSettings::runTimeSettings());
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
@@ -2465,7 +2468,6 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef __linux__
-    linux_exception::installCrashSignalHandler();
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
@@ -2474,6 +2476,7 @@ int main(int argc, char* argv[])
     QString rwConfigFilePath;
     bool showVersion = false;
     bool showHelp = false;
+    bool disableCrashHandler = false;
     QString engineVersion;
 
     QnCommandLineParser commandLineParser;
@@ -2503,7 +2506,18 @@ int main(int argc, char* argv[])
         lit("This help message"), true);
     commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
         lit("Force the other engine version"), QString());
+
+    #ifdef __linux__
+        commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
+            lit("Disables crash signal handler (linux only)"), true);
+    #endif
+
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
+
+    #ifdef __linux__
+        if( !disableCrashHandler )
+            linux_exception::installCrashSignalHandler();
+    #endif
 
     if( showVersion )
     {
@@ -2541,5 +2555,7 @@ int main(int argc, char* argv[])
 
 static void printVersion()
 {
-    std::cout << "  " << qApp->applicationName().toUtf8().data() << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
+    std::cout
+        << QN_ENGINE_VERSION << "-" << QN_APPLICATION_REVISION
+        << (strcmp(QN_BETA, "true") ? "" : "-beta") << std::endl;
 }
