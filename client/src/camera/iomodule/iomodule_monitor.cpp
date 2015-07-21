@@ -43,7 +43,7 @@ bool QnIOModuleMonitor::open()
     QMutexLocker lk( &m_mutex );
     m_httpClient.reset();
 
-    auto httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    auto httpClient = nx_http::AsyncHttpClient::create();
     connect( httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnIOModuleMonitor::at_MonitorResponseReceived, Qt::DirectConnection );
     connect( httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnIOModuleMonitor::at_MonitorMessageBodyAvailable, Qt::DirectConnection );
     connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnIOModuleMonitor::at_MonitorConnectionClosed, Qt::DirectConnection );

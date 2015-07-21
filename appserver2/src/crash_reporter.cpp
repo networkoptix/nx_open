@@ -119,7 +119,7 @@ bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSetting
         return false;
     }
 
-    auto httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    auto httpClient = nx_http::AsyncHttpClient::create();
     auto report = new ReportData(crash, settings, *this, httpClient.get());
     QObject::connect(httpClient.get(), &nx_http::AsyncHttpClient::done,
                     report, &ReportData::finishReport, Qt::DirectConnection);

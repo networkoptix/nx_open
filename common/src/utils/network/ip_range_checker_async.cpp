@@ -90,7 +90,7 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
         return false;  //all ip addresses are being scanned at the moment
     quint32 ipToCheck = m_nextIPToCheck++;
 
-    nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     connect(
         httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
         this, &QnIpRangeCheckerAsync::onDone,

@@ -253,12 +253,12 @@ namespace nx_http
 
     void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
     {
-        std::shared_ptr<AsyncHttpClient> sharedThis;
+        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+
         QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
-        sharedThis = shared_from_this();
         Q_ASSERT( sock == m_socket.data() );
 
         if( m_state != sWaitingConnectToHost )
@@ -298,12 +298,12 @@ namespace nx_http
 
     void AsyncHttpClient::asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten )
     {
-        std::shared_ptr<AsyncHttpClient> sharedThis;
+        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+
         QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
-        sharedThis = shared_from_this();
         Q_ASSERT( sock == m_socket.data() );
 
         if( m_state != sSendingRequest )
@@ -360,12 +360,12 @@ namespace nx_http
     {
         using namespace std::placeholders;
 
-        std::shared_ptr<AsyncHttpClient> sharedThis;
+        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+
         QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
-        sharedThis = shared_from_this();
         Q_ASSERT( sock == m_socket.data() );
 
         if( errorCode != SystemError::noError )
@@ -904,6 +904,11 @@ namespace nx_http
         digestAuthorizationHeader->addParam( "response", digestResponse );
         return true;
     }
+    AsyncHttpClientPtr AsyncHttpClient::create()
+    {
+        return AsyncHttpClientPtr( std::shared_ptr<AsyncHttpClient>( new AsyncHttpClient() ) );
+    }
+
     bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
@@ -1073,7 +1078,7 @@ namespace nx_http
         const nx_http::HttpHeaders& extraHeaders,
         const QAuthenticator &auth)
     {
-        nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();       
+        nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
         httpClientCaptured->addRequestHeaders(extraHeaders);
         if (!auth.isNull()) {
             httpClientCaptured->setUserName(auth.user());

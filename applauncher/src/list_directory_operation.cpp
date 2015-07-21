@@ -168,7 +168,7 @@ namespace detail
             _dirPath,
             _handler ),
         m_localTargetDirPath( localTargetDirPath ),
-        m_httpClient( new nx_http::AsyncHttpClient() ),
+        m_httpClient( nx_http::AsyncHttpClient::create() ),
         m_totalsize( -1 )
     {
         connect(

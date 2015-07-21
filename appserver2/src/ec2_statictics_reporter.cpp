@@ -28,6 +28,7 @@ namespace ec2
     const QString Ec2StaticticsReporter::SR_TIME_CYCLE = lit("statisticsReportTimeCycle");
     const QString Ec2StaticticsReporter::SR_SERVER_API = lit("statisticsReportServerApi");
     const QString Ec2StaticticsReporter::SYSTEM_ID = lit("systemId");
+    const QString Ec2StaticticsReporter::SYSTEM_NAME_FOR_ID = lit("systemNameForId");
 
     const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = lit("http://stats.networkoptix.com");
 
@@ -282,7 +283,7 @@ namespace ec2
             return res;
         }
 
-        m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+        m_httpClient = nx_http::AsyncHttpClient::create();
         connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done,
                 this, &Ec2StaticticsReporter::finishReport, Qt::DirectConnection);
 
@@ -309,12 +310,19 @@ namespace ec2
 
     QnUuid Ec2StaticticsReporter::getOrCreateSystemId()
     {
-        auto systemId = m_admin->getProperty(SYSTEM_ID);
-        if (!systemId.isEmpty())
-            return QnUuid(systemId);
+        const auto systemName = qnCommon->localSystemName();
+        const auto systemNameForId = m_admin->getProperty(SYSTEM_NAME_FOR_ID);
+        const auto systemId = m_admin->getProperty(SYSTEM_ID);
 
-        auto newId = QnUuid::createUuid();
+        if (systemNameForId == systemName // system name was not changed
+            && !systemId.isEmpty())       // and systemId is already generated
+        {
+            return QnUuid(systemId);
+        }
+
+        const auto newId = QnUuid::createUuid();
         m_admin->setProperty(SYSTEM_ID, newId.toString());
+        m_admin->setProperty(SYSTEM_NAME_FOR_ID, systemName);
         propertyDictionary->saveParams(m_admin->getId());
         return newId;
     }

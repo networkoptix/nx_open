@@ -195,7 +195,7 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
     requestUrl.setPath( requestPath );
 
     QnMutexLocker lk( &m_inputPortMutex );
-    nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     connect( httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnPlAxisResource::onMonitorResponseReceived, Qt::DirectConnection );
     connect( httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnPlAxisResource::onMonitorMessageBodyAvailable, Qt::DirectConnection );
     connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnPlAxisResource::onMonitorConnectionClosed, Qt::DirectConnection );
@@ -220,15 +220,15 @@ void QnPlAxisResource::stopInputPortMonitoringAsync()
     resetHttpClient(m_inputPortStateReader);
 }
 
-void QnPlAxisResource::resetHttpClient(HttpClient& value)
+void QnPlAxisResource::resetHttpClient(nx_http::AsyncHttpClientPtr& value)
 {
     QnMutexLocker lk( &m_inputPortMutex );
 
     if( !value )
         return;
 
-    std::shared_ptr<nx_http::AsyncHttpClient> httpClient;
-    std::swap(httpClient, value);
+    nx_http::AsyncHttpClientPtr httpClient;
+    httpClient.swap(value);
 
     lk.unlock();
     httpClient->terminate();
@@ -1266,8 +1266,11 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     requestPath += portList;
     requestUrl.setPath( requestPath );
     
-    nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnPlAxisResource::onCurrentIOStateResponseReceived, Qt::DirectConnection );
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    connect(
+        httpClient.get(), &nx_http::AsyncHttpClient::done,
+        this, &QnPlAxisResource::onCurrentIOStateResponseReceived,
+        Qt::DirectConnection );
     httpClient->setTotalReconnectTries( nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
     httpClient->setUserName( auth.user() );
     httpClient->setUserPassword( auth.password() );

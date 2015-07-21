@@ -30,9 +30,11 @@ protected:
 private:
     int processTextResponse();
 private:
+    static const int MEDIA_STREAM_COUNT = 2;
+
     TCPSocketPtr m_socket;
     quint8 m_recvBuffer[65536];
-    QnFfmpegRtpParser m_parsers[2];
+    QnFfmpegRtpParser m_parsers[MEDIA_STREAM_COUNT];
     QElapsedTimer m_keepaliveTimer;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     mutable QnMutex m_audioLayoutMutex;

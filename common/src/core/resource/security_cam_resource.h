@@ -245,6 +245,8 @@ public:
     //!Returns list of IO ports's states
     virtual QnIOStateDataList ioStates() const { return QnIOStateDataList(); }
     
+    virtual Qn::BitratePerGopType bitratePerGopType() const;
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -309,7 +311,6 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
-    virtual bool isBitratePerGOP() const;
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
