@@ -37,7 +37,8 @@ public:
 
 
     QnAuditRecordList getAuditData(const QnTimePeriod& period, const QnUuid& sessionId = QnUuid());
-    bool addAuditRecord(const QnAuditRecord& data);
+    int addAuditRecord(const QnAuditRecord& data);
+    int updateAuditRecord(int internalId, const QnAuditRecord& data);
 
     static QnEventsDB* instance();
     static void init();

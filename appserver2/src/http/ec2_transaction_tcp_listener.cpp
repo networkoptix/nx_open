@@ -217,7 +217,7 @@ void QnTransactionTcpProcessor::run()
     else
     {
         if (remotePeer.isClient())
-            ; //qnAuditManager->at_connectionOpened(authSession());
+            qnAuditManager->at_connectionOpened(authSession());
 
         auto base64EncodingRequiredHeaderIter = d->request.headers.find( Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME );
         if( base64EncodingRequiredHeaderIter != d->request.headers.end() )

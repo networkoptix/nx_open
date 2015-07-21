@@ -13,8 +13,27 @@ public:
     QnAuditManager();
 
     static QnAuditManager* instance();
+public:
+    QnAuditRecord prepareRecord(const QnAuthSession& authInfo, Qn::AuditRecordType recordType);
+    virtual int addAuditRecord(const QnAuditRecord& record) = 0;
+    virtual int updateAuditRecord(int internalId, const QnAuditRecord& record) = 0;
 public slots:
-    virtual void addAuditRecord(const QnAuditRecord& record) = 0;
+    void at_connectionOpened(const QnAuthSession &data);
+    void at_connectionClosed(const QnAuthSession &data);
+protected:
+    /* return internal id of inserted record. Returns <= 0 if error */
+private:
+
+    struct AuditConnection
+    {
+        AuditConnection(): internalId(0) {}
+
+        QnAuditRecord record;
+        int internalId;
+    };
+
+    QMap<QnUuid, AuditConnection> m_openedConnections;
+    mutable QMutex m_mutex;
 };
 #define qnAuditManager QnAuditManager::instance()
 

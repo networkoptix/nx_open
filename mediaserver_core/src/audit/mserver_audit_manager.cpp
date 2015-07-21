@@ -11,15 +11,12 @@ QnMServerAuditManager::~QnMServerAuditManager()
 {
 }
 
-void QnMServerAuditManager::addAuditRecord(const QnAuditRecord& record)
+int QnMServerAuditManager::addAuditRecord(const QnAuditRecord& record)
 {
-    qnEventsDB->addAuditRecord(record);
+    return qnEventsDB->addAuditRecord(record);
 }
 
-void QnMServerAuditManager::at_connectionOpened(const QnAuthSession &data)
+int QnMServerAuditManager::updateAuditRecord(int internalId, const QnAuditRecord& record)
 {
-    QnAuditRecord record;
-    //record.fillAuthInfo(authInfo);
-    //record.timestamp = qnSyncTime->currentMSecsSinceEpoch() / 1000;
-    //record.eventType = recordType;
+    return qnEventsDB->updateAuditRecord(internalId, record);
 }

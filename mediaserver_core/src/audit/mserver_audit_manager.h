@@ -6,13 +6,13 @@
 
 class QnMServerAuditManager: public QnAuditManager
 {
-    Q_OBJECT
 public:
     QnMServerAuditManager();
     ~QnMServerAuditManager();
-    virtual void addAuditRecord(const QnAuditRecord& record) override;
-private slots:
-    void at_connectionOpened(const QnAuthSession &data);
+    virtual int addAuditRecord(const QnAuditRecord& record) override;
+    virtual int updateAuditRecord(int internalId, const QnAuditRecord& record) override;
+//private slots:
+    
     //void at_remotePeerLost(const ec2::ApiPeerAliveData &data);
 };
 

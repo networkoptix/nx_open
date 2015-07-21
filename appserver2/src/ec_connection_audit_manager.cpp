@@ -4,14 +4,6 @@
 
 namespace ec2
 {
-    QnAuditRecord initRecord(const QnAuthSession& authInfo, Qn::AuditRecordType recordType)
-    {
-        QnAuditRecord result;
-        result.fillAuthInfo(authInfo);
-        result.timestamp = qnSyncTime->currentMSecsSinceEpoch() / 1000;
-        result.eventType = recordType;
-        return result;
-    }
 
     ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConnection)
     {
@@ -20,7 +12,7 @@ namespace ec2
 
     void ECConnectionAuditManager::addAuditRecord( const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo)
     {
-        QnAuditRecord auditRecord = initRecord(authInfo, Qn::AR_CameraUpdate);
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
         for (const auto& value: params)
             auditRecord.resources.push_back(value.cameraID);
         qnAuditManager->addAuditRecord(auditRecord);
@@ -28,21 +20,21 @@ namespace ec2
 
     void ECConnectionAuditManager::addAuditRecord( const ApiCameraAttributesData& params, const QnAuthSession& authInfo)
     {
-        QnAuditRecord auditRecord = initRecord(authInfo, Qn::AR_CameraUpdate);
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
         auditRecord.resources.push_back(params.cameraID);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
     void ECConnectionAuditManager::addAuditRecord( const ApiMediaServerUserAttributesData& params, const QnAuthSession& authInfo)
     {
-        QnAuditRecord auditRecord = initRecord(authInfo, Qn::AR_ServerUpdate);
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
         auditRecord.resources.push_back(params.serverID);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
     void ECConnectionAuditManager::addAuditRecord( const ApiMediaServerUserAttributesDataList& params, const QnAuthSession& authInfo)
     {
-        QnAuditRecord auditRecord = initRecord(authInfo, Qn::AR_ServerUpdate);
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
         for (const auto& value: params)
             auditRecord.resources.push_back(value.serverID);
         qnAuditManager->addAuditRecord(auditRecord);
