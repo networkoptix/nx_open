@@ -341,7 +341,6 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 {
     Q_D(QnRtspConnectionProcessor);
 
-    d->responseBody.clear();
     d->response = nx_http::Response();
     d->response.statusLine.version = d->request.requestLine.version;
     d->response.statusLine.statusCode = code;
@@ -369,7 +368,7 @@ void QnRtspConnectionProcessor::generateSessionId()
 
 void QnRtspConnectionProcessor::sendResponse(int code)
 {
-    QnTCPConnectionProcessor::sendResponse(code, "application/sdp", "", true);
+    QnTCPConnectionProcessor::sendResponse(code, "application/sdp", "", "", true);
 }
 
 int QnRtspConnectionProcessor::getMetadataChannelNum() const
@@ -626,7 +625,7 @@ int QnRtspConnectionProcessor::composeDescribe()
     if (acceptMethods.indexOf("sdp") == -1)
         return CODE_NOT_IMPLEMETED;
 
-    QTextStream sdp(&d->responseBody);
+    QTextStream sdp(&d->response.messageBody);
 
     
     QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
@@ -1309,9 +1308,9 @@ int QnRtspConnectionProcessor::composeGetParameter()
         QByteArray normParamName = parameter.trimmed().toLower();
         if (normParamName == "position" || normParamName.isEmpty())
         {
-            d->responseBody.append("position: ");
-            d->responseBody.append(QDateTime::fromMSecsSinceEpoch(getRtspTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT));
-            d->responseBody.append(ENDL);
+            d->response.messageBody.append("position: ");
+            d->response.messageBody.append(QDateTime::fromMSecsSinceEpoch(getRtspTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT));
+            d->response.messageBody.append(ENDL);
             addResponseRangeHeader();
         }
         else {

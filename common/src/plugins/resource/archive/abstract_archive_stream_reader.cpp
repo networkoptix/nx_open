@@ -7,6 +7,7 @@
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
+#include "core/resource/media_resource.h"
 
 
 QnAbstractArchiveReader::QnAbstractArchiveReader(const QnResourcePtr& dev ) :
@@ -145,8 +146,16 @@ void QnAbstractArchiveReader::run()
         if(data)
             data->dataProvider = this;
 
-        if (videoData)
-            m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(videoData->dataSize()));
+        auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
+        if (mediaRes && !mediaRes->hasVideo(this)) 
+        {
+            if (data)
+                m_stat[data->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
+        }
+        else {
+            if (videoData)
+                m_stat[data->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
+        }
 
 
         putData(std::move(data));

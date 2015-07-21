@@ -123,5 +123,50 @@
         <resource name = "AXISQ1931" public = "AXISQ1921"/>        
         <resource name = "AXISP3365" public = "AXISP3301"/>
         <resource name = "AXISM1145" public = "AXISM1103"/>
+        <resource name = "AXISP8524" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                    default_value ="30"/>
+            </params> 
+        </resource>
+        <resource name = "AXISQ6000" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                    default_value ="30"/>
+            </params>        
+        </resource>
+        <resource name = "AXISV5914" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                    default_value ="60"/>
+            </params>       
+        </resource>
+        <resource name = "AXISV5915" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                    default_value ="60"/>
+            </params>       
+        </resource>
+        <resource name = "AXISP5635" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                    default_value ="30"/>
+            </params>       
+        </resource>
+        <resource name = "AXISP5624" public = "AXISP5635"/>
+        <resource name = "AXISP1365" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                    default_value ="60"/>
+            </params>       
+        </resource>   
+        <resource name = "AXISP8221" public = "AXIS_COMMON">
+            <params>
+                <param name = "noVideoSupport" default_value ="1"/>
+                <param name = "forcedAudioStream" default_value ="1"/>
+		<param name = "hasDualStreaming" default_value ="0"/>
+            </params>
+        </resource>
+ 
     </oem>
 </resources>

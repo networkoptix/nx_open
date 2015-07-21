@@ -377,6 +377,10 @@
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -399,16 +403,20 @@
 <context>
     <name>CameraManagementWidget</name>
     <message>
-        <source>Enable camera auto discovery</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Allow system to optimize camera settings (Recommended)</source>
         <translation>Allow system to optimise camera settings (recommended)</translation>
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -748,12 +756,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Monitor All Servers on a Single Layout</translation>
     </message>
     <message>
-        <source>Camera Management</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>System Configuration Backup and Restore</source>
         <translation>System Backup and Restore</translation>
+    </message>
+    <message>
+        <source>System Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2514,6 +2522,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>File Settings...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Ask About Statistics Reporting</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -3268,18 +3280,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>FPS value is too high</source>
-        <translation>FPS value is too high.</translation>
-    </message>
-    <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>Current FPS in Schedule is %1. FPS has been dropped to maximum camera FPS %2.</translation>
-    </message>
-    <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>Software Motion requires 2 FPS for secondary stream. Current FPS in Schedule is %1. As a result, FPS has been changed to %2.</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation></translation>
     </message>
@@ -3911,18 +3911,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Critical Performance Tip</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
         <translation></translation>
     </message>
@@ -3933,6 +3921,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Important Performance Tip</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>This could lead to client software malfunction including crash.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4023,14 +4015,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutTabBar</name>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4505,10 +4489,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Find System</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>The new system will have password and name from the system:</source>
         <translation></translation>
     </message>
@@ -4590,6 +4570,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5233,11 +5217,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Users</source>
         <translation></translation>
     </message>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
@@ -5449,11 +5428,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
+        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
+        <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5840,6 +5819,18 @@ Short for &quot;seconds&quot;</extracomment>
         <source>This action CANNOT be undone!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation type="unfinished">FPS value is too high.</translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation type="unfinished">Current FPS in Schedule is %1. FPS has been dropped to maximum camera FPS %2.</translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation type="unfinished">Software Motion requires 2 FPS for secondary stream. Current FPS in Schedule is %1. As a result, FPS has been changed to %2.</translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -5938,10 +5929,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Unauthorised</translation>
     </message>
     <message>
-        <source>Please check authentication information&lt;br/&gt;in camera settings</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Activate analog license to remove this message</source>
         <translation></translation>
     </message>
@@ -5956,6 +5943,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Diagnose...</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Please check authentication information in camera settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6619,22 +6610,6 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>Client v%1&lt;br/&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server v%1&lt;br/&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Version Mismatch</source>
         <translation></translation>
     </message>
@@ -6700,6 +6675,35 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Error while uploading picture.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Some components of the system are not updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server v%1 at %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update all components to the latest version %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous Usage Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
+If you would like to disable this feature you can do so in the System Settings dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6749,6 +6753,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Connect to Server...</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Could not connect to server...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6961,6 +6969,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>exported</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7309,18 +7321,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>%1 (%2)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New layout</source>
-        <translation>New Layout</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>New Layout %1</translation>
-    </message>
-    <message>
         <source>To enable the feature please activate at least one Video Wall license</source>
         <translation>To enable Video Wall, please activate at least one Video Wall license.</translation>
     </message>
@@ -7411,6 +7411,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You&apos;ll have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n cameras</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7688,10 +7697,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Start</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation>Rebuild Progress</translation>
     </message>
     <message>
         <source>Cancel</source>

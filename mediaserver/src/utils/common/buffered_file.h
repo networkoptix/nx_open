@@ -1,6 +1,8 @@
 #ifndef __BUFFERED_FILE_H__
 #define __BUFFERED_FILE_H__
 
+#include <memory>
+
 #include <utils/thread/wait_condition.h>
 #include <QtCore/QString>
 #include <QtCore/QQueue>
@@ -75,7 +77,7 @@ public:
     * @param ioBlockSize - IO block size
     * @param minBufferSize - do not empty buffer(after IO operation) less then minBufferSize
     */
-    QBufferedFile(const QString& fileName, int ioBlockSize, int minBufferSize);
+    QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int ioBlockSize, int minBufferSize);
     virtual ~QBufferedFile();
 
     /*
@@ -102,7 +104,7 @@ private:
     void mergeBufferWithExistingData();
     int writeBuffer(int toWrite);
 private:
-    QnFile m_fileEngine;
+    std::shared_ptr<IQnFile> m_fileEngine;
     int m_minBufferSize;
     QnMediaCyclicBuffer m_cycleBuffer;
     QueueFileWriter* m_queueWriter;

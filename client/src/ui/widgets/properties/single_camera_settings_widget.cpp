@@ -93,6 +93,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->recordingTab,                                          Qn::CameraSettings_Recording_Help);
     setHelpTopic(ui->motionTab,                                             Qn::CameraSettings_Motion_Help);
     setHelpTopic(ui->advancedTab,                                           Qn::CameraSettings_Properties_Help);
+    setHelpTopic(ui->ioSettingsTab,                                         Qn::CameraSettings_Properties_Help);
     setHelpTopic(ui->fisheyeTab,                                            Qn::CameraSettings_Dewarping_Help);
     setHelpTopic(ui->forceArCheckBox, ui->forceArComboBox,                  Qn::CameraSettings_AspectRatio_Help);
     setHelpTopic(ui->forceRotationCheckBox, ui->forceRotationComboBox,      Qn::CameraSettings_Rotation_Help);
@@ -138,6 +139,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   [this](int state){ ui->forceArComboBox->setEnabled(state == Qt::Checked);} );
     connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
+
+    connect(ui->ioPortSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
 
     ui->forceArComboBox->addItem(tr("4:3"),  4.0f / 3);
     ui->forceArComboBox->addItem(tr("16:9"), 16.0f / 9);
@@ -211,6 +214,8 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
         return Qn::GeneralSettingsTab;
     } else if(tab == ui->recordingTab) {
         return Qn::RecordingSettingsTab;
+    } else if(tab == ui->ioSettingsTab) {
+        return Qn::IOSettingsSettingsTab;
     } else if(tab == ui->motionTab) {
         return Qn::MotionSettingsTab;
     } else if(tab == ui->advancedTab) {
@@ -244,6 +249,9 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     case Qn::AdvancedCameraSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->advancedTab);
         break;
+    case Qn::IOSettingsSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->ioSettingsTab);
+        break;
     case Qn::ExpertCameraSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->expertTab);
         break;
@@ -270,6 +278,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         if (!name.isEmpty())
             m_camera->setCameraName(name);  //TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
+
         //m_camera->setUrl(ui->ipAddressEdit->text());
         QAuthenticator loginEditAuth;
         loginEditAuth.setUser( ui->loginEdit->text().trimmed() );
@@ -316,6 +325,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
             m_camera->setProperty(QnMediaResource::rotationKey(), QString());
 
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
+        ui->ioPortSettingsWidget->submitToResource(m_camera);
 
         QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
@@ -365,14 +375,18 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
         ui->analogGroupBox->setVisible(false);
+        ui->imageControlGroupBox->setEnabled(true);
     } else {
+        bool hasVideo = m_camera->hasVideo(0);
+        ui->imageControlGroupBox->setEnabled(hasVideo);
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
         ui->vendorEdit->setText(m_camera->getVendor());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
+
         ui->fisheyeCheckBox->setChecked(m_camera->getDewarpingParams().enabled);
-        ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
+        ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported() && !m_camera->isAudioForced());
 
         /* There are fisheye cameras on the market that report themselves as PTZ.
          * We still want to be able to toggle them as fisheye instead, 
@@ -385,9 +399,10 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
 
         bool dtsBased = m_camera->isDtsBased();
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !dtsBased);
-        ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
-        ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased);
-        ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased);
+        ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased && hasVideo);
+        ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased && hasVideo);
+        ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
+        ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->getCameraCapabilities() & Qn::IOModuleCapability);
 
         ui->analogGroupBox->setVisible(m_camera->isDtsBased());
         ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
@@ -484,6 +499,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
     updateIpAddressText();
     updateWebPageText();
     ui->advancedSettingsWidget->updateFromResource();
+    ui->ioPortSettingsWidget->updateFromResource(m_camera);
     
     updateRecordingParamsAvailability();
 
@@ -562,6 +578,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     if(m_motionWidget)
         setReadOnly(m_motionWidget, readOnly);
     setReadOnly(ui->advancedSettingsWidget, readOnly);
+    setReadOnly(ui->ioPortSettingsWidget, readOnly);
     m_readOnly = readOnly;
 }
 
@@ -653,7 +670,7 @@ void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
     if (!m_camera)
         return;
     
-    ui->cameraScheduleWidget->setRecordingParamsAvailability(!m_camera->hasParam(lit("noRecordingParams")));
+    ui->cameraScheduleWidget->setRecordingParamsAvailability(m_camera->hasVideo(0) && !m_camera->hasParam(lit("noRecordingParams")));
 }
 
 void QnSingleCameraSettingsWidget::updateMotionCapabilities() {

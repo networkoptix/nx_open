@@ -3,6 +3,8 @@
 #include <QtSql>
 
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/storage_plugin_factory.h>
+#include <plugins/storage/file_storage/file_storage_resource.h>
 
 #include <utils/serialization/sql.h>
 #include "utils/common/log.h"
@@ -10,8 +12,9 @@
 
 static const int COMMIT_INTERVAL = 1000 * 60 * 1;
 
-QnStorageDb::QnStorageDb(int storageIndex):
+QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
     QnDbHelper(),
+    m_storage(s),
     m_storageIndex(storageIndex),
     m_tran(m_sdb, m_mutex),
     m_needReopenDB(false)
@@ -171,6 +174,8 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
 
 bool QnStorageDb::open(const QString& fileName)
 {
+    // TODO: #akulikov If storage is DBReady, DB should work via Storage::IODevice.
+    //       But this change requires DB implementation to be able to work via IODevice, and this is not the case right now.
     m_sdb = QSqlDatabase::addDatabase("QSQLITE", QString("QnStorageManager_%1").arg(fileName));
     m_sdb.setDatabaseName(fileName);
     return m_sdb.open() && createDatabase();
@@ -204,8 +209,17 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
     result << loadChunksFileCatalog();
     result << loadBookmarksFileCatalog();
 
-    addCatalogFromMediaFolder(lit("hi_quality"), QnServer::HiQualityCatalog, result);
-    addCatalogFromMediaFolder(lit("low_quality"), QnServer::LowQualityCatalog, result);
+    addCatalogFromMediaFolder(
+        lit("hi_quality"), 
+        QnServer::HiQualityCatalog, 
+        result
+    );
+    
+    addCatalogFromMediaFolder(
+        lit("low_quality"), 
+        QnServer::LowQualityCatalog, 
+        result
+    );
 
     return result;
 }
@@ -220,12 +234,25 @@ bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServe
     return false;
 }
 
-void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix, QnServer::ChunksCatalog catalog, QVector<DeviceFileCatalogPtr>& result)
+void QnStorageDb::addCatalogFromMediaFolder(
+    const QString&                  postfix, 
+    QnServer::ChunksCatalog         catalog, 
+    QVector<DeviceFileCatalogPtr>&  result
+)
 {
-
     QString root = closeDirPath(QFileInfo(m_sdb.databaseName()).absoluteDir().path()) + postfix;
-    QDir dir(root);
-    for(const QFileInfo& fi: dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name))
+    QnAbstractStorageResource::FileInfoList files;
+    if (m_storage)
+        files = m_storage->getFileList(root);
+    else
+        files = QnAbstractStorageResource::FIListFromQFIList(
+            QDir(root).entryInfoList(
+                QDir::Dirs | QDir::NoDotAndDotDot, 
+                QDir::Name
+            )
+        );
+
+    for (const QnAbstractStorageResource::FileInfo& fi: files)
     {
         QString uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId)) {

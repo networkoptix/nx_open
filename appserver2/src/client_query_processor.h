@@ -31,6 +31,7 @@
 namespace ec2
 {
     static const size_t RESPONSE_WAIT_TIMEOUT_MS = 30*1000;
+    static const size_t TCP_CONNECT_TIMEOUT_MS = 10*1000;
 
     class ClientQueryProcessor
     :
@@ -63,6 +64,7 @@ namespace ec2
             QUrl requestUrl( ecBaseUrl );
             nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
+            httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
                 httpClient->setUserName(requestUrl.userName());
                 httpClient->setUserPassword(requestUrl.password());
@@ -109,6 +111,7 @@ namespace ec2
             QUrl requestUrl( ecBaseUrl );
             nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
+            httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
                 httpClient->setUserName(requestUrl.userName());
                 httpClient->setUserPassword(requestUrl.password());

@@ -381,9 +381,8 @@ bool DeviceFileCatalog::needRebuildPause()
 
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
-    QDir dir(folder);
-    QList<QFileInfo> files;
-    for(const QFileInfo& fi: dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
+    QnAbstractStorageResource::FileInfoList files;
+    for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
     {
         while (!qnStorageMan->needToStopMediaScan() && needRebuildPause())
             QnLongRunnable::msleep(100);
@@ -401,7 +400,6 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         {
             files << fi;
         }
-
     }
 
     if (files.empty())
@@ -414,7 +412,8 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     {
         QnConcurrent::run( &tp, [&]() 
         {
-            QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
+            //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
+            QString fileName = fi.absoluteFilePath();
 
             Chunk chunk = chunkFromFile(storage, fileName);
             chunk.setFileSize(fi.size());
@@ -438,7 +437,11 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             }
             else {
                 //qnFileDeletor->deleteFile(fi.absoluteFilePath());
-                emptyFileList << EmptyFileInfo(fi.created().toMSecsSinceEpoch(), fi.absoluteFilePath());
+                emptyFileList 
+                    << EmptyFileInfo(/*fi.created().toMSecsSinceEpoch()*/
+                           chunk.startTimeMs, 
+                           fi.absoluteFilePath()
+                       );
             }
         }
         );
@@ -478,7 +481,7 @@ bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, co
 
     for(const EmptyFileInfo& emptyFile: emptyFileList) {
         if (emptyFile.startTimeMs < period.endTimeMs())
-            qnFileDeletor->deleteFile(emptyFile.fileName);
+            storage->removeFile(emptyFile.fileName);
     }
 
     QnMutexLocker lk( &m_mutex );

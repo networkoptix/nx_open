@@ -661,6 +661,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory.beginSubMenu(); {
         factory(Qn::OpenFileAction).
             flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+            mode(QnActionTypes::DesktopMode).
             requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("File(s)...")).
             shortcut(tr("Ctrl+O")).
@@ -915,6 +916,12 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open")).
         conditionalText(tr("Monitor"), hasFlags(Qn::server), Qn::All).
         condition(new QnOpenInCurrentLayoutActionCondition(this));
+
+    factory(Qn::OpenIOMonitorAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
+        text(tr("IO monitor")).
+        condition(new QnOpenIOMonitorActionCondition(this));
 
     factory(Qn::OpenInNewLayoutAction).
         mode(QnActionTypes::DesktopMode).
@@ -1343,6 +1350,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Camera Settings...")).
+        conditionalText(tr("IO Module Settings..."), hasFlags(Qn::io_module), Qn::All).
         requiredPermissions(Qn::WritePermission).
         condition(new QnConjunctionActionCondition(
              new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),

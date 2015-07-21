@@ -86,7 +86,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::saveStorages( const QnAbstractStorageResourceList& storages, impl::SimpleHandlerPtr handler )
+    int QnMediaServerManager<T>::saveStorages( const QnStorageResourceList& storages, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiStorageDataList> tran(ApiCommand::saveStorages);

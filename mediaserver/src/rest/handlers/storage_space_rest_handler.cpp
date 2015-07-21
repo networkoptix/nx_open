@@ -3,6 +3,7 @@
 #include <api/model/storage_space_reply.h>
 
 #include <core/resource/storage_resource.h>
+#include <core/resource/storage_plugin_factory.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -39,7 +40,8 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         if (storage->getStatus() == Qn::Online) {
             data.totalSpace = storage->getTotalSpace();
             data.freeSpace = storage->getFreeSpace();
-            data.isWritable = storage->isStorageAvailableForWriting();
+            data.isWritable = storage->getCapabilities() & 
+                              QnAbstractStorageResource::cap::WriteFile;
         }
         data.reservedSpace = storage->getSpaceLimit();
         data.isExternal = storage->isExternal();
@@ -90,7 +92,8 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
             storage->setUrl(data.url); /* createStorage does not fill url. */
             storage->setSpaceLimit(defaultStorageSpaceLimit);
             storage->setStorageType(data.storageType);
-            data.isWritable = storage->isStorageAvailableForWriting();
+            data.isWritable = storage->getCapabilities() & 
+                              QnAbstractStorageResource::cap::WriteFile;
         } else {
             data.isWritable = false;
         }

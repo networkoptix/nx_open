@@ -14,6 +14,7 @@
 #include "configure_reply.h"
 #include "upload_update_reply.h"
 #include "rebuild_archive_reply.h"
+#include "api_ioport_data.h"
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\
@@ -33,7 +34,9 @@
     (QnPingReply)\
     (QnCameraListReply)\
     (QnConfigureReply) \
-    (QnUploadUpdateReply)
+    (QnUploadUpdateReply)\
+
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnIOPortData)(QnCameraPortsData)(QnIOStateData)(QnCameraIOStateData), (eq)(ubjson)(json), _Fields)
 

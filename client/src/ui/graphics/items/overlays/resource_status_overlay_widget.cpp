@@ -15,6 +15,8 @@
 #include <ui/style/globals.h>
 #include <ui/workaround/gl_native_painting.h>
 #include "opengl_renderer.h"
+#include "ui/style/skin.h"
+#include "utils/math/color_transformations.h"
 
 /** @def QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
  *
@@ -63,7 +65,8 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
     m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
     m_staticTexts[LoadingText] = tr("Loading...");
-
+    m_staticTexts[NoVideoStreamText] = tr("No video stream");
+    
     for(int i = 0; i < m_staticTexts.size(); i++) {
         m_staticTexts[i].setPerformanceHint(QStaticText::AggressiveCaching);
         m_staticTexts[i].setTextOption(QTextOption(Qt::AlignCenter));
@@ -159,7 +162,17 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     QRectF rect = this->rect();
 
-    painter->fillRect(rect, palette().color(QPalette::Window));
+    if (m_statusOverlay == Qn::NoVideoDataOverlay) 
+    {
+        auto color = palette().color(QPalette::Window);
+        QRadialGradient gradient(rect.center(), rect.width()/2);
+        gradient.setColorAt(0, shiftColor(color, 0x50, 0x50, 0x50));
+        gradient.setColorAt(1, color);
+        painter->fillRect(rect, gradient);
+    }
+    else {
+        painter->fillRect(rect, palette().color(QPalette::Window));
+    }
 
     if(m_statusOverlay == Qn::LoadingOverlay || m_statusOverlay == Qn::PausedOverlay || m_statusOverlay == Qn::EmptyOverlay) {
         qreal unit = qnGlobals->workbenchUnitSize();
@@ -235,6 +248,12 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
                 paintFlashingText(painter, m_staticTexts[VideowallLicenseText], 0.035, QPointF(0.0, 0.06 * i));
             break;
         }
+    case Qn::NoVideoDataOverlay:
+        //paintFlashingText(painter, m_staticTexts[NoVideoStreamText], 0.125);
+        if (!m_ioSpeakerPixmap)
+            m_ioSpeakerPixmap.reset(new QPixmap(qnSkin->pixmap("item/io_speaker.png")));
+        paintPixmap(painter, *m_ioSpeakerPixmap, 0.125);
+        break;
     default:
         break;
     }
@@ -264,4 +283,24 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
     Q_UNUSED(transformRollback)
     Q_UNUSED(penRollback)
     Q_UNUSED(fontRollback) // TODO: #Elric remove
+}
+
+void QnStatusOverlayWidget::paintPixmap(QPainter *painter, const QPixmap &picture, qreal imageSize) 
+{
+    QRectF rect = this->rect();
+    qreal unit = qMin(rect.width(), rect.height());
+
+    QnScopedPainterTransformRollback transformRollback(painter);
+
+    qreal scaleFactor = imageSize * unit / staticFontSize;
+    if (picture.size().width() * scaleFactor > rect.width())
+        scaleFactor = rect.width() / picture.size().width();
+
+    qreal opacity = painter->opacity();
+    //painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(flashingPeriodMSec * 2) * M_PI)));
+    painter->translate(rect.center());
+    painter->scale(scaleFactor, scaleFactor);
+
+    painter->drawPixmap(-toPoint(picture.size() / 2), picture);
+    painter->setOpacity(opacity);
 }

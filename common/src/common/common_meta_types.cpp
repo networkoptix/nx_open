@@ -69,6 +69,7 @@
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
+#include "api/model/api_ioport_data.h"
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -107,7 +108,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnVirtualCameraResourcePtr>();
     qRegisterMetaType<QnVirtualCameraResourceList>();
     qRegisterMetaType<QnSecurityCamResourcePtr>();
-    qRegisterMetaType<QnAbstractStorageResourcePtr>();
+    qRegisterMetaType<QnStorageResourcePtr>();
     qRegisterMetaType<QnVideoWallResourcePtr>();
 
     qRegisterMetaType<QnUserResourceList>();
@@ -194,6 +195,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::PtzCommand>();
     qRegisterMetaType<Qn::PtzTraits>();
     qRegisterMetaType<Qn::PtzCapabilities>();
+
+    qRegisterMetaType<QnIOPortData>();
+    qRegisterMetaType<QnIOStateData>();
 
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();

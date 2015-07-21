@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>storage_plugins</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.3.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.3.2-SNAPSHOT</version>
+    <artifactId>ftpstorageplugin</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness Ftp storage plugin</name>	
+
+    <properties>
+        <product.title>${ftpstorageplugin.name}</product.title>	
+        <libtype>plugin</libtype>
+        <buildLib>sharedlib</buildLib>
+        <!--Global libs-->
+        <qt.libs>core</qt.libs>
+        <global.libs/>
+        <!--Specific os libs used-->
+        <windows.oslibs/>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>
+        <!--Global defines-->
+        <global.defines/>
+        <linux.defines/>
+        <mac.defines/>
+        <!--Specific os defines-->
+        <windows.defines>WIN32_LEAN_AND_MEAN NOMINMAX _CRT_NON_CONFORMING_SWPRINTFS _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE</windows.defines>
+        <additional.defines>NOLFS NOSSL STORAGE_EXPORTS</additional.defines>
+    </properties>
+    <dependencies/>
+</project>

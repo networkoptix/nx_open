@@ -10,6 +10,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/storage_plugin_factory.h>
 
 #include <core/datapacket/abstract_data_packet.h>
 #include <core/datapacket/media_data_packet.h>
@@ -341,9 +342,10 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 
     if (m_firstTime)
     {
-        if (vd == 0)
+        const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
+        if (vd == 0 &&  mediaDev->hasVideo(m_mediaProvider))
             return true; // skip audio packets before first video packet
-        if (!initFfmpegContainer(vd))
+        if (!initFfmpegContainer(md))
         {
             if (!m_fileName.isEmpty())
                 m_recordingFinished = true;
@@ -467,11 +469,11 @@ void QnStreamRecorder::endOfRun()
     close();
 }
 
-bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& mediaData)
+bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
     Q_ASSERT(m_mediaProvider);
-    Q_ASSERT(mediaData->flags & AV_PKT_FLAG_KEY);
+    //Q_ASSERT(mediaData->flags & AV_PKT_FLAG_KEY);
 
     m_endDateTime = m_startDateTime = mediaData->timestamp;
 
@@ -551,8 +553,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
 
 
         int videoChannels = isTranscode ? 1 : layout->channelCount();
-
-        for (int i = 0; i < videoChannels; ++i) 
+        QnConstCompressedVideoDataPtr vd = std::dynamic_pointer_cast<const QnCompressedVideoData>(mediaData);
+        for (int i = 0; i < videoChannels && vd; ++i) 
         {
             // TODO: #vasilenko avoid using deprecated methods
             AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
@@ -578,10 +580,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
 
-                m_videoTranscoder->open(mediaData);
+                m_videoTranscoder->open(vd);
                 m_videoTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(m_videoTranscoder->getResolution()));
                 m_videoTranscoder->setQuality(Qn::QualityHighest);
-                m_videoTranscoder->open(mediaData); // reopen again for new size
+                m_videoTranscoder->open(vd); // reopen again for new size
 
                 avcodec_copy_context(videoStream->codec, m_videoTranscoder->getCodecContext());
             }
@@ -594,8 +596,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
             {
                 // determine real width and height
                 QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
-                CLFFmpegVideoDecoder decoder(mediaData->compressionType, mediaData, false);
-                decoder.decode(mediaData, &outFrame);
+                CLFFmpegVideoDecoder decoder(mediaData->compressionType, vd, false);
+                decoder.decode(vd, &outFrame);
                 if (m_role == Role_FileExport) 
                 {
                     avcodec_copy_context(videoStream->codec, decoder.getContext());
@@ -606,8 +608,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                 }
             }
             else {
-                videoCodecCtx->width = qMax(8,mediaData->width);
-                videoCodecCtx->height = qMax(8,mediaData->height);
+                videoCodecCtx->width = qMax(8,vd->width);
+                videoCodecCtx->height = qMax(8,vd->height);
             }
 
             videoCodecCtx->bit_rate = 1000000 * 6;

@@ -12,7 +12,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_factory.h>
-#include <core/resource/abstract_storage_resource.h>
+#include <core/resource/storage_resource.h>
 #include "utils/network/http/asynchttpclient.h"
 
 
@@ -52,8 +52,8 @@ public:
 
     QnMediaServerConnectionPtr apiConnection();
 
-    QnAbstractStorageResourceList getStorages() const;
-    QnAbstractStorageResourcePtr getStorageByUrl(const QString& url) const;
+    QnStorageResourceList getStorages() const;
+    QnStorageResourcePtr getStorageByUrl(const QString& url) const;
     //void setStorages(const QnAbstractStorageResourceList& storages);
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
@@ -101,7 +101,7 @@ public:
 
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
-    void setStorageDataToUpdate(const QnAbstractStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storageUrlToRemove);
+    void setStorageDataToUpdate(const QnStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storageUrlToRemove);
     /*
     * Return pair of handles of saving requests. first: handle for saving storages, second: handle for remove storages
     */
@@ -141,7 +141,7 @@ private:
     QnUuid m_originalGuid;
 
     // used for client purpose only. Can be moved to separete class
-    QnAbstractStorageResourceList m_storagesToUpdate;
+    QnStorageResourceList m_storagesToUpdate;
     ec2::ApiIdDataList m_storagesToRemove;
 
     CachedValue<Qn::PanicMode> m_panicModeCache;

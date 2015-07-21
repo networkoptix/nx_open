@@ -308,7 +308,7 @@ protected:
 
     Qn::ResourceStatusOverlay statusOverlay() const;
     void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay);
-    Qn::ResourceStatusOverlay calculateStatusOverlay(int resourceStatus) const;
+    Qn::ResourceStatusOverlay calculateStatusOverlay(int resourceStatus, bool hasVideo) const;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const;
     Q_SLOT void updateStatusOverlay();
 

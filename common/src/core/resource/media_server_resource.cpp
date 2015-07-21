@@ -100,10 +100,12 @@ QString QnMediaServerResource::getName() const
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
-
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
-    if( !(*lk)->name.isEmpty() )
-        return (*lk)->name;
+    else
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if( !(*lk)->name.isEmpty() )
+            return (*lk)->name;
+    }
     return QnResource::getName();
 }
 
@@ -215,12 +217,12 @@ QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourc
     return result;
 }
 
-QnAbstractStorageResourceList QnMediaServerResource::getStorages() const
+QnStorageResourceList QnMediaServerResource::getStorages() const
 {
-    return qnResPool->getResourcesByParentId(getId()).filtered<QnAbstractStorageResource>();
+    return qnResPool->getResourcesByParentId(getId()).filtered<QnStorageResource>();
 }
 
-void QnMediaServerResource::setStorageDataToUpdate(const QnAbstractStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storagesToRemove)
+void QnMediaServerResource::setStorageDataToUpdate(const QnStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storagesToRemove)
 {
     m_storagesToUpdate = storagesToUpdate;
     m_storagesToRemove = storagesToRemove;
@@ -286,13 +288,13 @@ void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
     emit serverFlagsChanged(::toSharedPointer(this));
 }
 
-QnAbstractStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
+QnStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
 {
-   for(const QnAbstractStorageResourcePtr& storage: getStorages()) {
+   for(const QnStorageResourcePtr& storage: getStorages()) {
        if (storage->getUrl() == url)
            return storage;
    }
-   return QnAbstractStorageResourcePtr();
+   return QnStorageResourcePtr();
 }
 
 void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
@@ -422,6 +424,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.sslAllowed = false;
     moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
+    moduleInformation.name = getName();
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
     
@@ -430,7 +433,6 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
-    moduleInformation.name = getName();
     moduleInformation.port = QUrl(m_apiUrl).port();
     moduleInformation.id = getId();
     moduleInformation.flags = getServerFlags();

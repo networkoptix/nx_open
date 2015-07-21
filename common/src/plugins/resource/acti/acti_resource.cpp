@@ -588,19 +588,29 @@ QnAbstractPtzController *QnActiResource::createPtzControllerInternal()
     return new QnActiPtzController(toSharedPointer(this));
 }
 
-QStringList QnActiResource::getRelayOutputList() const
+QnIOPortDataList QnActiResource::getRelayOutputList() const
 {
-    QStringList outputIDStrList;
-    for( int i = 1; i <= m_outputCount; ++i )
-        outputIDStrList << QString::number(i);
+    QnIOPortDataList outputIDStrList;
+    for( int i = 1; i <= m_outputCount; ++i ) {
+        QnIOPortData value;
+        value.portType = Qn::PT_Output;
+        value.id = QString::number(i);
+        value.outputName = tr("Output %1").arg(i);
+        outputIDStrList.push_back(value);
+    }
     return outputIDStrList;
 }
 
-QStringList QnActiResource::getInputPortList() const
+QnIOPortDataList QnActiResource::getInputPortList() const
 {
-    QStringList inputIDStrList;
-    for( int i = 1; i <= m_inputCount; ++i )
-        inputIDStrList << QString::number(i);
+    QnIOPortDataList inputIDStrList;
+    for( int i = 1; i <= m_inputCount; ++i ) {
+        QnIOPortData value;
+        value.portType = Qn::PT_Input;
+        value.id = QString::number(i);
+        value.inputName = tr("Input %1").arg(i);
+        inputIDStrList.push_back(value);
+    }
     return inputIDStrList;
 }
 

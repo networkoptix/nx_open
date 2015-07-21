@@ -263,7 +263,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_instrumentManager(display()->instrumentManager()),
+    m_fpsCountingInstrument(NULL),
+    m_controlsActivityInstrument(NULL),
     m_flags(0),
+    m_controlsWidget(NULL),
     m_treeVisible(false),
     m_titleUsed(false),
     m_titleVisible(false),
@@ -279,14 +282,29 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_searchOpened(false),
     m_ignoreClickEvent(false),
     m_inactive(false),
+    m_fpsItem(NULL),
+    m_debugOverlayLabel(NULL),
+
     m_inFreespace(false),
+    m_unzoomedOpenedPanels(),
+
+    m_sliderItem(NULL),
+    m_sliderResizerWidget(NULL),
     m_ignoreSliderResizerGeometryChanges(false),
     m_ignoreSliderResizerGeometryLater(false),
     m_ignoreTreeResizerGeometryChanges(false),
     m_updateTreeResizerGeometryLater(false),
     m_sliderZoomingIn(false),
     m_sliderZoomingOut(false),
+    m_sliderZoomButtonsWidget(NULL),
+    m_sliderOpacityProcessor(NULL),
+    m_sliderYAnimator(NULL),
+    m_sliderShowButton(NULL),
+    m_sliderOpacityAnimatorGroup(NULL),
+    m_sliderAutoHideTimer(NULL),
+
     m_lastThumbnailsHeight(48.0),
+
 
     m_treeWidget(NULL),
     m_treeResizerWidget(NULL),
@@ -324,10 +342,23 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_calendarPinButton(nullptr),
     m_dayTimeMinimizeButton(nullptr),
+    m_calendarItem(NULL),
+    m_calendarSizeAnimator(NULL),
+    m_calendarOpacityAnimatorGroup(NULL),
+    m_calendarOpacityProcessor(NULL),
     m_inCalendarGeometryUpdate(false),
-    m_inDayTimeGeometryUpdate(false),
-    m_inSearchGeometryUpdate(false),
 
+    m_inDayTimeGeometryUpdate(false),
+    m_dayTimeItem(NULL),
+    m_dayTimeWidget(NULL),
+    m_dayTimeSizeAnimator(NULL),
+
+    m_searchWidget(NULL),
+    m_searchSizeAnimator(NULL),
+    m_searchOpacityAnimatorGroup(NULL),
+    m_searchOpacityProcessor(NULL),
+    m_inSearchGeometryUpdate(false),
+    
     m_calendarPinOffset(),
     m_dayTimeOffset()
 {
@@ -387,7 +418,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     createSearchWidget();
 
     /* Debug overlay */
-//    createDebugWidget();
+    createDebugWidget();
 
     initGraphicsMessageBox();
 
@@ -603,13 +634,14 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
 }
 
 bool QnWorkbenchUi::isHovered() const {
-    return  m_sliderOpacityProcessor->isHovered() ||
-            m_treeOpacityProcessor->isHovered() ||
-            m_titleOpacityProcessor->isHovered() ||
-            (m_notificationsOpacityProcessor && m_notificationsOpacityProcessor->isHovered()) || // in light mode it can be NULL
-            m_calendarOpacityProcessor->isHovered()
-            || m_searchOpacityProcessor->isHovered()
-            ;
+    return  
+           (m_sliderOpacityProcessor        && m_sliderOpacityProcessor->isHovered())
+        || (m_treeOpacityProcessor          && m_treeOpacityProcessor->isHovered())
+        || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
+        || (m_notificationsOpacityProcessor && m_notificationsOpacityProcessor->isHovered())
+        || (m_calendarOpacityProcessor      && m_calendarOpacityProcessor->isHovered())
+        || (m_searchOpacityProcessor        && m_searchOpacityProcessor->isHovered())
+        ;
 }
 
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const {
@@ -692,6 +724,8 @@ void QnWorkbenchUi::tick(int deltaMSecs) {
 
 void QnWorkbenchUi::at_freespaceAction_triggered() {
     Q_ASSERT_X(!qnRuntime->isActiveXMode(), Q_FUNC_INFO, "This function must not be called in ActiveX mode.");
+	if (qnRuntime->isActiveXMode())
+		return;
 
     QAction *fullScreenAction = action(Qn::EffectiveMaximizeAction);
 
@@ -907,7 +941,7 @@ void QnWorkbenchUi::updateTreeOpacity(bool animate) {
     if(!m_treeVisible) {
         setTreeOpacity(0.0, 0.0, animate);
     } else {
-        if(m_treeOpacityProcessor->isHovered()) {
+        if(m_treeOpacityProcessor && m_treeOpacityProcessor->isHovered()) {
             setTreeOpacity(hoverTreeOpacity, hoverTreeBackgroundOpacity, animate);
         } else {
             setTreeOpacity(normalTreeOpacity, normalTreeBackgroundOpacity, animate);
@@ -930,6 +964,7 @@ bool QnWorkbenchUi::isTreeOpened() const {
 
 void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
     ensureAnimationAllowed(animate);
+
 
 	if (!m_treeItem)
 		return;

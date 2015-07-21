@@ -1021,6 +1021,10 @@ namespace Qn {
          */
         DebugControlPanelAction,
 
+        /**
+         * open IO monitor for IO module
+         */
+        OpenIOMonitorAction,
 
         ActionCount,
 

@@ -54,6 +54,7 @@ public:
         QString serializedData(lit("%1;;%2;;%3"));
         serializedData = serializedData.arg(m_storagePath).arg(QnLexical::serialized(m_catalog)).arg(m_cameraUniqueId);
         MSSettings::roSettings()->setValue(SCAN_ARCHIVE_FROM, serializedData);
+        MSSettings::roSettings()->sync();
     }
     void load() {
         QString serializedData = MSSettings::roSettings()->value(SCAN_ARCHIVE_FROM).toString();
@@ -66,6 +67,7 @@ public:
     }
     static void reset() {
         MSSettings::roSettings()->setValue(SCAN_ARCHIVE_FROM, QString());
+        MSSettings::roSettings()->sync();
     }
     bool isEmpty() const { return m_cameraUniqueId.isEmpty(); }
     bool operator<(const ArchiveScanPosition& other) {
@@ -217,8 +219,8 @@ public:
         {
             if (needToStop())
                 break;
-            QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
-            Qn::ResourceStatus status = fileStorage->isStorageAvailable() ? Qn::Online : Qn::Offline;
+            QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
+            Qn::ResourceStatus status = fileStorage->isAvailable() ? Qn::Online : Qn::Offline;
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
         }
@@ -277,7 +279,7 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         newChunks.push_back(itr.value());
 
     for(const DeviceFileCatalog::EmptyFileInfo& emptyFile: emptyFileList)
-        qnFileDeletor->deleteFile(emptyFile.fileName);
+        storage->removeFile(emptyFile.fileName);
 
     // add to DB
     QnStorageDbPtr sdb = getSDB(storage);
@@ -395,12 +397,17 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff)
 {
-    QDir dir(closeDirPath(storage->getPath()) + DeviceFileCatalog::prefixByCatalog(catalog));
     ArchiveScanPosition scanPos;
     scanPos.load(); // load from persistent storage
 
-    QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
-    for(const QFileInfo& fi: list)
+    QnAbstractStorageResource::FileInfoList list = 
+        storage->getFileList(
+            closeDirPath(
+                storage->getPath()
+            ) + DeviceFileCatalog::prefixByCatalog(catalog)
+        );
+
+    for(const QnAbstractStorageResource::FileInfo& fi: list)
     {
         if (m_rebuildCancelled)
             return; // cancel rebuild
@@ -474,18 +481,25 @@ static const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
 {
     QString storagePath = storage->getPath();
-    const QString dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
+    QString dbRefFilePath;
+    
+    if (storagePath.indexOf(lit("://")) != -1)
+        dbRefFilePath = dbRefFileName.arg(getLocalGuid());
+    else
+        dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
 
     QByteArray dbRefGuidStr;
     //checking for file db_ref.guid existence
-    if( QFile::exists(dbRefFilePath) )
+    if (storage->isFileExists(dbRefFilePath))
     {
         //have to use db from data directory, not from storage
         //reading guid from file
-        QFile dbGuidFile( dbRefFilePath );
-        if( !dbGuidFile.open( QIODevice::ReadOnly ) )
+        QIODevice *dbGuidFile = storage->open(dbRefFilePath, QIODevice::ReadOnly);
+
+        if (dbGuidFile == nullptr)
             return false;
-        dbRefGuidStr = dbGuidFile.readAll();
+        dbRefGuidStr = dbGuidFile->readAll();
+        dbGuidFile->close();
     }
 
     if( !dbRefGuidStr.isEmpty() )
@@ -494,22 +508,15 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
         return true;
     }
 
-#ifdef _WIN32
-    //on windows always placing db to a storage directory
-    *dbDirectory = storagePath;
-    return true;
-#else
-    //On linux, sqlite db cannot be safely placed on a network partition due to lock problem
-        //So, for such storages creating DB in data dir
-
-    QList<QnPlatformMonitor::PartitionSpace> partitions = 
-        qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-            QnPlatformMonitor::NetworkPartition );
-
-    for( const QnPlatformMonitor::PartitionSpace& partition: partitions )
+    if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
     {
-        if( !storagePath.startsWith( partition.path ) )
-            continue;
+        *dbDirectory = storagePath;
+        return true;
+    }
+    else
+    {   // we won't be able to create ref guid file if storage is not writable
+        if (!(storage->getCapabilities() & QnAbstractStorageResource::WriteFile))
+            return false;
 
         dbRefGuidStr = QUuid::createUuid().toString().toLatin1();
         if( dbRefGuidStr.size() < 2 )
@@ -518,27 +525,28 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
         dbRefGuidStr.remove( dbRefGuidStr.size()-1, 1 );
         dbRefGuidStr.remove( 0, 1 );
         //saving db ref guid to file on storage
-        QFile dbGuidFile( dbRefFilePath );
-        if( !dbGuidFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+        QIODevice *dbGuidFile = storage->open(
+            dbRefFilePath, 
+            QIODevice::WriteOnly | QIODevice::Truncate 
+        );
+        if (dbGuidFile == nullptr)
             return false;
-        if( dbGuidFile.write( dbRefGuidStr ) != dbRefGuidStr.size() )
+        if( dbGuidFile->write( dbRefGuidStr ) != dbRefGuidStr.size() )
             return false;
-        dbGuidFile.close();
+        dbGuidFile->close();
 
         storagePath = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
         if( !QDir().mkpath( storagePath ) )
             return false;
-        break;
     }
-
     *dbDirectory = storagePath;
     return true;
-#endif
 }
 
 QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 {
     QnMutexLocker lock( &m_sdbMutex );
+
     QnStorageDbPtr sdb = m_chunksDB[storage->getPath()];
     if (!sdb) 
     {
@@ -551,10 +559,23 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
         }
         QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
         QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
-        if (QFile::exists(oldFileName) && !QFile::exists(fileName))
-            QFile::rename(oldFileName, fileName);
+        
+        if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
+        {
+            if (storage->isFileExists(oldFileName) && !storage->isFileExists(fileName))
+                storage->renameFile(oldFileName, fileName);
 
-        sdb = m_chunksDB[storage->getPath()] = QnStorageDbPtr(new QnStorageDb(getStorageIndex(storage)));
+            sdb = m_chunksDB[storage->getPath()] = 
+                QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
+        }
+        else
+        {
+            if (QFile::exists(oldFileName) && !QFile::exists(fileName))
+                QFile::rename(oldFileName, fileName);
+            sdb = m_chunksDB[storage->getPath()] = 
+                QnStorageDbPtr(new QnStorageDb(QnStorageResourcePtr(), getStorageIndex(storage)));
+        }
+
         if (!sdb->open(fileName))
         {
             qWarning() << "can't initialize sqlLite database! Actions log is not created!";
@@ -579,8 +600,8 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         //    storage->addWritedSpace(oldStorage->getWritedSpace());
         storage->setStatus(Qn::Offline); // we will check status after
         m_storageRoots.insert(storageIndex, storage);
-        connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), 
-                this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
+        connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), 
+                this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
     }
     updateStorageStatistics();
 }
@@ -646,9 +667,9 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &)
     updateStorageStatistics();
 }
 
-bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const
+bool QnStorageManager::existsStorageWithID(const QnStorageResourceList& storages, const QnUuid &id) const
 {
-    for(const QnAbstractStorageResourcePtr& storage: storages)
+    for(const QnStorageResourcePtr& storage: storages)
     {
         if (storage->getId() == id)
             return true;
@@ -656,7 +677,7 @@ bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& 
     return false;
 }
 
-void QnStorageManager::removeAbsentStorages(const QnAbstractStorageResourceList &newStorages)
+void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStorages)
 {
     QnMutexLocker lock( &m_mutexStorages );
     for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
@@ -962,7 +983,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     QString dir = storage->getPath();
 
-    if (!storage->isNeedControlFreeSpace())
+    if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile))
         return;
 
     qint64 freeSpace = storage->getFreeSpace();
@@ -1021,7 +1042,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     }
 }
 
-void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs)
+void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs)
 {
     Q_UNUSED(newEndTimeMs)
     int storageIndex = detectStorageIndex(resource->getUrl());
@@ -1043,7 +1064,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     qint64 bigStorageThreshold = 0;
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
+        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (itr.value());
         if (fileStorage && fileStorage->getStatus() != Qn::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
@@ -1054,7 +1075,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
+        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (itr.value());
         if (fileStorage && fileStorage->getStatus() != Qn::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
@@ -1128,7 +1149,7 @@ void QnStorageManager::updateStorageStatistics()
     m_isWritableStorageAvail = !storages.isEmpty();
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
         minSpace = qMin(minSpace, storageSpace);
@@ -1136,7 +1157,7 @@ void QnStorageManager::updateStorageStatistics()
 
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(storageSpace / (double) minSpace);

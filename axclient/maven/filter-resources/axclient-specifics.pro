@@ -14,9 +14,7 @@ INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${root.dir}/appserver2/src/ \
                 ${root.dir}/client.core/src/ \
                 ${root.dir}/client/src/
-
-include(${root.dir}/bespin/bespin.pri)
-                
+              
 CONFIG(debug, debug|release) {
   QMAKE_POST_LINK = ..\${arch}\post.bat debug ${arch};
 }

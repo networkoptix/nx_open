@@ -414,7 +414,7 @@ void QnProgressiveDownloadingConsumer::run()
 
     if (qnCommon->isTranscodeDisabled())
     {
-        d->responseBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
+        d->response.messageBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
         sendResponse(CODE_NOT_IMPLEMETED, "text/plain");
         return;
     }
@@ -432,7 +432,7 @@ void QnProgressiveDownloadingConsumer::run()
     {
         parseRequest();
 
-        d->responseBody.clear();
+        d->response.messageBody.clear();
 
         //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
         const QString& requestedResourcePath = QnFile::fileName(getDecodedUrl().path());
@@ -442,7 +442,7 @@ void QnProgressiveDownloadingConsumer::run()
         QByteArray mimeType = getMimeType(d->streamingFormat);
         if (mimeType.isEmpty())
         {
-            d->responseBody = QByteArray("Unsupported streaming format ") + mimeType;
+            d->response.messageBody = QByteArray("Unsupported streaming format ") + mimeType;
             sendResponse(CODE_NOT_FOUND, "text/plain");
             return;
         }
@@ -484,7 +484,7 @@ void QnProgressiveDownloadingConsumer::run()
         QnResourcePtr resource = qnResPool->getResourceByUniqueId(resUniqueID);
         if (resource == 0)
         {
-            d->responseBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLatin1()) + QByteArray(" not found ");
+            d->response.messageBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLatin1()) + QByteArray(" not found ");
             sendResponse(CODE_NOT_FOUND, "text/plain");
             return;
         }
@@ -517,7 +517,7 @@ void QnProgressiveDownloadingConsumer::run()
             QByteArray msg;
             msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLatin1();
             qWarning() << msg;
-            d->responseBody = msg;
+            d->response.messageBody = msg;
             sendResponse(CODE_INTERNAL_ERROR, "plain/text");
             return;
         }
@@ -556,13 +556,13 @@ void QnProgressiveDownloadingConsumer::run()
 
             if (isUTCRequest)
             {
-                d->responseBody = "now";
+                d->response.messageBody = "now";
                 sendResponse(CODE_OK, "text/plain");
                 return;
             }
 
             if (!camera) {
-                d->responseBody = "Media not found\r\n";
+                d->response.messageBody = "Media not found\r\n";
                 sendResponse(CODE_NOT_FOUND, "text/plain");
                 return;
             }
@@ -624,7 +624,7 @@ void QnProgressiveDownloadingConsumer::run()
                         else
                             ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLatin1() + QByteArray("\"");
                     }
-                    d->responseBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
+                    d->response.messageBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
                     sendResponse(CODE_OK, "application/json");
                 }
                 else {
@@ -644,7 +644,7 @@ void QnProgressiveDownloadingConsumer::run()
         
         if (dataProvider == 0)
         {
-            d->responseBody = "Video camera is not ready yet\r\n";
+            d->response.messageBody = "Video camera is not ready yet\r\n";
             sendResponse(CODE_NOT_FOUND, "text/plain");
             return;
         }
@@ -654,7 +654,7 @@ void QnProgressiveDownloadingConsumer::run()
             QByteArray msg;
             msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder.getLastErrorMessage().toLatin1();
             qWarning() << msg;
-            d->responseBody = msg;
+            d->response.messageBody = msg;
             sendResponse(CODE_INTERNAL_ERROR, "plain/text");
             return;
         }

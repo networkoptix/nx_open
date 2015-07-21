@@ -48,7 +48,7 @@ public:
     /*
     * Remove storage if storage is absent in specified list
     */
-    void removeAbsentStorages(const QnAbstractStorageResourceList &newStorages);
+    void removeAbsentStorages(const QnStorageResourceList &newStorages);
     void addStorage(const QnStorageResourcePtr &storage);
 
     QString getFileName(const qint64& fileDate, qint16 timeZone, const QnNetworkResourcePtr &netResource, const QString& prefix, const QnStorageResourcePtr& storage);
@@ -123,7 +123,7 @@ signals:
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
     void rebuildFinished();
 public slots:
-    void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
+    void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
     void at_storageChanged(const QnResourcePtr &storage);
@@ -135,7 +135,7 @@ private:
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
     void getTimePeriodInternal(std::vector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
-    bool existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const;
+    bool existsStorageWithID(const QnStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
 
     QString toCanonicalPath(const QString& path);

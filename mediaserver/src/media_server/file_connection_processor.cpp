@@ -29,8 +29,8 @@ struct HttpContentTypes
 
 static HttpContentTypes contentTypes[] =
 {
-    { "html", "text/html; charset=iso-8859-1"},
-    { "htm",  "text/html; charset=iso-8859-1"},
+    { "html", "text/html; charset=utf-8"},
+    { "htm",  "text/html; charset=utf-8"},
     { "css",  "text/css"},
     { "js",   "application/javascript"},
     { "json", "application/json"},
@@ -84,7 +84,7 @@ void QnFileConnectionProcessor::run()
     parseRequest();
 
 
-    d->responseBody.clear();
+    d->response.messageBody.clear();
 
     QUrl url = getDecodedUrl();
     QString path = url.path();
@@ -118,13 +118,13 @@ void QnFileConnectionProcessor::run()
         CacheEntry* cachedData = cachedFiles.object(path);
         if (cachedData && cachedData->lastModified == lastModified)
         {
-            d->responseBody = cachedData->data;
+            d->response.messageBody = cachedData->data;
         }
         else 
         {
-            d->responseBody = file.readAll();
-            if (d->responseBody.size() < cachedFiles.maxCost())
-                cachedFiles.insert(path, new CacheEntry(d->responseBody, lastModified), d->responseBody.size());
+            d->response.messageBody = file.readAll();
+            if (d->response.messageBody.size() < cachedFiles.maxCost())
+                cachedFiles.insert(path, new CacheEntry(d->response.messageBody, lastModified), d->response.messageBody.size());
         }
 
         int formats = sizeof(contentTypes) / sizeof(HttpContentTypes);
@@ -137,10 +137,10 @@ void QnFileConnectionProcessor::run()
         }
 
 #ifndef EDGE_SERVER
-        if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty()) 
+        if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty()) 
         {
             if (!contentType.contains("image")) {
-                d->responseBody = GZipCompressor::compressData(d->responseBody);
+                d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
                 contentEncoding = "gzip";
             }
         }

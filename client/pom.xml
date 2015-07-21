@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Client</name>
+    <name>HD Witness Client Library</name>
 
     <dependencies>
         <dependency>
@@ -37,7 +37,7 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
-        </dependency>
+        </dependency>			
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -47,7 +47,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/client.core/pom.xml</systemPath>
         </dependency>
-    </dependencies>
+    </dependencies>	
 
     <properties>
         <product.title>${client.name}</product.title>
@@ -61,7 +61,7 @@
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx</mac.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx -lFestival -lestools -leststring -lestbase</mac.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->

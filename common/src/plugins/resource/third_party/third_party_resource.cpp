@@ -199,24 +199,42 @@ QnConstResourceAudioLayoutPtr QnThirdPartyResource::getAudioLayout(const QnAbstr
 }
 
 //!Implementation of QnSecurityCamResource::getRelayOutputList
-QStringList QnThirdPartyResource::getRelayOutputList() const
+QnIOPortDataList QnThirdPartyResource::getRelayOutputList() const
 {
+    QnIOPortDataList result;
+
     QStringList ids;
     if( !m_relayIOManager.get() )
-        return ids;
+        return result;
 
     m_relayIOManager->getRelayOutputList( &ids );
-    return ids;
+
+    for (const auto& data: ids) {
+        QnIOPortData value;
+        value.portType = Qn::PT_Output;
+        value.id = data;
+        value.outputName = tr("Otput %1").arg(data);
+        result.push_back(value);
+    }
+    return result;
 }
 
-QStringList QnThirdPartyResource::getInputPortList() const
+QnIOPortDataList QnThirdPartyResource::getInputPortList() const
 {
-    QStringList ids;
+    QnIOPortDataList result;
     if( !m_relayIOManager.get() )
-        return ids;
+        return result;
 
+    QStringList ids;
     m_relayIOManager->getInputPortList( &ids );
-    return ids;
+    for (const auto& data: ids) {
+        QnIOPortData value;
+        value.portType = Qn::PT_Input;
+        value.id = data;
+        value.inputName = tr("Input %1").arg(data);
+        result.push_back(value);
+    }
+    return result;
 }
 
 bool QnThirdPartyResource::setRelayOutputState(
