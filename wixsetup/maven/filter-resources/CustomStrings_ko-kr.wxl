@@ -57,6 +57,10 @@
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">바로가기</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">바탕화면에 바로가기 생성</String>
     
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">바로가기</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">바탕화면에 바로가기 생성</String>
+    
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">최종 버젼의 [ProductName] 이 이미 설치 되어있습니다.</String> 
 
@@ -126,6 +130,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">설정을 종료하시면 ${product.name} 이 시작됩니다.</String>    
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">설정을 종료하시면 ${nxtool.name} 이 시작됩니다.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">이 프로그램은 32비트 운영체재용입니다. 설치가 종료 됩니다.</String>
 
     <!-- SelectionWarningDlg -->

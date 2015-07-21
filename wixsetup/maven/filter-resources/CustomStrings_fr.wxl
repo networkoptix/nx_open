@@ -57,6 +57,10 @@
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Raccourci</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">Placer un raccourci sur le bureau</String>
     
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">Raccourci</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">Placer un raccourci sur le bureau</String>
+    
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Une version ultérieure de [ProductName] est déjà installé.</String> 
 
@@ -124,6 +128,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Lancer ${display.product.name} lorsque l'installation se termine.</String>    
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">Lancer ${nxtool.name} lorsque l'installation se termine.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">Cette installateur est pour un SE 32-bit. L'installation va maintenant fermer.</String>
 
     <!-- SelectionWarningDlg -->

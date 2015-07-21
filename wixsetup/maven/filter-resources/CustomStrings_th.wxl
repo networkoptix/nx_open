@@ -57,6 +57,10 @@
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">ทางลัด</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">ทางลัดบนเดสก์ทอป</String>
     
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">ทางลัด</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">ทางลัดบนเดสก์ทอป</String>
+    
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">รุ่นที่ใหม่กว่า [ProductName] มีการติดตั้งแล้ว</String> 
 
@@ -124,6 +128,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">เริ่มดำเนินการ ${product.name} เมื่อออกจากการติดตั้ง</String>    
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">เริ่มดำเนินการ ${nxtool.name} เมื่อออกจากการติดตั้ง</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">แพคเกจนี้ถูกออกแบบมาสำหรับ ระบบปฏิบัติการ 32 บิต ออกจากการตั้งค่าในขณะนี้</String>
 
     <!-- SelectionWarningDlg -->
