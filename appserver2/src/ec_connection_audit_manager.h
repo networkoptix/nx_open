@@ -28,6 +28,8 @@ namespace ec2
 
         void addAuditRecord( const ApiCameraAttributesData& params, const QnAuthSession& authInfo);
         void addAuditRecord( const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo);
+        void addAuditRecord( const ApiMediaServerUserAttributesData& params, const QnAuthSession& authInfo);
+        void addAuditRecord( const ApiMediaServerUserAttributesDataList& params, const QnAuthSession& authInfo);
     };
 
 }

@@ -11,6 +11,7 @@
 #include "common/common_module.h"
 #include "transaction/transaction_transport.h"
 #include "http/custom_headers.h"
+#include "audit/audit_manager.h"
 
 
 namespace ec2
@@ -215,6 +216,9 @@ void QnTransactionTcpProcessor::run()
     }
     else
     {
+        if (remotePeer.isClient())
+            ; //qnAuditManager->at_connectionOpened(authSession());
+
         auto base64EncodingRequiredHeaderIter = d->request.headers.find( Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME );
         if( base64EncodingRequiredHeaderIter != d->request.headers.end() )
             d->response.headers.insert( *base64EncodingRequiredHeaderIter );
