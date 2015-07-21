@@ -15,6 +15,7 @@
 	<name>HD Witness Test Camera</name>	
 
     <properties>
+        <template>app</template>
         <!--Global libs-->
         <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale</global.libs>
         <!--Specific os libs used-->

@@ -44,14 +44,13 @@ namespace
     
     QByteArray selectionTimeZoneId(const rtu::ServerInfoPtrContainer &servers)
     {
-        if (servers.empty())
+        if (servers.empty() || !servers.first()->hasExtraInfo())
             return kDiffTimeZonesId;
-        
+
         const QByteArray timeZoneId = servers.first()->extraInfo().timeZoneId;
         for (rtu::ServerInfo *info: servers)
         {
-            //TODO: #ynikitenkov make sure extraInfo exists here
-            if (timeZoneId != info->extraInfo().timeZoneId)
+            if (!info->hasExtraInfo() || (timeZoneId != info->extraInfo().timeZoneId))
                 return kDiffTimeZonesId;
         }
         return timeZoneId;

@@ -9,33 +9,36 @@
 struct QnRecordingStatsData
 {
 public:
-    QnRecordingStatsData(): recordedBytes(0), recordedSecs(0), averageBitrate(0) {}
+    QnRecordingStatsData(): recordedBytes(0), recordedSecs(0), averageBitrate(0), archiveDurationSecs(0) {}
 
-    qint64 recordedBytes;  // recorded archive in bytes
+    qint64 recordedBytes;    // recorded archive in bytes
     qint64 recordedSecs;     // recorded archive in seconds
-    qint64 averageBitrate; // average bitrate in bytes/sec
+    qint64 averageBitrate;   // average bitrate in bytes/sec
+    qint64 archiveDurationSecs; // archive calendar duration in seconds
     
     void operator +=(const QnRecordingStatsData& right) {
         recordedBytes += right.recordedBytes;
         recordedSecs += right.recordedSecs;
+        archiveDurationSecs += right.archiveDurationSecs;
     }
 
 };
-#define QnRecordingStatsData_Fields (recordedBytes)(recordedSecs)(averageBitrate)
+#define QnRecordingStatsData_Fields (recordedBytes)(recordedSecs)(averageBitrate)(archiveDurationSecs)
 
 struct QnCamRecordingStatsData: public QnRecordingStatsData
 {
     QnCamRecordingStatsData(): QnRecordingStatsData() {}
     QnCamRecordingStatsData(const QnRecordingStatsData& value): QnRecordingStatsData(value) {}
 
-    QnUuid id;
+    QString uniqueId;
 };
-#define QnCamRecordingStatsData_Fields (id) QnRecordingStatsData_Fields
+#define QnCamRecordingStatsData_Fields (uniqueId) QnRecordingStatsData_Fields
 
 QN_FUSION_DECLARE_FUNCTIONS(QnRecordingStatsData, (json))
 QN_FUSION_DECLARE_FUNCTIONS(QnCamRecordingStatsData, (json))
 
 typedef QVector<QnCamRecordingStatsData> QnRecordingStatsReply;
+Q_DECLARE_METATYPE(QnCamRecordingStatsData)
 Q_DECLARE_METATYPE(QnRecordingStatsReply)
 
 

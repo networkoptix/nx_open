@@ -1400,6 +1400,15 @@ QnActionManager::QnActionManager(QObject *parent):
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
                       this));
 
+    factory(Qn::RecordingStatisticsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Recording statistics...")).
+        condition(new QnConjunctionActionCondition(
+        new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
+        new QnEdgeServerCondition(false, this),
+        new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
+        this));
+
     factory(Qn::PingAction).
         flags(Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Ping..."));

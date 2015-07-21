@@ -1,6 +1,8 @@
 
 #include "rtu_context.h"
 
+#include <version.h>
+
 #include <base/selection.h>
 #include <base/servers_finder.h>
 #include <base/changes_manager.h>
@@ -8,6 +10,7 @@
 #include <models/ip_settings_model.h>
 #include <models/servers_selection_model.h>
 
+#include <helpers/time_helper.h>
 #include <helpers/http_client.h>
 
 class rtu::RtuContext::Impl : public QObject
@@ -75,6 +78,11 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
         , m_selectionModel, &ServersSelectionModel::changeServer);
     QObject::connect(m_serversFinder.data(), &ServersFinder::serversRemoved
         , m_selectionModel, &ServersSelectionModel::removeServers);
+
+    QObject::connect(m_serversFinder.data(), &ServersFinder::unknownAdded
+        , m_selectionModel, &ServersSelectionModel::unknownAdded);
+    QObject::connect(m_serversFinder.data(), &ServersFinder::unknownRemoved
+        , m_selectionModel, &ServersSelectionModel::unknownRemoved);
 
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
         , m_changesManager, &ChangesManager::serverDiscovered);
@@ -157,17 +165,17 @@ QObject *rtu::RtuContext::changesManager()
     return m_impl->changesManager();
 }
 
-#include <helpers/time_helper.h>
-
 QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     , const QTime &time
     , const QByteArray &prevTimeZoneId
     , const QByteArray &newTimeZoneId)
 {
-    if (prevTimeZoneId.isEmpty() || newTimeZoneId.isEmpty())
+    if (newTimeZoneId.isEmpty())
         return QDateTime();
 
-    const QTimeZone prevTimeZone(prevTimeZoneId);
+    const QTimeZone prevTimeZone(!prevTimeZoneId.isEmpty() ? QTimeZone(prevTimeZoneId)
+        : QDateTime::currentDateTime().timeZone());
+
     const QTimeZone nextTimeZone(newTimeZoneId);
     if (date.isNull() || time.isNull() || !prevTimeZone.isValid()
         || !nextTimeZone.isValid() || !date.isValid() || !time.isValid())
@@ -178,9 +186,44 @@ QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     return convertDateTime(date, time, prevTimeZone, nextTimeZone).toLocalTime();
 }
 
-void rtu::RtuContext::tryLoginWith(const QString &password)
+void rtu::RtuContext::tryLoginWith(const QString &primarySystem
+    , const QString &password)
 {
-    return m_impl->selectionModel()->tryLoginWith(password);
+    return m_impl->selectionModel()->tryLoginWith(primarySystem, password
+        , [this, primarySystem]() 
+    {
+        emit this->loginOperationFailed(primarySystem);
+    });
+}
+
+QString rtu::RtuContext::toolDisplayName() const
+{
+    return QString(QN_APPLICATION_DISPLAY_NAME);
+}
+
+bool rtu::RtuContext::isBeta() const
+{
+    return (QN_BETA == "true");
+}
+
+QString rtu::RtuContext::toolVersion() const
+{
+    return QString(QN_APPLICATION_VERSION);
+}
+
+QString rtu::RtuContext::toolRevision() const
+{
+    return QString(QN_APPLICATION_REVISION);
+}
+
+QString rtu::RtuContext::toolSupportMail() const
+{
+    return QString(QN_SUPPORT_MAIL_ADDRESS);
+}
+
+QString rtu::RtuContext::toolCompanyUrl() const
+{
+    return QString(QN_COMPANY_URL);
 }
 
 void rtu::RtuContext::setCurrentPage(int pageId)

@@ -2,7 +2,7 @@
 
 Q_GLOBAL_STATIC(QnStoragePluginFactory, QnStoragePluginFactory_instance)
 
-QnStoragePluginFactory::QnStoragePluginFactory(): m_defaultFactory(0)
+QnStoragePluginFactory::QnStoragePluginFactory(): m_defaultFactory()
 {
 }
 
@@ -38,7 +38,9 @@ QnStorageResource *QnStoragePluginFactory::createStorage(const QString &url, boo
     
     QString protocol = url.left(index);
     if (m_factoryByProtocol.contains(protocol)) {
-        return m_factoryByProtocol.value(protocol)(url);
+        QnStorageResource *ret = m_factoryByProtocol.value(protocol)(url);
+        ret->setStorageType(protocol);
+        return ret;
     } else {
         if (useDefaultForUnknownPrefix)
             return m_defaultFactory ? m_defaultFactory(url) : NULL;

@@ -1,43 +1,28 @@
 import QtQuick 2.0
 
+import "../rtu" as Rtu;
 import "../base" as Base;
+
 import "../../common" as Common;
 
-Column
+Base.Column
 {
     id: thisComponent;
 
-    signal selectAllClicked;
+    signal selectAllServers(bool select);
 
-    spacing: Common.SizeManager.spacing.medium;
+    property alias selectAllCheckedState: selectAllCheckBox.selectAllCheckedState;
 
-    anchors
-    {
-        left: parent.left;
-        right: parent.right;
-
-        leftMargin: Common.SizeManager.spacing.medium;
-        rightMargin: Common.SizeManager.spacing.medium;
-    }
+    width: parent.width;
 
     Base.EmptyCell {}
 
-    Base.StyledButton
+    Rtu.SelectAllCheckbox
     {
-        id: selectAllButton;
+        id: selectAllCheckBox;
 
-        height: Common.SizeManager.clickableSizes.base;
-        anchors
-        {
-            left: parent.left;
-            right: parent.right;
-        }
-
-        text: qsTr("select all systems");
-
-        onClicked: selectAllClicked();
+        onSelectAllServers: { thisComponent.selectAllServers(select); }
     }
 
     Base.EmptyCell {}
 }
-

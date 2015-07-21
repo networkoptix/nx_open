@@ -50,9 +50,14 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     QnUuid routeVia = connection->routeToPeerVia(id, &result.distance);
     if (routeVia == id || routeVia.isNull())
         return result; // can't route
+
+        // peer accesible directly, but no address avaliable (bc of NAT),
+        // so we need backwards connection
+    // route gateway is found
+    result.gatewayId = routeVia;
     result.addr = m_moduleFinder->primaryAddress(routeVia);
-    if (!result.addr.isNull())
-        result.gatewayId = routeVia; // route gateway is found
+    if (result.addr.isNull())
+        result.reverseConnect = true;
     return result;
 }
 

@@ -1,6 +1,5 @@
 #include "iostate_display_widget.h"
 #include "camera/iomodule/iomodule_monitor.h"
-#include "ui_iostate_display_widget.h"
 #include "ui/style/skin.h"
 #include "business/business_event_parameters.h"
 #include "business/business_action_parameters.h"

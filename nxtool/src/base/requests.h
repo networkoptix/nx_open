@@ -7,6 +7,7 @@
 
 #include <base/types.h>
 #include <base/server_info.h>
+#include <helpers/http_client.h>
 
 class QDateTime;
 class QTimeZone;
@@ -83,17 +84,26 @@ namespace rtu
     typedef std::function<void (const QUuid &id
         , const rtu::ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
     
+    void getTime(HttpClient *client
+        , const BaseServerInfo &baseInfo
+        , const QString &password
+        , const ExtraServerInfoSuccessCallback &successful
+        , const OperationCallback &failed
+        , int timeout = HttpClient::kUseDefaultTimeout);
+
     void getServerExtraInfo(HttpClient *client
         , const BaseServerInfo &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
-        , const OperationCallback &failed);
+        , const OperationCallback &failed
+        , int timeout = HttpClient::kUseDefaultTimeout);
 
     void sendIfListRequest(HttpClient *client
         , const BaseServerInfo &info
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
-        , const OperationCallback &failed);
+        , const OperationCallback &failed
+        , int timeout = HttpClient::kUseDefaultTimeout);
 
     ///
 

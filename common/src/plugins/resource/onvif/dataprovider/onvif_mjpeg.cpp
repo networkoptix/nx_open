@@ -151,6 +151,8 @@ QnAbstractMediaDataPtr MJPEGStreamReader::getNextData()
 CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     Q_UNUSED(isCameraControlRequired);
+    Q_UNUSED(params);
+
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 

@@ -1,37 +1,32 @@
 ----------------------------------------------2.3.2.xxxx------------------------------------------
 
 Features:
-Feature #5301 - Gathering statistics about product usage
-Feature #5507 - 41_Nx1 Config Utility
-Feature #5051 - Optional server auto discovery. "Enable cameras auto-duscovery" was renamed to "Enable cameras and servers auto-duscovery"
-Feature #5767 - Autoupdates: multiple servers support
-Feature #5716,5537 - Introduced NX1
-Feature #5618 - expert tab setting for cameras with kbpGOP target bitrate
+Feature #5301 - Gathering usage statistics and crash reports
+Feature #5507,5716,5537 - Introduced NX1 and Nx1 Config Utility
+Feature #5051 - Added option to disable auto discover servers. If "Enable cameras and servers auto-duscovery" is released, than camera auto discovery and server's auto discovery for "Other System" doesn't work. 
+Feature #5618 - Added setting for cameras with kbpGOP target bitrate on Expert tab
 Task #5764 -  Windows 10 support
 
 Improvements:
-Feature #5757 - Merge system dialog renaming
+Feature #5757 - Merge system dialog. "Find System" button is renamed to "Check".
 Feature #4041 - Auto updates. Add a proper warning if there isn't enough free space on C:
-Feature #5683 - Login page for strange requests
-Feature #5621 - WA, server API. Add additional tag for second level header.
-Feature #5581 - Added some changes to reduce CPU usage of ISD.
-Feature #5580 - Archive reindex should start form the place it was over
-Feature #5548 - Proxy reverse connection mediaserver-mediaserver by request
-Feature #5534 - Default system password should be "admin"
-Feature #5517 - Add warning to "Server Settings" about storage usage
-Feature #5750 - add some text to bad video card warning
+Feature #5683 - Web Admin. Login page for strange requests
+Feature #5621 - API documnetation on server Web Admin is improved.
+Feature #5581 - Reduced CPU usage on ISD edge/CaaS cameras.
+Feature #5580 - In case if server by some reason restarts while rebuilding the archive, with next start it will continue rebulding form the place it stopped last time.
+Very much helps for big NASes(like 100TB).
+Feature #5548 - Simplified networking. Now in case if multiple servers and each one behind it's own NAT, it's enought to port forward just one server for system to function properly.
+Feature #5534 - Default system password is "admin" ( used to be "123")
+Improved some warnings text.
 
 Bugs:
-Bug #4011 - Video wall. Hide and auto-remove auto-created videowall layouts.
-Bug #5565 - Timeline twitches on speed changing from 1x to -1x and back
-Bug #5583 - If user disables all addresses from the specific subnet, servers from this subnet should go offline
-Bug #5608 - AVI export from AV20185 panoramic is broken.
-Bug #5584 - Http-link is not available after camera's reboot
-Bug #5731 - built-in motion jpeg stream reader returns incorrect resolution for video frames
-Bug #5747 - Authentication issue if server time has been changed
+Bug #4011 - Video wall. Auto-created videowall layouts are hided and removed.
+Bug #5608 - AVI export from AV20185 panoramic is broken. Fixed
+Bug #5584 - Http-link is not available after camera's reboot. Fixed
+Bug #5731 - Motion Detection didn't work for mjpeg stream. Fixed. 
+Bug #5747 - Fixed authentication issue if server time has been changed.
 Bug #5749 - Server should not send multicast packets for cameras discovery if enable camera auto discovery is disabled and server has no failover enabled or only one server in the system.
-Bug #5766 - Login dialog displays servers with different protocol version as compatible
-Bug #5784 - Fixed small memory leak in client
+Bug #5766 - Login dialog displays servers with different protocol version as compatible. Fixed
 
 
 ----------------------------------------------2.3.1.xxxx-------------------------------------------

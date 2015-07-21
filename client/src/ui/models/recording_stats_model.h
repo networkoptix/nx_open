@@ -10,6 +10,15 @@
 #include <utils/common/id.h>
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
+#include "core/resource/resource_fwd.h"
+
+class QnSortedRecordingStatsModel: public QSortFilterProxyModel
+{
+public:
+    QnSortedRecordingStatsModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+protected:
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+};
 
 class QnRecordingStatsModel : public QAbstractItemModel
 {
@@ -39,11 +48,19 @@ public:
     
     void clear();
     void setModelData(const QnRecordingStatsReply& data);
+    QnRecordingStatsReply modelData() const;
+    void setForecastData(const QnRecordingStatsReply& data);
 private:
-    QString textData(const QModelIndex &index) const;
+    QString displayData(const QModelIndex &index) const;
+    QString footerDisplayData(const QModelIndex &index) const;
+    QnResourcePtr getResource(const QModelIndex &index) const;
+    qreal chartData(const QModelIndex &index, bool isForecast) const;
+    QVariant footerData(const QModelIndex &index, int role) const;
+    void setModelDataInternal(const QnRecordingStatsReply& data, QnRecordingStatsReply& result);
 private:
 
     QnRecordingStatsReply m_data;
+    QnRecordingStatsReply m_forecastData;
 };
 
 

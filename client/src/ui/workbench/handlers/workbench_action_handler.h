@@ -22,6 +22,7 @@
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/event_log_dialog.h>
+#include <ui/dialogs/recording_stats_dialog.h>
 #include <ui/dialogs/camera_list_dialog.h>
 #include <ui/dialogs/search_bookmarks_dialog.h>
 
@@ -160,6 +161,7 @@ protected:
     QnBusinessRulesDialog *businessRulesDialog() const;
 
     QnEventLogDialog *businessEventsLogDialog() const;
+    QnRecordingStatsDialog *recordingStatsDialog() const;
 
     QnCameraListDialog *cameraListDialog() const;
 
@@ -212,6 +214,7 @@ protected slots:
     void at_openBusinessRulesAction_triggered();
     void at_openBookmarksSearchAction_triggered();
     void at_openBusinessLogAction_triggered();
+    void at_openRecordingStatsAction_triggered();
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
     void at_systemAdministrationAction_triggered();
@@ -313,7 +316,8 @@ private:
     QPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
-    QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
+	QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
+    QPointer<QnRecordingStatsDialog> m_recordingStatsDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;

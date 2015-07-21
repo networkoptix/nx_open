@@ -34,6 +34,7 @@
     <properties>
         <product.title>${traytool.name}</product.title>
         <product.display.title>${traytool.display.name}</product.display.title>
+        <template>app</template>
         <!--Global libs-->
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->

@@ -241,6 +241,10 @@ void QnTcpListener::run()
                 d->newPort.compare_exchange_strong(currentValue, 0);  // reset newPort if no more changes
             }
 
+            if (d->localPort == 0 && d->serverSocket)
+                d->localPort = d->serverSocket->getLocalAddress().port;
+
+
             AbstractStreamSocket* clientSocket = d->serverSocket->accept();
             if( clientSocket )
             {

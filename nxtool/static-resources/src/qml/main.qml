@@ -11,7 +11,7 @@ Window
 {
     id: mainWindow;
     
-    title: qsTr("Nx1 Setup & Configuration Tool");
+    title: rtuContext.toolDisplayName + (rtuContext.isBeta ? " (beta)" : "");
         
     width: 1024;
     height: 600;

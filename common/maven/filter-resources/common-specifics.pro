@@ -1,6 +1,3 @@
-TEMPLATE = lib
-QT += core gui network xml xmlpatterns sql concurrent multimedia
-
 exists( ${libdir}/libcreateprocess.pri ) {
   include( ${libdir}/libcreateprocess.pri )
 }

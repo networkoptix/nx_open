@@ -353,6 +353,11 @@ namespace Qn {
         OpenBookmarksSearchAction,
 
         /**
+         * Opens recording statistics dialog.
+         */
+        RecordingStatisticsAction,
+
+        /**
          * Opens camera list dialog.
          */
         CameraListAction,

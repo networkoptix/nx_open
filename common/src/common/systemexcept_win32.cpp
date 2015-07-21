@@ -20,7 +20,7 @@
 #define MAX_SYMBOL_SIZE 1024
 
 static const bool isBeta = strcmp(QN_BETA, "true") == 0;
-static const std::string versionId = QN_ENGINE_VERSION"-"QN_APPLICATION_REVISION;
+static const std::string versionId = QN_ENGINE_VERSION "-" QN_APPLICATION_REVISION;
 static const std::string fullVersionId = versionId + (isBeta ? "-beta" : "");
 
 class GlobalCrashDumpSettings
@@ -61,8 +61,15 @@ static bool GetProgramName( char* buffer ) {
     DWORD dwLen = ::GetModuleFileNameA( NULL, sModuleName, MAX_SYMBOL_SIZE );
     if( dwLen == MAX_SYMBOL_SIZE || dwLen < 0 )
         return false;
+
     int iBaseNamePos = GetBaseName( sModuleName , dwLen );
     CopyMemory( buffer , sModuleName + iBaseNamePos , dwLen - iBaseNamePos + 1 );
+
+    // replace spaces with underscores
+    for ( auto it = buffer; *it; ++it )
+        if ( *it == ' ' )
+            *it = '_';
+
     return true;
 }
 

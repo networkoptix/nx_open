@@ -231,6 +231,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
     connect(action(Qn::OpenBookmarksSearchAction),              SIGNAL(triggered()),    this,   SLOT(at_openBookmarksSearchAction_triggered()));
+    connect(action(Qn::RecordingStatisticsAction),              SIGNAL(triggered()),    this,   SLOT(at_openRecordingStatsAction_triggered()));
     connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
@@ -494,6 +495,10 @@ QnBusinessRulesDialog *QnWorkbenchActionHandler::businessRulesDialog() const {
 
 QnEventLogDialog *QnWorkbenchActionHandler::businessEventsLogDialog() const {
     return m_businessEventsLogDialog.data();
+}
+
+QnRecordingStatsDialog *QnWorkbenchActionHandler::recordingStatsDialog() const {
+    return m_recordingStatsDialog.data();
 }
 
 QnCameraListDialog *QnWorkbenchActionHandler::cameraListDialog() const {
@@ -1201,6 +1206,16 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
         businessEventsLogDialog()->setCameraList(cameras);
         businessEventsLogDialog()->enableUpdateData();
     }
+}
+
+void QnWorkbenchActionHandler::at_openRecordingStatsAction_triggered() 
+{
+    QnNonModalDialogConstructor<QnRecordingStatsDialog> dialogConstructor(m_recordingStatsDialog, mainWindow());
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaServerResourcePtr server;
+    if (!parameters.resources().isEmpty())
+        server = parameters.resource().dynamicCast<QnMediaServerResource>();
+    recordingStatsDialog()->setServer(server);
 }
 
 void QnWorkbenchActionHandler::at_cameraListAction_triggered() {
@@ -2496,7 +2511,7 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-    auto result = QMessageBox::information(
+    QMessageBox::information(
         mainWindow(),
         tr("Anonymous Usage Statistics"),                                   
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"

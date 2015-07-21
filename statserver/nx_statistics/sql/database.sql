@@ -143,7 +143,7 @@ CREATE TABLE `mediaservers` (
   `version` varchar(45) DEFAULT NULL,
   `beta` tinyint(1) DEFAULT NULL,
   `country` varchar(45) DEFAULT NULL,
-  `statisticsReportAllowed` varchar(10) DEFAULT NULL
+  `statisticsReportAllowed` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -160,6 +160,7 @@ CREATE TABLE `storages` (
   `systemId` varchar(45) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `etc` text,
+  `space` bigint(20) DEFAULT NULL,
   `spaceLimit` bigint(20) DEFAULT NULL,
   `usedForWriting` tinyint(1) DEFAULT NULL,
   `storageType` varchar(45) DEFAULT NULL

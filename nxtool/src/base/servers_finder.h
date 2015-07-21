@@ -36,6 +36,10 @@ namespace rtu
 
         void serverDiscovered(const BaseServerInfo &baseInfo);
 
+        void unknownAdded(const QString &ip);
+
+        void unknownRemoved(const QString &ip);
+
     private:
         ServersFinder();
         

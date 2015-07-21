@@ -1,6 +1,4 @@
-TEMPLATE = app
 QT += xmlpatterns
-
 DEFINES += CL_FORCE_LOGO
 TRANSLATIONS += ${basedir}/translations/client_en.ts \
 

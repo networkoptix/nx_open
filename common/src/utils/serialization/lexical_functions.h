@@ -8,7 +8,8 @@
 #include "lexical.h"
 #include "lexical_enum.h"
 
-#include <utils/common/latin1_array.h>
+#include "utils/common/latin1_array.h"
+#include "utils/fusion/fusion_fwd.h"
 
 namespace QnLexicalDetail {
     template<class T, class Temporary>

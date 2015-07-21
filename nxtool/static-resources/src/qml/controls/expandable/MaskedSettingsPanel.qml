@@ -59,7 +59,7 @@ GenericSettingsPanel
 
                     wrapMode: Text.Wrap;
                     font.pixelSize: Common.SizeManager.fontSizes.medium;
-                    text: qsTr("Settings in this partition are different for selected servers.");
+                    text: qsTr("Settings in this partition can be different for selected servers.");
                 }
 
                 Row
@@ -89,7 +89,7 @@ GenericSettingsPanel
                         color: "#666666";
                         wrapMode: Text.Wrap;
                         font.pixelSize: Common.SizeManager.fontSizes.base;
-                        text: qsTr("If you doesn't click this button,\nnothing will changed");
+                        text: qsTr("If you doesn't click this button,\nnothing will be changed");
                     }
                 }
             }

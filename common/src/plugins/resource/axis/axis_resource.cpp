@@ -1058,15 +1058,13 @@ bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts, const 
 
 QnIOPortDataList QnPlAxisResource::mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO)
 {
-    QnIOPortDataList result = cameraIO;
-    for (int i = 0; i < result.size(); ++i)
-    {
-        for (int j = 0; j < savedIO.size(); ++j) {
-            if (savedIO[j].id == result[i].id) 
-                result[i] = savedIO[j];
-        }
-    }
-    return result;
+    QnIOPortDataList resultIO = cameraIO;
+    for (auto& result : resultIO)
+        for(const auto& saved : savedIO)
+            if (result.id == saved.id)
+                result = saved;
+
+    return resultIO;
 }
 
 bool QnPlAxisResource::ioPortErrorOccured()
@@ -1284,6 +1282,8 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
 
 void QnPlAxisResource::asyncUpdateIOSettings(const QString & key)
 {
+    QN_UNUSED(key);
+
     const auto newValue = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
     QnIOPortDataList prevValue;
     {

@@ -29,8 +29,6 @@
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 #include "transaction/runtime_transaction_log.h"
-#include "../../mediaserver/src/media_server/settings.h"
-
 
 namespace ec2
 {
@@ -395,7 +393,7 @@ static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
 void QnTransactionMessageBus::addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tran, int timeout)
 {
     DelayedAliveData data;
-    data.tran = tran;
+    data.tran = std::move(tran);
     data.timeToSend = m_relativeTimer.elapsed() + timeout;
     m_delayedAliveTran.insert(tran.params.peer.id, std::move(data));
 }
@@ -404,7 +402,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
 {
     for (auto itr = m_delayedAliveTran.begin(); itr != m_delayedAliveTran.end();)
     {
-        const DelayedAliveData& data = itr.value();
+        DelayedAliveData& data = itr.value();
         if (m_relativeTimer.elapsed() >= data.timeToSend) 
         {
             bool isAliveNow = m_alivePeers.contains(data.tran.params.peer.id);
@@ -415,7 +413,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
                     ttHeader.distance = 1;
                 ttHeader.processedPeers = connectedServerPeers() << m_localPeer.id;
                 ttHeader.fillSequence();
-                sendTransactionInternal(data.tran, ttHeader); // resend broadcast alive info for that peer
+                sendTransactionInternal(std::move(data.tran), ttHeader); // resend broadcast alive info for that peer
                 itr = m_delayedAliveTran.erase(itr);
             }
             else

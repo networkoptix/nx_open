@@ -31,7 +31,7 @@ bool isSignatureMatch(const std::string &data, const std::string& signature, con
     RSA* publicRSAKey = PEM_read_bio_RSA_PUBKEY(bp, 0, 0, 0);
     BIO_free(bp);
 
-    if (publicRSAKey == 0 || signature.size() != RSA_size(publicRSAKey))
+    if (publicRSAKey == 0 || signature.size() != static_cast<size_t>(RSA_size(publicRSAKey)))
         return false;
 
     // Decrypt data

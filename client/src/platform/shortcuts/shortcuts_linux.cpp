@@ -6,7 +6,9 @@ QnLinuxShortcuts::QnLinuxShortcuts(QObject *parent /*= NULL*/):
 
 }
 
-bool QnLinuxShortcuts::createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments, int iconId)
+bool QnLinuxShortcuts::createShortcut(
+        const QString& /*sourceFile*/, const QString& /*destinationPath*/,
+        const QString& /*name*/, const QStringList& /*arguments*/, int /*iconId*/)
 {
     /*
     QFile link(strDstPath + QDir::separator() + strName + ".desktop");
@@ -28,11 +30,13 @@ bool QnLinuxShortcuts::createShortcut(const QString &sourceFile, const QString &
     return false;
 }
 
-bool QnLinuxShortcuts::deleteShortcut(const QString &destinationPath, const QString &name) const {
+bool QnLinuxShortcuts::deleteShortcut(const QString& /*destinationPath*/,
+                                      const QString& /*name*/) const {
     return true;
 }
 
-bool QnLinuxShortcuts::shortcutExists(const QString &destinationPath, const QString &name) const {
+bool QnLinuxShortcuts::shortcutExists(const QString& /*destinationPath*/,
+                                      const QString& /*name*/) const {
     return false;
 }
 

@@ -459,8 +459,7 @@ bool QnAviArchiveDelegate::findStreams()
     {
         if (m_fastStreamFind) {
             m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
-            // TODO: #vasilenko avoid using deprecated methods
-            av_find_stream_info(m_formatContext);
+            avformat_find_stream_info(m_formatContext, nullptr);
             m_formatContext->interrupt_callback.callback = 0;
             m_streamsFound = m_formatContext->nb_streams > 0;
             for (unsigned i = 0; i < m_formatContext->nb_streams; ++i)
@@ -468,7 +467,7 @@ bool QnAviArchiveDelegate::findStreams()
         }
         else {
             // TODO: #vasilenko avoid using deprecated methods
-            m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
+            m_streamsFound = avformat_find_stream_info(m_formatContext, nullptr) >= 0;
         }
 
         if (m_streamsFound) 

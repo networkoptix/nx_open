@@ -1,5 +1,3 @@
-TEMPLATE = app
-
 android-no-sdk {
     target.path = /data/user/qt
     export(target.path)
@@ -31,3 +29,4 @@ DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
 
 export(INSTALLS)
 
+RC_FILE = ${project.build.directory}/nxtool.rc

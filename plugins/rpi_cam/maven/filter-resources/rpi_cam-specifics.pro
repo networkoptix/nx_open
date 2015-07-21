@@ -1,5 +1,3 @@
-TEMPLATE = lib
-
 unix
 {
   QMAKE_CXXFLAGS += -Wno-unused-function

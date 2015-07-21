@@ -5,12 +5,15 @@
 #include <onvif/soapDeviceBindingProxy.h>
 
 #include <common/common_module.h>
-#include <utils/math/fuzzy.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <onvif/soapImagingBindingProxy.h>
+#include <onvif/soapPTZBindingProxy.h>
 #include <plugins/resource/onvif/onvif_resource.h>
+#include <utils/math/fuzzy.h>
 
 #include "soap_wrapper.h"
+
 
 static QByteArray ENCODE_PREFIX("BASE64_");
 
@@ -66,6 +69,9 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     bool absoluteMoveBroken = data.value<bool>(lit("onvifPtzAbsoluteMoveBroken"),   false);
     bool focusEnabled       = data.value<bool>(lit("onvifPtzFocusEnabled"),         false);
     bool presetsEnabled     = data.value<bool>(lit("onvifPtzPresetsEnabled"),       false);
+    const int digitsAfterDecimalPoint  = data.value<int>(lit("onvifPtzDigitsAfterDecimalPoint"), 4);
+    sprintf( m_floatFormat, "%%.%df", digitsAfterDecimalPoint );
+    sprintf( m_doubleFormat, "%%.%dlf", digitsAfterDecimalPoint );
 
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
@@ -96,6 +102,8 @@ Qn::PtzCapabilities QnOnvifPtzController::initMove() {
 
     QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz(ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    ptz.getProxy()->soap->float_format = m_floatFormat;
+    ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     _onvifPtz__GetConfigurations request;
     _onvifPtz__GetConfigurationsResponse response;
@@ -187,6 +195,8 @@ bool QnOnvifPtzController::readBuiltinPresets() {
 
     QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz(ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    ptz.getProxy()->soap->float_format = m_floatFormat;
+    ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     GetPresetsReq request;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
@@ -214,6 +224,8 @@ Qn::PtzCapabilities QnOnvifPtzController::initContinuousFocus() {
 
     QAuthenticator auth = m_resource->getAuth();
     ImagingSoapWrapper imaging(imagingUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    imaging.getProxy()->soap->float_format = m_floatFormat;
+    imaging.getProxy()->soap->double_format = m_doubleFormat;
 
     _onvifImg__GetMoveOptions moveOptionsRequest;
     moveOptionsRequest.VideoSourceToken = m_resource->getVideoSourceToken().toStdString();
@@ -247,6 +259,8 @@ bool QnOnvifPtzController::stopInternal() {
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    ptz.getProxy()->soap->float_format = m_floatFormat;
+    ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     bool stopValue = true;
 
@@ -271,6 +285,8 @@ bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    ptz.getProxy()->soap->float_format = m_floatFormat;
+    ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     onvifXsd__Vector2D onvifPanTiltSpeed;
     onvifPanTiltSpeed.x = normalizeSpeed(speed.x(), m_panSpeedLimits);
@@ -311,6 +327,8 @@ bool QnOnvifPtzController::continuousFocus(qreal speed) {
 
     QAuthenticator auth(m_resource->getAuth());
     ImagingSoapWrapper imaging(imagingUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    imaging.getProxy()->soap->float_format = m_floatFormat;
+    imaging.getProxy()->soap->double_format = m_doubleFormat;
 
     onvifXsd__ContinuousFocus onvifContinuousFocus;
     onvifContinuousFocus.Speed = normalizeSpeed(speed, m_focusSpeedLimits);
@@ -341,7 +359,9 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    
+    ptz.getProxy()->soap->float_format = m_floatFormat;
+    ptz.getProxy()->soap->double_format = m_doubleFormat;
+
     onvifXsd__Vector2D onvifPanTilt;
     onvifPanTilt.x = position.x();
     onvifPanTilt.y = position.y();
@@ -398,7 +418,9 @@ bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    
+    ptz.getProxy()->soap->float_format = m_floatFormat;
+    ptz.getProxy()->soap->double_format = m_doubleFormat;
+
     _onvifPtz__GetStatus request;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
 
@@ -461,6 +483,8 @@ bool QnOnvifPtzController::removePreset(const QString &presetId) {
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    ptz.getProxy()->soap->float_format = m_floatFormat;
+    ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     RemovePresetReq request;
     RemovePresetResp response;
@@ -493,6 +517,8 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) 
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    ptz.getProxy()->soap->float_format = m_floatFormat;
+    ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     onvifXsd__Vector2D onvifPanTiltSpeed;
     onvifPanTiltSpeed.x = speed; // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
@@ -534,6 +560,8 @@ bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset) {
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    ptz.getProxy()->soap->float_format = m_floatFormat;
+    ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     SetPresetReq request;
     SetPresetResp response;

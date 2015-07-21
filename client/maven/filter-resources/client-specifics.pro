@@ -1,5 +1,3 @@
-TEMPLATE = lib
-
 INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \
                 ${qt.dir}/include/QtGui/$$QT_VERSION/ \

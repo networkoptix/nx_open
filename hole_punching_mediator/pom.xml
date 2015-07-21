@@ -23,6 +23,7 @@
 
     <properties>
         <product.title>${company.name} Mediator</product.title>  
+        <template>app</template>
         <!--Global libs-->        
         <qt.libs>core network concurrent</qt.libs>
         <global.libs>-lcommon</global.libs>

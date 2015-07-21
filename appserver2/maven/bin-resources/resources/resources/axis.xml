@@ -1,11 +1,14 @@
 <resources> 
     <oem name = "Axis">
-        <resource name = "AXISP7216" public = "AXIS_ENCODER">
+        <resource name = "AXISP7216Group1" public = "AXIS_ENCODER">
             <params>
-                <param name = "channelsAmount"
-                default_value = "16"/>
+                <param name = "channelsAmount" default_value = "4"/>
+                <param name = "MaxFPS" default_value = "30"/>
             </params>
         </resource>
+        <resource name = "AXISP7216Group2" public = "AXISP7216Group1"/>
+        <resource name = "AXISP7216Group3" public = "AXISP7216Group1"/>
+        <resource name = "AXISP7216Group4" public = "AXISP7216Group1"/>        
         <resource name = "AXISP1428E" public = "AXIS_COMMON">
             <params>
                 <param name = "MaxFPS"
@@ -55,19 +58,21 @@
         <resource name = "AXISQ7436Channel5" public = "AXISQ7436Channel1"/>
         <resource name = "AXISQ7436Channel6" public = "AXISQ7436Channel1"/>
         <resource name = "AXISP1311" public = "AXISM1103"/>
-        <resource name = "AXISQ3214" public = "AXIS_COMMON">
+        <resource name = "AXISP3214" public = "AXIS_COMMON">
             <params>
                 <param name = "MaxFPS"
                 default_value ="30"/>
             </params>
         </resource>
-        <resource name = "AXISQ3215" public = "AXISQ3214"/>
+        <resource name = "AXISP3215" public = "AXISP3214"/>
         <resource name = "AXISP8535" public = "AXIS_COMMON">
             <params>
                 <param name = "MaxFPS"
                 default_value ="30"/>
             </params>
         </resource>
+        <resource name = "AXISP3225" public = "AXISP3215"/>
+        <resource name = "AXISP3224" public = "AXISP3214"/>
         <resource name = "AXISP8514" public = "AXISP8535"/>
         <resource name = "AXISP1224" public = "AXIS_COMMON">
             <params>
@@ -103,12 +108,6 @@
         <resource name = "AXISP5414" public = "AXISM3004"/> 
         <resource name = "AXISP5415" public = "AXISM3004"/>    
         <resource name = "AXISQ1765" public = "AXISQ1755"/>       
-        <resource name = "AXISP7216" public = "AXIS_ENCODER">
-            <params>
-                <param name = "channelsAmount"
-                default_value = "16"/>
-            </params>
-        </resource>        
         <resource name = "AXISP3904" public = "AXIS_COMMON">
         <params>
             <param name = "MaxFPS"
@@ -160,6 +159,8 @@
                     default_value ="60"/>
             </params>       
         </resource>   
+        <resource name = "AXISQ6115" public = "AXISP1365"/>
+        <resource name = "AXISQ6114" public = "AXISQ6115"/>
         <resource name = "AXISP8221" public = "AXIS_COMMON">
             <params>
                 <param name = "ioConfigCapability" default_value ="1"/>
@@ -168,7 +169,6 @@
                 <param name = "forcedAudioStream" default_value ="1"/>
                 <param name = "hasDualStreaming" default_value ="0"/>
             </params>
-        </resource>
- 
+        </resource> 
     </oem>
 </resources>

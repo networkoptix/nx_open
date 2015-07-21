@@ -46,7 +46,7 @@ namespace boost {
 //        BOOST_PP_IS_EMPTY(QTSERVICE_H), /* Make sure QtService compiles. */     \
 //        toLocal8Bit,                                                            \
 //        toLocal8Bit_is_forbidden                                                \
-//    ) 
+//    )
 
 /* qPrintable uses toLocal8Bit, so we have to redefine it. Not a big loss. */
 #undef qPrintable

@@ -32,6 +32,7 @@ namespace Qn
     static const QString CAMERA_CAPABILITIES_PARAM_NAME = lit("cameraCapabilities");
     static const QString CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = lit("mediaStreams");
     static const QString CAMERA_BITRATE_INFO_LIST_PARAM_NAME = lit("bitrateInfos");
+    static const QString CAMERA_AUDIO_CODEC_PARAM_NAME = lit("audioCodec");
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
@@ -47,12 +48,16 @@ namespace Qn
     /* Whether statistics gathering is allowed on the current server. */
     static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
 
-    // Hardware information  
+    // Hardware information
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
     static const QString CPU_MODEL_NAME = lit("cpuModelName");
     static const QString PHISICAL_MEMORY = lit("phisicalMemory");
     static const QString BETA = lit("beta");
     static const QString PUBLIC_IP = lit("publicIp");
+    static const QString NETWORK_INTERFACES = lit("networkInterfaces");
+
+    // Storage
+    static const QString SPACE = lit("space");
 }
 
 #endif // QN_PARAM_H

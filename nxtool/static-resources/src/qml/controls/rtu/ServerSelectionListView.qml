@@ -21,33 +21,23 @@ ListView
     spacing: 1
 
     model: rtuContext.selectionModel();
-    
+
     header: Rtu.SelectionHeader 
     {
-        selectAllCheckedState: (!model.serversCount || !model.selectedCount ? Qt.Unchecked
-            : (model.selectedCount === model.serversCount ? Qt.Checked : Qt.PartiallyChecked));
+        selectAllCheckedState: impl.selectAllCheckedState;
         
-        onSelectAllServers:
-        {
-            var selectedParam = select;
-            impl.tryChangeSelectedServers(function()
-            {
-                thisComponent.model.setAllItemSelected(selectedParam);
-            });
-        }
+        onSelectAllServers: { impl.selectAllServers(select); }
     }
 
     footer: Rtu.SelectionFooter 
     {
-        enabled: (model.serversCount && (model.selectedCount !== model.serversCount));
-    
-        onSelectAllClicked: impl.tryChangeSelectedServers(function()
-        {
-            thisComponent.model.setAllItemSelected(true);
-        });
-       
+        visible: thisComponent.contentHeight > thisComponent.height;
+
+        selectAllCheckedState: impl.selectAllCheckedState;
+
+        onSelectAllServers: { impl.selectAllServers(select); }
     }
-    
+
     delegate: Loader
     {
         id: meatLoader;
@@ -63,6 +53,16 @@ ListView
                 systemName: model.systemName;
                 loggedState: model.loggedState;
                 selectedState: model.selectedState;
+
+                onSelectionStateShouldBeChanged:
+                {
+                    var selectedIndex = index;
+                    impl.tryChangeSelectedServers( function()
+                    {
+                        thisComponent.model.changeItemSelectedState(index);
+                    });
+                }
+
             }
         }
     
@@ -72,7 +72,7 @@ ListView
             
             Rtu.ServerItemDelegate
             {
-                logged: model.logged;
+                loggedIn: model.loggedIn;
                 serverName: model.name;
                 macAddress: model.macAddress;
                 selectedState: model.selectedState;
@@ -85,22 +85,55 @@ ListView
                         thisComponent.model.setItemSelected(index);
                     });
                 }
+
+                onSelectionStateShouldBeChanged:
+                {
+                    var selectedIndex = index;
+                    impl.tryChangeSelectedServers( function()
+                    {
+                        thisComponent.model.changeItemSelectedState(index);
+                    });
+                }
+
+            }
+        }
+
+        Component
+        {
+            id: unknownGroupDeletate;
+
+            Rtu.UnknownGroupDelegate
+            {
+                caption: model.name;
+            }
+        }
+
+        Component
+        {
+            id: unknownItemDelegate;
+
+            Rtu.UnknownItemDelegate
+            {
+                address: model.ipAddress;
             }
         }
 
         width: parent.width;
 
-        sourceComponent: (model.isSystem ? systemDelegate : serverDelegate);
-        Connections
+        sourceComponent:
         {
-            target: meatLoader.item;
-            onSelectionStateShouldBeChanged: 
+            switch(model.itemType)
             {
-                var selectedIndex = index;
-                impl.tryChangeSelectedServers( function() 
-                {
-                    thisComponent.model.changeItemSelectedState(index);
-                });
+            case NxRtu.Constants.SystemItemType:
+                return systemDelegate;
+            case NxRtu.Constants.ServerItemType:
+                return serverDelegate;
+            case NxRtu.Constants.UnknownGroupType:
+                return unknownGroupDeletate;
+            case NxRtu.Constants.UnknownEntityType:
+                return unknownItemDelegate;
+            default:
+                return undefined;
             }
         }
     }
@@ -137,6 +170,19 @@ ListView
 
     property QtObject impl: QtObject
     {
+        readonly property int selectAllCheckedState:
+            (!model.serversCount || !model.selectedCount ? Qt.Unchecked
+            : (model.selectedCount === model.serversCount ? Qt.Checked : Qt.PartiallyChecked));
+
+        function selectAllServers(select)
+        {
+            var selectedParam = select;
+            impl.tryChangeSelectedServers(function()
+            {
+                thisComponent.model.setAllItemSelected(selectedParam);
+            });
+        }
+
         function tryChangeSelectedServers(changeFunc)
         {
             if (askForSelectionChange)
@@ -152,5 +198,22 @@ ListView
         }
     }
 
+    Dialogs.ErrorDialog
+    {
+        id: loginToSystemFailed;
+        property string systemName;
+
+        message: qsTr("Can't login to any server in system %1 with entered password").arg(systemName);
+
+        Connections
+        {
+            target: rtuContext;
+            onLoginOperationFailed:
+            {
+                loginToSystemFailed.systemName = primarySystem;
+                loginToSystemFailed.show();
+            }
+        }
+    }
 }
 

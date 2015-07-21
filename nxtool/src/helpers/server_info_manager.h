@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <QObject>
 
 #include <base/types.h>
@@ -15,29 +17,29 @@ namespace rtu
         Q_OBJECT
         
     public:
+
+        typedef std::function<void (const QUuid &id, const ExtraServerInfo &extraInfo
+            , const QString &host)> SuccessfulCallback;
+        typedef std::function<void (const QUuid &id)> FailedCallback;
+
         ServerInfoManager(QObject *parent = nullptr);
         
         virtual ~ServerInfoManager();
        
-        void loginToServer(const BaseServerInfo &info);
+        void loginToServer(const BaseServerInfo &info
+            , const SuccessfulCallback &success
+            , const FailedCallback &failed);
         
         void loginToServer(const BaseServerInfo &info
-            , const QString &password);
+            , const QString &password
+            , const SuccessfulCallback &success
+            , const FailedCallback &failed);
 
         ///
 
-        void updateServerInfos(const ServerInfoContainer &servers);
-
-    signals:
-        void loginOperationFailed(const QUuid &id);
-        
-        void loginOperationSuccessfull(const QUuid &id
-            , const ExtraServerInfo &extraInfo);
-
-        void serverExtraInfoUpdated(const QUuid &id
-            , const ExtraServerInfo &extraInfo);
-
-        void serverExtraInfoUpdateFailed(const QUuid &id);
+        void updateServerInfos(const ServerInfoContainer &servers
+            , const SuccessfulCallback &success
+            , const FailedCallback &failed);
 
     private:
         class Impl;

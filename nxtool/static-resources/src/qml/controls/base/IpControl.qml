@@ -7,6 +7,7 @@ Base.TextField
 {
     id: thisComponent;
 
+    property bool changed: changedBase && enabled;
     property string defaultEmptyValue: "0.0.0.0";
     
     validator: RegExpValidator

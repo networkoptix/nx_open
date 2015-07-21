@@ -29,7 +29,9 @@ namespace rtu
 
         void setAllItemSelected(bool selected);
         
-        void tryLoginWith(const QString &password);
+        void tryLoginWith(const QString &primarySystem
+            , const QString &password
+            , const Callback &callback);
 
         ///
 
@@ -50,6 +52,10 @@ namespace rtu
         void changeServer(const BaseServerInfo &baseInfo);
 
         void removeServers(const IDsVector &removed);
+
+        void unknownAdded(const QString &address);
+
+        void unknownRemoved(const QString &address);
 
         void updateTimeDateInfo(const QUuid &id
             , qint64 utcDateTimeMs
@@ -77,6 +83,7 @@ namespace rtu
         void serversCountChanged();
         
         void serverLogged(const ServerInfo &info);
+
     private:
         int rowCount(const QModelIndex &parent = QModelIndex()) const;
         
