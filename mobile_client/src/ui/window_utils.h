@@ -9,6 +9,6 @@ void showSystemUi();
 
 int statusBarHeight();
 int navigationBarHeight();
-bool isTablet();
+bool isPhone();
 
 #endif // WINDOW_UTILS_H

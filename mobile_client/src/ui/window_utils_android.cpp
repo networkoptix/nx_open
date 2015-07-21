@@ -24,8 +24,8 @@ int navigationBarHeight() {
     return QAndroidJniObject::callStaticMethod<jint>("com/networkoptix/nxwitness/utils/QnWindowUtils", "getNavigationBarHeight");
 }
 
-bool isTablet() {
-    return QAndroidJniObject::callStaticMethod<jboolean>("com/networkoptix/nxwitness/utils/QnWindowUtils", "isTablet");
+bool isPhone() {
+    return QAndroidJniObject::callStaticMethod<jboolean>("com/networkoptix/nxwitness/utils/QnWindowUtils", "isPhone");
 }
 
 #endif

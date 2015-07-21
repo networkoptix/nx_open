@@ -11,6 +11,7 @@ import android.util.DisplayMetrics;
 import android.app.Activity;
 import android.os.Build;
 import android.util.Log;
+import android.annotation.TargetApi;
 import org.qtproject.qt5.android.QtNative;
 
 public class QnWindowUtils {
@@ -59,9 +60,10 @@ public class QnWindowUtils {
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
 
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         private void prepareSystemUi() {
             Window window = mActivity.getWindow();
-            if (Build.VERSION.SDK_INT >= 21) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setFlags(
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
@@ -114,10 +116,10 @@ public class QnWindowUtils {
             int orientation = resources.getConfiguration().orientation;
             int resourceId;
 
-            if (isTablet())
-                resourceId = resources.getIdentifier(orientation == Configuration.ORIENTATION_PORTRAIT ? "navigation_bar_height" : "navigation_bar_height_landscape", "dimen", "android");
-            else
+            if (isPhone())
                 resourceId = resources.getIdentifier(orientation == Configuration.ORIENTATION_PORTRAIT ? "navigation_bar_height" : "navigation_bar_width", "dimen", "android");
+            else
+                resourceId = resources.getIdentifier(orientation == Configuration.ORIENTATION_PORTRAIT ? "navigation_bar_height" : "navigation_bar_height_landscape", "dimen", "android");
 
             if (resourceId > 0)
                 return resources.getDimensionPixelSize(resourceId);
@@ -134,7 +136,7 @@ public class QnWindowUtils {
         return result;
     }
 
-    public static boolean isTablet() {
-        return (QtNative.activity().getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    public static boolean isPhone() {
+        return (QtNative.activity().getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) < Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 }

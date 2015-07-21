@@ -16,7 +16,7 @@ int navigationBarHeight() {
     return 0;
 }
 
-bool isTablet() {
+bool isPhone() {
     return false;
 }
 

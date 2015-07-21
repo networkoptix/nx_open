@@ -52,7 +52,7 @@ int QnContext::getNavigationBarHeight() const {
 }
 
 bool QnContext::getDeviceIsPhone() const {
-    return !isTablet();
+    return isPhone();
 }
 
 void QnContext::enterFullscreen() {
