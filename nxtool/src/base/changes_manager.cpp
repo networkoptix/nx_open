@@ -653,11 +653,16 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
         ItfUpdateInfoContainer changes;
         for (const InterfaceInfo &itfInfo: info->extraInfo().interfaces)
         {
+            if (itfInfo.useDHCP)   /// Do not switch DHCP "ON" where it has turned on already
+                continue;
+
             ItfUpdateInfo turnOnDhcpUpdate(itfInfo.name);
             turnOnDhcpUpdate.useDHCP.reset(new bool(true));
             changes.push_back(turnOnDhcpUpdate);
         }
-        addRequest(info, changes);
+
+        if (!changes.empty())
+            addRequest(info, changes);
     }
 }
 
