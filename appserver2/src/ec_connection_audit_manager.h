@@ -21,12 +21,13 @@ namespace ec2
     public:
         ECConnectionAuditManager(AbstractECConnection* ecConnection);
         template <class T>
-        void addAuditRecord( const QnTransaction<T>& tran, const QnAuthSession& authInfo)
+        void addAuditRecord( const T& params, const QnAuthSession& authInfo)
         {
             // nothing to do by default
         }
 
-        void addAuditRecord( const QnTransaction<ApiCameraAttributesData>& tran, const QnAuthSession& authInfo);
+        void addAuditRecord( const ApiCameraAttributesData& params, const QnAuthSession& authInfo);
+        void addAuditRecord( const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo);
     };
 
 }

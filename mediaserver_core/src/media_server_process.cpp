@@ -194,6 +194,7 @@
 #include "network/universal_request_processor.h"
 #include "utils/network/nettools.h"
 #include "http/iomonitor_tcp_server.h"
+#include "audit/mserver_audit_manager.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1516,7 +1517,7 @@ void MediaServerProcess::run()
     soapServer.bind();
     soapServer.start();
 #endif //ENABLE_ONVIF
-
+    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     std::unique_ptr<QnResourcePropertyDictionary> dictionary(new QnResourcePropertyDictionary());

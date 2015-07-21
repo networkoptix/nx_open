@@ -220,6 +220,7 @@ void QnLoginDialog::accept() {
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
         switch (status) {
         case QnConnectionDiagnosticsHelper::Result::Success:
+            qnCommon->updateRunningInstanceGuid();
             menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
             updateStoredConnections(url, name);
             break;

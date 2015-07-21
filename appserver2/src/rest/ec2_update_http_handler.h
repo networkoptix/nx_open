@@ -140,7 +140,7 @@ namespace ec2
              // update local data
             if (errorCode == ErrorCode::ok) {
                 m_connection->notificationManager()->triggerNotification(tran);
-                m_connection->auditManager()->addAuditRecord(tran, owner->authSession());
+                m_connection->auditManager()->addAuditRecord(tran.params, owner->authSession());
             }
 
             return (errorCode == ErrorCode::ok)

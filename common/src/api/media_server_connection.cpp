@@ -38,6 +38,7 @@
 #include "model/upload_update_reply.h"
 #include "http/custom_headers.h"
 #include "model/recording_stats_reply.h"
+#include "common/common_module.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -325,6 +326,7 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
 
     if (!videowallGuid.isNull())
         extraHeaders.insert(QString::fromLatin1(Qn::VIDEOWALL_GUID_HEADER_NAME), videowallGuid.toString());
+    extraHeaders.insert(QString::fromLatin1(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
     setExtraHeaders(extraHeaders);
 }
 

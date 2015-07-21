@@ -93,12 +93,12 @@ bool QnEventsDB::createDatabase()
             "timestamp INTEGER NOT NULL,"
             "end_timestamp INTEGER NOT NULL,"
             "event_type SMALLINT NOT NULL,"
+            "resources BLOB,"
+            "params TEXT,"
             "session_id BLOB(16),"
             "user_name TEXT,"
-            "user_host TEXT,"
-            "description TEXT,"
-            "resources BLOB,"
-            "params TEXT)"
+            "user_host TEXT)"
+
         );
         if (!ddlQuery.exec())
             return false;
@@ -126,11 +126,9 @@ bool QnEventsDB::addAuditRecord(const QnAuditRecord& data)
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO audit_log"
-        "(timestamp, end_timestamp, event_type, session_id, user_name,"
-        "user_host, description, resources, params)"
-        "values ("
-        "(:timestamp, :endTimestamp, :eventType, :sessionId, :userName,"
-        ":userHost, :description, :resources, :params)"
+        "(timestamp, end_timestamp, event_type, resources, params, session_id, user_name, user_host)"
+        "VALUES"
+        "(:timestamp, :endTimestamp, :eventType, :resources, :extraParams, :sessionId, :userName, :userHost)"
         );
     QnSql::bind(data, &insQuery);
 
@@ -146,11 +144,16 @@ bool QnEventsDB::addAuditRecord(const QnAuditRecord& data)
 QnAuditRecordList QnEventsDB::getAuditData(const QnTimePeriod& period, const QnUuid& sessionId)
 {
     QnAuditRecordList result;
-    QString request;
-    if (sessionId.isNull())
-        request = (lit("SELECT * from audit_log WHERE timestamp BETWEEN ? and ? order by timestamp"));
-    else
-        request = (lit("SELECT * from audit_log WHERE timestamp BETWEEN ? and ? AND session_id = ? order by timestamp"));
+    QString request = QString::fromLatin1(
+        "SELECT "
+        "timestamp, end_timestamp as endTimestamp, event_type as eventType, resources, params as extraParams, "
+        "session_id as sessionId, user_name as userName, user_host as userHost "
+        "FROM audit_log "
+        "WHERE timestamp BETWEEN ? and ? ");
+    if (!sessionId.isNull())
+        request += lit("AND session_id = ? ");
+    request += lit("ORDER BY timestamp");
+
         
 
     QWriteLocker lock(&m_mutex);

@@ -4,7 +4,6 @@
 #include <QObject>
 #include "api/model/audit/audit_record.h"
 #include "api/model/audit/auth_session.h"
-#include "../../appserver2/src/transaction/transaction.h"
 
 class QnAuditManager: public QObject
 {
