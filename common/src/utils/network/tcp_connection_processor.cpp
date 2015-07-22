@@ -6,6 +6,7 @@
 #include <utils/common/util.h>
 #include <utils/network/http/httptypes.h>
 
+#include "http/http_mod_manager.h"
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
 #include "err.h"
@@ -115,6 +116,8 @@ void QnTCPConnectionProcessor::parseRequest()
     }
     d->protocol = d->request.requestLine.version.protocol;
     d->requestBody = d->request.messageBody;
+
+    nx_http::HttpModManager::instance()->apply( &d->request );
 }
 
 /*

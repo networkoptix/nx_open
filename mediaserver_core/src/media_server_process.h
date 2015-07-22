@@ -1,6 +1,8 @@
 #ifndef MEDIA_SERVER_PROCESS_H
 #define MEDIA_SERVER_PROCESS_H
 
+#include <memory>
+
 #include <QtCore/QTimer>
 #include <QtCore/QStringList>
 
@@ -16,6 +18,8 @@
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
+#include <utils/network/http/http_mod_manager.h>
+
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -79,6 +83,7 @@ private:
     qint64 m_firstRunningTime;
 
     QnModuleFinder* m_moduleFinder;
+    std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;

@@ -1355,6 +1355,9 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 
 bool MediaServerProcess::initTcpListener()
 {
+    m_httpModManager.reset( new nx_http::HttpModManager() );
+    m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
+
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
