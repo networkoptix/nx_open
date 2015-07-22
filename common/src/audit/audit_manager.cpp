@@ -39,7 +39,8 @@ void QnAuditManager::at_connectionClosed(const QnAuthSession &data)
     QMutexLocker lock(&m_mutex);
     auto itr = m_openedConnections.find(data.sessionId);
     if (itr != m_openedConnections.end()) {
-        const AuditConnection& connection = itr.value();
+        AuditConnection& connection = itr.value();
+        connection.record.endTimestamp = qnSyncTime->currentMSecsSinceEpoch() / 1000;
         updateAuditRecord(connection.internalId, connection.record);
     }
     m_openedConnections.remove(data.sessionId);

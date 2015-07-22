@@ -216,8 +216,12 @@ void QnTransactionTcpProcessor::run()
     }
     else
     {
-        if (remotePeer.isClient())
-            qnAuditManager->at_connectionOpened(authSession());
+        std::function<void ()> ttFinishCallback;
+        if (remotePeer.isClient()) {
+            auto session = authSession();
+            qnAuditManager->at_connectionOpened(session);
+            ttFinishCallback = std::bind(&QnAuditManager::at_connectionClosed, qnAuditManager, session);
+        }
 
         auto base64EncodingRequiredHeaderIter = d->request.headers.find( Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME );
         if( base64EncodingRequiredHeaderIter != d->request.headers.end() )
@@ -230,7 +234,9 @@ void QnTransactionTcpProcessor::run()
             remotePeer,
             remoteSystemIdentityTime,
             d->request,
-            contentEncoding );
+            contentEncoding,
+            ttFinishCallback
+            );
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
         d->socket.clear();
     }

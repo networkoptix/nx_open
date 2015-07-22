@@ -149,7 +149,7 @@ int QnEventsDB::updateAuditRecord(int internalId, const QnAuditRecord& data)
         return false;
 
     QSqlQuery updQuery(m_sdb);
-    updQuery.prepare("UPDATE audit_log SET"
+    updQuery.prepare("UPDATE audit_log SET "
         "timestamp = :timestamp, end_timestamp = :endTimestamp, event_type = :eventType, resources = :resources, "
         "params = :extraParams, session_id = :sessionId, user_name = :userName, user_host = :userHost WHERE id = :id"
         );
