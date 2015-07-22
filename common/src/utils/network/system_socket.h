@@ -374,7 +374,7 @@ private:
         void* buffer,
         unsigned int bufferLen,
         HostAddress* const sourceAddress,
-        int* const sourcePort );
+        quint16* const sourcePort );
 };
 
 #endif

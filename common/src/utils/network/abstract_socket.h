@@ -202,6 +202,7 @@ public:
         \note If socket is in non-blocking mode and non-blocking send is not possible, method will return -1 and set error code to \a SystemError::wouldBlock
      */
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) = 0;
+    int recv( QByteArray data, int flags = 0 )  { return recv( data.data(), data.size(), flags ); }
     //!Write the given buffer to this socket
     /*!
         Call \a AbstractCommunicatingSocket::connect() before calling \a AbstractCommunicatingSocket::send()

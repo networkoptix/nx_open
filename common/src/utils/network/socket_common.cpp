@@ -12,6 +12,9 @@
 const HostAddress HostAddress::localhost( QLatin1String("127.0.0.1") );
 const HostAddress HostAddress::anyHost( (uint32_t)INADDR_ANY );
 
+static const QByteArray IP_V6_MAP_PREFIX_HEX = QByteArray(10*2, '0') + QByteArray(2*2, 'F');
+static const QByteArray IP_V6_MAP_PREFIX = QByteArray::fromHex(IP_V6_MAP_PREFIX_HEX);
+
 HostAddress::HostAddress()
 :
     m_addressResolved(true)
@@ -49,6 +52,22 @@ HostAddress::HostAddress( uint32_t _ipv4 )
     m_addressResolved(true)
 {
     memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
+    m_sinAddr.s_addr = htonl( _ipv4 );
+}
+
+HostAddress::HostAddress( const QByteArray& _ipv6 )
+:
+    m_addressResolved(true)
+{
+    memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
+
+    if( _ipv6.size() != IP_V6_MAP_PREFIX.size() + sizeof(m_sinAddr.s_addr) ) return;
+    if( !_ipv6.startsWith(IP_V6_MAP_PREFIX) ) return;
+
+    uint32_t _ipv4;
+    QDataStream stream(_ipv6.right(sizeof(m_sinAddr.s_addr)));
+    stream >> _ipv4;
+
     m_sinAddr.s_addr = htonl( _ipv4 );
 }
 
@@ -97,6 +116,15 @@ HostAddress::HostAddress( const char* addrStr )
 uint32_t HostAddress::ipv4() const
 {
     return ntohl(inAddr().s_addr);
+}
+
+QByteArray HostAddress::ipv6() const
+{
+    QByteArray _ipv6;
+    QDataStream stream(&_ipv6, QIODevice::WriteOnly);
+    stream.writeRawData(IP_V6_MAP_PREFIX.data(), IP_V6_MAP_PREFIX.size());
+    stream << ipv4();
+    return _ipv6;
 }
 
 QString HostAddress::toString() const
@@ -170,7 +198,6 @@ struct in_addr HostAddress::inAddr(bool* ok) const
         *ok = m_addressResolved;
     return m_sinAddr;
 }
-
 
 class SocketGlobalRuntimeInternal
 {

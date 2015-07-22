@@ -1344,7 +1344,7 @@ int UDPSocket::recvFrom(
     void* buffer,
     unsigned int bufferLen,
     HostAddress* const sourceAddress,
-    int* const sourcePort )
+    quint16* const sourcePort )
 {
     sockaddr_in clntAddr;
     socklen_t addrLen = sizeof( clntAddr );

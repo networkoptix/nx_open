@@ -17,9 +17,9 @@
 #include <stdint.h>
 
 #include <boost/optional.hpp>
+#include "utils/common/hash.h"
 
 #include <QString>
-
 
 //!Represents ipv4 address. Supports conversion to QString and to uint32
 /*!
@@ -30,13 +30,21 @@ class HostAddress
 public:
     //!Creates 0.0.0.0 address
     HostAddress();
+
     HostAddress( const HostAddress& rhs );
     HostAddress( HostAddress&& rhs );
     HostAddress( const struct in_addr& sinAddr );
+
     /*!
         \param _ipv4 ipv4 address in local byte order
     */
     HostAddress( uint32_t _ipv4 );
+
+    /*!
+     *  \param _ipv6 ipv6 address in local byte order (ipv4-mapped
+     */
+    HostAddress( const QByteArray& _ipv6 );
+
     HostAddress( const QString& addrStr );
     HostAddress( const char* addrStr );
 
@@ -45,6 +53,10 @@ public:
         \note This method can trigger blocking address resolve. Check 
     */
     uint32_t ipv4() const;
+
+    //!Returns ip4-mapped ipv6
+    QByteArray ipv6() const;
+
     QString toString() const;
     //!Returns \a true if address is resolved. I.e., it's ip address is known
     bool isResolved() const;
@@ -74,9 +86,9 @@ class SocketAddress
 {
 public:
     HostAddress address;
-    int port;
+    quint16 port;
 
-    SocketAddress( const HostAddress& _address = HostAddress(), unsigned short _port = 0 )
+    SocketAddress( const HostAddress& _address = HostAddress(), quint16 _port = 0 )
     :
         address( _address ),
         port( _port )
@@ -113,6 +125,10 @@ public:
 
     bool isNull() const { return address == HostAddress() && port == 0; }
 };
+
+inline bool operator!=( const SocketAddress& lhs, const SocketAddress& rhs ) {
+    return !( lhs == rhs );
+}
 
 inline uint qHash(const SocketAddress &address) {
     return qHash(address.address.toString(), address.port);
