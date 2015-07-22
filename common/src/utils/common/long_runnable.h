@@ -9,6 +9,7 @@
 #include "singleton.h"
 #include "semaphore.h"
 #include "utils/common/stoppable.h"
+#include <utils/common/safe_direct_connection.h>
 
 
 class QnLongRunnablePoolPrivate;
@@ -16,7 +17,8 @@ class QnLongRunnablePoolPrivate;
 class QN_EXPORT QnLongRunnable
 :
     public QThread,
-    public QnStoppable  //QnLongRunnable::pleaseStop moved to separate interface QnStoppable since not only threads need to be stopped
+    public QnStoppable,  //QnLongRunnable::pleaseStop moved to separate interface QnStoppable since not only threads need to be stopped
+    public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 

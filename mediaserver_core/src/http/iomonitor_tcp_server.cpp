@@ -28,6 +28,8 @@ QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<Ab
 
 QnIOMonitorConnectionProcessor::~QnIOMonitorConnectionProcessor()
 {
+    directDisconnectAll();
+
     stop();
 }
 
@@ -49,9 +51,9 @@ void QnIOMonitorConnectionProcessor::run()
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
             return;
         }
-        connect(camera.data(), &QnSecurityCamResource::initializedChanged, this, &QnIOMonitorConnectionProcessor::at_cameraInitDone, Qt::DirectConnection);
-        connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged, Qt::DirectConnection);
-        connect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged, Qt::DirectConnection);
+        Qn::directConnect(camera.data(), &QnSecurityCamResource::initializedChanged, this, &QnIOMonitorConnectionProcessor::at_cameraInitDone);
+        Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
+        Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
 
         if (camera->getParentId() != qnCommon->moduleGUID()) {
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
