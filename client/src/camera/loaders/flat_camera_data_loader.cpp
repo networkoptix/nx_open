@@ -23,12 +23,12 @@ namespace {
     const int detailLevel = 1;
 }
 
-QnFlatCameraDataLoader::QnFlatCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
+QnFlatCameraDataLoader::QnFlatCameraDataLoader(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
     QnAbstractCameraDataLoader(camera, dataType, parent),
-    m_connection(connection)
+    m_server(server)
 {
-    if(!connection)
-        qnNullWarning(connection);
+    if(!server)
+        qnNullWarning(server);
 
     if(!camera)
         qnNullWarning(camera);
@@ -38,11 +38,7 @@ QnFlatCameraDataLoader *QnFlatCameraDataLoader::newInstance(const QnMediaServerR
     if (!server || !camera)
         return NULL;
     
-    QnMediaServerConnectionPtr serverConnection = server->apiConnection();
-    if (!serverConnection)
-        return NULL;
-
-    return new QnFlatCameraDataLoader(serverConnection, camera, dataType, parent);
+    return new QnFlatCameraDataLoader(server, camera, dataType, parent);
 }
 
 int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
@@ -95,7 +91,7 @@ void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
 
 int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
     Q_ASSERT_X(m_dataType != Qn::BookmarkData, Q_FUNC_INFO, "this loader should NOT be used to load bookmarks");
-    return m_connection->getTimePeriodsAsync(
+    return m_server->apiConnection()->getTimePeriodsAsync(
         QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
         startTimeMs, 
         DATETIME_NOW,   /* Always load data to the end. */ 
