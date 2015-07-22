@@ -54,6 +54,7 @@ QnPopup {
         QnButton {
             anchors.left: parent.left
             text: qsTr("Close")
+            icon: "image://icon/close.png"
             flat: true
             onClicked: calendarPanel.hide()
         }
