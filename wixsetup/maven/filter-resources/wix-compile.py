@@ -26,19 +26,16 @@ if '${nxtool}' == 'true':
     'light -cultures:${installer.language} -cc ${project.build.directory} -reusecab -loc CustomStrings_${installer.language}.wxl -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -ext wixext\WixSystemToolsExtension.dll -out %s/%s -pdbout bin\\${build.configuration}\\EVEMediaPlayerSetup.wixpdb obj\\${build.configuration}-nxtool\\*.wixobj' % (nxtool_msi_folder, nxtool_msi_name),\
     'cscript FixExitDialog.js %s/%s' % (nxtool_msi_folder, nxtool_msi_name)
     ]
-
+   
 for command in commands:
-    print command
-    
-#for command in commands:
-  #  p = subprocess.Popen(command, shell=True, stdout=PIPE)
-  #  out, err = p.communicate()
- #   print ('\n++++++++++++++++++++++%s++++++++++++++++++++++' % command)
-#    print out
-#    p.wait()
-#    if p.returncode != 0 and p.returncode != 204:  
-#        print "failed with code: %s" % str(p.returncode) 
-#        sys.exit(1)
+    p = subprocess.Popen(command, shell=True, stdout=PIPE)
+    out, err = p.communicate()
+    print ('\n++++++++++++++++++++++%s++++++++++++++++++++++' % command)
+    print out
+    p.wait()
+    if p.returncode != 0 and p.returncode != 204:  
+        print "failed with code: %s" % str(p.returncode) 
+        sys.exit(1)
 
 client_msi_product_code = subprocess.check_output('cscript //NoLogo productcode.js %s\\%s' % (client_msi_folder, client_msi_name)).strip()
 server_msi_product_code = subprocess.check_output('cscript //NoLogo productcode.js %s\\%s' % (server_msi_folder, server_msi_name)).strip()
