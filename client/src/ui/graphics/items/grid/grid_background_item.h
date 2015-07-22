@@ -39,7 +39,7 @@ public:
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    QnGridBackgroundItemPrivate* const d_ptr;
+    QScopedPointer<QnGridBackgroundItemPrivate> const d_ptr;
 
 private slots:
     void updateGeometry();
