@@ -22,7 +22,7 @@
 #include <core/resource_management/resource_searcher.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <plugins/resource/upnp/upnp_device_searcher.h>
+#include <utils/network/upnp/upnp_device_searcher.h>
 #include <plugins/storage/dts/abstract_dts_searcher.h>
 
 #include <utils/common/sleep.h>
@@ -188,8 +188,8 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
     QElapsedTimer discoveryTime;
     discoveryTime.restart();
-    if( UPNPDeviceSearcher::instance() )
-        UPNPDeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
+    if( nx_upnp::DeviceSearcher::instance() )
+        nx_upnp::DeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
 
     ResourceSearcherList searchersList;
     {

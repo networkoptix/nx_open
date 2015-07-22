@@ -29,7 +29,7 @@ protected:
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
         const HostAddress& host,
-        const UpnpDeviceInfo& devInfo,
+        const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         const QAuthenticator &auth,
         QnResourceList& result) override;
@@ -44,7 +44,7 @@ private:
     struct CashedDevInfo
     {
         QElapsedTimer timer;
-        UpnpDeviceInfo info;
+        nx_upnp::DeviceInfo info;
     };
 
     QMap<QString, CasheInfo> m_cachedXml;
@@ -56,7 +56,7 @@ private:
     QByteArray getDeviceXml(const QUrl& url);
 
     void createResource(
-        const UpnpDeviceInfo& devInfo,
+        const nx_upnp::DeviceInfo& devInfo,
         const QnMacAddress& mac,
         const QAuthenticator &auth,
         QnResourceList& result );

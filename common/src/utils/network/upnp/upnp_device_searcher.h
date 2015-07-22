@@ -1,41 +1,35 @@
-
 #ifndef UPNP_DEVICE_SEARCHER_H
 #define UPNP_DEVICE_SEARCHER_H
 
+#include "upnp_device_description.h"
+
 #include <list>
 #include <map>
+#include <set>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
+#include <QtCore/QMutex>
 #include <QtCore/QString>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/timermanager.h>
+#include <utils/network/aio/aioeventhandler.h>
 #include <utils/network/http/httptypes.h>
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/network/nettools.h>
 #include <utils/network/socket.h>
 
-
-//Contains some info about discovered UPnP device
-struct UpnpDeviceInfo
-{
-    QString friendlyName;
-    QString manufacturer;
-    QString modelName;
-    QString serialNumber;
-    QString presentationUrl;
-};
+namespace nx_upnp {
 
 //!Receives discovered devices info
-class UPNPSearchHandler
+class SearchHandler
 {
 public:
-    virtual ~UPNPSearchHandler() {}
+    virtual ~SearchHandler() {}
 
     /*!
         \param localInterfaceAddress Local interface address, device has been discovered on
@@ -46,8 +40,8 @@ public:
     */
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
-        const HostAddress& discoveredDevAddress,
-        const UpnpDeviceInfo& devInfo,
+        const SocketAddress& discoveredDevAddress,
+        const DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) = 0;
 };
 
@@ -59,7 +53,7 @@ public:
     \note Class methods are thread-safe with the only exception: \a saveDiscoveredDevicesSnapshot() and \a processDiscoveredDevices() calls MUST be serialized by calling entity
     \note this class is single-tone
 */
-class UPNPDeviceSearcher
+class DeviceSearcher
 :
     public QObject,
     public TimerEventHandler,
@@ -69,22 +63,31 @@ class UPNPDeviceSearcher
 
 public:
     static const unsigned int DEFAULT_DISCOVER_TRY_TIMEOUT_MS = 3000;
+    static const QString DEFAULT_DEVICE_TYPE;
 
     /*!
+        \param discoverDeviceTypes Devies to discover, mediaservers by default
         \param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch
     */
-    UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
-    virtual ~UPNPDeviceSearcher();
+    DeviceSearcher( unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
+    virtual ~DeviceSearcher();
 
     //!Implementation of \a QnStoppable::pleaseStop
     virtual void pleaseStop() override;
 
     /*!
-        If \a handler is already added, nothing is done
+        If \a handler is already added for \a deviceType, nothing is done
         \note Handlers are iterated in order they were registered
+        \note if \a deviceType is empty, all devices will be reported
     */
-    void registerHandler( UPNPSearchHandler* handler );
-    void cancelHandlerRegistration( UPNPSearchHandler* handler );
+    void registerHandler( SearchHandler* handler, const QString& deviceType = QString() );
+
+    /*!
+     *  If \a handler is not added for \a deviceType, nothing is done
+     *  \note if \a deviceType is empty, handler will be unregistred for ALL device types
+     *        even if they were registred by separate calls with certain types
+     */
+    void unregisterHandler( SearchHandler* handler, const QString& deviceType = QString() );
 
     //!Makes internal copy of discovered but not processed devices. \a processDiscoveredDevices uses this copy
     void saveDiscoveredDevicesSnapshot();
@@ -93,9 +96,9 @@ public:
         If some handlers processes packet (UPNPSearchHandler::processPacket returns true), then packet is removed and not passed to other handlers
         \param handlerToUse If NULL, all handlers are used, otherwise packets are passed to \a handlerToUse only
     */
-    void processDiscoveredDevices( UPNPSearchHandler* handlerToUse = NULL );
+    void processDiscoveredDevices( SearchHandler* handlerToUse = NULL );
 
-    static UPNPDeviceSearcher* instance();
+    static DeviceSearcher* instance();
     static int cacheTimeout();
 private:
     class DiscoveredDeviceInfo
@@ -108,7 +111,7 @@ private:
         //!Device uuid. Places as a separater member because it becomes known before \a devInfo
         QByteArray uuid;
         QUrl descriptionUrl;
-        UpnpDeviceInfo devInfo;
+        DeviceInfo devInfo;
         QByteArray xmlDevInfo;
     };
 
@@ -117,7 +120,7 @@ private:
     class UPNPDescriptionCacheItem
     {
     public:
-        UpnpDeviceInfo devInfo;
+        DeviceInfo devInfo;
         QByteArray xmlDevInfo;
         qint64 creationTimestamp;
 
@@ -136,9 +139,9 @@ private:
     };
 
     const unsigned int m_discoverTryTimeoutMS;
-    mutable QnMutex m_mutex;
+    mutable QMutex m_mutex;
     quint64 m_timerID;
-    std::list<UPNPSearchHandler*> m_handlers;
+    std::map< QString, std::map< SearchHandler*, uint > > m_handlers;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
     char* m_readBuf;
@@ -175,9 +178,23 @@ private:
         \note MUST be called with \a m_mutex locked
     */
     void updateItemInCache( const DiscoveredDeviceInfo& devInfo );
+    bool processPacket( const QHostAddress& localInterfaceAddress,
+                        const SocketAddress& discoveredDevAddress,
+                        const DeviceInfo& devInfo,
+                        const QByteArray& xmlDevInfo );
 
 private slots:
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );
 };
+
+class SearchAutoHandler
+        : public SearchHandler
+{
+public:
+    SearchAutoHandler( const QString& devType = QString() );
+    virtual ~SearchAutoHandler();
+};
+
+} // namespace nx_upnp
 
 #endif  //UPNP_DEVICE_SEARCHER_H

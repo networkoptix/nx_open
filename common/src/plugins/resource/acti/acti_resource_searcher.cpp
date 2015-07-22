@@ -184,7 +184,7 @@ static QString serialNumberToPhysicalID( const QString& serialNumber )
 void QnActiResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
     const HostAddress& /*host*/,
-    const UpnpDeviceInfo& devInfo,
+    const nx_upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/,
     const QAuthenticator& auth,
     QnResourceList& result )
@@ -219,7 +219,7 @@ void QnActiResourceSearcher::processPacket(
 }
 
 void QnActiResourceSearcher::createResource(
-    const UpnpDeviceInfo& devInfo,
+    const nx_upnp::DeviceInfo& devInfo,
     const QnMacAddress& mac,
     const QAuthenticator& auth,
     QnResourceList& result )
