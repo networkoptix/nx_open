@@ -23,6 +23,33 @@ angular.module('webadminApp')
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
                     animationDuration: 500, // 300, // 200-400 for smooth animation
 
+                    levelsSettings:{
+                        labels:{
+                            markSize:15/110,
+                            transparency:1,
+                            fontSize:14,
+                            labelPositionFix:5//20
+                        },
+                        middle:{
+                            markSize:10/110,
+                            transparency:0.75,
+                            fontSize:13,
+                            labelPositionFix:0//18
+                        },
+                        small:{
+                            markSize:5/110,
+                            transparency:0.5,
+                            fontSize:11,
+                            labelPositionFix:-5//16
+                        },
+                        marks:{
+                            markSize:5/110,
+                            transparency:0.25,
+                            fontSize:0,
+                            labelPositionFix:0
+                        }
+                    },
+
                     timelineBgColor: [28,35,39], //Color for ruler marks and labels
                     font:'Roboto',//'sans-serif',
 
@@ -82,7 +109,7 @@ angular.module('webadminApp')
                     topLabelBgOddColor: false,
                     topLabelPositionFix:0, //Vertical fix for position
                     topLabelFixed: true,
-
+                    oldStyle:false,
 
                     labelAlign:"above",// center, left, above
                     labelHeight:25/110, // %
@@ -100,9 +127,9 @@ angular.module('webadminApp')
                     labelFixed: true,
 
 
-                    lowerMarkerAttach:"bottom", // top, bottom
-                    lowerMarksHeight:10/110,
-                    lowerMarksColor:[83,112,127,0.4]
+                    marksAttach:"bottom", // top, bottom
+                    marksHeight:10/110,
+                    marksColor:[83,112,127,0.4]
                 };
 
 
@@ -115,8 +142,9 @@ angular.module('webadminApp')
                     labelAlign:"above",// center, left, above
                     labelMarkerColor:[53,70,79,0],//false
                     labelBgColor: [28,35,39],
+                    oldStyle:false,
 
-                    lowerMarksColor:[83,112,127,0]
+                    marksColor:[83,112,127,0]
                 },{
                     topLabelAlign: "center", // center, left, above
                     topLabelMarkerColor: [105,135,150], // Color for mark for top label
@@ -126,8 +154,9 @@ angular.module('webadminApp')
                     labelAlign:"above",// center, left, above
                     labelMarkerColor:[83,112,127,0.6],//false
                     labelBgColor: [28,35,39],
+                    oldStyle:false,
 
-                    lowerMarksColor:[83,112,127,0]
+                    marksColor:[83,112,127,0]
                 },{
                     topLabelAlign: "left", // center, left, above
                     topLabelMarkerColor: [105,135,150], // Color for mark for top label
@@ -137,8 +166,9 @@ angular.module('webadminApp')
                     labelAlign:"left",// center, left, above
                     labelMarkerColor:[83,112,127,0.6],//false
                     labelBgColor: [28,35,39],
+                    oldStyle:false,
 
-                    lowerMarksColor:[83,112,127,0.4]
+                    marksColor:[83,112,127,0.4]
                 },{
                     topLabelAlign: "center", // center, left, above
                     topLabelHeight: 20/110, //% // Size for top label text
@@ -172,9 +202,10 @@ angular.module('webadminApp')
                     labelMarkerHeight:20/110,
                     labelFixed: false,
 
-                    lowerMarkerAttach:"top", // top, bottom
-                    lowerMarksHeight:10/110,
-                    lowerMarksColor:[83,112,127,0.4]
+                    marksAttach:"top", // top, bottom
+                    marksHeight:10/110,
+                    marksColor:[83,112,127,0.4],
+                    oldStyle:true
                 }];
 
                 scope.selectPreset = function(preset){
@@ -249,8 +280,8 @@ angular.module('webadminApp')
 
                     var context = clearTimeline();
                     drawTopLabels(context);
+
                     drawLabels(context);
-                    drawLowerMarks(context);
 
                     drawEvents(context);
                     drawOrCheckScrollBar(context);
@@ -283,7 +314,7 @@ angular.module('webadminApp')
                     return colorString;
                 }
                 function formatFont(font){
-                    return font.weight + " " + font.size + "px " + font.face;
+                    return font.weight + " " + Math.round(font.size) + "px " + font.face;
                 }
 
                 function clearTimeline(){
@@ -299,7 +330,7 @@ angular.module('webadminApp')
                 var targetTopLabelLevelIndex = 0;
                 scope.changingTopLevel = 1;
                 function drawTopLabels(context){
-                    var instantLevelIndex = scope.scaleManager.levels.topLabels.index;
+                    var instantLevelIndex = scope.scaleManager.levels.top.index;
                     if(instantLevelIndex != targetTopLabelLevelIndex){ // Start animation here
                         targetTopLabelLevelIndex = instantLevelIndex;
                         animateScope.progress(scope,'changingTopLevel').then(function(){
@@ -329,6 +360,25 @@ angular.module('webadminApp')
                 var targetLabelLevelIndex = 0;
                 scope.changingLevel = 1;
                 function drawLabels(context){
+                    if(timelineConfig.oldStyle) {
+                        drawLabelsOldStyle(
+                            context,
+                            "format",
+                            timelineConfig.labelFixed,
+                            timelineConfig.topLabelHeight,
+                            timelineConfig.labelHeight,
+                            timelineConfig.labelFont,
+                            timelineConfig.labelAlign,
+                            timelineConfig.labelBgColor,
+                            timelineConfig.labelBgColor,
+                            timelineConfig.labelMarkerColor,
+                            timelineConfig.labelMarkerAttach,
+                            timelineConfig.levelsSettings);
+
+                        return;
+                    }
+
+
                     var instantLevelIndex = scope.scaleManager.levels.labels.index;
                     if(instantLevelIndex != targetLabelLevelIndex){ // Start animation here
                         targetLabelLevelIndex = instantLevelIndex;
@@ -356,27 +406,28 @@ angular.module('webadminApp')
                         timelineConfig.labelMarkerAttach,
                         timelineConfig.labelMarkerHeight);
 
+                    drawMarks(context);
                 }
 
 
-                var currentLowerMarksLevelIndex = 0;
-                var targetLowerMarksLevelIndex = 0;
-                scope.changingLowerMarksLevel = 1;
-                function drawLowerMarks(context){
-                    var instantLevelIndex = scope.scaleManager.levels.lowerMarks.index;
-                    if(instantLevelIndex != targetLowerMarksLevelIndex){ // Start animation here
-                        targetLowerMarksLevelIndex = instantLevelIndex;
-                        animateScope.progress(scope,'changingLowerMarksLevel').then(function(){
+                var currentMarksLevelIndex = 0;
+                var targetMarksLevelIndex = 0;
+                scope.changingMarksLevel = 1;
+                function drawMarks(context){
+                    var instantLevelIndex = scope.scaleManager.levels.marks.index;
+                    if(instantLevelIndex != targetMarksLevelIndex){ // Start animation here
+                        targetMarksLevelIndex = instantLevelIndex;
+                        animateScope.progress(scope,'changingMarksLevel').then(function(){
 
-                            currentLowerMarksLevelIndex = targetLowerMarksLevelIndex;
+                            currentMarksLevelIndex = targetMarksLevelIndex;
                         });
                     }
 
                     drawLabelsRow(
                         context,
-                        currentLowerMarksLevelIndex,
-                        targetLowerMarksLevelIndex,
-                        scope.changingLowerMarksLevel,
+                        currentMarksLevelIndex,
+                        targetMarksLevelIndex,
+                        scope.changingMarksLevel,
                         false,// No format
                         "none",
                         timelineConfig.topLabelHeight,
@@ -385,10 +436,150 @@ angular.module('webadminApp')
                         null,//align
                         null,//no bg label
                         null,//no bg label
-                        timelineConfig.lowerMarksColor,
+                        timelineConfig.marksColor,
                         0,
-                        timelineConfig.lowerMarkerAttach,
-                        timelineConfig.lowerMarksHeight );
+                        timelineConfig.marksAttach,
+                        timelineConfig.marksHeight );
+                }
+
+                function drawLabelsOldStyle(context,
+                    labelFormat, labelFixed, levelTop, levelHeight,
+                    font, labelAlign, bgColor, bgOddColor, markColor, markAttach, levelsSettings){
+                    // 1. we need four levels:
+                    // Mark only
+                    // small label
+                    // middle label
+                    // Large label
+
+                    //2. Every level can be animated
+                    //3. Animation includes changing of height and font-size and transparency for colors
+
+                    var animations = {};
+                    var targets = {};
+                    var currents = {};
+
+                    function animateLevel(levelName) { // Check previous and current value for this level and run smooth transition if needed
+                        var instantLevelIndex = scope.scaleManager.levels[levelName].index;
+                        var targetName = levelName + "TargetIndex";
+                        var currentName = levelName + "CurrentIndex";
+                        var animationName = levelName + "IndexChanging";
+                        if(!scope[currentName]){
+                            scope[currentName] = 0;
+                        }
+                        if (instantLevelIndex != scope[targetName]) { // Start animation here
+                            scope[targetName] = instantLevelIndex;
+                            animateScope.progress(scope, animationName).then(function () {
+                                scope[currentName] = scope[targetName];
+                            });
+                        }
+
+                        //Cache for this iteration
+                        animations[levelName] = scope[animationName];
+                        targets[levelName] = scope[targetName];
+                        currents[levelName] = scope[currentName];
+                    }
+
+                    function getPointAnimation(pointLevelIndex, levelName){ // Get transition value for animation for this level
+                        var animation = animations[levelName]
+                        if( animation == 1){
+                            return 1;
+                        }
+
+                        var maxLevel = Math.max(targets[levelName],currents[levelName]);
+
+                        if(pointLevelIndex >= maxLevel || animation == 1) {
+                            return 1; //No animation
+                        }
+
+                        if(pointLevelIndex > targets[levelName]){ // decrease from upper level to current
+                            return 1 - animation;
+                        }else if(pointLevelIndex > currents[levelName]){ // increase from current level to upper
+                            return animation;
+                        }
+                    }
+
+                    function getLevelMinValue(levelName){ // Get lower levelinex for this level
+                        return Math.min(currents[levelName],targets[levelName]);
+                    }
+
+                    function getBestLevelName(pointLevelIndex){ // Find best level for this levelindex
+                        if(pointLevelIndex <= getLevelMinValue("labels"))
+                            return "labels";
+
+                        if(pointLevelIndex <= getLevelMinValue("middle"))
+                            return "middle";
+
+                        if(pointLevelIndex <= getLevelMinValue("small"))
+                            return "small";
+
+                        return "marks";
+                    }
+
+                    function getUpperLevelName(levelName){ // Next level
+                        switch(levelName){
+                            case "labels":
+                            case "middle":
+                                return "labels";
+
+                            case "small":
+                                return "middle";
+
+                            case "marks":
+                            default:
+                                return "small"
+                        }
+                    }
+
+                    function interpolate(alpha, min, max){ // Find value during animation
+                        return min + alpha * (max - min);
+                    }
+
+                    animateLevel("labels"); // Run animation for levels if needed
+                    animateLevel("middle");
+                    animateLevel("small");
+                    animateLevel("marks");
+
+
+                    var levelIndex = Math.max(scope.scaleManager.levels.marks.index, scope.marksTargetIndex); // Target level is lowest of visible
+                    var level = RulerModel.levels[levelIndex]; // Actual calculating level
+
+                    var start1 = scope.scaleManager.alignStart(level);
+                    var start = scope.scaleManager.alignStart(level);
+                    var end = scope.scaleManager.alignEnd(level);
+
+                    var counter = 2000;// Protection from neverending cycles.
+                    while(start <= end && counter-- > 0){
+                        var odd = Math.round((start.getTime() / level.interval.getMilliseconds())) % 2 === 1; // add or even for zebra coloring
+                        var pointLevelIndex = RulerModel.findBestLevelIndex(start);
+
+                        var levelName = getBestLevelName(pointLevelIndex); // Here we detect best level for this particular point
+
+                        var animation = getPointAnimation(pointLevelIndex, levelName); // We detect, if level is changing
+                        var markSize = levelsSettings[levelName].markSize;
+                        var transparency = levelsSettings[levelName].transparency;
+                        var fontSize = levelsSettings[levelName].fontSize;
+                        var labelPositionFix = levelsSettings[levelName].labelPositionFix;
+
+                        if(animation<1){ //decreasing from upperLevel to levelName to up
+                            var upperLevelName = getUpperLevelName(levelName);
+                            markSize = interpolate(animation,markSize,levelsSettings[upperLevelName].markSize);
+                            transparency = interpolate(animation,transparency,levelsSettings[upperLevelName].transparency);
+                            fontSize = interpolate(animation,fontSize,levelsSettings[upperLevelName].fontSize);
+                            labelPositionFix = interpolate(animation,labelPositionFix,levelsSettings[levelName].labelPositionFix);
+                        }
+
+                        font.size = fontSize; // Set font size for label
+
+                        //Draw lebel, using calculated values
+                        drawLabel(context, start, level, transparency,
+                            labelFormat, labelFixed, levelTop, levelHeight,
+                            font, labelAlign, odd?bgColor: bgOddColor, markColor, labelPositionFix, markAttach, markSize);
+
+                        start = level.interval.addToDate(start);
+                    }
+                    if(counter < 1){
+                        console.error("problem!", start1, start, end, level);
+                    }
                 }
 
                 function drawLabelsRow (context, currentLevelIndex, taretLevelIndex, animation,
@@ -402,12 +593,6 @@ angular.module('webadminApp')
                     var start = scope.scaleManager.alignStart(level);
                     var end = scope.scaleManager.alignEnd(level);
 
-                    function checkDate(date){
-                        return !isNaN( date.getTime());
-                    }
-                    if(!(checkDate(start)|| checkDate(end))){
-                        console.error("broken Date",checkDate(start), checkDate(end));
-                    }
 
                     var counter = 1000;
                     while(start <= end && counter-- > 0){
@@ -421,12 +606,7 @@ angular.module('webadminApp')
                         }
                         drawLabel(context,start,level,alpha,
                                         labelFormat, labelFixed, levelTop, levelHeight, font, labelAlign, odd?bgColor: bgOddColor, markColor, labelPositionFix, markAttach, markHeight);
-                        var newStart = level.interval.addToDate(start);
-
-                        if(!(checkDate(start)|| checkDate(newStart))){
-                            console.error("broken Date 2 ",checkDate(start), checkDate(newStart));
-                        }
-                        start = newStart;
+                        start = level.interval.addToDate(start);
                     }
                     if(counter < 1){
                         console.error("problem!", start1, start, end, level);
