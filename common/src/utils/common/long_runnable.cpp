@@ -4,10 +4,11 @@
 #include <typeinfo>
 
 #include <QtCore/QSet>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include <common/systemexcept_win32.h>
+#include <common/systemexcept_linux.h>
 
 #ifdef Q_OS_LINUX
 #   include <sys/types.h>
@@ -24,19 +25,19 @@ public:
     QnLongRunnablePoolPrivate() {}
 
     void stopAll() {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         for(QnLongRunnable *runnable: m_created)
             runnable->pleaseStop();
         waitAllLocked();
     }
 
     void waitAll() {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         waitAllLocked();
     }
 
     void createdNotify(QnLongRunnable *runnable) {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         assert(runnable && !m_created.contains(runnable));
 
@@ -44,7 +45,7 @@ public:
     }
 
     void startedNotify(QnLongRunnable *runnable) {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         assert(runnable && !m_running.contains(runnable));
 
@@ -52,7 +53,7 @@ public:
     }
 
     void finishedNotify(QnLongRunnable *runnable) {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         assert(runnable); //  && m_running.contains(runnable)
 
@@ -62,7 +63,7 @@ public:
     }
 
     void destroyedNotify(QnLongRunnable *runnable) {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         assert(runnable && m_created.contains(runnable));
 
@@ -76,8 +77,8 @@ private:
     }
 
 private:
-    QMutex m_mutex;
-    QWaitCondition m_waitCondition;
+    QnMutex m_mutex;
+    QnWaitCondition m_waitCondition;
     QSet<QnLongRunnable *> m_created, m_running;
 };
 
@@ -232,11 +233,19 @@ void QnLongRunnable::at_started() {
     win32_exception::installThreadSpecificUnhandledExceptionHandler();
 #endif
 
+#ifdef __linux__
+    linux_exception::installQuitThreadBacktracer();
+#endif
+
     if(m_pool)
         m_pool->startedNotify(this);
 }
 
 void QnLongRunnable::at_finished() {
+#ifdef __linux__
+    linux_exception::uninstallQuitThreadBacktracer();
+#endif
+
     if(m_pool)
         m_pool->finishedNotify(this);
 }

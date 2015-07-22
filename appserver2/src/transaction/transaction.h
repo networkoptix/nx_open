@@ -57,12 +57,12 @@ namespace ec2
             saveCamera                  = 301,  /*< ApiCameraData */
             saveCameras                 = 302,  /*< ApiCameraDataList */
             removeCamera                = 303,  /*< ApiIdData */
-            getCameraHistoryItems       = 304,  /*< ApiCameraServerItemDataList */
-            addCameraHistoryItem        = 305,  /*< ApiCameraServerItemData */
+            getCameraHistoryItems       = 304,  /*< ApiServerFootageDataList */
+            addCameraHistoryItem        = 305,  /*< ApiServerFootageData */
             addCameraBookmarkTags       = 306,  /*< ApiCameraBookmarkTagDataList */
             getCameraBookmarkTags       = 307,  /*< ApiCameraBookmarkTagDataList */
             removeCameraBookmarkTags    = 308,
-            removeCameraHistoryItem     = 309,  /*< ApiCameraServerItemData */
+            removeCameraHistoryItem     = 309,  /*< ApiServerFootageData */
             saveCameraUserAttributes    = 310,  /*< ApiCameraAttributesData */
             saveCameraUserAttributesList= 311,  /*< ApiCameraAttributesDataList */
             getCameraUserAttributes     = 312,  /*< ApiCameraAttributesDataList */
@@ -150,6 +150,14 @@ namespace ec2
             getKnownPeersSystemTime     = 2005,  /*< ApiPeerSystemTimeDataList */
             markLicenseOverflow         = 2006,  /*< ApiLicenseOverflowData */
             getSettings                 = 2007,  /*< ApiResourceParamDataList */
+
+            /* Client information */
+            getClientInfos              = 4001,  /*< ApiClientInfoDataList */
+            saveClientInfo              = 4002,  /*< ApiClientInfoData */
+
+            /* Statistics */
+            getStatisticsReport         = 5001,  /*< ApiSystemStatistics */
+            triggerStatisticsReport     = 5002,  /*< ApiStatisticsServerInfo */
 
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */

@@ -439,6 +439,7 @@ protected slots:
     void at_notificationTimer_timeout(const QVariant &resource, const QVariant &type);
     void at_notificationTimer_timeout(const QnResourcePtr &resource, int type);
 
+    bool canShowLayoutBackground() const;
 private:
     /* Directly visible state */
 

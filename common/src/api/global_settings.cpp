@@ -44,6 +44,7 @@ namespace {
     const QString nameSignature(lit("emailSignature"));
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationEnabled"));
+    const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
     
 }
 
@@ -54,6 +55,8 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
+    m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
+    m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, false, this);
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameFrom, QString(), this);
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
@@ -64,7 +67,6 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(namePort, 0, this);
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmailSettings::defaultTimeoutSec(), this);
     m_simpleAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameSimple, true, this);
-    m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, false, this);
 
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
@@ -83,12 +85,14 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_allAdaptors 
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
+        << m_serverAutoDiscoveryEnabledAdaptor
         << m_updateNotificationsEnabledAdaptor
         << emailAdaptors
         ;
 
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
+    connect(m_serverAutoDiscoveryEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::serverAutoDiscoveryChanged,          Qt::QueuedConnection);
 
     for(QnAbstractResourcePropertyAdaptor* adaptor: emailAdaptors)
         connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::emailSettingsChanged, Qt::QueuedConnection);
@@ -125,6 +129,14 @@ void QnGlobalSettings::setCameraSettingsOptimizationEnabled(bool cameraSettingsO
     m_cameraSettingsOptimizationAdaptor->setValue(cameraSettingsOptimizationEnabled);
 }
 
+bool QnGlobalSettings::isServerAutoDiscoveryEnabled() const {
+    return m_serverAutoDiscoveryEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setServerAutoDiscoveryEnabled(bool enabled) {
+    m_serverAutoDiscoveryEnabledAdaptor->setValue(enabled);
+}
+
 void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     if(m_admin)
         return;
@@ -136,7 +148,7 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user->isAdmin())
         return;
 
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     m_admin = user;
     for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
@@ -147,7 +159,7 @@ void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &reso
     if (!m_admin || resource != m_admin)
         return;
 
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     m_admin.reset();
 
     for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)

@@ -99,9 +99,15 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
 }
 
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+
+QnConstResourceVideoLayoutPtr QnMediaResource::getDefaultVideoLayout()
+{
+    return defaultVideoLayout;
+}
+
 QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
-    QMutexLocker lock(&m_layoutMutex);
+    QnMutexLocker lock( &m_layoutMutex );
 
     if (dataProvider) {
         QnConstResourceVideoLayoutPtr providerLayout = dataProvider->getVideoLayout();
@@ -121,13 +127,6 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
         }
         return m_customVideoLayout;
     }
-}
-
-void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout)
-{
-    QMutexLocker lock(&m_layoutMutex);
-    m_customVideoLayout = newLayout;
-    toResource()->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newLayout->toString());
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );

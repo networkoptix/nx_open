@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
 #include <network/authenticate_helper.h>
 #include <network/universal_tcp_listener.h>
@@ -15,11 +15,14 @@
 #include <utils/common/concurrent.h>
 #include <utils/network/simple_http_client.h>
 
+#include <rest/active_connections_rest_handler.h>
+
 #include "compatibility/old_ec_connection.h"
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_camera_data_ex.h"
+#include "nx_ec/data/api_camera_history_data.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -27,9 +30,12 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
+#include "http/http_transaction_receiver.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
+
+static const char INCOMING_TRANSACTIONS_PATH[] = "ec2/forward_events";
 
 namespace ec2
 {
@@ -68,13 +74,13 @@ namespace ec2
 
     void Ec2DirectConnectionFactory::pleaseStop()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_terminated = true;
     }
 
     void Ec2DirectConnectionFactory::join()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         while( m_runningRequests > 0 )
         {
             lk.unlock();
@@ -96,7 +102,8 @@ namespace ec2
     }
 
     //!Implementation of AbstractECConnectionFactory::connectAsync
-    int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler )
+    int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo, 
+                                                  impl::ConnectHandlerPtr handler )
     {
         QUrl url = addr;
         url.setUserName(url.userName().toLower());
@@ -104,12 +111,13 @@ namespace ec2
         if (url.scheme() == "file")
             return establishDirectConnection(url, handler);
         else
-            return establishConnectionToRemoteServer(url, handler);
+            return establishConnectionToRemoteServer(url, handler, clientInfo);
     }
 
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
     {
         universalTcpListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
+        universalTcpListener->addHandler<QnHttpTransactionReceiver>("HTTP", INCOMING_TRANSACTIONS_PATH);
 
         m_sslEnabled = universalTcpListener->isSslEnabled();
     }
@@ -163,11 +171,9 @@ namespace ec2
         //AbstractCameraManager::getUserAttributes
         registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::getCameraUserAttributes );
         //AbstractCameraManager::addCameraHistoryItem
-        registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
-        //AbstractCameraManager::removeCameraHistoryItem
-        registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::removeCameraHistoryItem );
+        registerUpdateFuncHandler<ApiServerFootageData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryItems
-        registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
+        registerGetFuncHandler<std::nullptr_t, ApiServerFootageDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
         //AbstractCameraManager::getCamerasEx
@@ -264,6 +270,9 @@ namespace ec2
             std::bind( &TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1 ) );
         //TODO #ak register AbstractTimeManager::getPeerTimeInfoList
 
+        //ApiClientInfoData
+        registerUpdateFuncHandler<ApiClientInfoData>(restProcessorPool, ApiCommand::saveClientInfo);
+        registerGetFuncHandler<std::nullptr_t, ApiClientInfoDataList>(restProcessorPool, ApiCommand::getClientInfos);
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>( restProcessorPool, ApiCommand::getLicenses );
@@ -279,6 +288,25 @@ namespace ec2
 
         registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
             std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
+
+        //Ec2StaticticsReporter
+        registerFunctorHandler<std::nullptr_t, ApiSystemStatistics>( restProcessorPool, ApiCommand::getStatisticsReport,
+            [ this ]( std::nullptr_t, ApiSystemStatistics* const out ) {
+                if( !m_directConnection ) return ErrorCode::failure;
+                return m_directConnection->getStaticticsReporter()->collectReportData(nullptr, out);
+            } );
+        registerFunctorHandler<std::nullptr_t, ApiStatisticsServerInfo>( restProcessorPool, ApiCommand::triggerStatisticsReport,
+            [ this ]( std::nullptr_t, ApiStatisticsServerInfo* const out ) {
+                if( !m_directConnection ) return ErrorCode::failure;
+                return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(nullptr, out);
+            } );
+
+        restProcessorPool->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler());
+
+        //using HTTP processor since HTTP REST does not support HTTP interleaving
+        //restProcessorPool->registerHandler(
+        //    QLatin1String(INCOMING_TRANSACTIONS_PATH),
+        //    new QnRestTransactionReceiver() );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
@@ -296,7 +324,7 @@ namespace ec2
         connectionInfo.ecUrl = url;
         ec2::ErrorCode connectionInitializationResult = ec2::ErrorCode::ok;
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( !m_directConnection ) {
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
                 if( !m_directConnection->initialized() )
@@ -310,13 +338,13 @@ namespace ec2
         return reqID;
     }
 
-    int Ec2DirectConnectionFactory::establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler )
+    int Ec2DirectConnectionFactory::establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo )
     {
         const int reqID = generateRequestID();
 
         ////TODO: #ak return existing connection, if one
         //{
-        //    QMutexLocker lk( &m_mutex );
+        //    QnMutexLocker lk( &m_mutex );
         //    auto it = m_urlToConnection.find( addr );
         //    if( it != m_urlToConnection.end() )
         //        AbstractECConnectionPtr connection = it->second.second;
@@ -325,23 +353,19 @@ namespace ec2
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
+        loginInfo.clientInfo = clientInfo;
+
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return INVALID_REQ_ID;
             ++m_runningRequests;
         }
-#if 1
+
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(
-            addr, ApiCommand::connect, std::nullptr_t(), func );
-#else
-        //TODO: #ak following does not compile due to msvc2012 restriction: no more than 6 arguments to std::bind
-        using namespace std::placeholders;
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            addr, ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, reqID, _1, _2, addr, handler) );
-#endif
+            addr, ApiCommand::connect, loginInfo, func );
         return reqID;
     }
 
@@ -405,7 +429,7 @@ namespace ec2
                 break;
         }
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         --m_runningRequests;
     }
 
@@ -464,7 +488,7 @@ namespace ec2
             errorCode,
             connection);
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         --m_runningRequests;
     }
 
@@ -478,7 +502,7 @@ namespace ec2
         if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized )
         {
             handler->done( reqID, errorCode, connectionInfo );
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             --m_runningRequests;
             return;
         }
@@ -494,7 +518,7 @@ namespace ec2
     }
 
     ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
-        const ApiLoginData& /*loginInfo*/,
+        const ApiLoginData& loginInfo,
         QnConnectionInfo* const connectionInfo )
     {
         connectionInfo->version = qnCommon->engineVersion();
@@ -506,6 +530,38 @@ namespace ec2
 #endif
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+        
+		if (!loginInfo.clientInfo.id.isNull())
+        {
+			auto clientInfo = loginInfo.clientInfo;
+			clientInfo.parentId = qnCommon->moduleGUID();
+
+			ApiClientInfoDataList infos;
+			auto result = dbManager->doQuery(clientInfo.id, infos);
+			if (result != ErrorCode::ok)
+				return result;
+
+			if (infos.size() && clientInfo == infos.front())
+			{
+				NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
+					cl_logDEBUG2);
+				return ErrorCode::ok;
+			}
+
+            QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
+            m_serverQueryProcessor.processUpdateAsync(transaction,
+                [&](ErrorCode result) {
+					if (result == ErrorCode::ok) {
+						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
+							cl_logINFO);
+					}
+					else {
+						NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
+							.arg(toString(result)), cl_logERROR);
+					}
+				});
+        }
+
         return ErrorCode::ok;
     }
 
@@ -523,7 +579,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return INVALID_REQ_ID;
             ++m_runningRequests;

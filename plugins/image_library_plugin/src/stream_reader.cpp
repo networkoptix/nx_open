@@ -119,8 +119,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         *lpPacket = new ILPEmptyPacket(
             0,
             curTimestamp,
-            (isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0) |
-                (m_encoderNumber > 0 ? nxcip::MediaDataPacket::fLowQuality : 0),
+            (isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0),
             cSeq );
         return nxcip::NX_NO_ERROR;
     }
@@ -129,7 +128,6 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         0,
         curTimestamp,
         nxcip::MediaDataPacket::fKeyPacket |
-            (m_encoderNumber > 0 ? nxcip::MediaDataPacket::fLowQuality : 0) |
             (streamReset ? nxcip::MediaDataPacket::fStreamReset : 0) |
             (isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0),
         cSeq ) );

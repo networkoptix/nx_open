@@ -38,6 +38,10 @@ class QnLayoutItemData;
 class QnResourceCommand;
 typedef std::shared_ptr<QnResourceCommand> QnResourceCommandPtr;
 
+struct QnCameraAdvancedParamValue;
+class QnCameraAdvancedParamValueMap;
+typedef QList<QnCameraAdvancedParamValue> QnCameraAdvancedParamValueList;
+
 // -->
 
 
@@ -55,7 +59,6 @@ typedef QList<QnResourceTypePtr> QnResourceTypeList;
 class QnVirtualCameraResource;
 typedef QnSharedResourcePointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
 typedef QnSharedResourcePointerList<QnVirtualCameraResource> QnVirtualCameraResourceList;
-typedef QSharedPointer<QnVirtualCameraResourceList> QnVirtualCameraResourceListPtr; // TODO: #Elric remove?
 
 class QnPhysicalCameraResource;
 typedef QnSharedResourcePointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
@@ -86,6 +89,7 @@ typedef QnSharedResourcePointerList<QnNetworkResource> QnNetworkResourceList;
 
 class QnSecurityCamResource;
 typedef QnSharedResourcePointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
+typedef QnSharedResourcePointer<const QnSecurityCamResource> QnConstSecurityCamResourcePtr;
 typedef QnSharedResourcePointerList<QnSecurityCamResource> QnSecurityCamResourceList;
 
 class QnCameraUserAttributes;
@@ -144,9 +148,9 @@ class QnPlIqResource;
 typedef QnSharedResourcePointer<QnPlIqResource> QnPlIqResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIqResource> QnPlIqResourceList;
 
-class QnPlWatchDogResource;
-typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
-typedef QnSharedResourcePointerList<QnPlWatchDogResource> QnPlWatchDogResourceList;
+class QnDigitalWatchdogResource;
+typedef QnSharedResourcePointer<QnDigitalWatchdogResource> QnDigitalWatchdogResourcePtr;
+typedef QnSharedResourcePointerList<QnDigitalWatchdogResource> QnDigitalWatchdogResourceList;
 
 class QnVistaResource;
 typedef QnSharedResourcePointer<QnVistaResource> QnVistaResourcePtr;

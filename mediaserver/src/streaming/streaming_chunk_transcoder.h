@@ -10,11 +10,12 @@
 
 #include <QtCore/QAtomicInt>
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QThread>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
 #include <streaming/ondemand_media_data_provider.h>
+#include <utils/common/singleton.h>
 #include <utils/common/timermanager.h>
 
 #include "data_source_cache.h"
@@ -34,7 +35,8 @@ class QnTranscoder;
 class StreamingChunkTranscoder
 :
     public QObject,
-    public TimerEventHandler
+    public TimerEventHandler,
+    public Singleton<StreamingChunkTranscoder>
 {
     Q_OBJECT
 
@@ -73,8 +75,6 @@ public:
         const StreamingChunkCacheKey& transcodeParams,
         StreamingChunkPtr chunk );
 
-    static StreamingChunkTranscoder* instance();
-
 protected:
     virtual void onTimer( const quint64& timerID );
 
@@ -92,7 +92,7 @@ private:
 
     bool m_terminated;
     Flags m_flags;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     //!map<transcoding id, data>
     std::map<int, TranscodeContext> m_scheduledTranscodings;
     //!map<task id, transcoding id>

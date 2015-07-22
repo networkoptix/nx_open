@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <QtCore/QProcess>
 
 #include <QtWidgets/QApplication>
@@ -15,13 +17,17 @@
 #include <QtGui/QImageWriter>
 
 #include <api/network_proxy_factory.h>
+#include <ec2_statictics_reporter.h>
 
 #include <business/business_action_parameters.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
+#include <camera/camera_data_manager.h>
+
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
+#include <client/client_runtime_settings.h>
 
 #include <common/common_module.h>
 
@@ -100,7 +106,6 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
@@ -224,7 +229,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PreferencesNotificationTabAction),       SIGNAL(triggered()),    this,   SLOT(at_preferencesNotificationTabAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
-    connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
+    connect(action(Qn::OpenBookmarksSearchAction),              SIGNAL(triggered()),    this,   SLOT(at_openBookmarksSearchAction_triggered()));
     connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
@@ -292,6 +297,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
+    connect(action(Qn::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
+
     /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
     connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
@@ -450,7 +457,7 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
         arguments << QLatin1String("--screen") << QString::number(screen);
     }
 
-    if (qnSettings->isDevMode())
+    if (qnRuntime->isDevMode())
         arguments << lit("--dev-mode-key=razrazraz");
 
     qDebug() << "Starting new instance with args" << arguments;
@@ -471,7 +478,8 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
 }
 
 void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
-    qnRedAssController->setMode(resolutionMode);
+    if (qnRedAssController)
+        qnRedAssController->setMode(resolutionMode);
 }
 
 QnCameraSettingsDialog *QnWorkbenchActionHandler::cameraSettingsDialog() const {
@@ -560,7 +568,7 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-	if (!qnSettings->isActiveXMode()) {
+	if (!qnRuntime->isActiveXMode()) {
 		if (!user) {
 	        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 			return;
@@ -573,7 +581,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
 	}
 
     // we should not change state when using "Open in New Window"
-    if (m_delayedDrops.isEmpty() && !qnSettings->isVideoWallMode() && !qnSettings->isActiveXMode()) {
+    if (m_delayedDrops.isEmpty() && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode()) {
         QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
         workbench()->update(state);
 
@@ -587,7 +595,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     * Otherwise the user will see uncreated layouts in layout selection menu.
     * As temporary workaround we can just remove that layouts. */
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
-    if (user && !qnSettings->isActiveXMode()) {
+    if (user && !qnRuntime->isActiveXMode()) {
         foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
             if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
                 resourcePool()->removeResource(layout);
@@ -622,7 +630,8 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(Qn::RadassAutoAction)->setChecked(true);
-    qnRedAssController->setMode(Qn::AutoResolution);
+    if (qnRedAssController)
+        qnRedAssController->setMode(Qn::AutoResolution);
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -632,7 +641,7 @@ void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
 
     m_currentUserLayoutsMenu = menu()->newMenu(Qn::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
@@ -1131,7 +1140,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
     if (!server)
         /* If target server is not provided, open the server we are currently connected to. */
-        server = qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>();
+        server = qnCommon->currentServer();
 
     if (!server)
         return;
@@ -1155,8 +1164,9 @@ void QnWorkbenchActionHandler::at_systemUpdateAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UpdatesPage);
 }
 
-void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
-    menu()->trigger(Qn::OpenBusinessLogAction);
+void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
+{
+    QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
@@ -1216,11 +1226,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     }
 
     /* Adjust for chunks. If they are provided, they MUST intersect with period */
-    if(!periods.isEmpty()) {
+    if(!periods.empty()) {
 
         QnTimePeriodList localPeriods = periods.intersected(period);
 
-        qint64 startDelta = localPeriods.first().startTimeMs - period.startTimeMs;
+        qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
         if (startDelta > 0) { //user selected period before the first chunk
             period.startTimeMs += startDelta;
             period.durationMs -= startDelta;
@@ -1350,8 +1360,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         QnTimePeriod localPeriod (time, step);
         QnTimePeriodList localPeriods = periods.intersected(localPeriod);
         qint64 localTime = time;
-        if (!localPeriods.isEmpty())
-            localTime = qMax(localTime, localPeriods.first().startTimeMs);
+        if (!localPeriods.empty())
+            localTime = qMax(localTime, localPeriods.begin()->startTimeMs);
 
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
@@ -1488,7 +1498,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
     QnMediaServerResourcePtr server = servers.first();
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::clearLoaderCache);
+    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->instance<QnCameraDataManager>(), &QnCameraDataManager::clearCache);
 
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
@@ -1748,7 +1758,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         
         if (camera && nodeType == Qn::EdgeNode) {
-            if (mServer = resource->getParentResource().dynamicCast<QnMediaServerResource>())
+            if (mServer = camera->getParentServer())
                 mServer->setName(name);
         }
 
@@ -1789,6 +1799,9 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
         if(!layoutResource)
             return false;
+
+        if (qnResPool->isAutoGeneratedLayout(layoutResource))
+            return true;
 
         return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
     };
@@ -2390,57 +2403,48 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
         latestMsVersion = latestVersion;
 
-    QString components;
+    QStringList messageParts;
+    messageParts << tr("Some components of the system are not updated");
+    messageParts << QString();
+
     foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
         QString component;
         switch(data.component) {
         case Qn::ClientComponent:
-            component = tr("Client v%1<br/>").arg(data.version.toString());
+            component = tr("Client v%1").arg(data.version.toString());
             break;
         case Qn::ServerComponent: {
             QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
             if(resource) {
-                component = tr("Server v%1 at %2<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
+                component = tr("Server v%1 at %2").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
             } else {
-                component = tr("Server v%1<br/>").arg(data.version.toString());
+                component = tr("Server v%1").arg(data.version.toString());
             }
         }
         default:
             break;
         }
 
-        bool updateRequested = false;
-        switch (data.component) {
-        case Qn::ServerComponent:
-            updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
-            break;
-        case Qn::ClientComponent:
-            updateRequested = false;
-            break;
-        default:
-            break;
-        }
+        bool updateRequested = (data.component == Qn::ServerComponent) &&
+            QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
             component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
         
-        components += component;
+        messageParts << component;
     }
 
+    messageParts << QString();
+    messageParts << tr("Please update all components to the latest version %1.").arg(latestMsVersion.toString());
 
-    QString message = tr(
-        "Some components of the system are not updated:<br/>"
-        "<br/>"
-        "%1"
-        "<br/>"
-        "Please update all components to the latest version %2."
-    ).arg(components).arg(latestMsVersion.toString());
+    QString message = messageParts.join(lit("<br/>"));
 
     QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
         new QnWorkbenchStateDependentDialog<QnMessageBox>(mainWindow()));
     messageBox->setIcon(QMessageBox::Warning);
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);
+    messageBox->setTextFormat(Qt::RichText);
     messageBox->setStandardButtons(QMessageBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
@@ -2458,6 +2462,42 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
                          tr("You are running beta version of %1.")
                          .arg(qApp->applicationDisplayName()));
 }
+
+void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
+
+    const QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+
+    /* Check if we are not connected yet. */
+    if (servers.isEmpty())
+        return;
+
+    /* Check if user already made a decision. */
+    if (ec2::Ec2StaticticsReporter::isDefined(servers))
+        return;
+
+    /* Suppress notification if no server has internet access. */
+    bool atLeastOneServerHasInternetAccess = boost::algorithm::any_of(servers, [](const QnMediaServerResourcePtr &server) {
+        return (server->getServerFlags() & Qn::SF_HasPublicIP);
+    });
+    if (!atLeastOneServerHasInternetAccess)
+        return;
+
+    auto result = QMessageBox::information(
+        mainWindow(),
+        tr("Anonymous Usage Statistics"),                                   
+        tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
+           "If you would like to disable this feature you can do so in the System Settings dialog."),
+        QMessageBox::Ok | QMessageBox::Cancel,
+        QMessageBox::Ok);
+
+    if (result == QMessageBox::Ok) {
+        ec2::Ec2StaticticsReporter::setAllowed(servers, true);
+        propertyDictionary->saveParamsAsync(idListFromResList(servers));
+    } else {
+        menu()->triggerIfPossible(Qn::SystemAdministrationAction);
+    }
+}
+
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());

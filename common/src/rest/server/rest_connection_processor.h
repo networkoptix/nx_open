@@ -2,6 +2,8 @@
 #define _REST_CONNECTION_PROCESSOR_H__
 
 #include <QtCore/QVariantList>
+
+#include <utils/network/http/httptypes.h>
 #include "utils/network/tcp_connection_processor.h"
 #include "request_handler.h"
 
@@ -32,7 +34,13 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
 public:
     QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRestConnectionProcessor();
+
     QnUuid authUserId() const;
+
+    //!Rest handler can use following methods to access http request/response directly
+    const nx_http::Request& request() const;
+    nx_http::Response* response() const;
+    QnTcpListener* owner() const;
 protected:
     virtual void run() override;
 

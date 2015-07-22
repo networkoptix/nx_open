@@ -123,7 +123,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     qSort(resolutions.begin(), resolutions.end(), sizeCompare);
 
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_resolution1 = resolutions[0];
         m_resolution2 = QSize(0,0);
 
@@ -212,14 +212,6 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     const int sepPos = cameraFirmwareVersion.indexOf('=');
     setFirmware( QLatin1String( sepPos != -1 ? cameraFirmwareVersion.mid( sepPos+1 ) : cameraFirmwareVersion ) );
 
-    /*
-    CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_resolution1, CODEC_ID_H264 ) );
-    if( m_resolution2.width() > 0 )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_resolution2, CODEC_ID_H264 ) );
-    saveMediaStreamInfoIfNeeded( mediaStreams );
-    */
-
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     //setMotionType( Qn::MT_SoftwareGrid );
     saveParams();
@@ -229,13 +221,13 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
 QSize QnPlIsdResource::getPrimaryResolution() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_resolution1;
 }
 
 QSize QnPlIsdResource::getSecondaryResolution() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_resolution2;
 }
 

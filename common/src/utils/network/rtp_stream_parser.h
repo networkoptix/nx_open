@@ -100,7 +100,7 @@ class QnRtpAudioStreamParser: public QnRtpStreamParser
 public:
     QnRtpAudioStreamParser() {}
 
-    virtual QnResourceAudioLayoutPtr getAudioLayout() = 0;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout() = 0;
     virtual QnAbstractMediaDataPtr nextData() override;
 protected:
     std::deque<QnAbstractMediaDataPtr> m_audioData;

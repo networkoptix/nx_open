@@ -74,17 +74,17 @@ void QnSyncPlayArchiveDelegate::jumpTo (qint64 time)
 
 qint64 QnSyncPlayArchiveDelegate::seek (qint64 time, bool findIFrame)
 {
-    //QMutexLocker lock(&m_mutex);
+    //QnMutexLocker lock( &m_mutex );
     //m_nextData.clear();
     return m_ownerDelegate->seek(time, findIFrame);
 }
 
-QnResourceVideoLayoutPtr QnSyncPlayArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnSyncPlayArchiveDelegate::getVideoLayout()
 {
     return m_ownerDelegate->getVideoLayout();
 }
 
-QnResourceAudioLayoutPtr QnSyncPlayArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnSyncPlayArchiveDelegate::getAudioLayout()
 {
     return m_ownerDelegate->getAudioLayout();
 }

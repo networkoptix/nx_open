@@ -168,7 +168,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     if (uuidFile) {
         QByteArray data = uuidFile->readAll();
         layout->setId(QnUuid(data.data()));
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceById(layout->getId()).dynamicCast<QnLayoutResource>();
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceById<QnLayoutResource>(layout->getId());
         if (existingLayout)
             return existingLayout;
 
@@ -252,7 +252,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
             aviResource->setTimeZoneOffset(timeZoneOffset);
 
         qnResPool->addResource(aviResource);
-        aviResource = qnResPool->getResourceByUniqId(aviResource->getUniqueId()).dynamicCast<QnAviResource>(); // It may have already been in the pool!
+        aviResource = qnResPool->getResourceByUniqueId<QnAviResource>(aviResource->getUniqueId()); // It may have already been in the pool!
         if(!aviResource) {
             qnWarning("ACHTUNG! Total mess up in exported layout loading!");
             continue;

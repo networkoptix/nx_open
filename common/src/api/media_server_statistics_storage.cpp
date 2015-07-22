@@ -74,7 +74,7 @@ void QnMediaServerStatisticsStorage::setFlagsFilter(Qn::StatisticsDeviceType dev
 }
 
 void QnMediaServerStatisticsStorage::update() {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(m_serverId).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
     bool canRequest = server && server->getStatus() == Qn::Online;
 
     if (!m_listeners || m_updateRequests > 0 || !canRequest) {

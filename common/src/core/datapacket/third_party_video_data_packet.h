@@ -22,7 +22,7 @@ public:
         \note Does not call \a videoPacket->addRef
     */
     QnThirdPartyCompressedVideoData(
-        nxcip::VideoDataPacket* videoPacket,
+        nxcip::MediaDataPacket* videoPacket,
         QnMediaContextPtr ctx = QnMediaContextPtr(0) );
     /*!
         \note Calls \a videoPacket->releaseRef
@@ -37,7 +37,7 @@ public:
     virtual size_t dataSize() const override;
 
 private:
-    nxcip::VideoDataPacket* m_videoPacket;
+    nxcip::MediaDataPacket* m_mediaPacket;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

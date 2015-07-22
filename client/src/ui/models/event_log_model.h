@@ -67,8 +67,8 @@ private:
     static QString motionUrl(Column column, const QnBusinessActionData& action);
     static QString formatUrl(const QString& url);
     static QnResourcePtr getResourceById(const QnUuid& id);
-    static QString getResourceNameString(QnUuid id);
-    static QString getUserGroupString(QnBusinessActionParameters::UserGroup value);
+    static QString getResourceNameString(const QnUuid &id);
+    static QString getUserGroupString(QnBusiness::UserGroup value);
 
     void at_resource_removed(const QnResourcePtr &resource);
 

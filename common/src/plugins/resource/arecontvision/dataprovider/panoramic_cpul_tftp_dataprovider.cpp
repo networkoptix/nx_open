@@ -60,14 +60,14 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
     //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
-    QVariant mdresult;
+    QString mdresult;
 
     QnArecontPanoramicResourcePtr res = getResource().dynamicCast<QnArecontPanoramicResource>();
 
-    if (!res->getParamPhysical2(m_motionData + 1, QLatin1String("mdresult"), mdresult))
+    if (!res->getParamPhysicalByChannel(m_motionData + 1, lit("mdresult"), mdresult))
         return QnMetaDataV1Ptr(0);
 
-    if (mdresult.toString() == QLatin1String("no motion"))
+    if (mdresult == lit("no motion"))
     {
         motion->channelNumber = m_motionData;
         return motion; // no motion detected
@@ -77,7 +77,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
     QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
     int zones = avRes->totalMdZones() == 1024 ? 32 : 8;
 
-    QStringList md = mdresult.toString().split(QLatin1Char(' '), QString::SkipEmptyParts);
+    QStringList md = mdresult.split(QLatin1Char(' '), QString::SkipEmptyParts);
     if (md.size() < zones*zones)
         return QnMetaDataV1Ptr(0);
 
@@ -148,7 +148,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     int quality = 15;
 
     {
-        QMutexLocker mutex(&m_mutex);
+        QnMutexLocker mutex( &m_mutex );
 
         h264 = isH264();;
 
@@ -366,24 +366,13 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
 {
-    QMutexLocker mtx(&m_mutex);
+    QnMutexLocker mtx( &m_mutex );
     for (int i = 0; i < 4; ++i)
         if (m_gotKeyFrame[i]<2)  // due to bug of AV panoramic H.264 cam. cam do not send frame with diff resolution of resolution changed. first I frame comes with old resolution
             return true;
 
     return false;
 
-}
-
-void AVPanoramicClientPullSSTFTPStreamreader::updateStreamParamsBasedOnFps()
-{
-    QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnFps();
-}
-
-void AVPanoramicClientPullSSTFTPStreamreader::updateStreamParamsBasedOnQuality()
-{
-    QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality();
-    QnArecontPanoramicResourcePtr avPanoResource = m_resource.dynamicCast<QnArecontPanoramicResource>();
 }
 
 void AVPanoramicClientPullSSTFTPStreamreader::beforeRun()

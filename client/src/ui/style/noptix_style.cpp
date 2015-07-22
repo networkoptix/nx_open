@@ -55,7 +55,6 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_hoverAnimator(new QnNoptixStyleAnimator(this)),
     m_rotationAnimator(new QnNoptixStyleAnimator(this)),
     m_skin(qnSkin),
-    m_globals(qnGlobals),
     m_customizer(qnCustomizer)
 {
     m_branchClosed = m_skin->icon("tree/branch_closed.png");

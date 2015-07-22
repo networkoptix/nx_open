@@ -8,6 +8,7 @@
 
 #include "av_resource.h"
 #include "av_panoramic.h"
+#include "core/resource_management/resource_properties.h"
 
 #define MAX_RESPONSE_LEN (4*1024)
 
@@ -36,7 +37,7 @@ QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider
     return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
-bool QnArecontPanoramicResource::getParamPhysical2(int channel, const QString& name, QVariant &val)
+bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QString& name, QString &val)
 {
     m_mutex.lock();
     m_mutex.unlock();
@@ -63,16 +64,15 @@ bool QnArecontPanoramicResource::getParamPhysical2(int channel, const QString& n
     return true;
 }
 
-bool QnArecontPanoramicResource::setParamPhysical(const QString &param, const QVariant& val )
-{
-    if (setSpecialParam(param, val))
+bool QnArecontPanoramicResource::setParamPhysical(const QString &id, const QString &value) {
+    if (setSpecialParam(id, value))
         return true;
     QUrl devUrl(getUrl());
     for (int i = 1; i <=4 ; ++i)
     {
         CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
-        QString request = QLatin1String("set") + QString::number(i) + QLatin1Char('?') + param + QLatin1Char('=') + val.toString();
+        QString request = QLatin1String("set") + QString::number(i) + QLatin1Char('?') + id + QLatin1Char('=') + value;
 
         if (connection.doGET(request)!=CL_HTTP_SUCCESS)
             if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
@@ -81,18 +81,17 @@ bool QnArecontPanoramicResource::setParamPhysical(const QString &param, const QV
     return true;
 }
 
-bool QnArecontPanoramicResource::setSpecialParam(const QString& name, const QVariant& val)
-{
-    if (name == QLatin1String("resolution"))
+bool QnArecontPanoramicResource::setSpecialParam(const QString &id, const QString& value) {
+    if (id == lit("resolution"))
     {
-        if (val.toString() == QLatin1String("half"))
+        if (value == lit("half"))
             return setResolution(false);
-        if (val.toString() == QLatin1String("full"))
+        if (value == lit("full"))
             return setResolution(true);
     }
-    else if (name == QLatin1String("Quality"))
+    else if (id == lit("Quality"))
     {
-        int q = val.toInt();
+        int q = value.toInt();
         if (q >= 1 && q <= 21)
             return setCamQuality(q);
     }
@@ -109,9 +108,9 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 
     setRegister(3, 100, 10); // sets I frame frequency to 10
 
-    setParamPhysical(QLatin1String("cnannelenable"), 15); // to enable all channels
+    setParamPhysical(lit("cnannelenable"), QString::number(15)); // to enable all channels
 
-    updateFlipState();
+    getVideoLayout(0);
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -175,12 +174,15 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout(
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     Q_UNUSED(dataProvider)
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_layoutMutex);
 
-    const QnConstResourceVideoLayoutPtr layout = QnArecontPanoramicResource::getDefaultVideoLayout();
+    QnConstResourceVideoLayoutPtr layout = QnArecontPanoramicResource::getDefaultVideoLayout();
     const QnCustomResourceVideoLayout* customLayout = dynamic_cast<const QnCustomResourceVideoLayout*>(layout.data());
-    const_cast<QnArecontPanoramicResource*>(this)->updateFlipState();
-    if (m_isRotated && customLayout)
+    if (!customLayout)
+        return layout;
+    auto nonConstThis = const_cast<QnArecontPanoramicResource*>(this);
+    nonConstThis->updateFlipState();
+    if (m_isRotated)
     {
         if (!m_rotatedLayout) {
             m_rotatedLayout.reset( new QnCustomResourceVideoLayout(customLayout->size()) );
@@ -188,7 +190,14 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const Q
             std::reverse(channels.begin(), channels.end());
             m_rotatedLayout->setChannels(channels);
         }
-        return m_rotatedLayout;
+        layout = m_rotatedLayout;
+    }
+
+    QString oldVideoLayout = propertyDictionary->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
+    QString newVideoLayout = layout->toString();
+    if (newVideoLayout != oldVideoLayout) {
+        propertyDictionary->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
+        propertyDictionary->saveParams(getId());
     }
 
     return layout;

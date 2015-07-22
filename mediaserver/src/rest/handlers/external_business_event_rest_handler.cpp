@@ -7,7 +7,6 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
-#include "api/serializer/serializer.h"
 #include "utils/common/synctime.h"
 #include <business/business_event_connector.h>
 
@@ -38,7 +37,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
     else if (eventType.isEmpty())
         errStr = tr("Parameter 'event_type' is absent or empty. \n");
     else {
-        resource= qnResPool->getResourceByUniqId(resourceId);
+        resource= qnResPool->getResourceByUniqueId(resourceId);
         if (!resource) {
             resource= qnResPool->getResourceById(QnUuid(resourceId));
             if (!resource)

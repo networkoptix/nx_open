@@ -495,7 +495,6 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 }
 
 Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameters &parameters) {
-#ifdef QN_ENABLE_BOOKMARKS
     if(!parameters.hasArgument(Qn::TimePeriodRole))
         return Qn::InvisibleAction;
 
@@ -514,22 +513,12 @@ Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameter
     }
 
     return Qn::EnabledAction;
-#else
-    Q_UNUSED(parameters)
-    return Qn::InvisibleAction;
-#endif
 }
 
-
 Qn::ActionVisibility QnModifyBookmarkActionCondition::check(const QnActionParameters &parameters) {
-#ifdef QN_ENABLE_BOOKMARKS
     if(!parameters.hasArgument(Qn::CameraBookmarkRole))
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
-#else
-    Q_UNUSED(parameters)
-    return Qn::InvisibleAction;
-#endif
 }
 
 Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &parameters) {
@@ -1011,7 +1000,7 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
         return Qn::InvisibleAction;
 
     /* Do not check real pointer type to speed up check. */
-    QnResourcePtr desktopCamera = qnResPool->getResourceByUniqId(QnAppServerConnectionFactory::clientGuid());
+    QnResourcePtr desktopCamera = qnResPool->getResourceByUniqueId(qnCommon->moduleGUID().toString());
 #ifdef DESKTOP_CAMERA_DEBUG
     Q_ASSERT_X(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == qnCommon->remoteGUID()), 
         Q_FUNC_INFO, 

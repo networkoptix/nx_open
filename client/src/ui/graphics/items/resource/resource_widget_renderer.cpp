@@ -6,7 +6,7 @@
 #include <camera/gl_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
-#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include "decodedpicturetoopengluploader.h"
 #include "decodedpicturetoopengluploadercontextpool.h"
@@ -66,7 +66,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
         if (m_channelRenderers[i].uploader == 0) {
             RenderingTools renderingTools;
             renderingTools.uploader = new DecodedPictureToOpenGLUploader( m_glContext );
-            renderingTools.uploader->setForceSoftYUV( qnSettings->isSoftwareYuv() );
+            renderingTools.uploader->setForceSoftYUV( qnRuntime->isSoftwareYuv() );
             renderingTools.renderer = new QnGLRenderer( m_glContext, *renderingTools.uploader );
             renderingTools.renderer->setScreenshotInterface(m_screenshotInterface);
             renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());
@@ -218,7 +218,7 @@ void QnResourceWidgetRenderer::setScreenshotInterface(ScreenshotInterface* value
 
 bool QnResourceWidgetRenderer::isEnabled(int channelNumber) const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_renderingEnabled[channelNumber];
 }
 
@@ -228,7 +228,7 @@ void QnResourceWidgetRenderer::setEnabled(int channelNumber, bool enabled)
     if( !ctx.uploader )
         return;
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     m_renderingEnabled[channelNumber] = enabled;
     if( !enabled )
@@ -238,7 +238,7 @@ void QnResourceWidgetRenderer::setEnabled(int channelNumber, bool enabled)
 void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image)
 {
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         if( !m_renderingEnabled[image->channel] )
             return;
@@ -292,13 +292,13 @@ void QnResourceWidgetRenderer::finishPostedFramesRender(int channel)
 }
 
 QSize QnResourceWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_channelScreenSize;
 }
 
 void QnResourceWidgetRenderer::setChannelScreenSize(const QSize &screenSize) {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     m_channelScreenSize = screenSize;
 }
@@ -308,7 +308,7 @@ bool QnResourceWidgetRenderer::constantDownscaleFactor() const {
 }
 
 QSize QnResourceWidgetRenderer::sourceSize() const {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     //return QSize(m_sourceSize.width() * m_panoFactor, m_sourceSize.height());
     return QSize(m_sourceSize.width(), m_sourceSize.height());

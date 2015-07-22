@@ -10,7 +10,7 @@
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 #ifdef Q_OS_MACX
 #include <zlib.h>
 #else
@@ -263,7 +263,7 @@ namespace ec2
         quint64 manualTimerServerSelectionCheckTaskID = 0;
         quint64 internetSynchronizationTaskID = 0;
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = false;
             broadcastSysTimeTaskID = m_broadcastSysTimeTaskID;
             m_broadcastSysTimeTaskID = 0;
@@ -323,7 +323,7 @@ namespace ec2
                  Qt::DirectConnection );
 
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
 
             using namespace std::placeholders;
             if( m_peerType == Qn::PT_Server )
@@ -348,7 +348,7 @@ namespace ec2
 
     qint64 TimeSynchronizationManager::getSyncTime() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return getSyncTimeNonSafe();
     }
 
@@ -357,7 +357,7 @@ namespace ec2
         quint64 localTimePriorityBak = 0;
         quint64 newLocalTimePriority = 0;
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
 
             localTimePriorityBak = m_localTimePriorityKey.toUInt64();
 
@@ -434,7 +434,7 @@ namespace ec2
 
     void TimeSynchronizationManager::peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         peerSystemTimeReceivedNonSafe( tran.params );
 
@@ -448,7 +448,7 @@ namespace ec2
         for( const ApiPeerSystemTimeData& data: tran.params )
         {
             {
-                QMutexLocker lk( &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 peerSystemTimeReceivedNonSafe( data );
             }
             WhileExecutingDirectCall callGuard( this );
@@ -458,7 +458,7 @@ namespace ec2
 
     TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfo() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         const qint64 elapsed = m_monotonicClock.elapsed();
         return TimeSyncInfo(
@@ -469,13 +469,13 @@ namespace ec2
 
     qint64 TimeSynchronizationManager::getMonotonicClock() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_monotonicClock.elapsed();
     }
 
     void TimeSynchronizationManager::forgetSynchronizedTime()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
         m_systemTimeByPeer.clear();
@@ -489,7 +489,7 @@ namespace ec2
 
     QnPeerTimeInfoList TimeSynchronizationManager::getPeerTimeInfoList() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         //list<pair<peerid, time> >
         QnPeerTimeInfoList peers;
@@ -503,7 +503,7 @@ namespace ec2
 
     ApiPeerSystemTimeDataList TimeSynchronizationManager::getKnownPeersSystemTime() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         ApiPeerSystemTimeDataList result;
         result.reserve( m_systemTimeByPeer.size() );
@@ -521,7 +521,7 @@ namespace ec2
     }
 
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
-        QMutexLocker* const lock,
+        QnMutexLockerBase* const lock,
         const QnUuid& remotePeerID,
         qint64 localMonotonicClock,
         qint64 remotePeerSyncTime,
@@ -582,7 +582,9 @@ namespace ec2
     void TimeSynchronizationManager::onNewConnectionEstablished(QnTransactionTransport* transport )
     {
         using namespace std::placeholders;
-        transport->getSocket()->toggleStatisticsCollection( true );
+        auto transportSocket = transport->getSocket();
+        if( transportSocket )
+            transportSocket->toggleStatisticsCollection( true );
         transport->setBeforeSendingChunkHandler( std::bind( &TimeSynchronizationManager::onBeforeSendingTransaction, this, _1, _2 ) );
         transport->setHttpChunkExtensonHandler( std::bind( &TimeSynchronizationManager::onTransactionReceived, this, _1, _2 ) );
     }
@@ -613,7 +615,8 @@ namespace ec2
                 //taking into account tcp connection round trip time
                 unsigned int rttMillis = 0;
                 StreamSocketInfo sockInfo;
-                if( transport->getSocket()->getConnectionStatistics( &sockInfo ) )
+                auto transportSocket = transport->getSocket();
+                if( transportSocket && transportSocket->getConnectionStatistics( &sockInfo ) )
                     rttMillis = sockInfo.rttVar;
 
                 TimeSyncInfo remotePeerTimeSyncInfo;
@@ -629,7 +632,7 @@ namespace ec2
                     rttMillis = 0;
                 }
 
-                QMutexLocker lk( &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 remotePeerTimeSyncUpdate(
                     &lk,
                     transport->remotePeer().id,
@@ -644,7 +647,7 @@ namespace ec2
     void TimeSynchronizationManager::broadcastLocalSystemTime( quint64 taskID )
     {
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( (taskID != m_broadcastSysTimeTaskID) || m_terminated )
                 return;
 
@@ -664,7 +667,7 @@ namespace ec2
         tran.params.peerID = qnCommon->moduleGUID();
         tran.params.timePriorityKey = m_localTimePriorityKey.toUInt64();
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             tran.params.peerSysTime = QDateTime::currentMSecsSinceEpoch();  //currentMSecsSinceEpoch();
         }
         peerSystemTimeReceived( tran ); //remembering own system time
@@ -674,7 +677,7 @@ namespace ec2
     void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( quint64 /*taskID*/ )
     {
         //TODO #ak it is better to run this method on event, not by timeout
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         m_manualTimerServerSelectionCheckTaskID = 0;
         if( m_terminated )
@@ -715,7 +718,7 @@ namespace ec2
     {
         NX_LOG( lit( "TimeSynchronizationManager. TimeSynchronizationManager::syncTimeWithInternet. taskID %1" ).arg( taskID ), cl_logDEBUG2 );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         if( (taskID != m_internetSynchronizationTaskID) || m_terminated )
             return;
@@ -742,7 +745,7 @@ namespace ec2
         quint64 localTimePriorityBak = 0;
         quint64 newLocalTimePriority = 0;
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
 
             localTimePriorityBak = m_localTimePriorityKey.toUInt64();
 
@@ -862,13 +865,13 @@ namespace ec2
 
     void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_systemTimeByPeer.erase( data.peer.id );
     }
 
     void TimeSynchronizationManager::onDbManagerInitialized()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         //restoring local time priority from DB
         QByteArray timePriorityStr;

@@ -56,7 +56,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="4" column="0">
        <widget class="QPushButton" name="cameraListButton">
         <property name="text">
          <string>&amp;Camera List</string>
@@ -73,24 +73,47 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="4" column="1">
        <widget class="QLabel" name="cameraListLabel">
         <property name="text">
          <string notr="true" extracomment="Text set in source file">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="5" column="0">
        <widget class="QPushButton" name="healthMonitorButton">
         <property name="text">
          <string>&amp;Health Monitoring</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="5" column="1">
        <widget class="QLabel" name="healthMonitoringLabel">
         <property name="text">
          <string>Open all servers statistics on one layout</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QPushButton" name="bookmarksButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>&amp;Bookmarks</string>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+B</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="bookmarksLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks(&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -100,7 +123,7 @@
    <item>
     <widget class="QGroupBox" name="camerasGroupBox">
      <property name="title">
-      <string>Camera Management</string>
+      <string>System Settings</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>

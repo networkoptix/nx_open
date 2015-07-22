@@ -11,7 +11,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-
+#include <core/resource/camera_history.h>
 #include <utils/common/product_features.h>
 #include <utils/common/timermanager.h>
 
@@ -31,6 +31,9 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
     loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"), false);
 
+    instance<QnResourcePool>();
+    instance<QnCameraHistoryPool>();
+
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
     m_transcodingDisabled = false;
@@ -45,16 +48,18 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     /* Can't use resourceChanged signal because it's not emited when we are saving server locally. */
     connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::updateModuleInformation);
     connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::updateModuleInformation);
+    connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::updateModuleInformation);
 }
 
 void QnCommonModule::bindModuleinformation(const QnUserResourcePtr &adminUser) {
     connect(adminUser.data(),   &QnUserResource::resourceChanged,   this,   &QnCommonModule::updateModuleInformation);
     connect(adminUser.data(),   &QnUserResource::hashChanged,       this,   &QnCommonModule::updateModuleInformation);
+    connect(adminUser.data(),   &QnUserResource::hashChanged,       this,   &QnCommonModule::updateModuleInformation);
 }
 
 void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (m_remoteUuid == guid)
             return;
         m_remoteUuid = guid;
@@ -63,17 +68,24 @@ void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
 }
 
 QnUuid QnCommonModule::remoteGUID() const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_remoteUuid;
 }
 
+QnMediaServerResourcePtr QnCommonModule::currentServer() const {
+    QnUuid serverId = remoteGUID();
+    if (serverId.isNull())
+        return QnMediaServerResourcePtr();
+    return qnResPool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
+}
+
 QnSoftwareVersion QnCommonModule::engineVersion() const {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     return m_engineVersion;
 }
 
 void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     m_engineVersion = version;
 }
 
@@ -93,7 +105,7 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInfor
 {
     bool isSystemNameChanged = false;
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk( &m_mutex );
         if (m_moduleInformation == moduleInformation)
             return;
 
@@ -107,7 +119,7 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInfor
 
 QnModuleInformation QnCommonModule::moduleInformation() const
 {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     return m_moduleInformation;
 }
 
@@ -118,15 +130,16 @@ void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QStrin
 }
 
 void QnCommonModule::updateModuleInformation() {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     QnModuleInformation moduleInformationCopy = m_moduleInformation;
     lk.unlock();
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleGUID()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleGUID());
     if (server) {
         QnModuleInformation moduleInformation = server->getModuleInformation();
         moduleInformationCopy.port = moduleInformation.port;
         moduleInformationCopy.name = moduleInformation.name;
+        moduleInformationCopy.flags = moduleInformation.flags;
     }
 
     QnUserResourcePtr admin = qnResPool->getAdministrator();

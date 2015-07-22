@@ -2,7 +2,7 @@
 #define __UNIVERSAL_TCP_LISTENER_H__
 
 #include <QMultiMap>
-#include <QWaitCondition>
+#include <utils/thread/wait_condition.h>
 #include <QtCore/QElapsedTimer>
 
 #include "utils/network/tcp_listener.h"
@@ -95,9 +95,9 @@ private:
 
     QList<HandlerInfo> m_handlers;
     ProxyInfo m_proxyInfo;
-    QMutex m_proxyMutex;
+    QnMutex m_proxyMutex;
     QMap<QString, QList<AwaitProxyInfo>> m_proxyPool;
-    QWaitCondition m_proxyCondition;
+    QnWaitCondition m_proxyCondition;
     bool m_needAuth;
 };
 

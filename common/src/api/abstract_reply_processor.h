@@ -7,7 +7,9 @@
 
 #include <rest/server/json_rest_result.h>
 #include <utils/common/warnings.h>
+
 #include <utils/serialization/json.h>
+#include <utils/serialization/compressed_time.h>
 
 #include "abstract_connection.h"
 
@@ -89,6 +91,42 @@ protected:
         }
 
         emitFinished(derived, status, reply, handle, errorString);
+    }
+
+    template<class T, class Derived>
+    void processFusionReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
+        int status = response.status;
+        QString errorString = QString::fromUtf8(response.errorString);
+
+        T reply;
+        if(status == 0) {
+            bool jsonDeserialized = QJson::deserialize(response.data, &reply);
+            if (!jsonDeserialized) {
+#ifdef JSON_REPLY_DEBUG
+                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+#endif
+                status = 1;
+            }
+        } else {
+#ifdef JSON_REPLY_DEBUG
+            qnWarning("Error processing request: %1.", response.errorString);
+#endif
+        }
+
+        emitFinished(derived, status, reply, handle, errorString);
+    }
+
+    template<class T, class Derived>
+    void processCompressedPeriodsReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
+        int status = response.status;
+        T reply;
+        if(status == 0) {
+            bool success = true;
+            reply = QnCompressedTime::deserialized(response.data, T(), &success);
+            if (!success)
+                status = 1;
+        } 
+        emitFinished(derived, status, reply, handle, QString::fromUtf8(response.errorString));
     }
 
 private:

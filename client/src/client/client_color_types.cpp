@@ -47,13 +47,16 @@ QnBackgroundColors::QnBackgroundColors() {
     panic = QColor(255, 0, 0, 255);
 }
 
-QnCalendarColors::QnCalendarColors() {
-    selection = QColor(0, 150, 255, 192);
-    primaryRecording = QColor(32, 128, 32, 255);
-    secondaryRecording = QColor(32, 255, 32, 255);
-    primaryMotion = QColor(128, 0, 0, 255);
-    secondaryMotion = QColor(255, 0, 0, 255);
-    separator = QColor(0, 0, 0, 255);
+QnCalendarColors::QnCalendarColors()
+    : selection(0, 150, 255, 192)
+    , primaryRecording(32, 128, 32, 255)
+    , secondaryRecording(32, 255, 32, 255)
+    , primaryBookmark(55, 117, 196, 255)
+    , secondaryBookmark(105, 164, 240, 255)
+    , primaryMotion(128, 0, 0, 255)
+    , secondaryMotion(255, 0, 0, 255)
+    , separator(0, 0, 0, 255)
+{
 }
 
 QnStatisticsColors::QnStatisticsColors() {

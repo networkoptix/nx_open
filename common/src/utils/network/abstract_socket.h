@@ -67,7 +67,7 @@ public:
         \param val Filled with flag value in case of success. In case of error undefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getReuseAddrFlag( bool* val ) = 0;
+    virtual bool getReuseAddrFlag( bool* val ) const = 0;
     //!if \a val is \a true turns non-blocking mode on, else turns it off
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -83,7 +83,7 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getMtu( unsigned int* mtuValue ) = 0;
+    virtual bool getMtu( unsigned int* mtuValue ) const = 0;
     //!Set socket's send buffer size (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -93,7 +93,7 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getSendBufferSize( unsigned int* buffSize ) = 0;
+    virtual bool getSendBufferSize( unsigned int* buffSize ) const = 0;
     //!Set socket's receive buffer (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -103,7 +103,7 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getRecvBufferSize( unsigned int* buffSize ) = 0;
+    virtual bool getRecvBufferSize( unsigned int* buffSize ) const = 0;
     //!Change socket's receive timeout (in millis)
     /*!
         \param ms. New timeout value. 0 - no timeout
@@ -116,7 +116,7 @@ public:
         \param millis In case of error value is udefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getRecvTimeout( unsigned int* millis ) = 0;
+    virtual bool getRecvTimeout( unsigned int* millis ) const = 0;
     //!Change socket's send timeout (in millis)
     /*!
         \param ms. New timeout value. 0 - no timeout
@@ -129,12 +129,12 @@ public:
         \param millis In case of error value is udefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getSendTimeout( unsigned int* millis ) = 0;
+    virtual bool getSendTimeout( unsigned int* millis ) const = 0;
     //!Get socket's last error code. Needed in case of \a aio::etError
     /*!
         \return \a true if read error code successfully, \a false otherwise
     */
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) = 0;
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const = 0;
     //!Returns system-specific socket handle
     /*!
         TODO: #ak remove this method after complete move to the new socket
@@ -177,21 +177,21 @@ public:
 
     //!Establish connection to specified foreign address
     /*!
-        \param foreignAddress foreign address (IP address or name)
-        \param foreignPort foreign port
+        \param remoteSocketAddress remote address (IP address or name) and port
         \param timeoutMillis connection timeout, 0 - no timeout
         \return false if unable to establish connection
     */
+    virtual bool connect(
+        const SocketAddress& remoteSocketAddress,
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
     bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS )
     {
+        //TODO #ak this method MUST replace the previous one
         return connect( SocketAddress(foreignAddress, foreignPort), timeoutMillis );
     }
-    virtual bool connect(
-        const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
     //!Read into the given \a buffer up to \a bufferLen bytes data from this socket
     /*!
         Call \a AbstractCommunicatingSocket::connect() before calling \a AbstractCommunicatingSocket::recv()
@@ -329,7 +329,7 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool getNoDelay( bool* value ) = 0;
+    virtual bool getNoDelay( bool* value ) const = 0;
     //!Enable collection of socket statistics
     /*!
         \param val \a true - enable, \a false - diable
@@ -405,6 +405,11 @@ public:
         {
             return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::forward<HandlerType>(handler) ) );
         }
+    //!
+    /*!
+        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
+    */
+    virtual void cancelAsyncIO( bool waitForRunningHandlerCompletion = true ) = 0;
 
 protected:
     virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) = 0;

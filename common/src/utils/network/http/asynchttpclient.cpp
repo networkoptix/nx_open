@@ -9,12 +9,16 @@
 #include <mutex>
 
 #include <QtCore/QCryptographicHash>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
+#include <http/custom_headers.h>
+#include <utils/common/log.h>
 #include <utils/common/util.h>
-#include "utils/network/socket_factory.h"
-#include "../../common/log.h"
-#include "../../common/systemerror.h"
+#include <utils/network/socket_factory.h>
+#include <utils/common/systemerror.h>
+
+#include "auth_tools.h"
+#include "version.h"
 
 
 //TODO: #ak persistent connection support
@@ -58,7 +62,7 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> result = m_socket;
 
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = true;
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
@@ -73,7 +77,7 @@ namespace nx_http
     void AsyncHttpClient::terminate()
     {
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return;
             m_terminated = true;
@@ -110,7 +114,7 @@ namespace nx_http
     bool AsyncHttpClient::doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody )
+        const nx_http::StringType& messageBody)
     {
         resetDataBeforeNewRequest();
         m_url = url;
@@ -118,8 +122,29 @@ namespace nx_http
         m_request.headers.insert( make_pair("Content-Type", contentType) );
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
+        m_request.headers.insert( make_pair("Content-Encoding", "identity") );
         m_request.messageBody = messageBody;
         return initiateHttpMessageDelivery( url );
+    }
+
+    bool AsyncHttpClient::doPut(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        const nx_http::StringType& messageBody )
+    {
+        resetDataBeforeNewRequest();
+        m_url = url;
+        composeRequest( nx_http::Method::PUT );
+        m_request.headers.insert( make_pair("Content-Type", contentType) );
+        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
+        //TODO #ak support chunked encoding & compression
+        m_request.messageBody = messageBody;
+        return initiateHttpMessageDelivery( url );
+    }
+
+    const nx_http::Request& AsyncHttpClient::request() const
+    {
+        return m_request;
     }
 
     /*!
@@ -142,6 +167,19 @@ namespace nx_http
         return contentTypeIter->second;
     }
 
+    bool AsyncHttpClient::hasRequestSuccesed() const
+    {
+        if (state() == sFailed)
+            return false;
+
+        if (auto resp = response())
+        {
+            auto status = resp->statusLine.statusCode;
+            return status >= 200 && status < 300; // SUCCESS codes 2XX
+        }
+        return false;
+    }
+
     //!Returns current message body buffer, clearing it
     BufferType AsyncHttpClient::fetchMessageBodyBuffer()
     {
@@ -155,7 +193,7 @@ namespace nx_http
 
     quint64 AsyncHttpClient::totalBytesRead() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_totalBytesRead;
     }
 
@@ -199,16 +237,11 @@ namespace nx_http
         m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
     }
 
-    void AsyncHttpClient::setDecodeChunkedMessageBody( bool val )
-    {
-        m_httpStreamReader.setDecodeChunkedMessageBody( val );
-    }
-
     void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
@@ -253,7 +286,7 @@ namespace nx_http
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
@@ -270,7 +303,7 @@ namespace nx_http
             if( reconnectIfAppropriate() )
                 return;
             NX_LOG( lit( "Error sending (1) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+            m_state = sFailed;
             lk.unlock();
             emit done( sharedThis );
             lk.relock();
@@ -315,7 +348,7 @@ namespace nx_http
 
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
@@ -326,7 +359,11 @@ namespace nx_http
             if( reconnectIfAppropriate() )
                 return;
             NX_LOG(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+            m_state = 
+                ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
+                    m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
+                ? sDone
+                : sFailed;
             lk.unlock();
             emit done( sharedThis );
             lk.relock();
@@ -388,12 +425,14 @@ namespace nx_http
                     arg( QLatin1String( m_httpStreamReader.message().response->statusLine.reasonPhrase ) ), cl_logDEBUG2 );
 
                 const Response* response = m_httpStreamReader.message().response;
-                if( response->statusLine.statusCode == StatusCode::unauthorized
-                    && !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
+                if( response->statusLine.statusCode == StatusCode::unauthorized )
                 {
-                    //trying authorization
-                    if( resendRequestWithAuthorization( *response ) )
-                        return;
+                    if( !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
+                    {
+                        //trying authorization
+                        if( resendRequestWithAuthorization( *response ) )
+                            return;
+                    }
                 }
 
                 const bool messageHasMessageBody =
@@ -505,7 +544,7 @@ namespace nx_http
     {
         //stopping client, if it is running
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = true;
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
@@ -513,7 +552,7 @@ namespace nx_http
             m_socket->cancelAsyncIO();
 
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = false;
         }
 
@@ -580,7 +619,7 @@ namespace nx_http
 
         m_state = sInit;
 
-        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
+        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(m_url.scheme() == lit("https")));
         m_connectionClosed = false;
         if( !m_socket->setNonBlockingMode( true ) ||
             !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
@@ -629,6 +668,8 @@ namespace nx_http
 
         m_totalBytesRead += bytesRead;
 
+        //TODO #ak m_httpStreamReader is allowed to process not all bytes in m_responseBuffer. MUST support this!
+
         if( !m_httpStreamReader.parseBytes( m_responseBuffer, bytesRead ) )
         {
             NX_LOG( lit("Error parsing http response from %1. %2").
@@ -663,21 +704,21 @@ namespace nx_http
         nx_http::insertOrReplaceHeader(
             &m_request.headers,
             HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
-        nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("Connection", "keep-alive") );
-        if( !m_userAgent.isEmpty() )
-            m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
+        m_request.headers.emplace(
+            "User-Agent",
+            m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1() );
         if( useHttp11 )
         {
             if( httpMethod == nx_http::Method::GET || httpMethod == nx_http::Method::HEAD )
             {
-                m_request.headers.insert( std::make_pair("Accept", "*/*") );
+                //m_request.headers.insert( std::make_pair("Accept", "*/*") );
                 if( m_contentEncodingUsed )
-                    m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip;q=1.0, identity;q=0.5, *;q=0") );
-                else
-                    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
+                    m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip") );
+                //else
+                //    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
             }
             //m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
-            //m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
+            m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
             m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
         }
 
@@ -692,10 +733,22 @@ namespace nx_http
         //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
         if( !m_userName.isEmpty() )
-            nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("X-Nx-User-Name", m_userName.toUtf8()) );
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()) );
 
-        //not using Basic authentication by default, since it is not secure
-        nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+        //if that url has already been authenticated, adding same authentication info to the request
+        //first request per tcp-connection always uses authentication
+        //    This is done due to limited AuthInfoCache implementation
+        if( m_authCacheItem.url.isEmpty() ||
+            !AuthInfoCache::instance()->addAuthorizationHeader(
+                m_url,
+                &m_request,
+                &m_authCacheItem ) )
+        {
+            //not using Basic authentication by default, since it is not secure
+            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+        }
     }
 
     void AsyncHttpClient::addAdditionalHeader(const StringType& key, const StringType& value)
@@ -708,6 +761,12 @@ namespace nx_http
         m_additionalHeaders.erase( key );
     }
 
+    void AsyncHttpClient::addRequestHeaders(const HttpHeaders& headers)
+    {
+        for (HttpHeaders::const_iterator itr = headers.begin(); itr != headers.end(); ++itr)
+            m_additionalHeaders.emplace( itr->first, itr->second);
+    }
+
     void AsyncHttpClient::serializeRequest()
     {
         m_requestBuffer.clear();
@@ -715,142 +774,10 @@ namespace nx_http
         m_requestBytesSent = 0;
     }
 
-#if 0
-    bool AsyncHttpClient::sendRequest()
-    {
-        Q_ASSERT( (int)m_requestBytesSent < m_requestBuffer.size() );
-        int bytesSent = m_socket->send( m_requestBuffer.data()+m_requestBytesSent, m_requestBuffer.size()-m_requestBytesSent );
-        if( bytesSent == -1 )
-            return (SystemError::getLastOSErrorCode() == SystemError::wouldBlock) || (SystemError::getLastOSErrorCode() == SystemError::again);
-        m_requestBytesSent += bytesSent;    //TODO #ak it would be very usefull to use buffer with effective pop_front()
-        return true;
-    }
-#endif
-
     bool AsyncHttpClient::reconnectIfAppropriate()
     {
         //TODO #ak we need reconnect and request entity from the point we stopped at
         return false;
-    }
-
-    QByteArray AsyncHttpClient::calcHa1(
-        const QByteArray& userName,
-        const QByteArray& realm,
-        const QByteArray& userPassword )
-    {
-        QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
-        md5HashCalc.addData( userName );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( realm );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( userPassword );
-        return md5HashCalc.result().toHex();
-    }
-
-    QByteArray AsyncHttpClient::calcHa2(
-        const QByteArray& method,
-        const QByteArray& uri )
-    {
-        QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
-        md5HashCalc.addData( method );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( uri );
-        return md5HashCalc.result().toHex();
-    }
-
-    QByteArray AsyncHttpClient::calcResponse(
-        const QByteArray& ha1,
-        const QByteArray& nonce,
-        const QByteArray& ha2 )
-    {
-        QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
-        md5HashCalc.addData( ha1 );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( nonce );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( ha2 );
-        return md5HashCalc.result().toHex();
-    }
-
-    QByteArray AsyncHttpClient::calcResponseAuthInt(
-        const QByteArray& ha1,
-        const QByteArray& nonce,
-        const QByteArray& nonceCount,
-        const QByteArray& clientNonce,
-        const QByteArray& qop,
-        const QByteArray& ha2 )
-    {
-        QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
-        md5HashCalc.addData( ha1 );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( nonce );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( nonceCount );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( clientNonce );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( qop );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( ha2 );
-        return md5HashCalc.result().toHex();
-    }
-
-    bool AsyncHttpClient::calcDigestResponse(
-        const QByteArray& method,
-        const QString& userName,
-        const boost::optional<QString>& userPassword,
-        const boost::optional<QByteArray>& predefinedHA1,
-        const QUrl& url,
-        const header::WWWAuthenticate& wwwAuthenticateHeader,
-        header::DigestAuthorization* const digestAuthorizationHeader )
-    {
-        if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
-            return false;
-
-        //reading params
-        QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
-        const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
-        QMap<BufferType, BufferType>::const_iterator realmIter = wwwAuthenticateHeader.params.find("realm");
-        const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
-        QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
-        const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
-
-        if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
-            return false;   //qop=auth-int is not supported
-
-        const BufferType& ha1 = predefinedHA1
-            ? predefinedHA1.get()
-            : calcHa1(
-                userName.toLatin1(),
-                realm,
-                userPassword ? userPassword.get().toLatin1() : QByteArray() );
-        //HA2, qop=auth-int is not supported
-        const BufferType& ha2 = calcHa2(
-            method,
-            url.path().toLatin1() );
-        //response
-        digestAuthorizationHeader->addParam( "username", userName.toLatin1() );
-        digestAuthorizationHeader->addParam( "realm", realm );
-        digestAuthorizationHeader->addParam( "nonce", nonce );
-        digestAuthorizationHeader->addParam( "uri", url.path().toLatin1() );
-
-        const BufferType nonceCount = "00000001";     //TODO #ak generate it
-        const BufferType clientNonce = "0a4f113b";    //TODO #ak generate it
-
-        QByteArray digestResponse;
-        if( qop.isEmpty() )
-        {
-            digestResponse = calcResponse( ha1, nonce, ha2 );
-        }
-        else
-        {
-            digestResponse = calcResponseAuthInt( ha1, nonce, nonceCount, clientNonce, qop, ha2 );
-            digestAuthorizationHeader->addParam( "qop", qop );
-            digestAuthorizationHeader->addParam( "nc", nonceCount );
-            digestAuthorizationHeader->addParam( "cnonce", clientNonce );
-        }
-        digestAuthorizationHeader->addParam( "response", digestResponse );
-        return true;
     }
 
     bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
@@ -866,81 +793,61 @@ namespace nx_http
         wwwAuthenticateHeader.parse( wwwAuthenticateIter->second );
         if( wwwAuthenticateHeader.authScheme == header::AuthScheme::basic )
         {
+            header::BasicAuthorization basicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() );
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader(
                     header::Authorization::NAME,
-                    header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+                    basicAuthorization.serialized() ) );
+            //TODO #ak MUST add to cache only after OK response
+            m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
+                m_url,
+                m_request.requestLine.method,
+                m_userName.toLatin1(),
+                m_userPassword.toLatin1(),
+                boost::optional<BufferType>(),
+                std::move(wwwAuthenticateHeader),
+                std::move(basicAuthorization) );
+            AuthInfoCache::instance()->cacheAuthorization( m_authCacheItem );
         }
         else if( wwwAuthenticateHeader.authScheme == header::AuthScheme::digest )
         {
-            //reading params
-            QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
-            const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
-            QMap<BufferType, BufferType>::const_iterator realmIter = wwwAuthenticateHeader.params.find("realm");
-            const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
-            QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
-            const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
-
-            if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
-                return false;   //qop=auth-int is not supported
-
-            BufferType ha1;
-            QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
-            if (m_authType == authDigestWithPasswordHash) {
-                ha1 = m_userPassword.toUtf8();
-            }
-            else {
-                //HA1
-                md5HashCalc.addData( m_userName.toLatin1() );
-                md5HashCalc.addData( ":" );
-                md5HashCalc.addData( realm );
-                md5HashCalc.addData( ":" );
-                md5HashCalc.addData( m_userPassword.toLatin1() );
-                ha1 = md5HashCalc.result().toHex();
-            }
-            //HA2, qop=auth-int is not supported
-            md5HashCalc.reset();
-            md5HashCalc.addData( m_request.requestLine.method );
-            md5HashCalc.addData( ":" );
-            md5HashCalc.addData( m_url.path().toLatin1() );
-            const BufferType& ha2 = md5HashCalc.result().toHex();
-            //response
             header::DigestAuthorization digestAuthorizationHeader;
-            digestAuthorizationHeader.addParam( "username", m_userName.toLatin1() );
-            digestAuthorizationHeader.addParam( "realm", realm );
-            digestAuthorizationHeader.addParam( "nonce", nonce );
-            digestAuthorizationHeader.addParam( "uri", m_url.path().toLatin1() );
-            md5HashCalc.reset();
-            md5HashCalc.addData( ha1 );
-            md5HashCalc.addData( ":" );
-            md5HashCalc.addData( nonce );
-            md5HashCalc.addData( ":" );
-            if( !qop.isEmpty() )
+            if( !calcDigestResponse(
+                    m_request.requestLine.method,
+                    m_userName.toUtf8(),
+                    m_authType != authDigestWithPasswordHash
+                        ? m_userPassword.toUtf8()
+                        : boost::optional<nx_http::BufferType>(),
+                    m_authType == authDigestWithPasswordHash
+                        ? m_userPassword.toLatin1()
+                        : boost::optional<nx_http::BufferType>(),
+                    m_url,
+                    wwwAuthenticateHeader,
+                    &digestAuthorizationHeader ) )
             {
-                const BufferType nonceCount = "00000001";     //TODO/IMPL
-                const BufferType clientNonce = "0a4f113b";    //TODO/IMPL
-
-                md5HashCalc.addData( nonceCount );
-                md5HashCalc.addData( ":" );
-                md5HashCalc.addData( clientNonce );
-                md5HashCalc.addData( ":" );
-                md5HashCalc.addData( qop );
-                md5HashCalc.addData( ":" );
-
-                digestAuthorizationHeader.addParam( "qop", qop );
-                digestAuthorizationHeader.addParam( "nc", nonceCount );
-                digestAuthorizationHeader.addParam( "cnonce", clientNonce );
+                return false;
             }
-            md5HashCalc.addData( ha2 );
-            digestAuthorizationHeader.addParam( "response", md5HashCalc.result().toHex() );
-
             BufferType authorizationStr;
             digestAuthorizationHeader.serialize( &authorizationStr );
 
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
+            //TODO #ak MUST add to cache only after OK response
+            m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
+                m_url,
+                m_request.requestLine.method,
+                m_userName.toLatin1(),
+                m_authType == authDigestWithPasswordHash
+                    ? boost::optional<BufferType>()
+                    : boost::optional<BufferType>(m_userPassword.toLatin1()),
+                m_authType == authDigestWithPasswordHash
+                    ? boost::optional<BufferType>(m_userPassword.toLatin1())
+                    : boost::optional<BufferType>(),
+                std::move(wwwAuthenticateHeader),
+                std::move(digestAuthorizationHeader) );
+            AuthInfoCache::instance()->cacheAuthorization( m_authCacheItem );
         }
         else
         {
@@ -981,12 +888,30 @@ namespace nx_http
         m_authType = value;
     }
 
+    AuthInfoCache::AuthorizationCacheItem AsyncHttpClient::authCacheItem() const
+    {
+        return m_authCacheItem;
+    }
+
+
+    /**********************************************************
+    * utils
+    ***********************************************************/
 
     bool downloadFileAsync(
         const QUrl& url,
-        std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler )
+        std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders,
+        const QAuthenticator &auth)
     {
-        nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();
+        nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();       
+        httpClientCaptured->addRequestHeaders(extraHeaders);
+        if (!auth.isNull()) {
+            httpClientCaptured->setUserName(auth.user());
+            httpClientCaptured->setUserPassword(auth.password());
+            httpClientCaptured->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+        }
+
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
             ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {

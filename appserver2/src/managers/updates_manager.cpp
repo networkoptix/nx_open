@@ -17,7 +17,6 @@ namespace ec2 {
     ////////////////////////////////////////////////////////////
     QnUpdatesNotificationManager::QnUpdatesNotificationManager()
     {
-        connect(QnTransactionMessageBus::instance(), &QnTransactionMessageBus::transactionProcessed, this, &QnUpdatesNotificationManager::at_transactionProcessed);
     }
 
     void QnUpdatesNotificationManager::triggerNotification(const QnTransaction<ApiUpdateUploadData> &transaction) {
@@ -32,18 +31,8 @@ namespace ec2 {
 
     void QnUpdatesNotificationManager::triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction) {
         assert(transaction.command == ApiCommand::installUpdate);
-        m_requestedUpdateIds.insert(transaction.persistentInfo, transaction.params.updateId);
-    }
-
-    void QnUpdatesNotificationManager::at_transactionProcessed(const QnAbstractTransaction &transaction) {
-        if (transaction.command != ApiCommand::installUpdate)
-            return;
-
-        QString requestedUpdateId = m_requestedUpdateIds.take(transaction.persistentInfo);
-        if (requestedUpdateId.isEmpty())
-            return;
-
-        emit updateInstallationRequested(requestedUpdateId);
+        //TODO: #2.4 #rvasilenko #dklychkov Implement a mechanism to determine the transaction was successfully sent to the other peers, then emit this signal.
+        emit updateInstallationRequested(transaction.params.updateId);
     }
 
 

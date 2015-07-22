@@ -40,7 +40,7 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
         }
 
         // check for manual camera
-        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(uniqueID).dynamicCast<QnSecurityCamResource>();
+        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(uniqueID);
         if( !camera )
             continue;
 

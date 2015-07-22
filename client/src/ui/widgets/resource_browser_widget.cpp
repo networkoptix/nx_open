@@ -16,6 +16,7 @@
 #include <camera/camera_thumbnail_manager.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <common/common_meta_types.h>
 
@@ -305,7 +306,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
         return;
     }
 
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode())
         return;
 
     QnActionManager *manager = context()->menu();

@@ -9,8 +9,8 @@
 #include <map>
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
@@ -25,6 +25,7 @@
 #include "transaction/json_transaction_serializer.h"
 #include "transaction/transaction.h"
 #include "utils/serialization/ubjson.h"
+#include "http/custom_headers.h"
 
 
 namespace ec2
@@ -40,7 +41,7 @@ namespace ec2
     public:
         virtual ~ClientQueryProcessor()
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             while( !m_runningHttpRequests.empty() )
             {
                 nx_http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
@@ -88,7 +89,7 @@ namespace ec2
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( !httpClient->doPost(requestUrl, Qn::serializationFormatToHttpContentType(format), tranBuffer) )
             {
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );
@@ -117,7 +118,7 @@ namespace ec2
 
             //TODO #ak videowall looks strange here
             if (!QnAppServerConnectionFactory::videowallGuid().isNull())
-                httpClient->addAdditionalHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
@@ -127,7 +128,7 @@ namespace ec2
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( !httpClient->doGet( requestUrl ) )
             {
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure, OutputData() ) );
@@ -142,7 +143,7 @@ namespace ec2
         {
             std::function<void()> handler;
             {
-                QMutexLocker lk( &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 auto it = m_runningHttpRequests.find( httpClient );
                 assert( it != m_runningHttpRequests.end() );
                 handler = std::move(it->second);
@@ -154,7 +155,7 @@ namespace ec2
         }
 
     private:
-        QMutex m_mutex;
+        QnMutex m_mutex;
         std::map<nx_http::AsyncHttpClientPtr, std::function<void()> > m_runningHttpRequests;
 
         template<class OutputData, class HandlerType>

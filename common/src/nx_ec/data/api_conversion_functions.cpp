@@ -1,7 +1,5 @@
 #include "api_conversion_functions.h"
 
-#include <api/serializer/serializer.h>
-
 #include <utils/serialization/json.h>
 
 #include <business/business_event_parameters.h>
@@ -30,7 +28,7 @@
 #include "api_camera_attributes_data.h"
 #include "api_camera_data_ex.h"
 #include "api_camera_bookmark_data.h"
-#include "api_camera_server_item_data.h"
+#include "api_camera_history_data.h"
 #include "api_email_data.h"
 #include "api_full_info_data.h"
 #include "api_layout_data.h"
@@ -55,14 +53,14 @@ void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &d
 
     dst->setEventResources(QVector<QnUuid>::fromStdVector(src.eventResourceIds));
 
-    dst->setEventParams(QnBusinessEventParameters::fromBusinessParams(deserializeBusinessParams(src.eventCondition)));
+    dst->setEventParams(QJson::deserialized<QnBusinessEventParameters>(src.eventCondition));
 
     dst->setEventState(src.eventState);
     dst->setActionType(src.actionType);
 
     dst->setActionResources(QVector<QnUuid>::fromStdVector(src.actionResourceIds));
 
-    dst->setActionParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.actionParams)));
+    dst->setActionParams(QJson::deserialized<QnBusinessActionParameters>(src.actionParams));
 
     dst->setAggregationPeriod(src.aggregationPeriod);
     dst->setDisabled(src.disabled);
@@ -78,8 +76,8 @@ void fromResourceToApi(const QnBusinessEventRulePtr &src, ApiBusinessRuleData &d
     dst.eventResourceIds = src->eventResources().toStdVector();
     dst.actionResourceIds = src->actionResources().toStdVector();
 
-    dst.eventCondition = serializeBusinessParams(src->eventParams().toBusinessParams());
-    dst.actionParams = serializeBusinessParams(src->actionParams().toBusinessParams());
+    dst.eventCondition = QJson::serialized(src->eventParams());
+    dst.actionParams = QJson::serialized(src->actionParams());
 
     dst.eventState = src->eventState();
     dst.actionType = src->actionType();
@@ -112,22 +110,22 @@ void fromResourceToApi(const QnAbstractBusinessActionPtr &src, ApiBusinessAction
     dst.receivedFromRemoteHost = src->isReceivedFromRemoteHost();
     dst.resourceIds = src->getResources().toStdVector();
 
-    dst.params = serializeBusinessParams(src->getParams().toBusinessParams());
-    dst.runtimeParams = serializeBusinessParams(src->getRuntimeParams().toBusinessParams());
+    dst.params = QJson::serialized(src->getParams());
+    dst.runtimeParams = QJson::serialized(src->getRuntimeParams());
 
     dst.ruleId = src->getBusinessRuleId();
     dst.aggregationCount = src->getAggregationCount();
 }
 
 void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActionPtr &dst, QnResourcePool *) {
-    dst = QnBusinessActionFactory::createAction(static_cast<QnBusiness::ActionType>(src.actionType), QnBusinessEventParameters::fromBusinessParams(deserializeBusinessParams(src.runtimeParams)));
+    dst = QnBusinessActionFactory::createAction(src.actionType, QJson::deserialized<QnBusinessEventParameters>(src.runtimeParams));
 
     dst->setToggleState(src.toggleState);
     dst->setReceivedFromRemoteHost(src.receivedFromRemoteHost);
 
     dst->setResources(QVector<QnUuid>::fromStdVector(src.resourceIds));
 
-    dst->setParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.params)));
+    dst->setParams(QJson::deserialized<QnBusinessActionParameters>(src.params));
 
     dst->setBusinessRuleId(src.ruleId);
     dst->setAggregationCount(src.aggregationCount);
@@ -272,7 +270,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.audioEnabled = src->audioEnabled;
     dst.secondaryStreamQuality = src->secondaryQuality;
     dst.controlEnabled = !src->cameraControlDisabled;
-    dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->dewarpingParams);
+    dst.dewarpingParams = QJson::serialized(src->dewarpingParams);
     dst.minArchiveDays = src->minDays;
     dst.maxArchiveDays = src->maxDays;
     dst.preferedServerId = src->preferedServerId;
@@ -334,53 +332,6 @@ void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraData
     }
 }
 
-
-////////////////////////////////////////////////////////////
-//// QnCameraHistoryItem
-////////////////////////////////////////////////////////////
-
-void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst) {
-    dst.cameraUniqueId = src.cameraUniqueId;
-    dst.serverGuid = src.mediaServerGuid;
-    dst.timestamp = src.timestamp;
-}
-
-void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst) {
-    dst.cameraUniqueId = src.cameraUniqueId;
-    dst.mediaServerGuid = src.serverGuid;
-    dst.timestamp = src.timestamp;
-}
-
-void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) 
-{
-    /* CameraUniqueId -> (Timestamp -> ServerGuid). */
-    QMap<QString, QMap<qint64, QnUuid> > history;
-
-    /* Fill temporary history map. */
-    for (auto pos = src.begin(); pos != src.end(); ++pos)
-        history[pos->cameraUniqueId][pos->timestamp] = pos->serverGuid;
-
-    for(auto pos = history.begin(); pos != history.end(); ++pos) {
-        QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
-
-        if (pos.value().isEmpty())
-            continue;
-
-        QMapIterator<qint64, QnUuid> camit(pos.value());
-        camit.toFront();
-
-        cameraHistory->setCameraUniqueId(pos.key());
-        while (camit.hasNext())
-        {
-            camit.next();
-            cameraHistory->addTimePeriod(camit.key(), camit.value());
-        }
-
-        dst.append(cameraHistory);
-    }
-}
-
-
 void fromResourceToApi(const QnEmailSettings &src, ApiEmailSettingsData &dst) {
     dst.host = src.server;
     dst.port = src.port;
@@ -414,7 +365,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.videowalls, dst.resources);
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
-    fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
+    dst.camerasWithArchiveList = src.cameraHistory;
     dst.allProperties = src.allProperties;
     fromApiToResourceList(src.storages, dst.resources, ctx);
     dst.resStatusList = src.resStatusList;
@@ -580,6 +531,7 @@ void fromResourceToApi(const QnAbstractStorageResourcePtr &src, ApiStorageData &
 
     dst.spaceLimit = src->getSpaceLimit();
     dst.usedForWriting = src->isUsedForWriting();
+    dst.storageType = src->getStorageType();
 }
 
 void fromResourceToApi(const QnAbstractStorageResourceList &src, ApiStorageDataList &dst)
@@ -597,6 +549,7 @@ void fromApiToResource(const ApiStorageData &src, QnAbstractStorageResourcePtr &
 
     dst->setSpaceLimit(src.spaceLimit);
     dst->setUsedForWriting(src.usedForWriting);
+    dst->setStorageType(src.storageType);
 }
 
 void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &dst) {

@@ -7,6 +7,7 @@
 #include <ui/widgets/business/popup_business_action_widget.h>
 #include <ui/widgets/business/play_sound_business_action_widget.h>
 #include <ui/widgets/business/say_text_business_action_widget.h>
+#include <ui/widgets/business/bookmark_business_action_widget.h>
 
 QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBusiness::ActionType actionType, QWidget *parent) {
     switch (actionType) {
@@ -24,6 +25,8 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBu
         return new QnPlaySoundBusinessActionWidget(parent);
     case QnBusiness::SayTextAction:
         return new QnSayTextBusinessActionWidget(parent);
+    case QnBusiness::BookmarkAction:
+        return new QnBookmarkBusinessActionWidget(parent);
     default:
         return new QnEmptyBusinessActionWidget(parent);
     }

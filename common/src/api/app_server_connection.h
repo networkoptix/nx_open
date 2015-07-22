@@ -1,7 +1,7 @@
 #ifndef QN_APP_SERVER_CONNECTION_H
 #define QN_APP_SERVER_CONNECTION_H
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/request_param.h>
 #include <utils/common/software_version.h>
@@ -26,12 +26,10 @@ public:
     QnAppServerConnectionFactory();
     virtual ~QnAppServerConnectionFactory();
 
-    static QString clientGuid();
     static QUrl url();
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
-    static void setClientGuid(const QString &guid);
     static void setUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
     static void setCurrentVersion(const QnSoftwareVersion &version);
@@ -53,8 +51,7 @@ public:
     static ec2::AbstractECConnectionPtr getConnection2();
 
 private:
-    QMutex m_mutex;
-    QString m_clientGuid;
+    QnMutex m_mutex;
     QUrl m_url;
 
     /** Videowall-related fields */

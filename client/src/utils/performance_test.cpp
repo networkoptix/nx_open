@@ -8,8 +8,11 @@
 #include <utils/common/app_info.h>
 #include <utils/common/performance.h>
 #include <utils/common/log.h>
+
 #include <client/client_globals.h>
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
+
 #include <ui/dialogs/message_box.h>
 
 #ifdef Q_OS_LINUX
@@ -20,8 +23,8 @@
 #endif
 
 void QnPerformanceTest::detectLightMode() {
-    if (qnSettings->lightModeOverride() != -1) {
-        qnSettings->setLightMode(static_cast<Qn::LightModeFlags>(qnSettings->lightModeOverride()));
+    if (qnRuntime->lightModeOverride() != -1) {
+        qnSettings->setLightMode(static_cast<Qn::LightModeFlags>(qnRuntime->lightModeOverride()));
         return;
     }
 

@@ -49,8 +49,8 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnResourceVideoLayoutPtr getVideoLayout() override;
-    virtual QnResourceAudioLayoutPtr getAudioLayout() override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 
     virtual AVCodecContext* setAudioChannel(int num);
 
@@ -98,7 +98,7 @@ private:
     friend class QnAviAudioLayout;
     AVIOContext* m_ioContext;
     bool m_eofReached;
-    QMutex m_openMutex;
+    QnMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
     bool m_fastStreamFind;
 };

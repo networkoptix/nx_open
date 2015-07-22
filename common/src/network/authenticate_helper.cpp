@@ -13,6 +13,7 @@
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "core/resource/media_server_resource.h"
+#include "http/custom_headers.h"
 
 
 static const QString COOKIE_DIGEST_AUTH(lit("Authorization=Digest"));
@@ -68,13 +69,16 @@ QnAuthHelper* QnAuthHelper::m_instance;
 
 static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
 static const qint64 COOKIE_EXPERATION_PERIOD = 3600;
-static const QString REALM(lit("NetworkOptix"));
+
+// TODO: #2.4 replace with customization value
+const QString QnAuthHelper::REALM(lit("NetworkOptix"));
 
 QnAuthHelper::QnAuthHelper()
 {
     connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(qnResPool, SIGNAL(resourceChanged(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    m_digestNonceCache.setMaxCost(100);
 }
 
 QnAuthHelper::~QnAuthHelper()
@@ -107,9 +111,9 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
 
     if( allowedAuthMethods & AuthMethod::videowall )
     {
-        const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue( request.headers, "X-NetworkOptix-VideoWall" );
+        const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue( request.headers, Qn::VIDEOWALL_GUID_HEADER_NAME );
         if (!videoWall_auth.isEmpty())
-            return (!qnResPool->getResourceById(QnUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
+            return (!qnResPool->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull());
     }
 
     if( allowedAuthMethods & AuthMethod::urlQueryParam )
@@ -143,10 +147,10 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
             : nx_http::getHeaderValue( request.headers, "Authorization" );
         if( authorization.isEmpty() )
         {
-            const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, "X-Nx-User-Name" );
+            const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME );
             if( !nxUserName.isEmpty() )
             {
-                QMutexLocker lock(&m_mutex);
+                QnMutexLocker lock( &m_mutex );
                 for( const QnUserResourcePtr& user: m_users )
                 {
                     if( user->getName().toUtf8().toLower() == nxUserName )
@@ -245,14 +249,14 @@ bool QnAuthHelper::authenticate(
 
 bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest ) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     for(const QnUserResourcePtr& user: m_users)
     {
         if (user->getName().toLower() == login.toLower())
             return user->getDigest() == digest;
     }
     //checking if it videowall connect
-    return !qnResPool->getResourceById(QnUuid(login)).dynamicCast<QnVideoWallResource>().isNull();
+    return !qnResPool->getResourceById<QnVideoWallResource>(QnUuid(login)).isNull();
 }
 
 QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()
@@ -291,7 +295,7 @@ QByteArray QnAuthHelper::createHttpQueryAuthParam( const QString& userName, cons
     "three, four"
     \endcode
 */
-static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
+QList<QByteArray> QnAuthHelper::smartSplit(const QByteArray& data, const char delimiter)
 {
     bool quoted = false;
     QList<QByteArray> rez;
@@ -362,7 +366,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     //if (isNonceValid(nonce))
     if (checkNonceFunc(nonce))
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         for(const QnUserResourcePtr& user: m_users)
         {
             if (user->getName().toUtf8().toLower() == userName)
@@ -454,7 +458,7 @@ bool QnAuthHelper::isCookieNonceValid(const QByteArray& nonce)
 {
     static const qint64 USEC_IN_SEC = 1000000ll;
 
-    QMutexLocker lock(&m_cookieNonceCacheMutex);
+    QnMutexLocker lock( &m_cookieNonceCacheMutex );
 
     qint64 n1 = nonce.toLongLong(0, 16);
     qint64 n2 = qnSyncTime->currentUSecsSinceEpoch();
@@ -504,7 +508,8 @@ bool QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteAr
 
 void QnAuthHelper::addAuthHeader(nx_http::Response& response, bool isProxy)
 {
-    QString auth(lit("Digest realm=\"%1\",nonce=\"%2\""));
+    QString auth(lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5"));
+    //QString auth(lit("Digest realm=\"%1\",nonce=\"%2\",algorithm=MD5,qop=\"auth\""));
 	QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
     nx_http::insertOrReplaceHeader(
         &response.headers,
@@ -513,6 +518,13 @@ void QnAuthHelper::addAuthHeader(nx_http::Response& response, bool isProxy)
 
 bool QnAuthHelper::isNonceValid(const QByteArray& nonce)
 {
+    {
+        // nonce cache will help if time just changed
+        QnMutexLocker lock(&m_nonceMtx);
+        if (m_digestNonceCache.contains(nonce) && m_digestNonceCache[nonce]->elapsed() < NONCE_TIMEOUT)
+            return true;
+    }
+    // trust to unknown nonce to allow one step digest auth
     qint64 n1 = nonce.toLongLong(0, 16);
     qint64 n2 = qnSyncTime->currentUSecsSinceEpoch();
     return qAbs(n2 - n1) < NONCE_TIMEOUT;
@@ -520,12 +532,17 @@ bool QnAuthHelper::isNonceValid(const QByteArray& nonce)
 
 QByteArray QnAuthHelper::getNonce()
 {
-    return QByteArray::number(qnSyncTime->currentUSecsSinceEpoch() , 16);
+    QByteArray result = QByteArray::number(qnSyncTime->currentUSecsSinceEpoch(), 16);
+    QElapsedTimer* timeout = new QElapsedTimer();
+    timeout->restart();
+    QnMutexLocker lock(&m_nonceMtx);
+    m_digestNonceCache.insert(result, timeout);
+    return result;
 }
 
 void QnAuthHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QnUserResourcePtr user = res.dynamicCast<QnUserResource>();
     QnMediaServerResourcePtr server = res.dynamicCast<QnMediaServerResource>();
@@ -537,7 +554,7 @@ void QnAuthHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)
 
 void QnAuthHelper::at_resourcePool_resourceRemoved(const QnResourcePtr &res)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     m_users.remove(res->getId());
     m_servers.remove(res->getId());

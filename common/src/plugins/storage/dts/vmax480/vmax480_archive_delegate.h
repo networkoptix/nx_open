@@ -20,8 +20,8 @@ public:
     virtual qint64 endTime()override;
     virtual QnAbstractMediaDataPtr getNextData()override;
     virtual qint64 seek (qint64 time, bool findIFrame)override;
-    virtual QnResourceVideoLayoutPtr getVideoLayout()override;
-    virtual QnResourceAudioLayoutPtr getAudioLayout()override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout()override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout()override;
 
     virtual void beforeClose() override;
 
@@ -47,7 +47,7 @@ private:
     bool m_thumbnailsMode;
     qint64 m_lastSeekPos;
     bool m_isOpened;
-    mutable QMutex m_seekMtx;
+    mutable QnMutex m_seekMtx;
     QByteArray m_groupId;
     bool m_beforeSeek;
     bool m_ignoreNextSeek;

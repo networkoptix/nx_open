@@ -32,6 +32,7 @@ class QnWorkbenchItem;
 class QnStatusOverlayWidget;
 class QnImageButtonWidget;
 class QnImageButtonBar;
+class QnProxyLabel;
 
 class GraphicsLabel;
 
@@ -85,6 +86,8 @@ public:
      * Virtual destructor.
      */
     virtual ~QnResourceWidget();
+
+    void setBookmarksLabelText(const QString &text);
 
     /**
      * \returns                         Resource associated with this widget.
@@ -318,6 +321,9 @@ protected:
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
 
+    /** Create custom widget overlays. */
+    virtual void createCustomOverlays();
+
     void updateInfoVisiblity(bool animate = true);
 
     QnImageButtonBar *buttonBar() const {
@@ -354,6 +360,10 @@ protected:
 
     float defaultAspectRatio() const;
 private:
+    void createButtons();
+    void createHeaderOverlay();
+    void createFooterOverlay();
+
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
 
@@ -418,6 +428,7 @@ private:
     GraphicsWidget *m_footerWidget;
     GraphicsLabel *m_footerLeftLabel;
     GraphicsLabel *m_footerRightLabel;
+    QnProxyLabel *m_footerBookmarkDescriptionLabel;
 
     QnStatusOverlayWidget *m_statusOverlayWidget;
 

@@ -13,7 +13,7 @@ namespace stree
     {
     }
 
-    bool ResourceContainer::get( int resID, QVariant* const value ) const
+    bool ResourceContainer::getAsVariant( int resID, QVariant* const value ) const
     {
         std::map<int, QVariant>::const_iterator it = m_mediaStreamPameters.find( resID );
         if( it == m_mediaStreamPameters.end() )
@@ -83,7 +83,7 @@ namespace stree
     {
     }
 
-    bool SingleResourceContainer::get( int resID, QVariant* const value ) const
+    bool SingleResourceContainer::getAsVariant( int resID, QVariant* const value ) const
     {
         if( resID != m_resID )
             return false;
@@ -105,7 +105,7 @@ namespace stree
     {
     }
 
-    bool MultiSourceResourceReader::get( int resID, QVariant* const value ) const
+    bool MultiSourceResourceReader::getAsVariant( int resID, QVariant* const value ) const
     {
         return m_rc1.get( resID, value ) || m_rc2.get( resID, value );
     }

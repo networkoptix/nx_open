@@ -61,6 +61,12 @@ QnRestConnectionProcessor::~QnRestConnectionProcessor()
     stop();
 }
 
+QnTcpListener* QnRestConnectionProcessor::owner() const
+{
+    Q_D(const QnRestConnectionProcessor);
+    return d->owner;
+}
+
 void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
@@ -87,7 +93,8 @@ void QnRestConnectionProcessor::run()
         if (d->request.requestLine.method.toUpper() == "GET") {
             rez = handler->executeGet(url.path(), params, d->responseBody, contentType, this);
         }
-        else if (d->request.requestLine.method.toUpper() == "POST") {
+        else if (d->request.requestLine.method.toUpper() == "POST" || 
+                 d->request.requestLine.method.toUpper() == "PUT") {
             rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->responseBody, contentType, this);
         }
         else {
@@ -101,6 +108,7 @@ void QnRestConnectionProcessor::run()
         rez = redirectTo(QnTcpListener::defaultPage(), contentType);
     }
     QByteArray contentEncoding;
+    QByteArray uncompressedResponse = d->responseBody;
     if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty() && rez == CODE_OK) 
     {
         if (!contentType.contains("image")) {
@@ -112,10 +120,25 @@ void QnRestConnectionProcessor::run()
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Cache-Control", "post-check=0, pre-check=0"));
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Pragma", "no-cache"));
     sendResponse(rez, contentType, contentEncoding, false);
+    if (handler)
+        handler->afterExecute(url.path(), params, uncompressedResponse, this);
 }
 
 QnUuid QnRestConnectionProcessor::authUserId() const
 {
     Q_D(const QnRestConnectionProcessor);
     return d->authUserId;
+}
+
+const nx_http::Request& QnRestConnectionProcessor::request() const
+{
+    Q_D(const QnRestConnectionProcessor);
+    return d->request;
+}
+
+nx_http::Response* QnRestConnectionProcessor::response() const
+{
+    Q_D(const QnRestConnectionProcessor);
+    //TODO #ak remove following const_cast in 2.3.1 (requires change in QnRestRequestHandler API)
+    return const_cast<nx_http::Response*>(&d->response);
 }

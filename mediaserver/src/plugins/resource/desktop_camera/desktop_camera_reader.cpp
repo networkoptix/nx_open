@@ -21,7 +21,7 @@ QnDesktopCameraStreamReader::~QnDesktopCameraStreamReader()
     stop();
 }
 
-CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     Q_UNUSED(isCameraControlRequired);
     closeStream();
@@ -162,7 +162,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         result->opaque = 0;
         if (result->dataType == QnAbstractMediaData::AUDIO && result->context && result->context->ctx() && !m_audioLayout)
         {
-            QMutexLocker lock(&m_audioLayoutMutex);
+            QnMutexLocker lock( &m_audioLayoutMutex );
             m_audioLayout.reset( new QnResourceCustomAudioLayout() );
             QnResourceAudioLayout::AudioTrack track(result->context, "");
             m_audioLayout->addAudioTrack(track);
@@ -172,17 +172,13 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
     return result;
 }
 
-void QnDesktopCameraStreamReader::updateStreamParamsBasedOnQuality()
-{
-}
-
-void QnDesktopCameraStreamReader::updateStreamParamsBasedOnFps()
+void QnDesktopCameraStreamReader::pleaseReopenStream()
 {
 }
 
 QnConstResourceAudioLayoutPtr QnDesktopCameraStreamReader::getDPAudioLayout() const
 {
-    QMutexLocker lock(&m_audioLayoutMutex);
+    QnMutexLocker lock( &m_audioLayoutMutex );
     return m_audioLayout;
 }
 

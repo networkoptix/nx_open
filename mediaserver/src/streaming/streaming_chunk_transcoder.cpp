@@ -4,7 +4,7 @@
 
 #include "streaming_chunk_transcoder.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
@@ -61,14 +61,17 @@ StreamingChunkTranscoder::~StreamingChunkTranscoder()
 {
     //cancelling all scheduled transcodings
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_terminated = true;
     }
 
     for( auto val: m_taskIDToTranscode )
         TimerManager::instance()->joinAndDeleteTimer( val.first );
 
-    std::for_each( m_transcodeThreads.begin(), m_transcodeThreads.end(), std::default_delete<StreamingChunkTranscoderThread>() );
+    std::for_each(
+        m_transcodeThreads.begin(),
+        m_transcodeThreads.end(),
+        std::default_delete<StreamingChunkTranscoderThread>() );
     m_transcodeThreads.clear();
 }
 
@@ -77,7 +80,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     StreamingChunkPtr chunk )
 {
     //searching for resource
-    QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( transcodeParams.srcResourceUniqueID() );
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId( transcodeParams.srcResourceUniqueID() );
     if( !resource )
     {
         NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found").
@@ -234,16 +237,9 @@ bool StreamingChunkTranscoder::transcodeAsync(
     return true;
 }
 
-Q_GLOBAL_STATIC_WITH_ARGS( StreamingChunkTranscoder, streamingChunkTranscoderInstance, (StreamingChunkTranscoder::fBeginOfRangeInclusive) );
-
-StreamingChunkTranscoder* StreamingChunkTranscoder::instance()
-{
-    return streamingChunkTranscoderInstance();
-}
-
 void StreamingChunkTranscoder::onTimer( const quint64& timerID )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( m_terminated )
         return;
@@ -312,7 +308,7 @@ bool StreamingChunkTranscoder::scheduleTranscoding(
         this,
         delayMSec );
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_taskIDToTranscode[taskID] = transcodeID;
     return true;
 }

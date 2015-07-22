@@ -16,37 +16,49 @@ QnAbstractStorageResource::~QnAbstractStorageResource()
 
 void QnAbstractStorageResource::setSpaceLimit(qint64 value)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_spaceLimit = value;
 }
 
 qint64 QnAbstractStorageResource::getSpaceLimit() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_spaceLimit;
+}
+
+void QnAbstractStorageResource::setStorageType(const QString& type)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_storageType = type;
+}
+
+QString QnAbstractStorageResource::getStorageType() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_storageType;
 }
 
 void QnAbstractStorageResource::setMaxStoreTime(int timeInSeconds)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_maxStoreTime = timeInSeconds;
 }
 
 int QnAbstractStorageResource::getMaxStoreTime() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_maxStoreTime;
 }
 
 void QnAbstractStorageResource::setUsedForWriting(bool isUsedForWriting) 
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_usedForWriting = isUsedForWriting;
 }
 
 bool QnAbstractStorageResource::isUsedForWriting() const 
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_usedForWriting;
 }
 
@@ -59,21 +71,21 @@ QString QnAbstractStorageResource::getUniqueId() const
 float QnAbstractStorageResource::bitrate() const
 {
     float rez = 0;
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock( &m_bitrateMtx );
     for(const QnAbstractMediaStreamDataProvider* provider: m_providers)
-        rez += provider->getBitrate();
+        rez += provider->getBitrateMbps();
     return rez;
 }
 
 void QnAbstractStorageResource::addBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock( &m_bitrateMtx );
     m_providers << provider;
 }
 
 void QnAbstractStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock( &m_bitrateMtx );
     m_providers.remove(provider);
 }
 #endif

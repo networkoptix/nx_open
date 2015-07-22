@@ -21,7 +21,6 @@ QnResourcePoolScaffold::QnResourcePoolScaffold() {
     m_cameraAttributesPool = new QnCameraUserAttributePool();
     m_serverAttributesPool = new QnMediaServerUserAttributesPool();
     m_resPool = new QnResourcePool();
-    QnResourcePool::instance(); // to initialize net state;
 }
 
 QnResourcePoolScaffold::~QnResourcePoolScaffold() {

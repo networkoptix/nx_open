@@ -1,0 +1,251 @@
+/**********************************************************
+* 23 dec 2013
+* a.kolesnikov
+***********************************************************/
+
+#ifndef BASE_STREAM_PROTOCOL_CONNECTION_H
+#define BASE_STREAM_PROTOCOL_CONNECTION_H
+
+#include <atomic>
+#include <functional>
+
+#include "base_protocol_message_types.h"
+#include "base_server_connection.h"
+
+
+namespace nx_api
+{
+    //!Connection of stream-orientied protocol of type request/respose
+    /*!
+        It is not tied to underlying transport (tcp, udp, etc...)
+
+        \a CustomConnectionType MUST provide following methods:
+        \code {*.cpp}
+            //!Called for every received message 
+            void processMessage( Message&& request );
+        \endcode
+
+        \note SerializerType::serialize is allowed to reallocate source buffer if needed, 
+            but it is not recommended due to performance considerations!
+    */
+    template<
+        class CustomConnectionType,
+        class CustomConnectionManagerType,
+        class MessageType,
+        class ParserType,
+        class SerializerType
+    > class BaseStreamProtocolConnection
+    :
+        public BaseServerConnection<
+            BaseStreamProtocolConnection<
+                CustomConnectionType,
+                CustomConnectionManagerType,
+                MessageType,
+                ParserType,
+                SerializerType>,
+            CustomConnectionManagerType>
+    {
+    public:
+        typedef BaseStreamProtocolConnection<
+            CustomConnectionType,
+            CustomConnectionManagerType,
+            MessageType,
+            ParserType,
+            SerializerType> SelfType;
+        //typedef BaseStreamProtocolConnection<CustomConnectionType, CustomConnectionManagerType> SelfType;
+        typedef BaseServerConnection<SelfType, CustomConnectionManagerType> BaseType;
+        //!Type of messages used by this connection class. Request/response/indication is sub-class of message, so no difference at this level
+        typedef MessageType message_type;
+
+        BaseStreamProtocolConnection(
+            CustomConnectionManagerType* connectionManager,
+            std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
+        :
+            BaseType( connectionManager, std::move(streamSocket) ),
+            m_serializerState( SerializerState::done ),
+            m_isSendingMessage( 0 )
+        {
+            static const size_t DEFAULT_SEND_BUFFER_SIZE = 4*1024;
+            m_writeBuffer.reserve( DEFAULT_SEND_BUFFER_SIZE );
+
+            m_parser.setMessage( &m_request );
+        }
+
+        void bytesReceived( const nx::Buffer& buf )
+        {
+            for( size_t pos = 0; pos < buf.size(); )
+            {
+                //parsing message
+                size_t bytesProcessed = 0;
+                switch( m_parser.parse( pos > 0 ? buf.mid((int)pos) : buf, &bytesProcessed ) )
+                {
+                    case ParserState::init:
+                    case ParserState::inProgress:
+                        assert( bytesProcessed == buf.size() );
+                        return;
+
+                    case ParserState::done:
+                    {
+                        //processing request
+                        //NOTE interleaving is not supported yet
+                        static_cast<CustomConnectionType*>(this)->processMessage( std::move(m_request) );
+                        m_parser.reset();
+                        m_request.clear();
+                        m_parser.setMessage( &m_request );
+                        pos += bytesProcessed;
+                        break;
+                    }
+
+                    case ParserState::failed:
+                        //TODO : #ak ignore all following data and close connection?
+                        return;
+                }
+            }
+        }
+
+        void readyToSendData()
+        {
+            // Using clear will clear the reserved buffer in QByteArray --dpeng
+            m_writeBuffer.resize(0);
+
+            if( m_serializerState != SerializerState::needMoreBufferSpace )
+            {
+                //can accept another outgoing message
+                m_isSendingMessage = 0;
+                if( m_sendCompletionHandler )
+                {
+                    //completion handler is allowed to remove this connection, so moving handler to local variable
+                    auto sendCompletionHandlerBak = std::move( m_sendCompletionHandler );
+                    sendCompletionHandlerBak( SystemError::noError );
+                }
+                return;
+            }
+            size_t bytesWritten = 0;
+            m_serializerState = m_serializer.serialize( &m_writeBuffer, &bytesWritten );
+            if( (m_serializerState == SerializerState::needMoreBufferSpace) && (bytesWritten == 0) )
+            {
+                //TODO #ak increase buffer
+                assert( false );
+            }
+            //assuming that all bytes will be written or none
+            if( !BaseType::sendBufAsync( m_writeBuffer ) )
+            {
+                auto sendCompletionHandlerBak = std::move( m_sendCompletionHandler );
+                sendCompletionHandlerBak( SystemError::getLastOSErrorCode() );
+            }
+        }
+
+        //TODO #ak add message body streaming
+
+        /*!
+            Initiates asynchoronous message send
+        */
+        template<class Handler>
+        bool sendMessage(
+            MessageType&& msg,
+            Handler&& handler = std::function<void(SystemError::ErrorCode)>() )
+        {
+            //TODO: #ak interleaving is not supported yet
+            assert( m_isSendingMessage == 0 );
+
+            m_sendCompletionHandler = std::forward<Handler>(handler);
+            sendMessageInternal( std::move(msg) );
+            return true;
+        }
+
+        template<class BufferType, class Handler>
+        bool sendData(
+            BufferType&& data,
+            Handler&& handler = std::function<void( SystemError::ErrorCode )>() )
+        {
+            assert( m_isSendingMessage == 0 && m_writeBuffer.isEmpty() );
+            m_sendCompletionHandler = std::forward<Handler>( handler );
+            m_writeBuffer = std::forward<BufferType>( data );
+            m_serializerState = SerializerState::done;
+            return BaseType::sendBufAsync( m_writeBuffer );
+        }
+
+    private:
+        MessageType m_request;
+        ParserType m_parser;
+        SerializerType m_serializer;
+        SerializerState::Type m_serializerState;
+        nx::Buffer m_writeBuffer;
+        std::atomic<int> m_isSendingMessage;
+        std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
+
+        void sendMessageInternal( MessageType&& msg )
+        {
+            //serializing message
+            m_serializer.setMessage( std::move(msg) );
+            m_serializerState = SerializerState::needMoreBufferSpace;
+            m_isSendingMessage = 1;
+            readyToSendData();
+        }
+    };
+
+    /*!
+        Inherits \a BaseStreamProtocolConnection and delegates \a processMessage to functor set with \a BaseStreamProtocolConnectionEmbeddable::setMessageHandler
+        \todo Remove this class or get rid of virtual call (in function)
+    */
+    template<
+        class CustomConnectionManagerType,
+        class MessageType,
+        class ParserType,
+        class SerializerType
+    > class BaseStreamProtocolConnectionEmbeddable
+    :
+        public BaseStreamProtocolConnection<
+            BaseStreamProtocolConnectionEmbeddable<
+                CustomConnectionManagerType,
+                MessageType,
+                ParserType,
+                SerializerType>,
+            CustomConnectionManagerType,
+            MessageType,
+            ParserType,
+            SerializerType>
+    {
+        typedef BaseStreamProtocolConnectionEmbeddable<
+            CustomConnectionManagerType,
+            MessageType,
+            ParserType,
+            SerializerType
+        > self_type;
+        typedef BaseStreamProtocolConnection<
+            self_type,
+            CustomConnectionManagerType,
+            MessageType,
+            ParserType,
+            SerializerType
+        > base_type;
+
+    public:
+        BaseStreamProtocolConnectionEmbeddable(
+            CustomConnectionManagerType* connectionManager,
+            std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
+        :
+            base_type(
+                connectionManager,
+                std::move(streamSocket) )
+        {
+        }
+
+        template<class T>
+        void setMessageHandler( T&& handler )
+        {
+            m_handler = std::forward<T>(handler);
+        }
+
+        void processMessage( MessageType&& msg )
+        {
+            if( m_handler )
+                m_handler( std::move(msg) );
+        }
+
+    private:
+        std::function<void(MessageType&&)> m_handler;
+    };
+}
+
+#endif   //BASE_STREAM_PROTOCOL_CONNECTION_H

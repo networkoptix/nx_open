@@ -10,9 +10,9 @@
 
 #include <QtCore/QAtomicInt>
 #include <QtCore/QDateTime>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
-#include <QtCore/QWaitCondition>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include <utils/common/log.h>
 
@@ -22,8 +22,8 @@ using namespace std;
 class TimerManagerImpl
 {
 public:
-    QWaitCondition cond;
-    mutable QMutex mtx;
+    QnWaitCondition cond;
+    mutable QnMutex mtx;
     //!map<pair<time, timerID>, handler>
     std::map<std::pair<qint64, quint64>, std::function<void(quint64)> > timeToTask;
     //!map<timerID, time>
@@ -73,7 +73,7 @@ TimerManager::~TimerManager()
 void TimerManager::stop()
 {
     {
-        QMutexLocker lk( &m_impl->mtx );
+        QnMutexLocker lk( &m_impl->mtx );
         m_impl->terminated = true;
         m_impl->cond.wakeAll();
     }
@@ -95,7 +95,7 @@ quint64 TimerManager::addTimer(
 {
     static QAtomicInt lastTaskID = 0;
 
-    QMutexLocker lk( &m_impl->mtx );
+    QnMutexLocker lk( &m_impl->mtx );
 
     const qint64 taskTime = QDateTime::currentMSecsSinceEpoch() + delay;
     quint64 timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
@@ -120,14 +120,14 @@ quint64 TimerManager::addTimer(
 
 void TimerManager::deleteTimer( const quint64& timerID )
 {
-    QMutexLocker lk( &m_impl->mtx );
+    QnMutexLocker lk( &m_impl->mtx );
 
     m_impl->deleteTaskNonSafe( timerID );
 }
 
 void TimerManager::joinAndDeleteTimer( const quint64& timerID )
 {
-    QMutexLocker lk( &m_impl->mtx );
+    QnMutexLocker lk( &m_impl->mtx );
     //having locked \a m_impl->mtx we garantee, that execution of timer timerID will not start
 
     if( QThread::currentThread() != this )
@@ -148,7 +148,7 @@ static const unsigned int ERROR_SKIP_TIMEOUT_MS = 3000;
 
 void TimerManager::run()
 {
-    QMutexLocker lk( &m_impl->mtx );
+    QnMutexLocker lk( &m_impl->mtx );
 
     NX_LOG( lit("TimerManager started"), cl_logDEBUG1 );
 

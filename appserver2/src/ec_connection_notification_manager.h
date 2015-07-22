@@ -27,6 +27,7 @@ namespace ec2
     class QnMiscNotificationManager;
     class QnDiscoveryNotificationManager;
 
+    // TODO: #2.4 remove EC prefix to avoid ec2::ECConnectionNotificationManager
     //!Stands for emitting API notifications
     class ECConnectionNotificationManager
     {
@@ -68,7 +69,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran );
+        void triggerNotification( const QnTransaction<ApiServerFootageData>& tran );
         void triggerNotification( const QnTransaction<ApiUserData>& tran );
         void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran );
         void triggerNotification( const QnTransaction<ApiLayoutData>& tran );
@@ -95,6 +96,8 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiPeerSystemTimeDataList>& tran );
         void triggerNotification( const QnTransaction<ApiDatabaseDumpData> & /*tran*/ );
         void triggerNotification( const QnTransaction<ApiReverseConnectionData> & tran );
+        void triggerNotification( const QnTransaction<ApiClientInfoData> & /*tran*/ );
+        void triggerNotification( const QnTransaction<ApiClientInfoDataList> & /*tran*/ );
 
         void triggerNotification(const QnTransaction<ApiUpdateSequenceData> &/*tran*/) { /* nothing to do */ }
 

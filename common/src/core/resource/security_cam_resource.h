@@ -2,7 +2,7 @@
 #define sequrity_cam_resource_h_1239
 
 #include <QtGui/QRegion>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/value_cache.h>
 
@@ -43,6 +43,8 @@ public:
         Can differ from resource name
     */
     void setCameraName( const QString& newCameraName );
+
+    QnMediaServerResourcePtr getParentServer() const;
 
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
@@ -289,7 +291,7 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
-
+    virtual bool isBitratePerGOP() const;
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;

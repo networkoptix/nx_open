@@ -4,6 +4,8 @@
 #include <map>
 
 #include <QtCore/QMap>
+#include <QElapsedTimer>
+#include <QCache>
 
 #include <core/resource/resource_fwd.h>
 
@@ -86,10 +88,13 @@ class QnAuthHelper: public QObject
     Q_OBJECT
 
 public:
+    static const QString REALM;
+
     QnAuthHelper();
     virtual ~QnAuthHelper();
 
     static void initStaticInstance(QnAuthHelper* instance);
+    static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter);
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side
@@ -136,7 +141,7 @@ private:
     bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
     bool doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     static QnAuthHelper* m_instance;
     //QMap<QByteArray, QElapsedTimer> m_nonces;
     QMap<QnUuid, QnUserResourcePtr> m_users;
@@ -144,7 +149,10 @@ private:
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
 
     QMap<qint64, qint64> m_cookieNonceCache;
-    mutable QMutex m_cookieNonceCacheMutex;
+    mutable QnMutex m_cookieNonceCacheMutex;
+
+    QCache<QByteArray, QElapsedTimer> m_digestNonceCache;
+    mutable QnMutex m_nonceMtx;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

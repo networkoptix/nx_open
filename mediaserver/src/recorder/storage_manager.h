@@ -5,7 +5,7 @@
 #include <QtCore/QString>
 #include <QtCore/QMap>
 #include <QtCore/QFile>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
 
@@ -20,6 +20,7 @@
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include "utils/common/uuid.h"
+#include <set>
 #include "api/model/rebuild_archive_reply.h"
 
 class QnAbstractMediaStreamDataProvider;
@@ -62,14 +63,14 @@ public:
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator);
 
     QnStorageResourcePtr getStorageByUrl(const QString& fileName);
-    QnStorageResourcePtr storageRoot(int storage_index) const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots.value(storage_index); }
+    QnStorageResourcePtr storageRoot(int storage_index) const { QnMutexLocker lock( &m_mutexStorages ); return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const; 
     bool isStorageAvailable(const QnStorageResourcePtr& storage) const; 
 
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
 
-    QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs);
+    QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs, int limit);
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
@@ -77,12 +78,13 @@ public:
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
     QnStorageResourceList getStorages() const;
+    QnStorageResourceList getStoragesInLexicalOrder() const;
 
     void clearSpace();
     
     void clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
     void clearMaxDaysData();
-    void clearMaxDaysData(const FileCatalogMap &catalogMap);
+    void clearMaxDaysData(QnServer::ChunksCatalog catalogIdx);
 
     void deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 minTime);
     void clearDbByChunk(DeviceFileCatalogPtr catalog, const DeviceFileCatalog::Chunk& chunk);
@@ -104,13 +106,18 @@ public:
     */
     QStringList getAllStoragePathes() const;
 
-    bool addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
+    bool addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark, bool forced = false);
     bool updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
     void initDone();
     int getStorageIndex(const QnStorageResourcePtr& storage);
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
+
+    /*
+    * Return camera list with existing archive. Camera Unique ID is used as camera ID
+    */
+    std::vector<QnUuid> getCamerasWithArchive() const;
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
@@ -127,7 +134,7 @@ private:
     int detectStorageIndex(const QString& path);
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
-    void getTimePeriodInternal(QVector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
+    void getTimePeriodInternal(std::vector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
 
@@ -149,15 +156,16 @@ private:
     QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
     bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
+    void getCamerasWithArchiveInternal(std::set<QString>& result,  const FileCatalogMap& catalog) const;
     void testStoragesDone();
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
 
-    mutable QMutex m_mutexStorages;
-    mutable QMutex m_mutexCatalog;
-    mutable QMutex m_mutexRebuild;
-    mutable QMutex m_rebuildStateMtx;
+    mutable QnMutex m_mutexStorages;
+    mutable QnMutex m_mutexCatalog;
+    mutable QnMutex m_mutexRebuild;
+    mutable QnMutex m_rebuildStateMtx;
 
     QMap<QString, QSet<int> > m_storageIndexes;
     bool m_storagesStatisticsReady;
@@ -182,9 +190,9 @@ private:
 
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     bool m_initInProgress;
-    mutable QMutex m_sdbMutex;
+    mutable QnMutex m_sdbMutex;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
-    mutable QMutex m_csvMigrationMutex;
+    mutable QnMutex m_csvMigrationMutex;
     bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
 };

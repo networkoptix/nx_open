@@ -87,7 +87,7 @@ bool changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLo
         return true;
 
     qnCommon->setLocalSystemName(systemName);
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
         return false;
@@ -96,6 +96,7 @@ bool changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLo
     MSSettings::roSettings()->setValue("systemName", systemName);
     qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
     server->setSystemName(systemName);
+    server->setServerFlags(server->getServerFlags() & ~Qn::SF_AutoSystemName);
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 

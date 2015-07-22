@@ -17,6 +17,7 @@
 #include "transaction_transport.h"
 #include <transaction/transaction_log.h>
 #include "runtime_transaction_log.h"
+#include "transport_connection_info.h"
 
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
@@ -43,12 +44,14 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
+        QList<QnTransportConnectionInfo> connectionsInfo() const;
         void gotConnectionFromRemotePeer(
             const QnUuid& connectionGuid,
-            const QSharedPointer<AbstractStreamSocket>& socket,
+            QSharedPointer<AbstractStreamSocket> socket,
             ConnectionType::Type connectionType,
             const ApiPeerData& remotePeer,
             qint64 remoteSystemIdentityTime,
+            const nx_http::Request& request,
             const QByteArray& contentEncoding );
         //!Report socket to receive transactions from
         /*!
@@ -61,6 +64,14 @@ namespace ec2
             qint64 remoteSystemIdentityTime,
             const nx_http::Request& request,
             const QByteArray& requestBuf );
+        //!Process transaction received via standard HTTP server interface
+        bool gotTransactionFromRemotePeer(
+            const QnUuid& connectionGuid,
+            const nx_http::Request& request,
+            const QByteArray& requestMsgBody );
+        //!Blocks till connection \a connectionGuid is ready to accept new transactions
+        void waitForNewTransactionsReady( const QnUuid& connectionGuid );
+        void connectionFailure( const QnUuid& connectionGuid );
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -79,10 +90,10 @@ namespace ec2
         void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock( &m_mutex );
             if (m_connections.isEmpty())
                 return;
-            QnTransactionTransportHeader ttHeader(connectedServerPeers(tran.command) << m_localPeer.id, dstPeers);
+            QnTransactionTransportHeader ttHeader(connectedServerPeers() << m_localPeer.id, dstPeers);
             ttHeader.fillSequence();
             sendTransactionInternal(tran, ttHeader);
         }
@@ -132,7 +143,7 @@ namespace ec2
         * If can't find route info then return null value. 
         * Otherwise return route gateway.
         */
-        QnUuid routeToPeerVia(const QnUuid& dstPeer) const;
+        QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
 
     signals:
         void peerLost(ApiPeerAliveData data);
@@ -145,7 +156,6 @@ namespace ec2
         //void gotUnlockRequest(ApiLockData);
         void gotLockResponse(ApiLockData);
 
-        void transactionProcessed(const QnAbstractTransaction &transaction);
         void remotePeerUnauthorized(const QnUuid& id);
     private:
         friend class QnTransactionTransport;
@@ -220,7 +230,7 @@ namespace ec2
         */
         bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader);
 
-        QnPeerSet connectedServerPeers(ApiCommand::Value command) const;
+        QnPeerSet connectedServerPeers() const;
 
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
 
@@ -236,6 +246,7 @@ namespace ec2
         void removePeersWithTimeout(const QSet<QnUuid>& lostPeers);
         QSet<QnUuid> checkAlivePeerRouteTimeout();
         void updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
+        int distanceToPeer(const QnUuid& dstPeer) const;
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -266,7 +277,7 @@ namespace ec2
         QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;
         ECConnectionNotificationManager* m_handler;
         QTimer* m_timer;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         QThread *m_thread;
         QnConnectionMap m_connections;
 

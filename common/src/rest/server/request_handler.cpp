@@ -4,24 +4,6 @@
 #include "request_handler.h"
 #include "utils/common/util.h"
 
-qint64 QnRestRequestHandler::parseDateTime(const QString& dateTime) const
-{
-    if (dateTime.toLower().trimmed() == QLatin1String("now"))
-    {
-        return DATETIME_NOW;
-    }
-    else if( dateTime.contains(L'T') || (dateTime.contains(L'-') && !dateTime.startsWith(L'-')) )
-    {
-        QStringList dateTimeParts = dateTime.split(L'.');
-        QDateTime tmpDateTime = QDateTime::fromString(dateTimeParts[0], Qt::ISODate);
-        if (dateTimeParts.size() > 1)
-            tmpDateTime = tmpDateTime.addMSecs(dateTimeParts[1].toInt()/1000);
-        return tmpDateTime.toMSecsSinceEpoch() * 1000;
-    }
-    else
-        return dateTime.toLongLong();
-}
-
 QString QnRestRequestHandler::extractAction(const QString &path) const {
     QString localPath = path;
     while(localPath.endsWith(L'/'))

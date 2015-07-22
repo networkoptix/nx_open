@@ -20,19 +20,19 @@ public:
     virtual bool bind( const SocketAddress& localAddress ) override;
     virtual SocketAddress getLocalAddress() const override;
     virtual bool setReuseAddrFlag( bool reuseAddr ) override;
-    virtual bool getReuseAddrFlag( bool* val ) override;
+    virtual bool getReuseAddrFlag( bool* val ) const override;
     virtual bool setNonBlockingMode( bool val ) override;
     virtual bool getNonBlockingMode( bool* val ) const override;
-    virtual bool getMtu( unsigned int* mtuValue ) override;
+    virtual bool getMtu( unsigned int* mtuValue ) const  override;
     virtual bool setSendBufferSize( unsigned int buffSize ) override;
-    virtual bool getSendBufferSize( unsigned int* buffSize ) override;
+    virtual bool getSendBufferSize( unsigned int* buffSize ) const override;
     virtual bool setRecvBufferSize( unsigned int buffSize ) override;
-    virtual bool getRecvBufferSize( unsigned int* buffSize ) override;
+    virtual bool getRecvBufferSize( unsigned int* buffSize ) const override;
     virtual bool setRecvTimeout( unsigned int millis ) override;
-    virtual bool getRecvTimeout( unsigned int* millis ) override;
+    virtual bool getRecvTimeout( unsigned int* millis ) const override;
     virtual bool setSendTimeout( unsigned int ms ) override;
-    virtual bool getSendTimeout( unsigned int* millis ) override;
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) override;
+    virtual bool getSendTimeout( unsigned int* millis ) const override;
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const  override;
     virtual SOCKET_HANDLE handle() const override;
     virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
 
@@ -44,7 +44,7 @@ public:
 
     virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;
-    virtual bool getNoDelay( bool* value ) override;
+    virtual bool getNoDelay( bool* value ) const override;
     virtual bool toggleStatisticsCollection( bool val ) override;
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
 

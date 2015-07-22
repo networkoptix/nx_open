@@ -1,7 +1,7 @@
 #ifndef _SERVER_ARCHIVE_DELEGATE_H__
 #define _SERVER_ARCHIVE_DELEGATE_H__
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtGui/QRegion>
 
 #include "core/resource/resource_fwd.h"
@@ -27,8 +27,8 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnResourceVideoLayoutPtr getVideoLayout();
-    virtual QnResourceAudioLayoutPtr getAudioLayout();
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 
     virtual AVCodecContext* setAudioChannel(int num);
     virtual void onReverseMode(qint64 displayTime, bool value);
@@ -85,7 +85,7 @@ private:
 
     ArchiveChunkInfo m_currentChunkInfo;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;

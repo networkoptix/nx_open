@@ -24,8 +24,8 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnResourceVideoLayoutPtr getVideoLayout();
-    virtual QnResourceAudioLayoutPtr getAudioLayout();
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout();
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout();
     virtual bool isRealTimeSource() const;
     virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/);
     virtual void setSingleshotMode(bool value);
@@ -46,7 +46,7 @@ protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);
 private:
-    //QMutex m_mutex;
+    //QnMutex m_mutex;
     //bool m_usePrebuffer;
     //QnAbstractMediaDataPtr m_nextData;
     QnAbstractArchiveReader* m_reader; 

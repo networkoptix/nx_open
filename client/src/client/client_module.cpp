@@ -9,10 +9,17 @@
 #include <api/session_manager.h>
 
 #include <common/common_module.h>
+#ifdef Q_OS_WIN
+    #include "common/systemexcept_win32.h"
+#endif
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
-#include <client/client_message_processor.h>
+
+#include <redass/redass_controller.h>
+#include <client/desktop_client_message_processor.h>
+#include <client/client_instance_manager.h>
 
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -25,6 +32,8 @@
 #include <platform/platform_abstraction.h>
 
 #include <plugins/resource/server_camera/server_camera_factory.h>
+
+#include <ui/style/globals.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
@@ -49,18 +58,25 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
     /* We don't want changes in desktop color settings to mess up our custom style. */
     QApplication::setDesktopSettingsAware(false);
  
+    
+
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
 
-    QnClientSettings *settings = new QnClientSettings(forceLocalSettings);
-    common->store<QnClientSettings>(settings);
+    common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
+    common->store<QnClientSettings>(new QnClientSettings(forceLocalSettings));
+
+    auto clientInstanceManager = new QnClientInstanceManager(); /* Depends on QnClientSettings */
+    common->store<QnClientInstanceManager>(clientInstanceManager); 
+    common->setModuleGUID(clientInstanceManager->instanceGuid());
+
+    common->store<QnGlobals>(new QnGlobals());
     common->store<QnSessionManager>(new QnSessionManager());
 
-    common->setModuleGUID(QnUuid::createUuid());
+    common->store<QnCameraUserAttributePool>(new QnCameraUserAttributePool());
+    common->store<QnMediaServerUserAttributesPool>(new QnMediaServerUserAttributesPool());
+    common->store<QnRedAssController>(new QnRedAssController());
 
-    m_cameraUserAttributePool.reset(new QnCameraUserAttributePool());
-    m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
-    common->store<QnResourcePool>(new QnResourcePool());
     common->store<QnSyncTime>(new QnSyncTime());
 
     common->store<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary());
@@ -71,14 +87,17 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
     common->store<QnClientPtzControllerPool>(new QnClientPtzControllerPool());
     common->store<QnGlobalSettings>(new QnGlobalSettings());
-    common->store<QnClientMessageProcessor>(new QnClientMessageProcessor());
+    common->store<QnDesktopClientMessageProcessor>(new QnDesktopClientMessageProcessor());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnServerCameraFactory>(new QnServerCameraFactory());
+
+#ifdef Q_OS_WIN
+    win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());
+#endif
 
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
 
-    QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
 }
 

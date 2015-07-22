@@ -40,8 +40,7 @@ signals:
     void finished(int status, const QnTimePeriodList &reply, int handle, const QString &errorString);
     void finished(int status, const QnStatisticsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QVector3D &reply, int handle, const QString &errorString);
-    void finished(int status, const QnStringVariantPairList &reply, int handle, const QString &errorString);
-    void finished(int status, const QnStringBoolPairList &reply, int handle, const QString &errorString);
+	void finished(int status, const QnCameraAdvancedParamValueList &reply, int handle, const QString &errorString);
     void finished(int status, const QnTimeReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnTestEmailSettingsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle, const QString &errorString);
@@ -60,6 +59,8 @@ signals:
     void finished(int status, const QnUploadUpdateReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnModuleInformation &reply, int handle, const QString &errorString);
     void finished(int status, const QList<QnModuleInformation> &reply, int handle, const QString &errorString);
+    void finished(int status, const ec2::ApiCameraHistoryDataList &reply, int handle, const QString &errorString);
+    void finished(int status, const MultiServerPeriodDataList &reply, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

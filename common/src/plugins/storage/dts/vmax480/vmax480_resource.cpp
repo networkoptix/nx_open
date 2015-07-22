@@ -11,7 +11,7 @@
 #include "utils/network/simple_http_client.h"
 #include "vmax480_resource_searcher.h"
 
-QMutex QnPlVmax480Resource::m_chunkReaderMutex;
+QnMutex QnPlVmax480Resource::m_chunkReaderMutex;
 QMap<QString, QnVMax480ChunkReader*> QnPlVmax480Resource::m_chunkReaderMap;
 
 
@@ -27,7 +27,7 @@ QnPlVmax480Resource::QnPlVmax480Resource():
 
 QnPlVmax480Resource::~QnPlVmax480Resource()
 {
-    QMutexLocker lock(&m_chunkReaderMutex);
+    QnMutexLocker lock( &m_chunkReaderMutex );
     if (m_chunkReader) {
         m_chunkReaderMap.remove(getHostAddress());
         delete m_chunkReader;
@@ -63,7 +63,7 @@ void QnPlVmax480Resource::setHostAddress(const QString &ip)
     setUrl(url.toString());
 
     {
-        QMutexLocker lock(&m_chunkReaderMutex);
+        QnMutexLocker lock( &m_chunkReaderMutex );
         if (m_chunkReader) {
             m_chunkReaderMap.remove(oldHostAddr);
             m_chunkReaderMap.insert(getHostAddress(), m_chunkReader);
@@ -143,16 +143,9 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
 
-    //detecting and saving selected resolutions
-    /*
-    CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, QSize(640, 480), CODEC_ID_H264 ) );
-    saveMediaStreamInfoIfNeeded( mediaStreams );
-    */
-
     saveParams();
 
-    QMutexLocker lock(&m_chunkReaderMutex);
+    QnMutexLocker lock( &m_chunkReaderMutex );
     QnVMax480ChunkReader* chunkReader = m_chunkReaderMap.value(getHostAddress());
     if (chunkReader == 0) {
         m_chunkReader = new QnVMax480ChunkReader(toSharedPointer());
@@ -166,32 +159,32 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
 
 qint64 QnPlVmax480Resource::startTime() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_startTime;
 }
 
 qint64 QnPlVmax480Resource::endTime() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_endTime;
 }
 
 void QnPlVmax480Resource::setStartTime(qint64 valueUsec)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_startTime = valueUsec;
 }
 
 void QnPlVmax480Resource::setEndTime(qint64 valueUsec)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_endTime = valueUsec;
 }
 
 void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec, bool recursive)
 {
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_startTime = startTimeUsec;
         m_endTime = endTimeUsec;
     }
@@ -236,13 +229,13 @@ void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
 
 QnTimePeriodList  QnPlVmax480Resource::getChunks()
 {
-    QMutexLocker lock(&m_mutexChunks);
+    QnMutexLocker lock( &m_mutexChunks );
     return m_chunks;
 }
 
 void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
 {
-    QMutexLocker lock(&m_mutexChunks);
+    QnMutexLocker lock( &m_mutexChunks );
     m_chunks = chunks;
     m_chunksReady = true;
     //m_chunksCond.wakeAll();
@@ -251,12 +244,12 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
 QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) 
 {
     Q_UNUSED(detailLevel)
-    if (!m_chunks.isEmpty())
+    if (!m_chunks.empty())
         startTimeMs = qMin(startTimeMs, m_chunks.last().startTimeMs);
 
     QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
     
-    QMutexLocker lock(&m_mutexChunks);
+    QnMutexLocker lock( &m_mutexChunks );
     //while (!m_chunksReady)
     //    m_chunksCond.wait(&m_mutexChunks);
 

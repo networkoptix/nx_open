@@ -59,40 +59,23 @@ QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
     return 0;
 }
 
-QString QnAppServerConnectionFactory::clientGuid()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_clientGuid;
-    }
-
-    return QString();
-}
-
 QUrl QnAppServerConnectionFactory::url() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
 
-        QMutexLocker locker(&factory->m_mutex);
+        QnMutexLocker locker( &factory->m_mutex );
         return factory->m_url;
     }
 
     return QUrl();
 }
 
-void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_clientGuid = guid;
-    }
-}
-
-
 void QnAppServerConnectionFactory::setUrl(const QUrl &url) {
     if (url.isValid())
         Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        QMutexLocker locker(&factory->m_mutex);
+        QnMutexLocker locker( &factory->m_mutex );
         factory->m_url = url;
     }
 }

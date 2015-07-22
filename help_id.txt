@@ -8,7 +8,7 @@ Resource Tree (Empty Space) - working_with_a_resource_tree.htm
 Resource Tree - Search (Empty Space) - search.htm
 Playback Panel (empty Space) - playback_panel.htm
 FullScreen Button on top - full_screen_and_windowed_mode.htm
-Local Settings -> Look and Feel - customizing_product.name.htm
+Local Settings -> Look and Feel - customizing_product_name.htm
 Analog cameras (items in Scene) if not licensed - obtaining_and_Activating_VMS_Licenses.htm
 Licenses Form - obtaining_and_Activating_VMS_Licenses.htm
 Server in tree - Configuring_Media_Servers_Additional_Settings_(Ad.htm
@@ -89,7 +89,7 @@ User in Tree - users_management.htm
 Modifying User - changing_user_settings.htm
 E-mapping (layout with background (void) or Layout Properties Void) - e-mapping.htm
 Layout in Tree - Adjusting_the_Layout_Look_and_Feel.htm
-Zoom windows (click on item with zoom windows or on zoom window) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/zoom_windows.htm
+Zoom windows (click on item with zoom windows or on zoom window) - zoom_windows.htm
 Layout Properties (General Settings) - locking_layouts.htm
 Unsaved Layout Warning - Saving_Layouts_(Admin_Only).htm
 Delete Layout Warning - Deleting_Layouts_(Admin_Only).htm

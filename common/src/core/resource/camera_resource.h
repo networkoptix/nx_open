@@ -58,6 +58,8 @@ const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
 
 class CameraMediaStreams;
 class CameraMediaStreamInfo;
+class CameraBitrates;
+class CameraBitrateInfo;
 
 class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource
 {
@@ -79,6 +81,11 @@ public:
     bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
     bool saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams );
 
+    /*!
+     *  \return \a true if \param bitrateInfo.encoderIndex is not already saved
+     */
+    bool saveBitrateIfNotExists( const CameraBitrateInfo& bitrateInfo );
+
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
 
@@ -87,7 +94,7 @@ protected:
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 private:
-    QMutex m_mediaStreamsMutex;
+    QnMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
 };
 
@@ -95,6 +102,7 @@ class CameraMediaStreamInfo
 {
 public:
     static const QLatin1String anyResolution;
+    static QString resolutionToString( const QSize& resolution = QSize() );
 
     //!0 - primary stream, 1 - secondary stream
     int encoderIndex;
@@ -114,24 +122,13 @@ public:
     int codec;
     std::map<QString, QString> customStreamParams;
 
-    CameraMediaStreamInfo()
-    :
-        encoderIndex( -1 ),
-        resolution( lit("*") ),
-        transcodingRequired( false ),
-        codec( CODEC_ID_NONE )
-    {
-    }
-
     CameraMediaStreamInfo(
-        int _encoderIndex,
-        const QSize& _resolution,
-        CodecID _codec )
+        int _encoderIndex = -1,
+        const QSize& _resolution = QSize(),
+        CodecID _codec = CODEC_ID_NONE)
     :
         encoderIndex( _encoderIndex ),
-        resolution( _resolution.isValid()
-            ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height())
-            : anyResolution ),
+        resolution( resolutionToString( _resolution ) ),
         transcodingRequired( false ),
         codec( _codec )
     {
@@ -160,7 +157,6 @@ public:
 };
 #define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)(customStreamParams)
 
-
 class CameraMediaStreams
 {
 public:
@@ -168,7 +164,43 @@ public:
 };
 #define CameraMediaStreams_Fields (streams)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json) )
+class CameraBitrateInfo
+{
+public:
+    int encoderIndex;
+    float suggestedBitrate;
+    float actualBitrate;
+    int fps;
+    QString resolution;
+
+    CameraBitrateInfo(
+            int _encoderIndex = -1,
+            float _suggestedBitrate = 0,
+            float _actualBitrate = 0,
+            int _fps = 0,
+            const QSize& _resolution = QSize())
+    :
+        encoderIndex( _encoderIndex ),
+        suggestedBitrate( _suggestedBitrate ),
+        actualBitrate( _actualBitrate ),
+        fps( _fps ),
+        resolution( CameraMediaStreamInfo::resolutionToString( _resolution ) )
+    {
+    }
+};
+#define CameraBitrateInfo_Fields (encoderIndex)(suggestedBitrate)(actualBitrate)(fps)(resolution)
+
+class CameraBitrates
+{
+public:
+    std::vector<CameraBitrateInfo> streams;
+};
+#define CameraBitrates_Fields (streams)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( \
+        (CameraMediaStreamInfo)(CameraMediaStreams) \
+        (CameraBitrateInfo)(CameraBitrates), \
+        (json) )
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
 Q_DECLARE_METATYPE(QnVirtualCameraResourceList);

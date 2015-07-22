@@ -33,8 +33,8 @@ public:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual qint64 seek (qint64 time, bool findIFrame) override;
     qint64 seek(qint64 startTime, qint64 endTime);
-    virtual QnResourceVideoLayoutPtr getVideoLayout() override;
-    virtual QnResourceAudioLayoutPtr getAudioLayout() override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 
     virtual void onReverseMode(qint64 displayTime, bool value) override;
 
@@ -80,14 +80,13 @@ private:
     void lockTime(qint64 value);
     void unlockTime();
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     RTPSession m_rtspSession;
     RTPIODevice* m_rtpData;
     quint8* m_rtpDataBuffer;
     bool m_tcpMode;
     QMap<quint32, quint16> m_prevTimestamp;
     qint64 m_position;
-    QSharedPointer<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
     bool m_opened;
     QnVirtualCameraResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
@@ -122,7 +121,7 @@ private:
         QString password;
         QnUuid videowall;
     } m_auth;
-    mutable QMutex m_timeMutex;
+    mutable QnMutex m_timeMutex;
     qint64 m_lockedTime;
 };
 

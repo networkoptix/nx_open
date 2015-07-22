@@ -9,12 +9,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.3.1-SNAPSHOT</version>
+        <version>2.5.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.5.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client</artifactId>
     <packaging>pom</packaging>
@@ -38,6 +38,15 @@
             <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>client.core</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/client.core/pom.xml</systemPath>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -46,7 +55,7 @@
         <!--Global libs-->
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lquazip</global.libs>
+        <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lquazip -ludt</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lFestival -lestools -leststring -lestbase -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>

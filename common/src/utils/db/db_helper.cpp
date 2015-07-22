@@ -1,4 +1,6 @@
 #include "db_helper.h"
+
+#include <QtCore/QCoreApplication>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QFile>
@@ -125,12 +127,15 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
 #ifdef DB_DEBUG
         qDebug() << QString(QLatin1String("processing command %1 of %2")).arg(++i).arg(n);
 #endif // DB_DEBUG
-        if (singleCommand.trimmed().isEmpty())
+        QString command = QString::fromUtf8(singleCommand).trimmed();
+        if (command.isEmpty())
             continue;
         QSqlQuery ddlQuery(database);
-        ddlQuery.prepare(QString::fromUtf8(singleCommand));
+        ddlQuery.prepare(command);
         if (!ddlQuery.exec()) {
-            qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text() << ". Query was: " << singleCommand;
+            qWarning() << "Error while executing SQL file" << fileName;
+            qWarning() << "Query was:" << command;
+            qWarning() << "Error:" << ddlQuery.lastError().text();
             return false;
         }
     }
@@ -156,4 +161,66 @@ void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
 {
     m_sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), dbname);
     m_sdb.setDatabaseName(fileName);
+}
+
+bool QnDbHelper::applyUpdates(const QString &dirName) {
+
+    if (!isObjectExists(lit("table"), lit("south_migrationhistory"), m_sdb)) {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(lit(
+            "CREATE TABLE \"south_migrationhistory\" (\
+            \"id\" integer NOT NULL PRIMARY KEY autoincrement,\
+            \"app_name\" varchar(255) NOT NULL,\
+            \"migration\" varchar(255) NOT NULL,\
+            \"applied\" datetime NOT NULL);"
+            ));
+        if (!ddlQuery.exec())
+            return false;
+    }
+
+    QSqlQuery existsUpdatesQuery(m_sdb);
+    existsUpdatesQuery.prepare(lit("SELECT migration from south_migrationhistory"));
+    if (!existsUpdatesQuery.exec())
+        return false;
+    QStringList existUpdates;
+    while (existsUpdatesQuery.next())
+        existUpdates << existsUpdatesQuery.value(0).toString();
+
+
+    QDir dir(dirName);
+    for(const QFileInfo& entry: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
+    {
+        QString fileName = entry.absoluteFilePath();
+        if (!existUpdates.contains(fileName)) 
+        {
+            if (!beforeInstallUpdate(fileName))
+                return false;
+            if (!execSQLFile(fileName, m_sdb))
+                return false;
+            if (!afterInstallUpdate(fileName))
+                return false;
+
+            QSqlQuery insQuery(m_sdb);
+            insQuery.prepare(lit("INSERT INTO south_migrationhistory (app_name, migration, applied) values(?, ?, ?)"));
+            insQuery.addBindValue(qApp->applicationName());
+            insQuery.addBindValue(fileName);
+            insQuery.addBindValue(QDateTime::currentDateTime());
+            if (!insQuery.exec()) {
+                qWarning() << Q_FUNC_INFO << __LINE__ << insQuery.lastError();
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool QnDbHelper::beforeInstallUpdate(const QString& updateName) {
+    Q_UNUSED(updateName);
+    return true;
+}
+
+bool QnDbHelper::afterInstallUpdate(const QString& updateName) {
+    Q_UNUSED(updateName);
+    return true;
 }

@@ -83,7 +83,7 @@ void QnVMax480ChunkReader::run()
             continue;
         }
 
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
 
         switch (m_state)
         {
@@ -176,7 +176,7 @@ void QnVMax480ChunkReader::updateRecordedDays(quint32 startDateTime, quint32 end
 void QnVMax480ChunkReader::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
 {
     //VMaxStreamFetcher::onGotArchiveRange(startDateTime, endDateTime);
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (m_firstRange) {
         updateRecordedDays(startDateTime, endDateTime);
         m_firstRange = false;
@@ -189,7 +189,7 @@ void QnVMax480ChunkReader::onGotArchiveRange(quint32 startDateTime, quint32 endD
 
 void QnVMax480ChunkReader::onGotMonthInfo(const QDate& month, int _monthInfo)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
 //    QDateTime timestamp(month);
 //    qint64 base = timestamp.toMSecsSinceEpoch();
@@ -208,7 +208,7 @@ void QnVMax480ChunkReader::onGotMonthInfo(const QDate& month, int _monthInfo)
 
 void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     int year =  dayNum / 10000;
     int month =(dayNum % 10000)/100;
@@ -237,10 +237,10 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
             }
         }
 
-        if (!dayPeriods.isEmpty()) {
-            QVector<QnTimePeriodList> allPeriods;
-            allPeriods << m_chunks[ch];
-            allPeriods << dayPeriods;
+        if (!dayPeriods.empty()) {
+            std::vector<QnTimePeriodList> allPeriods;
+            allPeriods.push_back(m_chunks[ch]);
+            allPeriods.push_back(dayPeriods);
             m_chunks[ch] = QnTimePeriodList::mergeTimePeriods(allPeriods);
         }
     }
@@ -250,7 +250,7 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
 
 void QnVMax480ChunkReader::addChunk(QnTimePeriodList& chunks, const QnTimePeriod& period)
 {
-    if (!chunks.isEmpty() && chunks.last().endTimeMs() == period.startTimeMs)
+    if (!chunks.empty() && chunks.last().endTimeMs() == period.startTimeMs)
         chunks.last().addPeriod(period);
     else
         chunks.push_back(period);

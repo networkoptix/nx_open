@@ -1,0 +1,37 @@
+/**********************************************************
+* 9 sep 2014
+* a.kolesnikov
+***********************************************************/
+
+#ifndef NX_CUSTOM_STUN_H
+#define NX_CUSTOM_STUN_H
+
+#include <utils/network/stun/stun_message.h>
+
+
+//!hpm stands for "Hole Punching Mediator". This namespace is to contain all mediator types (maybe)
+namespace nx_hpm
+{
+    namespace StunMethods
+    {
+        enum Value
+        {
+            listen = static_cast<int>( nx_stun::MethodType::userMethod ),
+            connect,
+            connectionRequested
+        };
+    };
+
+    //TODO custom stun requests parameters
+    namespace StunParameters
+    {
+        enum Value
+        {
+            systemName = static_cast<int>( nx_stun::attr::AttributeType::userDefine ),
+            authorization,
+            serverId
+        };
+    }
+}
+
+#endif  //NX_CUSTOM_STUN_H

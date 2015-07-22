@@ -51,7 +51,7 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     if (!clientOnly) {
         m_serverSocket = new UDPSocket();
         m_serverSocket->setReuseAddrFlag(true);
-        m_serverSocket->bind(SocketAddress(HostAddress::anyHost, multicastGroupPort));
+        m_serverSocket->bind(SocketAddress(HostAddress::anyHost, m_multicastGroupPort));
     }
     connect(qnCommon, &QnCommonModule::moduleInformationChanged, this, &QnMulticastModuleFinder::at_moduleInformationChanged, Qt::DirectConnection);
 }
@@ -65,7 +65,7 @@ QnMulticastModuleFinder::~QnMulticastModuleFinder() {
 }
 
 bool QnMulticastModuleFinder::isValid() const {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     return !m_clientSockets.empty();
 }
 
@@ -78,7 +78,7 @@ void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
 }
 
 void QnMulticastModuleFinder::updateInterfaces() {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
 
     QList<QHostAddress> addressesToRemove = m_clientSockets.keys();
 
@@ -144,7 +144,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
 
     //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
     {
-        QMutexLocker lock(&m_moduleInfoMutex);
+        QnMutexLocker lock(&m_moduleInfoMutex);
         if (m_serializedModuleInfo.isEmpty())
             m_serializedModuleInfo = RevealResponse(qnCommon->moduleInformation()).serialize();
     }
@@ -159,7 +159,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
 
 void QnMulticastModuleFinder::at_moduleInformationChanged()
 {
-    QMutexLocker lock(&m_moduleInfoMutex);
+    QnMutexLocker lock(&m_moduleInfoMutex);
     m_serializedModuleInfo.clear(); // clear cached value
 }
 
@@ -243,7 +243,7 @@ void QnMulticastModuleFinder::run() {
         currentClock = QDateTime::currentMSecsSinceEpoch();
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk( &m_mutex );
 
             for (UDPSocket *socket: m_clientSockets) {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
@@ -288,7 +288,7 @@ void QnMulticastModuleFinder::run() {
         }
     }
 
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     for (UDPSocket *socket: m_clientSockets)
         m_pollSet.remove(socket->implementationDelegate(), aio::etRead);
     if (m_serverSocket)

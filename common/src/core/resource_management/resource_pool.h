@@ -3,7 +3,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QHash>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <utils/common/uuid.h>
 #include <QtNetwork/QHostAddress>
@@ -42,7 +42,7 @@ public:
         AllResources
     };
 
-    QnResourcePool();
+    QnResourcePool(QObject* parent = NULL);
     ~QnResourcePool();
 
     // this function will add or update existing resources
@@ -62,7 +62,7 @@ public:
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources() const {
-        QMutexLocker locker(&m_resourcesMtx);
+        QnMutexLocker locker( &m_resourcesMtx );
         QnSharedResourcePointerList<Resource> result;
         for (const QnResourcePtr &resource : m_resources)
             if(QnSharedResourcePointer<Resource> derived = resource.template dynamicCast<Resource>())
@@ -72,7 +72,7 @@ public:
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources(const QVector<QnUuid>& idList) const {
-        QMutexLocker locker(&m_resourcesMtx);
+        QnMutexLocker locker( &m_resourcesMtx );
         QnSharedResourcePointerList<Resource> result;
         for (const auto& id: idList) {
             const auto itr = m_resources.find(id);
@@ -84,9 +84,23 @@ public:
         return result;
     }
 
+    template <class Resource>
+    QnSharedResourcePointer<Resource> getResourceByUniqueId(const QString &id) const {
+        QnMutexLocker locker(&m_resourcesMtx);
+        auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&id](const QnResourcePtr &resource) { return resource->getUniqueId() == id; });
+        return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
+    }
+
+    template <class Resource>
+    QnSharedResourcePointer<Resource> getResourceById(const QnUuid &id) const {
+        QnMutexLocker locker(&m_resourcesMtx);
+        auto itr = m_resources.find(id);
+        return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
+    }
+
     QnResourcePtr getResourceById(const QnUuid &id) const;
 
-    QnResourcePtr getResourceByUniqId(const QString &id) const;
+    QnResourcePtr getResourceByUniqueId(const QString &id) const;
     void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
 
     bool hasSuchResource(const QString &uniqid) const;
@@ -170,7 +184,7 @@ private:
     */
     void invalidateCache();
 private:
-    mutable QMutex m_resourcesMtx;
+    mutable QnMutex m_resourcesMtx;
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;

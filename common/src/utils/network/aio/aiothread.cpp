@@ -12,6 +12,7 @@
 #include <QtCore/QDateTime>
 
 #include "../system_socket.h"
+#include "../udt_socket.h"
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
 
@@ -85,6 +86,7 @@ namespace aio
     {
         template<class SocketType> struct get {};
         template<> struct get<Pollable> { typedef PollSet value; };
+        template<> struct get<UdtSocket> { typedef UdtPollSet value; };
     }
 
 
@@ -103,6 +105,7 @@ namespace aio
             unsigned int timeout;
             std::atomic<int>* taskCompletionEvent;
             std::function<void()> postHandler;
+            std::function<void()> taskCompletionHandler;
 
             /*!
                 \param taskCompletionEvent if not NULL, set to 1 after processing task
@@ -113,14 +116,16 @@ namespace aio
                 aio::EventType _eventType,
                 AIOEventHandler<SocketType>* const _eventHandler,
                 unsigned int _timeout = 0,
-                std::atomic<int>* const _taskCompletionEvent = nullptr )
+                std::atomic<int>* const _taskCompletionEvent = nullptr,
+                std::function<void()> _taskCompletionHandler = std::function<void()>() )
             :
                 type( _type ),
                 socket( _socket ),
                 eventType( _eventType ),
                 eventHandler( _eventHandler ),
                 timeout( _timeout ),
-                taskCompletionEvent( _taskCompletionEvent )
+                taskCompletionEvent( _taskCompletionEvent ),
+                taskCompletionHandler( _taskCompletionHandler )
             {
             }
         };
@@ -197,17 +202,17 @@ namespace aio
         //TODO #ak too many mutexes here. Refactoring required
 
         PollSetType pollSet;
-        QMutex* const aioServiceMutex;
+        QnMutex* const aioServiceMutex;
         std::deque<SocketAddRemoveTask> pollSetModificationQueue;
         unsigned int newReadMonitorTaskCount;
         unsigned int newWriteMonitorTaskCount;
-        mutable QMutex mutex;
+        mutable QnMutex mutex;
         //TODO #ak get rid of map here to avoid undesired allocations
         std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
         //TODO #ak use cyclic array here to minimize allocations
         std::deque<SocketAddRemoveTask> postedCalls;
 
-        AIOThreadImpl( QMutex* const _aioServiceMutex )
+        AIOThreadImpl( QnMutex* const _aioServiceMutex )
         :
             aioServiceMutex( _aioServiceMutex ),
             newReadMonitorTaskCount( 0 ),
@@ -220,7 +225,7 @@ namespace aio
             if( pollSetModificationQueue.empty() )
                 return;
 
-            QMutexLocker lk( aioServiceMutex );
+            QnMutexLocker lk( aioServiceMutex );
 
             for( typename std::deque<SocketAddRemoveTask>::iterator
                 it = pollSetModificationQueue.begin();
@@ -291,6 +296,8 @@ namespace aio
                 }
                 if( task.taskCompletionEvent )
                     task.taskCompletionEvent->store( 1, std::memory_order_relaxed );
+                if( task.taskCompletionHandler )
+                    task.taskCompletionHandler();
                 it = pollSetModificationQueue.erase( it );
             }
         }
@@ -442,7 +449,7 @@ namespace aio
                     static_cast<AIOEventHandlingDataHolder<SocketType>*>(
                         socket->impl()->eventTypeToUserData[handlerToInvokeType])->data;
 
-                QMutexLocker lk( &mutex );
+                QnMutexLocker lk( &mutex );
                 ++handlingData->beingProcessed;
                 //TODO #ak possibly some atomic fence is required here
                 if( handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0 ) //socket has been removed from watch
@@ -472,7 +479,7 @@ namespace aio
 
             for( ;; )
             {
-                QMutexLocker lk( &mutex );
+                QnMutexLocker lk( &mutex );
 
                 PeriodicTaskData periodicTaskData;
                 {
@@ -560,7 +567,7 @@ namespace aio
             SocketType* _socket,
             aio::EventType eventType )
         {
-            QMutexLocker lk( &mutex );
+            QnMutexLocker lk( &mutex );
             addPeriodicTaskNonSafe( taskClock, handlingData, _socket, eventType );
         }
 
@@ -605,7 +612,7 @@ namespace aio
 
 
     template<class SocketType>
-    AIOThread<SocketType>::AIOThread( QMutex* const aioServiceMutex ) //TODO: #ak give up using single aioServiceMutex for all aio threads
+    AIOThread<SocketType>::AIOThread( QnMutex* const aioServiceMutex ) //TODO: #ak give up using single aioServiceMutex for all aio threads
     :
         m_impl( new AIOThreadImplType( aioServiceMutex ) )
     {
@@ -638,7 +645,8 @@ namespace aio
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        unsigned int timeoutMs )
+        unsigned int timeoutMs,
+        std::function<void()> socketAddedToPollHandler )
     {
         //NOTE m_impl->aioServiceMutex is locked up the stack
 
@@ -651,7 +659,9 @@ namespace aio
             sock,
             eventToWatch,
             eventHandler,
-            timeoutMs ) );
+            timeoutMs,
+            nullptr,
+            socketAddedToPollHandler ) );
         if( eventToWatch == aio::etRead )
             ++m_impl->newReadMonitorTaskCount;
         else if( eventToWatch == aio::etWrite )
@@ -667,7 +677,8 @@ namespace aio
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        unsigned int timeoutMs )
+        unsigned int timeoutMs,
+        std::function<void()> socketAddedToPollHandler )
     {
         //TODO #ak looks like copy-paste of previous method. Remove copy-paste nahuy!!!
 
@@ -689,7 +700,9 @@ namespace aio
             sock,
             eventToWatch,
             eventHandler,
-            timeoutMs ) );
+            timeoutMs,
+            nullptr,
+            socketAddedToPollHandler ) );
         if( currentThreadSystemId() != systemThreadId() )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
             m_impl->pollSet.interrupt();
 
@@ -867,7 +880,7 @@ namespace aio
             //taking clock of the next periodic task
             qint64 nextPeriodicEventClock = 0;
             {
-                QMutexLocker lk( &m_impl->mutex );
+                QnMutexLocker lk( &m_impl->mutex );
                 nextPeriodicEventClock = m_impl->periodicTasksByClock.empty() ? 0 : m_impl->periodicTasksByClock.cbegin()->first;
             }
 
@@ -913,4 +926,5 @@ namespace aio
     }
 
     template class AIOThread<Pollable>;
+    template class AIOThread<UdtSocket>;
 }

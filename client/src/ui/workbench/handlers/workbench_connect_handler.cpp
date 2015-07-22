@@ -14,6 +14,7 @@
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -26,6 +27,9 @@
 #include <core/resource_management/status_dictionary.h>
 
 #include <nx_ec/ec_proto_version.h>
+#include <llutil/hardware_id.h>
+
+#include <platform/hardware_information.h>
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
@@ -36,6 +40,7 @@
 #include <ui/dialogs/non_modal_dialog_constructor.h>
 
 #include <ui/graphics/items/generic/graphics_message_box.h>
+#include <ui/graphics/opengl/gl_functions.h>
 
 #include <ui/style/skin.h>
 
@@ -52,10 +57,10 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/collection.h>
 #include <utils/common/synctime.h>
+#include <utils/common/system_information.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/router.h>
 #include <utils/reconnect_helper.h>
-
 
 #include "compatibility.h"
 
@@ -80,6 +85,11 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         /* Reload all dialogs and dependent data. */
         context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
 
+        menu()->triggerIfPossible(Qn::AllowStatisticsReportMessageAction);
+
+        /* Collect and send crash dumps if allowed */
+        m_crashReporter.scanAndReportAsync(qnSettings->rawSettings());
+
         /* We are just reconnected automatically, e.g. after update. */
         if (!m_readyForConnection)
             return;
@@ -90,10 +100,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         if(!watcher->hasMismatches())
             return;
 
-        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
-            return;
-
-        menu()->trigger(Qn::VersionMismatchMessageAction);
+        menu()->triggerIfPossible(Qn::VersionMismatchMessageAction);
     });
 
     QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();
@@ -171,7 +178,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     // ask user if he wants to save changes
-    bool force = qnSettings->isActiveXMode() || qnSettings->isVideoWallMode();
+    bool force = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
     if (connected() && !disconnectFromServer(force))
         return; 
 
@@ -180,14 +187,14 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
 
     if (url.isValid()) {
         /* ActiveX plugin */
-        if (qnSettings->isActiveXMode()) {
+        if (qnRuntime->isActiveXMode()) {
             if (connectToServer(url, true) != ec2::ErrorCode::ok) {
                 QnGraphicsMessageBox::information(tr("Could not connect to server..."), 1000 * 60 * 60 * 24);
                 menu()->trigger(Qn::ExitAction);
             }
         } else
         /* Videowall item */
-        if (qnSettings->isVideoWallMode()) {
+        if (qnRuntime->isVideoWallMode()) {
             //TODO: #GDM #High videowall should try indefinitely
             if (connectToServer(url, true) != ec2::ErrorCode::ok) {
                 QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);
@@ -256,8 +263,33 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     /* Hiding message box from previous connect. */
     hideMessageBox();
 
+    ec2::ApiClientInfoData clientData;
+    {
+        const auto hwId = LLUtil::getMainHardwareIds(0, qnSettings->rawSettings()).last();
+        clientData.id = QnUuid::fromHardwareId(hwId);
+
+        const auto skin = qnSettings->clientSkin();
+        /**/ if (skin == Qn::DarkSkin) clientData.skin = lit("Dark");
+        else if (skin == Qn::LightSkin) clientData.skin = lit("Light");
+        else clientData.skin = lit("Unknown");
+
+        const auto systemInfo = QnSystemInformation::currentSystemInformation();
+        clientData.systemInfo = systemInfo.toString();
+
+        const auto& hw = HardwareInformation::instance();
+        clientData.phisicalMemory = hw.phisicalMemory;
+        clientData.cpuArchitecture = hw.cpuArchitecture;
+        clientData.cpuModelName = hw.cpuModelName;
+
+        const auto gl = QnGlFunctions::openGLCachedInfo();
+        clientData.openGLRenderer = gl.renderer;
+        clientData.openGLVersion = gl.version;
+        clientData.openGLVendor = gl.vendor;
+    }
+
     QnEc2ConnectionRequestResult result;
-    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(appServerUrl, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
+    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+        appServerUrl, clientData, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
     if (!silent)
         m_connectingMessageBox = QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX);
 
@@ -344,6 +376,9 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 
 
 void QnWorkbenchConnectHandler::showLoginDialog() {
+    if (qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode())
+        return;
+
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
     dialogConstructor.resetGeometry();
 

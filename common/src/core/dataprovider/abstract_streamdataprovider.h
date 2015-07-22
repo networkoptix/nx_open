@@ -50,14 +50,14 @@ public:
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();
-
+    void videoLayoutChanged();
 protected:
     virtual void putData(const QnAbstractDataPacketPtr& data);
     void beforeDisconnectFromResource();
 
 protected:
     QList<QnAbstractDataReceptor*> m_dataprocessors;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QHash<QByteArray, QVariant> m_streamParam;
     Qn::ConnectionRole m_role;
 };

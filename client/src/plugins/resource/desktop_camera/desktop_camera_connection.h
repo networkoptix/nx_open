@@ -32,11 +32,11 @@ private:
     QnMediaServerResourcePtr m_server;
     CLSimpleHTTPClient* connection;
     QnDesktopCameraConnectionProcessor* processor;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     struct {
         QString username;
         QString password;
-        QString clientGuid;
+        QnUuid clientGuid;
     } m_auth;
 };
 

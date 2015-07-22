@@ -21,6 +21,7 @@
 #include "common/common_module.h"
 
 #include <client/client_message_processor.h>
+#include <client/client_runtime_settings.h>
 
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_context.h"
@@ -74,6 +75,10 @@
 #include <QtCore/private/qthread_p.h>
 
 #include <QXmlStreamWriter>
+
+#ifdef _DEBUG
+    #define QN_WAIT_FOR_DEBUGGER
+#endif
 
 static QtMessageHandler defaultMsgHandler = 0;
 
@@ -327,8 +332,16 @@ void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timest
     if (resources.isEmpty())
         return;
 
+    qint64 maxTime = qnSyncTime->currentMSecsSinceEpoch();
     qint64 timeStampMs = timestamp.toLongLong();
+    if (timeStampMs < 0)
+        timeStampMs = maxTime; /* Live */
+
     QnTimePeriod period(timeStampMs - displayWindowLengthMs/2, displayWindowLengthMs);
+    if (period.endTimeMs() > maxTime) {
+        period.startTimeMs = maxTime - displayWindowLengthMs;
+        period.durationMs = displayWindowLengthMs;
+    }
 
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QnUuid::createUuid());
@@ -346,7 +359,14 @@ void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timest
     for (QnWorkbenchItem *item: wlayout->items())
         item->setData(Qn::ItemSliderWindowRole, qVariantFromValue(period));
 
-    m_context->navigator()->timeSlider()->setWindow(period.startTimeMs, period.endTimeMs(), false);
+    auto timeSlider = m_context->navigator()->timeSlider();
+    /* Disable unused options to make sure our window will be set to fixed size. */
+    timeSlider->setOption(QnTimeSlider::StickToMinimum, false);
+    timeSlider->setOption(QnTimeSlider::StickToMaximum, false);
+
+    /* Set range to maximum allowed value, so we will not constrain window by any values. */
+    timeSlider->setRange(0, maxTime);
+    timeSlider->setWindow(period.startTimeMs, period.endTimeMs(), false);
 }
 
 void AxHDWitness::removeFromCurrentLayout(const QString &uniqueId) {
@@ -418,8 +438,6 @@ bool AxHDWitness::doInitialize()
     
     AllowSetForegroundWindow(ASFW_ANY);
 
-    int argc = 0;
-
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
@@ -427,7 +445,7 @@ bool AxHDWitness::doInitialize()
     m_clientModule.reset(new QnClientModule());
 
     qnSettings->setLightMode(Qn::LightModeActiveX);
-    qnSettings->setActiveXMode(true);
+    qnRuntime->setActiveXMode(true);
 
     QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
@@ -464,8 +482,7 @@ bool AxHDWitness::doInitialize()
     
     ffmpegInit();
       
-    m_moduleFinder.reset(new QnModuleFinder(true));
-    m_moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
+    m_moduleFinder.reset(new QnModuleFinder(true, qnRuntime->isDevMode()));
     m_moduleFinder->start();
 
     m_router.reset(new QnRouter(m_moduleFinder.data()));
@@ -542,20 +559,8 @@ void AxHDWitness::createMainWindow() {
     m_context->menu()->trigger(Qn::ShowFpsAction);
 #endif
 
-    connect(m_context->navigator(), &QnWorkbenchNavigator::playingChanged, this, [this] {
-         if (m_context->navigator()->isPlaying()) {
-             qDebug() << "setPlaying";
-//             emit started();
-         }
-         else {
-             qDebug() <<"paused";
-//             emit paused();
-         }
-    });
+#ifdef QN_WAIT_FOR_DEBUGGER
+    QMessageBox::information(m_mainWindow, "Waiting...", "Waiting for debugger to be attached.");
+#endif
 
-    connect(m_context->navigator(), &QnWorkbenchNavigator::speedChanged, this, [this] {
-        qreal speed = m_context->navigator()->speed();
-        qDebug() << "speedChanged to" << speed;
-//        emit speedChanged(speed);
-    });
 }

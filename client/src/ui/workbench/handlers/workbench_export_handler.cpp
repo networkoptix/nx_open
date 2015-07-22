@@ -4,12 +4,15 @@
 #include <QtWidgets/QComboBox>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <common/common_globals.h>
 
 #include <camera/loaders/caching_camera_data_loader.h>
+
 #include <camera/client_video_camera.h>
 #include <camera/client_video_camera_export_tool.h>
+#include <camera/camera_data_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -34,7 +37,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/extensions/workbench_layout_export_tool.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
@@ -51,6 +53,8 @@ namespace {
 
     /** Maximum sane duration: 30 minutes of recording. */
     static const qint64 maxRecordingDurationMsec = 1000 * 60 * 30;
+
+    static const QString filterSeparator(QLatin1String(";;"));
 }
 
 // -------------------------------------------------------------------------- //
@@ -147,7 +151,6 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     }
 
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
-    exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
     exportProgressDialog->show();
 
@@ -168,6 +171,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     return tool->start();
 }
 
+//TODO: #GDM Monstrous function, refactor required
 void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
@@ -225,19 +229,20 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
 
-    QString filterSeparator(QLatin1String(";;"));
     QString aviFileFilter = tr("AVI (*.avi)");
     QString mkvFileFilter = tr("Matroska (*.mkv)");
 
     QString allowedFormatFilter =
             aviFileFilter
             + filterSeparator
-            + mkvFileFilter
+            + mkvFileFilter;
+
 #ifdef Q_OS_WIN
-            + filterSeparator
-            + binaryFilterName()
+    if (!qnRuntime->isActiveXMode())
+        allowedFormatFilter += 
+            filterSeparator
+            + binaryFilterName();
 #endif
-            ;
 
     QnLayoutItemData itemData = widget->item()->data();
 
@@ -281,7 +286,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         QnAbstractWidgetControlDelegate* delegate = NULL;
 #ifdef Q_OS_WIN
-        delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
+        if (!qnRuntime->isActiveXMode())
+            delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
         QComboBox* comboBox = new QComboBox(dialog.data());
         comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
@@ -323,7 +329,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         }
 
         if (dialog->selectedNameFilter().contains(aviFileFilter)) {
-            QnCachingCameraDataLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
+            QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(widget->resource());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
             if (loader && archive) {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
@@ -393,7 +399,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
 #ifdef Q_OS_WIN
-    if (selectedFilter.contains(binaryFilterName()))
+    if (!qnRuntime->isActiveXMode()
+        && selectedFilter.contains(binaryFilterName()))
     {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
@@ -413,25 +420,28 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnProgressDialog *exportProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
     exportProgressDialog->setWindowTitle(tr("Exporting Video"));
     exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
-    exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
 
     QnMediaResourcePtr resource = widget->resource();
     QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
 
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
+
+    QnImageFilterHelper imageParameters;
+    imageParameters.setSrcRect(zoomRect);
+    imageParameters.setContrastParams(contrastParams);
+    imageParameters.setDewarpingParams(resource->getDewarpingParams(), dewarpingParams);
+    imageParameters.setRotation(rotation);
+    imageParameters.setCustomAR(customAr);
+    imageParameters.setTimeCorner(timestampPos, timeOffset, 0);
+    imageParameters.setVideoLayout(resource->getVideoLayout());
+
     QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
                                               camera,
                                               period,
                                               fileName,
-                                              timestampPos,
-                                              timeOffset,
+                                              imageParameters,
                                               serverTimeZone,
-                                              zoomRect,
-                                              contrastParams,
-                                              dewarpingParams,
-                                              rotation,
-                                              customAr,
                                               this);
 
     connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);
@@ -467,7 +477,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
     bool hasLocal = false;
 
     foreach (const QnLayoutItemData &item, layout->getItems()) {
-        QnResourcePtr resource = qnResPool->getResourceByUniqId(item.resource.path);
+        QnResourcePtr resource = qnResPool->getResourceByUniqueId(item.resource.path);
         if (!resource)
             continue;
         if( resource->getParentResource() == layout )
@@ -509,7 +519,7 @@ void QnWorkbenchExportHandler::removeLayoutFromPool(const QnLayoutResourcePtr &e
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         QnLayoutItemData& item = itr.value();
-        QnResourcePtr layoutRes = qnResPool->getResourceByUniqId(item.resource.path);
+        QnResourcePtr layoutRes = qnResPool->getResourceByUniqueId(item.resource.path);
         if (layoutRes)
             qnResPool->removeResource(layoutRes);
     }
@@ -540,21 +550,23 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
 
-    QString suggestion = replaceNonFileNameCharacters(layout->getName(), QLatin1Char('_'));
+    QString baseName = layout->getName();
+    if (qnRuntime->isActiveXMode() || baseName.isEmpty())
+        baseName = tr("exported");
+    QString suggestion = replaceNonFileNameCharacters(baseName, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, QFileInfo(suggestion).baseName());
 
     QString fileName;
     bool readOnly = false;
 
+    QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(QnAppInfo::organizationName());
+
 #ifdef Q_OS_WIN
-    QString filterSeparator(QLatin1String(";;"));
+    if (!qnRuntime->isActiveXMode())
+        mediaFileFilter +=
+            filterSeparator
+            + binaryFilterName();
 #endif
-    QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(QnAppInfo::organizationName())
-#ifdef Q_OS_WIN
-            + filterSeparator
-            + binaryFilterName()
-#endif
-            ;
 
     while (true) {
         /* Check if we were disconnected (server shut down) while the dialog was open. 

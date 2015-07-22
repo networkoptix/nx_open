@@ -192,7 +192,7 @@ void OnvifResourceSearcherWsdd::pleaseStop()
 
 /*void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
 
@@ -244,7 +244,7 @@ void OnvifResourceSearcherWsdd::pleaseStop()
 
 void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     wsddProxy soapWsddProxy(SOAP_IO_UDP);
     soapWsddProxy.soap->send_timeout = SOAP_HELLO_CHECK_TIMEOUT;

@@ -9,13 +9,15 @@
 #include <map>
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
+#include <QtNetwork/QAuthenticator>
 #include <QSharedPointer>
 
 #include "utils/network/abstract_socket.h"
 
+#include "auth_cache.h"
 #include "httpstreamreader.h"
 
 
@@ -95,12 +97,21 @@ namespace nx_http
             const QUrl& url,
             const nx_http::StringType& contentType,
             const nx_http::StringType& messageBody );
+        bool doPut(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody );
+        const nx_http::Request& request() const;
         /*!
             Response is valid only after signal \a responseReceived() has been emitted
             \return Can be NULL if no response has been received yet
         */
         const Response* response() const;
         StringType contentType() const;
+
+        //! Checks state as well as response return HTTP code (expect 2XX)
+        bool hasRequestSuccesed() const;
+
         //!Returns current message body buffer, clearing it
         /*!
             \note This method is thread-safe and can be called in any thread
@@ -129,15 +140,11 @@ namespace nx_http
             If timeout has been met, connection is closed, state set to \a failed and \a AsyncHttpClient::done emitted
         */
         void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
-        /*!
-            By default \a true.
-            \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
-        */
-        void setDecodeChunkedMessageBody( bool val );
 
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addAdditionalHeader( const StringType& key, const StringType& value );
+        void addRequestHeaders(const HttpHeaders& headers);
         void removeAdditionalHeader( const StringType& key );
         template<class HttpHeadersRef>
         void setAdditionalHeaders( HttpHeadersRef&& additionalHeaders )
@@ -145,39 +152,7 @@ namespace nx_http
             m_additionalHeaders = std::forward<HttpHeadersRef>(additionalHeaders);
         }
         void setAuthType( AuthType value );
-
-        static QByteArray calcHa1(
-            const QByteArray& userName,
-            const QByteArray& realm,
-            const QByteArray& userPassword );
-
-        /*! \note HA2 in case of qop=auth-int is not supported */
-        static QByteArray calcHa2(
-            const QByteArray& method,
-            const QByteArray& uri );
-
-        static QByteArray calcResponse(
-            const QByteArray& ha1,
-            const QByteArray& nonce,
-            const QByteArray& ha2 );
-
-        //!Calculate Digest response with message-body validation (auth-int)
-        static QByteArray calcResponseAuthInt(
-            const QByteArray& ha1,
-            const QByteArray& nonce,
-            const QByteArray& nonceCount,
-            const QByteArray& clientNonce,
-            const QByteArray& qop,
-            const QByteArray& ha2 );
-
-        static bool calcDigestResponse(
-            const QByteArray& method,
-            const QString& userName,
-            const boost::optional<QString>& userPassword,
-            const boost::optional<QByteArray>& predefinedHA1,
-            const QUrl& url,
-            const header::WWWAuthenticate& wwwAuthenticateHeader,
-            header::DigestAuthorization* const digestAuthorizationHeader );
+        AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
 
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
@@ -215,7 +190,7 @@ namespace nx_http
         QString m_userPassword;
         bool m_authorizationTried;
         bool m_terminated;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
         unsigned int m_responseReadTimeoutMs;
@@ -224,6 +199,7 @@ namespace nx_http
         HttpHeaders m_additionalHeaders;
         int m_awaitedMessageNumber;
         SocketAddress m_remoteEndpoint;
+        AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );
@@ -261,7 +237,9 @@ namespace nx_http
     */
     bool downloadFileAsync(
         const QUrl& url,
-        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler );
+        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
+        const QAuthenticator &auth = QAuthenticator());
     //!Calls previous function and waits for completion
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,

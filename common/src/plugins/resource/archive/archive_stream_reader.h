@@ -8,7 +8,7 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
-#include <QtCore/QWaitCondition>
+#include <utils/thread/wait_condition.h>
 
 #include "core/datapacket/audio_data_packet.h"
 #include "core/resource/resource_media_layout.h"
@@ -162,15 +162,15 @@ private:
     bool m_keepLastSkkipingFrame;
     bool m_singleShot;
     bool m_singleQuantProcessed;
-    mutable QMutex m_jumpMtx;
-    QWaitCondition m_singleShowWaitCond;
+    mutable QnMutex m_jumpMtx;
+    QnWaitCondition m_singleShowWaitCond;
     QnAbstractMediaDataPtr m_currentData;
     QnAbstractMediaDataPtr m_afterMotionData;
     QnAbstractMediaDataPtr m_nextData;
     QQueue<QnAbstractMediaDataPtr> m_skippedMetadata;
     QnMediaContextPtr m_codecContext;
 
-    mutable QMutex m_playbackMaskSync;
+    mutable QnMutex m_playbackMaskSync;
     QnPlaybackMaskHelper m_playbackMaskHelper;
     MediaQuality m_quality;
     bool m_qualityFastSwitch;
@@ -187,8 +187,8 @@ private:
     qint64 m_latPacketTime;
     
     bool m_stopCond;
-    mutable QMutex m_stopMutex;
-    QWaitCondition m_stopWaitCond;
+    mutable QnMutex m_stopMutex;
+    QnWaitCondition m_stopWaitCond;
 
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);

@@ -10,8 +10,8 @@
 #include <memory>
 #include <thread>
 
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QThread>
 #include <qglobal.h>
 
@@ -31,17 +31,11 @@ namespace aio
         if( !threadCount )
             threadCount = QThread::idealThreadCount();
 
-        for( unsigned int i = 0; i < threadCount; ++i )
-        {
-            std::unique_ptr<SystemAIOThread> thread( new SystemAIOThread( &m_mutex ) );
-            thread->start();
-            if( !thread->isRunning() )
-                continue;
-            m_systemSocketAIO.aioThreadPool.push_back( thread.release() );
-        }
+        initializeAioThreadPool(&m_systemSocketAIO, threadCount);
+        initializeAioThreadPool(&m_udtSocketAIO, threadCount);
 
-        assert( !m_systemSocketAIO.aioThreadPool.empty() );
-        if( m_systemSocketAIO.aioThreadPool.empty() )
+        assert(!m_systemSocketAIO.aioThreadPool.empty() && !m_udtSocketAIO.aioThreadPool.empty());
+        if( m_systemSocketAIO.aioThreadPool.empty() && m_udtSocketAIO.aioThreadPool.empty() )
         {
             //I wish we used exceptions
             NX_LOG( lit("Could not start a single AIO thread. Terminating..."), cl_logALWAYS );
@@ -56,14 +50,14 @@ namespace aio
     AIOService::~AIOService()
     {
         m_systemSocketAIO.sockets.clear();
-        for( std::list<SystemAIOThread*>::iterator
-            it = m_systemSocketAIO.aioThreadPool.begin();
-            it != m_systemSocketAIO.aioThreadPool.end();
-            ++it )
-        {
-            delete *it;
-        }
+        for( auto thread : m_systemSocketAIO.aioThreadPool )
+            delete thread;
         m_systemSocketAIO.aioThreadPool.clear();
+
+        m_udtSocketAIO.sockets.clear();
+        for( auto thread : m_udtSocketAIO.aioThreadPool )
+            delete thread;
+        m_udtSocketAIO.aioThreadPool.clear();
 
         Q_ASSERT( AIOService_instance == this );
         AIOService_instance = nullptr;
@@ -91,4 +85,13 @@ namespace aio
         return m_systemSocketAIO;
     }
 
+    template<> AIOService::SocketAIOContext<UdtSocket>& AIOService::getAIOHandlingContext()
+    {
+        return m_udtSocketAIO;
+    }
+
+    template<> const AIOService::SocketAIOContext<UdtSocket>& AIOService::getAIOHandlingContext() const
+    {
+        return m_udtSocketAIO;
+    }
 }

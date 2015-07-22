@@ -13,16 +13,16 @@
 #include <QtCore/QMap>
 #include <QtCore/QPair>
 #include <QSharedPointer>
-#include <QtCore/QWaitCondition>
+#include <utils/thread/wait_condition.h>
 #include <QtXml/QXmlDefaultHandler>
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_advanced_param.h>
+
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
-#include "onvif_resource_settings.h"
-
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -42,6 +42,8 @@ class VideoOptionsLocal;
 //first = width, second = height
 
 class QDomElement;
+class QnOnvifImagingProxy;
+class QnOnvifMaintenanceProxy;
 
 template<typename SyncWrapper, typename Request, typename Response>
 class GSoapAsyncCallWrapper;
@@ -203,6 +205,8 @@ public:
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl);
 
+    virtual bool getParamPhysical(const QString &id, QString &value) override;
+    virtual bool setParamPhysical(const QString &id, const QString& value) override;
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
@@ -231,12 +235,14 @@ public:
     bool secondaryResolutionIsLarge() const;
     virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const override;
 
-    QMutex* getStreamConfMutex();
+    QnMutex* getStreamConfMutex();
     void beforeConfigureStream();
     void afterConfigureStream();
 
     static QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 
+signals:
+    void advancedParameterChanged(const QString &id, const QString &value);
 protected:
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
@@ -249,10 +255,13 @@ protected:
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
-    virtual bool getParamPhysical(const QString &param, QVariant &val);
-    virtual bool setParamPhysical(const QString &param, const QVariant& val);
+    virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const;
+    virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params);
+    virtual QSet<QString> calculateSupportedAdvancedParameters() const;
+    virtual void fetchAndSetAdvancedParameters();
 
-    virtual void fetchAndSetCameraSettings();
+    virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values);
+    virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value);
 
 private:
     void setMaxFps(int f);
@@ -288,17 +297,13 @@ private:
 
     QRect getVideoSourceMaxSize(const QString& configToken);
 
-    bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
+    bool isH264Allowed() const; // block H264 if need for compatible with some onvif devices
     CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;
-    std::unique_ptr<OnvifCameraSettingsResp> m_onvifAdditionalSettings;
-
-    mutable QMutex m_physicalParamsMutex;
-    QDateTime m_advSettingsLastUpdated;
 
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
     virtual void stopInputPortMonitoringAsync() override;
@@ -457,7 +462,7 @@ private:
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;
-    mutable QMutex m_ioPortMutex;
+    mutable QnMutex m_ioPortMutex;
     bool m_inputMonitored;
     EventMonitorType m_eventMonitorType;
     quint64 m_nextPullMessagesTimerID;
@@ -465,8 +470,8 @@ private:
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     
-    QMutex m_streamConfMutex;
-    QWaitCondition m_streamConfCond;
+    QnMutex m_streamConfMutex;
+    QnWaitCondition m_streamConfCond;
     int m_streamConfCounter;
     CameraDiagnostics::Result m_prevOnvifResultCode; 
     QString m_onvifNotificationSubscriptionReference;
@@ -500,6 +505,13 @@ private:
         DeviceSoapWrapper* const soapWrapper,
         CapabilitiesResp* const response );
     void fillFullUrlInfo( const CapabilitiesResp& response );
+
+    mutable QnMutex m_physicalParamsMutex;
+    std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
+    std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
+    QDateTime m_advSettingsLastUpdated;
+    QnCameraAdvancedParamValueMap m_advancedParamsCache;
+    QnCameraAdvancedParams m_advancedParameters;
 };
 
 #endif //ENABLE_ONVIF

@@ -63,13 +63,13 @@ bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) 
 
 QStringList QnAbstractFileResourceSearcher::getPathCheckList() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     return m_pathListToCheck;
 }
 
 void QnAbstractFileResourceSearcher::setPathCheckList(const QStringList& paths)
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     m_pathListToCheck = paths;
 }
 

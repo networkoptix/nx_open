@@ -18,6 +18,7 @@
 #include <ui/style/globals.h>
 
 #include <client/client_meta_types.h>
+#include <client/client_runtime_settings.h>
 
 #include <utils/common/app_info.h>
 
@@ -174,11 +175,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
                 return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
             return baseValue;
         }
-    case DEBUG_COUNTER:
-    case DEV_MODE:
-    case VIDEO_WALL_MODE:
-    case ACTIVE_X_MODE:
-        return defaultValue; /* Not to be read from settings. */
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
         break;
@@ -186,7 +182,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
 }
 
 void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
-    if (isVideoWallMode() || isActiveXMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
 
     switch(id) {
@@ -223,19 +219,13 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         settings->endGroup();
         break;
     }
-    case DEBUG_COUNTER:
     case UPDATE_FEED_URL:
     //case SHOWCASE_URL:
     //case SHOWCASE_ENABLED:
     case SETTINGS_URL:
-    case DEV_MODE:
     case GL_VSYNC:
     case LIGHT_MODE:
-    case LIGHT_MODE_OVERRIDE:
     case PTZ_PRESET_IN_USE_WARNING_DISABLED:
-    case VIDEO_WALL_MODE:
-    case ACTIVE_X_MODE:
-    case SOFTWARE_YUV:
     case NO_CLIENT_UPDATE:
         break; /* Not to be saved to settings. */
     default:
@@ -271,6 +261,10 @@ void QnClientSettings::save() {
 
 bool QnClientSettings::isWritable() const {
     return m_settings->isWritable();
+}
+
+QSettings* QnClientSettings::rawSettings() {
+    return m_settings;
 }
 
 void QnClientSettings::loadFromWebsite() {

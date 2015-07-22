@@ -1,159 +1,41 @@
 #include "recorded_chunks_rest_handler.h"
 
+#include <api/helpers/chunks_request_data.h>
+
 #include "recorder/storage_manager.h"
-#include "utils/network/tcp_connection_priv.h"
 
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 
+#include "motion/motion_helper.h"
+
+#include <rest/helpers/chunks_request_helper.h>
+
 #include "utils/common/util.h"
 #include <utils/fs/file.h>
-#include "motion/motion_helper.h"
-#include "api/serializer/serializer.h"
-
-//#define QN_PERIODS_HIGHLOAD_TEST
-
-#ifdef QN_PERIODS_HIGHLOAD_TEST
-namespace {
-
-    /* 1.5 years of chunks. */
-    qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 547;
-
-    /* 60 seconds each. */
-    qint64 chunkLengthMs = 1000ll * 60;
-
-    /* 5 seconds spacing. */
-    qint64 chunkSpaceMs = 1000ll * 5;
-
-    /* Align chunks. */
-    qint64 startAlignMs = chunkLengthMs + chunkSpaceMs;
-
-    QnTimePeriodList generateAlotOfPeriods(qint64 startTimeMs, int offset) {
-        qint64 baseStartTimeMs = QDateTime::currentMSecsSinceEpoch();
-
-        QnTimePeriodList result;
-        qint64 start = startTimeMs > 0 ? startTimeMs : baseStartTimeMs - totalLengthMs;
-        // align to make sure results will be the same for different requests
-        start = start - (start % startAlignMs) + offset;
-
-        while (start + chunkLengthMs < baseStartTimeMs) {
-            result.push_back(QnTimePeriod(start, chunkLengthMs));
-            start += (chunkLengthMs + chunkSpaceMs);
-        }
-        return result;
-    }
-
-    QString now() {
-        return QDateTime::currentDateTime().toString(lit("hh:mm:ss.zzz"));
-    }
-
-    QString dt(qint64 ms) {
-        return QDateTime::fromMSecsSinceEpoch(ms).toString(lit("yyyy dd MM hh:mm:ss.zzz"));
-    }
-
-    void testPeriods(const QnTimePeriodList &periods) {
-        if (periods.isEmpty())
-            return;
-
-        const int callsCount = 1000*1000;      
-        qint64 result = QDateTime::currentMSecsSinceEpoch();        
-        qint64 test = periods.last().startTimeMs;
-        int N = periods.size();
-
-        for (int i = 0; i < callsCount; ++i)
-            test = std::min<qint64>(test, periods[i % N].startTimeMs);
-        result =  QDateTime::currentMSecsSinceEpoch() - result;
-        qDebug() << now() << "test 1 finished for" << result << "ms" << test;
-
-        std::vector<QnTimePeriod> stdPeriods;
-        stdPeriods.reserve(N);
-        for (const QnTimePeriod &p: periods)
-            stdPeriods.push_back(p);
-
-        result = QDateTime::currentMSecsSinceEpoch();
-        test = periods.last().startTimeMs;
-
-        qDebug() << now() << "starting test 2";
-        for (int i = 0; i < callsCount; ++i)
-            test = std::min<qint64>(test, stdPeriods[i % N].startTimeMs);
-        result =  QDateTime::currentMSecsSinceEpoch() - result;
-        qDebug() << now() << "test 2 finished for" << result << "ms" << test;
-
-    }
-
-}
-#endif
+#include "utils/network/tcp_connection_priv.h"
+#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
 
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
-    qint64 startTime = -1;
-    qint64 endTime = -1;
-    qint64 detailLevel = -1;
-    QnResourceList resList;
-    QByteArray errStr;
-    QByteArray errStrPhysicalId;
-    bool urlFound = false;
-    QString physicalId;
     
-    ChunkFormat format = ChunkFormat_Unknown;
-    QString callback;
-    Qn::TimePeriodContent periodsType = Qn::TimePeriodContentCount;
-    QString filter;
-
-    for (int i = 0; i < params.size(); ++i)
-    {
-        if (params[i].first == "physicalId" || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
-        {
-            urlFound = true;
-            physicalId = params[i].second.trimmed();
-            QnResourcePtr res = qnResPool->getNetResourceByPhysicalId(physicalId);
-            if (res == 0)
-                errStrPhysicalId += QByteArray("Resource with physicalId '") + physicalId.toUtf8() + QByteArray("' not found. \n");
-            else 
-                resList << res;
-        }
-        else if (params[i].first == "startTime") 
-        {
-            startTime = parseDateTime(params[i].second.toUtf8());
-        }
-        else if (params[i].first == "endTime") {
-            endTime = parseDateTime(params[i].second.toUtf8());
-        }
-        else if (params[i].first == "detail")
-            detailLevel = params[i].second.toLongLong();
-        else if (params[i].first == "format") 
-        {
-            if (params[i].second == "bin")
-                format = ChunkFormat_Binary;
-            else if (params[i].second == "bii")
-                format = ChunkFormat_BinaryIntersected;
-            else if (params[i].second == "xml")
-                format = ChunkFormat_XML;
-            else if (params[i].second == "txt")
-                format = ChunkFormat_Text;
-            else
-                format = ChunkFormat_Json;
-        }
-        else if (params[i].first == "callback")
-            callback = params[i].second;
-        else if (params[i].first == "filter")
-            filter = params[i].second;
-        else if (params[i].first == "periodsType")
-            periodsType = static_cast<Qn::TimePeriodContent>(params[i].second.toInt());
-    }
-    if (!urlFound)
+    QByteArray errStr;
+    QnChunksRequestData request = QnChunksRequestData::fromParams(params);
+    QString callback = params.value("callback");
+    
+    if (request.resList.isEmpty())
         errStr += "Parameter physicalId must be provided. \n";
-    if (startTime < 0)
+    if (request.startTimeMs < 0)
         errStr += "Parameter startTime must be provided. \n";
-    if (endTime < 0)
+    if (request.endTimeMs < 0)
         errStr += "Parameter endTime must be provided. \n";
-    if (detailLevel < 0)
+    if (request.detailLevel < 0)
         errStr += "Parameter detail must be provided. \n";
-
-    if (resList.isEmpty())
-        errStr += errStrPhysicalId;
+    if (request.format == Qn::UnsupportedFormat)
+        errStr += "Parameter format must be provided. \n";
 
     auto errLog = [&](const QString &errText) {
         result.append("<root>\n");
@@ -165,57 +47,9 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     if (!errStr.isEmpty())
         return errLog(errStr);
     
-    QnTimePeriodList periods;
-    switch (periodsType) {
-    case Qn::RecordingContent:
-        {
-            periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
-#ifdef QN_PERIODS_HIGHLOAD_TEST
-            qDebug() << now() << "chunks requested for" << physicalId << "for period" << dt(startTime) << " - " << dt(endTime);
+    QnTimePeriodList periods = QnChunksRequestHelper::load(request);
 
-            auto resourceId = resList.filtered<QnVirtualCameraResource>().first()->getId().toByteArray();
-            int offset = 0;
-            for (char c: resourceId)
-                offset += c;
-            periods = generateAlotOfPeriods(startTime, offset);
-#endif
-        }
-        break;
-    case Qn::MotionContent:
-        {
-            QList<QRegion> motionRegions;
-            parseRegionList(motionRegions, filter);
-            periods = QnMotionHelper::instance()->matchImage(motionRegions, resList, startTime, endTime, detailLevel);
-        }
-        break;
-#ifdef QN_ENABLE_BOOKMARKS
-    case Qn::BookmarksContent:
-        {
-            QnCameraBookmarkTags tags;
-            if (!filter.isEmpty()) {
-                QnCameraBookmarkSearchFilter bookmarksFilter;
-                bookmarksFilter.minStartTimeMs = startTime;
-                bookmarksFilter.maxStartTimeMs = endTime;
-                bookmarksFilter.minDurationMs = detailLevel;
-                bookmarksFilter.text = filter;
-                QnCameraBookmarkList bookmarks;
-                if (qnStorageMan->getBookmarks(physicalId.toUtf8(), bookmarksFilter, bookmarks)) {
-                    for (const QnCameraBookmark &bookmark: bookmarks)
-                        periods << QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs);                    
-                }
-            } else {
-            //TODO: #GDM #Bookmarks use tags to filter periods?
-                periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
-            }
-            break;
-        }
-#endif
-    default:
-        return errLog("Invalid periodsType parameter.");
-    }
-
-    
-    switch(format) 
+    switch(request.format) 
     {
         case ChunkFormat_Binary:
             result.append("BIN");

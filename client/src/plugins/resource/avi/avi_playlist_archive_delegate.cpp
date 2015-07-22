@@ -1,6 +1,6 @@
 #include "avi_playlist_archive_delegate.h"
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <core/resource/resource.h>
 #include "utils/common/util.h"
@@ -379,7 +379,7 @@ qint32 QnAVIPlaylistArchiveDelegate::writePacket(quint8* /*buf*/, int /*size*/)
     return 0; // not implemented
 }
 
-QnResourceVideoLayoutPtr QnAVIPlaylistArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnAVIPlaylistArchiveDelegate::getVideoLayout()
 {
     return m_defaultVideoLayout;
 }

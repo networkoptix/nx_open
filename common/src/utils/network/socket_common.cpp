@@ -86,7 +86,9 @@ HostAddress::HostAddress( const QString& addrStr )
         return;
     }
 
-    m_sinAddr.s_addr = inet_addr( addrStr.toLatin1().constData() );
+    if( !addrStr.isEmpty() )
+        m_sinAddr.s_addr = inet_addr( addrStr.toLatin1().constData() );
+    //otherwise considering 0.0.0.0
     if( m_sinAddr.s_addr != INADDR_NONE )
         m_addressResolved = true;   //addrStr contains valid ip address
 }
@@ -133,6 +135,11 @@ QString HostAddress::toString() const
         m_addrStr = QLatin1String(inet_ntoa(m_sinAddr));
     }
     return m_addrStr.get();
+}
+
+bool HostAddress::isResolved() const
+{
+    return m_addressResolved;
 }
 
 HostAddress& HostAddress::operator=( const HostAddress& rhs )
