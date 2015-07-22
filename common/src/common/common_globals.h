@@ -370,7 +370,8 @@ public:
         AR_CameraUpdate,
         AR_ServerUpdate,
         AR_GeneralSettingsChange,
-        AR_PlaybackControl
+        AR_ViewArchive,
+        AR_ViewLive
     };
 
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuditRecordType)
