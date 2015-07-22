@@ -3,6 +3,7 @@
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
 
+#include <sstream>
 #include <gtest/gtest.h>
 
 test::StorageTestGlobals tg;
@@ -46,10 +47,74 @@ TEST(AbstractStorageResourceTest, Capabilities)
     }
 }
 
-TEST(AbstractStorageResourceTest, FileOperations)
+TEST(AbstractStorageResourceTest, FileCommonOperations)
 {
+    const size_t fileCount = 200;
+    std::vector<QString> fileNames;
+    const char *dummyData = "abcdefgh";
+    const size_t dummyDataLen = strlen(dummyData);
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> nameDistribution(0, 15);
+    std::uniform_int_distribution<> pathDistribution(1, 5);
+    std::stringstream pathStream;
+    std::stringstream randomStringStream;
+
+    auto randomString = [&]
+    {
+        randomStringStream.clear();
+        randomStringStream.str("");
+
+        for (size_t i = 0; i < 16; ++i)
+            randomStringStream << std::hex << nameDistribution(gen);
+        
+        return randomStringStream.str();
+    };
+
+    auto randomFilePath = [&]
+    {
+        pathStream.clear();
+        pathStream.str("");
+
+        for (size_t i = 0; i < pathDistribution(gen) - 1; ++i)
+        {
+            pathStream << randomString() << "/";
+        }
+        pathStream << randomString() << ".tmp";
+        return pathStream.str();
+    };
+
     for (auto storage : tg.storages)
     {
+        fileNames.clear();
+        // create many files
+        for (size_t i = 0; i < fileCount; ++i)
+        {   
+            QString fileName = closeDirPath(storage->getUrl()) + QString::fromStdString(randomFilePath());
+            fileNames.push_back(fileName);
+            std::unique_ptr<QIODevice> ioDevice = std::unique_ptr<QIODevice>(
+                storage->open(
+                    fileName.toLatin1().constData(), 
+                    QIODevice::WriteOnly
+                )
+            );
+            ASSERT_TRUE(ioDevice);
+            ASSERT_TRUE(ioDevice->write(dummyData, dummyDataLen) == dummyDataLen);
+        }
+
+        // check if newly created files exist and their sizes are correct
+        for (const auto &fname : fileNames)
+        {   
+            ASSERT_TRUE(storage->isFileExists(fname));
+            ASSERT_TRUE(storage->getFileSize(fname) == dummyDataLen);
+        }
+
+        // remove all files
+        for (const auto &fname : fileNames)
+        {   
+            ASSERT_TRUE(storage->removeFile(fname));
+        }
     }
 }
 
@@ -123,5 +188,7 @@ TEST(AbstractStorageResourceTest, IODevice)
         }
 
         ASSERT_TRUE(memcmp(readData.constData(), data.data(), dataSize) == 0);
+        ioDevice->close();
+        ASSERT_TRUE(storage->removeFile(fileName));
     }
 }
