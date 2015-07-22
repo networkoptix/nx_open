@@ -18,6 +18,7 @@ namespace Qn
 
     EnableSafeDirectConnection::EnableSafeDirectConnection()
     :
+        m_globalHelper( SafeDirectConnectionGlobalHelper::instance() ),
         m_uniqueObjectSequence( ++enableSafeDirectConnectionCounter )
     {
     }
@@ -25,12 +26,12 @@ namespace Qn
     EnableSafeDirectConnection::~EnableSafeDirectConnection()
     {
         //TODO #ak verifying that safeDirectDisconnect() has been called
-        Q_ASSERT( !SafeDirectConnectionGlobalHelper::instance()->isConnected(this) );
+        Q_ASSERT( !m_globalHelper->isConnected(this) );
     }
 
     void EnableSafeDirectConnection::directDisconnectAll()
     {
-        SafeDirectConnectionGlobalHelper::instance()->directDisconnectAll( this );
+        m_globalHelper->directDisconnectAll( this );
     }
 
     EnableSafeDirectConnection::ID EnableSafeDirectConnection::uniqueObjectSequence() const
@@ -71,11 +72,13 @@ namespace Qn
         return m_receivers.find( receiver->uniqueObjectSequence() ) != m_receivers.end();
     }
 
-    Q_GLOBAL_STATIC( SafeDirectConnectionGlobalHelper, safeDirectConnectionGlobalHelperInstance );
+    //TODO #ak create this instance on-demand
+    static std::shared_ptr<SafeDirectConnectionGlobalHelper>
+        safeDirectConnectionGlobalHelperInstance( std::make_shared<SafeDirectConnectionGlobalHelper>() );
 
-    SafeDirectConnectionGlobalHelper* SafeDirectConnectionGlobalHelper::instance()
+    std::shared_ptr<SafeDirectConnectionGlobalHelper> SafeDirectConnectionGlobalHelper::instance()
     {
-        return safeDirectConnectionGlobalHelperInstance();
+        return safeDirectConnectionGlobalHelperInstance;
     }
 
     void SafeDirectConnectionGlobalHelper::newSafeConnectionEstablished(

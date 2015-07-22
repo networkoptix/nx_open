@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <list>
+#include <memory>
 #include <type_traits>
 
 #include <QtCore/QObject>
@@ -20,6 +21,8 @@
 
 namespace Qn
 {
+    class SafeDirectConnectionGlobalHelper;
+
     //!Class that want to receive signals directly, MUST inherit this type
     /*!
         \warning Implementation MUST call \a EnableSafeDirectConnection::safeDirectDisconnect before object destruction
@@ -43,6 +46,7 @@ namespace Qn
         ID uniqueObjectSequence() const;
 
     private:
+        std::shared_ptr<SafeDirectConnectionGlobalHelper> m_globalHelper;
         const ID m_uniqueObjectSequence;
     };
 
@@ -96,7 +100,11 @@ namespace Qn
         //!Returns \a true if receiver is still connected to some signal
         bool isConnected( const EnableSafeDirectConnection* receiver ) const;
 
-        static SafeDirectConnectionGlobalHelper* instance();
+        /*!
+            \note By using \a std::shared_ptr we ensure that \a SafeDirectConnectionGlobalHelper instance
+                is destroyed not earlier then last \a EnableSafeDirectConnection instance
+        */
+        static std::shared_ptr<SafeDirectConnectionGlobalHelper> instance();
 
     private:
         struct ReceiverContext
