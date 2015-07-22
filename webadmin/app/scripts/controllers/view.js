@@ -141,9 +141,9 @@ angular.module('webadminApp').controller('ViewCtrl',
                 } else {
                     $scope.playerAPI.pause();
                 }
-            }
-            if( $scope.positionProvider) {
-                $scope.positionProvider.playing = play;
+                if ($scope.positionProvider) {
+                    $scope.positionProvider.playing = play;
+                }
             }
         };
 

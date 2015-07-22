@@ -155,7 +155,7 @@ angular.module('webadminApp')
 
                 function initRtsp(){
                     scope.videogular = false;
-                    var locomote = new Locomote('videowindow', 'bower_components/locomote/dist/Player.swf'/*'components/Player.swf'*/);
+                    var locomote = new Locomote('videowindow', /*'bower_components/locomote/dist/Player.swf'/**/'components/Player.swf'/**/);
                     locomote.on('apiReady', function() {
                         console.log("play rtsp");
                         scope.api = locomote;
