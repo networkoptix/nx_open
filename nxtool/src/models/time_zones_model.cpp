@@ -42,16 +42,15 @@ namespace
     const QByteArray kUnknownTimeZoneId = "<Unknown>";
   
     
-    QByteArray selectionTimeZoneId(const rtu::ServerInfoList &servers)
+    QByteArray selectionTimeZoneId(const rtu::ServerInfoPtrContainer &servers)
     {
-        if (servers.empty())
+        if (servers.empty() || !servers.first()->hasExtraInfo())
             return kDiffTimeZonesId;
-        
+
         const QByteArray timeZoneId = servers.first()->extraInfo().timeZoneId;
         for (rtu::ServerInfo *info: servers)
         {
-            //TODO: #ynikitenkov make sure extraInfo exists here
-            if (timeZoneId != info->extraInfo().timeZoneId)
+            if (!info->hasExtraInfo() || (timeZoneId != info->extraInfo().timeZoneId))
                 return kDiffTimeZonesId;
         }
         return timeZoneId;
@@ -62,7 +61,7 @@ class rtu::TimeZonesModel::Impl : public QObject
 {
 public:
     Impl(rtu::TimeZonesModel *owner
-        , const rtu::ServerInfoList &selectedServers);
+        , const rtu::ServerInfoPtrContainer &selectedServers);
     
     virtual ~Impl();
     
@@ -110,7 +109,7 @@ private:
 };
 
 rtu::TimeZonesModel::Impl::Impl(rtu::TimeZonesModel *owner
-    , const rtu::ServerInfoList &selectedServers)
+    , const rtu::ServerInfoPtrContainer &selectedServers)
     : QObject(owner)
     , m_owner(owner)
     , m_timeZones()
@@ -261,7 +260,7 @@ QByteArray rtu::TimeZonesModel::Impl::timeZoneIdByIndex(int index) const {
 
 ///
 
-rtu::TimeZonesModel::TimeZonesModel(const ServerInfoList &selectedServers
+rtu::TimeZonesModel::TimeZonesModel(const ServerInfoPtrContainer &selectedServers
     , QObject *parent)
     : QAbstractListModel(parent)
     , m_impl(new Impl(this, selectedServers))

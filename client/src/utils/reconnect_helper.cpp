@@ -34,6 +34,7 @@ namespace {
             qDebug() << prefix << message;
 #else
         Q_UNUSED(message);
+        Q_UNUSED(server);
 #endif
     }
 

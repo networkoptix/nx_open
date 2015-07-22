@@ -353,6 +353,11 @@ namespace Qn {
         BusinessEventsLogAction,
 
         /**
+         * Opens recording statistics dialog.
+         */
+        RecordingStatisticsAction,
+
+        /**
          * Opens camera list dialog.
          */
         CameraListAction,
@@ -1011,6 +1016,10 @@ namespace Qn {
          */
         DebugControlPanelAction,
 
+        /**
+         * open IO monitor for IO module
+         */
+        OpenIOMonitorAction,
 
         ActionCount,
 

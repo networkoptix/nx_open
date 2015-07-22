@@ -9,12 +9,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.3.2-SNAPSHOT</version>
+        <version>2.4-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.2-SNAPSHOT</version>
+    <version>2.4-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>axclient</artifactId>
     <packaging>pom</packaging>
@@ -24,8 +24,8 @@
         <product.title>${client.name}</product.title>
         <assembly-skip>true</assembly-skip>
         <rename-skip>true</rename-skip>
-
-    <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
+        <template>lib</template>
+        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
         <!--Global libs-->
         <global.libs>-lcommon -lappserver2 -lclient -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
         <!--Specific os libs used-->

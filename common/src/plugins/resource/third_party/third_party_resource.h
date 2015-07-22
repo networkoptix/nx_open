@@ -56,12 +56,12 @@ public:
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QStringList getRelayOutputList() const override;
+    virtual QnIOPortDataList getRelayOutputList() const override;
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     //!Implementation of QnSecurityCamResource::getInputPortList
-    virtual QStringList getInputPortList() const override;
+    virtual QnIOPortDataList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
     virtual bool setRelayOutputState( const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS ) override;
     //!Implementation of QnSecurityCamResource::createArchiveDataProvider

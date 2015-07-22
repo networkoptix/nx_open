@@ -6636,7 +6636,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please update all components to the latest version %1.</source>
-        <translation>모든 시스템 구성요소 업데이트 요망</translation>
+        <translation>모든 시스템 구성요소 업데이트 요망 %1.</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>

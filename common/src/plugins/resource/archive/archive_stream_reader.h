@@ -42,6 +42,7 @@ public:
 
     virtual QnConstResourceVideoLayoutPtr getDPVideoLayout() const;
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual bool hasVideo() const;
     static bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
     static QString serializeLayout(const QnResourceVideoLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);
@@ -189,6 +190,7 @@ private:
     bool m_stopCond;
     mutable QMutex m_stopMutex;
     QWaitCondition m_stopWaitCond;
+    mutable boost::optional<bool> m_hasVideo;
 
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);

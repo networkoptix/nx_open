@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.3.2-SNAPSHOT</version>
+		<version>2.4-SNAPSHOT</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.3.2-SNAPSHOT</version>
+	<version>2.4-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>common</artifactId>
 	<packaging>pom</packaging>
@@ -23,7 +23,8 @@
     <properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <!--Global libs-->
-        <!-- <qt.libs>core gui network opengl xml multimedia sql</qt.libs> -->
+        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <template>lib</template>
         <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lonvif -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
@@ -35,7 +36,6 @@
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <linux.defines/>
         <mac.defines/>      
-        <qt.libs>core gui network xml multimedia sql</qt.libs>
     </properties>   
 
     <dependencies>

@@ -573,6 +573,21 @@ namespace nx_http
         dstBuffer->append( messageBody );
     }
 
+    void Response::serializeMultipartResponse( BufferType* const dstBuffer, const ConstBufferRefType& boundary  ) const
+    {
+        //estimating required buffer size
+        dstBuffer->reserve( dstBuffer->size() + boundary.size() + 2 + estimateSerializedDataSize(headers) + 2 + messageBody.size() + 2);
+
+        //serializing
+        dstBuffer->append(boundary);
+        dstBuffer->append("\r\n");
+        serializeHeaders( headers, dstBuffer );
+        dstBuffer->append( (const BufferType::value_type*)"\r\n" );
+        dstBuffer->append( messageBody );
+        dstBuffer->append("\r\n");
+    }
+
+
     BufferType Response::toString() const
     {
         BufferType buf;
@@ -580,6 +595,12 @@ namespace nx_http
         return buf;
     }
 
+    BufferType Response::toMultipartString(const ConstBufferRefType& boundary) const
+    {
+        BufferType buf;
+        serializeMultipartResponse( &buf, boundary );
+        return buf;
+    }
 
     namespace MessageType
     {

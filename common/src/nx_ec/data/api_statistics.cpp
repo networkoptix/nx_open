@@ -52,7 +52,7 @@ namespace ec2 {
 
     ApiStorageDataStatistics::ApiStorageDataStatistics(ApiStorageData&& data)
         : ApiStorageData(std::move(data))
-	{}
+    {}
 
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics() {}
 

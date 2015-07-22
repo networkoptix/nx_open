@@ -53,25 +53,38 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
-        QSet<QString> totalRelays;
+        QnIOPortDataList outputPorts;
         bool inited = false;
 
         QnVirtualCameraResourceList cameras = model->actionResources().filtered<QnVirtualCameraResource>();
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-            QStringList cameraRelays = camera->getRelayOutputList();
+            QnIOPortDataList cameraOutputs = camera->getRelayOutputList();
             if (!inited) {
-                totalRelays = cameraRelays.toSet();
+                outputPorts = cameraOutputs;
                 inited = true;
             } else {
-                totalRelays = totalRelays.intersect(cameraRelays.toSet());
+                for (auto itr = outputPorts.begin(); itr != outputPorts.end();)
+                {
+                    const QnIOPortData& value = *itr;
+                    bool found = false;
+                    for (const auto& other: cameraOutputs) {
+                        if (other.id == value.id && other.getName() == value.getName()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        ++itr;
+                    else
+                        itr = outputPorts.erase(itr);
+                }
             }
         }
 
         ui->relayComboBox->clear();
         ui->relayComboBox->addItem(tr("<automatic>"), QString());
-        foreach (QString relay, totalRelays)
-            ui->relayComboBox->addItem(relay, relay);
-
+        for (const auto& relayOutput: outputPorts)
+            ui->relayComboBox->addItem(relayOutput.getName(), relayOutput.id);
     }
 
     if (fields & QnBusiness::ActionParamsField) {
@@ -95,7 +108,7 @@ void QnCameraOutputBusinessActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnBusinessActionParameters params;
+    QnBusinessActionParameters params = model()->actionParams();
     params.relayOutputId = ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString();
     params.relayAutoResetTimeout = ui->autoResetCheckBox->isChecked()
                                                          ? ui->autoResetSpinBox->value() * 1000

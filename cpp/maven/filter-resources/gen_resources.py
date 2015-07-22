@@ -157,6 +157,7 @@ if __name__ == '__main__':
             print(vc_path)
             os.environ["path"] += os.pathsep + vc_path
             os.system('echo %PATH%')
+            os.system('cd ${qt.dir} && ${qt.dir}/qtbinpatcher.exe')
             p = subprocess.Popen(r'qmake.bat %s' % output_pro_file, shell=True, stdout=PIPE)
             p = subprocess.Popen(r'${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile %s' % output_pro_file, shell=True, stdout=PIPE)
             out, err = p.communicate()

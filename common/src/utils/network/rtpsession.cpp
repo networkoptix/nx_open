@@ -895,7 +895,7 @@ QList<QByteArray> RTPSession::getSdpByTrackNum(int trackNum) const
 
 void RTPSession::registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo)
 {
-    while (m_rtpToTrack.size() <= rtpNum)
+    while (m_rtpToTrack.size() <= static_cast<size_t>(rtpNum))
         m_rtpToTrack.emplace_back( QSharedPointer<SDPTrackInfo>() );
     m_rtpToTrack[rtpNum] = std::move(trackInfo);
 }
@@ -1617,7 +1617,7 @@ RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
 {
     TrackType rez = TT_UNKNOWN;
     int rtpChannelNum = channelNum & ~1;
-    if (rtpChannelNum < m_rtpToTrack.size()) {
+    if (static_cast<size_t>(rtpChannelNum) < m_rtpToTrack.size()) {
         const QSharedPointer<SDPTrackInfo>& track = m_rtpToTrack[rtpChannelNum];
         if (track)
             rez = track->trackType;
@@ -1635,7 +1635,7 @@ RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
 int RTPSession::getChannelNum(int rtpChannelNum)
 {
     rtpChannelNum = rtpChannelNum & ~1;
-    if (rtpChannelNum < m_rtpToTrack.size()) {
+    if (static_cast<size_t>(rtpChannelNum) < m_rtpToTrack.size()) {
         const QSharedPointer<SDPTrackInfo>& track = m_rtpToTrack[rtpChannelNum];
         if (track)
             return track->trackNum;

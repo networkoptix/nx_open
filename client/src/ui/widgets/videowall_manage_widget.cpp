@@ -39,6 +39,7 @@ QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /*= 0*/):
 QnVideowallManageWidget::~QnVideowallManageWidget() { }
 
 void QnVideowallManageWidget::paintEvent(QPaintEvent *event) {
+    QN_UNUSED(event);
     Q_D(QnVideowallManageWidget);
 
     QScopedPointer<QPainter> painter(new QPainter(this));

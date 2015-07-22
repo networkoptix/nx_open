@@ -9,6 +9,7 @@
 #include "utils/common/util.h"
 #include "utils/media/externaltimesource.h"
 #include "utils/common/synctime.h"
+#include "core/resource/media_resource.h"
 
 
 // used in reverse mode.
@@ -207,6 +208,17 @@ QnConstResourceVideoLayoutPtr QnArchiveStreamReader::getDPVideoLayout() const
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
         m_delegate->open(m_resource);
     return m_delegate->getVideoLayout();
+}
+
+bool QnArchiveStreamReader::hasVideo() const
+{
+    if (!m_hasVideo.is_initialized()) {
+        if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineHasVideo)) {
+            m_delegate->open(m_resource);
+        }
+        m_hasVideo = m_delegate->hasVideo();
+    }
+    return *m_hasVideo;
 }
 
 QnConstResourceAudioLayoutPtr QnArchiveStreamReader::getDPAudioLayout() const
@@ -752,8 +764,17 @@ begin_label:
     if (videoData && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && m_ignoreSkippingFrame)
         goto begin_label;
 
-    if (videoData && videoData->context) 
-        m_codecContext = videoData->context;
+    auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
+    if (mediaRes && !mediaRes->hasVideo(this)) 
+    {
+        if (m_currentData && m_currentData->channelNumber == 0)
+            m_codecContext = m_currentData->context;
+    }
+    else {
+        if (videoData && videoData->context) 
+            m_codecContext = videoData->context;
+    }
+    
 
 
     if (reverseMode && !delegateForNegativeSpeed)

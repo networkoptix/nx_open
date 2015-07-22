@@ -549,7 +549,6 @@ CameraSettings& CameraSettingsWidgetsTreeCreator::dataPtr() {
 
 void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings &settings) {
     m_settings = settings;
-    bool result = false;
     if ( !m_id.isNull() )
         CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
 }

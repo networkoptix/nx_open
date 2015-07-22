@@ -29,8 +29,6 @@
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 #include "transaction/runtime_transaction_log.h"
-#include "../../mediaserver/src/media_server/settings.h"
-
 
 namespace ec2
 {
@@ -395,7 +393,7 @@ void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, b
 void QnTransactionMessageBus::addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tran, int timeout)
 {
     DelayedAliveData data;
-    data.tran = tran;
+    data.tran = std::move(tran);
     data.timeToSend = m_relativeTimer.elapsed() + timeout;
     m_delayedAliveTran.insert(tran.params.peer.id, std::move(data));
 }
@@ -404,7 +402,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
 {
     for (auto itr = m_delayedAliveTran.begin(); itr != m_delayedAliveTran.end();)
     {
-        const DelayedAliveData& data = itr.value();
+        DelayedAliveData& data = itr.value();
         if (m_relativeTimer.elapsed() >= data.timeToSend) 
         {
             bool isAliveNow = m_alivePeers.contains(data.tran.params.peer.id);
@@ -415,7 +413,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
                     ttHeader.distance = 1;
                 ttHeader.processedPeers = connectedServerPeers() << m_localPeer.id;
                 ttHeader.fillSequence();
-                sendTransactionInternal(data.tran, ttHeader); // resend broadcast alive info for that peer
+                sendTransactionInternal(std::move(data.tran), ttHeader); // resend broadcast alive info for that peer
                 itr = m_delayedAliveTran.erase(itr);
             }
             else
@@ -1106,6 +1104,7 @@ void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
 {
     if (m_alivePeers.contains(peer.id)) 
         return;
+    m_delayedAliveTran.remove(peer.id); // it's expected new tran about peer state if we connected / reconnected. drop previous (probably offline) tran
     addAlivePeerInfo(peer, peer.id, 0);
     handlePeerAliveChanged(peer, true, false);
 }
@@ -1123,7 +1122,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
             tran.params.persistentState = transactionLog->getTransactionsState();
             tran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
         }
-        if (transactionLog && peer.id == m_localPeer.id)
+        if (peer.id == m_localPeer.id)
             sendTransaction(tran);
         else  {
             int delay = rand() % (ALIVE_RESEND_TIMEOUT_MAX - ALIVE_RESEND_TIMEOUT_MIN) + ALIVE_RESEND_TIMEOUT_MIN;
@@ -1343,9 +1342,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL) {
         m_aliveSendTimer.restart();
         handlePeerAliveChanged(m_localPeer, true, true);
-    NX_LOG( QnLog::EC2_TRAN_LOG, "Current transaction state:", cl_logDEBUG1 );
-    if (transactionLog)
-        printTranState(transactionLog->getTransactionsState());
+        NX_LOG( QnLog::EC2_TRAN_LOG, "Current transaction state:", cl_logDEBUG1 );
+        if (transactionLog)
+            printTranState(transactionLog->getTransactionsState());
     }
 
     QSet<QnUuid> lostPeers = checkAlivePeerRouteTimeout(); // check if some routs to a server not accessible any more
@@ -1729,7 +1728,7 @@ int QnTransactionMessageBus::distanceToPeer(const QnUuid& dstPeer) const
     int minDistance = INT_MAX;
     for (const RoutingRecord& rec: m_alivePeers.value(dstPeer).routingInfo)
         minDistance = qMin(minDistance, rec.distance);
-    Q_ASSERT(minDistance != INT_MAX);
+    //Q_ASSERT(minDistance != INT_MAX);
     return minDistance;
 }
 

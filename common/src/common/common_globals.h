@@ -33,13 +33,13 @@ namespace Qn
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            ServerFlag CameraStatusFlag)
+            ServerFlag CameraStatusFlag IOPortType IODefaultState)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
             PtzDataFields PtzCapabilities PtzTraits 
             MotionTypes TimePeriodTypes 
-            ServerFlags CameraStatusFlags)
+            ServerFlags CameraStatusFlags IOPortTypes)
 public:
 #else
     Q_NAMESPACE
@@ -86,7 +86,8 @@ public:
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        ShareIpCapability                   = 0x020 
+        ShareIpCapability                   = 0x020,
+        IOModuleCapability                  = 0x040,
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -301,6 +302,7 @@ public:
         parent_change = 0x800000,       /**< Camera discovery internal purpose */
         depend_on_parent_status = 0x1000000,   /**< Resource status depend on parent resource status */
         search_upd_only = 0x2000000,   /**< Disable to insert new resource during discovery process, allow update only */
+        io_module       = 0x4000000,   /**< It's IO module camera (camera subtype) */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -327,6 +329,12 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 
+    enum BitratePerGopType {
+        BPG_None,
+        BPG_Predefined,
+        BPG_User
+    };
+
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag { 
         SF_None         = 0x0, 
@@ -341,6 +349,23 @@ public:
 
     Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
+
+    enum IOPortType {
+        PT_Unknown  = 0x0,
+        PT_Disabled = 0x1,
+        PT_Input    = 0x2,
+        PT_Output   = 0x4
+    };
+    Q_DECLARE_FLAGS(IOPortTypes, IOPortType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(IOPortTypes)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IOPortType)
+
+    
+    enum IODefaultState {
+        IO_OpenCircuit,
+        IO_GroundedCircuit
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IODefaultState)
 
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */
@@ -489,6 +514,14 @@ public:
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
+
+        StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
+
+        IOPortDataRole,                             /**< Return QnIOPortData object. Used in IOPortDataModel */
+        
+        RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
+        RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
+        RecordingStatForecastDataRole,              /**< Return qreal for chart. Forecast value. Used in QnRecordingStatsModel */
 
         LastItemDataRole
     };
@@ -660,7 +693,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
-        (Qn::TTHeaderFlag),
+        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState),
     (metatype)(lexical)
 )
 
@@ -677,6 +710,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TTHeaderFlags),
     (metatype)(numeric)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::IOPortTypes),
+    (metatype)(numeric)(lexical)
 )
 
 #endif // QN_COMMON_GLOBALS_H

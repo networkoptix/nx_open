@@ -80,7 +80,7 @@ public:
 
     QByteArray protocol;
     QByteArray requestBody;
-    QByteArray responseBody;
+    //QByteArray responseBody;
     QByteArray clientRequest;
     QByteArray receiveBuffer;
     QMutex sockMutex;

@@ -453,13 +453,13 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
         QString status;
 
         /* Update latest version if we have checked for updates in the internet. */
-        if (targetVersion.isNull() && !result.latestVersion.isNull()) {
-            m_latestVersion = result.latestVersion;
+        if (targetVersion.isNull() && !result.version.isNull()) {
+            m_latestVersion = result.version;
             m_updatesModel->setLatestVersion(m_latestVersion);
         }
-        QnSoftwareVersion displayVersion = targetVersion.isNull()
+        QnSoftwareVersion displayVersion = result.version.isNull()
             ? m_latestVersion
-            : targetVersion;
+            : result.version;
 
         switch (result.result) {
         case QnCheckForUpdateResult::UpdateFound:
@@ -513,7 +513,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
         m_updatesModel->setCheckResult(result);
 
         if (autoStart && result.result == QnCheckForUpdateResult::UpdateFound)
-            m_updateTool->startUpdate(targetVersion, !targetVersion.isNull());
+            m_updateTool->startUpdate(result.version, !result.version.isNull());
     });
 
 }
@@ -539,7 +539,7 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
 
         switch (result.result) {
         case QnCheckForUpdateResult::UpdateFound:
-            if (!result.latestVersion.isNull() && result.clientInstallerRequired) {
+            if (!result.version.isNull() && result.clientInstallerRequired) {
                 detail = tr("Newer version found.");
                 detail += lit("\n");
 #ifdef Q_OS_MAC

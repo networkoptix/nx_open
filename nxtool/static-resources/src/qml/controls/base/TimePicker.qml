@@ -32,10 +32,11 @@ QtControls.TextField
     
     Timer  {
         id: updateSecondsTimer
+
         interval: 1000;
-        running: true;
+        running: !changed;
         repeat: true;
-        onTriggered: impl.timeChanged()
+        onTriggered: impl.tick()
     }
 
     onShowNowChanged:
@@ -59,7 +60,7 @@ QtControls.TextField
     onTextChanged: 
     {
         time = Date.fromLocaleTimeString(Qt.locale(), text, impl.timeFormat);
-        if (!impl.textIsValid())
+        if (!acceptableInput)
             return;
         
         thisComponent.changed = (initTime && time 
@@ -70,23 +71,18 @@ QtControls.TextField
     {
         readonly property string timeFormat: "hh:mm:ss";
         readonly property string mask: (timeFormat.replace(new RegExp(/[a-zA-Z0-9]/g), "9") + ";-");
-        readonly property string emptyMaskValue: "::";  
     
-        function textIsValid() {
-            return (text !== impl.emptyMaskValue);
-        }
-
         function stringFromTime(timeValue)
         {
             return (timeValue ? timeValue.toLocaleTimeString(Qt.locale(), timeFormat) : "");
         }
 
-        function timeChanged()
+        function tick()
         {
             if (initTime)
                 initTime.setSeconds(initTime.getSeconds() + 1);
 
-            if (activeFocus || !enabled || !textIsValid())
+            if (activeFocus || !acceptableInput)
                 return;
 
             if (changed) {

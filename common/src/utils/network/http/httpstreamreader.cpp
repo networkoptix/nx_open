@@ -337,6 +337,15 @@ namespace nx_http
                 return true;
             }
         }
+        else if( m_httpMessage.type == MessageType::response )
+        {
+            if( m_httpMessage.response->statusLine.statusCode == nx_http::StatusCode::noContent )
+            {
+                //response with "204 No Content" status code cannot have Message-Body
+                m_contentLength = 0;
+                return true;
+            }
+        }
 
         HttpHeaders::const_iterator contentEncodingIter = m_httpMessage.headers().find( nx_http::StringType("Content-Encoding") );
         if( contentEncodingIter != m_httpMessage.headers().end() &&

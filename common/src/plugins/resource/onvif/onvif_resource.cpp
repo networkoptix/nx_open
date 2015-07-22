@@ -1295,7 +1295,7 @@ static QString getRelayOutpuToken( const QnPlOnvifResource::RelayOutputInfo& rel
 }
 
 //!Implementation of QnSecurityCamResource::getRelayOutputList
-QStringList QnPlOnvifResource::getRelayOutputList() const
+QnIOPortDataList QnPlOnvifResource::getRelayOutputList() const
 {
     QStringList idList;
     std::transform(
@@ -1303,13 +1303,21 @@ QStringList QnPlOnvifResource::getRelayOutputList() const
         m_relayOutputInfo.end(),
         std::back_inserter(idList),
         getRelayOutpuToken );
-    return idList;
+    QnIOPortDataList result;
+    for (const auto& data: idList) {
+        QnIOPortData value;
+        value.portType = Qn::PT_Output;
+        value.id = data;
+        value.outputName = tr("Otput %1").arg(data);
+        result.push_back(value);
+    }
+    return result;
 }
 
-QStringList QnPlOnvifResource::getInputPortList() const
+QnIOPortDataList QnPlOnvifResource::getInputPortList() const
 {
     //TODO/IMPL
-    return QStringList();
+    return QnIOPortDataList();
 }
 
 bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitiesResponse )

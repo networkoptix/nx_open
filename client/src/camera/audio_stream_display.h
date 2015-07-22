@@ -33,6 +33,10 @@ public:
 
     // how many ms is buffered in audio buffers at this moment(!)
     int msInBuffer() const;
+    qint64 getCurrentTime() const;
+    qint64 lastAudioTime() const;
+    void blockTimeValue(qint64 value);
+    void unblockTimeValue();
 
     // returns start buffering time or AV_NOPTS_VALUE if audio is not buffering
     qint64 startBufferingTime() const;
@@ -49,7 +53,7 @@ public:
     void playCurrentBuffer();
 
     int getAudioBufferSize() const;
-
+    bool isPlaying() const;
 private:
     int msInQueue() const;
 
@@ -76,6 +80,9 @@ private:
     QQueue<QnCompressedAudioDataPtr> m_audioQueue;
     QnByteArray m_decodedAudioBuffer;
     qint64 m_startBufferingTime;
+    qint64 m_lastAudioTime;
+    mutable QMutex m_audioQueueMutex;
+    qint64 m_blockedTimeValue;
 };
 
 #endif //QN_AUDIO_STREAM_DISPLAY

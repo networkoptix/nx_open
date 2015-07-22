@@ -1,4 +1,3 @@
-TEMPLATE = lib
 TARGET = Ax${ax.className}
 DEF_FILE = ${basedir}/contrib/activeqt/control/qaxserver.def
 #RC_FILE  = ${project.build.sourceDirectory}/axhdwitness.rc

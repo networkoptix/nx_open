@@ -671,13 +671,15 @@ void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay)
     }
 }
 
-Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceStatus) const {
+Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceStatus, bool hasVideo) const {
     if (resourceStatus == Qn::Offline) {
         return Qn::OfflineOverlay;
     } else if (resourceStatus == Qn::Unauthorized) {
         return Qn::UnauthorizedOverlay;
     } else if(m_renderStatus == Qn::NewFrameRendered) {
         return Qn::EmptyOverlay;
+    } else if(!hasVideo) {
+        return Qn::NoVideoDataOverlay;
     } else if(m_renderStatus == Qn::NothingRendered || m_renderStatus == Qn::CannotRender) {
         return Qn::LoadingOverlay;
     } else if(QDateTime::currentMSecsSinceEpoch() - m_lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) { 
@@ -689,7 +691,8 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceS
 }
 
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay() const {
-    return calculateStatusOverlay(m_resource->getStatus());
+    const auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
+    return calculateStatusOverlay(m_resource->getStatus(), mediaRes && mediaRes->hasVideo(0));
 }
 
 void QnResourceWidget::updateStatusOverlay() {

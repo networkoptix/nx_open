@@ -240,6 +240,7 @@ void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const Qn
 
 void QnCameraSettingsDialog::at_cameras_properties_saved(int requestId, ec2::ErrorCode errorCode) 
 {
+    QN_UNUSED(requestId);
     if( errorCode == ec2::ErrorCode::ok )
         return;
 }
@@ -300,7 +301,8 @@ void QnCameraSettingsDialog::at_selectionChangeAction_triggered() {
     QTimer::singleShot(50, this, SLOT(updateCamerasFromSelection()));
 }
 
-void QnCameraSettingsDialog::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult) {
+void QnCameraSettingsDialog::at_camera_settings_saved(
+        int /*httpStatusCode*/, const QList<QPair<QString, bool> >& /*operationResult*/) {
 
 }
 

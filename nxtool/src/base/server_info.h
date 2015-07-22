@@ -40,11 +40,19 @@ namespace rtu
             , Qt::CheckState initUseDHCP);
 
     };
+
+    bool operator == (const InterfaceInfo &first
+        , const InterfaceInfo &second);
+
+    bool operator != (const InterfaceInfo &first
+        , const InterfaceInfo &second);
+
     typedef QList<InterfaceInfo> InterfaceInfoList;
     
     struct BaseServerInfo
     {
         QUuid id;
+        QString displayAddress;
         Constants::ServerFlags flags;
         
         QString name;
@@ -85,6 +93,9 @@ namespace rtu
         
         ServerInfo(const BaseServerInfo &baseInfo);
         
+        ServerInfo(const BaseServerInfo &baseInfo
+            , const ExtraServerInfo &extraInfo);
+
         ~ServerInfo();
         
         ServerInfo &operator = (const ServerInfo &other);

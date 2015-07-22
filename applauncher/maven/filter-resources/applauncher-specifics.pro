@@ -1,5 +1,3 @@
-TEMPLATE = app
-
 QMAKE_RPATHDIR = ""
 unix:!mac {
      QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"

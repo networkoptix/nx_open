@@ -96,7 +96,7 @@ qint64 QnTimeImageFilter::calcHash(const quint8* data, int width, int height, in
     qint64 result = 0;
     const qint64* data64 = (const qint64*) data;
     for (int y = 0; y < height; ++y) {
-        for (int i = 0; i < width / sizeof(qint64); ++i)
+        for (int i = 0; i < static_cast<int>(width / sizeof(qint64)); ++i)
             result ^= data64[i];
         data64 += linesize / sizeof(qint64);
     }

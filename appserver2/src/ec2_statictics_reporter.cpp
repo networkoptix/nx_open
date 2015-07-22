@@ -28,6 +28,7 @@ namespace ec2
     const QString Ec2StaticticsReporter::SR_TIME_CYCLE = lit("statisticsReportTimeCycle");
     const QString Ec2StaticticsReporter::SR_SERVER_API = lit("statisticsReportServerApi");
     const QString Ec2StaticticsReporter::SYSTEM_ID = lit("systemId");
+    const QString Ec2StaticticsReporter::SYSTEM_NAME_FOR_ID = lit("systemNameForId");
 
     const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = lit("http://stats.networkoptix.com");
 
@@ -140,17 +141,19 @@ namespace ec2
 
     bool Ec2StaticticsReporter::isAllowed(const QnMediaServerResourceList &servers)
     {
-        int result = 0;
-        for (const QnMediaServerResourcePtr &server: servers) {
-            if (!server->hasProperty(Qn::STATISTICS_REPORT_ALLOWED))
-                continue;
-            bool allowedForServer = QnLexical::deserialized(server->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true);
-            if (allowedForServer)
-                ++result;
-            else
-                --result;
+        int overweight = 0;
+        for (const QnMediaServerResourcePtr &server: servers)
+        {
+            const auto allowedForServer = server->getProperty(Qn::STATISTICS_REPORT_ALLOWED);
+            if (!allowedForServer.isEmpty())
+                overweight += QnLexical::deserialized<bool>(allowedForServer) ? 1 : -1;
         }
-        return result >= 0;
+
+        const bool allowed = (overweight >= 0);
+        NX_LOG(lit("Ec2StaticticsReporter::isAllowed = %1 (%2 of %3 overweight)")
+               .arg(allowed).arg(overweight).arg(servers.size()), cl_logDEBUG2);
+
+        return allowed;
     }
 
     bool Ec2StaticticsReporter::isAllowed(const AbstractMediaServerManagerPtr& msManager)
@@ -282,7 +285,7 @@ namespace ec2
             return res;
         }
 
-        m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+        m_httpClient = nx_http::AsyncHttpClient::create();
         connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done,
                 this, &Ec2StaticticsReporter::finishReport, Qt::DirectConnection);
 
@@ -309,12 +312,19 @@ namespace ec2
 
     QnUuid Ec2StaticticsReporter::getOrCreateSystemId()
     {
-        auto systemId = m_admin->getProperty(SYSTEM_ID);
-        if (!systemId.isEmpty())
-            return QnUuid(systemId);
+        const auto systemName = qnCommon->localSystemName();
+        const auto systemNameForId = m_admin->getProperty(SYSTEM_NAME_FOR_ID);
+        const auto systemId = m_admin->getProperty(SYSTEM_ID);
 
-        auto newId = QnUuid::createUuid();
+        if (systemNameForId == systemName // system name was not changed
+            && !systemId.isEmpty())       // and systemId is already generated
+        {
+            return QnUuid(systemId);
+        }
+
+        const auto newId = QnUuid::createUuid();
         m_admin->setProperty(SYSTEM_ID, newId.toString());
+        m_admin->setProperty(SYSTEM_NAME_FOR_ID, systemName);
         propertyDictionary->saveParams(m_admin->getId());
         return newId;
     }

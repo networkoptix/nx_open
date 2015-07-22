@@ -11,7 +11,7 @@ Window
 {
     id: mainWindow;
     
-    title: qsTr("Nx1 Setup & Configuration Tool");
+    title: rtuContext.toolDisplayName + (rtuContext.isBeta ? " (beta)" : "");
         
     width: 1024;
     height: 600;
@@ -19,8 +19,7 @@ Window
     color: "white";
 
     minimumHeight: 480;
-    minimumWidth: selectionPage.width 
-        + (loader.item && loader.item.minWidth ? loader.item.minWidth : 0);
+    minimumWidth: 1024;
     
     visible: true;
     

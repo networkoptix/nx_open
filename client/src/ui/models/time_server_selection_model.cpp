@@ -370,9 +370,10 @@ bool QnTimeServerSelectionModel::isSelected(quint64 priority) {
 QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec) {
     if (offsetMSec == 0)
         return lit("0.00");
-    QChar sign = offsetMSec < 0 
-        ? L'-'
-        : L'+';
+
+    //QChar sign = offsetMSec < 0
+    //    ? L'-'
+    //    : L'+';
 
     QTimeSpan span(offsetMSec);
     span.normalize();

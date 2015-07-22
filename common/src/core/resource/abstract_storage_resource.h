@@ -1,75 +1,204 @@
-#ifndef __ABSTRACT_STORAGE_RESOURCE_H__
-#define __ABSTRACT_STORAGE_RESOURCE_H__
+#ifndef __ABSTRACT_STORAGE_H__
+#define __ABSTRACT_STORAGE_H__
 
 #include "resource.h"
+#include <QtCore/QtCore>
+#include <memory>
 
-class QnAbstractMediaStreamDataProvider;
-
-class QnAbstractStorageResource : public QnResource
+class QnAbstractStorageResource 
+    : public QnResource 
 {
-    Q_OBJECT
+public:
+    enum cap
+    {
+        ListFile        = 0x0001,                   // capable of listing files
+        RemoveFile      = 0x0002,                   // capable of removing files
+        ReadFile        = 0x0004,                   // capable of reading files
+        WriteFile       = 0x0008,                   // capable of writing files
+        DBReady         = 0x0010                    // capable of DB hosting
+    };
 
-    Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
-    Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
+    static const int chunkLen = 60;
+
+    class FileInfo
+    {
+        typedef std::shared_ptr<QFileInfo> QFileInfoPtr;
+
+    public: // ctors
+        explicit 
+        FileInfo(const QString& uri, qint64 size, bool isDir = false)
+            : m_fpath(uri),
+              m_size(size),
+              m_isDir(isDir)
+        {
+            parseUri();
+        }
+
+        explicit
+        FileInfo(const QFileInfo& qfi)
+            : m_qfi(new QFileInfo(qfi))
+        {}
+
+    public:
+        static FileInfo fromQFileInfo(const QFileInfo &fi)
+        {
+            return FileInfo(fi);
+        }
+
+        bool isDir() const
+        {
+            return m_qfi ? m_qfi->isDir() : m_isDir;
+        }
+
+        QString absoluteFilePath() const
+        {
+            return m_qfi ? m_qfi->absoluteFilePath() : m_fpath;
+        }
+
+        QString fileName() const
+        {
+            return m_qfi ? m_qfi->fileName() : m_fname;
+        }
+
+        QString baseName() const
+        {
+            return m_qfi ? m_qfi->baseName() : m_basename;
+        }
+
+        qint64 size() const
+        {
+            return m_qfi ? m_qfi->size() : m_size;
+        }
+
+        QDateTime created() const
+        {
+            return m_qfi ? m_qfi->created() : m_created;
+        }
+
+    private:
+        void parseUri()
+        {   
+            QStringList pathEntries = m_fpath.split(lit("/"));
+            bool found = false;
+            
+            auto assignBN = [this]()
+            {
+                int dotIndex = m_fname.lastIndexOf(lit("."));
+                if (dotIndex != -1)
+                    m_basename = m_fname.left(dotIndex);
+                else
+                    m_basename = m_fname;
+            };
+
+            for (int i = pathEntries.size() - 1; i >= 0; --i)
+            {
+                if (!pathEntries[i].isEmpty())
+                {
+                    found = true;
+                    m_fname = pathEntries[i];
+                    assignBN();
+                    break;
+                }
+            }
+
+            if (!found && !m_fpath.isEmpty())
+            {
+                m_fname = m_fpath;
+                assignBN();
+            }
+        }
+
+    private:
+        QString         m_fpath;
+        QString         m_basename;
+        QString         m_fname;
+        qint64          m_size;
+        bool            m_isDir;
+        QFileInfoPtr    m_qfi;
+        QDateTime       m_created;
+    };
+
+    typedef QList<FileInfo> FileInfoList;
+
+    static FileInfoList FIListFromQFIList(const QFileInfoList& l)
+    {
+        FileInfoList ret;
+        for (const auto& fi: l)
+            ret.append(FileInfo(fi));
+        return ret;
+    }
 
 public:
-    QnAbstractStorageResource();
-    virtual ~QnAbstractStorageResource();
+    static const qint64 UnknownSize = 0x0000FFFFFFFFFFFFll; // TODO: #Elric replace with -1.
 
-    virtual QString getUniqueId() const;
+    virtual QIODevice *open(const QString &fileName, QIODevice::OpenMode openMode) = 0;
 
-    void setSpaceLimit(qint64 value);
-    qint64 getSpaceLimit() const;
+    /**
+    *   \return storage capabilities ('cap' flag(s))
+    */
+    virtual int getCapabilities() const = 0;
 
-    void setStorageType(const QString& type);
-    QString getStorageType() const;
-
-    void setMaxStoreTime(int timeInSeconds);
-    int getMaxStoreTime() const;
-
-    void setUsedForWriting(bool isUsedForWriting);
-    bool isUsedForWriting() const;
-    QString getPath() const;
-    static QString urlToPath(const QString& url);
-
-    static QnUuid fillID(const QnUuid& mserverId, const QString& url);
-    bool isExternal() const;
-#ifdef ENABLE_DATA_PROVIDERS
-    virtual float bitrate() const;
-    virtual float getStorageBitrateCoeff() const { return 1.0; }
-
-    void addBitrate(QnAbstractMediaStreamDataProvider* provider);
-    void releaseBitrate(QnAbstractMediaStreamDataProvider* provider);
-#endif
-
-    /*
-     * Short and uniq storage ID. It is addition related ID field, and used for memory usage optimization
+    /**
+     * \returns                         Storage free space in bytes, or <tt>UnknownSize</tt> if this function is not supported.
      */
-    virtual void setUrl(const QString& value) override;
+    virtual qint64 getFreeSpace() = 0;
 
-    /*
-     * Returns storage usage in range [0..1]
+    /**
+     * \returns                         Storage total space in bytes, or <tt>UnknownSize</tt> if this function is not supported.
      */
-    virtual float getAvarageWritingUsage() const;
+    virtual qint64 getTotalSpace() = 0;
 
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
-signals:
-    /*
-     * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
-     * @param newStartTime - new archive start time point
-     * @param newEndTime - Not used now, reserved for future use
+    ///**
+    // * \returns                         Whether the storage is physically accessible.
+    // */
+    virtual bool isAvailable() const = 0;
+
+    /**
+     * \param url                       Url of the file to delete.
+     * \returns                         Whether the file was successfully removed.
      */
-    void archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
-private:
-    qint64 m_spaceLimit;
-    int m_maxStoreTime; // in seconds
-    bool m_usedForWriting;
-    QString m_storageType;
-    QSet<QnAbstractMediaStreamDataProvider*> m_providers;
-    mutable QMutex m_bitrateMtx;
+    virtual bool removeFile(const QString& url) = 0;
+
+    /**
+     * \param url                       Url of the folder to remove.
+     * \returns                         Whether the folder was successfully removed.
+     */
+    virtual bool removeDir(const QString& url) = 0;
+
+    /**
+     * This function is used when server restarts. Unfinished files re-readed, writed again (under a new name), then renamed.
+     *
+     * \param oldName
+     * \param newName
+     * \returns                         Whether the file was successfully renamed.
+     */
+    virtual bool renameFile(const QString& oldName, const QString& newName) = 0;
+
+    /**
+     * \param dirName                   Url of the folder to list.
+     * \returns                         List of files in given directory, excluding subdirectories.
+     * 
+     * \note QFileInfo structure MUST contains valid fields for full file name and file size.
+     */
+    virtual FileInfoList getFileList(const QString& dirName) = 0;
+
+    /**
+     * \param url                       Url of a file to check.
+     * \returns                         Whether a file with the given url exists.
+     */
+    virtual bool isFileExists(const QString& url) = 0;
+
+    /**
+     * \param url                       Url of a folder to check.
+     * \returns                         Whether a folder with the given name exists.
+     */
+    virtual bool isDirExists(const QString& url) = 0;
+
+    /**
+     * \param url                       Url of the file to get size of.
+     * \returns                         Size of the file, or 0 if the file does not exist.
+     */
+    virtual qint64 getFileSize(const QString& url) const = 0;
 };
 
-Q_DECLARE_METATYPE(QnAbstractStorageResourcePtr);
-Q_DECLARE_METATYPE(QnAbstractStorageResourceList);
-
-#endif // __ABSTRACT_STORAGE_RESOURCE_H__
+#endif // __ABSTRACT_STORAGE_H__

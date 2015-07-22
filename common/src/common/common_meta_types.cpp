@@ -68,6 +68,8 @@
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
+#include "api/model/api_ioport_data.h"
+#include "api/model/recording_stats_reply.h"
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -106,7 +108,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnVirtualCameraResourcePtr>();
     qRegisterMetaType<QnVirtualCameraResourceList>();
     qRegisterMetaType<QnSecurityCamResourcePtr>();
-    qRegisterMetaType<QnAbstractStorageResourcePtr>();
+    qRegisterMetaType<QnStorageResourcePtr>();
     qRegisterMetaType<QnVideoWallResourcePtr>();
 
     qRegisterMetaType<QnUserResourceList>();
@@ -197,6 +199,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::PtzTraits>();
     qRegisterMetaType<Qn::PtzCapabilities>();
 
+    qRegisterMetaType<QnIOPortData>();
+    qRegisterMetaType<QnIOStateData>();
+
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();
 
@@ -237,6 +242,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnUuid>( "QnUuid" );
     qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
+    qRegisterMetaType<QnRecordingStatsReply>();
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

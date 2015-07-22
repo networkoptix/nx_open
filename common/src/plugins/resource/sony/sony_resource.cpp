@@ -171,7 +171,7 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
             //and forgetHttpClient cannot be called before doGet call
 
     requestUrl.setPath( lit("/command/alarmdata.cgi?interval=%1").arg(INPUT_MONITOR_TIMEOUT_SEC) );
-    m_inputMonitorHttpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    m_inputMonitorHttpClient = nx_http::AsyncHttpClient::create();
     connect( m_inputMonitorHttpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
     connect( m_inputMonitorHttpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),    Qt::DirectConnection );
     connect( m_inputMonitorHttpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
@@ -183,7 +183,7 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
 
 void QnPlSonyResource::stopInputPortMonitoringAsync()
 {
-    std::shared_ptr<nx_http::AsyncHttpClient> inputMonitorHttpClient = m_inputMonitorHttpClient;
+    nx_http::AsyncHttpClientPtr inputMonitorHttpClient = m_inputMonitorHttpClient;
     {
         QMutexLocker lk( &m_inputPortMutex );
         if( !m_inputMonitorHttpClient )

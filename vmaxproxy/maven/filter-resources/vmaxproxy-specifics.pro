@@ -1,5 +1,3 @@
-TEMPLATE = app
-
 LIBS -= -L${qt.dir}/lib
 LIBS += -L${qt.dir}/../qtbase-x86/lib
 DESTDIR = ${libdir}/${arch}/bin/$$CONFIGURATION/${project.artifactId}

@@ -1415,6 +1415,9 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
     case Qn::VideoWallMatrixNode:
         valid = parameters.videoWallMatrices().size() == 1 && parameters.videoWallMatrices().first().isValid();
         break;
+    default:
+        // do nothing
+        break;
     }
 
     Q_ASSERT_X(valid, Q_FUNC_INFO, "Data should correspond to action profile.");
@@ -1428,6 +1431,9 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
         break;
     case Qn::VideoWallMatrixNode:
         oldName = parameters.videoWallMatrices().first().matrix().name;
+        break;
+    default:
+        // do nothing
         break;
     }
 
@@ -1444,6 +1450,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
             saveVideowall(index.videowall());
         }
         break;
+
     case Qn::VideoWallMatrixNode:
         {
             QnVideoWallMatrixIndex index = parameters.videoWallMatrices().first();
@@ -1452,6 +1459,10 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
             index.videowall()->matrices()->updateItem(existingMatrix);
             saveVideowall(index.videowall());
         }
+        break;
+
+    default:
+        // nothing
         break;
     }
 
@@ -1883,6 +1894,8 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcAdded(const QnVideoWallResource
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc) {
     //TODO: #GDM #VW implement screen size changes handling
+    QN_UNUSED(videoWall);
+    QN_UNUSED(pc);
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc) {
@@ -2269,7 +2282,7 @@ void QnWorkbenchVideoWallHandler::at_navigator_positionChanged() {
     if (display()->isChangingLayout())
         return;
 
-    if (navigator()->position() == AV_NOPTS_VALUE)
+    if (navigator()->position() == qint64(AV_NOPTS_VALUE))
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPositionChanged);
@@ -2284,7 +2297,7 @@ void QnWorkbenchVideoWallHandler::at_navigator_speedChanged() {
     if (display()->isChangingLayout())
         return;
 
-    if (navigator()->position() == AV_NOPTS_VALUE)
+    if (navigator()->position() == qint64(AV_NOPTS_VALUE))
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorSpeedChanged);
@@ -2482,6 +2495,7 @@ void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps &
 }
 
 void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action) {
+    QN_UNUSED(videowall);
     if (action == ItemAction::Changed) {
 
         // index to place updated layout

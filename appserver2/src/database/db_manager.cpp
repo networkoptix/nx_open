@@ -42,6 +42,7 @@ using std::nullptr_t;
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
+static const QString RES_TYPE_STORAGE = "storage";
 
 namespace ec2
 {
@@ -2953,7 +2954,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
         FROM vms_resource r \
         JOIN vms_storage s on s.resource_ptr_id = r.id \
         %1 \
-        ORDER BY r.parent_guid\
+        ORDER BY r.guid\
     ").arg(filterStr));
 
     if (!queryStorage.exec()) {
@@ -2962,6 +2963,25 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     }
 
     QnSql::fetch_many(queryStorage, &storageList);
+
+    QnQueryFilter filter;
+    filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_STORAGE );
+
+    ApiResourceParamWithRefDataList params;
+    const auto result = fetchResourceParams( filter, params );
+    if( result != ErrorCode::ok )
+        return result;
+
+    mergeObjectListData<ApiStorageData>(
+        storageList, params,
+        &ApiStorageData::addParams,
+        &ApiResourceParamWithRefData::resourceId);
+
+    // Storages are generally bound to MediaServers,
+    // so it's required to be sorted by parent id
+    std::sort(storageList.begin(), storageList.end(),
+              [](const ApiStorageData& lhs, const ApiStorageData& rhs)
+              { return lhs.parentId < rhs.parentId; });
 
     return ErrorCode::ok;
 }

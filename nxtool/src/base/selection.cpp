@@ -10,7 +10,7 @@ namespace
     template<typename ParameterType
         , typename GetterFunc
         , typename EqualsFunc>
-    ParameterType getSelectionValue(const rtu::ServerInfoList &servers
+    ParameterType getSelectionValue(const rtu::ServerInfoPtrContainer &servers
         , const ParameterType &emptyValue
         , const ParameterType &differentValue
         , const EqualsFunc &eqFunc
@@ -28,7 +28,7 @@ namespace
 
     enum { kSingleServerSelectionCount = 1 };
     
-    int calcPort(const rtu::ServerInfoList &servers)
+    int calcPort(const rtu::ServerInfoPtrContainer &servers)
     {
         enum { kDefaultPort = 0 };
         return getSelectionValue<int>(servers, kDefaultPort, kDefaultPort
@@ -38,7 +38,7 @@ namespace
         });
     }
     
-    rtu::Constants::ServerFlags calcFlags(const rtu::ServerInfoList &servers)
+    rtu::Constants::ServerFlags calcFlags(const rtu::ServerInfoPtrContainer &servers)
     {
         rtu::Constants::ServerFlags flags = rtu::Constants::AllFlags;
         for (const rtu::ServerInfo * const info: servers)
@@ -48,7 +48,7 @@ namespace
         return flags;
     }
 
-    Qt::CheckState calcDHCPState(const rtu::ServerInfoList &servers)
+    Qt::CheckState calcDHCPState(const rtu::ServerInfoPtrContainer &servers)
     {
         return getSelectionValue<Qt::CheckState>(servers, Qt::Unchecked, Qt::PartiallyChecked
             , std::equal_to<Qt::CheckState>(), [](const rtu::ServerInfo &info)
@@ -67,7 +67,7 @@ namespace
         });
     }
     
-    QString calcSystemName(const rtu::ServerInfoList &servers)
+    QString calcSystemName(const rtu::ServerInfoPtrContainer &servers)
     {
         if (servers.empty())
             return QString();
@@ -83,7 +83,7 @@ namespace
             , std::equal_to<QString>(), getter);
     }
 
-    QString calcPassword(const rtu::ServerInfoList &servers)
+    QString calcPassword(const rtu::ServerInfoPtrContainer &servers)
     {
         if (servers.empty())
             return QString();
@@ -98,11 +98,13 @@ namespace
             , kDifferentPasswords, std::equal_to<QString>(), getter);
     }
 
-    QDateTime calcDateTime(const rtu::ServerInfoList &servers
+    QDateTime calcDateTime(const rtu::ServerInfoPtrContainer &servers
         , rtu::Constants::ServerFlags flags)
     {
+        QDateTime defaultDateTime = QDateTime();
+
         if (servers.empty())
-            return QDateTime();
+            return defaultDateTime;
         
         const qint64 now = QDateTime::currentMSecsSinceEpoch();
         const auto &getter = [now](const rtu::ServerInfo &info) -> qint64
@@ -121,7 +123,7 @@ namespace
             const rtu::ServerInfo &firstInfo = **servers.begin();
             qint64 utcTimeMs = getter(firstInfo);
             if (utcTimeMs <= 0)
-                return QDateTime();
+                return defaultDateTime;
 
             return rtu::convertUtcToTimeZone(utcTimeMs, QTimeZone(firstInfo.extraInfo().timeZoneId));
         }
@@ -142,11 +144,11 @@ namespace
         });
 
         return (utcTimeMs <= 0  || tz.isEmpty() ?
-            QDateTime() : rtu::convertUtcToTimeZone(utcTimeMs, QTimeZone(tz)));
+            defaultDateTime : rtu::convertUtcToTimeZone(utcTimeMs, QTimeZone(tz)));
     }
 
     
-    bool calcEditableInterfaces(const rtu::ServerInfoList &servers)
+    bool calcEditableInterfaces(const rtu::ServerInfoPtrContainer &servers)
     {
         if (servers.empty())
             return false;

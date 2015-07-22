@@ -92,7 +92,7 @@ namespace nxpt
     };
 
     //!Alignes \a val up to the boundary \a alignment
-    static size_t alignUp( size_t val, size_t alignment )
+    inline size_t alignUp( size_t val, size_t alignment )
     {
         const size_t remainder = val % alignment;
         if( remainder == 0 )
@@ -122,7 +122,7 @@ namespace nxpt
     }
 
     //!Calls above function passing \a ::malloc as third argument
-    static void* mallocAligned( size_t size, size_t alignment )
+    inline void* mallocAligned( size_t size, size_t alignment )
     {
         return mallocAligned<>( size, alignment, ::malloc );
     }
@@ -147,7 +147,7 @@ namespace nxpt
     }
 
     //!Calls above function passing \a ::free as second argument
-    static void freeAligned( void* ptr )
+    inline void freeAligned( void* ptr )
     {
         return freeAligned<>( ptr, ::free );
     }

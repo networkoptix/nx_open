@@ -174,6 +174,7 @@ namespace Qn {
         PausedOverlay,
         LoadingOverlay,
         NoDataOverlay,
+        NoVideoDataOverlay,
         UnauthorizedOverlay,
         OfflineOverlay,
         AnalogWithoutLicenseOverlay,

@@ -99,9 +99,16 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resour
 			id = server->getId();
         QnRoute route = QnRouter::instance()->routeTo(id);
         if (!route.gatewayId.isNull()) {
-            Q_ASSERT(!route.addr.isNull());
-            return QNetworkProxy(QNetworkProxy::HttpProxy, route.addr.address.toString(), route.addr.port,
-                                    QnAppServerConnectionFactory::url().userName(), QnAppServerConnectionFactory::url().password());
+            Q_ASSERT(!route.addr.isNull() || route.reverseConnect);
+
+            if (route.reverseConnect)
+                // reverse connection is not supported for a client
+                return QNetworkProxy(QNetworkProxy::NoProxy);
+
+            const auto& url = QnAppServerConnectionFactory::url();
+            return QNetworkProxy(QNetworkProxy::HttpProxy,
+                                 route.addr.address.toString(), route.addr.port,
+                                 url.userName(), url.password());
         }
     }
 

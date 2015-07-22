@@ -139,7 +139,9 @@ void QnTransactionTcpProcessor::run()
         // 1-st stage
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
         d->response.headers.emplace( "Content-Length", "0" );   //only declaring content-type
-        sendResponse(lockOK ? nx_http::StatusCode::ok : nx_http::StatusCode::forbidden , QnTransactionTransport::TUNNEL_CONTENT_TYPE);
+        sendResponse(
+            lockOK ? nx_http::StatusCode::noContent : nx_http::StatusCode::forbidden,
+            QnTransactionTransport::TUNNEL_CONTENT_TYPE );
         if (!lockOK)
             return;
 

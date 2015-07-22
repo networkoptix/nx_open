@@ -929,7 +929,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
-    if (!(m_resource->toResource()->flags() & Qn::local))
+    if (m_resource->hasVideo(m_display->mediaProvider()) && !(m_resource->toResource()->flags() & Qn::local))
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
 #endif
 
@@ -941,8 +941,12 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
         if (channel >= channelCount())
             channel = 0;
-
-        qint64 utcTime = m_renderer->getTimestampOfNextFrameToRender(channel) / 1000;
+        
+        qint64 utcTime;
+        if (m_resource->hasVideo(m_display->mediaProvider()))
+            utcTime = m_renderer->getTimestampOfNextFrameToRender(channel) / 1000;
+        else
+            utcTime = display()->camDisplay()->getCurrentTime() / 1000;
         if(qnSettings->timeMode() == Qn::ServerTimeMode)
             utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
 
@@ -951,11 +955,17 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             : QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"));
         
     }
-
-    return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
-        .arg(size.width())
-        .arg(size.height())
-        .arg(fps, 0, 'f', 2)
+    if (m_resource->hasVideo(m_display->mediaProvider()))
+        return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
+            .arg(size.width())
+            .arg(size.height())
+            .arg(fps, 0, 'f', 2)
+            .arg(mbps, 0, 'f', 2)
+            .arg(codecString)
+            .arg(hqLqString)
+            .arg(timeString);
+    else
+        return lit("@ %1Mbps%2 %3\t%4")
         .arg(mbps, 0, 'f', 2)
         .arg(codecString)
         .arg(hqLqString)
@@ -974,11 +984,12 @@ QString QnMediaResourceWidget::calculateTitleText() const {
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
+    bool hasVideo = m_resource->hasVideo(m_display->mediaProvider());
 
     if (qnRuntime->isDevMode())
         result |= DbgScreenshotButton;
 
-    if(!(resource()->toResource()->flags() & Qn::still_image))
+    if(hasVideo && !(resource()->toResource()->flags() & Qn::still_image))
         result |= ScreenshotButton;
 
     bool rgbImage = false;
@@ -989,13 +1000,13 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     // and not on file extension checks!
     if(((resource()->toResource()->flags() & Qn::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg"))) 
         rgbImage = true;
-    if (!rgbImage)
+    if (!rgbImage && hasVideo)
         result |= EnhancementButton;
 
     if (!zoomRect().isNull())
         return result;
 
-    if (resource()->toResource()->hasFlags(Qn::motion))
+    if (hasVideo && resource()->toResource()->hasFlags(Qn::motion))
         result |= MotionSearchButton;
 
     bool isExportedLayout = item() 
@@ -1021,7 +1032,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result &= ~PtzButton;
     }
 
-    if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows)) {
+    if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo) {
         if(item()
                 && item()->layout()
                 && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
@@ -1071,7 +1082,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
             return Qn::NoDataOverlay;
         QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
-            return base_type::calculateStatusOverlay(Qn::Online);
+            return base_type::calculateStatusOverlay(Qn::Online, m_resource && m_resource->hasVideo(m_display->mediaProvider()));
         else
             return Qn::NoDataOverlay;
     } else if (m_display->isPaused()) {
@@ -1080,7 +1091,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         else
             return Qn::EmptyOverlay;
     } else {
-        return base_type::calculateStatusOverlay(Qn::Online);
+        return base_type::calculateStatusOverlay(Qn::Online, m_resource && m_resource->hasVideo(m_display->mediaProvider()));
     }
 }
 

@@ -62,12 +62,6 @@ QByteArray QnProxySenderConnection::readProxyResponse()
     return QByteArray();
 }
 
-void QnProxySenderConnection::addNewProxyConnect()
-{
-    Q_D(QnProxySenderConnection);
-    d->owner->addProxySenderConnections(d->proxyServerUrl, 1);
-}
-
 void QnProxySenderConnection::doDelay()
 {
     for (int i = 0; i < 100; ++i)

@@ -416,7 +416,7 @@ void CLSimpleHTTPClient::readAll(QByteArray& data)
         m_dataRestLen = 0;
     }
 
-    if (m_contentLen && m_contentLen == data.size())
+    if (m_contentLen && static_cast<int>(m_contentLen) == data.size())
         return;
 
     static const unsigned long BUFSIZE = 1024;
@@ -425,7 +425,7 @@ void CLSimpleHTTPClient::readAll(QByteArray& data)
     while ((nRead = read(buf, BUFSIZE)) > 0)
     {
         data.append(buf, nRead);
-        if (m_contentLen && m_contentLen == data.size())
+        if (m_contentLen && static_cast<int>(m_contentLen) == data.size())
             return;
     }
 }

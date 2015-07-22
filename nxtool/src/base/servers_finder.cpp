@@ -19,29 +19,51 @@
 #include <base/server_info.h>
 #include <base/requests.h>
 
+#ifdef WIN32
+    #include <WinSock2.h>
+    #include <WS2tcpip.h>
+#else
+    #error Not supported target os
+#endif
+
 namespace
 {
     const QString kMediaServerType = "Media Server";
     
     const QString kApplicationTypeTag = "application";
     const QString kTypeTag = "type";
-    const QString kIDTag = "id";
-    const QString kSeedTag = "seed";
-    const QString kNameTag = "name";
-    const QString kSystemNameTag = "systemName";
-    const QString kPortTag = "port";
-    const QString kRemoteAddressesTag = "remoteAddresses";
     const QString kReplyTag = "reply";
-    const QString kFlagsTag = "flags";
       
     enum 
     {
-        kUpdateServersInfoInterval = 1000
-        , kServerAliveTimeout = 10 * 1000
+        kUpdateServersInfoInterval = 2000
+        , kHostLifeTimeMs = kUpdateServersInfoInterval * 2
+        , kUnknownHostTimeout = 60 * 1000
+        , kServerAliveTimeout = 12 * 1000
     };
 
     enum { kInvalidOpSize = -1 };
 
+    /// Setupsmulticast parameters. Aviods error in QUdpSocket
+    bool setupMulticast(QAbstractSocket *socket
+        , const QString &interfaceAddress
+        , const QString &multicastAddress)
+    {
+        if (!socket || interfaceAddress.isEmpty() || multicastAddress.isEmpty()
+            || (socket->state() != QAbstractSocket::BoundState))
+        {
+            return false;
+        }
+
+        ip_mreq request;
+        request.imr_multiaddr.s_addr = inet_addr(multicastAddress.toLatin1());
+        request.imr_interface.s_addr = inet_addr(interfaceAddress.toLatin1());
+
+        enum { kNoError = 0 };
+        const auto handle = socket->socketDescriptor();
+        return (setsockopt( handle, IPPROTO_IP, IP_ADD_MEMBERSHIP
+            , reinterpret_cast<const char*>(&request), sizeof(request)) == kNoError);
+    }
 }
 
 namespace
@@ -51,44 +73,6 @@ namespace
     
     const QByteArray kSearchRequestBody("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
     const int kSearchRequestSize = kSearchRequestBody.size();
-    
-    typedef QHash<QString, std::function<void (const QJsonObject &object
-        , rtu::BaseServerInfo &info)> > KeyParserContainer;
-    const KeyParserContainer parser = []() -> KeyParserContainer
-    {
-        KeyParserContainer result;
-        result.insert(kIDTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.id = QUuid(object.value(kIDTag).toString()); });
-        result.insert(kSeedTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.id = QUuid(object.value(kSeedTag).toString()); });
-        result.insert(kNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.name = object.value(kNameTag).toString(); });
-        result.insert(kSystemNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.systemName = object.value(kSystemNameTag).toString(); });
-        result.insert(kPortTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.port = object.value(kPortTag).toInt(); });
-            
-            
-        result.insert(kFlagsTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            {
-                typedef QPair<QString, rtu::Constants::ServerFlag> TextFlagsInfo;
-                static const TextFlagsInfo kKnownFlags[] = 
-                {
-                    TextFlagsInfo("SF_timeCtrl", rtu::Constants::ServerFlag::AllowChangeDateTimeFlag)
-                    , TextFlagsInfo("SF_IfListCtrl", rtu::Constants::ServerFlag::AllowIfConfigFlag)
-                    , TextFlagsInfo("SF_AutoSystemName" , rtu::Constants::ServerFlag::IsFactoryFlag)
-                };
-                
-                info.flags = rtu::Constants::ServerFlag::NoFlags;
-                const QString textFlags = object.value(kFlagsTag).toString();
-                for (const TextFlagsInfo &flagInfo: kKnownFlags)
-                {
-                    if (textFlags.contains(flagInfo.first))
-                        info.flags |= flagInfo.second;
-                }
-            });
-        return result;
-    }();
 }
 
 namespace 
@@ -110,19 +94,32 @@ namespace
         if (!isCorrectApp && !isCorrectNative)
             return false;
 
-        const QStringList &keys = jsonObject.keys();
-//        if (!jsonObject.value("systemName").toString().contains("nx1"))
-//            return false;
-
-        for (const auto &key: keys)
-        {
-            const auto itHandler = parser.find(key);
-            if (itHandler != parser.end())
-                (*itHandler)(jsonObject, info);
-        }
+       // if (!jsonObject.value("systemName").toString().contains("nx1_"))
+       //     return false;
         
+        rtu::parseModuleInformationReply(jsonObject, info);
+
         return true;
     }
+
+    struct ServerInfoData
+    {
+        qint64 timestamp;
+        qint64 visibleAddressTimestamp;
+        rtu::BaseServerInfo info;
+
+        ServerInfoData(qint64 newTimestamp
+            , rtu::BaseServerInfo newInfo);
+    };
+
+    ServerInfoData::ServerInfoData(qint64 newTimestamp
+        , rtu::BaseServerInfo newInfo)
+        : timestamp(newTimestamp)
+        , visibleAddressTimestamp(- newTimestamp * 2) /// for correct first initialization 
+        , info(newInfo)
+    {
+    }
+
 }
 
 ///
@@ -138,16 +135,38 @@ public:
     void waitForServer(const QUuid &id);
 
 private:
+    typedef QSharedPointer<QUdpSocket> SocketPtr;
+
     void checkOutdatedServers();
+
+    typedef QHash<QString, qint64> Hosts;
+    /// Returns list with removed addresses
+    QStringList checkOutdatedHosts(Hosts &targetHostsList
+        , int lifetime);
 
     void updateServers();
     
-    typedef QSharedPointer<QUdpSocket> SocketPtr;
-    bool readData(const SocketPtr &socket);
+    /// Reads answers to sent "magic" messages
+    void readResponseData(const SocketPtr &socket);
+
+    bool readResponsePacket(const SocketPtr &socket);
+
+    /// Reads incomming "magic" packets
+    void readRequestData();
+
+    bool readRequestPacket();
+
+    /// Returns true if it is entity with new address, otherwise false
+    bool onEntityDiscovered(const QString &address
+        , Hosts &targetHostsList);
+
+    bool readPendingPacket(const SocketPtr &socket
+        , QByteArray &data
+        , QHostAddress *sender = nullptr
+        , quint16 *port = nullptr);
 
 private:
     typedef QHash<QHostAddress, SocketPtr> SocketsContainer;
-    typedef QPair<qint64, rtu::BaseServerInfo> ServerInfoData;
     typedef QHash<QUuid, ServerInfoData> ServerDataContainer;
 
     rtu::ServersFinder *m_owner;
@@ -156,6 +175,9 @@ private:
     rtu::IDsVector m_waitedServers;
     QTimer m_timer;
     QElapsedTimer m_msecCounter;
+    SocketPtr m_serverSocket;
+    Hosts m_knownHosts;
+    Hosts m_unknownHosts;
 };
 
 rtu::ServersFinder::Impl::Impl(rtu::ServersFinder *owner)
@@ -165,9 +187,10 @@ rtu::ServersFinder::Impl::Impl(rtu::ServersFinder *owner)
     , m_infos()
     , m_timer()
     , m_msecCounter()
+    , m_serverSocket()
+    , m_knownHosts()
+    , m_unknownHosts()
 {
-    updateServers();
-    
     QObject::connect(&m_timer, &QTimer::timeout, this, &Impl::updateServers);
     m_timer.setInterval(kUpdateServersInfoInterval);
     m_timer.start();
@@ -191,8 +214,8 @@ void rtu::ServersFinder::Impl::checkOutdatedServers()
     IDsVector forRemove;
     for(const auto &infoData: m_infos)
     {
-        const qint64 lastUpdateTime = infoData.first;
-        const BaseServerInfo &info = infoData.second;
+        const qint64 lastUpdateTime = infoData.timestamp;
+        const BaseServerInfo &info = infoData.info;
         if ((currentTime - lastUpdateTime) > kServerAliveTimeout)
             forRemove.push_back(info.id);
     }
@@ -206,11 +229,51 @@ void rtu::ServersFinder::Impl::checkOutdatedServers()
     }
 }
 
+QStringList rtu::ServersFinder::Impl::checkOutdatedHosts(Hosts &targetHostsList
+    , int lifetime)
+{
+    QStringList removedHosts;
+    const qint64 current = m_msecCounter.elapsed();
+    for (auto it = targetHostsList.begin(); it != targetHostsList.end();)
+    {
+        if ((current - it.value()) > lifetime)
+        {
+            removedHosts.push_back(it.key());
+            it = targetHostsList.erase(it);
+            continue;
+        }
+        ++it;
+    }
+    return removedHosts;
+}
 
 void rtu::ServersFinder::Impl::updateServers()
 {
     checkOutdatedServers();
     
+    checkOutdatedHosts(m_knownHosts, kHostLifeTimeMs);
+    const QStringList removedUnknownHosts =
+        checkOutdatedHosts(m_unknownHosts, kUnknownHostTimeout);
+    for (const QString &address: removedUnknownHosts)
+    {
+        emit m_owner->unknownRemoved(address);
+    }
+
+    if (!m_serverSocket)
+    {
+        m_serverSocket.reset(new QUdpSocket());
+        if (!m_serverSocket->bind(QHostAddress::AnyIPv4, kMulticastGroupPort, QAbstractSocket::ReuseAddressHint))
+            m_serverSocket.reset();
+
+        QObject::connect(m_serverSocket.data(), &QUdpSocket::readyRead, this, [this]
+        {
+            readRequestData();
+        });
+
+    }
+
+    readRequestData();
+
     const auto allAddresses = QNetworkInterface::allAddresses();
     for(const auto &address: allAddresses)
     {
@@ -219,8 +282,21 @@ void rtu::ServersFinder::Impl::updateServers()
 
         SocketsContainer::iterator &it = m_sockets.find(address);
         if (it == m_sockets.end())
+        {
             it = m_sockets.insert(address, SocketPtr(new QUdpSocket()));
-        
+            QObject::connect(it->data(), &QUdpSocket::readyRead, this, [this, it]
+            {
+                readResponseData(*it);
+            });
+
+            if (m_serverSocket)
+            {
+                /// join to multicast group on this address
+                setupMulticast(m_serverSocket.data(), address.toString()
+                    , kMulticastGroupAddress.toString());
+            }
+        }
+
         const SocketPtr &socket = *it;
         if (socket->state() != QAbstractSocket::BoundState)
         {
@@ -229,9 +305,7 @@ void rtu::ServersFinder::Impl::updateServers()
                 continue;
         }
 
-        while(socket->hasPendingDatagrams() && readData(socket))
-        {
-        }
+        readResponseData(socket);
 
         int written = 0;
         while(written < kSearchRequestBody.size())
@@ -250,20 +324,75 @@ void rtu::ServersFinder::Impl::updateServers()
     }
 }
 
-bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPtr &socket)
+void rtu::ServersFinder::Impl::readResponseData(const SocketPtr &socket)
+{
+    while(socket->hasPendingDatagrams() && readResponsePacket(socket)) {}
+}
+
+void rtu::ServersFinder::Impl::readRequestData()
+{
+    while(m_serverSocket->hasPendingDatagrams() && readRequestPacket()) {}
+}
+
+bool rtu::ServersFinder::Impl::onEntityDiscovered(const QString &address
+    , Hosts &targetHostsList)
+{
+    const auto it = targetHostsList.find(address);
+    const qint64 timestamp = m_msecCounter.elapsed();
+    if (it == targetHostsList.end())
+    {
+        targetHostsList.insert(address, timestamp);
+        return true;
+    }
+
+    it.value() = timestamp;
+    return false;
+}
+
+bool rtu::ServersFinder::Impl::readRequestPacket()
+{
+    QByteArray data;
+    QHostAddress sender;
+    quint16 port = 0;
+    if (!readPendingPacket(m_serverSocket, data, &sender, &port))
+        return false;
+
+    for (const auto socket: m_sockets)
+    {
+        if ((socket->localAddress() == sender) && (socket->localPort() == port))
+        {
+            /// This packet from current instance of tool
+            return true;
+        }
+    }
+
+    if (!data.contains(kSearchRequestBody))
+        return true;
+
+    const QString &address = sender.toString();
+    const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
+    if (!isKnown && onEntityDiscovered(address, m_unknownHosts))
+        emit m_owner->unknownAdded(address);
+
+    return true;
+}
+
+bool rtu::ServersFinder::Impl::readPendingPacket(const SocketPtr &socket
+    , QByteArray &data
+    , QHostAddress *sender
+    , quint16 *port)
 {
     const int pendingDataSize = socket->pendingDatagramSize();
-    QHostAddress sender;
-    quint16 senderPort;
     
     enum { kZeroSymbol = 0 };
-    QByteArray data(pendingDataSize, kZeroSymbol);
+    data.resize(pendingDataSize);
+    data.fill(kZeroSymbol);
 
     int readBytes = 0;
     while ((socket->state() == QAbstractSocket::BoundState) && (readBytes < pendingDataSize))
     {
         const int read = socket->readDatagram(data.data() + readBytes
-            , pendingDataSize - readBytes, &sender, &senderPort);
+            , pendingDataSize - readBytes, sender, port);
 
         if (read == kInvalidOpSize)
             return false;
@@ -276,14 +405,25 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
         socket->close();
         return false;
     }
-    
-    BaseServerInfo info;
+    return true;
+}
 
+bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl::SocketPtr &socket)
+{
+    QByteArray data;
+    QHostAddress sender;
+    quint16 port = 0;
+    if (!readPendingPacket(socket, data, &sender, &port))
+        return false;
+
+    BaseServerInfo info;
     if (!parseUdpPacket(data, info) )
         return true;
 
+    const QString &host = sender.toString();
+    info.hostAddress = host;
 
-    info.hostAddress = sender.toString();
+    onEntityDiscovered(host, m_knownHosts);
 
     emit m_owner->serverDiscovered(info);
 
@@ -297,12 +437,29 @@ bool rtu::ServersFinder::Impl::readData(const rtu::ServersFinder::Impl::SocketPt
     }
     else
     {
-        it.value().first = timestamp; /// Update alive info
-        if (info != it->second)
+        it->timestamp = timestamp; /// Update alive info
+        BaseServerInfo &oldInfo = it->info;
+
+        bool displayAddressOutdated = false;
+        info.displayAddress = oldInfo.displayAddress;
+        if (oldInfo.displayAddress == host)
         {
-            it.value().second.name = info.name;
-            it.value().second.systemName = info.systemName;
-            it.value().second.port = info.port;
+            it->visibleAddressTimestamp = timestamp;
+        }
+        else if ((timestamp - it->visibleAddressTimestamp) > kHostLifeTimeMs)
+        {
+            it->visibleAddressTimestamp = timestamp;
+            info.displayAddress = host;
+            displayAddressOutdated = true;
+        }
+
+        if ((info != it->info) || displayAddressOutdated)
+        {
+            oldInfo.name = info.name;
+            oldInfo.systemName = info.systemName;
+            oldInfo.port = info.port;
+            oldInfo.displayAddress = info.displayAddress;
+
             emit m_owner->serverChanged(info);
         }
     }

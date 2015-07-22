@@ -61,6 +61,8 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() + 1);
     qDebug() << qnRuntime->debugCounter();
 
+    // TODO: #gdm WTF??
+    /*
     auto showPalette = [this] {
         QnPaletteWidget *w = new QnPaletteWidget();
         w->setPalette(qApp->palette());
@@ -86,6 +88,7 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
         });
         timer->start();
     };
+    */
 }
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {

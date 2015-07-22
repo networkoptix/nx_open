@@ -70,8 +70,10 @@ bool QnBookmarkCameraData::isEmpty() const {
 }
 
 void QnBookmarkCameraData::update(const QnAbstractCameraDataPtr &other, const QnTimePeriod &updatedPeriod) {
+    QN_UNUSED(updatedPeriod);
     if (!other)
         return;
+
     //TODO: #GDM #Bookmarks use updatedPeriod
     QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data());
     if (!other_casted)
