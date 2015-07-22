@@ -574,7 +574,7 @@
                     }
                 }
             },
-			"onvifPtzDigitsAfterDecimalPoint": 2
+			"onvifPtzDigitsAfterDecimalPoint": 0
         },        
         {
             "keys": [
