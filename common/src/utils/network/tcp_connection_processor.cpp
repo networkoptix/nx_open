@@ -54,6 +54,9 @@ int QnTCPConnectionProcessor::isFullMessage(
     const QByteArray& message,
     boost::optional<qint64>* const fullMessageSize )
 {
+    if( message.startsWith("<policy-file-request/>") )
+        return message.size();
+
     if( fullMessageSize && fullMessageSize->is_initialized() )
         return fullMessageSize->get() > message.size()
             ? 0

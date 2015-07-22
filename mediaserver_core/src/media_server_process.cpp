@@ -1528,6 +1528,10 @@ void MediaServerProcess::run()
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
+
+    //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
+    QnAuthHelper::instance()->restrictionList()->allow( lit( "?" ), AuthMethod::noAuth );
+
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );   //allowed by default for now

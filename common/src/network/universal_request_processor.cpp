@@ -140,6 +140,14 @@ void QnUniversalRequestProcessor::run()
 
     while (1)
     {
+        if( d->clientRequest.startsWith("<policy-file-request/>") )
+        {
+            QFile f( lit( ":/static/crossdomain.xml" ) );
+            if( f.open( QIODevice::ReadOnly ) )
+                sendData( f.readAll() );
+            break;
+        }
+
         if (ready) 
         {
             t.restart();
