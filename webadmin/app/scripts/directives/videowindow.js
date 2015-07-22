@@ -102,7 +102,7 @@ angular.module('webadminApp')
                         case "Opera":
                         case "Webkit":
                         default:
-                            if(window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
+                            if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
                                 return "flashls";
                             }
                             if(weHaveHls) {
@@ -191,7 +191,7 @@ angular.module('webadminApp')
                 scope.$watch("vgSrc",function(){
                     console.log("change vgSrc", scope.api, scope.vgSrc);
 
-                    if(!scope.api && scope.vgSrc ) {
+                    if(/*!scope.api && */scope.vgSrc ) {
                         var format = detectBestFormat();
                         console.log("format",format);
                         switch(detectBestFormat()){
@@ -213,9 +213,9 @@ angular.module('webadminApp')
                                 initVideogular();
                         }
                     }
-                    if(scope.api && scope.vgSrc ) {
-                        scope.api.load(scope.vgSrc[0].src);
-                    }
+                    //if(scope.api && scope.vgSrc ) {
+                    //    scope.api.load(scope.vgSrc[0].src);
+                    //}
                 });
             }
         }
