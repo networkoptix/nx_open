@@ -19,9 +19,9 @@ QPixmap QnIconProvider::requestPixmap(const QString &id, QSize *size, const QSiz
         return pixmap;
 
     if (!requestedSize.isEmpty())
-        pixmap = pixmap.scaled(requestedSize, Qt::KeepAspectRatio);
+        pixmap = pixmap.scaled(requestedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     else
-        pixmap = pixmap.scaled(pixmap.size() * m_scale);
+        pixmap = pixmap.scaled(pixmap.size() * m_scale, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     *size = pixmap.size();
     return pixmap;

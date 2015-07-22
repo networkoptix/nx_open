@@ -53,35 +53,54 @@ Item {
 
             width: thumbnail.width
 
-            Item {
+            Rectangle {
                 id: thumbnailContainer
 
                 width: thumbnailWidth
-                height: thumbnailDummy.visible ? thumbnailDummy.height : thumbnail.height
+                height: thumbnailWidth * 3 / 4
+                color: d.offline ? QnTheme.cameraOfflineBackground : QnTheme.cameraBackground
 
-                Rectangle {
-                    id: thumbnailDummy
-                    width: thumbnailWidth
-                    height: thumbnailWidth * 3 / 4
-                    border.color: QnTheme.cameraBorder
-                    border.width: dp(1)
-                    color: "transparent"
-                    visible: thumbnail.status != Image.Ready
+                Column {
+                    id: thumbnailDummyContent
+
+                    x: dp(8)
+                    width: parent.width - 2 * x
+                    anchors.centerIn: parent
+
+                    visible: d.offline
+
+                    Image {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        source: d.unauthorized ? "image://icon/camera_locked.png" : "image://icon/camera_offline.png"
+                    }
 
                     Text {
-                        anchors.centerIn: parent
-                        text: d.unauthorized ? qsTr("Unauthorized") : qsTr("Offline")
-                        font.capitalization: Font.AllUppercase
-                        font.pixelSize: sp(18)
-                        font.weight: Font.Light
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width
+                        height: dp(32)
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+
+                        text: d.unauthorized ? qsTr("Authentication\nrequired") : qsTr("Offline")
+                        wrapMode: Text.WordWrap
+                        maximumLineCount: 2
+                        font.pixelSize: sp(14)
+                        font.weight: Font.Normal
                         color: QnTheme.cameraOfflineText
                     }
+                }
+
+                Loader {
+                    id: preloader
+                    anchors.centerIn: parent
+                    source: (!d.offline && thumbnail.status != Image.Ready) ? Qt.resolvedUrl("qrc:///qml/icons/QnThreeDotPreloader.qml") : ""
                 }
 
                 Image {
                     id: thumbnail
                     anchors.fill: parent
                     fillMode: Qt.KeepAspectRatio
+                    visible: !d.offline && status == Image.Ready
                 }
             }
 
@@ -99,8 +118,8 @@ Item {
                     id: label
                     width: parent.width - statusIndicator.width - 2 * anchors.margins
                     maximumLineCount: 2
-                    font.pixelSize: sp(15)
-                    font.weight: Font.DemiBold
+                    font.pixelSize: sp(16)
+                    font.weight: d.offline ? Font.DemiBold : Font.Normal
                     elide: Text.ElideRight
                     wrapMode: Text.WordWrap
                     color: d.offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
@@ -116,9 +135,9 @@ Item {
 
         width: thumbnailWidth
         height: thumbnailWidth * 3 / 4
-        border.color: QnTheme.cameraBorder
+        color: QnTheme.cameraHiddenBackground
         border.width: dp(1)
-        color: QnTheme.windowBackground
+        border.color: QnTheme.cameraDummyBorder
 
         opacity: 1.0 - Math.min(0.5, content.opacity) * 2
 
@@ -133,7 +152,7 @@ Item {
                 text: qsTr("Camera hidden")
 
                 horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: sp(15)
+                font.pixelSize: sp(16)
                 font.weight: Font.Light
                 maximumLineCount: 2
                 wrapMode: Text.WordWrap
@@ -149,7 +168,10 @@ Item {
                 text: qsTr("Undo")
                 icon: "image://icon/undo.png"
 
-                onClicked: d.hidden = false
+                onClicked: {
+                    cameraItem.z = -1
+                    d.hidden = false
+                }
             }
         }
     }
@@ -181,6 +203,9 @@ Item {
         drag.threshold: dp(8)
     }
 
-    z: materialSurface.drag.active ? 5 : 0
+    Binding {
+        target: cameraItem
+        property: "z"
+        value: materialSurface.drag.active ? 5 : 0
+    }
 }
-

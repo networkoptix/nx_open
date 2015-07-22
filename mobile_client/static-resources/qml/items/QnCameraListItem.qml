@@ -16,8 +16,12 @@ Item {
     width: parent.width
     height: dp(56)
 
-    property bool _offline: status == QnCameraListModel.Offline || status == QnCameraListModel.NotDefined || status == QnCameraListModel.Unauthorized
-    property bool _unauthorized: status == QnCameraListModel.Unauthorized
+    QtObject {
+        id: d
+
+        property bool offline: status == QnCameraListModel.Offline || status == QnCameraListModel.NotDefined || status == QnCameraListModel.Unauthorized
+        property bool unauthorized: status == QnCameraListModel.Unauthorized
+    }
 
     Item {
         id: thumbnailContainer
@@ -29,23 +33,23 @@ Item {
             id: thumbnailDummy
             width: parent.width
             height: parent.height
-            border.color: QnTheme.cameraBorder
-            border.width: dp(1)
-            color: "transparent"
-            visible: thumbnail.status != Image.Ready
+            color: d.offline ? QnTheme.cameraOfflineBackground : QnTheme.cameraBackground
 
-            Text {
-                anchors.centerIn: parent
-                text: _unauthorized ? qsTr("Unauthorized") : qsTr("Offline")
-                font.capitalization: Font.AllUppercase
-                font.pixelSize: sp(10)
-                minimumPixelSize: sp(6)
-                font.weight: Font.Light
-                fontSizeMode: Text.HorizontalFit
-                horizontalAlignment: Text.AlignHCenter
-                width: parent.width - dp(16)
-                color: QnTheme.cameraOfflineText
-            }
+        }
+
+        Image {
+            anchors.centerIn: parent
+            source: d.unauthorized ? "image://icon/camera_locked.png" : "image://icon/camera_offline.png"
+            visible: d.offline
+            sourceSize.width: dp(40)
+            sourceSize.height: dp(40)
+        }
+
+        Loader {
+            id: preloader
+            anchors.centerIn: parent
+            source: (!d.offline && thumbnail.status != Image.Ready) ? Qt.resolvedUrl("qrc:///qml/icons/QnThreeDotPreloader.qml") : ""
+            scale: 0.5
         }
 
         Image {
@@ -55,6 +59,7 @@ Item {
             fillMode: Qt.KeepAspectRatio
             sourceSize.width: parent.width
             sourceSize.height: parent.height
+            visible: !d.offline && status == Image.Ready
         }
     }
 
@@ -78,7 +83,7 @@ Item {
             font.pixelSize: sp(15)
             font.weight: Font.DemiBold
             elide: Text.ElideRight
-            color: _offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
+            color: d.offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
         }
     }
 

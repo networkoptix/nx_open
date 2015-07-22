@@ -49,10 +49,13 @@ QtObject {
     property color dialogSelectedBackground
     property color dialogSelectedText
 
+    property color cameraBackground
     property color cameraText
     property color cameraOfflineText
     property color cameraRecordingIndicator
-    property color cameraBorder
+    property color cameraOfflineBackground
+    property color cameraHiddenBackground
+    property color cameraDummyBorder
 
     property color toastBackground
     property color toastText
@@ -71,6 +74,7 @@ QtObject {
 
     property color attentionBackground
     property color loadingText
+    property color preloaderDot
 
     function loadColors() {
         windowBackground        = colorTheme.color("window.background")
@@ -108,10 +112,13 @@ QtObject {
         dialogTitleText         = colorTheme.color("dialog.titleText")
         dialogSelectedBackground = colorTheme.color("dialog.selectedBackground")
         dialogSelectedText      = colorTheme.color("dialog.selectedText")
+        cameraBackground        = colorTheme.color("cameras.background")
         cameraText              = colorTheme.color("cameras.text")
         cameraOfflineText       = colorTheme.color("cameras.offlineText")
         cameraRecordingIndicator = colorTheme.color("cameras.recordingIndicator")
-        cameraBorder            = colorTheme.color("cameras.border")
+        cameraOfflineBackground = colorTheme.color("cameras.offlineBackground")
+        cameraHiddenBackground  = colorTheme.color("cameras.hiddenBackground")
+        cameraDummyBorder       = colorTheme.color("cameras.dummyBorder")
         toastBackground         = colorTheme.color("toast.background")
         toastText               = colorTheme.color("toast.text")
         timelineText            = colorTheme.color("timeline.text")
@@ -126,6 +133,7 @@ QtObject {
         calendarSelectedText    = colorTheme.color("calendar.selectedText")
         attentionBackground     = colorTheme.color("other.attentionBackground")
         loadingText             = colorTheme.color("other.loadingText")
+        preloaderDot            = colorTheme.color("other.preloaderDot")
     }
 
     function transparent(color, opacity) {
