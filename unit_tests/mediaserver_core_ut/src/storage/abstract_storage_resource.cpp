@@ -46,6 +46,13 @@ TEST(AbstractStorageResourceTest, Capabilities)
     }
 }
 
+TEST(AbstractStorageResourceTest, FileOperations)
+{
+    for (auto storage : tg.storages)
+    {
+    }
+}
+
 TEST(AbstractStorageResourceTest, IODevice)
 {
     for (auto storage : tg.storages)
@@ -61,38 +68,38 @@ TEST(AbstractStorageResourceTest, IODevice)
         ASSERT_TRUE(ioDevice);
 
         const size_t dataSize = 10*1024*1024;
+        const size_t seekCount = 10000;
+        const char* newData = "bcdefg";
+        const size_t newDataSize = strlen(newData);
         std::vector<char> data(dataSize);
 
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(-127, 127);
+        std::uniform_int_distribution<> dataDistribution(-127, 127);
 
         std::generate(data.begin(), data.end(),
-            [&dis, &gen]
+            [&dataDistribution, &gen]
             {
-                return dis(gen);
+                return dataDistribution(gen);
             }
         );
         ASSERT_TRUE(ioDevice->write(data.data(), dataSize) == dataSize);
 
-        const qint64 seekPos = 10*1024 + 5;
-        ASSERT_TRUE(ioDevice->seek(seekPos));
+        std::uniform_int_distribution<> seekDistribution(0, dataSize - 32);
 
-        const char* newData = "bcdefg";
-        ASSERT_TRUE(ioDevice->write(newData, std::strlen(newData)) == std::strlen(newData));
-        std::copy(newData, newData + 6, data.begin() + seekPos); 
-
-        const qint64 seekPos2 = dataSize - 32;
-        ASSERT_TRUE(ioDevice->seek(seekPos2));
-
-        ASSERT_TRUE(ioDevice->write(newData, std::strlen(newData)) == std::strlen(newData));
-        std::copy(newData, newData + 6, data.begin() + seekPos2); 
+        for (size_t i = 0; i < seekCount; ++i)
+        {
+            const qint64 seekPos = seekDistribution(gen);
+            ASSERT_TRUE(ioDevice->seek(seekPos));
+            ASSERT_TRUE(ioDevice->write(newData, newDataSize) == newDataSize);
+            std::copy(newData, newData + newDataSize, data.begin() + seekPos);
+        }
 
         ioDevice->close();
         ioDevice.reset();
 
         // IODevice
-        // read, seeks
+        // read, check written before data
         ioDevice = std::unique_ptr<QIODevice>(
             storage->open(
                 fileName.toLatin1().constData(), 
@@ -102,6 +109,19 @@ TEST(AbstractStorageResourceTest, IODevice)
         ASSERT_TRUE(ioDevice);
         QByteArray readData = ioDevice->readAll();
         ASSERT_TRUE(readData.size() == dataSize);
+        if (memcmp(readData.constData(), data.data(), dataSize) != 0)
+        {
+            for (size_t i = 0; i < dataSize; ++i)
+            {
+                if (readData.at(i) != data[i])
+                {
+                    std::cout  << i << ":"     << std::hex
+                               << "readData: " << (unsigned)readData.at(i) << "    "
+                               << "data: "     << (unsigned)data[i]        << std::endl;
+                }
+            }
+        }
+
         ASSERT_TRUE(memcmp(readData.constData(), data.data(), dataSize) == 0);
     }
 }
