@@ -3,6 +3,7 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/singleton.h>

@@ -4,6 +4,7 @@
 #include <functional>
 
 #include <QtCore/QList>
+#include <QtCore/QStringList>
 
 #include <utils/common/model_functions_fwd.h>
 

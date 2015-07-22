@@ -16,49 +16,49 @@ QnStorageResource::~QnStorageResource()
 
 void QnStorageResource::setSpaceLimit(qint64 value)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_spaceLimit = value;
 }
 
 qint64 QnStorageResource::getSpaceLimit() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_spaceLimit;
 }
 
 void QnStorageResource::setStorageType(const QString& type)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_storageType = type;
 }
 
 QString QnStorageResource::getStorageType() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_storageType;
 }
 
 void QnStorageResource::setMaxStoreTime(int timeInSeconds)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_maxStoreTime = timeInSeconds;
 }
 
 int QnStorageResource::getMaxStoreTime() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_maxStoreTime;
 }
 
 void QnStorageResource::setUsedForWriting(bool isUsedForWriting) 
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_usedForWriting = isUsedForWriting;
 }
 
 bool QnStorageResource::isUsedForWriting() const 
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_usedForWriting;
 }
 

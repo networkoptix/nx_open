@@ -215,7 +215,7 @@ QnLayoutFileStorageResource::QnLayoutFileStorageResource():
     m_fileSync(QnMutex::Recursive),
     m_capabilities(0)
 {
-    QMutexLocker lock(&m_storageSync);
+    QnMutexLocker lock(&m_storageSync);
     m_novFileOffset = 0;
     //m_novFileLen = 0;
     m_allStorages.insert(this);

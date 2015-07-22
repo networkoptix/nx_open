@@ -361,7 +361,7 @@ void QnTransactionTransport::setStateNoLock(State state)
 
 QUrl QnTransactionTransport::remoteAddr() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_remoteAddr;
 }
 
@@ -485,7 +485,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
             "true" );
 
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk(&m_mutex);
         m_remoteAddr = remotePeerUrl;
         if (!m_remoteAddr.userName().isEmpty())
         {
@@ -514,7 +514,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     }
 
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk(&m_mutex);
         m_remoteAddr.setQuery(q);
     }
 
@@ -1191,7 +1191,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             assert( data.isEmpty() );
         }
         else {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             QUrlQuery query = QUrlQuery(m_remoteAddr);
             query.addQueryItem("canceled", QString());
             m_remoteAddr.setQuery(query);

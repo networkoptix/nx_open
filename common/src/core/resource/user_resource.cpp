@@ -96,7 +96,7 @@ QByteArray QnUserResource::getDigest() const
 void QnUserResource::setCryptSha512Hash( const QByteArray& cryptSha512Hash )
 {
     {
-        QMutexLocker locker( &m_mutex );
+        QnMutexLocker locker( &m_mutex );
         if( m_cryptSha512Hash == cryptSha512Hash )
             return;
         m_cryptSha512Hash = cryptSha512Hash;
@@ -106,7 +106,7 @@ void QnUserResource::setCryptSha512Hash( const QByteArray& cryptSha512Hash )
 
 QByteArray QnUserResource::getCryptSha512Hash() const
 {
-    QMutexLocker locker( &m_mutex );
+    QnMutexLocker locker( &m_mutex );
     return m_cryptSha512Hash;
 }
 

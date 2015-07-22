@@ -101,7 +101,7 @@ void MultipleInternetTimeFetcher::timeFetchingDone(
     qint64 utcMillis,
     SystemError::ErrorCode errorCode )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     ctx->utcMillis = utcMillis;
     ctx->errorCode = errorCode;

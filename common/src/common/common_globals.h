@@ -684,7 +684,7 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #endif
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner), 
+    (Qn::TimePeriodContent)(Qn::Corner),
     (metatype)
 )
 
