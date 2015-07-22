@@ -2096,6 +2096,8 @@ void QnMain::run()
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
+    m_crashReporter.reset(new ec2::CrashReporter);
+
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
     timer.start(QnVirtualCameraResource::issuesTimeoutMs());
@@ -2103,7 +2105,6 @@ void QnMain::run()
 
     QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
-
 
     m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
         std::bind( &QnMain::dumpSystemUsageStats, this ),
@@ -2120,7 +2121,6 @@ void QnMain::run()
         m_moduleFinder->start();
     }
 #endif
-    m_crashReporter.reset(new ec2::CrashReporter);
 
     exec();
 

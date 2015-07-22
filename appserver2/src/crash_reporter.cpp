@@ -22,7 +22,7 @@ static const QString SERVER_API_COMMAND = lit("crashserver/api/report");
 static const QString LAST_CRASH = lit("statisticsReportLastCrash");
 static const uint SENDING_MIN_INTERVAL = 24 * 60 * 60; /* secs => a day */
 static const uint SENDING_MAX_SIZE = 32 * 1024 * 1024; /* 30 mb */
-static const uint SCAN_TIMER_CYCLE = /*10 **/ 60 * 1000; /* every 10 minutes */
+static const uint SCAN_TIMER_CYCLE = 10 * 60 * 1000; /* every 10 minutes */
 
 static QFileInfoList readCrashes()
 {
@@ -121,11 +121,11 @@ bool CrashReporter::scanAndReport(QSettings* settings)
 void CrashReporter::scanAndReportAsync(QSettings* settings)
 {
     QMutexLocker lock(&m_mutex);
-
-    // This function is not supposed to be called more then once per binary, but anyway:
     m_activeCollection.waitForFinished();
 
     m_activeCollection = QnConcurrent::run(Ec2ThreadPool::instance(), [=](){
+        // \class QnConcurrent posts a job to \class Ec2ThreadPool rather than create new
+        // real thread, we need to reverve a thread to avoid possible deadlock
         QnScopedThreadRollback reservedThread( 1, Ec2ThreadPool::instance() );
         return scanAndReport(settings);
     });
@@ -212,7 +212,7 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
         QFile::remove(crash.absoluteFilePath());
 
     QMutexLocker lock(&m_host.m_mutex);
-    assert(m_host.m_activeHttpClient == httpClient);
+    Q_ASSERT(!m_host.m_activeHttpClient || m_host.m_activeHttpClient == httpClient);
     m_host.m_activeHttpClient.reset();
 }
 
