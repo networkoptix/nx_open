@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import sys, os, os.path, time
+#TODO: ADD THE DESCRIPTION!!!
+import sys, os, os.path, time, re
 from subprocess import Popen, PIPE, STDOUT
 import select
 import traceback
@@ -21,6 +22,8 @@ FAILMARK = '[  FAILED  ]'
 STARTMARK = '[ RUN      ]'
 OKMARK = '[       OK ]'
 
+NameRx = re.compile(r'\[[^\]]+\]\s(\S+)')
+
 READ_ONLY = select.POLLIN | select.POLLPRI | select.POLLHUP | select.POLLERR
 READY = select.POLLIN | select.POLLPRI
 
@@ -35,10 +38,10 @@ def email_notify(text):
     smtp.quit()
 
 def error_notify(lines, has_error, has_stranges):
-    what = ("errors and strange messages" if has_error and has_stranges
-        else 'errors' if has_error else 'strange mesages')
+    what = ("errors and dubious messages" if has_error and has_stranges
+        else 'errors' if has_error else 'dubious mesages')
     msg = MIMEText.MIMEText(
-        ("Some %s occured:\n\n" % what) +
+        ("%s:\n\n" % what.capitalize()) +
         "\n".join(lines) +
         ("\n\n[%s]" % time.strftime("%x %X %Z"))
     )
@@ -49,6 +52,11 @@ def ok_notify():
     msg = MIMEText.MIMEText("Autotest passed OK")
     msg['Subject'] = "Autotest OK"
     email_notify(msg)
+
+
+def get_name(line):
+    m = NameRx.match(line)
+    return m.group(1) if m else ''
 
 
 def check_repeats(repeats):
@@ -71,6 +79,7 @@ def run():
     has_errors = False
     has_stranges = False
     repeats = 0 # now many times the same 'strange' line repeats
+    running_test_name = ''
     while True:
         res = poller.poll(TIMEOUT)
         if res:
@@ -80,17 +89,24 @@ def run():
             ch = proc.stdout.read(1)
             if ch == '\n':
                 if len(line) > 0:
-                    print line
+#                    print line
                     if line.startswith(SUITMARK):
                         if line.startswith(FAILMARK):
                             ToSend.append(line) # line[len(FAILMARK):].strip())
                             last_suit_line = ''
+                            running_test_name = ''
                             has_errors = True
+                        elif line.startswith(OKMARK):
+                            if running_test_name == get_name(line): # print it out only if there were any 'strange' lines
+                                ToSend.append(line)
+                                running_test_name = ''
                         else:
                             last_suit_line = line
                     else: # gother test's messages
                         if last_suit_line != '':
                             ToSend.append(last_suit_line)
+                            if last_suit_line.startswith(STARTMARK):
+                                running_test_name = get_name(last_suit_line) # remember to print OK test result
                             last_suit_line = ''
                         if ToSend and (line == ToSend[-1]):
                             repeats += 1
@@ -108,7 +124,7 @@ def run():
             ToSend.append("TEST SUIT HAS TIMED OUT")
             has_errors = True
             break
-    print "---"
+    #print "---"
     if proc.poll() is None:
         proc.terminate()
 
@@ -119,10 +135,10 @@ def run():
         has_errors = True
 
     if ToSend:
-        print "Interesting output:"
-        for line in ToSend:
-            print line
-        print "Sending email..."
+        #print "Interesting output:"
+        #for line in ToSend:
+        #    print line
+        #print "Sending email..."
         error_notify(ToSend, has_errors, has_stranges)
     else:
         ok_notify()
