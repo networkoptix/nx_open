@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/long_runnable.h>
 
@@ -34,7 +34,7 @@ namespace aio
         /*!
             \param mutex Mutex to use for exclusive access to internal data
         */
-        AIOThread( QMutex* const mutex );
+        AIOThread( QnMutex* const mutex );
         virtual ~AIOThread();
 
         //!Implementation of QnLongRunnable::pleaseStop
@@ -49,7 +49,8 @@ namespace aio
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
-            unsigned int timeoutMS = 0 );
+            unsigned int timeoutMS = 0,
+            std::function<void()> socketAddedToPollHandler = std::function<void()>() );
         //!Change timeout of existing polling \a sock for \a eventToWatch to \a timeoutMS. \a eventHandler is changed also
         /*!
             \note If \a sock is not polled, undefined behaviour can occur
@@ -58,7 +59,8 @@ namespace aio
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
-            unsigned int timeoutMS = 0 );
+            unsigned int timeoutMS = 0,
+            std::function<void()> socketAddedToPollHandler = std::function<void()>() );
         //!Do not monitor \a sock for event \a eventType
         /*!
             Garantees that no \a eventTriggered will be called after return of this method.

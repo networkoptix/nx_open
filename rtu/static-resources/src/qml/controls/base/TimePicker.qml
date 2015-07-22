@@ -13,48 +13,49 @@ QtControls.TextField
         text = impl.stringFromTime(newTime);
     }
 
+    property bool showNow: false;
     property bool changed: false;    
-    property var changesHandler;
+    property int fontSize: Common.SizeManager.fontSizes.base;
     
     property var time;
     property var initTime;
     
     height: Common.SizeManager.clickableSizes.medium;
-    width: height * 2;
+    width: height * 3;
 
     opacity: enabled ? 1.0 : 0.5;
 
     text: impl.stringFromTime(initTime);
     inputMask: impl.mask;
 
-    onEnabledChanged:
+    enabled: !showNow;
+    
+    onShowNowChanged:
     {
-        inputMask = (enabled ? impl.mask : "");
-        text = (enabled ? impl.stringFromTime(time) : qsTr("<now>"));
+        inputMask = (showNow ? "" : impl.mask);
+        text = (showNow ? qsTr("<now>") : impl.stringFromTime(initTime));
     }
 
-    font.pointSize: Common.SizeManager.fontSizes.medium;
+    font.pixelSize: fontSize;
     
     style: TextFieldStyle
     {
         renderType: Text.NativeRendering;
     }
 
-    
-    onChangedChanged: 
+    validator: RegExpValidator
     {
-        if (changesHandler)
-            changesHandler.changed = true;
+        regExp: /([01]?[0-9]|2[0-3]):[0-5][0-9]/;
     }
 
     onTextChanged: 
     {
-        time = Date.fromLocaleTimeString(Qt.locale(), text, Locale.ShortFormat);
+        time = Date.fromLocaleTimeString(Qt.locale(), text, impl.timeFormat);
         if (!initTime && (text === impl.emptyMaskValue))
             return;
         
-        if (initTime && time && (impl.stringFromTime(initTime) !== impl.stringFromTime(time)))
-            thisComponent.changed = true;
+        thisComponent.changed = (initTime && time 
+            && (impl.stringFromTime(initTime) !== impl.stringFromTime(time)));
     }
     
     property QtObject impl: QtObject

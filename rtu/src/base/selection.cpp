@@ -48,6 +48,25 @@ namespace
         return flags;
     }
 
+    Qt::CheckState calcDHCPState(const rtu::ServerInfoList &servers)
+    {
+        return getSelectionValue<Qt::CheckState>(servers, Qt::Unchecked, Qt::PartiallyChecked
+            , std::equal_to<Qt::CheckState>(), [](const rtu::ServerInfo &info)
+        {
+            if (!info.hasExtraInfo() || info.extraInfo().interfaces.empty())
+                return Qt::Unchecked;
+            
+            const rtu::InterfaceInfoList &interfaces = info.extraInfo().interfaces;
+            Qt::CheckState firstVal = interfaces.begin()->useDHCP;
+            for (const rtu::InterfaceInfo &itfInfo: interfaces)
+            {
+                if (itfInfo.useDHCP != firstVal)
+                    return Qt::PartiallyChecked;
+            }
+            return firstVal;
+        });
+    }
+    
     QString calcSystemName(const rtu::ServerInfoList &servers)
     {
         if (servers.empty())
@@ -85,43 +104,46 @@ namespace
         if (servers.empty())
             return QDateTime();
         
-        const int selectedCount = servers.size();
-        const rtu::ServerInfo &firstInfo = **servers.begin();
-        if (selectedCount == kSingleServerSelectionCount)
-        {
-            if (!firstInfo.hasExtraInfo())
-                return QDateTime();
-
-            return rtu::convertUtcToTimeZone(firstInfo.extraInfo().utcDateTime
-                , firstInfo.extraInfo().timeZone);
-        }
-        else if (!(flags & rtu::Constants::ServerFlag::AllowChangeDateTimeFlag))
-        {
-            return QDateTime();
-        }
-    
-        static const auto &eq = [](const QDateTime &first, const QDateTime &second) -> bool
-        {
-            enum { kEps = 3 * 1000};    /// 3 seconds
-            return (std::abs(first.toMSecsSinceEpoch() - second.toMSecsSinceEpoch()) < kEps);
-        };
-    
         const qint64 now = QDateTime::currentMSecsSinceEpoch();
         const auto &getter = [now](const rtu::ServerInfo &info) -> QDateTime
         {
             if (!info.hasExtraInfo())
                 return QDateTime();
-            
+
             const qint64 dateMsecs = info.extraInfo().utcDateTime.toMSecsSinceEpoch();
             const qint64 timestamp = info.extraInfo().timestamp.toMSecsSinceEpoch();
             return QDateTime::fromMSecsSinceEpoch(dateMsecs + (now - timestamp));
         };
+
+        const int selectedCount = servers.size();
+        if (selectedCount == kSingleServerSelectionCount)
+        {
+            const rtu::ServerInfo &firstInfo = **servers.begin();
+            const QDateTime time = getter(firstInfo);
+            if (!time.isValid() || time.isNull())
+                return QDateTime();
+
+            return rtu::convertUtcToTimeZone(time, firstInfo.extraInfo().timeZone);
+        }
+    
+        static const auto &eq = [](const QDateTime &first, const QDateTime &second) -> bool
+        {
+            enum { kEps = 130 * 1000};    /// 30 seconds
+            return (std::abs(first.toMSecsSinceEpoch() - second.toMSecsSinceEpoch()) < kEps);
+        };
+    
     
         const QDateTime result = getSelectionValue<QDateTime>(
             servers, QDateTime(), QDateTime(), eq, getter);
 
-        return result;
-        return (!result.isNull() && result.isValid() ? result.toLocalTime() : QDateTime());
+        const QByteArray tz = getSelectionValue<QByteArray>(servers, QByteArray(), QByteArray()
+            , std::equal_to<QByteArray>(), [](const rtu::ServerInfo &info) -> QByteArray
+        {
+            return (info.hasExtraInfo() ? info.extraInfo().timeZone.id() : QByteArray());
+        });
+
+        return (result.isNull() || !result.isValid() || tz.isEmpty() ?
+            QDateTime() : rtu::convertUtcToTimeZone(result, QTimeZone(tz)));
     }
 
     
@@ -157,6 +179,7 @@ struct rtu::Selection::Snapshot
     int count;
     int port;
     rtu::Constants::ServerFlags flags;
+    Qt::CheckState dhcpState;
     QString systemName;
     QString password;
     QDateTime dateTime;
@@ -170,6 +193,7 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
     : count(model->selectedCount())
     , port(calcPort(model->selectedServers()))
     , flags(calcFlags(model->selectedServers()))
+    , dhcpState(calcDHCPState(model->selectedServers()))
     , systemName(calcSystemName(model->selectedServers()))
     , password(calcPassword(model->selectedServers()))
     , dateTime(calcDateTime(model->selectedServers(), flags))
@@ -187,37 +211,43 @@ rtu::Selection::Selection(ServersSelectionModel *selectionModel
 rtu::Selection::~Selection()
 {}
 
-int rtu::Selection::count()
+int rtu::Selection::count() const
 {
     return m_snapshot->count;
 }
 
-int rtu::Selection::port()
+int rtu::Selection::port() const
 {
     return m_snapshot->port;
 }
 
-int rtu::Selection::flags()
+int rtu::Selection::flags() const
 {
     return static_cast<int>(m_snapshot->flags);
 }
 
-QString rtu::Selection::systemName()
+
+int rtu::Selection::dhcpState() const
+{
+    return static_cast<int>(m_snapshot->dhcpState);
+}
+
+const QString &rtu::Selection::systemName() const
 {
     return m_snapshot->systemName;
 }
 
-QString rtu::Selection::password()
+const QString &rtu::Selection::password() const
 {
     return m_snapshot->password;
 }
 
-QDateTime rtu::Selection::dateTime()
+const QDateTime &rtu::Selection::dateTime() const
 {
     return m_snapshot->dateTime;
 }
 
-bool rtu::Selection::editableInterfaces()
+bool rtu::Selection::editableInterfaces() const
 {
     return m_snapshot->editableInterfaces;
 }

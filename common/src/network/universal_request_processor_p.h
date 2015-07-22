@@ -8,7 +8,7 @@ class QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
     QnTCPConnectionProcessor* processor;
-    QMutex mutex;
+    QnMutex mutex;
     QnUniversalTcpListener* owner;
     bool needAuth;
 

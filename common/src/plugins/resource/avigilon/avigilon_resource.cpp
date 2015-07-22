@@ -71,7 +71,7 @@ bool QnAvigilonResource::startInputPortMonitoringAsync( std::function<void(bool)
     m_checkInputUrl.setUserName( auth.user() );
     m_checkInputUrl.setPassword( auth.password() );
 
-    QMutexLocker lk(&m_ioPortMutex);
+    QnMutexLocker lk(&m_ioPortMutex);
 
     Q_ASSERT( !m_inputMonitored );
     m_inputMonitored = true;
@@ -86,7 +86,7 @@ void QnAvigilonResource::stopInputPortMonitoringAsync()
 {
     quint64 checkInputPortStatusTimerID = 0;
     {
-        QMutexLocker lk(&m_ioPortMutex);
+        QnMutexLocker lk(&m_ioPortMutex);
         m_inputMonitored = false;
         checkInputPortStatusTimerID = m_checkInputPortStatusTimerID;
         m_checkInputPortStatusTimerID = 0;
@@ -100,13 +100,13 @@ void QnAvigilonResource::stopInputPortMonitoringAsync()
 
 bool QnAvigilonResource::isInputPortMonitored() const
 {
-    QMutexLocker lk(&m_ioPortMutex);
+    QnMutexLocker lk(&m_ioPortMutex);
     return m_inputMonitored;
 }
 
 void QnAvigilonResource::checkInputPortState( qint64 timerID )
 {
-    QMutexLocker lk(&m_ioPortMutex);
+    QnMutexLocker lk(&m_ioPortMutex);
 
     if( timerID != m_checkInputPortStatusTimerID )
         return;
@@ -132,7 +132,7 @@ void QnAvigilonResource::checkInputPortState( qint64 timerID )
 
 void QnAvigilonResource::onCheckPortRequestDone( nx_http::AsyncHttpClientPtr httpClient )
 {
-    QMutexLocker lk(&m_ioPortMutex);
+    QnMutexLocker lk(&m_ioPortMutex);
 
     if( !m_inputMonitored )
         return;

@@ -1,9 +1,10 @@
+
+#include <QtQml>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
-#include <QtQml>
-#include <models/ip_settings_model.h>
-#include <models/servers_selection_model.h>
+
+#include <models/buttons.h>
 #include <base/constants.h>
 #include <base/rtu_context.h>
 
@@ -19,29 +20,17 @@ void registerTypes()
     };
     
     const char kServerFlagsQmlTypeName[] = "Constants";
-
     qmlRegisterUncreatableType<rtu::Constants>(kRtuDomainName
         , kMajorVersion, kMinorVersion, kServerFlagsQmlTypeName, kServerFlagsQmlTypeName);
-    
-/*
-    const char kIpSettingsModelTypeName[] = "IpSettingsModel";
-    qmlRegisterType<rtu::IpSettingsModel>(kRtuDomainName, 1, 0, kIpSettingsModelTypeName);
-    */
-    /*
-    const char kServersSelectionListModelTypeName[] = "ServersSelectionListModel";
-    qmlRegisterType<rtu::ServersSelectionModel>(kRtuDomainName, rtu::ServersSelectionModel::kVersionMajor
-        , rtu::ServersSelectionModel::kVersionMinor, kServersSelectionListModelTypeName);
-    */
-    /*
-    const char kRtuContextTypeName[] = "ServersSelectionListModel";
-    qmlRegisterType<rtu::ServersSelectionModel>(kRtuDomainName, rtu::ServersSelectionModel::kVersionMajor
-        , rtu::ServersSelectionModel::kVersionMinor, kServersSelectionListModelTypeName);
-        */
-    
-    
+
+    const char kButtonsModelQmlTypeName[] = "Buttons";
+    qmlRegisterType<rtu::Buttons>(kRtuDomainName
+        , kMajorVersion, kMinorVersion, kButtonsModelQmlTypeName);
 }
 
 #include <helpers/time_helper.h>
+#include <QFont>
+#include <QFontDatabase>
 
 int main(int argc, char *argv[])
 {
@@ -50,9 +39,9 @@ int main(int argc, char *argv[])
     rtu::RtuContext rtuContext(&app);
     
     QQmlApplicationEngine engine;
-    
+        
     registerTypes();
-
+    
     engine.rootContext()->setContextProperty("rtuContext", &rtuContext);
     engine.load(QUrl(QStringLiteral("qrc:/src/qml/main.qml")));
 

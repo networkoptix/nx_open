@@ -25,7 +25,7 @@ namespace {
     const QString updatesDirSuffix = lit("mediaserver/updates");
     const QString updateInfoFileName = lit("update.json");
     const QString updateLogFileName = lit("update.log");
-    const int installationDelay = 5000;
+    const int installationDelay = 15000;
 
     QDir getUpdatesDir() {
         const QString& dataDir = MSSettings::roSettings()->value( "dataDir" ).toString();
@@ -81,7 +81,7 @@ namespace {
 } // anonymous namespace
 
 QnServerUpdateTool::QnServerUpdateTool() :
-    m_mutex(QMutex::Recursive)
+    m_mutex(QnMutex::Recursive)
 {}
 
 QnServerUpdateTool::~QnServerUpdateTool() {}
@@ -324,7 +324,8 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
 }
 
 void QnServerUpdateTool::installUpdateDelayed(const QString &updateId) {
-    executeDelayed([updateId, this]() { installUpdate(updateId); }, installationDelay);
+    NX_LOG(lit("QnServerUpdateTool: Requested delayed installation of %1. Installing in %2 ms.").arg(updateId).arg(installationDelay), cl_logINFO);
+    executeDelayed([updateId, this]() { installUpdate(updateId); }, installationDelay, thread());
 }
 
 void QnServerUpdateTool::clearUpdatesLocation(const QString &idToLeave) {

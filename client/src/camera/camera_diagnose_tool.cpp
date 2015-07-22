@@ -10,7 +10,7 @@
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <utils/network/http/httptypes.h>
 
 
@@ -24,11 +24,11 @@ namespace CameraDiagnostics
         m_step( Step::mediaServerAvailability ),
         m_result( false )
     {
-        QnSecurityCamResourcePtr secCamRes = qnResPool->getResourceById<QnSecurityCamResource>( cameraID );
-        if( !secCamRes )
+        QnVirtualCameraResourcePtr camera = qnResPool->getResourceById( cameraID ).dynamicCast<QnVirtualCameraResource>();
+        if( !camera )
             return;
 
-        QnMediaServerResourcePtr serverResource = secCamRes->getParentServer();
+        QnMediaServerResourcePtr serverResource = camera->getParentServer();
         if( !serverResource )
             return;
         m_serverConnection = serverResource->apiConnection();

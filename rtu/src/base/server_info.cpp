@@ -19,26 +19,27 @@ rtu::InterfaceInfo::InterfaceInfo(bool initUseDHCP)
     , useDHCP(initUseDHCP ? Qt::Checked : Qt::Unchecked)
 {}
 
-rtu::InterfaceInfo::InterfaceInfo(QString initName
-    , QString initIp
-    , QString initMacAddress
-    , QString initMask
-    , QString initGateway
+rtu::InterfaceInfo::InterfaceInfo(const QString &initName
+    , const QString &initIp
+    , const QString &initMacAddress
+    , const QString &initMask
+    , const QString &initGateway
+    , const QString &initDns
     , Qt::CheckState initUseDHCP)
     : name(initName)
     , ip(initIp)
     , macAddress(initMacAddress)
     , mask(initMask)
     , gateway(initGateway)
+    , dns(initDns)
     , useDHCP(initUseDHCP)
 {}
 
 bool rtu::operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {
-    /// Do not compare hostAddress - it could be changed and it is Ok
-    return ((first.flags == second.flags)
-        && (first.id == second.id)
+    /// Do not compare hostAddress and flags - it is Ok
+    return ((first.id == second.id)
         && (first.name == second.name)
         && (first.port == second.port)
         && (first.systemName == second.systemName));

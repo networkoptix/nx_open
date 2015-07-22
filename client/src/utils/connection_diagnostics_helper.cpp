@@ -24,20 +24,23 @@ namespace {
     QnSoftwareVersion minSupportedVersion("1.4"); 
 }
 
-QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode) {
-    bool success = (errorCode == ec2::ErrorCode::ok);
 
+QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(
+    const QString &brand, 
+    const QnSoftwareVersion &version, 
+    int protoVersion, 
+    const QList<QnCompatibilityItem> &compatibilityItems)
+{
     //checking brand compatibility
-    if (success)
-        success = qnRuntime->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
+    bool success = qnRuntime->isDevMode() || brand.isEmpty() || brand == QnAppInfo::productNameShort();
 
     if(!success)
         return Result::Failure;
 
-    if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION)
+    if (protoVersion != nx_ec::EC2_PROTO_VERSION)
         return Result::Failure;
 
-    QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
+    QnCompatibilityChecker remoteChecker(compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
     QnCompatibilityChecker *compatibilityChecker;
@@ -47,9 +50,20 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         compatibilityChecker = &localChecker;
     }
 
-    return (compatibilityChecker->isCompatible(lit("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), lit("ECS"), connectionInfo.version))
+    return (compatibilityChecker->isCompatible(lit("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), lit("ECS"), version))
         ? Result::Success
         : Result::Failure;
+}
+
+
+QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode) {
+    if (errorCode != ec2::ErrorCode::ok)
+        return Result::Failure;
+
+    return validateConnectionLight(connectionInfo.brand, 
+        connectionInfo.version,
+        connectionInfo.nxClusterProtoVersion,
+        connectionInfo.compatibilityItems);
 }
 
 

@@ -128,11 +128,12 @@
 #include <rest/handlers/current_user_rest_handler.h>
 #include <rest/handlers/backup_db_rest_handler.h>
 #include <rest/handlers/discovered_peers_rest_handler.h>
+#include <rest/handlers/multiserver_chunks_rest_handler.h>
+#include <rest/handlers/camera_history_rest_handler.h>
+#include <rest/handlers/multiserver_bookmarks_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 
 #include <rtsp/rtsp_connection.h>
-
-#include <soap/soapserver.h>
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
@@ -188,7 +189,9 @@
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
 #include "network/universal_request_processor.h"
+#include "core/resource/camera_history.h"
 #include "utils/network/nettools.h"
+
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -364,10 +367,10 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 static int lockmgr(void **mtx, enum AVLockOp op)
 {
-    QMutex** qMutex = (QMutex**) mtx;
+    QnMutex** qMutex = (QnMutex**) mtx;
     switch(op) {
         case AV_LOCK_CREATE:
-            *qMutex = new QMutex();
+            *qMutex = new QnMutex();
             return 0;
         case AV_LOCK_OBTAIN:
             (*qMutex)->lock();
@@ -634,7 +637,7 @@ void QnMain::dumpSystemUsageStats()
     qnPlatform->monitor()->totalHddLoad();
     qnPlatform->monitor()->totalNetworkLoad();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
         return;
     m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
@@ -869,7 +872,7 @@ QnMain::~QnMain()
 
 bool QnMain::isStopping() const
 {
-    QMutexLocker lock(&m_stopMutex);
+    QnMutexLocker lock( &m_stopMutex );
     return m_stopping;
 }
 
@@ -901,7 +904,7 @@ void QnMain::stopSync()
     NX_LOG( lit("Stopping server"), cl_logALWAYS );
     if (serviceMainInstance) {
         {
-            QMutexLocker lock(&m_stopMutex);
+            QnMutexLocker lock( &m_stopMutex );
             m_stopping = true;
         }
         serviceMainInstance->pleaseStop();
@@ -1097,17 +1100,15 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
     }
 
     {
-        QnCameraHistoryList cameraHistoryList;
-        while (( rez = ec2Connection->getCameraManager()->getCameraHistoryListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
+        ec2::ApiServerFootageDataList cameraHistoryList;
+        while (( rez = ec2Connection->getCameraManager()->getCamerasWithArchiveListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
         }
-
-        for(QnCameraHistoryPtr history: cameraHistoryList)
-            QnCameraHistoryPool::instance()->addCameraHistory(history);
+        qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
     }
 
     {
@@ -1337,8 +1338,8 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/statistics", new QnStatisticsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/getCameraParam", new QnGetCameraParamRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/setCameraParam", new QnSetCameraParamRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/getCameraParam", new QnCameraSettingsRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/setCameraParam", new QnCameraSettingsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/manualCamera", new QnManualCameraAdditionRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ptz", new QnPtzRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/image", new QnImageRestHandler());
@@ -1368,9 +1369,11 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
-#ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
-#endif
+
+    QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
+    QnRestProcessorPool::instance()->registerHandler("ec2/cameraHistory", new QnCameraHistoryRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
@@ -1480,15 +1483,9 @@ void QnMain::run()
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
-#ifdef ENABLE_ONVIF
-    QnSoapServer soapServer;    //starting soap server to accept event notifications from onvif cameras
-    soapServer.bind();
-    soapServer.start();
-#endif //ENABLE_ONVIF
 
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
@@ -2117,7 +2114,7 @@ void QnMain::run()
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
         m_dumpSystemResourceUsageTaskID = 0;
     }

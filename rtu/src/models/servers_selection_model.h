@@ -48,6 +48,7 @@ namespace rtu
             , const QDateTime &timestamp);
 
         void updateInterfacesInfo(const QUuid &id
+            , const QString &host
             , const InterfaceInfoList &interfaces);
 
         void updateSystemNameInfo(const QUuid &id

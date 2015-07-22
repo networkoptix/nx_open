@@ -90,7 +90,7 @@ namespace ec2
         void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock( &m_mutex );
             if (m_connections.isEmpty())
                 return;
             QnTransactionTransportHeader ttHeader(connectedServerPeers() << m_localPeer.id, dstPeers);
@@ -143,7 +143,7 @@ namespace ec2
         * If can't find route info then return null value. 
         * Otherwise return route gateway.
         */
-        QnUuid routeToPeerVia(const QnUuid& dstPeer) const;
+        QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
 
     signals:
         void peerLost(ApiPeerAliveData data);
@@ -277,7 +277,7 @@ namespace ec2
         QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;
         ECConnectionNotificationManager* m_handler;
         QTimer* m_timer;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         QThread *m_thread;
         QnConnectionMap m_connections;
 

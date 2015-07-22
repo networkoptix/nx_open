@@ -180,7 +180,7 @@ bool QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
 
-    QMutexLocker lock(&d->mutex); 
+    QnMutexLocker lock( &d->mutex ); 
     if (auto handler = d->owner->findHandler(d->protocol, d->request))
         d->processor = handler(d->socket, d->owner);
     else
@@ -204,7 +204,7 @@ bool QnUniversalRequestProcessor::processRequest()
 void QnUniversalRequestProcessor::pleaseStop()
 {
     Q_D(QnUniversalRequestProcessor);
-    QMutexLocker lock(&d->mutex);
+    QnMutexLocker lock( &d->mutex );
     QnTCPConnectionProcessor::pleaseStop();
     if (d->processor)
         d->processor->pleaseStop();

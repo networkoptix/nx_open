@@ -26,7 +26,7 @@ QDateTime rtu::convertUtcToTimeZone(const QDateTime &utcTime
 {
     const int offsetFromUtc = timeZone.offsetFromUtc(utcTime);
     const QDateTime pseudoDateTime = QDateTime::fromMSecsSinceEpoch(
-        utcTime.toMSecsSinceEpoch()- offsetFromUtc * kMSecFactor, Qt::UTC);
+        utcTime.toMSecsSinceEpoch() +  offsetFromUtc * kMSecFactor, Qt::UTC);
     return QDateTime(pseudoDateTime.date(), pseudoDateTime.time());
 }
 
@@ -42,12 +42,13 @@ qint64 rtu::msecondsFromEpoch(const QDate &date
     , const QTime &time
     , const QTimeZone &timeZone)
 {
-    const int offsetFromUtc = timeZone.offsetFromUtc(QDateTime(date, time));
+    const int offsetFromUtc = timeZone.offsetFromUtc(QDateTime(date, time, Qt::UTC));
     const QDateTime utcTime = QDateTime(date, time, Qt::UTC);
-
-    const qint64 result = (utcTime.toMSecsSinceEpoch() + offsetFromUtc * kMSecFactor);
+    
+    const qint64 result = (utcTime.toMSecsSinceEpoch() - offsetFromUtc * kMSecFactor);
 
     qDebug() << "\n" << "source: " << date << " " << time << " " << timeZone;
+    qDebug() << offsetFromUtc;
     qDebug() << "target: " << result << "\n";
     return result;
 }

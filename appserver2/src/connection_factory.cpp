@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
 #include <network/authenticate_helper.h>
 #include <network/universal_tcp_listener.h>
@@ -22,6 +22,7 @@
 #include "ec2_thread_pool.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_camera_data_ex.h"
+#include "nx_ec/data/api_camera_history_data.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -73,13 +74,13 @@ namespace ec2
 
     void Ec2DirectConnectionFactory::pleaseStop()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_terminated = true;
     }
 
     void Ec2DirectConnectionFactory::join()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         while( m_runningRequests > 0 )
         {
             lk.unlock();
@@ -170,11 +171,9 @@ namespace ec2
         //AbstractCameraManager::getUserAttributes
         registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::getCameraUserAttributes );
         //AbstractCameraManager::addCameraHistoryItem
-        registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
-        //AbstractCameraManager::removeCameraHistoryItem
-        registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::removeCameraHistoryItem );
+        registerUpdateFuncHandler<ApiServerFootageData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryItems
-        registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
+        registerGetFuncHandler<std::nullptr_t, ApiServerFootageDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
         //AbstractCameraManager::getCamerasEx
@@ -325,7 +324,7 @@ namespace ec2
         connectionInfo.ecUrl = url;
         ec2::ErrorCode connectionInitializationResult = ec2::ErrorCode::ok;
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( !m_directConnection ) {
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
                 if( !m_directConnection->initialized() )
@@ -345,7 +344,7 @@ namespace ec2
 
         ////TODO: #ak return existing connection, if one
         //{
-        //    QMutexLocker lk( &m_mutex );
+        //    QnMutexLocker lk( &m_mutex );
         //    auto it = m_urlToConnection.find( addr );
         //    if( it != m_urlToConnection.end() )
         //        AbstractECConnectionPtr connection = it->second.second;
@@ -357,7 +356,7 @@ namespace ec2
         loginInfo.clientInfo = clientInfo;
 
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return INVALID_REQ_ID;
             ++m_runningRequests;
@@ -430,7 +429,7 @@ namespace ec2
                 break;
         }
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         --m_runningRequests;
     }
 
@@ -489,7 +488,7 @@ namespace ec2
             errorCode,
             connection);
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         --m_runningRequests;
     }
 
@@ -503,7 +502,7 @@ namespace ec2
         if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized )
         {
             handler->done( reqID, errorCode, connectionInfo );
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             --m_runningRequests;
             return;
         }
@@ -580,7 +579,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return INVALID_REQ_ID;
             ++m_runningRequests;

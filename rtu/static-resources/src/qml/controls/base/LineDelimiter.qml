@@ -6,19 +6,12 @@ Rectangle
 {
     id: thisComponent;
 
-    property bool thinDelimiter: true;
+    height: Common.SizeManager.lineSizes.thin;
 
-    height: (thinDelimiter ? Common.SizeManager.lineSizes.thin
-        : Common.SizeManager.lineSizes.thick);
-    radius: height / 2;
-
-    color: "grey";
-    opacity: (thinDelimiter ? 0.8 : 0.5);
+    color: "black";
     anchors
     {
         left: parent.left;
         right: parent.right;
-        leftMargin: Common.SizeManager.spacing.base;
-        rightMargin: Common.SizeManager.spacing.base;
     }
 }

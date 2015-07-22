@@ -1694,7 +1694,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->pleaseStop();
         }
 
-        if(const QnResourcePtr &resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid())) {
+        if(QnMediaResourcePtr resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>()) {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
             connect(m_loader, &QnThumbnailsLoader::thumbnailLoaded, this,       &QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded);
@@ -1992,7 +1992,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
-    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().getEventResourceId());
+    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().eventResourceId);
     if (!resource)
         return;
 
@@ -2003,7 +2003,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if(thumbnailed)
         return;
 
-    int type = businessAction->getRuntimeParams().getEventType();
+    int type = businessAction->getRuntimeParams().eventType;
 
     at_notificationTimer_timeout(resource, type);
     QnVariantTimer::singleShot(500, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);

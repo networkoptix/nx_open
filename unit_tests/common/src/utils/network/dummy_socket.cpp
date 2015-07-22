@@ -28,7 +28,7 @@ bool DummySocket::setReuseAddrFlag( bool reuseAddr )
     return true;
 }
 
-bool DummySocket::getReuseAddrFlag( bool* val )
+bool DummySocket::getReuseAddrFlag( bool* val ) const
 {
     return true;
 }
@@ -43,7 +43,7 @@ bool DummySocket::getNonBlockingMode( bool* val ) const
     return true;
 }
 
-bool DummySocket::getMtu( unsigned int* mtuValue )
+bool DummySocket::getMtu( unsigned int* mtuValue ) const
 {
     *mtuValue = 1500;
     return true;
@@ -54,7 +54,7 @@ bool DummySocket::setSendBufferSize( unsigned int buffSize )
     return true;
 }
 
-bool DummySocket::getSendBufferSize( unsigned int* buffSize )
+bool DummySocket::getSendBufferSize( unsigned int* buffSize ) const
 {
     *buffSize = 8192;
     return true;
@@ -65,7 +65,7 @@ bool DummySocket::setRecvBufferSize( unsigned int buffSize )
     return true;
 }
 
-bool DummySocket::getRecvBufferSize( unsigned int* buffSize )
+bool DummySocket::getRecvBufferSize( unsigned int* buffSize ) const
 {
     *buffSize = 8192;
     return true;
@@ -76,7 +76,7 @@ bool DummySocket::setRecvTimeout( unsigned int millis )
     return true;
 }
 
-bool DummySocket::getRecvTimeout( unsigned int* millis )
+bool DummySocket::getRecvTimeout( unsigned int* millis ) const
 {
     *millis = 0;
     return true;
@@ -87,13 +87,13 @@ bool DummySocket::setSendTimeout( unsigned int ms )
     return true;
 }
 
-bool DummySocket::getSendTimeout( unsigned int* millis )
+bool DummySocket::getSendTimeout( unsigned int* millis ) const
 {
     *millis = 0;
     return true;
 }
 
-bool DummySocket::getLastError( SystemError::ErrorCode* errorCode )
+bool DummySocket::getLastError( SystemError::ErrorCode* errorCode ) const
 {
     return false;
 }
@@ -135,7 +135,7 @@ bool DummySocket::setNoDelay( bool value )
     return true;
 }
 
-bool DummySocket::getNoDelay( bool* value )
+bool DummySocket::getNoDelay( bool* value ) const
 {
     return true;
 }

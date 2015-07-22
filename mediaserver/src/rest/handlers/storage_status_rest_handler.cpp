@@ -10,7 +10,6 @@
 #include <platform/platform_abstraction.h>
 
 #include "utils/common/util.h"
-#include "api/serializer/serializer.h"
 #include "recorder/storage_manager.h"
 #include "api/model/storage_status_reply.h"
 #include "media_server/settings.h"

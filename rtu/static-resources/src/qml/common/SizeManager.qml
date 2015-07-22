@@ -8,26 +8,30 @@ QtObject
 {
     id: thisComponent;
     
+    property alias regularFont: regularCustomFont;
+    property alias mediumFont: mediumCustomFont;
+
     property QtObject clickableSizes: QtObject
     {
-        readonly property real base: impl.sizeSourceButton.height;
-        readonly property real medium: base * 1.5;
-        readonly property real large: medium * 1.5;
+        readonly property real small: base * 0.5; 
+        readonly property real base: impl.sizeSourceButton.height * 1.2;
+        readonly property real medium: base * 1.3;
+        readonly property real large: medium * 1.3;
     }
-
+    
     property QtObject fontSizes: QtObject
     {
-        readonly property real small: impl.text.font.pointSize * 1.1;
-        readonly property real base: small * 1.1;
-        readonly property real medium: base * 1.1;
-        readonly property real large: medium * 1.1;
+        readonly property real small: 13;
+        readonly property real base: 15;
+        readonly property real medium: 17;
+        readonly property real large: 20;
     }
 
     property QtObject spacing: QtObject
     {
-        readonly property real base: clickableSizes.base / 2;
+        readonly property real small: clickableSizes.base / 8;
+        readonly property real base: clickableSizes.base / 3;
         readonly property real medium: clickableSizes.base / 1.5;
-        readonly property real small: clickableSizes.base / 5;
         readonly property real large: clickableSizes.base;
         readonly property real extraLarge: clickableSizes.base * 2;
     }
@@ -45,6 +49,17 @@ QtObject
         property Button sizeSourceButton: Button { text: "0"; }
         
         property Text text: Text {}
+        
+        property var font: FontLoader
+        {
+            id: regularCustomFont;
+            source: "qrc:/resources/Roboto-Regular.ttf";
+        }
+        property var mediumFont: FontLoader
+        {
+            id: mediumCustomFont;
+            source: "qrc:/resources/Roboto-Medium.ttf";
+        }
     }
 }
 

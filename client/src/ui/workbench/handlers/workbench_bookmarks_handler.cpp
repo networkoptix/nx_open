@@ -3,6 +3,7 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 
+#include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -23,6 +24,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
+#include "core/resource/camera_history.h"
 
 QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NULL */):
     base_type(parent),
@@ -74,11 +76,7 @@ QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const
     if (time == DATETIME_NOW)
         return currentServer;
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
-    if (!history)
-        return currentServer;
-
-    QnMediaServerResourcePtr mediaServer = history->getMediaServerOnTime(time, false);
+    QnMediaServerResourcePtr mediaServer = qnCameraHistoryPool->getMediaServerOnTime(camera, time);
     if (!mediaServer)
         return currentServer;
 
@@ -92,6 +90,7 @@ ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
         return;
 
@@ -101,7 +100,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
-            tr("Bookmark can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
+            tr("Bookmark can only be added to an online server.")); //TODO: #tr
         return;
     }
 
@@ -125,6 +124,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
         return;
 
@@ -152,6 +152,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
         return;
 
@@ -177,7 +178,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
 }
 
 void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle) {
-    QnResourcePtr camera = m_processingBookmarks.take(handle);
+    auto camera = m_processingBookmarks.take(handle);
     if (status != 0 || !camera)
         return;
 
@@ -185,13 +186,13 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
     m_tags.removeDuplicates();
     context()->navigator()->setBookmarkTags(m_tags);
 
-    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
-        loader->addBookmark(bookmark);
+//     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
+//         loader->addBookmark(bookmark);
 }
 
 
 void QnWorkbenchBookmarksHandler::at_bookmarkUpdated(int status, const QnCameraBookmark &bookmark, int handle) {
-    QnResourcePtr camera = m_processingBookmarks.take(handle);
+    auto camera = m_processingBookmarks.take(handle);
     if (status != 0 || !camera)
         return;
 
@@ -199,16 +200,16 @@ void QnWorkbenchBookmarksHandler::at_bookmarkUpdated(int status, const QnCameraB
     m_tags.removeDuplicates();
     context()->navigator()->setBookmarkTags(m_tags);
 
-    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
-        loader->updateBookmark(bookmark);
+//     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
+//         loader->updateBookmark(bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_bookmarkDeleted(int status, const QnCameraBookmark &bookmark, int handle) {
-    QnResourcePtr camera = m_processingBookmarks.take(handle);
+    auto camera = m_processingBookmarks.take(handle);
     if (status != 0 || !camera)
         return;
 
-    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
-        loader->removeBookmark(bookmark);
+//     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
+//         loader->removeBookmark(bookmark);
 }
 

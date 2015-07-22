@@ -12,52 +12,27 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
-
-QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(const QnVirtualCameraResourcePtr &camera,
-                                                              qint64 microSecSinceEpoch,
-                                                              int rotation,
-                                                              const QSize &size,
-                                                              ThumbnailFormat format,
-                                                              QObject *parent)
-{
-    if (!camera)
-        return NULL;
-
-    QnMediaServerResourcePtr server;
-    if (microSecSinceEpoch < 0 || microSecSinceEpoch == DATETIME_NOW) {
-        server = camera->getParentServer();
-    }
-    else {
-        server = QnCameraHistoryPool::instance()->getMediaServerOnTime(camera, microSecSinceEpoch / 1000, false);
-    }
-
-    if (!server)
-        return NULL;
-
-    QnMediaServerConnectionPtr serverConnection = server->apiConnection();
-    if (!serverConnection)
-        return NULL;
-
-    return new QnSingleThumbnailLoader(serverConnection, camera, microSecSinceEpoch, rotation, size, format, parent);
-}
-
-QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection,
-                                                 const QnVirtualCameraResourcePtr &camera,
-                                                 qint64 microSecSinceEpoch,
+QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePtr &camera,
+                                                 const QnMediaServerResourcePtr &server,
+                                                 qint64 msecSinceEpoch,
                                                  int rotation,
                                                  const QSize &size,
                                                  ThumbnailFormat format,
                                                  QObject *parent):
     base_type(parent),
     m_camera(camera),
-    m_connection(connection),
-    m_microSecSinceEpoch(microSecSinceEpoch),
+    m_server(server),
+    m_image(),
+    m_msecSinceEpoch(msecSinceEpoch),
     m_rotation(rotation),
     m_size(size),
     m_format(format)
 {
-    if(!connection)
-        qnNullWarning(connection);
+    if(!server)
+        qnNullWarning(server);
+
+    if(!server->apiConnection())
+        qnNullWarning(server->apiConnection());
 
     if(!camera)
         qnNullWarning(camera);
@@ -68,9 +43,12 @@ QImage QnSingleThumbnailLoader::image() const {
 }
 
 void QnSingleThumbnailLoader::doLoadAsync() {
-    m_connection->getThumbnailAsync(
+    if (!m_server || !m_server->apiConnection())
+        return;
+
+    m_server->apiConnection()->getThumbnailAsync(
             m_camera,
-            m_microSecSinceEpoch,
+            m_msecSinceEpoch * 1000,
             m_rotation,
             m_size,
             formatToString(m_format),
@@ -91,8 +69,8 @@ QString QnSingleThumbnailLoader::formatToString(ThumbnailFormat format) {
     return QString();
 }
 
-void QnSingleThumbnailLoader::at_replyReceived(int status, const QImage &image, int requstHandle) {
-    Q_UNUSED(requstHandle)
+void QnSingleThumbnailLoader::at_replyReceived(int status, const QImage &image, int requestHandle) {
+    Q_UNUSED(requestHandle)
     if (status == 0)
         m_image = image;
     else

@@ -9,14 +9,14 @@ class QnDwZoomPtzController: public QnBasicPtzController {
     typedef QnBasicPtzController base_type;
 
 public:
-    QnDwZoomPtzController(const QnPlWatchDogResourcePtr &resource);
+    QnDwZoomPtzController(const QnDigitalWatchdogResourcePtr &resource);
     virtual ~QnDwZoomPtzController();
 
     virtual Qn::PtzCapabilities getCapabilities() override;
     virtual bool continuousMove(const QVector3D &speed) override;
 
 private:
-    QnPlWatchDogResourcePtr m_resource;
+    QnDigitalWatchdogResourcePtr m_resource;
 };
 
 #endif // ENABLE_ONVIF

@@ -9,6 +9,7 @@
 
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
 #include <core/resource/motion_window.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/item_dewarping_params.h>
@@ -21,6 +22,7 @@
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
+class QnCachingCameraDataLoader;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -167,6 +169,7 @@ protected:
     void suspendHomePtzController();
     void resumeHomePtzController();
 
+    virtual void createCustomOverlays() override;
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -186,6 +189,7 @@ private slots:
     void at_videoLayoutChanged();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
+    void createButtons();
 
     Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
@@ -194,6 +198,10 @@ private:
     Q_SLOT void updateFisheye();
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
+
+    void updateBookmarks();
+
+    void updateCurrentTime(qreal timeMs);
 
 private:
     /** Media resource. */
@@ -237,6 +245,11 @@ private:
     QnFisheyeHomePtzController *m_homePtzController;
 
     QnMediaDewarpingParams m_dewarpingParams;
+
+    qreal m_currentTime;
+    QnCameraBookmarkList m_bookmarks;
+    QnCameraBookmarkList::const_iterator m_bookmarksBeginPosition;
+    QnCachingCameraDataLoader *m_dataLoader;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

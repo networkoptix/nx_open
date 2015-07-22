@@ -11,6 +11,7 @@
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include <utils/common/log.h>
+#include <utils/common/unused.h>
 
 
 namespace ec2
@@ -114,6 +115,7 @@ namespace ec2
         template <class T1, class T2>
         ErrorCode doQuery(const T1& t1, T2& t2)
         {
+            QN_UNUSED(t1);
             QWriteLocker lock(&m_mutex);
             return doQueryNoLock(t1, t2);
         }
@@ -209,7 +211,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataExList& cameraList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
 
         //getCameraBookmarkTags
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
@@ -261,7 +263,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiServerFootageData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceData>& tran);
@@ -522,25 +524,26 @@ namespace ec2
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
         bool updateResourceTypeGuids();
         bool updateGuids();
+        bool updateBusinessActionParameters();
         QnUuid getType(const QString& typeName);
         bool resyncTransactionLog();
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
-        bool applyUpdates();
 
         bool beforeInstallUpdate(const QString& updateName);
         bool afterInstallUpdate(const QString& updateName);
-        ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
-        ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
+
+        ErrorCode addCameraHistory(const ApiServerFootageData& params);
+        ErrorCode removeCameraHistory(const QnUuid& serverId);
         ErrorCode getScheduleTasks(const QnUuid& serverId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
         bool removeEmptyLayoutsFromTransactionLog();
         bool tuneDBAfterOpen();
-        bool updateCameraHistoryGuids();
+        bool removeOldCameraHistory();
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();

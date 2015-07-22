@@ -117,7 +117,7 @@ namespace ec2
     {
         outData->systemId = getOrCreateSystemId();
         {
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk(&m_mutex);
             if (m_timerDisabled)
             {
                 outData->status = ALREADY_IN_PROGRESS;
@@ -196,7 +196,7 @@ namespace ec2
 
     void Ec2StaticticsReporter::setupTimer()
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk(&m_mutex);
         if (!m_timerDisabled)
             m_timerId = TimerManager::instance()->addTimer(
                 std::bind(&Ec2StaticticsReporter::timerEvent, this), TIMER_CYCLE);
@@ -206,7 +206,7 @@ namespace ec2
     {
         boost::optional<quint64> timerId;
         {
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk(&m_mutex);
             m_timerDisabled = true;
 
             if (timerId = m_timerId)
@@ -220,7 +220,7 @@ namespace ec2
             client->terminate();
 
         {
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk(&m_mutex);
             m_timerDisabled = false;
         }
     }

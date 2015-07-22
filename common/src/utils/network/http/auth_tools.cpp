@@ -24,7 +24,7 @@ namespace nx_http
                 &request->headers,
                 nx_http::HttpHeader(
                     header::Authorization::NAME,
-                    basicAuthorization.toString() ) );
+                    basicAuthorization.serialized() ) );
             return true;
         }
         else if( wwwAuthenticateHeader.authScheme == header::AuthScheme::digest )
@@ -44,7 +44,7 @@ namespace nx_http
             }
             insertOrReplaceHeader(
                 &request->headers,
-                nx_http::HttpHeader( header::Authorization::NAME, digestAuthorizationHeader.toString() ) );
+                nx_http::HttpHeader( header::Authorization::NAME, digestAuthorizationHeader.serialized() ) );
             return true;
         }
 

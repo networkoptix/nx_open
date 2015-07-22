@@ -27,6 +27,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
+#include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attributes.h>
 #include <core/resource/user_resource.h>
@@ -120,9 +121,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnMediaServerUserAttributesPtr>();
     qRegisterMetaType<QnMediaServerUserAttributesList>();
 
-    qRegisterMetaType<QnCameraHistoryList>();
-    qRegisterMetaType<QnCameraHistoryItemPtr>();
-
     qRegisterMetaType<QnCameraBookmark>();
     qRegisterMetaType<QnCameraBookmarkList>();
     qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");/* The underlying type is identical to QStringList. */
@@ -147,6 +145,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::TimePeriodContent>();
     qRegisterMetaType<QnTimePeriodList>();
+    qRegisterMetaType<MultiServerPeriodDataList>();
 
     qRegisterMetaType<QnSoftwareVersion>();
     qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();
@@ -154,10 +153,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnSystemInformation>();
 
     qRegisterMetaType<TypeSpecificParamMap>();
-    qRegisterMetaType<QnStringBoolPairList>("QnStringBoolPairList");
-    qRegisterMetaType<QnStringBoolPairList>("QList<QPair<QString,bool> >");
-    qRegisterMetaType<QnStringVariantPairList>("QnStringVariantPairList");
-    qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
+    qRegisterMetaType<QnCameraAdvancedParamValue>();
+	qRegisterMetaType<QnCameraAdvancedParamValueList>();
+
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
 #ifdef ENABLE_DATA_PROVIDERS
@@ -212,8 +210,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<QnModuleInformation>>();
     qRegisterMetaType<QList<QnModuleInformationWithAddresses>>();
 
-    qRegisterMetaType<Qn::CameraDataType>();
-
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();
 
@@ -233,7 +229,10 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ApiResourceParamWithRefDataList");
 
     qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
-    qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamDataList");
+    qRegisterMetaType<ec2::ApiResourceParamDataList>("ApiResourceParamDataList");
+    qRegisterMetaType<ec2::ApiServerFootageDataList>("ec2::ApiServerFootageDataList");
+    qRegisterMetaType<ec2::ApiCameraHistoryData>("ec2::ApiCameraHistoryData");
+    qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
 
     qRegisterMetaType<QnUuid>( "QnUuid" );
     qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );

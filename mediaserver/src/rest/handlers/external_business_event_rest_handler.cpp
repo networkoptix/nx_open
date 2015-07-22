@@ -7,7 +7,6 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
-#include "api/serializer/serializer.h"
 #include "utils/common/synctime.h"
 #include <business/business_event_connector.h>
 

@@ -107,6 +107,7 @@ private:
     QHash<QnUuid, QnPeerUpdateInformation> m_updateInformationById;
     QMultiHash<QnSystemInformation, QnUuid> m_idBySystemInformation;
     QnUpdateResult::Value m_updateResult;
+    bool m_protocolChanged;
     QSet<QnUuid> m_failedPeerIds;
 };
 

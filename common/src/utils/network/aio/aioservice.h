@@ -17,6 +17,7 @@
 #include "aioeventhandler.h"
 #include "aiothread.h"
 #include "pollset.h"
+#include "../udt_socket.h"
 
 
 namespace aio
@@ -59,10 +60,11 @@ namespace aio
         bool watchSocket(
             SocketType* const sock,
             aio::EventType eventToWatch,
-            AIOEventHandler<SocketType>* const eventHandler )
+            AIOEventHandler<SocketType>* const eventHandler,
+            std::function<void()> socketAddedToPollHandler = std::function<void()>() )
         {
-            QMutexLocker lk( &m_mutex );
-            return watchSocketNonSafe( sock, eventToWatch, eventHandler );
+            QnMutexLocker lk( &m_mutex );
+            return watchSocketNonSafe( sock, eventToWatch, eventHandler, socketAddedToPollHandler );
         }
 
         //!Cancel monitoring \a sock for event \a eventType
@@ -81,7 +83,7 @@ namespace aio
             aio::EventType eventType,
             bool waitForRunningHandlerCompletion = true )
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             return removeFromWatchNonSafe( sock, eventType, waitForRunningHandlerCompletion );
         }
 
@@ -95,7 +97,7 @@ namespace aio
             unsigned int timeoutMillis,
             AIOEventHandler<SocketType>* const eventHandler )
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             return watchSocketNonSafe( sock, aio::etTimedOut, eventHandler, timeoutMillis );
         }
 
@@ -105,7 +107,7 @@ namespace aio
         {
             const SocketAIOContext<SocketType>& aioHandlingContext = getAIOHandlingContext<SocketType>();
 
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             const auto& it = aioHandlingContext.sockets.lower_bound( std::make_pair( sock, aio::etNone ) );
             return it != aioHandlingContext.sockets.end() && it->first.first == sock;
         }
@@ -117,7 +119,7 @@ namespace aio
         template<class SocketType, class Handler>
         bool post( SocketType* sock, Handler&& handler )
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             //if sock is not still bound to aio thread, binding it
             typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load( std::memory_order_relaxed );
             if( !threadToUse )  //socket has not been bound to aio thread yet
@@ -134,7 +136,7 @@ namespace aio
         template<class SocketType, class Handler>
         bool dispatch( SocketType* sock, Handler&& handler )
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             //if sock is not still bound to aio thread, binding it
             typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load( std::memory_order_relaxed );
             if( !threadToUse )  //socket has not been bound to aio thread yet
@@ -145,15 +147,19 @@ namespace aio
         }
 
         //TODO #ak better remove this method, violates encapsulation
-        QMutex* mutex() const { return &m_mutex; }
+        QnMutex* mutex() const { return &m_mutex; }
 
         //!Same as \a AIOService::watchSocket, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
+        /*!
+            \param socketAddedToPollHandler Called after socket has been added to pollset but before pollset.poll has been called
+        */
         template<class SocketType>
         bool watchSocketNonSafe(
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
-            boost::optional<unsigned int> timeoutMillis = boost::optional<unsigned int>() )
+            boost::optional<unsigned int> timeoutMillis = boost::optional<unsigned int>(),
+            std::function<void()> socketAddedToPollHandler = std::function<void()>() )
         {
             SocketAIOContext<SocketType>& aioHandlingContext = getAIOHandlingContext<SocketType>();
 
@@ -216,7 +222,7 @@ namespace aio
             if( !threadToUse )
                 return false;
 
-            if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get() ) )
+            if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get(), socketAddedToPollHandler ) )
             {
                 if( !aioHandlingContext.sockets.insert( std::make_pair( sockCtx, std::make_pair( threadToUse, timeoutMillis.get() ) ) ).second )
                     assert( false );
@@ -250,7 +256,7 @@ namespace aio
             SocketType* const sock,
             bool waitForRunningHandlerCompletion = true )
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             cancelPostedCallsNonSafe( sock, waitForRunningHandlerCompletion );
         }
 
@@ -277,10 +283,25 @@ namespace aio
         };
 
         SocketAIOContext<Pollable> m_systemSocketAIO;
-        mutable QMutex m_mutex;
+        SocketAIOContext<UdtSocket> m_udtSocketAIO;
+        mutable QnMutex m_mutex;
 
         template<class SocketType> SocketAIOContext<SocketType>& getAIOHandlingContext();
         template<class SocketType> const SocketAIOContext<SocketType>& getAIOHandlingContext() const;// { static_assert( false, "Bad socket type" ); }
+
+        template<class SocketType> void initializeAioThreadPool(SocketAIOContext<SocketType>* aioCtx, unsigned int threadCount)
+        {
+            typedef typename SocketAIOContext<SocketType>::AIOThreadType AIOThreadType;
+
+            for( unsigned int i = 0; i < threadCount; ++i )
+            {
+                std::unique_ptr<AIOThreadType> thread(new AIOThreadType(&m_mutex));
+                thread->start();
+                if( !thread->isRunning() )
+                    continue;
+                aioCtx->aioThreadPool.push_back(thread.release());
+            }
+        }
 
         template<class SocketType>
         aio::AIOThread<SocketType>* bindSocketToAioThread( SocketType* const sock )

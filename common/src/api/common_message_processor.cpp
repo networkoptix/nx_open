@@ -23,6 +23,7 @@
 #include "nx_ec/data/api_resource_data.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
+#include "core/resource/camera_history.h"
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     base_type(parent)
@@ -71,7 +72,6 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesChanged,      this, &QnCommonMessageProcessor::on_cameraUserAttributesChanged );
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesRemoved,      this, &QnCommonMessageProcessor::on_cameraUserAttributesRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
-    connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryRemoved,       this, &QnCommonMessageProcessor::on_cameraHistoryRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraBookmarkTagsAdded,    this, &QnCommonMessageProcessor::cameraBookmarkTagsAdded );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraBookmarkTagsRemoved,  this, &QnCommonMessageProcessor::cameraBookmarkTagsRemoved );
@@ -278,12 +278,9 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid&
         res->emitModificationSignals( modifiedFields );
 }
 
-void QnCommonMessageProcessor::on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory) {
-    QnCameraHistoryPool::instance()->addCameraHistoryItem(*cameraHistory.data());
-}
-
-void QnCommonMessageProcessor::on_cameraHistoryRemoved(const QnCameraHistoryItemPtr &cameraHistory) {
-    QnCameraHistoryPool::instance()->removeCameraHistoryItem(*cameraHistory.data());
+void QnCommonMessageProcessor::on_cameraHistoryChanged(const ec2::ApiServerFootageData &serverFootageData) 
+{
+    qnCameraHistoryPool->setServerFootageData(serverFootageData);
 }
 
 void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr &license) {
@@ -372,8 +369,8 @@ void QnCommonMessageProcessor::resetLicenses(const QnLicenseList& licenses) {
     qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnCommonMessageProcessor::resetCameraServerItems(const QnCameraHistoryList& cameraHistoryList) {
-    QnCameraHistoryPool::instance()->resetCameraHistory(cameraHistoryList);
+void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList) {
+    qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &) 
@@ -455,7 +452,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     resetResources(fullData.resources);
     resetPropertyList(fullData.allProperties);
     resetLicenses(fullData.licenses);
-    resetCameraServerItems(fullData.cameraHistory);
+    resetCamerasWithArchiveList(fullData.camerasWithArchiveList);
     resetStatusList(fullData.resStatusList);
 
     //on_runtimeInfoChanged(fullData.serverInfo);

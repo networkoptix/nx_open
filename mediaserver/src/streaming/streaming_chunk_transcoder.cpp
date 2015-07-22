@@ -4,7 +4,7 @@
 
 #include "streaming_chunk_transcoder.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
@@ -61,7 +61,7 @@ StreamingChunkTranscoder::~StreamingChunkTranscoder()
 {
     //cancelling all scheduled transcodings
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_terminated = true;
     }
 
@@ -80,7 +80,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     StreamingChunkPtr chunk )
 {
     //searching for resource
-    QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqueId( transcodeParams.srcResourceUniqueID() );
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId( transcodeParams.srcResourceUniqueID() );
     if( !resource )
     {
         NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found").
@@ -239,7 +239,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
 void StreamingChunkTranscoder::onTimer( const quint64& timerID )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( m_terminated )
         return;
@@ -308,7 +308,7 @@ bool StreamingChunkTranscoder::scheduleTranscoding(
         this,
         delayMSec );
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_taskIDToTranscode[taskID] = transcodeID;
     return true;
 }

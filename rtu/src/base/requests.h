@@ -5,6 +5,7 @@
 
 #include <QUuid>
 
+#include <base/types.h>
 #include <base/server_info.h>
 
 class QDateTime;
@@ -18,24 +19,52 @@ namespace rtu
     const QString &adminUserName();
     const QStringList &defaultAdminPasswords();
     
-    typedef std::function<void (const QUuid &serverId)> FailedCallback;
-    
     enum AffectedEntity
     {
         kNoEntitiesAffected = 0x0
-        , kPort             = 0x1
-        , kPassword         = 0x2
-        , kSystemName       = 0x4
-        , kIpAddress        = 0x8
-        , kSubnetMask       = 0x10
-        , kDHCPUsage        = 0x20
-        , kDateTime         = 0x40
-        , kTimeZone         = 0x80
-        , kAllFlags         = 0xFF
+        , kPortAffected             = 0x1
+        , kPasswordAffected         = 0x2
+        , kSystemNameAffected       = 0x4
+
+        , kIpAddressAffected        = 0x10
+        , kMaskAffected             = 0x20
+        , kDHCPUsageAffected        = 0x30
+        , kDNSAffected              = 0x40
+        , kGatewayAffected          = 0x80
+        , kAllAddressFlagsAffected  = kIpAddressAffected | kMaskAffected | kDHCPUsageAffected
+            | kDNSAffected | kGatewayAffected
+
+        , kDateTimeAffected         = 0x100
+        , kTimeZoneAffected         = 0x200
+        
+        , kAllEntitiesAffected      = 0xFFF
     };
     
     Q_DECLARE_FLAGS(AffectedEntities, AffectedEntity)
     Q_DECLARE_OPERATORS_FOR_FLAGS(AffectedEntities)
+
+    ///
+
+    struct ItfUpdateInfo
+    {
+        QString name;
+
+        BoolPointer useDHCP;
+        StringPointer ip;
+        StringPointer mask;
+        StringPointer dns;
+        StringPointer gateway;
+
+        ItfUpdateInfo();
+
+        ItfUpdateInfo(const ItfUpdateInfo &other);
+        
+        ItfUpdateInfo(const QString &initName);
+        
+        ItfUpdateInfo &operator =(const ItfUpdateInfo &other);
+    };
+
+    typedef QVector<ItfUpdateInfo> ItfUpdateInfoContainer;
     
     typedef std::function<void (const QString &errorReason
         , AffectedEntities affectedEntities)> OperationCallback; 
@@ -50,40 +79,46 @@ namespace rtu
     typedef std::function<void (const QUuid &id
         , const rtu::ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
     
-    void getServerExtraInfo(HttpClient *client
+    bool getServerExtraInfo(HttpClient *client
         , const BaseServerInfo &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
-        , const FailedCallback &failed);
-    
-    bool configureRequest(HttpClient *client
-        , const OperationCallback &callback
-        , const ServerInfo &info
-        , const QString &systemName
-        , const QString &password
-        , const int newPort);
-    
-    bool getTimeRequest(HttpClient *client
-        , const ServerInfo &info
-        , const DateTimeCallbackType &successfullCallback
-        , const FailedCallback &failedCallback);
-    
-    void interfacesListRequest(HttpClient *client
+        , const OperationCallback &failed);
+
+    bool sendIfListRequest(HttpClient *client
         , const BaseServerInfo &info
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
-        , const FailedCallback &failed);
+        , const OperationCallback &failed);
 
-    void setTimeRequest(HttpClient *client
+    ///
+
+    bool sendSetTimeRequest(HttpClient *client
         , const ServerInfo &info
         , const QDateTime &utcDateTime
         , const QTimeZone &timeZone
-        , const DateTimeCallbackType &successfulCallback
-        , const OperationCallback &failedCallback);
+        , const OperationCallback &callback);
+
     ///
 
-    void changeIpsRequest(HttpClient *client
+    bool sendSetSystemNameRequest(HttpClient *client
         , const ServerInfo &info
-        , const InterfaceInfoList &addresses
+        , const QString &systemName
+        , const OperationCallback &callback);
+    
+    bool sendSetPasswordRequest(HttpClient *client
+        , const ServerInfo &info
+        , const QString &password
+        , bool useNewPassword
+        , const OperationCallback &callback);
+
+    bool sendSetPortRequest(HttpClient *client
+        , const ServerInfo &info
+        , int port
+        , const OperationCallback &callback);
+
+    void sendChangeItfRequest(HttpClient *client
+        , const ServerInfo &infos
+        , const ItfUpdateInfoContainer &updateInfo
         , const OperationCallback &callback);
 }

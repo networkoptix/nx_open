@@ -4,11 +4,12 @@
 #include "ec2_statictics_reporter.h"
 
 #include <utils/common/concurrent.h>
+#include <utils/thread/mutex.h>
 
 #include <QDir>
-#include <QMutex>
 #include <QSettings>
 #include <set>
+
 
 namespace ec2 {
 
@@ -34,7 +35,7 @@ public:
 private:
     friend class ReportData;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QnConcurrent::QnFuture<bool> m_activeCollection;
     std::set<nx_http::AsyncHttpClientPtr> m_activeHttpClients;
 };

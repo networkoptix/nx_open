@@ -243,9 +243,9 @@ namespace ec2
     }
 
     template<class T>
-    QnUuid ec2::BaseEc2Connection<T>::routeToPeerVia(const QnUuid& dstPeer) const
+    QnUuid ec2::BaseEc2Connection<T>::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
     {
-        return qnTransactionBus ? qnTransactionBus->routeToPeerVia(dstPeer) : QnUuid();
+        return qnTransactionBus ? qnTransactionBus->routeToPeerVia(dstPeer, distance) : QnUuid();
     }
 
 

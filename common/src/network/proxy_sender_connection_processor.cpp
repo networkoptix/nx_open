@@ -1,9 +1,10 @@
+
 #include "common/common_globals.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include "proxy_sender_connection_processor.h"
 #include "network/universal_request_processor_p.h"
-#include "network/authenticate_helper.h"
+#include "utils/network/http/auth_tools.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
 #include "utils/common/log.h"
@@ -105,11 +106,11 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
     nx_http::header::WWWAuthenticate authHeader;
     authHeader.authScheme = nx_http::header::AuthScheme::digest;
     authHeader.params["nonce"] = QString::number(time, 16).toLatin1();
-    authHeader.params["realm"] = QnAuthHelper::REALM.toLatin1();;
+    authHeader.params["realm"] = H_REALM;
 
     nx_http::header::DigestAuthorization digestHeader;
-    if (!nx_http::AsyncHttpClient::calcDigestResponse(
-                H_METHOD, admin->getName(), boost::none, admin->getDigest(),
+    if (!nx_http::calcDigestResponse(
+                H_METHOD, admin->getName().toUtf8(), boost::none, admin->getDigest(),
                 url, authHeader, &digestHeader))
         return QByteArray();
 
@@ -121,7 +122,7 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
        "X-Server-Uuid: %6\r\n" \
        "\r\n"))
             .arg(QString::fromUtf8(H_METHOD)).arg(QString::fromUtf8(H_PATH))
-            .arg(url.toString()).arg(QString::fromUtf8(digestHeader.toString()))
+            .arg(url.toString()).arg(QString::fromUtf8(digestHeader.serialized()))
             .arg(admin->getName()).arg(serverUuid.toString())
             .toUtf8();
 }

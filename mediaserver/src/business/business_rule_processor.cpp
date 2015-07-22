@@ -20,7 +20,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "mustache/mustache_helper.h"
-#include "mustache/partial_info.h"
 
 #include <utils/common/synctime.h>
 #include <utils/common/email.h>
@@ -47,6 +46,73 @@ namespace {
     const QString tpImageMimeType(lit("image/png"));
     const QString tpScreenshotFilename(lit("screenshot"));
     const QString tpScreenshot(lit("screenshot.jpeg"));
+};
+
+struct QnEmailAttachmentData {
+
+    QnEmailAttachmentData(QnBusiness::EventType eventType) {
+        switch (eventType) {
+        case QnBusiness::CameraMotionEvent:
+            templatePath = lit(":/email_templates/camera_motion.mustache");
+            imageName = lit("camera.png");
+            imagePath = lit(":/skin/email_attachments/camera.png");
+            break;
+        case QnBusiness::CameraInputEvent:
+            templatePath = lit(":/email_templates/camera_input.mustache");
+            imageName = lit("camera.png");
+            imagePath = lit(":/skin/email_attachments/camera.png");
+            break;
+        case QnBusiness::CameraDisconnectEvent:
+            templatePath = lit(":/email_templates/camera_disconnect.mustache");
+            imageName = lit("camera.png");
+            imagePath = lit(":/skin/email_attachments/camera.png");
+            break;
+        case QnBusiness::StorageFailureEvent:
+            templatePath = lit(":/email_templates/storage_failure.mustache");
+            imageName = lit("storage.png");
+            imagePath = lit(":/skin/email_attachments/storage.png");
+            break;
+        case QnBusiness::NetworkIssueEvent:
+            templatePath = lit(":/email_templates/network_issue.mustache");
+            imageName = lit("server.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        case QnBusiness::CameraIpConflictEvent:
+            templatePath = lit(":/email_templates/camera_ip_conflict.mustache");
+            imageName = lit("camera.png");
+            imagePath = lit(":/skin/email_attachments/camera.png");
+            break;
+        case QnBusiness::ServerFailureEvent:
+            templatePath = lit(":/email_templates/mediaserver_failure.mustache");
+            imageName = lit("server.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        case QnBusiness::ServerConflictEvent:
+            templatePath = lit(":/email_templates/mediaserver_conflict.mustache");
+            imageName = lit("server.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        case QnBusiness::ServerStartEvent:
+            templatePath = lit(":/email_templates/mediaserver_started.mustache");
+            imageName = lit("server.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        case QnBusiness::LicenseIssueEvent:
+            templatePath = lit(":/email_templates/license_issue.mustache");
+            imageName = lit("license.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "All cases must be implemented.");
+            break;
+        }
+
+        Q_ASSERT_X(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
+    }
+
+    QString templatePath;
+    QString imageName;
+    QString imagePath;
 };
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
@@ -82,7 +148,7 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
     quit();
     wait();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     while( !m_aggregatedEmails.isEmpty() )
     {
         const quint64 taskID = m_aggregatedEmails.begin()->periodicTaskID;
@@ -246,7 +312,7 @@ void QnBusinessRuleProcessor::addBusinessRule(const QnBusinessEventRulePtr& valu
 
 void QnBusinessRuleProcessor::processBusinessEvent(const QnAbstractBusinessEventPtr& bEvent)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QnAbstractBusinessActionList actions = matchActions(bEvent);
     for(const QnAbstractBusinessActionPtr& action: actions)
@@ -371,7 +437,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
 
 void QnBusinessRuleProcessor::at_timer()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QMap<QString, QnProcessorAggregationInfo>::iterator itr = m_aggregateActions.begin();
     while (itr != m_aggregateActions.end())
     {
@@ -463,11 +529,11 @@ static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
 
 bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
 {
-    //QMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
+    //QnMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
 
     //aggregating by recipients and eventtype
-    if( action->getRuntimeParams().getEventType() != QnBusiness::CameraDisconnectEvent &&
-        action->getRuntimeParams().getEventType() != QnBusiness::NetworkIssueEvent )
+    if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
+        action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
     {
         return sendMailInternal( action, 1 );  //currently, aggregating only cameraDisconnected and networkIssue events
     }
@@ -479,7 +545,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
             recipients << email;
     }
 
-    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().getEventType(), recipients.join(';') );
+    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().eventType, recipients.join(';') );
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
     if( !aggregatedData.action )
     {
@@ -502,7 +568,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
 void QnBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggregationKey& aggregationKey )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     auto aggregatedActionIter = m_aggregatedEmails.find(aggregationKey);
     if( aggregatedActionIter == m_aggregatedEmails.end() )
@@ -551,23 +617,19 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
 
 
     QVariantHash contextMap = QnBusinessStringsHelper::eventDescriptionMap(action, action->aggregationInfo(), true);
-    QnPartialInfo partialInfo(action->getRuntimeParams().getEventType());
-
-    assert(!partialInfo.attrName.isEmpty());
-//    contextMap[partialInfo.attrName] = lit("true");
+    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);
 
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
 
     QnEmailAttachmentList attachments;
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(partialInfo.eventLogoFilename, lit(":/skin/email_attachments/") + partialInfo.eventLogoFilename, tpImageMimeType)));
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-    contextMap[tpEventLogoFilename] = lit("cid:") + partialInfo.eventLogoFilename;
+    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
     contextMap[tpSupportEmail] = emailSettings.supportEmail;
     contextMap[tpSystemName] = emailSettings.signature;
-    attachments.append(partialInfo.attachments);
 
     QByteArray screenshotData = this->getEventScreenshotEncoded(action->getRuntimeParams(), QSize(640, 480));
     if (!screenshotData.isNull()) {
@@ -576,7 +638,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
         contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
     }
 
-    QString messageBody = renderTemplateFromFile(lit(":/email_templates"), partialInfo.attrName + lit(".mustache"), contextMap);
+    QString messageBody = renderTemplateFromFile(attachmentData.templatePath, contextMap);
 
     ec2::ApiEmailData data(
         recipients,
@@ -647,13 +709,13 @@ void QnBusinessRuleProcessor::at_businessRuleChanged_i(const QnBusinessEventRule
 
 void QnBusinessRuleProcessor::at_businessRuleChanged(const QnBusinessEventRulePtr& bRule)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     at_businessRuleChanged_i(bRule);
 }
 
 void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList& rules)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     // Remove all rules
     for (int i = 0; i < m_rules.size(); ++i)
@@ -671,7 +733,7 @@ void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList
 
 void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, bool toggle)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QnVirtualCameraResourcePtr camResource = resource.dynamicCast<QnVirtualCameraResource>();
     if(!camResource)
@@ -733,7 +795,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr&
 
 void QnBusinessRuleProcessor::at_businessRuleDeleted(QnUuid id)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     for (int i = 0; i < m_rules.size(); ++i)
     {

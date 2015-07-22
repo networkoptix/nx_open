@@ -92,15 +92,15 @@ private:
     struct QnEcData {
         QnUuid id;
         QUrl url;
-        QString version;
+        QnSoftwareVersion version;
+        int protoVersion;
         QString systemName;
+        QString brand;
 
-        bool operator==(const QnEcData& other) const  {
-            return id == other.id && url == other.url && version == other.version && systemName == other.systemName;
-        }
-        bool operator!=(const QnEcData& other) const  {
-            return !(*this == other);
-        }
+        QnEcData();
+
+        bool operator==(const QnEcData& other) const;
+        bool operator!=(const QnEcData& other) const;
     };
 
     /** Hash list of automatically found Servers based on seed as key. */

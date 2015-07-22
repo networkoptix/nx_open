@@ -119,7 +119,7 @@ protected:
     //qint64 m_writedSpace;
 
 private:
-    mutable QMutex m_writedSpaceMtx;
+    mutable QnMutex m_writedSpaceMtx;
 };
 
 
@@ -138,7 +138,7 @@ public:
 private:
     QHash<QString, StorageResourceFactory> m_factoryByProtocol;
     StorageResourceFactory m_defaultFactory;
-    QMutex m_mutex; // TODO: #vasilenko this mutex is not used, is it intentional?
+    QnMutex m_mutex; // TODO: #vasilenko this mutex is not used, is it intentional?
 };
 
 #endif // QN_STORAGE_RESOURCE_H

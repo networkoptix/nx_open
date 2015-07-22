@@ -7,76 +7,109 @@ Grid
 {
     id: thisComponent;
 
-    property bool changed: (useDHCPCheckBox.changed || ipControl.changed || subnetMask.changed);
-    property bool isSingleSelectionModel: false;
-
-    property var changesHandler;
+    property bool changed: (useDHCPCheckBox.changed || ipControlField.changed 
+        || subnetMaskField.changed || dnsControl.changed || gatewayControl.changed);
 
     readonly property alias useDHCPControl: useDHCPCheckBox;
-    readonly property alias ipAddressControl: ipControl;
-    readonly property alias subnetMaskControl: subnetMask;
-
+    readonly property alias ipAddressControl: ipControlField;
+    readonly property alias subnetMaskControl: subnetMaskField;
+    readonly property alias dnsControl: dnsServerField;
+    readonly property alias gatewayControl: defaultGatewayField;
+    
     property string adapterNameValue;
+    property string interfaceCaption;
 
-    spacing: Common.SizeManager.spacing.small;
-
+    spacing: Common.SizeManager.spacing.base;
+    
+    verticalItemAlignment: Grid.AlignVCenter;
+    
     columns: 3;
-
 
     Base.Text
     {
         id: adapterName;
 
-        height: Common.SizeManager.clickableSizes.base;
-
-        text: (thisComponent.isSingleSelectionModel ? readableName: qsTr("Multiple interfaces"));
-        verticalAlignment: Text.AlignVCenter;
+        thin: false;
+        text: interfaceCaption;
     }
+    
+    Base.EmptyCell {}
+    
+    Base.EmptyCell {}
 
+    ///
     Base.Text
     {
-        id: subnetMaskCaption;
-
-        height: Common.SizeManager.clickableSizes.base;
-
-        text: (thisComponent.isSingleSelectionModel && (model.index === 0) ? "Mask": " ");
-        verticalAlignment: Text.AlignVCenter;
+        id: ipAddressText;
+        
+        text: qsTr("IP");
     }
-
-    Item
+    
+    Base.IpControl
     {
-        id: fakeEmptyItem;
-        width: 1;
-        height: 1;
+        id: ipControlField
+
+        enabled: !useDHCPCheckBox.checked;
     }
-
-    Base.TextField
-    {
-        id: ipControl
-
-        changesHandler: thisComponent.changesHandler;
-
-        enabled: !useDHCPCheckBox.checked && thisComponent.isSingleSelectionModel;
-        opacity: ( enabled ? 1 : 0.5 );
-    }
-
-    Base.TextField
-    {
-        id: subnetMask;
-
-        changesHandler: thisComponent.changesHandler;
-
-        enabled: !useDHCPCheckBox.checked && thisComponent.isSingleSelectionModel;
-        opacity: ( enabled ? 1 : 0.5 );
-    }
-
+    
     Base.CheckBox
     {
         id: useDHCPCheckBox;
 
-        height: subnetMask.height;
+        height: subnetMaskField.height;
         text: qsTr("Use DHCP");
-
-        changesHandler: thisComponent.changesHandler;
     }
+    
+    ///
+    
+    Base.Text
+    {
+        id: subnetMaskCaption;
+
+        text: qsTr("Subnet mask");
+    }
+
+    
+    Base.IpControl
+    {
+        id: subnetMaskField;
+
+        enabled: !useDHCPCheckBox.checked;
+    }
+
+    Base.EmptyCell {}    
+
+    ///
+    
+    Base.Text
+    {
+        id: dnsServerText;
+        
+        text: qsTr("DNS server");
+    }
+    
+    Base.IpControl
+    {
+        id: dnsServerField;
+        
+        enabled: !useDHCPCheckBox.checked;
+    }
+    
+    Base.EmptyCell {}
+
+    ///
+    
+    Base.Text
+    {
+        id: defaultGatewayText;
+        
+        text: qsTr("Default Gateway");
+    }
+    
+    Base.IpControl
+    {
+        id: defaultGatewayField;
+    }
+    
+    Base.EmptyCell {}
 }

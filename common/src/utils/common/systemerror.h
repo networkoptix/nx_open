@@ -36,6 +36,7 @@ namespace SystemError
     static const ErrorCode notConnected = WSAENOTCONN;
     static const ErrorCode interrupted = WSAEINTR;
     static const ErrorCode again = EAGAIN;
+    static const ErrorCode hostUnreach = WSAEHOSTUNREACH;
     static const ErrorCode nomem = ERROR_NOT_ENOUGH_MEMORY;
     static const ErrorCode notImplemented = ERROR_CALL_NOT_IMPLEMENTED;
     static const ErrorCode invalidData = ERROR_INVALID_DATA;
@@ -50,6 +51,7 @@ namespace SystemError
     static const ErrorCode notConnected = ENOTCONN;
     static const ErrorCode interrupted = EINTR;
     static const ErrorCode again = EAGAIN;
+    static const ErrorCode hostUnreach = EHOSTUNREACH;
     static const ErrorCode nomem = ENOMEM;
     static const ErrorCode notImplemented = ENOSYS;
     static const ErrorCode invalidData = EINVAL;

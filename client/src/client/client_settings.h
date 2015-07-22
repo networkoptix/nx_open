@@ -76,6 +76,7 @@ public:
         TREE_PINNED,
         TREE_OPENED,
         TREE_WIDTH,
+        CALENDAR_PINNED,
         SLIDER_OPENED,
         TITLE_OPENED,
         NOTIFICATIONS_PINNED,
@@ -201,6 +202,7 @@ private:
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_R_PROPERTY (bool,                        createFullCrashDump,                                CREATE_FULL_CRASH_DUMP,     false)
         QN_DECLARE_RW_PROPERTY(bool,                        isTreePinned,           setTreePinned,              TREE_PINNED,                true)
+        QN_DECLARE_RW_PROPERTY(bool,                        isCalendarPinned,       setCalendarPinned,          CALENDAR_PINNED,            false)
         QN_DECLARE_RW_PROPERTY(bool,                        isTreeOpened,           setTreeOpened,              TREE_OPENED,                true)
         QN_DECLARE_RW_PROPERTY(int,                         treeWidth,              setTreeWidth,               TREE_WIDTH,                 250)
         QN_DECLARE_RW_PROPERTY(bool,                        isSliderOpened,         setSliderOpened,            SLIDER_OPENED,              true)

@@ -2,8 +2,10 @@
 #define QN_COMMON_MODULE_H
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
+
+#include <core/resource/resource_fwd.h>
 
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>
@@ -54,6 +56,9 @@ public:
 
     void setRemoteGUID(const QnUuid& guid);
     QnUuid remoteGUID() const;
+
+    /** Server we are currently connected to. */
+    QnMediaServerResourcePtr currentServer() const;
 
     QUrl moduleUrl() const { return m_url; }
     void setModuleUlr(const QUrl& url) { m_url = url; }
@@ -113,7 +118,7 @@ private:
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     bool m_transcodingDisabled;
     QSet<QnUuid> m_allowedPeers;
     qint64 m_systemIdentityTime;

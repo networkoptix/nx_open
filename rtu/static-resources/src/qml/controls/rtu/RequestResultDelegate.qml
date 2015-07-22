@@ -14,11 +14,6 @@ Grid
     columns: repeater.model.columnsCount;
     spacing: Common.SizeManager.spacing.medium;
 
-    onColumnsChanged:
-    {
-        console.log("Columns: " + columns);
-    }
-
     Component
     {
         id: requestStateComponent;
@@ -46,7 +41,7 @@ Grid
             font
             {
                 bold: true;
-                pointSize: Common.SizeManager.fontSizes.base;
+                pixelSize: Common.SizeManager.fontSizes.base;
             }
             text: value;
         }
@@ -60,7 +55,7 @@ Grid
         {
             property var value;
 
-            font.pointSize: Common.SizeManager.fontSizes.base;
+            font.pixelSize: Common.SizeManager.fontSizes.base;
             text: value;
         }
     }
@@ -74,55 +69,9 @@ Grid
             
             property var value;
 
-            font.pointSize: Common.SizeManager.fontSizes.base;
+            font.pixelSize: Common.SizeManager.fontSizes.base;
             color: "red";
             text: (value ? value : " ");
-        }
-    }
-
-    Repeater
-    {
-        id: repeater;
-
-        delegate: Loader
-        {
-            id: loader;
-
-            sourceComponent:
-            {
-                switch(dataType)
-                {
-                case 0:
-                    return requestNameComponent;
-                case 1:
-                    return requestValueComponent;
-                case 2:
-                    return requestStateComponent;
-                default:
-                    return requestErrorReasonComponent
-                }
-            }
-
-            Binding
-            {
-                property: "width";
-                target: loader;
-                value: item.width;
-            }
-
-            Binding
-            {
-                property: "height";
-                target: loader;
-                value: item.height;
-            }
-
-            Binding
-            {
-                target: item;
-                property: "value";
-                value: roleValue;
-            }
         }
     }
 }

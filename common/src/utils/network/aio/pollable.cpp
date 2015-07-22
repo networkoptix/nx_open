@@ -48,7 +48,7 @@ const PollableImpl* Pollable::impl() const
     return m_impl.get();
 }
 
-bool Pollable::getLastError( SystemError::ErrorCode* )
+bool Pollable::getLastError( SystemError::ErrorCode* errorCode ) const
 {
     SystemError::setLastErrorCode( SystemError::notImplemented );
     return false;

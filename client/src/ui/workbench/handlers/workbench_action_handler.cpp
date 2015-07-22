@@ -23,6 +23,7 @@
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
+#include <camera/camera_data_manager.h>
 
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
@@ -105,7 +106,6 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
@@ -229,7 +229,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PreferencesNotificationTabAction),       SIGNAL(triggered()),    this,   SLOT(at_preferencesNotificationTabAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
-    connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
+    connect(action(Qn::OpenBookmarksSearchAction),              SIGNAL(triggered()),    this,   SLOT(at_openBookmarksSearchAction_triggered()));
     connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
@@ -1140,7 +1140,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
     if (!server)
         /* If target server is not provided, open the server we are currently connected to. */
-        server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+        server = qnCommon->currentServer();
 
     if (!server)
         return;
@@ -1164,8 +1164,9 @@ void QnWorkbenchActionHandler::at_systemUpdateAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UpdatesPage);
 }
 
-void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
-    menu()->trigger(Qn::OpenBusinessLogAction);
+void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
+{
+    QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
@@ -1225,11 +1226,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     }
 
     /* Adjust for chunks. If they are provided, they MUST intersect with period */
-    if(!periods.isEmpty()) {
+    if(!periods.empty()) {
 
         QnTimePeriodList localPeriods = periods.intersected(period);
 
-        qint64 startDelta = localPeriods.first().startTimeMs - period.startTimeMs;
+        qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
         if (startDelta > 0) { //user selected period before the first chunk
             period.startTimeMs += startDelta;
             period.durationMs -= startDelta;
@@ -1359,8 +1360,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         QnTimePeriod localPeriod (time, step);
         QnTimePeriodList localPeriods = periods.intersected(localPeriod);
         qint64 localTime = time;
-        if (!localPeriods.isEmpty())
-            localTime = qMax(localTime, localPeriods.first().startTimeMs);
+        if (!localPeriods.empty())
+            localTime = qMax(localTime, localPeriods.begin()->startTimeMs);
 
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
@@ -1497,7 +1498,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
     QnMediaServerResourcePtr server = servers.first();
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::clearLoaderCache);
+    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->instance<QnCameraDataManager>(), &QnCameraDataManager::clearCache);
 
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
@@ -2402,57 +2403,48 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
         latestMsVersion = latestVersion;
 
-    QString components;
+    QStringList messageParts;
+    messageParts << tr("Some components of the system are not updated");
+    messageParts << QString();
+
     foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
         QString component;
         switch(data.component) {
         case Qn::ClientComponent:
-            component = tr("Client v%1<br/>").arg(data.version.toString());
+            component = tr("Client v%1").arg(data.version.toString());
             break;
         case Qn::ServerComponent: {
             QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
             if(resource) {
-                component = tr("Server v%1 at %2<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
+                component = tr("Server v%1 at %2").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
             } else {
-                component = tr("Server v%1<br/>").arg(data.version.toString());
+                component = tr("Server v%1").arg(data.version.toString());
             }
         }
         default:
             break;
         }
 
-        bool updateRequested = false;
-        switch (data.component) {
-        case Qn::ServerComponent:
-            updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
-            break;
-        case Qn::ClientComponent:
-            updateRequested = false;
-            break;
-        default:
-            break;
-        }
+        bool updateRequested = (data.component == Qn::ServerComponent) &&
+            QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
             component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
         
-        components += component;
+        messageParts << component;
     }
 
+    messageParts << QString();
+    messageParts << tr("Please update all components to the latest version %1.").arg(latestMsVersion.toString());
 
-    QString message = tr(
-        "Some components of the system are not updated:<br/>"
-        "<br/>"
-        "%1"
-        "<br/>"
-        "Please update all components to the latest version %2."
-    ).arg(components).arg(latestMsVersion.toString());
+    QString message = messageParts.join(lit("<br/>"));
 
     QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
         new QnWorkbenchStateDependentDialog<QnMessageBox>(mainWindow()));
     messageBox->setIcon(QMessageBox::Warning);
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);
+    messageBox->setTextFormat(Qt::RichText);
     messageBox->setStandardButtons(QMessageBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 

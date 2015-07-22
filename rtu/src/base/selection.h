@@ -17,10 +17,10 @@ namespace rtu
         Q_PROPERTY(int count READ count NOTIFY changed)
         Q_PROPERTY(int port READ port NOTIFY changed)
         Q_PROPERTY(int flags READ flags NOTIFY changed)
+        Q_PROPERTY(int dhcpState READ dhcpState NOTIFY changed)
         Q_PROPERTY(QString systemName READ systemName NOTIFY changed)
         Q_PROPERTY(QString password READ password NOTIFY changed)
         Q_PROPERTY(QDateTime dateTime READ dateTime NOTIFY changed)
-        
         Q_PROPERTY(bool editableInterfaces READ editableInterfaces NOTIFY changed)
         
     public:
@@ -32,19 +32,21 @@ namespace rtu
     private:
         /// Getters for properties
         
-        int count();
+        int count() const;
         
-        int port();
+        int port() const;
         
-        int flags();
+        int flags() const;
         
-        QString systemName();
+        int dhcpState() const;
+        
+        const QString &systemName() const;
 
-        QString password();
+        const QString &password() const;
 
-        QDateTime dateTime();
+        const QDateTime &dateTime() const;
         
-        bool editableInterfaces();
+        bool editableInterfaces() const;
         
     signals:
         void changed();

@@ -65,8 +65,8 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     // should just do physical job ( network or so ) do not care about memory domain
-    virtual bool getParamPhysical(const QString &param, QVariant &val) override;
-    virtual bool setParamPhysical(const QString &param, const QVariant &val) override;
+    virtual bool getParamPhysical(const QString &id, QString &value) override;
+    virtual bool setParamPhysical(const QString &id, const QString &value) override;
 
     virtual void setMotionMaskPhysical(int channel) override;
 public:

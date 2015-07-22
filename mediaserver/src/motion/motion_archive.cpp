@@ -167,7 +167,7 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
         motionFile->setFileName(fileName + QString("motion_detailed_data") + getChannelPrefix() + ".bin");
     if (indexFile)
         indexFile->setFileName(fileName + QString("motion_detailed_index") + getChannelPrefix() + ".bin");
-    QMutex m_fileAccessMutex;
+    QnMutex m_fileAccessMutex;
     QDir dir;
     dir.mkpath(fileName);
 }
@@ -236,10 +236,15 @@ QnTimePeriodList QnMotionArchive::matchPeriod(const QRegion& region, qint64 msSt
                         break;
                     }
 
-                    if (!rez.isEmpty() && fullStartTime <= rez.last().startTimeMs + rez.last().durationMs + detailLevel)
-                        rez.last().durationMs = qMax(rez.last().durationMs, i->duration + fullStartTime - rez.last().startTimeMs);
-                    else
+                    if (rez.empty())
                         rez.push_back(QnTimePeriod(fullStartTime, i->duration));
+                    else {
+                        QnTimePeriod& last = *(rez.end()-1);
+                        if (fullStartTime <= last.startTimeMs + last.durationMs + detailLevel)
+                            last.durationMs = qMax(last.durationMs, i->duration + fullStartTime - last.startTimeMs);
+                        else
+                            rez.push_back(QnTimePeriod(fullStartTime, i->duration));
+                    }
                 }
                 curData += MOTION_DATA_RECORD_SIZE;
                 ++i;
@@ -339,12 +344,12 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
         int indexRecords = qMax((m_detailedIndexFile.size() - MOTION_INDEX_HEADER_SIZE) / MOTION_INDEX_RECORD_SIZE, 0ll);
         int dataRecords  = m_detailedMotionFile.size() / MOTION_DATA_RECORD_SIZE;
         if (indexRecords > dataRecords) {
-            QMutexLocker lock(&m_fileAccessMutex);
+            QnMutexLocker lock( &m_fileAccessMutex );
             if (!m_detailedIndexFile.resize(dataRecords*MOTION_INDEX_RECORD_SIZE + MOTION_INDEX_HEADER_SIZE))
                 return false;
         }
         else if ((indexRecords < dataRecords)) {
-            QMutexLocker lock(&m_fileAccessMutex);
+            QnMutexLocker lock( &m_fileAccessMutex );
             if (!m_detailedMotionFile.resize(indexRecords*MOTION_DATA_RECORD_SIZE))
                 return false;
         }

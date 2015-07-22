@@ -9,9 +9,10 @@
 #include <map>
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
+#include <QtNetwork/QAuthenticator>
 #include <QSharedPointer>
 
 #include "utils/network/abstract_socket.h"
@@ -143,6 +144,7 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addAdditionalHeader( const StringType& key, const StringType& value );
+        void addRequestHeaders(const HttpHeaders& headers);
         void removeAdditionalHeader( const StringType& key );
         template<class HttpHeadersRef>
         void setAdditionalHeaders( HttpHeadersRef&& additionalHeaders )
@@ -151,39 +153,6 @@ namespace nx_http
         }
         void setAuthType( AuthType value );
         AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
-
-        static QByteArray calcHa1(
-            const QByteArray& userName,
-            const QByteArray& realm,
-            const QByteArray& userPassword );
-
-        /*! \note HA2 in case of qop=auth-int is not supported */
-        static QByteArray calcHa2(
-            const QByteArray& method,
-            const QByteArray& uri );
-
-        static QByteArray calcResponse(
-            const QByteArray& ha1,
-            const QByteArray& nonce,
-            const QByteArray& ha2 );
-
-        //!Calculate Digest response with message-body validation (auth-int)
-        static QByteArray calcResponseAuthInt(
-            const QByteArray& ha1,
-            const QByteArray& nonce,
-            const QByteArray& nonceCount,
-            const QByteArray& clientNonce,
-            const QByteArray& qop,
-            const QByteArray& ha2 );
-
-        static bool calcDigestResponse(
-            const QByteArray& method,
-            const QString& userName,
-            const boost::optional<QString>& userPassword,
-            const boost::optional<QByteArray>& predefinedHA1,
-            const QUrl& url,
-            const header::WWWAuthenticate& wwwAuthenticateHeader,
-            header::DigestAuthorization* const digestAuthorizationHeader );
 
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
@@ -221,7 +190,7 @@ namespace nx_http
         QString m_userPassword;
         bool m_authorizationTried;
         bool m_terminated;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
         unsigned int m_responseReadTimeoutMs;
@@ -268,7 +237,9 @@ namespace nx_http
     */
     bool downloadFileAsync(
         const QUrl& url,
-        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler );
+        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
+        const QAuthenticator &auth = QAuthenticator());
     //!Calls previous function and waits for completion
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,

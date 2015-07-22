@@ -99,7 +99,7 @@ void QnUniversalTcpListener::addProxySenderConnections(const SocketAddress& prox
 QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(
         const QString& guid, int timeout, const SocketRequest& socketRequest)
 {
-    QMutexLocker lock(&m_proxyMutex);
+    QnMutexLocker lock( &m_proxyMutex );
     auto& serverPool = m_proxyPool[guid]; // get or create with new code
     if (serverPool.isEmpty())
     {
@@ -120,7 +120,7 @@ QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(
 bool QnUniversalTcpListener::registerProxyReceiverConnection(
         const QString& guid, QSharedPointer<AbstractStreamSocket> socket)
 {
-    QMutexLocker lock(&m_proxyMutex);
+    QnMutexLocker lock(&m_proxyMutex);
     auto serverPool = m_proxyPool.find(guid);
     if (serverPool == m_proxyPool.end()) {
         NX_LOG(lit("QnUniversalTcpListener: proxy was not requested from %2")
@@ -144,7 +144,7 @@ void QnUniversalTcpListener::doPeriodicTasks()
 {
     QnTcpListener::doPeriodicTasks();
 
-    QMutexLocker lock(&m_proxyMutex);
+    QnMutexLocker lock( &m_proxyMutex );
     for (auto& serverPool : m_proxyPool)
         while(!serverPool.isEmpty() &&
               serverPool.front().timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)

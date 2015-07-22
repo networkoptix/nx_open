@@ -27,11 +27,11 @@ protected:
     virtual void pleaseReopenStream() override;
 
 private:
-    static QMutex m_allReadersMutex;
+    static QnMutex m_allReadersMutex;
     static QMap<quint32, PlDroidStreamReader*> m_allReaders;
     void setSDPInfo(QByteArray sdpInfo);
 private:
-    QMutex m_controlPortSync;
+    QnMutex m_controlPortSync;
     std::unique_ptr<AbstractStreamSocket> m_tcpSock;
     //UDPSocket* m_videoSock;
     //UDPSocket* m_audioSock;

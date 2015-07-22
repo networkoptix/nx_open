@@ -260,6 +260,8 @@
             "selection": "selection.setAlpha(192)",
             "primaryRecording": "#208020ff",
             "secondaryRecording": "#20ff20ff",
+            "primaryBookmark": "#3775C4ff",
+            "secondaryBookmark": "#69A4F0ff",
             "primaryMotion": "#800000ff",
             "secondaryMotion": "#ff0000ff",
             "separator": "#000000ff"

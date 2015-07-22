@@ -4,90 +4,41 @@
 #include <QtCore/QStringList>
 
 #include <business/business_fwd.h>
-#include <utils/common/id.h>
 
+#include <utils/common/model_functions_fwd.h>
+#include <utils/common/uuid.h>
 
-class QnBusinessEventParameters
-{
-public:
-    enum Param 
-    {
-        // base for any event type
-        EventTypeParam,
-        EventTimestampParam,
-        EventResourceParam,
-        ActionResourceParam,
-        
-        // event specific params.
-        InputPortIdParam,
-
-        ReasonCodeParam,
-        ReasonParamsEncodedParam,
-        
-        SourceParam,
-        ConflictsParam,
-
-        ParamCount
-    };
+struct QnBusinessEventParameters {
 
     QnBusinessEventParameters();
 
-    QnBusiness::EventType getEventType() const;
-    void setEventType(QnBusiness::EventType value);
+    QnBusiness::EventType eventType;
 
-    qint64 getEventTimestamp() const;
-    void setEventTimestamp(qint64 value);
+    /** When did the event occur - in usecs. */
+    qint64 eventTimestampUsec;
 
-    QnUuid getEventResourceId() const;
-    void setEventResourceId(const QnUuid& value);
+    /** Event source - camera or server. */
+    QnUuid eventResourceId;
 
-    QnUuid getActionResourceId() const;
-    void setActionResourceId(const QnUuid& value);
+    QnUuid actionResourceId;
 
-    QnBusiness::EventReason getReasonCode() const;
-    void setReasonCode(QnBusiness::EventReason value);
+    /** Server that generated the event. */
+    QnUuid sourceServerId;
 
-    QString getReasonParamsEncoded() const;
-    void setReasonParamsEncoded(const QString& value);
+    QnBusiness::EventReason reasonCode;
+    QString reasonParamsEncoded;
+    QString source;
+    QStringList conflicts;
+    QString inputPortId;
 
-    QString getSource() const;
-    void setSource(const QString& value);
-
-    QStringList getConflicts() const;
-    void setConflicts(const QStringList& value);
-
-    QString getInputPortId() const;
-    void setInputPortId(const QString &value);
-
-
-    // convert/serialize/deserialize functions
-
-    static QnBusinessEventParameters unpack(const QByteArray& value);
-    QByteArray pack() const;
-
-    QnBusinessParams toBusinessParams() const;
-    static QnBusinessEventParameters fromBusinessParams(const QnBusinessParams& bParams);
-
-    //QVariant& operator[](int index);
-    //const QVariant& operator[](int index) const;
-    bool operator==(const QnBusinessEventParameters& other) const;
-
-    QString getParamsKey() const;
-
-private:
-    static int getParamIndex(const QString& key);
-
-private:
-    QnBusiness::EventType m_eventType;
-    qint64 m_timestamp;
-    QnUuid m_resourceId;
-    QnUuid m_actionResourceId;
-
-    QString m_inputPort;
-    QnBusiness::EventReason m_reasonCode;
-    QString m_reasonParamsEncoded;
-    QString m_source;
-    QStringList m_conflicts;
+    /** Hash for events aggregation. */
+    QnUuid getParamsHash() const;
 };
+
+#define QnBusinessEventParameters_Fields (eventType)(eventTimestampUsec)(eventResourceId)(actionResourceId)(sourceServerId)\
+    (reasonCode)(reasonParamsEncoded)(source)(conflicts)(inputPortId)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq));
+
 
 #endif // BUSINESS_EVENT_PARAMETERS_H

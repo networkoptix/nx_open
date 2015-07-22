@@ -92,7 +92,7 @@ private:
         return m_rawDataSize;
     }
 private:
-    mutable QMutex m_mtx;
+    mutable QnMutex m_mtx;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
 
     QSet<QnAbstractRenderer*> m_newList;
@@ -135,11 +135,11 @@ private:
     bool m_needResetDecoder;
     QSharedPointer<CLVideoDecoderOutput> m_lastDisplayedFrame;
     QSize m_imageSize;
-    mutable QMutex m_imageSizeMtx;
+    mutable QnMutex m_imageSizeMtx;
     int m_prevSrcWidth;
     int m_prevSrcHeight;
     qint64 m_lastIgnoreTime;
-    mutable QMutex m_renderListMtx;
+    mutable QnMutex m_renderListMtx;
     bool m_isPaused;
     qreal m_overridenAspectRatio;
 

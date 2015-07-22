@@ -66,7 +66,7 @@ private:
     bool m_usedForWriting;
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
-    mutable QMutex m_bitrateMtx;
+    mutable QnMutex m_bitrateMtx;
 };
 
 Q_DECLARE_METATYPE(QnAbstractStorageResourcePtr);

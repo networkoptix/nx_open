@@ -3,12 +3,22 @@ import QtQuick 2.1;
 import "../common" as Common;
 import "../controls/base" as Base;
 import "../controls/expandable" as Expandable;
+import "../dialogs" as Dialogs;
 
 Expandable.MaskedSettingsPanel
 {
     id: thisComponent;
 
-    propertiesGroupName: qsTr("System name and password");
+    changed:  (maskedArea && maskedArea.changed?  true : false);
+    
+    function tryApplyChanges()
+    {
+        if (!changed)
+            return true;
+        return maskedArea.tryApplyChanges();
+    }
+
+    propertiesGroupName: qsTr("Set System Name and Password");
 
     propertiesDelegate: Component
     {
@@ -16,18 +26,45 @@ Expandable.MaskedSettingsPanel
 
         Item
         {
-            height: settingsColumn.height + settingsColumn.anchors.topMargin;
+            property bool changed: systemName.changed || password.changed;
+            height: settingsColumn.height;
 
-            Connections
+            
+            Dialogs.ErrorDialog
             {
-                target: thisComponent;
-                onApplyButtonPressed:
+                id: errorDialog;
+            }
+            
+            readonly property string errorTemplate: qsTr("Invalid %1 specified. Can't apply changes");
+            function tryApplyChanges()
+            {
+                if (systemName.changed)
                 {
-                    if (systemName.changed)
-                        rtuContext.changesManager().addSystemChangeRequest(systemName.text);
-                    if (password.changed)
-                        rtuContext.changesManager().addPasswordChangeRequest(password.text);
+                    if (systemName.text.length === 0)
+                    {
+                        errorDialog.message = errorTemplate.arg(qsTr("system name"));
+                        errorDialog.show();
+                        
+                        systemName.focus = true;
+                        return false;
+                    }
+
+                    rtuContext.changesManager().addSystemChange(systemName.text);
                 }
+                if (password.changed)
+                {
+                    if (password.text.length === 0)
+                    {
+                        errorDialog.message = errorTemplate.arg(qsTr("password"));
+                        errorDialog.show();
+                        
+                        password.focus = true;
+                        return false;
+                    }
+
+                    rtuContext.changesManager().addPasswordChange(password.text);
+                }
+                return true;
             }
 
             Base.Column
@@ -39,12 +76,12 @@ Expandable.MaskedSettingsPanel
                     left: parent.left;
                     top: parent.top;
                     leftMargin: Common.SizeManager.spacing.base;
-                    topMargin: Common.SizeManager.spacing.large;
                 }
 
                 Base.Text
                 {
-                    text: qsTr("System name");
+                    thin: false;
+                    text: qsTr("System Name");
                 }
 
                 Base.TextField
@@ -52,15 +89,21 @@ Expandable.MaskedSettingsPanel
                     id: systemName;
                     
                     implicitWidth: implicitHeight * 6;
-
                     initialText: (rtuContext.selection && rtuContext.selection !== null ?
                         rtuContext.selection.systemName : "");
-                    changesHandler: thisComponent;
+                }
+
+                Item
+                {
+                    id: spacer;
+                    width: 1;
+                    height: Common.SizeManager.spacing.base;
                 }
 
                 Base.Text
                 {
-                    text: qsTr("New password");
+                    thin: false;
+                    text: qsTr("System Password");
                 }
 
                 Base.TextField
@@ -68,8 +111,6 @@ Expandable.MaskedSettingsPanel
                     id: password;
 
                     implicitWidth: systemName.implicitWidth;
-
-                    changesHandler: thisComponent;
                     initialText: rtuContext.selection.password;
                 }
             }

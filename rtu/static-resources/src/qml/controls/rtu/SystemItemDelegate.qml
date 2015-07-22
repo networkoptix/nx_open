@@ -2,175 +2,165 @@ import QtQuick 2.1;
 import QtQuick.Controls 1.1;
 
 import "../base" as Base;
+import "../rtu" as Rtu;
 import "../../common" as Common;
 import "../../dialogs" as Dialogs;
+
+import networkoptix.rtu 1.0 as NxRtu;
 
 Item
 {
     id: thisComponent;
 
+    property int itemIndex;
+    
+    property string systemName;
+    property int loggedState;
+    property int selectedState;
+    
     signal selectionStateShouldBeChanged(int currentItemIndex);
-
-    height: topColumn.height;
-/*
+  
+    height: column.height + buttonSpacer.height;
     anchors
     {
         left: parent.left;
         right: parent.right;
     }
-    */
+    
 
     Base.Column
     {
-        id: topColumn;
+        id: column;
+        
         anchors
         {
             left: parent.left;
             right: parent.right;
+            
+            leftMargin: Common.SizeManager.spacing.medium;
+            rightMargin: Common.SizeManager.spacing.medium;
         }
-
+        
+        spacing: 2;
         Item
         {
-            height: column.height;
+            id: headerSpacer;
+            width: parent.width;
+            height: Common.SizeManager.spacing.base;
+        }
+        
+        Item
+        {
+            id: descriptionHolder;
+            
+            height: Math.max(systemNameText.height, selectionCheckbox.height
+                , loggedStateComponent.height, Common.SizeManager.clickableSizes.base);
             anchors
             {
                 left: parent.left;
                 right: parent.right;
             }
-
-            Item
+             
+            Base.CheckBox
             {
-                id: column;
-
-                height: spacer.height + descriptionRow.height + delimiter.height;
+                id: selectionCheckbox;
+        
                 anchors
                 {
                     left: parent.left;
-                    right: parent.right;
+                    verticalCenter: parent.verticalCenter;
                 }
-
-                Item
-                {
-                    id: spacer;
+                
+                onClicked: { thisComponent.selectionStateShouldBeChanged(itemIndex); }
         
-                    height: Common.SizeManager.spacing.base;
-                    anchors
-                    {
-                        left: parent.left;
-                        right: parent.right;
-                    }
+                Binding
+                {
+                    target: selectionCheckbox;
+                    property: "checkedState";
+                    value: thisComponent.selectedState;
                 }
-        
-
-                Item
-                {
-                    id: descriptionRow;
-        
-                    height: systemName.height;
-                    anchors
-                    {
-                        top: spacer.bottom;
-                        left: parent.left;
-                        right: parent.right;
-                    }
-        
-                    Item
-                    {
-                        id: selectionCheckboxWrapper;
-        
-                        width: Common.SizeManager.clickableSizes.medium;
-                        height: width;
-                    
-                        anchors.verticalCenter: parent.verticalCenter;
-        
-                        Base.CheckBox
-                        {
-                            id: selectionCheckbox;
-        
-                            anchors.centerIn: parent;
-                            onClicked: { thisComponent.selectionStateShouldBeChanged(index); }
-        
-                            Binding
-                            {
-                                target: selectionCheckbox;
-                                property: "checkedState";
-                                value: model.selectedState;
-                            }
-                        }
+            }
                         
-                    }
-        
-                    Base.Text
-                    {
-                        id: systemName;
-        
-                        height: Common.SizeManager.clickableSizes.base;
-        
-                        anchors
-                        {
-                            left: selectionCheckboxWrapper.right;
-                            right: parent.right;
-                            verticalCenter: parent.verticalCenter;
-
-                        }
-        
-                        font.pointSize: Common.SizeManager.fontSizes.large;
-                        text: (!model.name || (model.name.length === 0) ? qsTr("NO SYSTEM") : model.name);
-                    }
-                }
-        
-                Base.LineDelimiter
+            Base.Text
+            {
+                id: systemNameText;
+    
+                anchors
                 {
-                    id: delimiter;
-                    thinDelimiter: false;
-                    color: "grey";
-
-                    anchors.top: column.bottom;
+                    left: selectionCheckbox.right;
+                    right: loggedStateComponent.left;
+                    verticalCenter: parent.verticalCenter;
+                    
+                    leftMargin: Common.SizeManager.spacing.medium;
+                    rightMargin: Common.SizeManager.spacing.medium;
                 }
-            }
-
-
-            MouseArea
-            {
-                id: selectionMouseArea;
-        
-                height: systemName.height;
-                anchors.fill: column;
-        
-        
-                onClicked: { thisComponent.selectionStateShouldBeChanged(index); }
-            }
-
-        }
-
-        Item
-        {
-            id: loginButtonSpacer;
-            height: model.loggedToAllServers ? 0 : loginButton.height + Common.SizeManager.spacing.small * 2;
-        
-            anchors
-            {
-                left: parent.left;
-                right: parent.right;
+    
+                thin: false;
+                wrapMode: Text.Wrap;
+                font.pixelSize: Common.SizeManager.fontSizes.medium;
+                text: (systemName.length === 0 ? qsTr("Unassigned system") : systemName);
             }
             
-            Base.Button
+            Rtu.LoggedState
             {
-                id: loginButton;
+                id: loggedStateComponent;
                 
-                implicitHeight: Common.SizeManager.clickableSizes.base;
-                anchors.centerIn: loginButtonSpacer;
-
-                text: qsTr("Enter password to login");
-                
-                height: model.loggedToAllServers ? 0 : implicitHeight;
-                visible: !model.loggedToAllServers;
-                
-                onClicked: 
+                anchors
                 {
-                    loginDialog.visible = true;
+                    right: parent.right;
+                    verticalCenter: parent.verticalCenter;
                 }
+    
+                loggedState: thisComponent.loggedState;
             }
+        }
+    
+        Base.LineDelimiter
+        {
+            color: "#666666";
+        }
+    }
+        
+    MouseArea
+    {
+        id: selectionMouseArea;
+
+        anchors.fill: column;
+        onClicked: { thisComponent.selectionStateShouldBeChanged(index); }
+    }
+    
+    Item
+    {
+        id: buttonSpacer;
+        
+        height: (loginButton.visible ? loginButton.height + Common.SizeManager.spacing.base : 0);
+        anchors
+        {
+            left: parent.left;
+            right: parent.right;
+            top: column.bottom;
+
+            leftMargin: Common.SizeManager.spacing.medium;
+            rightMargin: Common.SizeManager.spacing.medium;
+        }
+        
+        Base.StyledButton
+        {
+            id: loginButton;
+            
+            visible: (thisComponent.loggedState !== NxRtu.Constants.LoggedToAllServers);
+            height: (visible ? Common.SizeManager.clickableSizes.base : 0);
+            
+            anchors
+            {
+                verticalCenter: parent.verticalCenter;
+                left:(visible ? parent.left : undefined);
+                right: (visible ? parent.right : undefined);
+            }
+        
+            text: qsTr("enter password");
+            fontSize: Common.SizeManager.fontSizes.base;
+            onClicked: { loginDialog.visible = true; }    
             
             Dialogs.LoginToSystemDialog
             {
@@ -179,3 +169,4 @@ Item
         }
     }
 }
+

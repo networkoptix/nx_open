@@ -19,6 +19,7 @@
 #include "aio/pollable.h"
 #include "nettools.h"
 #include "socket_factory.h"
+#include "socket_impl_helper.h"
 #include "utils/common/byte_array.h"
 #include "../common/systemerror.h"
 
@@ -71,31 +72,31 @@ public:
     //!Implementation of AbstractSocket::setReuseAddrFlag
     bool setReuseAddrFlag( bool reuseAddr );
     //!Implementation of AbstractSocket::reuseAddrFlag
-    bool getReuseAddrFlag( bool* val );
+    bool getReuseAddrFlag( bool* val ) const;
     //!Implementation of AbstractSocket::setNonBlockingMode
     bool setNonBlockingMode( bool val );
     //!Implementation of AbstractSocket::getNonBlockingMode
     bool getNonBlockingMode( bool* val ) const;
     //!Implementation of AbstractSocket::getMtu
-    bool getMtu( unsigned int* mtuValue );
+    bool getMtu( unsigned int* mtuValue ) const;
     //!Implementation of AbstractSocket::setSendBufferSize
     bool setSendBufferSize( unsigned int buffSize );
     //!Implementation of AbstractSocket::getSendBufferSize
-    bool getSendBufferSize( unsigned int* buffSize );
+    bool getSendBufferSize( unsigned int* buffSize ) const;
     //!Implementation of AbstractSocket::setRecvBufferSize
     bool setRecvBufferSize( unsigned int buffSize );
     //!Implementation of AbstractSocket::getRecvBufferSize
-    bool getRecvBufferSize( unsigned int* buffSize );
+    bool getRecvBufferSize( unsigned int* buffSize ) const;
     //!Implementation of AbstractSocket::setRecvTimeout
     bool setRecvTimeout( unsigned int ms );
     //!Implementation of AbstractSocket::setSendTimeout
     bool setSendTimeout( unsigned int ms );
     //!Implementation of Pollable::getLastError
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) override;
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
     //!Implementation of AbstractSocket::postImpl
-    bool postImpl( std::function<void()>&& handler );
+    bool post( std::function<void()>&& handler );
     //!Implementation of AbstractSocket::dispatchImpl
-    bool dispatchImpl( std::function<void()>&& handler );
+    bool dispatch( std::function<void()>&& handler );
 
     /**
      *   Get the local port
@@ -203,185 +204,14 @@ private:
 };
 
 
-//!Implements pure virtual methods of \a AbstractSocket by delegating them to \a Socket
-template<typename AbstractBaseType, typename AbstractSocketMethodsImplementorType, int i = 0>
-class SocketImplementationDelegate
-:
-    public AbstractBaseType
-{
-public:
-    //TODO #ak replace multiple constructors with variadic template after move to msvc2013
-    template<class Param1Type>
-    SocketImplementationDelegate( const Param1Type& param1 )
-    :
-        m_implDelegate( param1 )
-    {
-    }
-
-    template<class Param1Type, class Param2Type>
-    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2 )
-    :
-        m_implDelegate( param1, param2 )
-    {
-    }
-
-    template<class Param1Type, class Param2Type, class Param3Type>
-    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
-    :
-        m_implDelegate( param1, param2, param3 )
-    {
-    }
-
-    template<class Param1Type, class Param2Type, class Param3Type>
-    SocketImplementationDelegate( AbstractCommunicatingSocket* abstractSocketPtr, const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
-    :
-        m_implDelegate( abstractSocketPtr, param1, param2, param3 )
-    {
-    }
-
-    //////////////////////////////////////////////////////////////////////
-    ///////// Implementation of AbstractSocket methods
-    //////////////////////////////////////////////////////////////////////
-
-    //!Implementation of AbstractSocket::bind
-    virtual bool bind( const SocketAddress& localAddress ) override { return m_implDelegate.bind( localAddress ); }
-    //!Implementation of AbstractSocket::getLocalAddress
-    virtual SocketAddress getLocalAddress() const override { return m_implDelegate.getLocalAddress(); }
-    //!Implementation of AbstractSocket::close
-    virtual void close() override { return m_implDelegate.close(); }
-    //!Implementation of AbstractSocket::isClosed
-    virtual bool isClosed() const override { return m_implDelegate.isClosed(); }
-    //!Implementation of AbstractSocket::setReuseAddrFlag
-    virtual bool setReuseAddrFlag( bool reuseAddr ) override { return m_implDelegate.setReuseAddrFlag( reuseAddr ); }
-    //!Implementation of AbstractSocket::reuseAddrFlag
-    virtual bool getReuseAddrFlag( bool* val ) override { return m_implDelegate.getReuseAddrFlag( val ); }
-    //!Implementation of AbstractSocket::setNonBlockingMode
-    virtual bool setNonBlockingMode( bool val ) override { return m_implDelegate.setNonBlockingMode( val ); }
-    //!Implementation of AbstractSocket::getNonBlockingMode
-    virtual bool getNonBlockingMode( bool* val ) const override { return m_implDelegate.getNonBlockingMode( val ); }
-    //!Implementation of AbstractSocket::getMtu
-    virtual bool getMtu( unsigned int* mtuValue ) override { return m_implDelegate.getMtu( mtuValue ); }
-    //!Implementation of AbstractSocket::setSendBufferSize
-    virtual bool setSendBufferSize( unsigned int buffSize ) override { return m_implDelegate.setSendBufferSize( buffSize ); }
-    //!Implementation of AbstractSocket::getSendBufferSize
-    virtual bool getSendBufferSize( unsigned int* buffSize ) override { return m_implDelegate.getSendBufferSize( buffSize ); }
-    //!Implementation of AbstractSocket::setRecvBufferSize
-    virtual bool setRecvBufferSize( unsigned int buffSize ) override { return m_implDelegate.setRecvBufferSize( buffSize ); }
-    //!Implementation of AbstractSocket::getRecvBufferSize
-    virtual bool getRecvBufferSize( unsigned int* buffSize ) override { return m_implDelegate.getRecvBufferSize( buffSize ); }
-    //!Implementation of AbstractSocket::setRecvTimeout
-    virtual bool setRecvTimeout( unsigned int ms ) override { return m_implDelegate.setRecvTimeout( ms ); }
-    //!Implementation of AbstractSocket::getRecvTimeout
-    virtual bool getRecvTimeout( unsigned int* millis ) override { return m_implDelegate.getRecvTimeout( millis ); }
-    //!Implementation of AbstractSocket::setSendTimeout
-    virtual bool setSendTimeout( unsigned int ms ) override { return m_implDelegate.setSendTimeout( ms ); }
-    //!Implementation of AbstractSocket::getSendTimeout
-    virtual bool getSendTimeout( unsigned int* millis ) override { return m_implDelegate.getSendTimeout( millis ); }
-    //!Implementation of AbstractSocket::getLastError
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) override { return m_implDelegate.getLastError( errorCode ); }
-    //!Implementation of AbstractSocket::handle
-    virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_implDelegate.handle(); }
-    //!Implementation of AbstractSocket::postImpl
-    virtual bool postImpl( std::function<void()>&& handler ) override { return m_implDelegate.postImpl( std::move(handler) ); }
-    //!Implementation of AbstractSocket::dispatchImpl
-    virtual bool dispatchImpl( std::function<void()>&& handler ) override { return m_implDelegate.dispatchImpl( std::move(handler) ); }
-
-    AbstractSocketMethodsImplementorType* implementationDelegate() { return &m_implDelegate; }
-    const AbstractSocketMethodsImplementorType* implementationDelegate() const { return &m_implDelegate; }
-
-protected:
-    AbstractSocketMethodsImplementorType m_implDelegate;
-};
-
-
-
-//!Implements pure virtual methods of \a AbstractCommunicatingSocket by delegating them to \a CommunicatingSocket
-template<typename AbstractBaseType>
-class SocketImplementationDelegate<AbstractBaseType, CommunicatingSocket, 0>
-:
-    public SocketImplementationDelegate<AbstractBaseType, CommunicatingSocket, 1>
-{
-    typedef SocketImplementationDelegate<AbstractBaseType, CommunicatingSocket, 1> base_type;
-
-public:
-    //TODO #ak replace multiple constructors with variadic template after move to msvc2013
-    template<class Param1Type>
-    SocketImplementationDelegate( const Param1Type& param1 )
-    :
-        base_type( this, param1 )
-    {
-    }
-
-    template<class Param1Type, class Param2Type>
-    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2 )
-    :
-        base_type( this, param1, param2 )
-    {
-    }
-
-    template<class Param1Type, class Param2Type, class Param3Type>
-    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3 )
-    :
-        base_type( this, param1, param2, param3 )
-    {
-    }
-
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override {
-        this->m_implDelegate.terminateAsyncIO( waitForRunningHandlerCompletion );
-    }
-
-    //////////////////////////////////////////////////////////////////////
-    ///////// Implementation of AbstractCommunicatingSocket methods
-    //////////////////////////////////////////////////////////////////////
-
-    //!Implementation of AbstractCommunicatingSocket::connect
-    virtual bool connect(
-        const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis ) override
-    {
-        return this->m_implDelegate.connect( remoteAddress, timeoutMillis );
-    }
-    //!Implementation of AbstractCommunicatingSocket::recv
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return this->m_implDelegate.recv( buffer, bufferLen, flags ); }
-    //!Implementation of AbstractCommunicatingSocket::send
-    virtual int send( const void* buffer, unsigned int bufferLen ) override { return this->m_implDelegate.send( buffer, bufferLen ); }
-    //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-    virtual SocketAddress getForeignAddress() const override { return this->m_implDelegate.getForeignAddress(); }
-    //!Implementation of AbstractCommunicatingSocket::isConnected
-    virtual bool isConnected() const override { return this->m_implDelegate.isConnected(); }
-    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
-    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override {
-        return this->m_implDelegate.connectAsyncImpl( addr, std::move(handler) );
-    }
-    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override {
-        return this->m_implDelegate.recvAsyncImpl( buf, std::move( handler ) );
-    }
-    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override {
-        return this->m_implDelegate.sendAsyncImpl( buf, std::move( handler ) );
-    }
-    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
-    virtual bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override {
-        return this->m_implDelegate.registerTimerImpl( timeoutMs, std::move( handler ) );
-    }
-    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
-    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override {
-        return this->m_implDelegate.cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
-    }
-};
-
-
-
 /**
  *   TCP socket for communication with other TCP sockets
  */
 class TCPSocket
 :
-    public SocketImplementationDelegate<AbstractStreamSocket, CommunicatingSocket>
+    public AbstractCommunicatingSocketImplementationDelegate<AbstractStreamSocket, CommunicatingSocket>
 {
-    typedef SocketImplementationDelegate<AbstractStreamSocket, CommunicatingSocket> base_type;
+    typedef AbstractCommunicatingSocketImplementationDelegate<AbstractStreamSocket, CommunicatingSocket> base_type;
 
 public:
     /**
@@ -403,7 +233,7 @@ public:
     //!Implementation of AbstractStreamSocket::setNoDelay
     virtual bool setNoDelay( bool value ) override;
     //!Implementation of AbstractStreamSocket::getNoDelay
-    virtual bool getNoDelay( bool* value ) override;
+    virtual bool getNoDelay( bool* value ) const override;
     //!Implementation of AbstractStreamSocket::toggleStatisticsCollection
     virtual bool toggleStatisticsCollection( bool val ) override;
     //!Implementation of AbstractStreamSocket::getConnectionStatistics
@@ -419,9 +249,9 @@ private:
  */
 class TCPServerSocket
 :
-    public SocketImplementationDelegate<AbstractStreamServerSocket, Socket>
+    public AbstractSocketImplementationEmbeddingDelegate<AbstractStreamServerSocket, Socket>
 {
-    typedef SocketImplementationDelegate<AbstractStreamServerSocket, Socket> base_type;
+    typedef AbstractSocketImplementationEmbeddingDelegate<AbstractStreamServerSocket, Socket> base_type;
 
 public:
     TCPServerSocket();
@@ -439,6 +269,8 @@ public:
     virtual bool listen( int queueLen ) override;
     //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
+    //!Implementation of AbstractStreamServerSocket::cancelAsyncIO
+    virtual void cancelAsyncIO( bool waitForRunningHandlerCompletion ) override;
 
 protected:
     //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
@@ -453,9 +285,9 @@ private:
   */
 class UDPSocket
 :
-    public SocketImplementationDelegate<AbstractDatagramSocket, CommunicatingSocket>
+    public AbstractCommunicatingSocketImplementationDelegate<AbstractDatagramSocket, CommunicatingSocket>
 {
-    typedef SocketImplementationDelegate<AbstractDatagramSocket, CommunicatingSocket> base_type;
+    typedef AbstractCommunicatingSocketImplementationDelegate<AbstractDatagramSocket, CommunicatingSocket> base_type;
 
 public:
     static const unsigned int MAX_PACKET_SIZE = 64*1024 - 24 - 8;   //maximum ip datagram size - ip header length - udp header length

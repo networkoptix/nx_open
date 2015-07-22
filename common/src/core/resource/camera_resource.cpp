@@ -49,7 +49,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSiz
 
 int QnPhysicalCameraResource::getChannel() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_channelNumber;
 }
 
@@ -57,7 +57,7 @@ void QnPhysicalCameraResource::setUrl(const QString &urlStr)
 {
     QnVirtualCameraResource::setUrl( urlStr ); /* This call emits, so we should not invoke it under lock. */
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QUrl url( urlStr );
     m_channelNumber = QUrlQuery( url.query() ).queryItemValue( QLatin1String( "channel" ) ).toInt();
     setHttpPort( url.port( httpPort() ) );
@@ -172,7 +172,7 @@ static const bool transcodingAvailable = false;
 bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
 {
     //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
-    QMutexLocker lk( &m_mediaStreamsMutex );
+    QnMutexLocker lk( &m_mediaStreamsMutex );
 
     //get saved stream info with index encoderIndex
     const QString& mediaStreamsStr = getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME );
@@ -379,7 +379,7 @@ void QnVirtualCameraResource::issueOccured() {
     bool tooManyIssues = false;
     {
         /* Calculate how many issues have occurred during last check period. */
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_issueCounter++;
         tooManyIssues = m_issueCounter >= MAX_ISSUE_CNT;
         m_lastIssueTimer.restart();
@@ -393,7 +393,7 @@ void QnVirtualCameraResource::issueOccured() {
 void QnVirtualCameraResource::cleanCameraIssues() {
     {
         /* Check if no issues occurred during last check period. */
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (!m_lastIssueTimer.hasExpired(issuesTimeoutMs())) 
             return;
         m_issueCounter = 0;

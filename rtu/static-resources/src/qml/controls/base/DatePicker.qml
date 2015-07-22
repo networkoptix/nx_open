@@ -13,52 +13,56 @@ QtControls.TextField
         text = impl.stringFromDate(newTime);
     }
 
+    property bool showNow: false;
     property bool changed: false;    
-    property var changesHandler;
+    property int fontSize: Common.SizeManager.fontSizes.base;
     
     property var date;
     property var initDate;
     
     height: Common.SizeManager.clickableSizes.medium;
     width: height * 3;
+    
     opacity: enabled ? 1.0 : 0.5;
+    
+    text: impl.stringFromDate(initDate);
+    inputMask: impl.mask;
+    
+    enabled: !showNow;
 
-    text: (enabled ? impl.stringFromDate(initDate) : "<now>");
-
-    onEnabledChanged:
+    onShowNowChanged:
     {
-        inputMask = (enabled ? impl.mask : "");
-        text = (enabled ? impl.stringFromDate(date) : qsTr("<now>"));
+        inputMask = (showNow ? "" : impl.mask);
+        text = (showNow ? qsTr("<now>") : impl.stringFromDate(initDate));
     }
 
-    font.pointSize: Common.SizeManager.fontSizes.medium;
+    font.pixelSize: fontSize;
     
     style: TextFieldStyle
     {
         renderType: Text.NativeRendering;
     }
 
-    inputMask: impl.mask;
-    
-    onChangedChanged: 
-    {
-        if (changesHandler)
-            changesHandler.changed = true;
-    }
-
     onTextChanged: 
     {
-        date = Date.fromLocaleDateString(Qt.locale(), text, Locale.ShortFormat);
+        date = Date.fromLocaleDateString(Qt.locale(), text, impl.dateFormat);
         if (!initDate && (text === impl.emptyMaskValue))
             return;
         
-        if (initDate && date && (impl.stringFromDate(initDate) !== impl.stringFromDate(date)))
-            thisComponent.changed = true;
+        thisComponent.changed = initDate && date && (impl.stringFromDate(initDate) !== impl.stringFromDate(date));
+        
+        console.log("acc: " + acceptableInput);
     }
-    
+
+    validator: RegExpValidator
+    {
+        regExp: /^(((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((1[6-9]|[2-9]\d)\d{2}))|(29\/02\/((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))))$/
+     //   regExp: /^(?:(?:(?:0[1-9]|1\d|2[0-8])(?:0[1-9]|1[0-2])|(?:29|30)(?:0[13-9]|1[0-2])|31(?:0[13578]|1[02]))[1-9]\d{3}|2902(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00))$/
+    }
+   
     property QtObject impl: QtObject
     {
-        readonly property string dateFormat: Qt.locale().dateFormat(Locale.NarrowFormat);
+        readonly property string dateFormat: "dd/MM/yyyy";
         readonly property string mask: (dateFormat.replace(new RegExp(/[a-zA-Z0-9]/g), "9") + ";-");
         readonly property string emptyMaskValue: ":";  
     

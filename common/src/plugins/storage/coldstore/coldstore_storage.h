@@ -73,7 +73,7 @@ private:
 
 
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnColdStoreConnectionPool m_connectionPool;
     QnColdStoreMetaDataPool m_metaDataPool;
 

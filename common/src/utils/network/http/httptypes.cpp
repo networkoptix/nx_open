@@ -866,7 +866,7 @@ namespace nx_http
                 digest->serialize( dstBuffer );
         }
 
-        StringType Authorization::toString() const
+        BufferType Authorization::serialized() const
         {
             BufferType dest;
             serialize( &dest );
@@ -921,6 +921,8 @@ namespace nx_http
         //   WWWAuthenticate
         //////////////////////////////////////////////
 
+        const StringType WWWAuthenticate::NAME("WWW-Authenticate");
+
         WWWAuthenticate::WWWAuthenticate()
         :
             authScheme( AuthScheme::none )
@@ -973,6 +975,13 @@ namespace nx_http
             }
 
             return true;
+        }
+
+        BufferType WWWAuthenticate::serialized() const
+        {
+            //TODO #ak
+            assert( false );
+            return BufferType();
         }
 
 

@@ -17,7 +17,6 @@ Item
     {
         id: headerDelegateLoader;
 
-        height: (headerDelegate ? item.height : 0);
         anchors
         {
             left: parent.left;
@@ -32,8 +31,6 @@ Item
     {
         id: areaDelegateLoader;
 
-        height: (areaDelegate ? item.height : 0);
-        
         anchors
         {
             left: parent.left;

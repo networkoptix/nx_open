@@ -49,7 +49,7 @@ public:
     PollableImpl* impl();
     const PollableImpl* impl() const;
 
-    virtual bool getLastError( SystemError::ErrorCode* errorCode );
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
 
 protected:
     AbstractSocket::SOCKET_HANDLE m_fd;

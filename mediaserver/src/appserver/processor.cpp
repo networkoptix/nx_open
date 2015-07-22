@@ -47,11 +47,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         //Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getPhysicalId()).isEmpty());
 
         cameraResource->setParentId(m_serverId);
-        //if (!cameraResource->hasFlags(Qn::parent_change))
-        //    cameraResource->setPreferedServerId(m_serverId);
     }
-
-    //QnResourcePool::instance()->addResources(resources);
 
     // we've got two loops to avoid double call of double sending addCamera
 
@@ -69,21 +65,6 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if( cameraResource->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(cameraResource->getId()))
             continue;   //ignoring newly discovered camera
 
-        /*
-        QnVirtualCameraResourceList cameras;
-        const ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCameraSync( cameraResource, &cameras );
-        if( errorCode != ec2::ErrorCode::ok ) {
-            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << ec2::toString(errorCode);
-            continue;
-        }
-        if (cameras.isEmpty())
-        {
-            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Unknown error code. Possible old ECS version is used!";
-            continue;
-        }
-        // cameras contains updated resource with all fields
-        QnResourcePool::instance()->addResource(cameras.first());
-        */
         QString uniqueId = cameraResource->getUniqueId();
         cameraResource->setId(cameraResource->uniqueIdToId(uniqueId));
         addNewCamera(cameraResource);
@@ -101,7 +82,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
         return;
     }
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QString name;
     if (cameraResource->hasFlags(Qn::parent_change))
         name = ec2::QnMutexCameraDataHandler::CAM_UPD_PREFIX;
@@ -126,7 +107,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
 
 void QnAppserverResourceProcessor::at_mutexLocked()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     LockData data = m_lockInProgress.value(mutex->name());
     if (!data.mutex)
@@ -215,7 +196,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 
 void QnAppserverResourceProcessor::at_mutexTimeout()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     m_lockInProgress.remove(mutex->name());
     mutex->deleteLater();

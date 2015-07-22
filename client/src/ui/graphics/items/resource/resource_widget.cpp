@@ -31,6 +31,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
@@ -122,23 +123,62 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setFont(font);
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
-    /* Header overlay. */
-    m_headerLeftLabel = new GraphicsLabel();
-    m_headerLeftLabel->setAcceptedMouseButtons(0);
-    m_headerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    createButtons();
+    createHeaderOverlay();
+    createFooterOverlay();
 
-    m_headerRightLabel = new GraphicsLabel();
-    m_headerRightLabel->setAcceptedMouseButtons(0);
-    m_headerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    /* Custom overlays should be added below the status overlay. */
+    createCustomOverlays();
 
-    auto checkedButtons = static_cast<Buttons>(item->data(Qn::ItemCheckedButtonsRole).toInt());
+    /* Status overlay. */
+    m_statusOverlayWidget = new QnStatusOverlayWidget(this);
+    addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
+
+
+    /* Initialize resource. */
+    m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
+    setChannelLayout(qn_resourceWidget_defaultContentLayout);
+
+    m_aspectRatio = defaultAspectRatio();
+
+    connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
+
+    /* Videowall license changes helper */
+    QnLicenseUsageWatcher* videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(this);
+    connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this, &QnResourceWidget::updateStatusOverlay);
+
+    /* Run handlers. */
+    setInfoVisible(buttonBar()->button(InfoButton)->isChecked(), false);
+    updateTitleText();
+    updateButtonsVisibility();
+    updateCursor();
+
+    connect(this, &QnResourceWidget::rotationChanged, this, [this]() {
+        if (m_enclosingGeometry.isValid())
+            setGeometry(calculateGeometry(m_enclosingGeometry));
+    });
+}
+
+QnResourceWidget::~QnResourceWidget() {
+    ensureAboutToBeDestroyedEmitted();
+}
+
+void QnResourceWidget::setBookmarksLabelText(const QString &text)
+{
+    m_footerBookmarkDescriptionLabel->setText(text);
+    m_footerBookmarkDescriptionLabel->setVisible(!text.isEmpty());
+}
+
+void QnResourceWidget::createButtons() {
+    auto checkedButtons = static_cast<Buttons>(m_item->data(Qn::ItemCheckedButtonsRole).toInt());
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setIcon(qnSkin->icon("item/close.png"));
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
-    connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
+    connect(accessController()->notifier(m_item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
     infoButton->setIcon(qnSkin->icon("item/info.png"));
@@ -147,7 +187,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
-    
+
     QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -168,6 +208,17 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_iconButton->setPreferredSize(24.0, 24.0);
     m_iconButton->setVisible(false);
     connect(m_iconButton, &QnImageButtonWidget::visibleChanged, this, &QnResourceWidget::at_iconButton_visibleChanged);
+}
+
+void QnResourceWidget::createHeaderOverlay() {
+    /* Header overlay. */
+    m_headerLeftLabel = new GraphicsLabel();
+    m_headerLeftLabel->setAcceptedMouseButtons(0);
+    m_headerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+
+    m_headerRightLabel = new GraphicsLabel();
+    m_headerRightLabel->setAcceptedMouseButtons(0);
+    m_headerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -193,75 +244,71 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
     addOverlayWidget(m_headerOverlayWidget, AutoVisible, true, true, true, true);
+}
 
-
+void QnResourceWidget::createFooterOverlay() {
     /* Footer overlay. */
-    m_footerLeftLabel = new GraphicsLabel();
-    m_footerLeftLabel->setAcceptedMouseButtons(0);
-    m_footerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-
-    m_footerRightLabel = new GraphicsLabel();
-    m_footerRightLabel->setAcceptedMouseButtons(0);
-    m_footerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-
-    QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    footerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    footerLayout->addItem(m_footerLeftLabel);
-    footerLayout->addStretch(0x1000);
-    footerLayout->addItem(m_footerRightLabel);
-
-    m_footerWidget = new GraphicsWidget();
-    m_footerWidget->setLayout(footerLayout);
-    m_footerWidget->setAcceptedMouseButtons(0);
-    m_footerWidget->setAutoFillBackground(true);
-    setPaletteColor(m_footerWidget, QPalette::Window, overlayBackgroundColor);
-    m_footerWidget->setOpacity(0.0);
-
-    QGraphicsLinearLayout *footerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    footerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    footerOverlayLayout->addStretch(0x1000);
-    footerOverlayLayout->addItem(m_footerWidget);
 
     m_footerOverlayWidget = new QnViewportBoundWidget(this);
-    m_footerOverlayWidget->setLayout(footerOverlayLayout);
+    addOverlayWidget(m_footerOverlayWidget, AutoVisible, true, true, true);
     m_footerOverlayWidget->setAcceptedMouseButtons(0);
     m_footerOverlayWidget->setOpacity(0.0);
-    addOverlayWidget(m_footerOverlayWidget, AutoVisible, true, true, true);
 
+    QGraphicsLinearLayout *footerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical, m_footerOverlayWidget);
+    footerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    footerOverlayLayout->addStretch(0x1000);
 
-    /* Status overlay. */
-    m_statusOverlayWidget = new QnStatusOverlayWidget(this);
-    addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
+    {
+        /// Creates bookmarks descrition area
+        QGraphicsLinearLayout *bookmarksLayout = new QGraphicsLinearLayout(Qt::Horizontal, footerOverlayLayout);
+        footerOverlayLayout->addItem(bookmarksLayout);
+        
+        enum { kSpacerFactor = 3 , kBookmarkFactor = 2 };
 
+        m_footerBookmarkDescriptionLabel = new QnProxyLabel(m_footerOverlayWidget);
+        bookmarksLayout->addItem(m_footerBookmarkDescriptionLabel);
+        bookmarksLayout->setStretchFactor(m_footerBookmarkDescriptionLabel, kBookmarkFactor);
+        m_footerBookmarkDescriptionLabel->setVisible(false);
+        m_footerBookmarkDescriptionLabel->setWordWrap(true);
+        m_footerBookmarkDescriptionLabel->setOpacity(0.0);
+        m_footerBookmarkDescriptionLabel->setAcceptedMouseButtons(0);
+        setPaletteColor(m_footerBookmarkDescriptionLabel, QPalette::Window, overlayBackgroundColor);
+        
+        bookmarksLayout->addStretch(kSpacerFactor);
+    }
 
-    /* Initialize resource. */
-    m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
-    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
-    setChannelLayout(qn_resourceWidget_defaultContentLayout);
+    {
+        /// Makes status line at the bottom
+        m_footerWidget = new GraphicsWidget(m_footerOverlayWidget);
+        footerOverlayLayout->addItem(m_footerWidget);
+        m_footerWidget->setAcceptedMouseButtons(0);
+        m_footerWidget->setAutoFillBackground(true);
+        setPaletteColor(m_footerWidget, QPalette::Window, overlayBackgroundColor);
+        m_footerWidget->setOpacity(0.0);
 
-    m_aspectRatio = defaultAspectRatio();
+        {
+            QGraphicsLinearLayout *lowerLayout = new QGraphicsLinearLayout(Qt::Horizontal, m_footerWidget);
+            lowerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
 
-    connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
+            m_footerLeftLabel = new GraphicsLabel();
+            lowerLayout->addItem(m_footerLeftLabel);
+            m_footerLeftLabel->setAcceptedMouseButtons(0);
+            m_footerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
-    /* Videowall license changes helper */
-    QnLicenseUsageWatcher* videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(this);
-    connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this, &QnResourceWidget::updateStatusOverlay);
+            lowerLayout->addStretch(0x1000);
 
-    /* Run handlers. */
-    setInfoVisible(infoButton->isChecked(), false);
-    updateTitleText();
-    updateButtonsVisibility();
-    updateCursor();
-
-    connect(this, &QnResourceWidget::rotationChanged, this, [this]() {
-        if (m_enclosingGeometry.isValid())
-            setGeometry(calculateGeometry(m_enclosingGeometry));
-    });
+            m_footerRightLabel = new GraphicsLabel();
+            lowerLayout->addItem(m_footerRightLabel);
+            m_footerRightLabel->setAcceptedMouseButtons(0);
+            m_footerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+        }
+    }
 }
 
-QnResourceWidget::~QnResourceWidget() {
-    ensureAboutToBeDestroyedEmitted();
+void QnResourceWidget::createCustomOverlays() {
+    //no custom overlays in the base widget
 }
+
 
 const QnResourcePtr &QnResourceWidget::resource() const {
     return m_resource;
@@ -434,7 +481,7 @@ void QnResourceWidget::setInfoTextFormat(const QString &infoTextFormat) {
 
 void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
     QString leftText, rightText;
-    
+
     splitFormat(infoText, &leftText, &rightText);
 
     m_footerLeftLabel->setText(leftText);
@@ -715,10 +762,15 @@ void QnResourceWidget::updateInfoVisiblity(bool animate)
 
     qreal opacity = visible ? 1.0 : 0.0;
 
-    if(animate) {
+    if(animate) 
+    {
         opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
-    } else {
+        opacityAnimator(m_footerBookmarkDescriptionLabel, 1.0)->animateTo(opacity);
+    }
+    else 
+    {
         m_footerWidget->setOpacity(opacity);
+        m_footerBookmarkDescriptionLabel->setOpacity(opacity);
     }
 
     if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))

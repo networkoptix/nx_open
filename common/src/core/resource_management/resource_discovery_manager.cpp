@@ -78,8 +78,8 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager()
     m_discoveryUpdateIdx(0),
     m_serverOfflineTimeout(20 * 1000)
 {
-    connect(QnResourcePool::instance(), &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
-    connect(QnResourcePool::instance(), &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
@@ -101,21 +101,21 @@ void QnResourceDiscoveryManager::start( Priority priority )
 
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
-    QMutexLocker locker(&m_searchersListMutex);
+    QnMutexLocker locker( &m_searchersListMutex );
     updateSearcherUsage(serv);
     m_searchersList.push_back(serv);
 }
 
 void QnResourceDiscoveryManager::addDTSServer(QnAbstractDTSSearcher* serv)
 {
-    QMutexLocker locker(&m_searchersListMutex);
+    QnMutexLocker locker( &m_searchersListMutex );
     m_dstList.push_back(serv);
 }
 
 
 void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* processor)
 {
-    QMutexLocker locker(&m_searchersListMutex);
+    QnMutexLocker locker( &m_searchersListMutex );
     m_resourceProcessor = processor;
 }
 
@@ -136,7 +136,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
     {
         ResourceSearcherList searchersList;
         {
-            QMutexLocker locker(&m_searchersListMutex);
+            QnMutexLocker locker( &m_searchersListMutex );
             searchersList = m_searchersList;
         }
 
@@ -155,7 +155,7 @@ void QnResourceDiscoveryManager::pleaseStop()
 {
     if (isRunning())
     {
-        QMutexLocker locker(&m_searchersListMutex);
+        QnMutexLocker locker( &m_searchersListMutex );
         for (QnAbstractResourceSearcher *searcher: m_searchersList)
             searcher->pleaseStop();
     }
@@ -193,7 +193,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 
     ResourceSearcherList searchersList;
     {
-        QMutexLocker locker(&m_searchersListMutex);
+        QnMutexLocker locker( &m_searchersListMutex );
         searchersList = m_searchersList;
     }
 
@@ -236,7 +236,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 
 void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList& resources)
 {
-    QMutexLocker lock(&m_resListMutex);
+    QnMutexLocker lock( &m_resListMutex );
     m_lastDiscoveredResources[m_discoveryUpdateIdx] = resources;
     int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
     m_discoveryUpdateIdx = (m_discoveryUpdateIdx + 1) % sz;
@@ -244,7 +244,7 @@ void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList
 
 QSet<QString> QnResourceDiscoveryManager::lastDiscoveredIds() const
 {
-    QMutexLocker lock(&m_resListMutex);
+    QnMutexLocker lock( &m_resListMutex );
     int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
     QSet<QString> allDiscoveredIds;
     for (int i = 0; i < sz; ++i) {
@@ -318,7 +318,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
     QnManualCameraInfoMap candidates;
     QnManualCameraInfoMap cameras;
     {
-        QMutexLocker locker(&m_searchersListMutex);
+        QnMutexLocker locker( &m_searchersListMutex );
         candidates = m_manualCameraMap;
         if (candidates.isEmpty())
             return;
@@ -465,7 +465,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 
     {
-        QMutexLocker lock(&m_searchersListMutex);
+        QnMutexLocker lock( &m_searchersListMutex );
         for (int i = resources.size()-1; i >= 0; --i)
         {
             if (m_recentlyDeleted.contains(resources[i]->getUniqueId()))
@@ -486,7 +486,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
 
 bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
-    QMutexLocker lock(&m_discoveryMutex);
+    QnMutexLocker lock( &m_discoveryMutex );
 
     //excluding already existing resources
     QnResourceList::iterator it = resources.begin();
@@ -524,7 +524,7 @@ void QnResourceDiscoveryManager::fillManualCamInfo(QnManualCameraInfoMap& camera
 
 bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMap& cameras)
 {
-    QMutexLocker lock(&m_searchersListMutex);
+    QnMutexLocker lock( &m_searchersListMutex );
     for (QnManualCameraInfoMap::const_iterator itr = cameras.constBegin(); itr != cameras.constEnd(); ++itr)
     {
         for (int i = 0; i < m_searchersList.size(); ++i)
@@ -541,7 +541,7 @@ bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoM
 
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
 {
-    QMutexLocker lock(&m_searchersListMutex);
+    QnMutexLocker lock( &m_searchersListMutex );
     QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
     if (itr != m_manualCameraMap.end())
         m_manualCameraMap.erase(itr);
@@ -552,7 +552,7 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 {
     QnManualCameraInfoMap newManualCameras;
     {
-        QMutexLocker lock(&m_searchersListMutex);
+        QnMutexLocker lock( &m_searchersListMutex );
         const QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
         if (!camera || !camera->isManuallyAdded())
             return;
@@ -567,7 +567,7 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 
 bool QnResourceDiscoveryManager::containManualCamera(const QString& url)
 {
-    QMutexLocker lock(&m_searchersListMutex);
+    QnMutexLocker lock( &m_searchersListMutex );
     return m_manualCameraMap.contains(url);
 }
 
@@ -641,7 +641,7 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
 void QnResourceDiscoveryManager::updateSearchersUsage() {
     ResourceSearcherList searchers;
     {
-        QMutexLocker locker(&m_searchersListMutex);
+        QnMutexLocker locker( &m_searchersListMutex );
         searchers = m_searchersList;
     }
 

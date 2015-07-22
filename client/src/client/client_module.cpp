@@ -18,7 +18,7 @@
 #include <client/client_meta_types.h>
 
 #include <redass/redass_controller.h>
-#include <client/client_message_processor.h>
+#include <client/desktop_client_message_processor.h>
 #include <client/client_instance_manager.h>
 
 #include <core/ptz/client_ptz_controller_pool.h>
@@ -77,7 +77,6 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
     common->store<QnMediaServerUserAttributesPool>(new QnMediaServerUserAttributesPool());
     common->store<QnRedAssController>(new QnRedAssController());
 
-    common->store<QnResourcePool>(new QnResourcePool());
     common->store<QnSyncTime>(new QnSyncTime());
 
     common->store<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary());
@@ -88,7 +87,7 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
     common->store<QnClientPtzControllerPool>(new QnClientPtzControllerPool());
     common->store<QnGlobalSettings>(new QnGlobalSettings());
-    common->store<QnClientMessageProcessor>(new QnClientMessageProcessor());
+    common->store<QnDesktopClientMessageProcessor>(new QnDesktopClientMessageProcessor());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnServerCameraFactory>(new QnServerCameraFactory());
 

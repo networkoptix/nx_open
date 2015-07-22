@@ -50,7 +50,7 @@ void rtu::LoginManager::Impl::primaryLoginToServer(const BaseServerInfo &info
         emit m_owner->loginOperationSuccessfull(id, extraInfo);
     };
     
-    const auto &failed = [this, info](const QUuid &id)
+    const auto &failed = [this, info](const QString &, int)
     {
         loginToServer(info, 0);
     };
@@ -73,7 +73,7 @@ void rtu::LoginManager::Impl::loginToServer(const BaseServerInfo &info
         emit m_owner->loginOperationSuccessfull(id, extraInfo);
     };
     
-    const auto &failed = [this, info, passwordIndex](const QUuid &id)
+    const auto &failed = [this, info, passwordIndex](const QString &,int)
     {
         loginToServer(info, passwordIndex + 1);
     };

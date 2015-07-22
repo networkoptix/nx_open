@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <functional>
+#include <type_traits>
 
 #include <QtCore/QThread>
 
@@ -33,7 +34,7 @@ public:
 
     bool post( std::function<void()>&& handler )
     {
-        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
         return aio::AIOService::instance()->post( m_socket, std::move(handler) );
@@ -41,7 +42,7 @@ public:
 
     bool dispatch( std::function<void()>&& handler )
     {
-        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
         return aio::AIOService::instance()->dispatch( m_socket, std::move(handler) );
@@ -50,7 +51,7 @@ public:
     //!This call stops async I/O on socket and it can never be resumed!
     void terminateAsyncIO()
     {
-        m_socket->impl()->terminated.store( true, std::memory_order_relaxed );
+        ++m_socket->impl()->terminated;
     }
 
 protected:
@@ -140,7 +141,9 @@ public:
 
     bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        //TODO with UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline
+
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
         {
             //socket has been terminated, no async call possible. 
             //Returning true to trick calling party: let it think everything OK and
@@ -148,6 +151,16 @@ public:
             //TODO #ak is it really ok to trick someone?
             return true;
         }
+
+        unsigned int sendTimeout = 0;
+#ifdef _DEBUG
+        bool isNonBlockingModeEnabled = false;
+        if( !m_abstractSocketPtr->getNonBlockingMode( &isNonBlockingModeEnabled ) )
+            return false;
+        assert( isNonBlockingModeEnabled );
+#endif
+        if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
+            return false;
 
         m_connectHandler = std::move( handler );
 
@@ -173,7 +186,7 @@ public:
 
     bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
         static const int DEFAULT_RESERVE_SIZE = 4*1024;
@@ -187,14 +200,14 @@ public:
         m_recvBuffer = buf;
         m_recvHandler = std::move( handler );
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        QnMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_recvAsyncCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etRead, this );
     }
 
     bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
         assert( buf.size() > 0 );
@@ -211,19 +224,19 @@ public:
         m_sendHandler = std::move( handler );
         m_sendBufPos = 0;
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        QnMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etWrite, this );
     }
 
     bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
         m_timerHandler = std::move( handler );
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        QnMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_registerTimerCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etTimedOut, this, timeoutMs );
     }
@@ -232,6 +245,11 @@ public:
     {
         if( eventType == aio::etNone )
         {
+            assert( waitForRunningHandlerCompletion );
+            //TODO #ak add asynchronous cancellation
+
+            ++this->m_socket->impl()->terminated;   //ignoring all new I/O operations while cancellation is in progress
+
             //TODO #ak underlying loop is a work-around. Must add method to aio::AIOService which cancels all operation atomically
             while( aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ) ||
                    HostAddressResolver::instance()->isRequestIDKnown(this) )
@@ -241,6 +259,8 @@ public:
                 cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
                 aio::AIOService::instance()->cancelPostedCalls( this->m_socket, waitForRunningHandlerCompletion );
             }
+
+            --this->m_socket->impl()->terminated;
             return;
         }
 
@@ -261,7 +281,7 @@ public:
         }
         else
         {
-            //TODO #ak AIO engine does not support truely async cancellation yet
+            //TODO #ak AIO engine does not support truly async cancellation yet
             assert( waitForRunningHandlerCompletion );
         }
     }
@@ -324,7 +344,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            QnMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etWrite );
         };
@@ -345,7 +365,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            QnMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( recvAsyncCallCounterBak == m_recvAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etRead );
         };
@@ -369,7 +389,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            QnMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etWrite );
         };
@@ -389,7 +409,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            QnMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( registerTimerCallCounterBak == m_registerTimerCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etTimedOut );
         };
@@ -557,21 +577,133 @@ private:
             return false;
         assert( isNonBlockingModeEnabled );
 #endif
-        if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
-            return false;
-        //if( !m_abstractSocketPtr->connect( addr.address.toString(), addr.port, sendTimeout ) )
-        if( !m_abstractSocketPtr->connect( resolvedAddress, sendTimeout ) )
-            return false;
 
 #ifdef _DEBUG
         assert( !m_asyncSendIssued );
         m_asyncSendIssued = true;
 #endif
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
+            return false;
+
+        QnMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
-        return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etWrite, this );
+        return aio::AIOService::instance()->watchSocketNonSafe(
+            this->m_socket,
+            aio::etWrite,
+            this,
+            boost::optional<unsigned int>(),
+            [this, resolvedAddress, sendTimeout](){ m_abstractSocketPtr->connect( resolvedAddress, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
     }
+};
+
+
+
+template <class SocketType>
+class AsyncServerSocketHelper
+:
+    public aio::AIOEventHandler<SocketType>
+{
+public:
+    AsyncServerSocketHelper(SocketType* _sock, AbstractStreamServerSocket* _abstractServerSocket)
+    :
+        m_sock(_sock),
+        m_abstractServerSocket(_abstractServerSocket),
+        m_threadHandlerIsRunningIn(NULL),
+        m_acceptAsyncCallCount(0),
+        m_terminatedFlagPtr(nullptr)
+    {
+    }
+
+    ~AsyncServerSocketHelper()
+    {
+        //NOTE removing socket not from completion handler while completion handler is running in another thread is undefined behavour, so no synchronization here
+        if( m_terminatedFlagPtr )
+            *m_terminatedFlagPtr = true;
+    }
+
+    void terminate()
+    {
+        cancelAsyncIO(true);
+    }
+
+    virtual void eventTriggered(SocketType* sock, aio::EventType eventType) throw() override
+    {
+        assert(m_acceptHandler);
+
+        bool terminated = false;    //set to true just before object destruction
+        m_terminatedFlagPtr = &terminated;
+        m_threadHandlerIsRunningIn.store( QThread::currentThreadId(), std::memory_order_release );
+        const int acceptAsyncCallCountBak = m_acceptAsyncCallCount;
+        auto acceptHandlerBak = std::move( m_acceptHandler );
+
+        auto acceptHandlerBakLocal = [this, sock, acceptHandlerBak, &terminated, acceptAsyncCallCountBak]( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection ){
+            acceptHandlerBak( errorCode, newConnection );
+            if( terminated )
+                return;
+            //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
+            QnMutexLocker lk( aio::AIOService::instance()->mutex() );
+            if( m_acceptAsyncCallCount == acceptAsyncCallCountBak )
+                aio::AIOService::instance()->removeFromWatchNonSafe(sock, aio::etRead);
+            m_threadHandlerIsRunningIn.store( nullptr, std::memory_order_release );
+        };
+
+        switch( eventType )
+        {
+            case aio::etRead:
+            {
+                //accepting socket
+                AbstractStreamSocket* newSocket = m_abstractServerSocket->accept();
+                acceptHandlerBakLocal(
+                    newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
+                    newSocket);
+                break;
+            }
+
+            case aio::etReadTimedOut:
+                acceptHandlerBakLocal(SystemError::timedOut, nullptr);
+                break;
+
+            case aio::etError:
+            {
+                SystemError::ErrorCode errorCode = SystemError::noError;
+                sock->getLastError(&errorCode);
+                acceptHandlerBakLocal(errorCode, nullptr);
+                break;
+            }
+
+            default:
+                assert(false);
+                break;
+        }
+    }
+
+    bool acceptAsync(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
+    {
+        m_acceptHandler = std::move(handler);
+
+        QnMutexLocker lk( aio::AIOService::instance()->mutex() );
+        ++m_acceptAsyncCallCount;
+        //TODO: #ak usually acceptAsyncImpl is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
+        return aio::AIOService::instance()->watchSocketNonSafe(m_sock, aio::etRead, this);
+    }
+
+    void cancelAsyncIO(bool waitForRunningHandlerCompletion)
+    {
+        aio::AIOService::instance()->removeFromWatch(m_sock, aio::etRead, waitForRunningHandlerCompletion);
+        if( m_threadHandlerIsRunningIn.load( std::memory_order_acquire ) == QThread::currentThreadId() )
+            ++m_acceptAsyncCallCount;     //we are in aio thread, eventTriggered is down the stack
+        else
+            assert( waitForRunningHandlerCompletion );      //TODO #ak AIO engine does not support truly async cancellation yet
+    }
+
+private:
+    SocketType* m_sock;
+    AbstractStreamServerSocket* m_abstractServerSocket;
+    std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
+    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
+    std::atomic<int> m_acceptAsyncCallCount;
+    bool* m_terminatedFlagPtr;
 };
 
 #endif  //ASYNC_SOCKET_HELPER_H
