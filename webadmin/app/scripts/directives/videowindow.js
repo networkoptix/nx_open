@@ -49,7 +49,7 @@ angular.module('webadminApp')
                 function detectBestFormat(){
                     //This function gets available sources for camera and chooses the best player for this browser
 
-                    return "rtsp"; // To debug some format - force it to work TODO: remove this hack in production
+                    //return "rtsp"; // To debug some format - force it to work
 
                     //We have options:
                     // webm - for good desktop browsers
@@ -70,13 +70,14 @@ angular.module('webadminApp')
                         return res;
                     }
                     var weHaveWebm = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['webm'];});
-
+                    var weHaveHls = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['hls'];});
+                    var weHaveRtsp = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['rtsp'];});
 
                     if(weHaveWebm && canPlayNatively("webm")){ // webm is our best format for now
                         return "webm";
                     }
 
-                    if(window.jscd.mobile){
+                    if(window.jscd.mobile && weHaveHls){
                         return "native-hls"; // Only one choice on mobile
                     }
 
@@ -89,7 +90,7 @@ angular.module('webadminApp')
                                 scope.ieNoWebm = true;
                             }
 
-                            if(window.jscd.browserMajorVersion>=10){
+                            if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }
 
@@ -104,9 +105,16 @@ angular.module('webadminApp')
                             if(window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
                                 return "flashls";
                             }
-                            return "jshls";// We are hoping that we have some good browser
+                            if(weHaveHls) {
+                                return "jshls";// We are hoping that we have some good browser
+                            }
+                            if(weHaveRtsp){
+                                return "rtsp";
+                            }
+                            return false; // IE9 - No supported formats
                     }
 
+                    return false; // No supported formats
                 }
 
 

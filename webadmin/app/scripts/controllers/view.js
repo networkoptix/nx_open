@@ -13,11 +13,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.availableFormats = [
             'Auto',
             'video/webm',
-            'video/mp4',
             'application/x-mpegURL',
-            'video/MP2T',
-            'video/3gpp',
-            'video/x-motion-jpeg'
+            'application/x-rtsp'
         ];
 
         $scope.settings = {id: null};
