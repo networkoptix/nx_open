@@ -243,7 +243,7 @@
                 </property>
                 <file>
                     <missing>customization/${customization}/mobile.skip</missing>
-                </file>                
+                </file>
             </activation>
             <modules>
                 <module>android-client/protobuf-classes</module>
@@ -263,7 +263,7 @@
                 </property>
                 <file>
                     <missing>customization/${customization}/mobile.skip</missing>
-                </file>                 
+                </file>
             </activation>
             <modules>
                 <module>ios-client</module>
@@ -412,14 +412,14 @@
             </activation>
             <modules>
                 <module>axclient</module>
-                <module>plugins/nxinterface</module>     
-                <module>plugins/nxcontrol</module>     
-                <module>plugins/acs/paxton</module>     
-                <module>plugins/acs/paxton-installer</module>     
+                <module>plugins/nxinterface</module>
+                <module>plugins/nxcontrol</module>
+                <module>plugins/acs/paxton</module>
+                <module>plugins/acs/paxton-installer</module>
                 <!-- Uncomment this when 2.3.1_paxton is merged -->
                 <!-- <module>plugins/acs/paxton</module>
                 <module>plugins/acs/paxton-installer</module> -->
-            </modules>            
+            </modules>
         </profile>
 
         <profile>
@@ -603,7 +603,6 @@
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
-                <additional.defines>debug_in_release</additional.defines>
                 <modification>rpi</modification>
             </properties>
             <modules>
@@ -632,7 +631,6 @@
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
-                <additional.defines>debug_in_release</additional.defines>
                 <modification>bpi</modification>
             </properties>
             <modules>
