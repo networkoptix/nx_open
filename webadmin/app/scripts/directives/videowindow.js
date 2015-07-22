@@ -49,7 +49,7 @@ angular.module('webadminApp')
                 function detectBestFormat(){
                     //This function gets available sources for camera and chooses the best player for this browser
 
-                    //return "jshls"; // To debug some format - force it to work
+                    return "rtsp"; // To debug some format - force it to work TODO: remove this hack in production
 
                     //We have options:
                     // webm - for good desktop browsers
