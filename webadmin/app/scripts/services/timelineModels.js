@@ -32,10 +32,21 @@ function Interval (ms,seconds,minutes,hours,days,months,years){
     this.years = years;
     this.milliseconds = ms
 }
-
+if(!Number.isInteger) {
+    Number.isInteger = function (num) {
+        return (typeof num === 'number') && (Math.round(num) === num);
+    };
+}
+function isDate(val){
+    return val instanceof Date;
+}
 Interval.prototype.addToDate = function(date, count){
     if(Number.isInteger(date)) {
         date = new Date(date);
+    }
+    if(!isDate(date)){
+        console.error("non date " + (typeof date) + ": " + date , Number.isInteger(date) , ((date ^ 0) === date) , (date ^ 0));
+        return date;
     }
     if(typeof(count)==='undefined') {
         count = 1;
@@ -121,6 +132,10 @@ Interval.prototype.checkDate = function(date){
     if(Number.isInteger(date)) {
         date = new Date(date);
     }
+    if(!isDate(date)){
+        console.error("checkDate - non date" , date);
+        return false;
+    }
 
     return this.alignToPast(date).getTime() === date.getTime();
 };
@@ -182,6 +197,7 @@ var RulerModel = {
         return typeof(targetLevel)!=='undefined' ? RulerModel.levels.indexOf(targetLevel) : RulerModel.levels.length-1;
     },
 
+
     findBestLevelIndex:function(date){
         var idx = 0;
         var findLevel = function(level,index){
@@ -193,6 +209,9 @@ var RulerModel = {
         };
         _.find(RulerModel.levels,findLevel);
         return idx;
+    },
+    findBestLevel:function(date){
+        return this.levels[this.findBestLevelIndex(date)];
     }
 };
 
@@ -404,7 +423,8 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
                     console.warn("skipped contained chunk 1",chunk,parent.children[i],i,parent);
                     return; //Skip it
                 }
-                console.error("impossible situation 1 - intersection in chunks",chunk,parent.children[i],i,parent);
+                //TODO: uncomment back!
+                //console.error("impossible situation 1 - intersection in chunks",chunk,parent.children[i],i,parent);
                 return;
             }
 
@@ -416,7 +436,8 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
                         console.warn("skipped contained chunk 2",chunk,parent.children[i],i,parent);
                         return; //Skip it
                     }
-                    console.error("impossible situation 2 - intersection in chunks",chunk,parent.children[i],i,parent);
+                    //TODO: uncomment back!
+                    //console.error("impossible situation 2 - intersection in chunks",chunk,parent.children[i],i,parent);
                     return;
                 }
                 break;

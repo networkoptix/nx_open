@@ -41,7 +41,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
         function updateVideoSource(playing) {
-            console.log("init positionProvider ", playing);
             var live = !playing;
             if(live){
                 playing = (new Date()).getTime();
@@ -55,41 +54,42 @@ angular.module('webadminApp').controller('ViewCtrl',
             var cameraId = $scope.activeCamera.physicalId;
             var server = getCamerasServer($scope.activeCamera);
             var serverUrl = '';
-
+            var rtspUrl = 'rtsp://' + window.location.host;
 
             if ($scope.settings.id && ($scope.settings.id.replace('{', '').replace('}', '') !== server.id.replace('{', '').replace('}', ''))) {
-                serverUrl = '/proxy/' + getServerUrl(server);
+                serverUrl = '/proxy/' + window.location.protocol.replace(':','') + '/' + getServerUrl(server);
+                rtspUrl += '/proxy/rtsp/';
             }
 
-
-            var extParam = '';
             var mediaDemo = mediaserver.mediaDemo();
             if(mediaDemo){
                 serverUrl = mediaDemo;
-                extParam = Config.demoAuth;
-
+                rtspUrl = "rtsp:" + mediaDemo;
             }
-
+            var authParam = "&auth=" + mediaserver.authForMedia();
 
 
             var positionMedia = !live ? "&pos=" + (playing) : "";
             var positionHls = !live ? "&startTimestamp=" + (playing) : "";
 
             $scope.acitveVideoSource = _.filter([
-                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + extParam ), type: 'video/webm' },
-                { src: ( serverUrl + '/media/' + cameraId + '.mp4?resolution='    + $scope.activeResolution + positionMedia + extParam ), type: 'video/mp4' },
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls   + extParam ), type: 'application/x-mpegURL'},
-                { src: ( serverUrl + '/media/' + cameraId + '.mpegts?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: 'video/MP2T'},
-                { src: ( serverUrl + '/media/' + cameraId + '.3gp?resolution='    + $scope.activeResolution + positionMedia + extParam ), type: 'video/3gpp'},
-                { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: 'video/x-motion-jpeg'}
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?' + positionHls + authParam + '&chunked&hi'), type: 'application/x-mpegURL'},
+                //{ src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls   + extParam ), type: 'application/x-mpegURL'},
+                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + authParam ), type: 'video/webm' },
+
+                // require duration, download-only links
+                // { src: ( serverUrl + '/hls/'   + cameraId + '.mkv?resolution='    + $scope.activeResolution + positionHls   + extParam ), type: 'video/x-matroska'},
+                // { src: ( serverUrl + '/hls/'   + cameraId + '.ts?resolution='     + $scope.activeResolution + positionHls   + extParam ), type: 'video/MP2T'},
+
+                // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: 'video/x-motion-jpeg'},
+
+                // Require plugin
+                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + authParam ), type: 'application/x-rtsp'}
             ],function(src){
                 return $scope.activeFormat == 'Auto'|| $scope.activeFormat == src.type;
             });
 
-            console.log("video source", $scope.activeFormat, $scope.acitveVideoSource[0].src );
-
-
-            console.log($scope.acitveVideoSource);
+            console.log("video source", $scope.activeFormat, $scope.acitveVideoSource[0].src  , $scope.acitveVideoSource);
         }
 
         $scope.activeVideoRecords = null;
@@ -138,10 +138,12 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         $scope.switchPlaying = function(play){
-            if(play) {
-                $scope.playerAPI.play();
-            }else{
-                $scope.playerAPI.pause();
+            if($scope.playerAPI) {
+                if (play) {
+                    $scope.playerAPI.play();
+                } else {
+                    $scope.playerAPI.pause();
+                }
             }
             if( $scope.positionProvider) {
                 $scope.positionProvider.playing = play;

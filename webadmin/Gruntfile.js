@@ -450,7 +450,9 @@ module.exports = function (grunt) {
                             //'bower_components/**/*',
                             //'bower_components/videogular-themes-default/videogular.css',
                             'images/{,*/}*.{webp}',
-                            'fonts/*'
+                            'fonts/*',
+                            'components/*',
+                            'components/**/*'
                         ]
                     },
                     {
@@ -465,6 +467,17 @@ module.exports = function (grunt) {
                         flatten: true,
                         dest: '<%= yeoman.dist %>/fonts',
                         src: ['bower_components/sass-bootstrap/fonts/*']
+                    }
+                    ,
+                    {
+                        expand: true,
+                        cwd: '<%= yeoman.app %>',
+                        flatten: true,
+                        dest: '<%= yeoman.dist %>/components',
+                        src: ['bower_components/mediaelement/build/silverlightmediaelement.xap',
+                            'bower_components/mediaelement/build/flashmediaelement.swf',
+                            'bower_components/locomote/dist/Player.swf']
+
                     }
                 ]
             },

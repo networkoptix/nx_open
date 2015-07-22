@@ -89,6 +89,9 @@ angular.module('webadminApp')
             logUrl:function(params){
                 return proxy + '/api/showLog' + (params||'');
             },
+            authForMedia:function(){
+                return ipCookie('auth');
+            },
             previewUrl:function(cameraPhysicalId,time,width,height){
                 return proxy + '/api/image' +
                     '?physicalId=' + cameraPhysicalId +

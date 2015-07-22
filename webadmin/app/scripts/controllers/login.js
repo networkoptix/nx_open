@@ -38,8 +38,12 @@ angular.module('webadminApp')
                 var cnonce = md5("GET:");
                 var response = md5(hash1 + ':' + nonce + ':' + cnonce);
 
+                var auth = Base64.encode(lowercaseLogin + ':0:' + hash1)
+
+
                 ipCookie('response',response, { path: '/' });
                 ipCookie('username',lowercaseLogin, { path: '/' });
+                ipCookie('auth',auth, { path: '/' });
 
                 // Check auth again
                 $scope.authorizing = true;

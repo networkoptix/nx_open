@@ -2,6 +2,7 @@
   "name": "webadmin",
   "version": "0.0.0",
   "dependencies": {
+    "bower": "^1.4.1",
     "grunt-scp": "^0.1.8"
   },
   "devDependencies": {

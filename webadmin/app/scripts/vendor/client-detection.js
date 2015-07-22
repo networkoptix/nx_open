@@ -62,6 +62,9 @@
         else if (nAgt.indexOf('Trident/') != -1) {
             browser = 'Microsoft Internet Explorer';
             version = nAgt.substring(nAgt.indexOf('rv:') + 3);
+        }else if ((verOffset = nAgt.indexOf('webkit')) != -1) {
+            browser = 'Webkit';
+            version = nAgt.substring(verOffset + 8);
         }
         // Other browsers
         else if ((nameOffset = nAgt.lastIndexOf(' ') + 1) < (verOffset = nAgt.lastIndexOf('/'))) {
@@ -174,6 +177,8 @@
         screen: screenSize,
         browser: browser,
         browserVersion: version,
+        browserMajorVersion:majorVersion,
+        isWebkit:'',
         touch: touch,
         mobile: mobile,
         os: os,

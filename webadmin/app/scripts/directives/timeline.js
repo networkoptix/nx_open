@@ -81,6 +81,7 @@ angular.module('webadminApp')
                     topLabelBgColor: false,
                     topLabelBgOddColor: false,
                     topLabelPositionFix:0, //Vertical fix for position
+                    topLabelFixed: true,
 
 
                     labelAlign:"above",// center, left, above
@@ -96,6 +97,7 @@ angular.module('webadminApp')
                     labelBgColor: [28,35,39],
                     labelPositionFix:-5, //Vertical fix for position
                     labelMarkerHeight:22/110,
+                    labelFixed: true,
 
 
                     lowerMarkerAttach:"bottom", // top, bottom
@@ -152,6 +154,7 @@ angular.module('webadminApp')
                     topLabelBgColor: [33,42,47],
                     topLabelBgOddColor: [43,56,63],
                     topLabelPositionFix:0, //Vertical fix for position
+                    topLabelFixed: true,
 
 
                     labelAlign:"above",// center, left, above
@@ -167,6 +170,7 @@ angular.module('webadminApp')
                     labelBgColor: [28,35,39],
                     labelPositionFix:5, //Vertical fix for position
                     labelMarkerHeight:20/110,
+                    labelFixed: false,
 
                     lowerMarkerAttach:"top", // top, bottom
                     lowerMarksHeight:10/110,
@@ -308,6 +312,7 @@ angular.module('webadminApp')
                         targetTopLabelLevelIndex,
                         scope.changingTopLevel,
                         "topFormat",
+                        timelineConfig.topLabelFixed,
                         0,
                         timelineConfig.topLabelHeight,
                         timelineConfig.topLabelFont,
@@ -339,6 +344,7 @@ angular.module('webadminApp')
                         targetLabelLevelIndex,
                         scope.changingLevel,
                         "format",
+                        timelineConfig.labelFixed,
                         timelineConfig.topLabelHeight,
                         timelineConfig.labelHeight,
                         timelineConfig.labelFont,
@@ -372,6 +378,7 @@ angular.module('webadminApp')
                         targetLowerMarksLevelIndex,
                         scope.changingLowerMarksLevel,
                         false,// No format
+                        "none",
                         timelineConfig.topLabelHeight,
                         timelineConfig.labelHeight,
                         null,//font
@@ -385,7 +392,7 @@ angular.module('webadminApp')
                 }
 
                 function drawLabelsRow (context, currentLevelIndex, taretLevelIndex, animation,
-                                        labelFormat, levelTop, levelHeight,
+                                        labelFormat, labelFixed, levelTop, levelHeight,
                                         font, labelAlign, bgColor, bgOddColor, markColor, labelPositionFix, markAttach, markHeight){
 
                     var levelIndex = Math.max(currentLevelIndex, taretLevelIndex);
@@ -413,7 +420,7 @@ angular.module('webadminApp')
                             alpha =  animation;
                         }
                         drawLabel(context,start,level,alpha,
-                                        labelFormat, levelTop, levelHeight, font, labelAlign, odd?bgColor: bgOddColor, markColor, labelPositionFix, markAttach, markHeight);
+                                        labelFormat, labelFixed, levelTop, levelHeight, font, labelAlign, odd?bgColor: bgOddColor, markColor, labelPositionFix, markAttach, markHeight);
                         var newStart = level.interval.addToDate(start);
 
                         if(!(checkDate(start)|| checkDate(newStart))){
@@ -426,7 +433,7 @@ angular.module('webadminApp')
                     }
                 }
                 function drawLabel( context, date, level, alpha,
-                                        labelFormat, levelTop, levelHeight, font, labelAlign, bgColor, markColor, labelPositionFix, markAttach, markHeight){
+                                        labelFormat, labelFixed, levelTop, levelHeight, font, labelAlign, bgColor, markColor, labelPositionFix, markAttach, markHeight){
 
                     var coordinate = scope.scaleManager.dateToScreenCoordinate(date);
 
@@ -435,10 +442,12 @@ angular.module('webadminApp')
 
                         var nextDate = level.interval.addToDate(date);
                         var stopcoordinate = scope.scaleManager.dateToScreenCoordinate(nextDate);
-                        var nextLabel = dateFormat(new Date(nextDate), level[labelFormat]);
+                        var nextlevel = labelFixed?level:RulerModel.findBestLevel(nextDate)
+                        var nextLabel = dateFormat(new Date(nextDate), nextlevel[labelFormat]);
                         var nextWidth = context.measureText(nextLabel).width;
 
-                        var label = dateFormat(new Date(date), level[labelFormat]);
+                        var bestlevel = labelFixed?level:RulerModel.findBestLevel(date);
+                        var label = dateFormat(new Date(date), bestlevel[labelFormat]);
                         var textWidth = context.measureText(label).width;
 
                         var textStart = levelTop * scope.viewportHeight // Top border
