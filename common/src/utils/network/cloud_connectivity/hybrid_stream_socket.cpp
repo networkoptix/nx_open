@@ -88,7 +88,9 @@ namespace nx_cc
 
     void CloudStreamSocket::onResolveDone( std::vector<nx_cc::DnsEntry> dnsEntries )
     {
-        if( !startAsyncConnect( std::move( dnsEntries ) ) )
+        //TODO #ak which port shell we actually use???
+        int port = 0;
+        if( !startAsyncConnect( std::move( dnsEntries ), port ) )
         {
             auto connectHandlerBak = std::move( m_connectHandler );
             connectHandlerBak( SystemError::getLastOSErrorCode() );

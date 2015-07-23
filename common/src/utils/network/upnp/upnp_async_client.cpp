@@ -178,7 +178,7 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
         callback( Message() );
     };
 
-    const auto httpClient = std::make_shared< nx_http::AsyncHttpClient >();
+    const auto httpClient = nx_http::AsyncHttpClient::create();
     httpClient->addAdditionalHeader( "SOAPAction", action.toUtf8() );
     httpClient->setMessageBodyReadTimeoutMs( MESSAGE_BODY_READ_TIMEOUT_MS );
     QObject::connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
@@ -276,7 +276,7 @@ bool AsyncClient::MappingInfo::isValid() const
 
 bool AsyncClient::getMapping(
         const QUrl& url, quint32 index,
-        std::function< void( const MappingInfo& ) > callback )
+        std::function< void( MappingInfo ) > callback )
 {
     AsyncClient::Message request;
     request.action = GET_GEN_PORT_MAPPING;
@@ -299,7 +299,7 @@ bool AsyncClient::getMapping(
 
 bool AsyncClient::getMapping(
         const QUrl& url, quint16 externalPort, Protocol protocol,
-        std::function< void( const MappingInfo& ) > callback )
+        std::function< void( MappingInfo ) > callback )
 {
     AsyncClient::Message request;
     request.action = GET_SPEC_PORT_MAPPING;
@@ -323,9 +323,9 @@ bool AsyncClient::getMapping(
 
 void fetchMappingsRecursive(
         AsyncClient* client, const QUrl& url,
-        const std::function< void( const AsyncClient::MappingList& ) >& callback,
+        const std::function< void( AsyncClient::MappingList ) >& callback,
         std::shared_ptr< AsyncClient::MappingList > collected,
-        const AsyncClient::MappingInfo& newMap )
+        AsyncClient::MappingInfo newMap )
 {
     if( !newMap.isValid() )
     {
@@ -336,8 +336,10 @@ void fetchMappingsRecursive(
     collected->push_back( std::move( newMap ) );
     if( !client->getMapping( url, collected->size(),
                              [ client, url, callback, collected ]
-                             ( const AsyncClient::MappingInfo& nextMap )
-        { fetchMappingsRecursive( client, url, callback, collected, nextMap ); } ) )
+                             ( AsyncClient::MappingInfo nextMap )
+        {
+            fetchMappingsRecursive( client, url, callback, collected, std::move(nextMap) );
+        } ) )
     {
         // return what we have rather then nothing
         callback( std::move( *collected ) );
@@ -345,13 +347,13 @@ void fetchMappingsRecursive(
 }
 
 bool AsyncClient::getAllMappings(
-        const QUrl& url, std::function< void( const MappingList& ) > callback )
+        const QUrl& url, std::function< void( MappingList ) > callback )
 {
     auto mappings = std::make_shared< std::vector< MappingInfo > >();
     return getMapping( url, 0,
-                       [ this, url, callback, mappings ]( const MappingInfo& newMap )
+                       [ this, url, callback, mappings ]( MappingInfo newMap )
     {
-        fetchMappingsRecursive( this, url, callback, mappings, newMap );
+        fetchMappingsRecursive( this, url, callback, mappings, std::move(newMap) );
     } );
 }
 

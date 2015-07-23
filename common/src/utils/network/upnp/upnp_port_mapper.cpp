@@ -42,13 +42,13 @@ PortMapper::MappingInfo::MappingInfo( quint16 inPort, quint16 exPort,
 
 bool PortMapper::enableMapping(
         quint16 port, Protocol protocol,
-        std::function< void( const MappingInfo& ) > callback )
+        std::function< void( MappingInfo ) > callback )
 {
     const auto request = std::make_pair( port, protocol );
 
     QMutexLocker lock( &m_mutex );
     if( !m_mappings.emplace( request, std::make_shared< Callback >(
-                                 std::move( callback ) ) ).second )
+                             std::move( callback ) ) ).second )
         return false; // port already mapped
 
     // ask to map this port on all known devices

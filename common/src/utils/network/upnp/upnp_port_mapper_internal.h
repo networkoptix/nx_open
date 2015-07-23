@@ -9,15 +9,14 @@ namespace nx_upnp {
 class PortMapper::Callback
 {
 public:
-    Callback( std::function< void( const MappingInfo& ) > callback );
-    void call( const MappingInfo& info );
+    Callback( std::function< void( MappingInfo ) > callback );
+    void call( MappingInfo info );
     void clear();
-    MappingInfo state();
 
 private:
     QMutex m_mutex;
-    MappingInfo m_state;
-    std::function< void( const MappingInfo& ) > m_callback;
+    SocketAddress m_external;
+    std::function< void( MappingInfo ) > m_callback;
 };
 
 //! slowes down requests in case of failures

@@ -13,14 +13,14 @@ class PortMapping
     quint32 timeLeft();
 };
 
+/*
 class NatPnpPortMapper
 {
 public:
     NatPnpPortMapper(const HostAddress& server);
-    /**  */
-    virtual bool mapPort(PortMapping& portMapping) override;
 
-    std::function<PortMapper
+    virtual bool mapPort(PortMapping& portMapping);
 };
+*/
 
 #endif // PORT_MAPPER_H

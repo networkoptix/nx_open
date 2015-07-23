@@ -14,21 +14,21 @@ static const quint16 PORT_RETRY_COUNT = 5; // maximal number of ports to try ope
 
 namespace nx_upnp {
 
-PortMapper::Callback::Callback( std::function< void( const MappingInfo& ) > callback )
+PortMapper::Callback::Callback( std::function< void( MappingInfo ) > callback )
     : m_callback( std::move( callback ) )
 {
 }
 
-void PortMapper::Callback::call( const MappingInfo& info )
+void PortMapper::Callback::call( MappingInfo info )
 {
     QMutexLocker lk( &m_mutex );
     if( !m_callback || (
-                m_state.externalIp == info.externalIp &&
-                m_state.externalPort == info.externalPort ) )
+                m_external.address == info.externalIp &&
+                m_external.port == info.externalPort ) )
         return;
 
-    m_state = info;
-    m_callback( info );
+    m_external = SocketAddress(info.externalIp, info.externalPort );
+    m_callback( std::move(info) );
 }
 
 void PortMapper::Callback::clear()
@@ -103,7 +103,7 @@ bool PortMapper::Device::map(
 
     const bool result = m_upnpClient->getAllMappings( m_url,
         [ this, port, desiredPort, protocol, callback ]
-            ( const AsyncClient::MappingList& list )
+            ( AsyncClient::MappingList list )
     {
         QMutexLocker lk( &m_mutex );
         for( const auto mapping : list )
@@ -171,7 +171,7 @@ bool PortMapper::Device::check( quint16 port, Protocol protocol,
     const auto external = it->second;
     return m_upnpClient->getMapping(
         m_url, external, protocol,
-        [ this, port, external, protocol, callback ]( const AsyncClient::MappingInfo& info )
+        [ this, port, external, protocol, callback ]( AsyncClient::MappingInfo info )
     {
         QMutexLocker lk( &m_mutex );
         if( info.internalPort == port &&

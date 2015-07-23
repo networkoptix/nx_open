@@ -93,6 +93,7 @@ bool Router::parseMapResponse(const QByteArray& response, Mapping& mapping)
 
     mapping.lifeTime = QDateTime::currentDateTime().toTime_t() + header.lifeTime;
     mapping.external = SocketAddress(HostAddress(message.externalIp), message.externalPort);
+    return true;
 }
 
 } // namespace pcp

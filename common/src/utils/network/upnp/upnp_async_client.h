@@ -77,17 +77,17 @@ public:
     //! Provides mapping info by @param index
     virtual
     bool getMapping( const QUrl& url, quint32 index,
-                     std::function< void( const MappingInfo& ) > callback );
+                     std::function< void( MappingInfo ) > callback );
 
     //! Provides mapping info by @param externalPort and @param protocol
     virtual
     bool getMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
-                     const std::function< void( const MappingInfo& ) > callback );
+                     std::function< void( MappingInfo ) > callback );
 
     typedef std::vector< MappingInfo > MappingList;
 
     bool getAllMappings( const QUrl& url,
-                         std::function< void( const MappingList& ) > callback  );
+                         std::function< void( MappingList ) > callback  );
 
 private:
     // TODO: replace with single httpClient when pipeline is supported
