@@ -13,6 +13,7 @@
 #include "cloud_tunnel.h"
 #include "dns_table.h"
 
+
 namespace nx_cc
 {
     //!Socket that is able to use hole punching (tcp or udp) and mediator to establish connection
@@ -42,12 +43,13 @@ namespace nx_cc
     private:
         std::unique_ptr<AbstractStreamSocket> m_socketDelegate;
         std::function<void( SystemError::ErrorCode )> m_connectHandler;
-        SocketAddress m_remoteAddr;
 
         void applyCachedAttributes();
         bool instanciateSocket( const nx_cc::DnsEntry& dnsEntry );
         void onResolveDone( std::vector<nx_cc::DnsEntry> dnsEntries );
-        bool startAsyncConnect( std::vector<nx_cc::DnsEntry>&& dnsEntries );
+        bool startAsyncConnect(
+            std::vector<nx_cc::DnsEntry>&& dnsEntries,
+            int port );
         void cloudConnectDone(
             std::shared_ptr<CloudTunnel> tunnel,
             nx_cc::ErrorDescription errorCode,

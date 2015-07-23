@@ -44,12 +44,19 @@ namespace nx_cc
 
         using namespace std::placeholders;
         m_connectHandler = std::move(handler);
-        m_remoteAddr = addr;
         std::vector<nx_cc::DnsEntry> dnsEntries;
+        const int remotePort = addr.port;
         const DnsTable::ResolveResult result = DnsTable::instance()->resolveAsync(
             addr.address,
             &dnsEntries,
-            std::bind(&CloudStreamSocket::onResolveDone, this, _1) );
+            [this, remotePort]( std::vector<nx_cc::DnsEntry> dnsEntries )
+            {
+                if( !startAsyncConnect( std::move( dnsEntries ), remotePort ) )
+                {
+                    auto connectHandlerBak = std::move( m_connectHandler );
+                    connectHandlerBak( SystemError::getLastOSErrorCode() );
+                }
+            } );
         switch( result )
         {
             case DnsTable::ResolveResult::done:
@@ -66,7 +73,7 @@ namespace nx_cc
                 return false;
         }
 
-        if( startAsyncConnect( std::move( dnsEntries ) ) )
+        if( startAsyncConnect( std::move( dnsEntries ), addr.port ) )
             return true;
 
         //resetting handler, since it may hold some resources
@@ -88,7 +95,9 @@ namespace nx_cc
         }
     }
 
-    bool CloudStreamSocket::startAsyncConnect( std::vector<nx_cc::DnsEntry>&& dnsEntries )
+    bool CloudStreamSocket::startAsyncConnect(
+        std::vector<nx_cc::DnsEntry>&& dnsEntries,
+        int port )
     {
         if( dnsEntries.empty() )
         {
@@ -97,7 +106,7 @@ namespace nx_cc
         }
 
         //TODO #ak should prefer regular address to a cloud one
-        const nx_cc::DnsEntry& dnsEntry = dnsEntries[0];
+        nx_cc::DnsEntry& dnsEntry = dnsEntries[0];
         switch( dnsEntry.addressType )
         {
             case nx_cc::AddressType::regular:
@@ -105,7 +114,7 @@ namespace nx_cc
                 m_socketDelegate.reset( new TCPSocket() );
                 applyCachedAttributes();
                 return m_socketDelegate->connectAsync(
-                    SocketAddress(dnsEntry.address, m_remoteAddr.port),
+                    SocketAddress(std::move(dnsEntry.address), port),
                     m_connectHandler );
 
             case nx_cc::AddressType::cloud:
@@ -116,7 +125,8 @@ namespace nx_cc
                     return false;
 
                 //establishing cloud connect
-                auto tunnel = CloudTunnelPool::instance()->getTunnelToHost( dnsEntry.address );
+                auto tunnel = CloudTunnelPool::instance()->getTunnelToHost(
+                    SocketAddress( std::move( dnsEntry.address ), port ) );
                 return tunnel->connect(
                     sockSendTimeout,
                     [this, tunnel](

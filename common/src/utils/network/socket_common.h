@@ -95,6 +95,13 @@ public:
     {
     }
 
+    SocketAddress( HostAddress&& _address, unsigned short _port = 0 )
+    :
+        address( std::move(_address) ),
+        port( _port )
+    {
+    }
+
     SocketAddress( const QString& str )
     :
         port( 0 )
@@ -123,7 +130,19 @@ public:
         return address == rhs.address && port == rhs.port;
     }
 
-    bool isNull() const { return address == HostAddress() && port == 0; }
+    bool operator<( const SocketAddress& rhs ) const
+    {
+        if( address < rhs.address )
+            return true;
+        if( rhs.address < address )
+            return false;
+        return port < rhs.port;
+    }
+
+    bool isNull() const
+    {
+        return address == HostAddress() && port == 0;
+    }
 };
 
 inline bool operator!=( const SocketAddress& lhs, const SocketAddress& rhs ) {

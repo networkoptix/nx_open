@@ -70,7 +70,7 @@ namespace nx_cc
     //    - udt tunnel (no matter hole punching is used or not)
     //    - tcp with hole punching
     //Last type of tunnel does not allow us to have multiple connections per tunnel (really?)
-        
+
 
     //!Tunnel between two peers. Tunnel can be established by backward TCP connection or by hole punching UDT connection
     /*!
@@ -93,8 +93,9 @@ namespace nx_cc
         public QnStoppableAsync
     {
     public:
+        //!Initializer
         /*!
-            MUST call \a CloudTunnel::start after creating this object
+            \note MUST call \a CloudTunnel::start after creating this object
         */
         CloudTunnel( std::unique_ptr<AbstractTunnelConnector> connector )
         :
@@ -185,11 +186,11 @@ namespace nx_cc
             Always returns not null tunnel.
             If tunnel does not exist, allocates new tunnel object, initiates cloud connection and returns tunnel object
         */
-        std::shared_ptr<CloudTunnel> getTunnelToHost( const HostAddress& targetHost );
+        std::shared_ptr<CloudTunnel> getTunnelToHost( const SocketAddress& targetEndpoint );
 
     private:
         QMutex m_mutex;
-        std::map< HostAddress, std::shared_ptr<CloudTunnel> > m_Pool;
+        std::map< SocketAddress, std::shared_ptr<CloudTunnel> > m_Pool;
     };
 }
 

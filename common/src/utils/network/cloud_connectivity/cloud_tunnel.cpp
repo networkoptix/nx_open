@@ -8,7 +8,9 @@
 
 namespace nx_cc
 {
-    void CloudTunnel::tunnelEstablished( nx_cc::ErrorDescription /*result*/, std::unique_ptr<AbstractStreamSocket> socket )
+    void CloudTunnel::tunnelEstablished(
+        nx_cc::ErrorDescription /*result*/,
+        std::unique_ptr<AbstractStreamSocket> socket )
     {
         //TODO
         m_tunnelSocket = std::move(socket);
@@ -26,7 +28,10 @@ namespace nx_cc
         if( m_pendingConnectionRequests.empty() )
             return;
 
-        auto connectionDoneHandler = [this]( nx_cc::ErrorDescription result, std::unique_ptr<AbstractStreamSocket> socket ) {
+        auto connectionDoneHandler = [this](
+            nx_cc::ErrorDescription result,
+            std::unique_ptr<AbstractStreamSocket> socket )
+        {
             assert( !m_pendingConnectionRequests.empty() );
             auto handler = std::move(m_pendingConnectionRequests.front().completionHandler);
             handler( result, std::move(socket) );
@@ -41,22 +46,25 @@ namespace nx_cc
             for( ConnectionRequest& connectionRequest: m_pendingConnectionRequests )
             {
                 auto handler = std::move(connectionRequest.completionHandler);
-                handler( nx_cc::ErrorDescription( nx_cc::ResultCode::ioError, sysErrorCode ), std::unique_ptr<AbstractStreamSocket>() );
+                handler(
+                    nx_cc::ErrorDescription( nx_cc::ResultCode::ioError, sysErrorCode ),
+                    std::unique_ptr<AbstractStreamSocket>() );
             }
             return;
         }
     }
 
     std::shared_ptr<CloudTunnel> CloudTunnelPool::getTunnelToHost(
-            const HostAddress& targetHost )
+        const SocketAddress& targetEndpoint )
     {
         QMutexLocker lock( &m_mutex );
-        auto it = m_Pool.find( targetHost );
-        if( it == m_Pool.end() )
-            it = m_Pool.insert( std::make_pair(
-                // TODO: #ak implementation?
-                targetHost, std::shared_ptr<CloudTunnel>() ) ).first;
+        auto it = m_Pool.find( targetEndpoint.address );
+        if( it != m_Pool.end() )
+            return it->second;
 
+        //TODO #ak creating tunnel
+
+        it = m_Pool.emplace( targetEndpoint, std::shared_ptr<CloudTunnel>() ).first;
         return it->second;
     }
 }
