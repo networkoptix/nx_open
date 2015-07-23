@@ -5,14 +5,11 @@
 #include "api/model/audit/audit_record.h"
 #include "events/events_db.h"
 #include "recording/time_period.h"
+#include "rest/server/json_rest_result.h"
 
-int QnAuditLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnAuditLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& contentBody, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path);
-    Q_UNUSED(params);
-    Q_UNUSED(result);
-    Q_UNUSED(contentType);
-
 
     QnUuid sessionId = QnUuid(params.value("sessionId"));
     QnTimePeriod period;
@@ -24,6 +21,6 @@ int QnAuditLogRestHandler::executeGet(const QString& path, const QnRequestParamL
 
     QnAuditRecordList outputData = qnEventsDB->getAuditData(period, sessionId);
 
-    QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType);
+    QnFusionRestHandlerDetail::serializeRestReply(outputData, params, contentBody, contentType, QnRestResult());
     return nx_http::StatusCode::ok;
 }

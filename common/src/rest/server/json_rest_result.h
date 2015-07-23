@@ -4,8 +4,9 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
-#include <utils/serialization/json.h>
 #include <utils/common/model_functions_fwd.h>
+#include <utils/serialization/json.h>
+
 
 // TODO: #MSAPI rename to QnRestResult.
 // 
@@ -19,7 +20,7 @@
 // description of the error.
 // 
 
-class QnJsonRestResult {
+class QnRestResult {
 public:
     enum Error {
         NoError = 0,
@@ -28,7 +29,7 @@ public:
         CantProcessRequest = 3,
     };
 
-    QnJsonRestResult();
+    QnRestResult();
 
     const QString &errorString() const;
     void setErrorString(const QString &errorString);
@@ -36,7 +37,21 @@ public:
     void setError(Error error);
     void setError(Error error, const QString &errorString);
 
-    const QJsonValue &reply() const;
+protected:
+    QN_FUSION_ENABLE_PRIVATE();
+    QString m_errorString;
+    Error m_error;
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnRestResult::Error)
+
+
+class QnJsonRestResult: public QnRestResult {
+public:
+    QnJsonRestResult(): QnRestResult() {}
+    QnJsonRestResult(const QnRestResult& base): QnRestResult(base) {}
+
+
+    const QJsonValue &reply() const { return m_reply; }
 
     template<class T>
     void setReply(const T &reply) {
@@ -51,12 +66,31 @@ public:
 
 private:
     QN_FUSION_ENABLE_PRIVATE();
-
-    QString m_errorString;
-    Error m_error;
     QJsonValue m_reply;
 };
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnJsonRestResult::Error)
+class QnUbjsonRestResult: public QnRestResult {
+public:
+    QnUbjsonRestResult(): QnRestResult() {}
+    QnUbjsonRestResult(const QnRestResult& base): QnRestResult(base) {}
+
+
+    const QByteArray &reply() const { return m_reply; }
+
+    template<class T>
+    void setReply(const T &reply) {
+        m_reply = QnUbjson::serialized(reply);
+    }
+
+    void setReply(const QByteArray &reply) {
+        m_reply = reply;
+    }
+
+    QN_FUSION_DECLARE_FUNCTIONS(QnUbjsonRestResult, (ubjson), friend)
+
+private:
+    QN_FUSION_ENABLE_PRIVATE();
+    QByteArray m_reply;
+};
 
 #endif // QN_JSON_REST_RESULT_H

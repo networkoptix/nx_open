@@ -28,11 +28,12 @@ struct QnAuditRecord
     QString userName;
     QString userHost;
 };
-typedef std::vector<QnAuditRecord> QnAuditRecordList;
+typedef QVector<QnAuditRecord> QnAuditRecordList;
 
 
 #define QnAuditRecord_Fields (timestamp)(endTimestamp)(eventType)(resources)(extraParams)(sessionId)(userName)(userHost)
 Q_DECLARE_METATYPE(QnAuditRecord)
+Q_DECLARE_METATYPE(QnAuditRecordList)
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnAuditRecord), (ubjson)(xml)(json)(csv_record)(eq)(sql_record))

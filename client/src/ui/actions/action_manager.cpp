@@ -500,6 +500,11 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(qnSkin->icon("events/log.png")).
         text(tr("Event Log..."));
 
+    factory(Qn::OpenAuditLogAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Audit Log..."));
+
     factory(Qn::OpenBusinessRulesAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).

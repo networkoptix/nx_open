@@ -88,6 +88,7 @@ namespace {
         (ConfigureObject,          "configure")
         (PingSystemObject,         "pingSystem")
         (RecordingStatsObject,     "recStats")
+        (AuditLogObject,           "auditLog")
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
@@ -290,6 +291,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case RecordingStatsObject:
         processJsonReply<QnRecordingStatsReply>(this, response, handle);
+        break;
+    case AuditLogObject:
+        processJsonReply<QnAuditRecordList>(this, response, handle);
         break;
     case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
@@ -845,6 +849,13 @@ int QnMediaServerConnection::getRecordingStatisticsAsync(qint64 bitrateAnalizePe
     QnRequestParamList params;
     params << QnRequestParam("bitrateAnalizePeriodMs", bitrateAnalizePeriodMs);
     return sendAsyncGetRequest(RecordingStatsObject, params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
+}
+
+int QnMediaServerConnection::getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("startTimeMs", startTimeMs);
+    params << QnRequestParam("endTimeMs", endTimeMs);
+    return sendAsyncGetRequest(AuditLogObject, params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
 
 int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {

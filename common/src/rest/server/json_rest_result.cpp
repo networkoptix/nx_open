@@ -2,41 +2,40 @@
 
 #include <utils/common/model_functions.h>
 
-QnJsonRestResult::QnJsonRestResult(): 
+QnRestResult::QnRestResult(): 
     m_error(NoError) 
 {}
 
-const QString &QnJsonRestResult::errorString() const {
+const QString &QnRestResult::errorString() const {
     return m_errorString;
 }
 
-void QnJsonRestResult::setErrorString(const QString &errorText) {
+void QnRestResult::setErrorString(const QString &errorText) {
     m_errorString = errorText;
 }
 
-QnJsonRestResult::Error QnJsonRestResult::error() const {
+QnRestResult::Error QnRestResult::error() const {
     return m_error;
 }
 
-void QnJsonRestResult::setError(Error error) {
+void QnRestResult::setError(Error error) {
     m_error = error;
 }
 
-void QnJsonRestResult::setError(Error error, const QString &errorText) {
+void QnRestResult::setError(Error error, const QString &errorText) {
     m_error = error;
     m_errorString = errorText;
 }
 
-const QJsonValue &QnJsonRestResult::reply() const {
-    return m_reply;
-}
+QN_FUSION_DEFINE_FUNCTIONS(QnRestResult::Error, (numeric))
 
-QN_FUSION_DEFINE_FUNCTIONS(QnJsonRestResult::Error, (numeric))
-
-QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnJsonRestResult, 
+QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnRestResult, 
     (json),
-    ((&QnJsonRestResult::m_error,       &QnJsonRestResult::m_error,         "error"))
-    ((&QnJsonRestResult::m_errorString, &QnJsonRestResult::m_errorString,   "errorString"))
-    ((&QnJsonRestResult::m_reply,       &QnJsonRestResult::m_reply,         "reply"))
+    ((&QnRestResult::m_error,       &QnRestResult::m_error,         "error"))
+    ((&QnRestResult::m_errorString, &QnRestResult::m_errorString,   "errorString"))
 )
 
+QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnJsonRestResult, 
+(json),
+((&QnJsonRestResult::m_reply,       &QnJsonRestResult::m_reply,         "reply"))
+)

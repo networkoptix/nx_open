@@ -7,6 +7,7 @@
 #include "utils/network/http/httptypes.h"
 #include <utils/common/model_functions.h>
 #include "utils/common/util.h"
+#include "json_rest_result.h"
 
 namespace QnFusionRestHandlerDetail
 {
@@ -37,6 +38,35 @@ namespace QnFusionRestHandlerDetail
         }
         contentType = Qn::serializationFormatToHttpContentType(format);
     }
+
+    template <class OutputData>
+    void serializeRestReply(const OutputData& outputData, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestResult& _restResult)
+    {
+        Qn::SerializationFormat format = formatFromParams(params);
+        switch(format) 
+        {
+        case Qn::UbjsonFormat:
+            {
+                QnUbjsonRestResult restReply(_restResult);
+                restReply.setReply(outputData);
+                result = QnUbjson::serialized(outputData);
+                break;
+            }
+        case Qn::JsonFormat:
+            {
+                QnJsonRestResult restReply(_restResult);
+                restReply.setReply(outputData);
+                result = QJson::serialized(result);
+                if (params.contains(lit("extraFormatting")))
+                    formatJSonString(result);
+                break;
+            }
+        default:
+            break; // not implemented, no content data
+        }
+        contentType = Qn::serializationFormatToHttpContentType(format);
+    }
+
 }
 
 class QnFusionRestHandler: public QnRestRequestHandler

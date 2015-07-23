@@ -245,6 +245,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnUuid>( "QnUuid" );
     qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
     qRegisterMetaType<QnRecordingStatsReply>();
+    qRegisterMetaType<QnAuditRecordList>();
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

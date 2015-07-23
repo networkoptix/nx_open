@@ -1,0 +1,272 @@
+#include "audit_log_dialog.h"
+#include "ui_audit_log_dialog.h"
+
+#include <QtCore/QMimeData>
+#include <QtGui/QClipboard>
+#include <QtWidgets/QMenu>
+#include <QtGui/QMouseEvent>
+
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+
+
+#include <client/client_globals.h>
+#include <client/client_settings.h>
+
+#include <plugins/resource/server_camera/server_camera.h>
+#include <ui/actions/action_manager.h>
+
+#include <ui/common/grid_widget_helper.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/models/audit_log_model.h>
+#include <ui/style/resource_icon_cache.h>
+#include <ui/style/skin.h>
+#include <ui/style/warning_style.h>
+
+#include <ui/workbench/workbench_context.h>
+#include <ui/workaround/widgets_signals_workaround.h>
+#include "utils/common/event_processors.h"
+
+namespace {
+    const int ProlongedActionRole = Qt::UserRole + 2;
+}
+
+
+QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
+    base_type(parent),
+    ui(new Ui::AuditLogDialog),
+    m_updateDisabled(false),
+    m_dirty(false)
+{
+    ui->setupUi(this);
+    setWarningStyle(ui->warningLabel);
+
+    //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
+
+
+    m_model = new QnAuditLogSessionModel(this);
+    ui->gridMaster->setModel(m_model);
+
+    QDate dt = QDateTime::currentDateTime().date();
+    ui->dateEditFrom->setDate(dt);
+    ui->dateEditTo->setDate(dt);
+
+    QHeaderView* headers = ui->gridMaster->horizontalHeader();
+    headers->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    
+    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File..."), this);
+    m_selectAllAction   = new QAction(tr("Select All"), this);
+    m_selectAllAction->setShortcut(QKeySequence::SelectAll);
+    m_clipboardAction->setShortcut(QKeySequence::Copy);
+
+    QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
+    mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
+    ui->gridMaster->viewport()->installEventFilter(mouseSignalizer);
+    connect(mouseSignalizer, &QnAbstractEventSignalizer::activated, this, &QnAuditLogDialog::at_mouseButtonRelease);
+
+    ui->gridMaster->addAction(m_clipboardAction);
+    ui->gridMaster->addAction(m_exportAction);
+
+    ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
+    ui->loadingProgressBar->hide();
+
+    connect(m_clipboardAction,      &QAction::triggered,                this,   &QnAuditLogDialog::at_clipboardAction_triggered);
+    connect(m_exportAction,         &QAction::triggered,                this,   &QnAuditLogDialog::at_exportAction_triggered);
+    connect(m_selectAllAction,      &QAction::triggered,                ui->gridMaster, &QTableView::selectAll);
+
+    connect(ui->dateEditFrom,       &QDateEdit::dateChanged,            this,   &QnAuditLogDialog::updateData);
+    connect(ui->dateEditTo,         &QDateEdit::dateChanged,            this,   &QnAuditLogDialog::updateData);
+    connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnAuditLogDialog::updateData);
+
+    connect(ui->gridMaster,         &QTableView::clicked,               this,   &QnAuditLogDialog::at_sessionsGrid_clicked);
+    connect(ui->gridMaster,         &QTableView::customContextMenuRequested, this, &QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested);
+    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridMaster, &QAbstractItemView::reset);
+
+    ui->mainGridLayout->activate();
+    //updateHeaderWidth();
+}
+
+QnAuditLogDialog::~QnAuditLogDialog() {
+}
+
+void QnAuditLogDialog::updateData()
+{
+    if (m_updateDisabled) {
+        m_dirty = true;
+        return;
+    }
+    m_updateDisabled = true;
+
+    query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(),
+          ui->dateEditTo->dateTime().addDays(1).toMSecsSinceEpoch());
+
+    // update UI
+
+    if (!m_requests.isEmpty()) {
+        ui->gridMaster->setDisabled(true);
+        ui->stackedWidget->setCurrentWidget(ui->gridPage);
+        setCursor(Qt::BusyCursor);
+        ui->loadingProgressBar->show();
+    }
+    else {
+        requestFinished(); // just clear grid
+        ui->stackedWidget->setCurrentWidget(ui->warnPage);
+    }
+
+    ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
+    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date());
+
+    m_updateDisabled = false;
+    m_dirty = false;
+}
+
+QList<QnMediaServerResourcePtr> QnAuditLogDialog::getServerList() const
+{
+    QList<QnMediaServerResourcePtr> result;
+    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
+    foreach(const QnResourcePtr& r, resList) {
+        QnMediaServerResourcePtr mServer = r.dynamicCast<QnMediaServerResource>();
+        if (mServer)
+            result << mServer;
+    }
+
+    return result;
+}
+
+void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
+{
+    m_requests.clear();
+    m_allData.clear();
+
+
+    QList<QnMediaServerResourcePtr> mediaServerList = getServerList();
+    foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
+    {
+        if (mserver->getStatus() == Qn::Online)
+        {
+            m_requests << mserver->apiConnection()->getAuditLogAsync(
+                fromMsec, toMsec,
+                this, SLOT(at_gotdata(int, const QnAuditRecordList&, int)));
+        }
+    }
+}
+
+void QnAuditLogDialog::at_gotdata(int httpStatus, const QnAuditRecordList& records, int requestNum)
+{
+    if (!m_requests.contains(requestNum))
+        return;
+    m_requests.remove(requestNum);
+    if (httpStatus == 0)
+        m_allData << records;
+    if (m_requests.isEmpty()) {
+        requestFinished();
+    }
+}
+
+void QnAuditLogDialog::requestFinished()
+{
+    m_model->setData(m_allData);
+    m_allData.clear();
+    ui->gridMaster->setDisabled(false);
+    setCursor(Qt::ArrowCursor);
+    //updateHeaderWidth();
+    if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
+        ui->statusLabel->setText(tr("Audit log for period from %1 to %2 - %n session(s) found", "", m_model->rowCount())
+        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
+        .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate)));
+    else
+        ui->statusLabel->setText(tr("Audit log for %1 - %n session(s) found", "", m_model->rowCount())
+        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
+    ui->loadingProgressBar->hide();
+}
+
+void QnAuditLogDialog::at_sessionsGrid_clicked(const QModelIndex& idx)
+{
+}
+
+void QnAuditLogDialog::setDateRange(const QDate& from, const QDate& to)
+{
+    ui->dateEditFrom->setDateRange(QDate(2000,1,1), to);
+    ui->dateEditTo->setDateRange(from, QDateTime::currentDateTime().date());
+
+    ui->dateEditTo->setDate(to);
+    ui->dateEditFrom->setDate(from);
+}
+
+void QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested(const QPoint&)
+{
+    QMenu* menu = 0;
+    QModelIndex idx = ui->gridMaster->currentIndex();
+    if (idx.isValid())
+    {
+        QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
+        QnActionManager *manager = context()->menu();
+        if (resource) {
+            menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resource));
+            foreach(QAction* action, menu->actions())
+                action->setShortcut(QKeySequence());
+        }
+    }
+    if (menu)
+        menu->addSeparator();
+    else
+        menu = new QMenu(this);
+
+    m_clipboardAction->setEnabled(ui->gridMaster->selectionModel()->hasSelection());
+    m_exportAction->setEnabled(ui->gridMaster->selectionModel()->hasSelection());
+
+    menu->addSeparator();
+
+    menu->addAction(m_selectAllAction);
+    menu->addAction(m_exportAction);
+    menu->addAction(m_clipboardAction);
+
+    menu->exec(QCursor::pos());
+    menu->deleteLater();
+}
+
+void QnAuditLogDialog::at_exportAction_triggered()
+{
+    QnGridWidgetHelper::exportToFile(ui->gridMaster, this, tr("Export selected records to a file"));
+}
+
+void QnAuditLogDialog::at_clipboardAction_triggered()
+{
+    QnGridWidgetHelper::copyToClipboard(ui->gridMaster);
+}
+
+void QnAuditLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
+{
+    Q_UNUSED(sender)
+    QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
+    //m_lastMouseButton = me->button();
+}
+
+void QnAuditLogDialog::disableUpdateData()
+{
+    m_updateDisabled = true;
+}
+
+void QnAuditLogDialog::enableUpdateData()
+{
+    m_updateDisabled = false;
+    if (m_dirty) {
+        m_dirty = false;
+        if (isVisible())
+            updateData();
+    }
+}
+
+void QnAuditLogDialog::setVisible(bool value)
+{
+    // TODO: #Elric use showEvent instead. 
+
+    if (value && !isVisible())
+        updateData();
+    QDialog::setVisible(value);
+}
