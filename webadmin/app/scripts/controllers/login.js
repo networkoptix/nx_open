@@ -36,14 +36,19 @@ angular.module('webadminApp')
 
                 var hash1 = md5(lowercaseLogin + ':' + realm + ':' + $scope.user.password);
                 var cnonce = md5("GET:");
+                var rtspcnonce = md5("PLAY:");
                 var response = md5(hash1 + ':' + nonce + ':' + cnonce);
 
-                var auth = Base64.encode(lowercaseLogin + ':0:' + hash1)
-
+                var rtspAuth = md5(hash1 + ':' + nonce + ':' + rtspcnonce);
+                ipCookie('rtspAuth',rtspAuth, { path: '/' });
 
                 ipCookie('response',response, { path: '/' });
                 ipCookie('username',lowercaseLogin, { path: '/' });
+
+                var auth = Base64.encode(lowercaseLogin + ':0:' + hash1)
                 ipCookie('auth',auth, { path: '/' });
+
+
 
                 // Check auth again
                 $scope.authorizing = true;

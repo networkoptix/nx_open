@@ -1,6 +1,6 @@
 <div class="container-fluid dark-theme row">
 
-    <table style="width:100%" class="webclient-window">
+   <table style="width:100%" class="webclient-window">
         <tbody>
         <tr>
             <td rowspan="2" class="cameras-panel">
@@ -63,12 +63,10 @@
                             </span>
                     </div>
                 </div>
-
-                <videowindow vg-player-ready="playerReady($API)"
-                             vg-update-time="updateTime($currentTime, $duration)"
+                <videowindow vg-update-time="updateTime($currentTime, $duration)"
+                             vg-player-ready="playerReady($API)"
                              vg-src="acitveVideoSource">
                 </videowindow>
-
             </td>
         </tr>
 

@@ -24,8 +24,8 @@ angular.module('webadminApp')
         return {
             restrict: 'E',
             scope: {
-                vgPlayerReady:"&", // $scope.vgPlayerReady({$API: $scope.API});
                 vgUpdateTime:"&",
+                vgPlayerReady:"&",
                 vgSrc:"="
             },
             templateUrl: 'views/components/videowindow.html',// ???
@@ -54,7 +54,7 @@ angular.module('webadminApp')
                     //We have options:
                     // webm - for good desktop browsers
                     // webm-codec - for IE. Detect
-                    // nativehls - for mobile browsers
+                    // native-hls - for mobile browsers
                     // flv - for desktop browsers - not supported yet
                     // rtsp - for desktop browsers
                     // activex-rtsp - for some browsers - not supported yet
@@ -118,20 +118,47 @@ angular.module('webadminApp')
                 }
 
 
+                function flushPlayer(){
+                    element.find("#videowindow").html("");
 
-                function initVideogular(){
+                    scope.vgPlayerReady({$API:null});
+                }
+
+                function initVideogular() {
                     scope.videogular = true;
+                }
+
+                function initNativePlayer(format){
+                    scope.videogular = false;
+                    nativePlayer.init(element.find("#videowindow"), function (api) {
+                        console.log("videowindow ready");
+                        scope.vgApi = api;
+                        scope.vgPlayerReady({$API:api});
+
+                        if (scope.vgSrc) {
+                            scope.vgApi.load(getFormatSrc(format),mimeTypes[format]);
+
+                            api.addEventListener("timeupdate",function(){
+                                console.log("timeupdate",api.currentTime);
+                                scope.vgUpdateTime({$currentTime:api.currentTime, $duration: api.duration});
+                            });
+                        }
+                    }, function (api) {
+                        console.alert("some error");
+                    });
                 }
 
                 function initFlashls() {
                     scope.videogular = false;
                     flashlsAPI.init("videowindow", function (api) {
                         console.log("videowindow ready");
-                        scope.api = api;
-                        scope.vgPlayerReady({$API: scope.api});
+                        scope.vgApi = api;
+                        
                         if (scope.vgSrc) {
-                            scope.api.load(getFormatSrc('hls'));
+                            scope.vgApi.load(getFormatSrc('hls'));
                         }
+
+                        scope.vgPlayerReady({$API:api});
                     }, function (api) {
                         console.alert("some error");
                     });
@@ -140,13 +167,15 @@ angular.module('webadminApp')
                 function initJsHls(){
                     scope.videogular = false;
 
-                    jshlsAPI.init( $("#videowindow"), function (api) {
+                    jshlsAPI.init( element.find("#videowindow"), function (api) {
                         console.log("videowindow ready");
-                        scope.api = api;
-                        scope.vgPlayerReady({$API: scope.api});
+                        scope.vgApi = api;
+
                         if (scope.vgSrc) {
-                            scope.api.load(getFormatSrc('hls'));
+                            scope.vgApi.load(getFormatSrc('hls'));
                         }
+
+                        scope.vgPlayerReady({$API:api});
                     }, function (api) {
                         console.alert("some error");
                     });
@@ -158,17 +187,16 @@ angular.module('webadminApp')
                     var locomote = new Locomote('videowindow', /*'bower_components/locomote/dist/Player.swf'/**/'components/Player.swf'/**/);
                     locomote.on('apiReady', function() {
                         console.log("play rtsp");
-                        scope.api = locomote;
-                        console.log('API is ready. `play` can now be called');
+                        scope.vgApi = locomote;
 
-                        scope.vgPlayerReady({$API: scope.api});
                         /* Tell Locomote to play the specified media */
-                        if(!scope.api.load ) {
-                            scope.api.load = scope.api.play;
-                            scope.api.play = function(){
-                                scope.api.load(getFormatSrc('rtsp'));
+                        if(!scope.vgApi.load ) {
+                            scope.vgApi.load = scope.vgApi.play;
+                            scope.vgApi.play = function(){
+                                scope.vgApi.load(getFormatSrc('rtsp'));
                             }
                         }
+
                         /* Start listening for streamStarted event */
                         locomote.on('streamStarted', function() {
                             console.log('stream has started');
@@ -181,20 +209,20 @@ angular.module('webadminApp')
 
                         if (scope.vgSrc) {
                             console.log('play',scope.vgSrc[2].src);
-                            scope.api.play(scope.vgSrc[2].src);
+                            scope.vgApi.play(scope.vgSrc[2].src);
                         }
+
+                        scope.vgPlayerReady({$API:api});
                     });
                 }
 
 
 
                 scope.$watch("vgSrc",function(){
-                    console.log("change vgSrc", scope.api, scope.vgSrc);
-
-                    if(/*!scope.api && */scope.vgSrc ) {
+                    flushPlayer();// Remove old player. TODO: recycle it later
+                    if(/*!scope.vgApi && */scope.vgSrc ) {
                         var format = detectBestFormat();
-                        console.log("format",format);
-                        switch(detectBestFormat()){
+                        switch(format){
                             case "flashls":
                                 initFlashls();
                                 break;
@@ -207,14 +235,18 @@ angular.module('webadminApp')
                                 initRtsp();
                                 break;
 
+                            case "native-hls":
+                                initNativePlayer("hls");
+                                break;
+
                             case "webm":
-                            case "nativehls":
                             default:
-                                initVideogular();
+                                initNativePlayer(format);
+                                break;
                         }
                     }
-                    //if(scope.api && scope.vgSrc ) {
-                    //    scope.api.load(scope.vgSrc[0].src);
+                    //if(scope.vgApi && scope.vgSrc ) {
+                    //    scope.vgApi.load(scope.vgSrc[0].src);
                     //}
                 });
             }

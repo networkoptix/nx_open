@@ -21,7 +21,7 @@ angular.module('webadminApp')
                     zoomSpeed: 0.025, // Zoom speed for buttons 0 -> 1 = full zoom
                     maxVerticalScrollForZoom: 50, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
-                    animationDuration: 500, // 300, // 200-400 for smooth animation
+                    animationDuration: 1000, // 300, // 200-400 for smooth animation
 
                     levelsSettings:{
                         labels:{
@@ -46,7 +46,13 @@ angular.module('webadminApp')
                             markSize:5/110,
                             transparency:0.25,
                             fontSize:0,
-                            labelPositionFix:0
+                            labelPositionFix:-10
+                        },
+                        none:{
+                            markSize:0,
+                            transparency:0,
+                            fontSize:0,
+                            labelPositionFix:-10
                         }
                     },
 
@@ -454,9 +460,9 @@ angular.module('webadminApp')
                     //2. Every level can be animated
                     //3. Animation includes changing of height and font-size and transparency for colors
 
-                    var animations = {};
-                    var targets = {};
-                    var currents = {};
+                    var animations = {none:0};
+                    var targets    = {none:100};
+                    var currents   = {none:100};
 
                     function animateLevel(levelName) { // Check previous and current value for this level and run smooth transition if needed
                         var instantLevelIndex = scope.scaleManager.levels[levelName].index;
@@ -468,6 +474,7 @@ angular.module('webadminApp')
                         }
                         if (instantLevelIndex != scope[targetName]) { // Start animation here
                             scope[targetName] = instantLevelIndex;
+                            console.log("animate",levelName,scope[targetName],scope[currentName]);
                             animateScope.progress(scope, animationName).then(function () {
                                 scope[currentName] = scope[targetName];
                             });
@@ -480,41 +487,64 @@ angular.module('webadminApp')
                     }
 
                     function getPointAnimation(pointLevelIndex, levelName){ // Get transition value for animation for this level
-                        var animation = animations[levelName]
-                        if( animation == 1){
-                            return 1;
+                        var animation = animations[levelName];
+
+                        var minLevel = getLevelMinValue(levelName);
+
+                        if( pointLevelIndex <= minLevel ) {
+                            return null; // Do not animate
                         }
 
-                        var maxLevel = Math.max(targets[levelName],currents[levelName]);
-
-                        if(pointLevelIndex >= maxLevel || animation == 1) {
-                            return 1; //No animation
+                        if(targets[levelName] > currents[levelName]){ // Increasing
+                            return 1-animation;
                         }
 
-                        if(pointLevelIndex > targets[levelName]){ // decrease from upper level to current
-                            return 1 - animation;
-                        }else if(pointLevelIndex > currents[levelName]){ // increase from current level to upper
-                            return animation;
-                        }
+                        return animation;
                     }
 
                     function getLevelMinValue(levelName){ // Get lower levelinex for this level
                         return Math.min(currents[levelName],targets[levelName]);
                     }
 
-                    function getBestLevelName(pointLevelIndex){ // Find best level for this levelindex
-                        if(pointLevelIndex <= getLevelMinValue("labels"))
-                            return "labels";
-
-                        if(pointLevelIndex <= getLevelMinValue("middle"))
-                            return "middle";
-
-                        if(pointLevelIndex <= getLevelMinValue("small"))
-                            return "small";
-
-                        return "marks";
+                    function getLevelMaxValue(levelName){
+                        return Math.max(currents[levelName],targets[levelName]);
                     }
 
+                    function getBestLevelName(pointLevelIndex){ // Find best level for this levelindex
+                        if(pointLevelIndex <= getLevelMaxValue("labels"))
+                            return "labels";
+
+                        if(pointLevelIndex <= getLevelMaxValue("middle"))
+                            return "middle";
+
+                        if(pointLevelIndex <= getLevelMaxValue("small"))
+                            return "small";
+
+                        if(pointLevelIndex <= getLevelMaxValue("marks"))
+                            return "marks";
+
+                        return "none";
+                    }
+
+                    function getLowerLevelName(levelName){
+                        switch(levelName){
+                            case "labels":
+                                return "middle";
+
+                            case "middle":
+                                return "small";
+
+                            case "small":
+                                return "marks";
+
+                            case "marks":
+                                return "none";
+
+                            case "none":
+                            default:
+                                return "none";
+                        }
+                    }
                     function getUpperLevelName(levelName){ // Next level
                         switch(levelName){
                             case "labels":
@@ -525,8 +555,11 @@ angular.module('webadminApp')
                                 return "middle";
 
                             case "marks":
+                                return "small";
+
+                            case "none":
                             default:
-                                return "small"
+                                return "marks";
                         }
                     }
 
@@ -560,12 +593,12 @@ angular.module('webadminApp')
                         var fontSize = levelsSettings[levelName].fontSize;
                         var labelPositionFix = levelsSettings[levelName].labelPositionFix;
 
-                        if(animation<1){ //decreasing from upperLevel to levelName to up
-                            var upperLevelName = getUpperLevelName(levelName);
-                            markSize = interpolate(animation,markSize,levelsSettings[upperLevelName].markSize);
-                            transparency = interpolate(animation,transparency,levelsSettings[upperLevelName].transparency);
-                            fontSize = interpolate(animation,fontSize,levelsSettings[upperLevelName].fontSize);
-                            labelPositionFix = interpolate(animation,labelPositionFix,levelsSettings[levelName].labelPositionFix);
+                        if(animation !== null){ //scaling between upperLevel and levelName to up
+                            var animationLevelName = getLowerLevelName(levelName);
+                            markSize = interpolate(animation, markSize, levelsSettings[animationLevelName].markSize);
+                            transparency = interpolate(animation, transparency, levelsSettings[animationLevelName].transparency);
+                            fontSize = interpolate(animation, fontSize, levelsSettings[animationLevelName].fontSize);
+                            labelPositionFix = interpolate(animation, labelPositionFix, levelsSettings[animationLevelName].labelPositionFix);
                         }
 
                         font.size = fontSize; // Set font size for label
@@ -660,11 +693,11 @@ angular.module('webadminApp')
 
                             case "above":
                             default:
-                                x = scope.scaleManager.bound(
-                                    timelineConfig.labelPadding,
-                                        coordinate - textWidth / 2,
-                                        stopcoordinate - nextWidth / 2 - textWidth - timelineConfig.labelPadding
-                                );
+                                //x = scope.scaleManager.bound(
+                                //    timelineConfig.labelPadding,
+                                x = coordinate - textWidth / 2;
+                                //        stopcoordinate - nextWidth / 2 - textWidth - timelineConfig.labelPadding
+                                //);
                                 break;
                         }
                     }

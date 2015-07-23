@@ -3,6 +3,7 @@
 angular.module('webadminApp').controller('ViewCtrl',
     function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$sce) {
 
+        $scope.playerApi = false;
         $scope.cameras = {};
         $scope.activeCamera = null;
 
@@ -37,6 +38,10 @@ angular.module('webadminApp').controller('ViewCtrl',
             return server.apiUrl.replace('http://', '').replace('https://', '');
         }
 
+        $scope.playerReady = function(API){
+            console.log("playerReady",API);
+            $scope.playerAPI = API;
+        };
         function updateVideoSource(playing) {
             var live = !playing;
             if(live){
@@ -101,10 +106,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         };
 
-        $scope.playerReady = function(API){
-            $scope.playerAPI = API;
-        };
-
         $scope.selectCameraById = function (cameraId,position) {
 
             $scope.cameraId = cameraId || $scope.cameraId;
@@ -144,6 +145,8 @@ angular.module('webadminApp').controller('ViewCtrl',
                 if ($scope.positionProvider) {
                     $scope.positionProvider.playing = play;
                 }
+            }else{
+                console.log("no api!",$scope.playerAPI);
             }
         };
 
