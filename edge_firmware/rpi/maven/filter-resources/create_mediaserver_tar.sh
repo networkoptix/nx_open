@@ -30,9 +30,9 @@ BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
 BOX_NAME=${box}
 BETA=""
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
+if [[ "${beta}" == "true" ]]; then
+  BETA="-beta"
+fi
 PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
 PACKAGE_NAME=$PACKAGE$BETA.tar.gz
 UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
@@ -44,7 +44,7 @@ PREFIX_DIR=/opt/$CUSTOMIZATION
 BUILD_OUTPUT_DIR=${libdir}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
 
-STRIP=true
+STRIP=
 
 for i in "$@"
 do
@@ -152,10 +152,12 @@ pushd $BUILD_DIR
   cp $PACKAGE_NAME ${project.build.directory}
 popd
 
-pushd $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/
-  tar czf $PACKAGE-debug-symbols.tar.gz ./bin ./lib
-  cp $PACKAGE-debug-symbols.tar.gz ${project.build.directory}
-popd
+if [ ! -z "$STRIP" ]; then
+    pushd $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/
+      tar czf $PACKAGE-debug-symbols.tar.gz ./bin ./lib
+      cp $PACKAGE-debug-symbols.tar.gz ${project.build.directory}
+    popd
+fi
 
 mkdir -p zip
 mv $PACKAGE_NAME ./zip
