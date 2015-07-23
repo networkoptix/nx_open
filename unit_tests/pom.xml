@@ -14,10 +14,37 @@
     <name>HD Witness Unit Tests</name>
 
     <properties>
-        <root.dir>${basedir}/../..</root.dir>
-<!--
-        <libtype>plugin</libtype>
-        <buildLib>sharedlib</buildLib>
--->
+        <root.dir>${basedir}/..</root.dir>
+        <template>app</template>
     </properties>
+    
+    <modules>
+        <module>common_ut</module>
+        <module>image_library_plugin_ut</module>
+    </modules>       
+    <!-- The following section is to rebuild the required artifact as lib. As soon as everything will be built as lib, this may be deleted -->
+<!--    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>            
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os> 
+            </activation>
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
+        </profile>
+    </profiles> -->       
 </project>

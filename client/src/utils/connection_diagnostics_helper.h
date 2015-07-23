@@ -4,9 +4,9 @@
 #include <QtCore/QObject>
 
 #include <nx_ec/ec_api_fwd.h>
+#include <api/model/compatibility_item.h>
 
 struct QnConnectionInfo;
-struct QnCompatibilityItem;
 class QnSoftwareVersion;
 
 class QnConnectionDiagnosticsHelper: public QObject
@@ -15,9 +15,17 @@ class QnConnectionDiagnosticsHelper: public QObject
 public:
     enum class Result {
         Success,
-        Failure,
-        Restart
+        RestartRequested,
+        IncompatibleBrand,
+        IncompatibleVersion,
+        IncompatibleProtocol,
+        Unauthorized,
+        ServerError
     };
+
+#ifdef _DEBUG
+    static QString resultToString(Result value);
+#endif //  _DEBUG
 
     struct TestConnectionResult {
         Result result;

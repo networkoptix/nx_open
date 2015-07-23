@@ -40,6 +40,7 @@ namespace {
 namespace ec2
 {
     static const size_t RESPONSE_WAIT_TIMEOUT_MS = 30*1000;
+    static const size_t TCP_CONNECT_TIMEOUT_MS = 10*1000;
 
     class ClientQueryProcessor
     :
@@ -70,8 +71,9 @@ namespace ec2
             void processUpdateAsync( const QUrl& ecBaseUrl, const QnTransaction<QueryDataType>& tran, HandlerType handler )
         {
             QUrl requestUrl( ecBaseUrl );
-            nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+            nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
+            httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
                 httpClient->setUserName(requestUrl.userName());
                 httpClient->setUserPassword(requestUrl.password());
@@ -116,8 +118,9 @@ namespace ec2
             void processQueryAsync( const QUrl& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             QUrl requestUrl( ecBaseUrl );
-            nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+            nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
+            httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
                 httpClient->setUserName(requestUrl.userName());
                 httpClient->setUserPassword(requestUrl.password());

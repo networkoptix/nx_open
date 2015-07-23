@@ -32,25 +32,38 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewMo
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::EventResourcesField) {
-        QSet<QString> inputPorts;
+        QnIOPortDataList inputPorts;
         bool inited = false;
 
         QnVirtualCameraResourceList cameras = model->eventResources().filtered<QnVirtualCameraResource>();
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-            QStringList cameraInputs = camera->getInputPortList();
+            QnIOPortDataList cameraInputs = camera->getInputPortList();
             if (!inited) {
-                inputPorts = cameraInputs.toSet();
+                inputPorts = cameraInputs;
                 inited = true;
             } else {
-                inputPorts = inputPorts.intersect(cameraInputs.toSet());
+                for (auto itr = inputPorts.begin(); itr != inputPorts.end();)
+                {
+                    const QnIOPortData& value = *itr;
+                    bool found = false;
+                    for (const auto& other: cameraInputs) {
+                        if (other.id == value.id && other.getName() == value.getName()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        ++itr;
+                    else
+                        itr = inputPorts.erase(itr);
+                }
             }
         }
 
         ui->relayComboBox->clear();
         ui->relayComboBox->addItem(tr("<automatic>"), QString());
-        foreach (QString relay, inputPorts)
-            ui->relayComboBox->addItem(relay, relay);
-
+        for (const auto& relayInput: inputPorts)
+            ui->relayComboBox->addItem(relayInput.getName(), relayInput.id);
     }
 
     if (fields & QnBusiness::EventParamsField) {
@@ -64,7 +77,7 @@ void QnCameraInputBusinessEventWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnBusinessActionParameters params;
-    params.inputPortId = ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString();
-    model()->setActionParams(params);
+    auto eventParams = model()->eventParams();
+    eventParams.inputPortId = ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString();
+    model()->setEventParams(eventParams);
 }

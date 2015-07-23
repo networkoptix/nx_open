@@ -36,10 +36,16 @@ AudioStreamReader::~AudioStreamReader()
         aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead, true );
 }
 
+bool AudioStreamReader::isAudioAvailable()
+{
+    std::unique_lock<std::mutex> lk( m_mutex );
+    if( m_amux.get() )
+        return true;
+    return initializeAmux(true);
+}
+
 bool AudioStreamReader::initializeIfNeeded()
 {
-    if( m_initializedInitially )
-        return true;
     std::unique_lock<std::mutex> lk( m_mutex );
     if( m_initializedInitially )
         return true;
@@ -57,8 +63,6 @@ size_t AudioStreamReader::setPacketReceiver( std::function<void(const std::share
     std::unique_lock<std::mutex> lk( m_mutex );
     const size_t id = ++m_prevReceiverID;
     m_packetReceivers[id] = std::move( packetReceiver );
-    //if( m_pollable && (m_packetReceivers.size() == 1) )
-    //    aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this );
     return id;
 }
 
@@ -66,15 +70,11 @@ void AudioStreamReader::removePacketReceiver( size_t id )
 {
     std::unique_lock<std::mutex> lk( m_mutex );
     m_packetReceivers.erase( id );
-    //if( m_pollable && m_packetReceivers.empty() )
-    //{
-    //    lk.unlock();
-    //    aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead, true );
-    //}
 }
 
 nxcip::AudioFormat AudioStreamReader::getAudioFormat() const
 {
+    //TODO #ak place mutex here when callback is done with mutex unlocked
     return m_audioFormat;
 }
 
@@ -91,6 +91,7 @@ void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType event
 
     aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead );
     //re-initializing audio
+    m_amux.reset();
     if( !initializeAmux() )
         return;
     {
@@ -192,20 +193,25 @@ void AudioStreamReader::fillAudioFormat()
     //std::cout<<"Audio format: sample_rate "<<m_audioInfo.sample_rate<<", bitrate "<<m_audioInfo.bit_rate<<"\n";
 }
 
-bool AudioStreamReader::initializeAmux()
+bool AudioStreamReader::initializeAmux( bool getFormatOnly )
 {
-    m_amux.reset();
-
-    std::unique_ptr<Amux> amux( new Amux() );
-    memset( &m_audioInfo, 0, sizeof(m_audioInfo) );
-
-    if( amux->GetInfo( &m_audioInfo ) )
+    if( !m_amux )
     {
-        std::cerr << "ISD plugin: can't get audio stream info. "<<strerror(errno)<<"\n";
-        return false;
-    }
+        std::unique_ptr<Amux> amux( new Amux() );
+        memset( &m_audioInfo, 0, sizeof(m_audioInfo) );
 
-    if( amux->StartAudio() )
+        if( amux->GetInfo( &m_audioInfo ) )
+        {
+            std::cerr << "ISD plugin: can't get audio stream info. "<<strerror(errno)<<"\n";
+            return false;
+        }
+        fillAudioFormat();
+        m_amux = std::move(amux);
+    }
+    if( getFormatOnly )
+        return true;
+
+    if( m_amux->StartAudio() )
     {
         std::cerr << "ISD plugin: can't start audio stream. "<<strerror(errno)<<"\n";
         return false;
@@ -213,10 +219,8 @@ bool AudioStreamReader::initializeAmux()
 
     //std::cout<<"AMUX initialized. Codec type "<<m_audioFormat.compressionType<<" fd = "<<amux->GetFD()<<"\n";
 
-    m_amux = std::move(amux);
     m_pollable.reset( new Pollable( m_amux->GetFD() ) );
 
-    fillAudioFormat();
     return true;
 }
 

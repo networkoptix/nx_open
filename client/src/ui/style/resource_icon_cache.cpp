@@ -10,6 +10,7 @@
 #include <core/resource/videowall_resource.h>
 
 #include <ui/style/skin.h>
+#include "core/resource/camera_resource.h"
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
@@ -24,6 +25,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(Servers,                 qnSkin->icon("tree/servers.png"));
     m_cache.insert(Layout,                  qnSkin->icon("tree/layout.png"));
     m_cache.insert(Camera,                  qnSkin->icon("tree/camera.png"));
+    m_cache.insert(IOModule,                qnSkin->icon("tree/io.png"));
     m_cache.insert(Recorder,                qnSkin->icon("tree/recorder.png"));
     m_cache.insert(Image,                   qnSkin->icon("tree/snapshot.png"));
     m_cache.insert(Media,                   qnSkin->icon("tree/media.png"));
@@ -112,7 +114,10 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource)
     } else if ((flags & Qn::layout) == Qn::layout) {
         key = Layout;
     } else if ((flags & Qn::live_cam) == Qn::live_cam) {
-        key = Camera;
+        if (flags & Qn::io_module)
+            key = IOModule;
+        else
+            key = Camera;
     } else if ((flags & Qn::SINGLE_SHOT) == Qn::SINGLE_SHOT) {
         key = Image;
     } else if ((flags & Qn::ARCHIVE) == Qn::ARCHIVE) {

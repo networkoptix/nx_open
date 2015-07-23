@@ -146,7 +146,7 @@ namespace ec2
     {
     }
 
-    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& dstPeer, int* ) const
+    QnUuid OldEcConnection::routeToPeerVia(const QnUuid&, int* ) const
     {
         return QnUuid();
     }

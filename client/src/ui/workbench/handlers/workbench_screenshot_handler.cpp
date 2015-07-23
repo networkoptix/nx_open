@@ -182,7 +182,7 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *w
     QnResourceDisplayPtr display = widget->display();
 
     qint64 timeUsec = display->camDisplay()->getCurrentTime();
-    if (timeUsec == AV_NOPTS_VALUE)
+    if (timeUsec == qint64(AV_NOPTS_VALUE))
         return latestScreenshotTime;
 
     qint64 timeMSec = timeUsec / 1000;

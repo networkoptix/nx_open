@@ -24,7 +24,7 @@ class LocalAudioFileResource
 {
 public:
     virtual QString getUniqueId() const { return QString(); }
-    virtual void setStatus(Qn::ResourceStatus, bool silenceMode ) override {}
+    virtual void setStatus(Qn::ResourceStatus, bool /*silenceMode*/ ) override {}
     virtual Qn::ResourceStatus getStatus() const override { return Qn::Online; }
 };
 

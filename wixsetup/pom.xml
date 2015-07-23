@@ -39,7 +39,16 @@
             <type>pom</type> 
             <scope>system</scope>
             <systemPath>${root.dir}/mediaserver/pom.xml</systemPath>            
-        </dependency>			
+        </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>clientexe</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/mediaserver/pom.xml</systemPath>            
+        </dependency>					
     </dependencies>		
 
     <build>
@@ -224,20 +233,6 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2.2</version>
                 <executions>
-                    <execution>
-                        <id>rtu-package</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.build.directory}/assembly-rtu.xml</descriptor>
-                            </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            <finalName>rtu</finalName>							
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>client-update-package</id>
                         <phase>prepare-package</phase>

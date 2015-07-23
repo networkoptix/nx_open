@@ -123,7 +123,7 @@ signals:
     void recordingFinished(int status, const QString &fileName);
 protected:
     virtual void endOfRun();
-    bool initFfmpegContainer(const QnConstCompressedVideoDataPtr& mediaData);
+    bool initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData);
 
     void setPrebufferingUsec(int value);
     void flushPrebuffer();

@@ -23,15 +23,13 @@
 
 namespace nx_http
 {
-    class AsyncHttpClient;
-    typedef std::shared_ptr<AsyncHttpClient> AsyncHttpClientPtr;
+    class AsyncHttpClientPtr;
 
     //!Http client. All operations are done asynchronously
     /*!
         It is strongly recommended to connect to signals using Qt::DirectConnection and slot MUST NOT use blocking calls.
         
-        \warning Instance of \a AsyncHttpClient MUST be used as shared pointer (std::shared_ptr)
-
+        \note To get new instance use AsyncHttpClient::create
         \note This class methods are not thread-safe
         \note All signals are emitted from io::AIOService threads
         \note State is changed just before emitting signal
@@ -70,7 +68,6 @@ namespace nx_http
 
         static const int UNLIMITED_RECONNECT_TRIES = -1;
 
-        AsyncHttpClient();
         virtual ~AsyncHttpClient();
 
         //!Stops socket event processing. If some event handler is running in a thread different from current one, method blocks until event handler had returned
@@ -128,6 +125,9 @@ namespace nx_http
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
+
+        //!Set socket send timeout
+        void setSendTimeoutMs( unsigned int sendTimeoutMs );
         /*!
             \param responseReadTimeoutMs 0 means infinity
             By default, 3000 ms.
@@ -187,6 +187,12 @@ namespace nx_http
             const header::WWWAuthenticate& wwwAuthenticateHeader,
             header::DigestAuthorization* const digestAuthorizationHeader );
 
+        //!Use this method to intanciate AsyncHttpClient class
+        /*!
+            \return smart pointer to newly created instance
+        */
+        static AsyncHttpClientPtr create();
+
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read
@@ -226,6 +232,7 @@ namespace nx_http
         mutable QnMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
+        unsigned int m_sendTimeoutMs;
         unsigned int m_responseReadTimeoutMs;
         unsigned int m_msgBodyReadTimeoutMs;
         AuthType m_authType;
@@ -233,6 +240,8 @@ namespace nx_http
         int m_awaitedMessageNumber;
         SocketAddress m_remoteEndpoint;
         AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
+
+        AsyncHttpClient();
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );
@@ -259,6 +268,106 @@ namespace nx_http
 
         static const char* toString( State state );
     };
+
+
+    //!Smart pointer for \a AsyncHttpClient
+    class AsyncHttpClientPtr
+    {
+        typedef void (AsyncHttpClientPtr::*bool_type)() const;
+        void this_type_does_not_support_comparisons() const {}
+
+    public:
+        AsyncHttpClientPtr()
+        {
+        }
+
+        AsyncHttpClientPtr( std::shared_ptr<AsyncHttpClient> obj )
+        :
+            m_obj( std::move(obj) )
+        {
+        }
+
+        AsyncHttpClientPtr( const AsyncHttpClientPtr& right )
+        :
+            m_obj( right.m_obj )
+        {
+        }
+
+        AsyncHttpClientPtr( AsyncHttpClientPtr&& right )
+        {
+            std::swap( m_obj, right.m_obj );
+        }
+
+        AsyncHttpClientPtr& operator=( const AsyncHttpClientPtr& right )
+        {
+            if( this == &right )
+                return *this;
+            reset();
+            m_obj = right.m_obj;
+            return *this;
+        }
+
+        AsyncHttpClientPtr& operator=( AsyncHttpClientPtr&& right )
+        {
+            if( this == &right )
+                return *this;
+            reset();
+            std::swap( m_obj, right.m_obj );
+            return *this;
+        }
+
+        ~AsyncHttpClientPtr()
+        {
+            reset();
+        }
+
+        AsyncHttpClient* operator->() const
+        {
+            return m_obj.get();
+        }
+
+        AsyncHttpClient& operator*() const
+        {
+            return *m_obj;
+        }
+
+        void reset()
+        {
+            //MUST call terminate BEFORE shared pointer destruction to allow for async handlers to complete
+            if( m_obj.use_count() == 1 )
+                m_obj->terminate();
+            m_obj.reset();
+        }
+
+        void swap( AsyncHttpClientPtr& right )
+        {
+            std::swap( m_obj, right.m_obj );
+        }
+
+        const AsyncHttpClient* get() const
+        {
+            return m_obj.get();
+        }
+
+        AsyncHttpClient* get()
+        {
+            return m_obj.get();
+        }
+
+        operator bool_type() const
+        {
+            return m_obj ? &AsyncHttpClientPtr::this_type_does_not_support_comparisons : 0;
+        }
+
+        bool operator<( const AsyncHttpClientPtr& right ) const { return m_obj < right.m_obj; }
+        bool operator<=( const AsyncHttpClientPtr& right ) const { return m_obj <= right.m_obj; }
+        bool operator>( const AsyncHttpClientPtr& right ) const { return m_obj > right.m_obj; }
+        bool operator>=( const AsyncHttpClientPtr& right ) const { return m_obj >= right.m_obj; }
+
+    private:
+        std::shared_ptr<AsyncHttpClient> m_obj;
+    };
+
 
     //!Helper function that uses nx_http::AsyncHttpClient for file download
     /*!

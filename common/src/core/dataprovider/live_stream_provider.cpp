@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include "core/resource/camera_resource.h"
+#include "core/resource_management/resource_properties.h"
 #include "utils/media/jpeg_utils.h"
 #include "utils/media/nalUnits.h"
 
@@ -32,6 +33,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_livemutex(QnMutex::Recursive),
     m_qualityUpdatedAtLeastOnce(false),
     m_framesSinceLastMetaData(0),
+    m_totalVideoFrames(0),
+    m_totalAudioFrames(0),
     m_softMotionRole(Qn::CR_Default),
     m_softMotionLastChannel(0),
     m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1),
@@ -276,10 +279,11 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
                                            const QnLiveStreamParams& currentLiveParams,
                                            bool isCameraControlRequired)
 {
+    m_totalVideoFrames++;
     m_framesSinceLastMetaData++;
 
     saveMediaStreamParamsIfNeeded(videoData);
-    if (isCameraControlRequired && m_framesSinceLastMetaData == SAVE_BITRATE_FRAME)
+    if (isCameraControlRequired && m_totalVideoFrames == SAVE_BITRATE_FRAME)
         saveBitrateIfNotExists(videoData, currentLiveParams);
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
@@ -305,6 +309,22 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
         }
     }
 #endif
+}
+
+void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audioData)
+{
+    if (m_totalAudioFrames++ == 0 &&    // only once
+        getRole() == Qn::CR_LiveVideo) // only primary stream
+    {
+        // save only onece
+        const auto savedCodec = m_cameraRes->getProperty(Qn::CAMERA_AUDIO_CODEC_PARAM_NAME);
+        const auto actualCodec = codecIDToString(audioData->compressionType);
+        if (savedCodec.isEmpty())
+        {
+            m_cameraRes->setProperty(Qn::CAMERA_AUDIO_CODEC_PARAM_NAME, actualCodec);
+            propertyDictionary->saveParams(m_cameraRes->getId());
+        }
+    }
 }
 
 void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)

@@ -62,7 +62,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSiz
 
     float result = qualityFactor*frameRateFactor * resolutionFactor;
     result = qMax(192.0, result);
-    if (isBitratePerGOP())
+    if (bitratePerGopType() != Qn::BPG_None)
         result = result * (30.0 / (qreal)fps);
     return (int) result;
 }

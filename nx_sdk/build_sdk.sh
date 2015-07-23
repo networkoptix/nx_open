@@ -32,7 +32,7 @@ cp -f ../common/maven/bin-resources/resources/camera_settings/camera_settings.xs
 cp -f ../common/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
 cp -f ../common/src/plugins/camera_plugin.h $TARGET_DIR/include/plugins/
 
-PLUGINS=(axiscamplugin image_library_plugin)
+PLUGINS=(axiscamplugin image_library_plugin rpi_cam)
 
 for (( i=0; i<${#PLUGINS[@]}; i++ ))
 do

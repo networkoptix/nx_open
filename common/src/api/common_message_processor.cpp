@@ -61,7 +61,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     auto mediaServerManager = connection->getMediaServerManager();
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, [this](const QnMediaServerResourcePtr &server){updateResource(server);});
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageChanged,   this, [this](const QnAbstractStorageResourcePtr &storage){updateResource(storage);});
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageChanged,   this, [this](const QnStorageResourcePtr &storage){updateResource(storage);});
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::removed,          this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageRemoved,   this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesChanged, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesChanged );

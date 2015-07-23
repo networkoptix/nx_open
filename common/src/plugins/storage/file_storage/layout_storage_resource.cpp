@@ -212,24 +212,22 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
 }
 
 QnLayoutFileStorageResource::QnLayoutFileStorageResource():
-    m_fileSync(QnMutex::Recursive)
+    m_fileSync(QnMutex::Recursive),
+    m_capabilities(0)
 {
-    QnMutexLocker lock( &m_storageSync );
+    QnMutexLocker lock(&m_storageSync);
     m_novFileOffset = 0;
     //m_novFileLen = 0;
     m_allStorages.insert(this);
+ 
+    m_capabilities |= cap::ListFile;
+    m_capabilities |= cap::ReadFile;
 }
 
 QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
 {
     QnMutexLocker lock( &m_storageSync );
     m_allStorages.remove(this);
-}
-
-
-bool QnLayoutFileStorageResource::isNeedControlFreeSpace()
-{
-    return false;
 }
 
 bool QnLayoutFileStorageResource::removeFile(const QString& url)
@@ -295,9 +293,9 @@ bool QnLayoutFileStorageResource::isDirExists(const QString& url)
     return d.exists(removeProtocolPrefix(url));
 }
 
-bool QnLayoutFileStorageResource::isCatalogAccessible()
+int QnLayoutFileStorageResource::getCapabilities() const
 {
-    return true;
+    return m_capabilities;
 }
 
 bool QnLayoutFileStorageResource::isFileExists(const QString& url)
@@ -315,11 +313,11 @@ qint64 QnLayoutFileStorageResource::getTotalSpace()
     return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
 }
 
-QFileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
+QnAbstractStorageResource::FileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
 {
     QDir dir;
     dir.cd(dirName);
-    return dir.entryInfoList(QDir::Files);
+    return QnAbstractStorageResource::FIListFromQFIList(dir.entryInfoList(QDir::Files));
 }
 
 qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
@@ -328,7 +326,7 @@ qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
     return 0; // not implemented
 }
 
-bool QnLayoutFileStorageResource::isStorageAvailable()
+bool QnLayoutFileStorageResource::isAvailable() const
 {
     QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);
@@ -349,25 +347,15 @@ bool QnLayoutFileStorageResource::isStorageAvailable()
     return false;
 }
 
-int QnLayoutFileStorageResource::getChunkLen() const 
-{
-    return 60;
-}
-
 QString QnLayoutFileStorageResource::removeProtocolPrefix(const QString& url)
 {
     int prefix = url.indexOf(QLatin1String("://"));
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
 
-QnStorageResource* QnLayoutFileStorageResource::instance()
+QnStorageResource* QnLayoutFileStorageResource::instance(const QString&)
 {
     return new QnLayoutFileStorageResource();
-}
-
-bool QnLayoutFileStorageResource::isStorageAvailableForWriting()
-{
-    return false; // it is read only file system
 }
 
 bool QnLayoutFileStorageResource::readIndexHeader()

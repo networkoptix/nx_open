@@ -11,7 +11,7 @@
 
 
 static const int PROXY_KEEP_ALIVE_INTERVAL = 40 * 1000;
-static const int PROXY_CONNECTIONS_TO_REQUEST = 5;
+static const int PROXY_CONNECTIONS_TO_REQUEST = 3;
 
 // -------------------------------- QnUniversalListener ---------------------------------
 
@@ -89,6 +89,9 @@ void QnUniversalTcpListener::addProxySenderConnections(const SocketAddress& prox
     if (m_needStop)
         return;
 
+    NX_LOG(lit("QnUniversalTcpListener: %1 reverse connection(s) to %2 is(are) needed")
+            .arg(size).arg(proxyUrl.toString()), cl_logDEBUG1);
+
     for (int i = 0; i < size; ++i) {
         auto connect = new QnProxySenderConnection(proxyUrl, qnCommon->moduleGUID(), this);
         connect->start();
@@ -99,21 +102,43 @@ void QnUniversalTcpListener::addProxySenderConnections(const SocketAddress& prox
 QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(
         const QString& guid, int timeout, const SocketRequest& socketRequest)
 {
+    NX_LOG(lit("QnUniversalTcpListener: reverse connection from %1 is needed")
+            .arg(guid), cl_logDEBUG1);
+
     QnMutexLocker lock( &m_proxyMutex );
     auto& serverPool = m_proxyPool[guid]; // get or create with new code
-    if (serverPool.isEmpty())
+    if (serverPool.available.isEmpty())
     {
-        if (socketRequest)
-            socketRequest(PROXY_CONNECTIONS_TO_REQUEST);
-
-        while (serverPool.isEmpty())
-            if (!m_proxyCondition.wait(&m_proxyMutex, timeout))
+        QElapsedTimer timer;
+        timer.start();
+        while (serverPool.available.isEmpty())
+        {
+            const auto elapsed = timer.elapsed();
+            if (elapsed >= timeout)
+            {
+                NX_LOG(lit("QnUniversalTcpListener: reverse connection from %1 was waited too long (%2 ms)")
+                        .arg(guid).arg(elapsed), cl_logERROR);
                 return QSharedPointer<AbstractStreamSocket>();
+            }
+
+            if (serverPool.requested == 0 || // was not requested by another thread
+                serverPool.timer.elapsed() > timeout) // or request was not field within timeout
+            {
+                serverPool.requested = PROXY_CONNECTIONS_TO_REQUEST;
+                serverPool.timer.restart();
+                socketRequest(serverPool.requested);
+            }
+
+            m_proxyCondition.wait(&m_proxyMutex, timeout - elapsed);
+        }
     }
 
-    auto socket = serverPool.front().socket;
+    auto socket = serverPool.available.front().socket;
+    serverPool.available.pop_front();
+    NX_LOG(lit("QnUniversalTcpListener: reverse connection from %1 is used, %2 more avaliable")
+            .arg(guid).arg(serverPool.available.size()), cl_logDEBUG1);
+
     socket->setNonBlockingMode(false);
-    serverPool.pop_front();
     return socket;
 }
 
@@ -122,20 +147,18 @@ bool QnUniversalTcpListener::registerProxyReceiverConnection(
 {
     QnMutexLocker lock(&m_proxyMutex);
     auto serverPool = m_proxyPool.find(guid);
-    if (serverPool == m_proxyPool.end()) {
-        NX_LOG(lit("QnUniversalTcpListener: proxy was not requested from %2")
+    if (serverPool == m_proxyPool.end() || serverPool->requested == 0) {
+        NX_LOG(lit("QnUniversalTcpListener: reverse connection was not requested from %1")
                .arg(guid), cl_logWARNING);
         return false;
     }
 
-    if (serverPool->size() > PROXY_CONNECTIONS_TO_REQUEST * 2) {
-        NX_LOG(lit("QnUniversalTcpListener: too many proxies from %2")
-               .arg(guid), cl_logINFO);
-        return false;
-    }
-
     socket->setNonBlockingMode(true);
-    serverPool->push_back(AwaitProxyInfo(socket));
+    serverPool->requested -= 1;
+    serverPool->available.push_back(AwaitProxyInfo(socket));
+    NX_LOG(lit("QnUniversalTcpListener: got new reverse connection from %1, there is(are) %2 avaliable and %3 requested")
+           .arg(guid).arg(serverPool->available.size()).arg(serverPool->requested), cl_logDEBUG1);
+
     m_proxyCondition.wakeAll();
     return true;
 }
@@ -146,9 +169,9 @@ void QnUniversalTcpListener::doPeriodicTasks()
 
     QnMutexLocker lock( &m_proxyMutex );
     for (auto& serverPool : m_proxyPool)
-        while(!serverPool.isEmpty() &&
-              serverPool.front().timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)
-            serverPool.pop_front();
+        while(!serverPool.available.isEmpty() &&
+              serverPool.available.front().timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)
+            serverPool.available.pop_front();
 }
 
 void QnUniversalTcpListener::disableAuth()

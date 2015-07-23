@@ -23,6 +23,8 @@ Qn::ResourceFlags QnServerCamera::flags() const {
     Qn::ResourceFlags result = base_type::flags();
     if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
         result |= Qn::motion;
+    if (hasCameraCapabilities(Qn::IOModuleCapability))
+        result |= Qn::io_module;
     return result;
 }
 
@@ -78,4 +80,9 @@ void QnServerCamera::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
     if (other->getParentId() != m_parentId)
         modifiedFields << "statusChanged";
     QnVirtualCameraResource::updateInner(other, modifiedFields);
+}
+
+QnIOModuleMonitorPtr QnServerCamera::createIOModuleMonitor()
+{
+    return QnIOModuleMonitorPtr(new QnIOModuleMonitor(toSharedPointer().dynamicCast<QnSecurityCamResource>()));
 }

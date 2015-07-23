@@ -17,7 +17,7 @@
 #     fi
 #     echo "$h"
 # }
-TOOLCHAIN_PREFIX=/usr/local/codesourcery/arm-2013.11/bin/arm-none-linux-gnueabi-
+TOOLCHAIN_PREFIX=/usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-
 
 
 CUSTOMIZATION=${deb.customization.company.name}
@@ -37,14 +37,14 @@ PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
 PACKAGE_NAME=$PACKAGE$BETA.tar.gz
 UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
-BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
+BUILD_DIR="/tmp/hdw_"$BOX_NAME"_build.tmp"
+DEBUG_DIR="/tmp/hdw_"$BOX_NAME"_build_debug.tmp"
 PREFIX_DIR=/opt/$CUSTOMIZATION
 
 BUILD_OUTPUT_DIR=${libdir}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
 
-STRIP=
-
+STRIP=true
 
 for i in "$@"
 do
@@ -90,11 +90,14 @@ echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/version.txt
 
 #copying libs
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
 for var in "${LIBS_TO_COPY[@]}"
 do
   cp $LIBS_DIR/${var} $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
   if [ ! -z "$STRIP" ]; then
-    $TOOLCHAIN_PREFIX"strip" $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
+    $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var} $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}.debug
+    $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
+    $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
   fi
 done
 
@@ -110,12 +113,28 @@ popd
 
 #copying bin
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
+mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
+if [ ! -z "$STRIP" ]; then
+  $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug
+  $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
+  $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
+fi
+
 
 #copying plugins
 if [ -e "$BUILD_OUTPUT_DIR/bin/release/plugins" ]; then
   mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
+  mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
   cp $BUILD_OUTPUT_DIR/bin/release/plugins/*.* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
+  for f in `ls $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/`
+    do
+      if [ ! -z "$STRIP" ]; then
+        $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f} $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}.debug
+        $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}
+        $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/${f}
+      fi
+    done
 fi
 
 #conf
@@ -129,20 +148,14 @@ install -m 755 ./etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUS
 
 #building package
 pushd $BUILD_DIR
-tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc
-
-if [ ! -z $TARGET_DIR ]; then
-  cp $PACKAGE_NAME $TARGET_DIR 
-fi
-
+  tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc
+  cp $PACKAGE_NAME ${project.build.directory}
 popd
 
-cp $BUILD_DIR/$PACKAGE_NAME .
-cp -P $LIBS_DIR/*.debug ${project.build.directory}
-cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/*.debug ${project.build.directory}
-cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/plugins/*.debug ${project.build.directory}
-tar czf ./$PACKAGE_NAME-debug-symbols.tar.gz ./*.debug
-rm -Rf $BUILD_DIR
+pushd $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/
+  tar czf $PACKAGE-debug-symbols.tar.gz ./bin ./lib
+  cp $PACKAGE-debug-symbols.tar.gz ${project.build.directory}
+popd
 
 mkdir -p zip
 mv $PACKAGE_NAME ./zip
@@ -153,3 +166,5 @@ zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..
 rm -Rf zip
+rm -Rf $BUILD_DIR
+rm -Rf $DEBUG_DIR

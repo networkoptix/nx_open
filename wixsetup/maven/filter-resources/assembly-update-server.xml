@@ -19,10 +19,6 @@
 				<include>update.json</include>
 				<include>install.bat</include>
 			</includes>		
-		</fileSet>		
-		<fileSet>
-			<directory>${environment.dir}/help/${release.version}/${customization}</directory>
-			<outputDirectory>../help</outputDirectory>
-		</fileSet>		
+		</fileSet>				
 	</fileSets>
 </assembly>

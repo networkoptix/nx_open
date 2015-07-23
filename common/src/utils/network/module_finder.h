@@ -3,6 +3,7 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/singleton.h>
@@ -100,6 +101,9 @@ private:
     QHash<QnUuid, ModuleItem> m_moduleItemById;
     QHash<SocketAddress, QnUuid> m_idByAddress;
     QHash<SocketAddress, qint64> m_lastResponse;
+
+    QMutex m_connectedPeersMutex;
+    QSet<QnUuid> m_connectedPeers;
 
     qint64 m_lastSelfConflict;
     int m_selfConflictCount;

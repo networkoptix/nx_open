@@ -291,6 +291,7 @@ int QnTranscoder::setVideoCodec(
             ffmpegTranscoder->setBitrate(bitrate);
             ffmpegTranscoder->setParams(params);
             ffmpegTranscoder->setQuality(quality);
+            m_extraTranscodeParams.setCodec(codec);
             ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
 
             if (codec != CODEC_ID_H263P) {

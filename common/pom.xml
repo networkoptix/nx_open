@@ -23,9 +23,10 @@
     <properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <!--Global libs-->
-        <!-- <qt.libs>core gui network opengl xml multimedia sql</qt.libs> -->
+        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <template>lib</template>
+        <global.libs></global.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
-        <global.libs>-lonvif -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>${ffmpeg.libs} -lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
         <linux.oslibs>${ffmpeg.libs} -lssl -lsigar</linux.oslibs>
@@ -38,7 +39,6 @@
         <linux.defines/>
         <mac.defines/>      
         <android.defines/>
-        <qt.libs>core gui network xml multimedia sql</qt.libs>
     </properties>   
 
     <dependencies>

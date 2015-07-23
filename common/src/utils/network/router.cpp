@@ -36,6 +36,9 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     bool isknownServer = qnResPool->getResourceById<QnMediaServerResource>(id) != 0;
     bool isClient = qnCommon->remoteGUID() != qnCommon->moduleGUID();
     if (!isknownServer && isClient) {
+		if (qnCommon->remoteGUID().isNull())
+            return result;
+			
         result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
         result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
         Q_ASSERT_X(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
@@ -47,9 +50,14 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     QnUuid routeVia = connection->routeToPeerVia(id, &result.distance);
     if (routeVia == id || routeVia.isNull())
         return result; // can't route
+
+        // peer accesible directly, but no address avaliable (bc of NAT),
+        // so we need backwards connection
+    // route gateway is found
+    result.gatewayId = routeVia;
     result.addr = m_moduleFinder->primaryAddress(routeVia);
-    if (!result.addr.isNull())
-        result.gatewayId = routeVia; // route gateway is found
+    if (result.addr.isNull())
+        result.reverseConnect = true;
     return result;
 }
 

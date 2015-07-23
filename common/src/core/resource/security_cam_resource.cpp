@@ -18,6 +18,9 @@
 #include "camera_user_attribute_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "resource_data.h"
+#include "api/model/api_ioport_data.h"
+#include "utils/serialization/json.h"
+#include <utils/common/model_functions.h>
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
 
@@ -85,12 +88,12 @@ QnSecurityCamResource::QnSecurityCamResource():
 
 QString QnSecurityCamResource::getName() const
 {
-    if( getId().isNull() )
-        return QnResource::getName();
-
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    if( !(*userAttributesLock)->name.isEmpty() )
-        return (*userAttributesLock)->name;
+    if( !getId().isNull() )
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if( !(*userAttributesLock)->name.isEmpty() )
+            return (*userAttributesLock)->name;
+    }
     return QnResource::getName();
 }
 
@@ -149,8 +152,6 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
-        QnConstResourceVideoLayoutPtr layout = getVideoLayout();
-
         if (other_casted->m_groupId != m_groupId)
             modifiedFields << "groupIdChanged";
 
@@ -363,12 +364,35 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
     }
 }
 
-QStringList QnSecurityCamResource::getRelayOutputList() const {
-    return QStringList();
+QnIOPortDataList QnSecurityCamResource::getRelayOutputList() const {
+    QnIOPortDataList result;
+    QnIOPortDataList ports = getIOPorts();
+    for (const auto& port: ports) {
+        if (port.portType == Qn::PT_Output)
+            result.push_back(port);
+    }
+    return result;
 }
 
-QStringList QnSecurityCamResource::getInputPortList() const {
-    return QStringList();
+QnIOPortDataList QnSecurityCamResource::getInputPortList() const 
+{
+    QnIOPortDataList result;
+    QnIOPortDataList ports = getIOPorts();
+    for (const auto& port: ports) {
+        if (port.portType == Qn::PT_Input)
+            result.push_back(port);
+    }
+    return result;
+}
+
+void QnSecurityCamResource::setIOPorts(const QnIOPortDataList& ports)
+{
+    setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(ports)));
+}
+
+QnIOPortDataList QnSecurityCamResource::getIOPorts() const
+{
+    return QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
 }
 
 bool QnSecurityCamResource::setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeout) {
@@ -676,7 +700,15 @@ void QnSecurityCamResource::setAudioEnabled(bool enabled) {
     (*userAttributesLock)->audioEnabled = enabled;
 }
 
-bool QnSecurityCamResource::isAudioEnabled() const {
+bool QnSecurityCamResource::isAudioForced() const
+{
+    return getProperty(Qn::IS_AUDIO_FORCED_PARAM_NAME).toInt() > 0;
+}
+
+bool QnSecurityCamResource::isAudioEnabled() const 
+{
+    if (isAudioForced())
+        return true;
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     return (*userAttributesLock)->audioEnabled;
 }
@@ -872,8 +904,14 @@ void QnSecurityCamResource::resetCachedValues()
     m_motionType.reset();
 }
 
-bool QnSecurityCamResource::isBitratePerGOP() const
+Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    return resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP) || getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0;
+    if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
+        return Qn::BPG_Predefined;
+
+    if (getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0)
+        return Qn::BPG_User;
+
+    return Qn::BPG_None;
 }

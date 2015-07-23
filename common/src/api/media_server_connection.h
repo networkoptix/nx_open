@@ -210,9 +210,11 @@ public:
 
     int restart(QObject *target, const char *slot);
 
-    int configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot);
+    int configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, 
+        const QByteArray &passwordDigest, const QByteArray &cryptSha512Hash, int port, QObject *target, const char *slot);
 
     int pingSystemAsync(const QUrl &url, const QString &user, const QString &password, QObject *target, const char *slot);
+    int getRecordingStatisticsAsync(qint64 bitrateAnalizePeriodMs, QObject *target, const char *slot);
     int mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot);
 
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);

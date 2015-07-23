@@ -781,8 +781,7 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
 
 AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize)
 {
-    int prefix = url.indexOf(QLatin1String("://"));
-    QString path = prefix == -1 ? url : url.mid(prefix+3);
+    QString path = url;
 
     quint8* ioBuffer;
     AVIOContext* ffmpegIOContext;

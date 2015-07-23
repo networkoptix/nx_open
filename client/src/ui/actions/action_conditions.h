@@ -512,6 +512,13 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
+class QnOpenIOMonitorActionCondition: public QnActionCondition {
+public:
+    QnOpenIOMonitorActionCondition(QObject *parent): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
 class QnOpenInNewEntityActionCondition: public QnActionCondition {
 public: 
     QnOpenInNewEntityActionCondition(QObject *parent): QnActionCondition(parent) {}

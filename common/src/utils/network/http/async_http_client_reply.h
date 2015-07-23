@@ -5,13 +5,8 @@
 #include <QtCore/QObject>
 #include <utils/thread/mutex.h>
 
-#include <utils/network/http/httptypes.h>
+#include "asynchttpclient.h"
 
-namespace nx_http {
-    /* Forward declaration */
-    class AsyncHttpClient;
-    typedef std::shared_ptr<AsyncHttpClient> AsyncHttpClientPtr;
-}
 
 class QnAsyncHttpClientReply : public QObject {
     Q_OBJECT

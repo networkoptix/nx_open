@@ -191,7 +191,7 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
-void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, bool displayDebug)
+void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
 {
     Q_D(QnTCPConnectionProcessor);
 
@@ -223,20 +223,16 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     if (!contentType.isEmpty())
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Type", contentType ) );
     if (!d->chunkedMode /*&& !contentType.isEmpty()*/ && (contentType.indexOf("multipart") == -1))
-        nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->responseBody.length()) ) );
+        nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->response.messageBody.length()) ) );
 
-    QByteArray response = d->response.toString();
-    if (!d->responseBody.isEmpty())
-    {
-        response += d->responseBody;
-    }
+    QByteArray response = !multipartBoundary.isEmpty() ? d->response.toMultipartString(multipartBoundary) : d->response.toString();
 
     if (displayDebug)
         NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getForeignAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
 
     NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
         arg(d->socket->getForeignAddress().toString()).
-        arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->responseBody.size() : 0)))), cl_logDEBUG1 );
+        arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)))), cl_logDEBUG1 );
 
     QnMutexLocker lock( &d->sockMutex );
     sendData(response.data(), response.size());
@@ -317,7 +313,6 @@ bool QnTCPConnectionProcessor::readRequest()
     d->response = nx_http::Response();
     d->clientRequest.clear();
     d->requestBody.clear();
-    d->responseBody.clear();
 
     boost::optional<qint64> fullHttpMessageSize;
     while (!needToStop() && d->socket->isConnected())
@@ -360,7 +355,6 @@ bool QnTCPConnectionProcessor::readSingleRequest()
     d->request = nx_http::Request();
     d->response = nx_http::Response();
     d->requestBody.clear();
-    d->responseBody.clear();
     d->currentRequestSize = 0;
     d->prevSocketError = SystemError::noError;
 
@@ -468,8 +462,8 @@ void QnTCPConnectionProcessor::releaseSocket()
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
 {
     Q_D(QnTCPConnectionProcessor);
-    contentType = "text/html; charset=iso-8859-1";
-    d->responseBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
+    contentType = "text/html; charset=utf-8";
+    d->response.messageBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
     d->response.headers.insert(nx_http::HttpHeader("Location", page));
     return CODE_MOVED_PERMANENTLY;
 }

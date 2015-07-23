@@ -35,6 +35,7 @@ namespace ec2
         static const QString SR_TIME_CYCLE;
         static const QString SR_SERVER_API;
         static const QString SYSTEM_ID;
+        static const QString SYSTEM_NAME_FOR_ID;
 
         // server information
         static const QString DEFAULT_SERVER_API;

@@ -16,6 +16,8 @@ extern "C"
 #include <utils/common/util.h>
 #include <utils/common/model_functions.h>
 
+#include <core/resource/storage_plugin_factory.h>
+
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_resource.h>
@@ -122,7 +124,8 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_duration(AV_NOPTS_VALUE),
     m_ioContext(0),
     m_eofReached(false),
-    m_fastStreamFind(false)
+    m_fastStreamFind(false),
+    m_hasVideo(true)
 {
     close();
     m_audioLayout.reset( new QnAviAudioLayout(this) );
@@ -362,6 +365,13 @@ const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
     return entry ? entry->value : 0;
 }
 
+bool QnAviArchiveDelegate::hasVideo() const
+{
+    auto nonConstThis = const_cast<QnAviArchiveDelegate*> (this);
+    nonConstThis->findStreams();
+    return m_hasVideo;
+}
+
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
 QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
 {
@@ -449,8 +459,7 @@ bool QnAviArchiveDelegate::findStreams()
     {
         if (m_fastStreamFind) {
             m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
-            // TODO: #vasilenko avoid using deprecated methods
-            avformat_find_stream_info(m_formatContext, NULL);
+            avformat_find_stream_info(m_formatContext, nullptr);
             m_formatContext->interrupt_callback.callback = 0;
             m_streamsFound = m_formatContext->nb_streams > 0;
             for (unsigned i = 0; i < m_formatContext->nb_streams; ++i)
@@ -458,7 +467,7 @@ bool QnAviArchiveDelegate::findStreams()
         }
         else {
             // TODO: #vasilenko avoid using deprecated methods
-            m_streamsFound = avformat_find_stream_info(m_formatContext, NULL) >= 0;
+            m_streamsFound = avformat_find_stream_info(m_formatContext, nullptr) >= 0;
         }
 
         if (m_streamsFound) 
@@ -478,7 +487,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
     int videoNum= 0;
     int lastStreamID = -1;
     m_firstVideoIndex = -1;
-
+    m_hasVideo = false;
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *strm= m_formatContext->streams[i];
@@ -500,6 +509,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
                 m_indexToChannel << -1;
             m_indexToChannel[i] = videoNum;
             videoNum++;
+            m_hasVideo = true;
             break;
 
         default:

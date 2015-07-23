@@ -6,7 +6,7 @@ import sys
 import os
 import argparse
 
-targetBranch = 'prod_2.3.1';
+targetBranch = 'prod_2.3.2';
 ignoredCommits = ['Merge', '']
 verbose = False
 header = 'Merge Changelog:'

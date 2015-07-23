@@ -20,16 +20,17 @@ QIODevice* QnQtFileStorageResource::open(const QString& url, QIODevice::OpenMode
     return rez;
 }
 
-
-
-QnQtFileStorageResource::QnQtFileStorageResource()
+int QnQtFileStorageResource::getCapabilities() const
 {
-};
-
-bool QnQtFileStorageResource::isNeedControlFreeSpace()
-{
-    return false;
+    return m_capabilities;
 }
+
+QnQtFileStorageResource::QnQtFileStorageResource() 
+    : m_capabilities(0)
+{
+    m_capabilities |= cap::ListFile;
+    m_capabilities |= cap::ReadFile;
+};
 
 bool QnQtFileStorageResource::removeFile(const QString& url)
 {
@@ -57,11 +58,6 @@ bool QnQtFileStorageResource::isDirExists(const QString& url)
     return d.exists(removeProtocolPrefix(url));
 }
 
-bool QnQtFileStorageResource::isCatalogAccessible()
-{
-    return true;
-}
-
 bool QnQtFileStorageResource::isFileExists(const QString& url)
 {
     return QFile::exists(removeProtocolPrefix(url));
@@ -77,13 +73,13 @@ qint64 QnQtFileStorageResource::getTotalSpace()
     return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
 }
 
-QFileInfoList QnQtFileStorageResource::getFileList(const QString& dirName)
+QnAbstractStorageResource::FileInfoList QnQtFileStorageResource::getFileList(const QString& dirName)
 {
     QDir dir;
     if (dir.cd(dirName))
-        return dir.entryInfoList(QDir::Files);
+        return QnAbstractStorageResource::FIListFromQFIList(dir.entryInfoList(QDir::Files));
     else
-        return QFileInfoList();
+        return QnAbstractStorageResource::FileInfoList();
 }
 
 qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
@@ -92,7 +88,7 @@ qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
 	return 0; // not implemented
 }
 
-bool QnQtFileStorageResource::isStorageAvailable()
+bool QnQtFileStorageResource::isAvailable() const
 {
     QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);
@@ -113,25 +109,15 @@ bool QnQtFileStorageResource::isStorageAvailable()
     return false;
 }
 
-int QnQtFileStorageResource::getChunkLen() const 
-{
-    return 60;
-}
-
 QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url)
 {
     int prefix = url.indexOf(QLatin1String("://"));
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
 
-QnStorageResource* QnQtFileStorageResource::instance()
+QnStorageResource* QnQtFileStorageResource::instance(const QString&)
 {
     return new QnQtFileStorageResource();
-}
-
-bool QnQtFileStorageResource::isStorageAvailableForWriting()
-{
-    return false; // it is read only file system
 }
 
 #endif //ENABLE_DATA_PROVIDERS

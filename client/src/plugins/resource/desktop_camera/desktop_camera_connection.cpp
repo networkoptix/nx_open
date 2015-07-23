@@ -45,11 +45,13 @@ protected:
             return false;
 
         int streamIndex = media->channelNumber;
+        Q_ASSERT(streamIndex <= 1);
 
         m_serializers[streamIndex].setDataPacket(media);
         m_owner->sendLock();
         while(!m_needStop && m_owner->isConnected() && m_serializers[streamIndex].getNextPacket(sendBuffer))
         {
+            Q_ASSERT(sendBuffer.size() < 65536 - 4);
             quint8 header[4];
             header[0] = '$';
             header[1] = streamIndex;
@@ -250,8 +252,8 @@ void QnDesktopCameraConnection::run()
 
         processor = new QnDesktopCameraConnectionProcessor(connection->getSocket(), 0, m_owner);
 
-        QTime timeout;
-        timeout.restart();
+        QElapsedTimer timeout;
+        timeout.start();
         while (!m_needStop && connection->getSocket()->isConnected())
         {
             if (processor->readRequest()) {

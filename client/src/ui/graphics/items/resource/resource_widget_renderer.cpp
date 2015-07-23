@@ -178,7 +178,7 @@ QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
 }
 
 Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity) {
-    if (m_channelRenderers.size() < channel)
+    if (m_channelRenderers.size() < static_cast<size_t>(channel))
         return Qn::NothingRendered;
     RenderingTools &ctx = m_channelRenderers[channel];
     if(!ctx.renderer)

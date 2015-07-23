@@ -22,7 +22,7 @@ static const unsigned int MAX_UPNP_RESPONSE_PACKET_SIZE = 512*1024;
 static const int XML_DESCRIPTION_LIVE_TIME_MS = 5*60*1000;
 static const int PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS = 24*60*60*1000;
 
-//!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
+//!Partial parser for SSDP descrition xml (UPnP(TM) Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
 :
     public QXmlDefaultHandler
@@ -355,7 +355,7 @@ void UPNPDeviceSearcher::startFetchDeviceXml(
         }
 
         //TODO: #ak linear search is not among fastest ones known to humanity
-        for( std::map<std::shared_ptr<nx_http::AsyncHttpClient>, DiscoveredDeviceInfo>::const_iterator
+        for( std::map<nx_http::AsyncHttpClientPtr, DiscoveredDeviceInfo>::const_iterator
             it = m_httpClients.begin();
             it != m_httpClients.end();
             ++it )
@@ -364,7 +364,7 @@ void UPNPDeviceSearcher::startFetchDeviceXml(
                 return; //if there is unfinished request to url descriptionUrl or to device with id uuidStr, then return
         }
 
-        httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+        httpClient = nx_http::AsyncHttpClient::create();
         m_httpClients[httpClient] = std::move(info);
     }
 

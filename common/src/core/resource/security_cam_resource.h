@@ -12,6 +12,7 @@
 #include "network_resource.h"
 #include "common/common_globals.h"
 #include "business/business_fwd.h"
+#include "api/model/api_ioport_data.h"
 
 
 class QnAbstractArchiveDelegate;
@@ -116,8 +117,8 @@ public:
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
 
-    virtual QStringList getRelayOutputList() const;
-    virtual QStringList getInputPortList() const;
+    virtual QnIOPortDataList getRelayOutputList() const;
+    virtual QnIOPortDataList getInputPortList() const;
 
 
     Qn::CameraCapabilities getCameraCapabilities() const;
@@ -157,6 +158,7 @@ public:
     bool isScheduleDisabled() const;
 
     bool isAudioEnabled() const;
+    bool isAudioForced() const;
     void setAudioEnabled(bool value);
 
     bool isAdvancedWorking() const;
@@ -233,6 +235,18 @@ public:
      * Implemented in QnDesktopCameraResource.
      */
     virtual bool isReadyToDetach() const {return true;}
+
+    //!Set list of IO ports
+    void setIOPorts(const QnIOPortDataList& ports);
+    
+    //!Returns list if IO ports
+    QnIOPortDataList getIOPorts() const;
+    
+    //!Returns list of IO ports's states
+    virtual QnIOStateDataList ioStates() const { return QnIOStateDataList(); }
+    
+    virtual Qn::BitratePerGopType bitratePerGopType() const;
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -259,6 +273,12 @@ signals:
         \param timestamp MSecs since epoch, UTC
     */
     void cameraInput(
+        const QnResourcePtr& resource,
+        const QString& inputPortID,
+        bool value,
+        qint64 timestamp );
+    
+    void cameraOutput(
         const QnResourcePtr& resource,
         const QString& inputPortID,
         bool value,
@@ -294,7 +314,6 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
-    virtual bool isBitratePerGOP() const;
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;

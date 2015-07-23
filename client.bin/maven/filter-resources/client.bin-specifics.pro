@@ -1,6 +1,4 @@
-TEMPLATE = app
 QT += xmlpatterns
-
 DEFINES += CL_FORCE_LOGO
 TRANSLATIONS += ${basedir}/translations/client_en.ts \
 
@@ -32,7 +30,6 @@ unix: !mac {
 }
 
 mac {
-    OBJECTIVE_SOURCES += ${basedir}/src/ui/workaround/mac_utils.mm
     LIBS += -lobjc -framework Foundation -framework AudioUnit -framework AppKit
 }
 

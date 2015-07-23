@@ -20,8 +20,31 @@
 #endif
 
 
+class IQnFile
+{
+public:
+    virtual QString getFileName() const = 0;
+
+    virtual bool open(
+        const QIODevice::OpenMode   &mode, 
+        unsigned int                systemDependentFlags = 0
+    ) = 0;
+    
+    virtual void close() = 0;
+    virtual qint64 read(char* buffer, qint64 count) = 0;
+
+    virtual qint64 write(const char* buffer, qint64 count) = 0;
+    virtual bool isOpen() const = 0;
+    virtual qint64 size() const = 0;
+    virtual bool seek( qint64 offset) = 0;
+    virtual bool truncate( qint64 newFileSize) = 0;
+
+    virtual ~IQnFile() {}
+};
+
 class QN_EXPORT QnFile
 :
+    public IQnFile,
     public std::enable_shared_from_this<QnFile>
 {
 public:
@@ -58,7 +81,7 @@ public:
     QnFile(const QString& fName);
     virtual ~QnFile();
     void setFileName(const QString& fName) { m_fileName = fName; }
-    QString getFileName() const { return m_fileName; }
+    virtual QString getFileName() const { return m_fileName; }
 
     virtual bool open(const QIODevice::OpenMode& mode, unsigned int systemDependentFlags = 0);
     virtual void close();

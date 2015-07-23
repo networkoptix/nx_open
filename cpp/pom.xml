@@ -164,7 +164,9 @@
                                     <!-- <excludes>
                                         <exclude>**/vmaxproxy-x64.vcproj</exclude>
                                     </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
+                                    <ignoreMissingFile>true</ignoreMissingFile>   
+									<escape>true</escape>
+									<regex>false</regex>									
                                     <replacements>
                                         <replacement>
                                             <token>Win32</token>
@@ -173,7 +175,11 @@
                                         <replacement>
                                             <token>Name="VCLibrarianTool"</token>
                                             <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
-                                        </replacement>         
+                                        </replacement>  
+                                        <replacement>
+                                            <token>;c:\Qt\5.4.2\qt-5.4.2-x64-msvc2012-opengl\lib\Qt5Core.lib;</token>
+                                            <value>;</value>
+                                        </replacement>  										
                                     </replacements>
                                 </configuration>                                
                             </execution>
@@ -189,7 +195,9 @@
                                     <!-- <excludes>
                                         <exclude>**/vmaxproxy-x64.vcproj</exclude>
                                     </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
+                                    <ignoreMissingFile>true</ignoreMissingFile>          
+									<escape>true</escape>
+									<regex>false</regex>	                                    
                                     <replacements>
                                         <replacement>
                                             <token>x64</token>
@@ -198,12 +206,16 @@
                                         <replacement>
                                             <token>Name="VCLibrarianTool"</token>
                                             <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
+                                        </replacement> 
+                                        <replacement>
+                                            <token>;c:\Qt\5.4.2\qt-5.4.2-x86-msvc2012-opengl\lib\Qt5Core.lib;</token>
+                                            <value>;</value>
                                         </replacement>         
                                     </replacements>
                                 </configuration>                                
                             </execution>
 
-                            <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unneccessary (when qmake is fixed) -->
+                            <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unnecessary (when qmake is fixed) -->
                             <execution>
                                 <id>fix-vcxproj-QMAKE-SUCKS!!!!!!!!!!</id>
                                 <phase>process-resources</phase>
@@ -230,6 +242,7 @@
                                             <token><![CDATA[<WarningLevel>Level3</WarningLevel>]]></token>
                                             <value><![CDATA[<WarningLevel>Level3</WarningLevel><Optimization>Disabled</Optimization>]]></value>
                                         </replacement>
+
                                         <replacement>
                                             <token>
                                                 <![CDATA[</RootNamespace>]]></token>
@@ -487,8 +500,8 @@
                                     <goal>replace</goal>
                                 </goals>
                                 <configuration>
-   				    <escape>true</escape>
-    				    <regex>false</regex>
+                                    <escape>true</escape>
+                                    <regex>false</regex>
                                     <encoding>utf-8</encoding>
                                     <file>${project.build.directory}/Makefile.release</file>
                                     <ignoreMissingFile>true</ignoreMissingFile>                                    

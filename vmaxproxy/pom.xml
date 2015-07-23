@@ -25,6 +25,7 @@
         <!--Skipping replace plugin. It replaces Win32->x64 in vcproj files for x64 build.-->
         <product.title>${vmaxproxy.name}</product.title>	
         <force_x86>true</force_x86>
+        <template>app</template>
         <!--Global libs-->
         <qt.libs>core</qt.libs>
         <global.libs/>

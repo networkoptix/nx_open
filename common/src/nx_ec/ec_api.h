@@ -284,11 +284,11 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int saveStorages( const QnAbstractStorageResourceList& storages, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int saveStorages( const QnStorageResourceList& storages, TargetType* target, HandlerType handler ) {
             return saveStorages( storages, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode saveStoragesSync( const QnAbstractStorageResourceList& storages) {
+        ErrorCode saveStoragesSync( const QnStorageResourceList& storages) {
             return impl::doSyncCall<impl::SimpleHandler>( 
                 [=](const impl::SimpleHandlerPtr &handler) {
                     return this->saveStorages(storages, handler);
@@ -341,7 +341,7 @@ namespace ec2
 
     signals:
         void addedOrUpdated( QnMediaServerResourcePtr camera );
-        void storageChanged( QnAbstractStorageResourcePtr camera );
+        void storageChanged( QnStorageResourcePtr camera );
         void removed( QnUuid id );
         void storageRemoved( QnUuid id );
         void userAttributesChanged( QnMediaServerUserAttributesPtr attributes );
@@ -352,7 +352,7 @@ namespace ec2
         virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
         virtual int saveUserAttributes( const QnMediaServerUserAttributesList& serverAttrs, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int saveStorages( const QnAbstractStorageResourceList& storages, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int saveStorages( const QnStorageResourceList& storages, impl::SimpleHandlerPtr handler ) = 0;
         virtual int removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler ) = 0;
         virtual int getStorages( const QnUuid& mediaServerId, impl::GetStoragesHandlerPtr handler ) = 0;
