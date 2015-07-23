@@ -13,7 +13,7 @@
 #include <QSharedPointer>
 
 #include "core/resource/camera_resource.h"
-#include "../../camera_plugin_qt_wrapper.h"
+#include "plugins/camera_plugin_qt_wrapper.h"
 
 
 //!Camera resource, integrated via external driver. Routes requests to \a nxcip::BaseCameraManager interface
