@@ -116,7 +116,7 @@ void QnAuditManager::at_timer()
             {
                 // aggregate data. join other records to this one
                 CameraPlaybackInfo pbInfo = *itr;
-                QnAuditRecord record = prepareRecord(pbInfo.session, pbInfo.startTimeUsec == DATETIME_NOW ? AR_ViewLive : AR_ViewArchive);
+                QnAuditRecord record = prepareRecord(pbInfo.session, pbInfo.startTimeUsec == DATETIME_NOW ? Qn::AR_ViewLive : Qn::AR_ViewArchive);
                 while (itr != m_closedPlaybackInfo.end())
                 {
                     if (canJoinRecords(pbInfo, *itr)) {
