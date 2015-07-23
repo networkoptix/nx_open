@@ -1,6 +1,10 @@
 CONFIG += console
 
-include( ${libdir}/gtest.pri )
+CONFIG(debug,debug|release) {
+  LIBS += -lgtestd -lgtest_main-mdd
+} else {
+  LIBS += -lgtest -lgtest_main-md
+}
 
 !win32 {
   ext_debug2.target  = $(TARGET).debug

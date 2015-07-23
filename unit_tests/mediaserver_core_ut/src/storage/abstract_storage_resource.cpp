@@ -20,14 +20,18 @@ TEST(AbstractStorageResourceTest, Init)
     
     tg.storages.push_back(fileStorage);
 
+    const char * ftpStorageUrl = "ftp://anonymous:@127.0.0.1/tmp";
     QnStorageResource *ftpStorage = 
         QnStoragePluginFactory::instance()->createStorage(
-            "ftp://anonymous:@127.0.0.1/tmp",
+            ftpStorageUrl,
             false
         );
     ASSERT_TRUE(ftpStorage);
     if (ftpStorage)
+    {
+        ftpStorage->setUrl(ftpStorageUrl);
         tg.storages.push_back(ftpStorage);
+    }
 }
 
 TEST(AbstractStorageResourceTest, Capabilities)
@@ -47,9 +51,9 @@ TEST(AbstractStorageResourceTest, Capabilities)
     }
 }
 
-TEST(AbstractStorageResourceTest, FileCommonOperations)
+TEST(AbstractStorageResourceTest, StorageCommonOperations)
 {
-    const size_t fileCount = 200;
+    const size_t fileCount = 500;
     std::vector<QString> fileNames;
     const char *dummyData = "abcdefgh";
     const size_t dummyDataLen = strlen(dummyData);
@@ -99,6 +103,10 @@ TEST(AbstractStorageResourceTest, FileCommonOperations)
                     QIODevice::WriteOnly
                 )
             );
+            if (!ioDevice)
+            {
+                std::cout << "ioDevice creation failed: " << fileName.toStdString() << std::endl;
+            }
             ASSERT_TRUE(ioDevice);
             ASSERT_TRUE(ioDevice->write(dummyData, dummyDataLen) == dummyDataLen);
         }
@@ -110,11 +118,37 @@ TEST(AbstractStorageResourceTest, FileCommonOperations)
             ASSERT_TRUE(storage->getFileSize(fname) == dummyDataLen);
         }
 
-        // remove all files
-        for (const auto &fname : fileNames)
-        {   
-            ASSERT_TRUE(storage->removeFile(fname));
-        }
+        // remove all
+        QnAbstractStorageResource::FileInfoList rootFileList = storage->getFileList(
+            storage->getUrl()
+        );
+        ASSERT_TRUE(!rootFileList.isEmpty());
+
+        std::function<void (const QnAbstractStorageResource::FileInfoList &)> recursiveRemover =
+            [&](const QnAbstractStorageResource::FileInfoList &fl)
+            {
+                for (const auto& entry : fl)
+                {
+                    if (entry.isDir())
+                    {
+                        ASSERT_TRUE(storage->isDirExists(entry.absoluteFilePath()));
+                        QnAbstractStorageResource::FileInfoList dirFileList = 
+                            storage->getFileList(
+                                entry.absoluteFilePath()
+                            );
+                        if (!dirFileList.isEmpty())
+                            recursiveRemover(dirFileList);
+                        ASSERT_TRUE(storage->removeDir(entry.absoluteFilePath()));
+                    }
+                    else
+                    {
+                        ASSERT_TRUE(storage->removeFile(entry.absoluteFilePath()));
+                    }
+                }
+            };
+        recursiveRemover(rootFileList);
+        rootFileList = storage->getFileList(storage->getUrl());
+        ASSERT_TRUE(rootFileList.isEmpty());
     }
 }
 
