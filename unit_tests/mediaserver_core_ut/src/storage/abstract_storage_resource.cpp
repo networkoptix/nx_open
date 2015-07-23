@@ -20,7 +20,7 @@ TEST(AbstractStorageResourceTest, Init)
     
     tg.storages.push_back(fileStorage);
 
-    const char * ftpStorageUrl = "ftp://anonymous:@127.0.0.1/tmp";
+    const char * ftpStorageUrl = "ftp://anonymous:@10.0.2.131/tmp";
     QnStorageResource *ftpStorage = 
         QnStoragePluginFactory::instance()->createStorage(
             ftpStorageUrl,

@@ -213,7 +213,8 @@ int ftplib::readline(char *buf,int max,ftphandle *ctl)
 			break;
 		}
 
-		if (!socket_wait(ctl)) return retval;
+		if (!socket_wait(ctl)) 
+            return retval;
 
 #ifndef NOSSL
 		if (ctl->tlsdata) x = SSL_read(ctl->ssl, ctl->cput, ctl->cleft);
@@ -478,7 +479,8 @@ int ftplib::FtpSendCmd(const char *cmd, char expresp, ftphandle *nControl)
 
 	if (!nControl->handle) return 0;
 
-	if (nControl->dir != FTPLIB_CONTROL) return 0;
+	if (nControl->dir != FTPLIB_CONTROL) 
+        return 0;
 	sprintf(buf,"%s\r\n",cmd);
 
 #ifndef NOSSL
@@ -908,9 +910,19 @@ int ftplib::FtpOpenPasv(ftphandle *nControl, ftphandle **nData, transfermode mod
 		return -1;
 	}
 
+#ifdef _WIN32
+#   define ioctl ioctlsocket
+#else
+#   define ioctl ioctl
+#endif
+
 	if (connect(sData, &sin.sa, sizeof(sin.sa)) == -1)
 	{
-		//perror("connect");
+        unsigned long count = 0;
+        int ecode = ioctl(nControl->handle, FIONREAD, &count);
+        if (ecode == 0 && count > 0)
+            readresp('1', nControl);
+#undef ioctl
 		net_close(sData);
 		return -1;
 	}
@@ -1105,7 +1117,8 @@ int ftplib::Mkdir(const char *path)
 
 	if ((strlen(path) + 6) > sizeof(buf)) return 0;
 	sprintf(buf,"MKD %s",path);
-	if (!FtpSendCmd(buf,'2', mp_ftphandle)) return 0;
+	if (!FtpSendCmd(buf,'2', mp_ftphandle)) 
+        return 0;
 	return 1;
 }
 
