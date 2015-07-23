@@ -19,7 +19,8 @@
 class PtsToClockMapper
 {
 public:
-    typedef int32_t pts_type;
+    typedef uint32_t pts_type;
+    typedef int64_t ts_type;
 
     //!Used for synchronizing multiple streams with same source
     /*!
@@ -44,15 +45,19 @@ public:
         size_t m_modificationSequence;
     };
 
+    /*!
+        \param ptsFrequency Number of pts ticks per second
+    */
     PtsToClockMapper(
         pts_type ptsFrequency,
+        size_t ptsBits,
         TimeSynchronizationData* timeSynchro,
         int sourceID = -1 );
 
     /*!
         \return Synchronized absolute local time (usec) corresponding to frame generation
     */
-    int64_t getTimestamp( pts_type pts );
+    ts_type getTimestamp( pts_type pts );
     /*!
         \a localTimeOnSource Usec. Absolute time on source corresponding to \a pts
     */
@@ -62,14 +67,25 @@ private:
     //void resyncTime( int32_t pts, int64_t absoluteSourceTimeUsec );
 
     const int64_t m_ptsFrequency;
+    const size_t m_ptsBits;
+    const pts_type m_ptsMask;
+    const pts_type m_maxPtsDrift;
+    size_t m_ptsOverflowCount;
     TimeSynchronizationData* const m_timeSynchro;
     const int m_sourceID;
     pts_type m_prevPts;
     pts_type m_ptsBase;
-    int64_t m_baseClock;
-    int64_t m_baseClockOnSource;
+    ts_type m_baseClock;
+    ts_type m_baseClockOnSource;
     size_t m_sharedSynchroModificationSequence;
     bool m_prevPtsValid;
+
+    pts_type absDiff(
+        PtsToClockMapper::pts_type one,
+        PtsToClockMapper::pts_type two ) const;
+    pts_type diff(
+        PtsToClockMapper::pts_type one,
+        PtsToClockMapper::pts_type two ) const;
 };
 
 #endif  //PTS_TO_CLOCK_MAPPER_H
