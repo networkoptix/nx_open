@@ -59,6 +59,7 @@ namespace {
 
     enum Column {
         CheckBoxColumn,
+        TypeColumn,
         PathColumn,
         CapacityColumn,
         LoginColumn,
@@ -120,6 +121,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->horizontalHeader()->setSectionsClickable(false);
     ui->storagesTable->horizontalHeader()->setStretchLastSection(false);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(CheckBoxColumn, QHeaderView::Fixed);
+    ui->storagesTable->horizontalHeader()->setSectionResizeMode(TypeColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(PathColumn, QHeaderView::Stretch);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(LoginColumn, QHeaderView::ResizeToContents);
@@ -224,17 +226,33 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     checkBoxItem->setData(StorageIdRole, QVariant::fromValue<QnUuid>(item.storageId));
     checkBoxItem->setData(ExternalRole, item.isExternal);
     checkBoxItem->setData(StorageType, item.storageType);
+    if (m_initialStorageCheckStates.size() <= row)
+        m_initialStorageCheckStates.resize(row + 1);
     m_initialStorageCheckStates[row] = checkBoxItem->checkState() == Qt::Checked;
+
+    QTableWidgetItem *typeItem = new QTableWidgetItem();
+    typeItem->setFlags(Qt::ItemIsEnabled);
+    typeItem->setData(Qt::DisplayRole, item.storageType);
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    pathItem->setData(Qt::DisplayRole, item.url);
+    pathItem->setData(Qn::StorageUrlRole, item.url);
+
+    QUrl url(item.url);
+    if (item.storageType == lit("file"))
+        pathItem->setData(Qt::DisplayRole, url.path().mid(1));
+    else if (item.storageType == lit("local"))
+        pathItem->setData(Qt::DisplayRole, item.url);
+    else 
+        pathItem->setData(
+            Qt::DisplayRole, 
+            url.host() + (url.port() != -1 ? lit(":") + QString::number(url.port()) : lit(""))  + url.path()
+        );
 
     QTableWidgetItem *capacityItem = new QTableWidgetItem();
     capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     capacityItem->setData(Qt::DisplayRole, item.totalSpace == -1 ? tr("Not available") : QnStorageSpaceSlider::formatSize(item.totalSpace));
 
-    QUrl url(item.url);
     QTableWidgetItem *loginItem = new QTableWidgetItem();
     loginItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     loginItem->setData(Qt::DisplayRole, url.userName());
@@ -254,6 +272,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     archiveSpaceItem->setData(FreeSpaceRole, item.freeSpace);
 
     ui->storagesTable->setItem(row, CheckBoxColumn, checkBoxItem);
+    ui->storagesTable->setItem(row, TypeColumn, typeItem);
     ui->storagesTable->setItem(row, PathColumn, pathItem);
     ui->storagesTable->setItem(row, CapacityColumn, capacityItem);
     ui->storagesTable->setItem(row, LoginColumn, loginItem);
@@ -281,6 +300,7 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
         return result;
 
     QTableWidgetItem *checkBoxItem = ui->storagesTable->item(row, CheckBoxColumn);
+    QTableWidgetItem *typeItem = ui->storagesTable->item(row, TypeColumn);
     QTableWidgetItem *pathItem = ui->storagesTable->item(row, PathColumn);
     QTableWidgetItem *capacityItem = ui->storagesTable->item(row, CapacityColumn);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
@@ -291,25 +311,13 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
-    result.storageType = checkBoxItem->data(StorageType).value<QString>();
+    result.storageType = typeItem->text();
     result.storageId = checkBoxItem->data(StorageIdRole).value<QnUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
     QString login = ui->storagesTable->item(row, LoginColumn)->text();
     QString password = ui->storagesTable->item(row, PasswordColumn)->text();
-    if (login.isEmpty())
-        result.url = pathItem->text();
-    else {
-        if (pathItem->text().indexOf(lit("://")) != -1)
-            result.url = pathItem->text();
-        else
-        {
-            QUrl url = QString(lit("file:///%1")).arg(pathItem->text());
-            url.setUserName(login);
-            url.setPassword(password);
-            result.url = url.toString();
-        }
-    }
+    result.url = qvariant_cast<QString>(pathItem->data(Qn::StorageUrlRole));
 
     result.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();
     result.freeSpace = archiveSpaceItem->data(FreeSpaceRole).toLongLong();

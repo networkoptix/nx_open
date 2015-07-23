@@ -42,7 +42,7 @@ public:
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
-    explicit QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection,
+    explicit QnSingleThumbnailLoader(const QnMediaServerResourcePtr &server,
                                      const QnVirtualCameraResourcePtr &camera,
                                      qint64 microSecSinceEpoch,
                                      int rotation,
@@ -63,7 +63,7 @@ private:
     QnVirtualCameraResourcePtr m_camera;
 
     /** Server connection that this loader uses. */
-    QnMediaServerConnectionPtr m_connection;
+    QnMediaServerResourcePtr m_server;
 
     QImage m_image;
 

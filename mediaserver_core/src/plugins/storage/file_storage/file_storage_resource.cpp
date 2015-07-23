@@ -8,6 +8,12 @@
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
+#include "utils/fs/file.h"
+
+#ifndef _WIN32
+#   include <platform/monitoring/global_monitor.h>
+#   include <platform/platform_abstraction.h>
+#endif
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -40,6 +46,13 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
+    
+    if (openMode & QIODevice::WriteOnly) 
+    {
+        QDir dir;
+        dir.mkpath(QnFile::absolutePath(fileName));
+    }
+
     std::unique_ptr<QBufferedFile> rez(
         new QBufferedFile(
             std::shared_ptr<IQnFile>(new QnFile(fileName)), 
@@ -51,6 +64,15 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     if (!rez->open(openMode))
         return 0;
     return rez.release();
+}
+
+QString QnFileStorageResource::getPath() const
+{
+    QString url = getUrl();
+    if (!url.contains(lit("://")))
+        return url;
+    else
+        return QUrl(url).path().mid(1);
 }
 
 bool QnFileStorageResource::updatePermissions() const
@@ -266,7 +288,7 @@ bool QnFileStorageResource::isAvailable() const
 QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 {
     int prefix = url.indexOf("://");
-    return prefix == -1 ? url : url.mid(prefix + 3);
+    return prefix == -1 ? url :QUrl(url).path().mid(1);//url.mid(prefix + 3);
 }
 
 QnStorageResource* QnFileStorageResource::instance(const QString&)

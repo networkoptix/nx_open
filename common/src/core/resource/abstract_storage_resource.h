@@ -138,16 +138,6 @@ public:
     */
     virtual int getCapabilities() const = 0;
 
-    ///**
-    // * TODO: #vasilenko doxydocs!
-    // */
-    //virtual int getChunkLen() const = 0;
-
-    ///**
-    // * \returns                         Whether the storage automatically deletes old files.
-    // */
-    //virtual bool isNeedControlFreeSpace() = 0;
-
     /**
      * \returns                         Storage free space in bytes, or <tt>UnknownSize</tt> if this function is not supported.
      */
@@ -162,12 +152,6 @@ public:
     // * \returns                         Whether the storage is physically accessible.
     // */
     virtual bool isAvailable() const = 0;
-
-    ///**
-    // * \returns                         Whether the storage is physically accessible and ready for writing
-    // */
-    //virtual bool isStorageAvailableForWriting() = 0;
-
 
     /**
      * \param url                       Url of the file to delete.
@@ -209,21 +193,6 @@ public:
      * \returns                         Whether a folder with the given name exists.
      */
     virtual bool isDirExists(const QString& url) = 0;
-
-    ///**
-    // * \returns                         Whether storage supports catalog functions: 
-    // *                                  <tt>isFileExists</tt>, <tt>isDirExists</tt>, <tt>getFileList</tt>. 
-    // *                                  If function returns false, server doesn't check file catalog on startup.
-    // */
-    //virtual bool isCatalogAccessible() = 0;
-
-    ///**
-    // * TODO: #vasilenko doxydocs!
-    // */
-    //virtual bool isRealFiles() const{return true;}
-
-    //qint64 getWritedSpace() const;
-    //void addWritedSpace(qint64 value);
 
     /**
      * \param url                       Url of the file to get size of.

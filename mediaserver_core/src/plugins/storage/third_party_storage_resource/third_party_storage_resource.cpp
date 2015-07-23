@@ -35,14 +35,13 @@ namespace aux
 
             int ecode;
             uint32_t fsize = m_io->size(&ecode);
-            QN_UNUSED(fsize);
             
-            if (ecode != Qn::error::NoError)
+            if (ecode != nx_spl::error::NoError)
                 return -1;
 
             uint32_t bytesRead = m_io->read(data, maxlen, &ecode);
 
-            if (ecode != Qn::error::NoError)
+            if (ecode != nx_spl::error::NoError)
                 return -1;
             
             return bytesRead;
@@ -56,7 +55,7 @@ namespace aux
             int ecode;
             m_io->write(data, len, &ecode);
 
-            if (ecode != Qn::error::NoError)
+            if (ecode != nx_spl::error::NoError)
                 return -1;
             
             return len;
@@ -66,7 +65,7 @@ namespace aux
         {
             int ecode;
             qint64 fsize = m_io->size(&ecode);
-            if (ecode != Qn::error::NoError)
+            if (ecode != nx_spl::error::NoError)
                 return -1;
             return fsize;
         }
@@ -77,7 +76,7 @@ namespace aux
                 return false;
             int ecode;
             int result = m_io->seek(pos, &ecode);
-            if (!result || ecode != Qn::error::NoError)
+            if (!result || ecode != nx_spl::error::NoError)
                 return false;
             return true;
         }
@@ -145,98 +144,65 @@ namespace aux
 
         virtual bool truncate( qint64 newFileSize) override
         {
-            QN_UNUSED(newFileSize);
-
             // Generally, third-party storages aren't supposed to
             // support truncating.
             assert(false);
             return false;
         }
 
-        virtual bool realFile() const override {return false;}
     private:
         QString         m_filename;
         TPIODevicePtr   m_impl;
     };
 } //namespace aux
 
-QnStorageResource* QnThirdPartyStorageResource::instance(const QString& url)
+QnStorageResource* QnThirdPartyStorageResource::instance(
+    const QString               &url, 
+    const StorageFactoryPtrType &sf
+)
 {
-    int pIndex = url.indexOf(lit("://"));
-    if (pIndex == -1)
-        return nullptr;
-    
-    QString proto(url.left(pIndex));
-    QDir pluginDir(lit("plugins"));
-
-    for (const auto& fi : pluginDir.entryInfoList(QDir::Files))
-    {   // TODO: #akulikov. Maybe another plugin finder algorithm is needed here
-        if (fi.fileName().indexOf(proto) != -1)
-        {
-            try
-            {
-                return new QnThirdPartyStorageResource(
-                    fi.absoluteFilePath(),
-                    url
-                );
-            }
-            catch(const std::exception&)
-            {
-                return nullptr;
-            }
-        }
+    try
+    {
+        return new QnThirdPartyStorageResource(
+            sf,
+            url
+        );
     }
-    return nullptr;
+    catch(...)
+    {
+        return new QnThirdPartyStorageResource;
+    }
 }
 
 QnThirdPartyStorageResource::QnThirdPartyStorageResource(
-    const QString  &libraryPath,
-    const QString  &storageUrl
-) : m_lib(libraryPath.toLatin1().constData())
+        const StorageFactoryPtrType &sf,
+        const QString               &storageUrl
+) : m_valid(true)
 {
-    if (libraryPath.isEmpty() || storageUrl.isEmpty())
-        throw std::runtime_error("Invalid storage construction arguments");
-
-    if (!m_lib)
-        throw std::runtime_error("Couldn't load storage plugin");
-
-    m_csf = reinterpret_cast<create_qn_storage_factory_function>(
-        m_lib.symbol("create_qn_storage_factory")
+    openStorage(
+        storageUrl.toLatin1().constData(),
+        sf
     );
-    
-    m_emf = reinterpret_cast<qn_storage_error_message_function>(
-        m_lib.symbol("qn_storage_error_message")
-    );
-
-    if (m_csf == nullptr || m_emf == nullptr)
-        throw std::runtime_error("Couldn't load library functions");
-
-    openStorage(storageUrl.toLatin1().constData());
 }
+
+QnThirdPartyStorageResource::QnThirdPartyStorageResource()
+    : m_valid(false)
+{}
 
 QnThirdPartyStorageResource::~QnThirdPartyStorageResource()
 {}
 
-void QnThirdPartyStorageResource::openStorage(const char *storageUrl)
+void QnThirdPartyStorageResource::openStorage(
+    const char                  *storageUrl,
+    const StorageFactoryPtrType &sf
+)
 {
     QMutexLocker lock(&m_mutex);
-    Qn::StorageFactory* sfRaw = m_csf();
-    if (sfRaw == nullptr)
-        throw std::runtime_error("Couldn't create StorageFactory");
-
-    std::shared_ptr<Qn::StorageFactory> sf = 
-        std::shared_ptr<Qn::StorageFactory>(
-            sfRaw, 
-            [](Qn::StorageFactory* p)
-            {
-                p->releaseRef();
-            }
-        );
 
     int ecode;
-    Qn::Storage* spRaw = sf->createStorage(storageUrl, &ecode);
+    nx_spl::Storage* spRaw = sf->createStorage(storageUrl, &ecode);
 
-    if (ecode != Qn::error::NoError)
+    if (ecode != nx_spl::error::NoError)
     {
         if (spRaw != nullptr)
             spRaw->releaseRef();
@@ -246,20 +212,21 @@ void QnThirdPartyStorageResource::openStorage(const char *storageUrl)
     if (spRaw == nullptr)
         throw std::runtime_error("Couldn't create Storage");
 
-    std::shared_ptr<Qn::Storage> sp =
-        std::shared_ptr<Qn::Storage>(
+    std::shared_ptr<nx_spl::Storage> sp =
+        std::shared_ptr<nx_spl::Storage>(
             spRaw,
-            [](Qn::Storage* p)
+            [](nx_spl::Storage* p)
             {
                 p->releaseRef();
             }
         );
 
-    if (void* queryResult = sp->queryInterface(Qn::IID_Storage))
+    void* queryResult = nullptr;
+    if (queryResult = sp->queryInterface(nx_spl::IID_Storage))
     {
         m_storage.reset(
-            static_cast<Qn::Storage*>(queryResult),
-            [](Qn::Storage* p)
+            static_cast<nx_spl::Storage*>(queryResult),
+            [](nx_spl::Storage* p)
             {
                 p->releaseRef();
             }
@@ -276,6 +243,9 @@ QIODevice *QnThirdPartyStorageResource::open(
     QIODevice::OpenMode  openMode
 )
 {
+    if (!m_valid)
+        return nullptr;
+
     if (fileName.isEmpty())
         return nullptr;
 
@@ -283,25 +253,25 @@ QIODevice *QnThirdPartyStorageResource::open(
     int ioFlags = 0;
 
     if (openMode & QIODevice::ReadOnly)
-        ioFlags |= Qn::io::ReadOnly;
+        ioFlags |= nx_spl::io::ReadOnly;
     if (openMode & QIODevice::WriteOnly)
-        ioFlags |= Qn::io::WriteOnly;
+        ioFlags |= nx_spl::io::WriteOnly;
 
-    Qn::IODevice* ioRaw = m_storage->open(
-        fileName.toLatin1().data(), 
+    nx_spl::IODevice* ioRaw = m_storage->open(
+        QUrl(fileName).path().toLatin1().constData(), 
         ioFlags, 
         &ecode
     );
 
     if (ioRaw == nullptr)
         return nullptr;
-    else if (ecode != Qn::error::NoError)
+    else if (ecode != nx_spl::error::NoError)
     {
         ioRaw->releaseRef();
         return nullptr;
     }
 
-    void *queryResult = ioRaw->queryInterface(Qn::IID_IODevice);
+    void *queryResult = ioRaw->queryInterface(nx_spl::IID_IODevice);
     if (queryResult == nullptr)
     {
         ioRaw->releaseRef();
@@ -334,8 +304,8 @@ QIODevice *QnThirdPartyStorageResource::open(
                         std::shared_ptr<aux::ThirdPartyIODevice>(
                             new aux::ThirdPartyIODevice(
                                 IODevicePtrType(
-                                    static_cast<Qn::IODevice*>(queryResult),
-                                    [](Qn::IODevice *p)
+                                    static_cast<nx_spl::IODevice*>(queryResult),
+                                    [](nx_spl::IODevice *p)
                                     {
                                         p->releaseRef();
                                     }
@@ -357,46 +327,66 @@ QIODevice *QnThirdPartyStorageResource::open(
 
 int QnThirdPartyStorageResource::getCapabilities() const
 {
-    return m_storage->getCapabilities();
+    return m_valid ? m_storage->getCapabilities() : 0;
 }
     
 qint64 QnThirdPartyStorageResource::getFreeSpace()
 {
+    if (!m_valid)
+        return 0;
+
     int ecode;
     qint64 freeSpace = m_storage->getFreeSpace(&ecode);
-    if (ecode != Qn::error::NoError)
+    if (ecode != nx_spl::error::NoError)
         return -1;
     return freeSpace;
 }
 
 qint64 QnThirdPartyStorageResource::getTotalSpace()
 {
+    if (!m_valid)
+        return 0;
+
     int ecode;
     qint64 totalSpace = m_storage->getTotalSpace(&ecode);
-    if (ecode != Qn::error::NoError)
+    if (ecode != nx_spl::error::NoError)
         return -1;
     return totalSpace;
 }
 
 bool QnThirdPartyStorageResource::isAvailable() const
 {
+    if (!m_valid)
+       return false;
     return m_storage->isAvailable();
 }
 
 bool QnThirdPartyStorageResource::removeFile(const QString& url)
 {
+    if (!m_valid)
+        return false;
+
     int ecode;
-    m_storage->removeFile(url.toLatin1().data(), &ecode);
-    if (ecode != Qn::error::NoError)
+    m_storage->removeFile(
+        urlToPath(url).toLatin1().constData(), 
+        &ecode
+    );
+    if (ecode != nx_spl::error::NoError)
         return false;
     return true;
 }
 
 bool QnThirdPartyStorageResource::removeDir(const QString& url)
 {
+    if (!m_valid)
+        return false;
+
     int ecode;
-    m_storage->removeDir(url.toLatin1().data(), &ecode);
-    if (ecode != Qn::error::NoError)
+    m_storage->removeDir(
+        urlToPath(url).toLatin1().constData(), 
+        &ecode
+    );
+    if (ecode != nx_spl::error::NoError)
         return false;
     return true;
 }
@@ -406,13 +396,16 @@ bool QnThirdPartyStorageResource::renameFile(
     const QString   &newName
 )
 {
+    if (!m_valid)
+        return false;
+
     int ecode;
     m_storage->renameFile(
-        oldName.toLatin1().data(), 
-        newName.toLatin1().data(), 
+        urlToPath(oldName).toLatin1().constData(), 
+        urlToPath(newName).toLatin1().constData(), 
         &ecode
     );
-    if (ecode != Qn::error::NoError)
+    if (ecode != nx_spl::error::NoError)
         return false;
     return true;
 }
@@ -421,22 +414,25 @@ bool QnThirdPartyStorageResource::renameFile(
 QnAbstractStorageResource::FileInfoList 
 QnThirdPartyStorageResource::getFileList(const QString& dirName)
 {
+    if (!m_valid)
+        return QnAbstractStorageResource::FileInfoList();
+
     QMutexLocker lock(&m_mutex);
     int ecode;
-    Qn::FileInfoIterator* fitRaw = m_storage->getFileIterator(
-        dirName.toLatin1().data(), 
+    nx_spl::FileInfoIterator* fitRaw = m_storage->getFileIterator(
+        urlToPath(dirName).toLatin1().constData(), 
         &ecode
     );
     if (fitRaw == nullptr)
         return QnAbstractStorageResource::FileInfoList();
 
-    if (ecode != Qn::error::NoError)
+    if (ecode != nx_spl::error::NoError)
     {
         fitRaw->releaseRef();
         return QnAbstractStorageResource::FileInfoList();
     }
 
-    void *queryResult = fitRaw->queryInterface(Qn::IID_FileInfoIterator);
+    void *queryResult = fitRaw->queryInterface(nx_spl::IID_FileInfoIterator);
     if (queryResult == nullptr)
     {
         fitRaw->releaseRef();
@@ -445,8 +441,8 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
     else
     {
         FileInfoIteratorPtrType fit = FileInfoIteratorPtrType(
-            static_cast<Qn::FileInfoIterator*>(queryResult),
-            [](Qn::FileInfoIterator *p)
+            static_cast<nx_spl::FileInfoIterator*>(queryResult),
+            [](nx_spl::FileInfoIterator *p)
             {
                 p->releaseRef();
             }
@@ -460,16 +456,16 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
         while (true)
         {
             int ecode;
-            Qn::FileInfo *fi = fit->next(&ecode);
+            nx_spl::FileInfo *fi = fit->next(&ecode);
 
-            if (fi == nullptr || ecode != Qn::error::NoError)
+            if (fi == nullptr || ecode != nx_spl::error::NoError)
                 break;
             
             ret.append(
                 QnAbstractStorageResource::FileInfo(
-                    QString::fromLatin1(fi->url), 
+                    QUrl(dirName).toString(QUrl::RemovePath) + QString::fromLatin1(fi->url), 
                     fi->size, 
-                    (fi->type & Qn::isDir) ? true : false
+                    (fi->type & nx_spl::isDir) ? true : false
                 )
             );
         }
@@ -479,31 +475,49 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
 
 bool QnThirdPartyStorageResource::isFileExists(const QString& url)
 {
+    if (!m_valid)
+        return false;
+
     QMutexLocker lock(&m_mutex);
     int ecode;
-    int result = m_storage->fileExists(url.toLatin1().constData(), &ecode);
-    if (ecode != Qn::error::NoError)
+    int result = m_storage->fileExists(
+        urlToPath(url).toLatin1().constData(), 
+        &ecode
+    );
+    if (ecode != nx_spl::error::NoError)
         return false;
     return result;
 }
 
 bool QnThirdPartyStorageResource::isDirExists(const QString& url)
 {
+    if (!m_valid)
+        return false;
+
     QMutexLocker lock(&m_mutex);
     int ecode;
-    int result = m_storage->dirExists(url.toLatin1().constData(), &ecode);
-    if (ecode != Qn::error::NoError)
+    int result = m_storage->dirExists(
+        urlToPath(url).toLatin1().constData(), 
+        &ecode
+    );
+    if (ecode != nx_spl::error::NoError)
         return false;
     return result;
 }
 
 qint64 QnThirdPartyStorageResource::getFileSize(const QString& url) const
 {
+    if (!m_valid)
+        return 0;
+
     QMutexLocker lock(&m_mutex);
     int ecode;
-    qint64 fsize = m_storage->fileSize(url.toLatin1().constData(), &ecode);
+    qint64 fsize = m_storage->fileSize(
+        urlToPath(url).toLatin1().constData(), 
+        &ecode
+    );
 
-    if (ecode != Qn::error::NoError)
+    if (ecode != nx_spl::error::NoError)
         return -1;
     return fsize;
 }

@@ -30,7 +30,7 @@ public:
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
-    QnFlatCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = NULL);
+    QnFlatCameraDataLoader(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = NULL);
 
     /**
      * Creates a new time period loader for the given camera resource. Returns NULL
@@ -71,7 +71,7 @@ private:
     };
 
     /** Video server connection that this loader uses. */
-    QnMediaServerConnectionPtr m_connection;
+    const QnMediaServerResourcePtr m_server;
 
     QString m_filter;
     

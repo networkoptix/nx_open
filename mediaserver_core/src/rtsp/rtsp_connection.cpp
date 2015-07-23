@@ -42,7 +42,7 @@
 #include <utils/common/model_functions.h>
 #include "http/custom_headers.h"
 #include "audit/audit_manager.h"
-
+#include "media_server/settings.h"
 
 class QnTcpListener;
 
@@ -238,7 +238,7 @@ void QnRtspConnectionProcessor::parseRequest()
         d->rtspScale = scaleIter->second.toDouble();
 
     QUrl url(d->request.requestLine.url);
-    if (d->mediaRes == 0)
+    if (d->mediaRes == 0 && d->request.requestLine.url.path() != lit("*"))
     {
         QString resId = url.path();
         if (resId.startsWith('/'))
@@ -666,6 +666,10 @@ int QnRtspConnectionProcessor::composeDescribe()
     sdp << "v=0" << ENDL;
     sdp << "s=" << d->mediaRes->toResource()->getName() << ENDL;
     sdp << "c=IN IP4 " << d->socket->getLocalAddress().address.toString() << ENDL;
+    QUrl sessionControlUrl = d->request.requestLine.url;
+    if( sessionControlUrl.port() == -1 )
+        sessionControlUrl.setPort( MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() );
+    sdp << "a=control:" << sessionControlUrl.toString() << ENDL;
 
     int i = 0;
     for (; i < numVideo + numAudio; ++i)
@@ -729,7 +733,13 @@ int QnRtspConnectionProcessor::composeDescribe()
 
         //sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "m=" << (i < numVideo ? "video " : "audio ") << 0 << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
+#if 0
         sdp << "a=control:trackID=" << i << ENDL;
+#else
+        QUrl subSessionControlUrl = sessionControlUrl;
+        subSessionControlUrl.setPath( subSessionControlUrl.path() + lit("/trackID=%1").arg(i) );
+        sdp << "a=control:" << subSessionControlUrl.toString()<< ENDL;
+#endif
         QByteArray additionSDP = encoder->getAdditionSDP( streamParams );
         if (!additionSDP.contains("a=rtpmap:"))
             sdp << "a=rtpmap:" << encoder->getPayloadtype() << ' ' << encoder->getName() << "/" << encoder->getFrequency() << ENDL;

@@ -4,19 +4,13 @@
 #include <cstdint>
 #include "plugins/plugin_api.h"
  
-#if defined(STORAGE_EXPORTS)
-    #include "third_party_storage_library.h"
-#else
-	#define STORAGE_API
-#endif
- 
 #if defined(_WIN32)
     #define STORAGE_METHOD_CALL __stdcall
 #else
     #define STORAGE_METHOD_CALL
 #endif
  
-namespace Qn
+namespace nx_spl
 {
     const uint64_t unknown_size = 0xffffffffffffffff;
  
@@ -296,10 +290,13 @@ namespace Qn
         *   \return ascii string with storage type
         */
         virtual const char* STORAGE_METHOD_CALL storageType() const = 0;
+
+        /**
+        *   \param  ecode   Error code
+        *   \return         NULL terminated utf8 encoded C string
+        */
+        virtual const char* lastErrorMessage(int ecode) const = 0;
     };
 }
- 
-typedef Qn::StorageFactory* (*create_qn_storage_factory_function)();
-typedef const char* (*qn_storage_error_message_function)(int);
 
 #endif // __THIRD_PARTY_STORAGE_H__

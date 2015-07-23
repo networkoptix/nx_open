@@ -395,13 +395,6 @@ bool QBufferedFile::seek(qint64 pos)
 bool QBufferedFile::open(QIODevice::OpenMode mode)
 {
     m_openMode = mode;
-    if (mode & QIODevice::WriteOnly) {
-        if (m_fileEngine->realFile())
-        {
-            QDir dir;
-            dir.mkpath(QnFile::absolutePath(m_fileEngine->getFileName()));
-        }
-    }
     m_isDirectIO = false;
 #ifdef Q_OS_WIN
     m_isDirectIO = m_systemDependentFlags & FILE_FLAG_NO_BUFFERING;

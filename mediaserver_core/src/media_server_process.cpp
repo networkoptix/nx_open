@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <functional>
 #include <signal.h>
 #ifdef __linux__
 #include <signal.h>
@@ -428,7 +429,8 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
         { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
     const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
-    storage->setStorageType(QnLexical::serialized(storageType));
+    if (storage->getStorageType().isEmpty())
+        storage->setStorageType(QnLexical::serialized(storageType));
 
     return storage;
 }
@@ -783,12 +785,6 @@ int serverMain(int argc, char *argv[])
     qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     ffmpegInit();
-    QnStoragePluginFactory::instance()->registerStoragePlugin(
-        "ftp",
-        QnThirdPartyStorageResource::instance,
-        false
-    );
-
     // ------------------------------------------
 #ifdef TEST_RTSP_SERVER
     addTestData();
@@ -1361,6 +1357,9 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 
 bool MediaServerProcess::initTcpListener()
 {
+    m_httpModManager.reset( new nx_http::HttpModManager() );
+    m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
+
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
@@ -1532,6 +1531,10 @@ void MediaServerProcess::run()
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
+
+    //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
+    QnAuthHelper::instance()->restrictionList()->allow( lit( "?" ), AuthMethod::noAuth );
+
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );   //allowed by default for now
@@ -1713,6 +1716,21 @@ void MediaServerProcess::run()
 
     //Initializing plugin manager
     PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
+
+    using namespace std::placeholders;
+    for (const auto storagePlugin : 
+         PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+    {
+        QnStoragePluginFactory::instance()->registerStoragePlugin(
+            storagePlugin->storageType(),
+            std::bind(
+                &QnThirdPartyStorageResource::instance,
+                _1,
+                storagePlugin
+            ),
+            false
+        );                    
+    }
 
     if (needToStop())
         return;

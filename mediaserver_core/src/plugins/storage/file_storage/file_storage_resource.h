@@ -38,6 +38,7 @@ public:
     virtual void setUrl(const QString& url) override;
 
 private:
+    virtual QString getPath() const override;
     QString removeProtocolPrefix(const QString& url);
     bool updatePermissions() const;
     bool checkWriteCap() const;

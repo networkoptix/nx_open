@@ -34,14 +34,10 @@ QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(const QnVirtualCam
     if (!server)
         return NULL;
 
-    QnMediaServerConnectionPtr serverConnection = server->apiConnection();
-    if (!serverConnection)
-        return NULL;
-
-    return new QnSingleThumbnailLoader(serverConnection, camera, microSecSinceEpoch, rotation, size, format, parent);
+    return new QnSingleThumbnailLoader(server, camera, microSecSinceEpoch, rotation, size, format, parent);
 }
 
-QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection,
+QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerResourcePtr &server,
                                                  const QnVirtualCameraResourcePtr &camera,
                                                  qint64 microSecSinceEpoch,
                                                  int rotation,
@@ -50,14 +46,14 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerConnectionPt
                                                  QObject *parent):
     base_type(parent),
     m_camera(camera),
-    m_connection(connection),
+    m_server(server),
     m_microSecSinceEpoch(microSecSinceEpoch),
     m_rotation(rotation),
     m_size(size),
     m_format(format)
 {
-    if(!connection)
-        qnNullWarning(connection);
+    if(!server)
+        qnNullWarning(server);
 
     if(!camera)
         qnNullWarning(camera);
@@ -68,7 +64,7 @@ QImage QnSingleThumbnailLoader::image() const {
 }
 
 void QnSingleThumbnailLoader::doLoadAsync() {
-    m_connection->getThumbnailAsync(
+    m_server->apiConnection()->getThumbnailAsync(
             m_camera,
             m_microSecSinceEpoch,
             m_rotation,
