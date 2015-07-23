@@ -377,6 +377,10 @@
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
         <translation>&quot;카메라 자동 설정 허용&quot; 설정은 시스템 관리에서 비활성화됩니다.</translation>
     </message>
+    <message>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
+        <translation>BPS기준이 아닌 GOP기준으로 계산</translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -399,16 +403,20 @@
 <context>
     <name>CameraManagementWidget</name>
     <message>
-        <source>Enable camera auto discovery</source>
-        <translation>자동 검색 사용</translation>
-    </message>
-    <message>
         <source>Allow system to optimize camera settings (Recommended)</source>
         <translation>카메라 자동 설정 허용(권장)</translation>
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
         <translation>주의! 녹화설정의 FPS과 화질 설정이 동작하지 않습니다!</translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
+        <translation>개발자에 문제점 리포트</translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation>카메라 자동 검색 기능 활성화</translation>
     </message>
 </context>
 <context>
@@ -748,12 +756,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>하나의 레이아웃에 모든 서버의 통계 열기</translation>
     </message>
     <message>
-        <source>Camera Management</source>
-        <translation>카메라 조정</translation>
-    </message>
-    <message>
         <source>System Configuration Backup and Restore</source>
         <translation>시스템 설정 백업 및 복원</translation>
+    </message>
+    <message>
+        <source>System Settings</source>
+        <translation>시스템설정</translation>
     </message>
 </context>
 <context>
@@ -2163,10 +2171,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>카메라 설정...</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>사진 설정...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>레이아웃 설정...</translation>
     </message>
@@ -2505,6 +2509,14 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Hide Search Panel</source>
         <translation>검색 판넬 숨기기</translation>
+    </message>
+    <message>
+        <source>Ask About Statistics Reporting</source>
+        <translation>통계현활 문의</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation>파일 설정</translation>
     </message>
 </context>
 <context>
@@ -3241,18 +3253,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>켬</translation>
     </message>
     <message>
-        <source>FPS value is too high</source>
-        <translation>프레임 값이 범위를 벗어남</translation>
-    </message>
-    <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>스케줄의 현재 프레임은 %1 입니다. 카메라의 최대 %2 프레임으로 떨어집니다.</translation>
-    </message>
-    <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>소프트웨어 모션의 2.프레임은 보조 스트림에서 사용합니다. 일정의 현재 프레임은 %1. 프레임이며, 설정이 %2로 떨어집니다.</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation>주의</translation>
     </message>
@@ -3879,18 +3879,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation>설치된 비디오 카드를 지원하지 않습니다.성능상의 문제가 자체 리스트를 가지고 진행합니다.</translation>
-    </message>
-    <message>
-        <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation>비디오 드라이버 설치 또는 업데이트를 통해 문제를 해결할 수 었습니다.</translation>
-    </message>
-    <message>
-        <source>Critical Performance Tip</source>
-        <translation>중요한 성능 팁</translation>
-    </message>
-    <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
         <translation>비디오 카드 드라이버가 감지되지 않거나, 최신버젼이 감지 되었습니다.</translation>
     </message>
@@ -3901,6 +3889,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Important Performance Tip</source>
         <translation>중요한 성능 팁</translation>
+    </message>
+    <message>
+        <source>This could lead to client software malfunction including crash.</source>
+        <translation>소프트웨어 오동작 가능성 있음</translation>
     </message>
 </context>
 <context>
@@ -3992,14 +3984,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;사진을 읽어오지 못합니다.&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutTabBar</name>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1 사용자의 화면</translation>
     </message>
 </context>
 <context>
@@ -4394,6 +4378,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation>파일설정</translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation>사진없음</translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation>어안렌즈파일 입니다.</translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Screenshot</source>
@@ -4453,10 +4452,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Password:</source>
         <translation>비밀번호:</translation>
-    </message>
-    <message>
-        <source>Find System</source>
-        <translation>시스템 찾기</translation>
     </message>
     <message>
         <source>The new system will have password and name from the system:</source>
@@ -4541,6 +4536,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
         <translation>원격 시스템에서 서버는 곧 표시 됩니다.</translation>
+    </message>
+    <message>
+        <source>Check</source>
+        <translation>확인</translation>
     </message>
 </context>
 <context>
@@ -4812,21 +4811,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Warning</source>
         <translation>주의</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>사진 설정</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>이미지를 업로드 할 수 없음</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>어안 렌즈 커메라 사용</translation>
     </message>
 </context>
 <context>
@@ -5193,11 +5177,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Users</source>
         <translation>사용자</translation>
     </message>
-    <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1의 화면</translation>
-    </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
@@ -5408,12 +5387,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>계속 진행 하시겠습니까?</translation>
     </message>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
-        <translation>저장기 인덱스 재 구성이 &apos;%1&apos; 진행 중 입니다</translation>
+        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
+        <translation>검생데이터파일 재구성중 : %1</translation>
     </message>
     <message>
-        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
-        <translation>저장기의 빠른 스캔이 &apos;%1&apos; 진행 중</translation>
+        <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
+        <translation>저장위치에서 고속 데이터 검색 중: %1</translation>
     </message>
 </context>
 <context>
@@ -5795,6 +5774,18 @@ Short for &quot;seconds&quot;</extracomment>
         <source>This action CANNOT be undone!</source>
         <translation>이 작업을 취소할 수 없음!</translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation>프레임 값이 범위를 벗어남</translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation>스케줄의 현재 프레임은 %1 입니다. 카메라의 최대 %2 프레임으로 떨어집니다.</translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation>소프트웨어 모션의 2.프레임은 보조 스트림에서 사용합니다. 일정의 현재 프레임은 %1. 프레임이며, 설정이 %2로 떨어집니다.</translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -5893,10 +5884,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>권한 오류</translation>
     </message>
     <message>
-        <source>Please check authentication information&lt;br/&gt;in camera settings</source>
-        <translation>카메라 설정의 인증 정보를&lt;br/&gt; 확인하십시오</translation>
-    </message>
-    <message>
         <source>Activate Video Wall license to remove this message</source>
         <translation>이 메세지를 지우시려면 비디오 월 인증 키를 활성화 하십시오</translation>
     </message>
@@ -5911,6 +5898,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Diagnose...</source>
         <translation>진단...</translation>
+    </message>
+    <message>
+        <source>Please check authentication information in camera settings</source>
+        <translation>카메라설정에서 사용자 정보 확인요망.</translation>
     </message>
 </context>
 <context>
@@ -6532,18 +6523,6 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation>%1 서버: v%2&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Server v%1&lt;br/&gt;</source>
-        <translation>서버 v%1&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>시스템의 일부 구성 요소가 업데이트 되지 않음: &lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;최근 버젼의 구성요소들로 업데이트 하십시오 %2.</translation>
-    </message>
-    <message>
         <source>Update...</source>
         <translation>업데이트...</translation>
     </message>
@@ -6586,10 +6565,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>
             <numerusform>현재 %n 리소스에 생성, 변경을 저장할 수 없습니다.</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Client v%1&lt;br/&gt;</source>
-        <translation>클라이언트 v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
@@ -6643,6 +6618,35 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Error while uploading picture.</source>
         <translation>사진을 업로드 하는 동안 오류가 발생하였습니다.</translation>
     </message>
+    <message>
+        <source>Some components of the system are not updated</source>
+        <translation>시스템 구성요소중 업데이트 되지 않은 항목이 있습니다.</translation>
+    </message>
+    <message>
+        <source>Client v%1</source>
+        <translation>클라이언트 %1</translation>
+    </message>
+    <message>
+        <source>Server v%1 at %2</source>
+        <translation>서버 %1 에서 %2</translation>
+    </message>
+    <message>
+        <source>Server v%1</source>
+        <translation>서버 %1</translation>
+    </message>
+    <message>
+        <source>Please update all components to the latest version %1.</source>
+        <translation>모든 시스템 구성요소 업데이트 요망 %1.</translation>
+    </message>
+    <message>
+        <source>Anonymous Usage Statistics</source>
+        <translation>공개된 사용 통계</translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
+If you would like to disable this feature you can do so in the System Settings dialog.</source>
+        <translation>제품 오동작및 통계정보를 개발자에서 전달 합니다. 기능을 해지하고 싶을경우 시스템 설정에서 해지 하십시오.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6692,6 +6696,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Connect to Server...</source>
         <translation>서버 연결...</translation>
+    </message>
+    <message>
+        <source>Could not connect to server...</source>
+        <translation>서버에 접속할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -6810,10 +6818,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>타임스템프:</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>WYSIWYG에서 비디오 변환을 보장함</translation>
-    </message>
-    <message>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
         <translation>현재 레이아웃에는 내부 파일이 포함되어있습니다. 내부 파일은 다중 비디오 내보내기를 허용하지 않습니다.</translation>
     </message>
@@ -6904,6 +6908,14 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
         <translation>추출하려는 여러 비디오 시퀀스가 30분 이상이 소요되는 데이터입니다.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation>검색조건 적용:방향 변경, De-Warping,이미지 수정, 사용자 화면 비율지정(Transcoding 요구됨)</translation>
+    </message>
+    <message>
+        <source>exported</source>
+        <translation>저장완료</translation>
     </message>
 </context>
 <context>
@@ -7247,18 +7259,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>비디오 월 제어 세션을 시작할 수 없습니다.</translation>
     </message>
     <message>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
-    </message>
-    <message>
-        <source>New layout</source>
-        <translation>새 레이아웃</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>%1 새 레이아웃</translation>
-    </message>
-    <message>
         <source>To enable the feature please activate at least one Video Wall license</source>
         <translation>기능 사용을 위해 최소 하나의 비디오 월 인증키가 필요합니다</translation>
     </message>
@@ -7347,6 +7347,15 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You&apos;ll have to start it manually.</source>
         <translation>수동으로 시작해야 합니다.</translation>
+    </message>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation>%1의 화면</translation>
+    </message>
+    <message>
+        <source>%n cameras</source>
+        <translation>%n 카메라</translation>
     </message>
 </context>
 <context>
@@ -7623,10 +7632,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Start</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation>처리 재정비</translation>
     </message>
     <message>
         <source>Cancel</source>

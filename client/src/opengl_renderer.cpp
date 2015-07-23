@@ -221,7 +221,10 @@ QnOpenGLRendererManager::~QnOpenGLRendererManager() {
 
 void loadImageData( int texture_wigth , int texture_height , int image_width , int image_heigth , int gl_bytes_per_pixel , int gl_format , const uchar* pixels )
 {
-   // if ( texture_wigth >= image_width )
+    static_cast<void>(texture_wigth);
+    static_cast<void>(gl_bytes_per_pixel);
+
+    // if ( texture_wigth >= image_width )
     {
         glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0 , image_width, qMin(image_heigth,texture_height), gl_format, GL_UNSIGNED_BYTE, pixels );
         glCheckError("glTexSubImage2D");

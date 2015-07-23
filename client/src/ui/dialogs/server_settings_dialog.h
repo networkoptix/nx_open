@@ -72,6 +72,7 @@ private:
     QnMediaServerResourcePtr m_server;
     QList<QString> m_storageProtocols;
     QPointer<QLabel> m_tableBottomLabel;
+    QVector<bool> m_initialStorageCheckStates;
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;

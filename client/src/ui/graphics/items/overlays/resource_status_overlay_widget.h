@@ -8,6 +8,7 @@
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/common/geometry.h>
+#include <memory>
 
 class QnPausedPainter;
 class QnLoadingProgressPainter;
@@ -44,12 +45,14 @@ private:
         UnauthorizedText,
         UnauthorizedSubText,
         LoadingText,
+        NoVideoStreamText,
         AnalogLicenseText,
         VideowallLicenseText,
         TextCount
     };
 
     void paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
+    void paintPixmap(QPainter *painter, const QPixmap &picture, qreal imageSize);
 
     void updateLayout();
     void updateDiagnosticsButtonOpacity(bool animate = true);
@@ -64,6 +67,7 @@ private:
 
     bool m_diagnosticsVisible;
     QnTextButtonWidget *m_diagnosticsButton;
+    std::unique_ptr<QPixmap> m_ioSpeakerPixmap;
 };
 
 #endif // QN_RESOURCE_STATUS_OVERLAY_WIDGET_H

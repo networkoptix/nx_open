@@ -77,7 +77,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if( d->request.requestLine.method == nx_http::Method::GET ||
                 d->request.requestLine.method == nx_http::Method::HEAD )
             {
-                d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
+                d->response.messageBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
             }
             if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
                 d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
@@ -94,8 +94,8 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
                 else if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
                 {
                     contentEncoding = "gzip";
-                    if( !d->responseBody.isEmpty() )
-                        d->responseBody = GZipCompressor::compressData(d->responseBody);
+                    if( !d->response.messageBody.isEmpty() )
+                        d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
                 }
                 else
                 {
@@ -104,7 +104,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             }
             sendResponse(
                 isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
-                d->responseBody.isEmpty() ? QByteArray() : "text/html; charset=iso-8859-1",
+                d->response.messageBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
                 contentEncoding );
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT)

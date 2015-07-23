@@ -20,7 +20,6 @@ protected:
     virtual void run() override;
 private:
     QByteArray readProxyResponse();
-    void addNewProxyConnect();
     void doDelay();
     int sendRequest(const QByteArray& data);
 private:

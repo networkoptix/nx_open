@@ -1716,7 +1716,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     QRectF lineBarRect = positionRect(rulerRect, lineBarPosition);
     QRectF tickmarkBarRect = positionRect(rulerRect, tickmarkBarPosition);
     QRectF bookmarkRect = lineBarRect;
-    
+
     qreal lineTop, lineUnit = qFuzzyIsNull(m_totalLineStretch) ? 0.0 : lineBarRect.height() / m_totalLineStretch;
 
     /* Draw background. */

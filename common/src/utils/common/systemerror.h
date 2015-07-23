@@ -40,6 +40,7 @@ namespace SystemError
     static const ErrorCode nomem = ERROR_NOT_ENOUGH_MEMORY;
     static const ErrorCode notImplemented = ERROR_CALL_NOT_IMPLEMENTED;
     static const ErrorCode invalidData = ERROR_INVALID_DATA;
+    static const ErrorCode addrInUse = WSAEADDRINUSE;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
@@ -55,6 +56,7 @@ namespace SystemError
     static const ErrorCode nomem = ENOMEM;
     static const ErrorCode notImplemented = ENOSYS;
     static const ErrorCode invalidData = EINVAL;
+    static const ErrorCode addrInUse = EADDRINUSE;
 #endif
 
     //!Returns error code of previous system call

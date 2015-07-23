@@ -2,6 +2,7 @@
 #define QN_SERVER_CAMERA_H
 
 #include <core/resource/camera_resource.h>
+#include "camera/iomodule/iomodule_monitor.h"
 
 class QnServerCamera;
 typedef QnSharedResourcePointer<QnServerCamera> QnServerCameraPtr;
@@ -26,6 +27,8 @@ public:
     virtual Qn::ResourceFlags flags() const override;
     virtual void setParentId(const QnUuid& parent) override;
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    
+    QnIOModuleMonitorPtr createIOModuleMonitor();
 
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;

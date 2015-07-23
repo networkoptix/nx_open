@@ -488,7 +488,7 @@ void QnActiResource::stopInputPortMonitoringAsync()
     const QAuthenticator auth = getAuth();
     QUrl url = getUrl();
     url.setPath( lit("/cgi-bin/%1?USER=%2&PWD=%3&%4").arg(lit("encoder")).arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr) );
-    nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
     connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
         ec2::DummyHandler::instance(), [httpClient](nx_http::AsyncHttpClientPtr) mutable {
@@ -588,19 +588,29 @@ QnAbstractPtzController *QnActiResource::createPtzControllerInternal()
     return new QnActiPtzController(toSharedPointer(this));
 }
 
-QStringList QnActiResource::getRelayOutputList() const
+QnIOPortDataList QnActiResource::getRelayOutputList() const
 {
-    QStringList outputIDStrList;
-    for( int i = 1; i <= m_outputCount; ++i )
-        outputIDStrList << QString::number(i);
+    QnIOPortDataList outputIDStrList;
+    for( int i = 1; i <= m_outputCount; ++i ) {
+        QnIOPortData value;
+        value.portType = Qn::PT_Output;
+        value.id = QString::number(i);
+        value.outputName = tr("Output %1").arg(i);
+        outputIDStrList.push_back(value);
+    }
     return outputIDStrList;
 }
 
-QStringList QnActiResource::getInputPortList() const
+QnIOPortDataList QnActiResource::getInputPortList() const
 {
-    QStringList inputIDStrList;
-    for( int i = 1; i <= m_inputCount; ++i )
-        inputIDStrList << QString::number(i);
+    QnIOPortDataList inputIDStrList;
+    for( int i = 1; i <= m_inputCount; ++i ) {
+        QnIOPortData value;
+        value.portType = Qn::PT_Input;
+        value.id = QString::number(i);
+        value.inputName = tr("Input %1").arg(i);
+        inputIDStrList.push_back(value);
+    }
     return inputIDStrList;
 }
 

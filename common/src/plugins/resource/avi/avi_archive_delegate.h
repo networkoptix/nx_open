@@ -51,6 +51,7 @@ public:
     virtual qint64 seek (qint64 time, bool findIFrame);
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
+    virtual bool hasVideo() const override;
 
     virtual AVCodecContext* setAudioChannel(int num);
 
@@ -101,6 +102,7 @@ private:
     QnMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
     bool m_fastStreamFind;
+    bool m_hasVideo;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

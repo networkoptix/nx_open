@@ -1260,7 +1260,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
       free(ptl_mait);
       return 0;
     }
-    for (j = 0; j < ((ptl_mait->nr_of_vtss + 1) * 8); j++) {
+    for (j = 0; j < static_cast<uint>((ptl_mait->nr_of_vtss + 1) * 8); j++) {
       B2N_16(pf_temp[j]);
     }
     ptl_mait->countries[i].pf_ptl_mai = (pf_level_t *)malloc(info_length);

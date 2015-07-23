@@ -318,7 +318,10 @@ namespace nx_http
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
+        //!Appends serialized multipart data block to \a dstBuffer
+        void serializeMultipartResponse( BufferType* const dstBuffer, const ConstBufferRefType& boundary ) const;
         BufferType toString() const;
+        BufferType toMultipartString(const ConstBufferRefType& boundary) const;
     };
 
     namespace MessageType

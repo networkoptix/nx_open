@@ -17,7 +17,7 @@
 #include <api/model/storage_space_reply.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/storage_resource.h>
+#include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include <client/client_model_types.h>
@@ -59,6 +59,7 @@ namespace {
 
     enum Column {
         CheckBoxColumn,
+        TypeColumn,
         PathColumn,
         CapacityColumn,
         LoginColumn,
@@ -120,6 +121,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->horizontalHeader()->setSectionsClickable(false);
     ui->storagesTable->horizontalHeader()->setStretchLastSection(false);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(CheckBoxColumn, QHeaderView::Fixed);
+    ui->storagesTable->horizontalHeader()->setSectionResizeMode(TypeColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(PathColumn, QHeaderView::Stretch);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(LoginColumn, QHeaderView::ResizeToContents);
@@ -132,6 +134,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 #endif
 
     setWarningStyle(ui->failoverWarningLabel);
+    setWarningStyle(ui->storagesWarningLabel);
+    ui->storagesWarningLabel->hide();
 
     /* Edge servers cannot be renamed. */
     ui->nameLineEdit->setReadOnly(QnMediaServerResource::isEdgeServer(server));
@@ -222,16 +226,33 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     checkBoxItem->setData(StorageIdRole, QVariant::fromValue<QnUuid>(item.storageId));
     checkBoxItem->setData(ExternalRole, item.isExternal);
     checkBoxItem->setData(StorageType, item.storageType);
+    if (m_initialStorageCheckStates.size() <= row)
+        m_initialStorageCheckStates.resize(row + 1);
+    m_initialStorageCheckStates[row] = checkBoxItem->checkState() == Qt::Checked;
+
+    QTableWidgetItem *typeItem = new QTableWidgetItem();
+    typeItem->setFlags(Qt::ItemIsEnabled);
+    typeItem->setData(Qt::DisplayRole, item.storageType);
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    pathItem->setData(Qt::DisplayRole, QnAbstractStorageResource::urlToPath(item.url));
+    pathItem->setData(Qn::StorageUrlRole, item.url);
+
+    QUrl url(item.url);
+    if (item.storageType == lit("file"))
+        pathItem->setData(Qt::DisplayRole, url.path().mid(1));
+    else if (item.storageType == lit("local"))
+        pathItem->setData(Qt::DisplayRole, item.url);
+    else 
+        pathItem->setData(
+            Qt::DisplayRole, 
+            url.host() + (url.port() != -1 ? lit(":") + QString::number(url.port()) : lit(""))  + url.path()
+        );
 
     QTableWidgetItem *capacityItem = new QTableWidgetItem();
     capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     capacityItem->setData(Qt::DisplayRole, item.totalSpace == -1 ? tr("Not available") : QnStorageSpaceSlider::formatSize(item.totalSpace));
 
-    QUrl url(item.url);
     QTableWidgetItem *loginItem = new QTableWidgetItem();
     loginItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     loginItem->setData(Qt::DisplayRole, url.userName());
@@ -251,6 +272,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     archiveSpaceItem->setData(FreeSpaceRole, item.freeSpace);
 
     ui->storagesTable->setItem(row, CheckBoxColumn, checkBoxItem);
+    ui->storagesTable->setItem(row, TypeColumn, typeItem);
     ui->storagesTable->setItem(row, PathColumn, pathItem);
     ui->storagesTable->setItem(row, CapacityColumn, capacityItem);
     ui->storagesTable->setItem(row, LoginColumn, loginItem);
@@ -265,6 +287,7 @@ void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &item
     QString bottomLabelText = this->bottomLabelText();
 
     ui->storagesTable->setRowCount(0);
+    m_initialStorageCheckStates.resize(items.count());
     foreach(const QnStorageSpaceData &item, items)
         addTableItem(item);
 
@@ -277,6 +300,7 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
         return result;
 
     QTableWidgetItem *checkBoxItem = ui->storagesTable->item(row, CheckBoxColumn);
+    QTableWidgetItem *typeItem = ui->storagesTable->item(row, TypeColumn);
     QTableWidgetItem *pathItem = ui->storagesTable->item(row, PathColumn);
     QTableWidgetItem *capacityItem = ui->storagesTable->item(row, CapacityColumn);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
@@ -287,20 +311,13 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
-    result.storageType = checkBoxItem->data(StorageType).value<QString>();
+    result.storageType = typeItem->text();
     result.storageId = checkBoxItem->data(StorageIdRole).value<QnUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
     QString login = ui->storagesTable->item(row, LoginColumn)->text();
     QString password = ui->storagesTable->item(row, PasswordColumn)->text();
-    if (login.isEmpty())
-        result.url = pathItem->text();
-    else {
-        QUrl url = QString(lit("file:///%1")).arg(pathItem->text());
-        url.setUserName(login);
-        url.setPassword(password);
-        result.url = url.toString();
-    }
+    result.url = qvariant_cast<QString>(pathItem->data(Qn::StorageUrlRole));
 
     result.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();
     result.freeSpace = archiveSpaceItem->data(FreeSpaceRole).toLongLong();
@@ -333,10 +350,13 @@ void QnServerSettingsDialog::updateFromResources()
     ui->nameLineEdit->setText(m_server->getName());
     int currentMaxCamerasValue = m_server->getMaxCameras();
     if( currentMaxCamerasValue == 0 )
+    {
         if( !m_server->getServerFlags().testFlag(Qn::SF_Edge) )
             currentMaxCamerasValue = PC_SERVER_MAX_CAMERAS; //not an edge server
         else
             currentMaxCamerasValue = EDGE_SERVER_MAX_CAMERAS;   //edge server
+    }
+
     ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
     ui->failoverCheckBox->setChecked(m_server->isRedundancy());
     ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
@@ -353,13 +373,13 @@ void QnServerSettingsDialog::updateFromResources()
     updateFailoverLabel();
 }
 
-void QnServerSettingsDialog::submitToResources() 
+void QnServerSettingsDialog::submitToResources()
 {
     if(m_hasStorageChanges) {
-        QnAbstractStorageResourceList newStorages;
+        QnStorageResourceList newStorages;
         foreach(const QnStorageSpaceData &item, tableItems()) 
         {
-            QnAbstractStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
+            QnStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
             if (storage) {
                 if (item.isUsedForWriting != storage->isUsedForWriting()) {
                     storage->setUsedForWriting(item.isUsedForWriting);
@@ -368,7 +388,7 @@ void QnServerSettingsDialog::submitToResources()
             }
             else {
                 // create or remove new storage
-                QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
+                QnStorageResourcePtr storage(new QnClientStorageResource());
                 if (!item.storageId.isNull())
                     storage->setId(item.storageId);
                 QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
@@ -466,8 +486,13 @@ void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
 }
 
 void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
-    Q_UNUSED(column)
-    Q_UNUSED(row)
+    if (column == CheckBoxColumn) {
+        if (QTableWidgetItem *item = ui->storagesTable->item(row, column)) {
+            bool checked = item->checkState() == Qt::Checked;
+            if (!checked && m_initialStorageCheckStates[row])
+                ui->storagesWarningLabel->show();
+        }
+    }
 
     m_hasStorageChanges = true;
 }
@@ -597,7 +622,8 @@ void QnServerSettingsDialog::updateFailoverLabel() {
 
 void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle)
 {
-    Q_UNUSED(handle)
+    Q_UNUSED(status);
+    Q_UNUSED(handle);
     updateRebuildUi(reply);
 
     if (reply.state > Qn::RebuildState_None)

@@ -7,17 +7,39 @@
 #include "decoders/video/ffmpeg.h"
 #include "filters/abstract_image_filter.h"
 #include "filters/crop_image_filter.h"
+#include "utils/common/util.h"
 
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
+const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
+const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
+
+
+static qint64& movigAverage(qint64& accumulator, qint64 value)
+{
+    static_assert(OPTIMIZATION_MOVING_AVERAGE_RATE < 100, "Moving average K should be below 100%");
+    static const auto movingAvg = static_cast<double>(OPTIMIZATION_MOVING_AVERAGE_RATE) / 100.0;
+
+    if (accumulator == 0)
+        return accumulator = value;
+
+    return accumulator = accumulator * movingAvg + value * (1.0 - movingAvg);
+}
+
+bool QnFfmpegVideoTranscoder::isOptimizationDisabled(false);
 
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),
-    m_mtMode(false)
+    m_mtMode(false),
+    m_lastEncodedTime(AV_NOPTS_VALUE),
+    m_averageCodingTimePerFrame(0),
+    m_averageVideoTimePerFrame(0),
+    m_encodedFrames(0),
+    m_droppedFrames(0)
 {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
         m_lastSrcWidth[i] = -1;
         m_lastSrcHeight[i] = -1;
@@ -97,19 +119,20 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         }
     }
 
-
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
         m_lastErrMessage = tr("Could not initialize video encoder.");
         return false;
     }
 
-
+    m_encodeTimer.start();
     return true;
 }
 
 int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
+    m_encodeTimer.restart();
+
     if( result )
         result->reset();
     if (!media)
@@ -118,8 +141,21 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     if (!m_lastErrMessage.isEmpty())
         return -3;
 
+    const auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
+    if (auto ret = transcodePacketImpl(video, result))
+        return ret;
+    
+    if (m_lastEncodedTime != qint64(AV_NOPTS_VALUE))
+        movigAverage(m_averageVideoTimePerFrame, video->timestamp - m_lastEncodedTime);
+    m_lastEncodedTime = video->timestamp;
 
-    QnConstCompressedVideoDataPtr video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
+    movigAverage(m_averageCodingTimePerFrame, m_encodeTimer.elapsed() * 1000 /*mks*/);
+    return 0;
+}
+
+int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result)
+{
+    
     CLFFmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)
         decoder = m_videoDecoders[video->channelNumber] = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
@@ -143,19 +179,34 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         if( !result )
             return 0;
 
+        // Improve performance by omitting frames to encode in case if encoding goes way too slow..
+        // TODO: #mu make mediaserver's config option and HTTP query option to disable feature
+        if (!isOptimizationDisabled && m_encodedFrames > OPTIMIZATION_BEGIN_FRAME)
+        {   
+            // the more frames are dropped the lower limit is gonna be set
+            // (x + (x >> k)) is faster and more precise then (x * (1 + 0.5^k))
+            const auto& codingTime = m_averageCodingTimePerFrame;
+            if (codingTime + (codingTime >> m_droppedFrames) > m_averageVideoTimePerFrame)
+            {
+                ++m_droppedFrames;
+                return 0;
+            }
+        }
+
         //TODO: #vasilenko avoid using deprecated methods
         int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
-
         if (encoded < 0)
-        {
             return -3;
-        }
+
         QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded);
         resultVideoData->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
         if(m_encoderCtx->coded_frame->key_frame)
             resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
         *result = QnCompressedVideoDataPtr(resultVideoData);
+        
+        ++m_encodedFrames;
+        m_droppedFrames = 0;
         return 0;
     }
     else {

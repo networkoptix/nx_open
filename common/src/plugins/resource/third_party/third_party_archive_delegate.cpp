@@ -31,6 +31,7 @@ ThirdPartyArchiveDelegate::ThirdPartyArchiveDelegate(
     m_flags |= QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
     m_flags |= QnAbstractArchiveDelegate::Flag_CanOfflineLayout;
     m_flags |= QnAbstractArchiveDelegate::Flag_UnsyncTime;
+    m_flags |= QnAbstractArchiveDelegate::Flag_CanOfflineHasVideo;
 }
 
 ThirdPartyArchiveDelegate::~ThirdPartyArchiveDelegate()

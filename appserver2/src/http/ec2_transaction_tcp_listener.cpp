@@ -99,7 +99,6 @@ void QnTransactionTcpProcessor::run()
             sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
             return;
         }
-        sendResponse( nx_http::StatusCode::ok, nx_http::StringType() );
 
         QnTransactionMessageBus::instance()->gotIncomingTransactionsConnectionFromRemotePeer(
             connectionGuid,
@@ -108,6 +107,7 @@ void QnTransactionTcpProcessor::run()
             remoteSystemIdentityTime,
             d->request,
             d->clientRequest );
+        sendResponse( nx_http::StatusCode::ok, nx_http::StringType() );
         d->socket.clear();
         return;
     }
@@ -139,7 +139,9 @@ void QnTransactionTcpProcessor::run()
         // 1-st stage
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
         d->response.headers.emplace( "Content-Length", "0" );   //only declaring content-type
-        sendResponse(lockOK ? nx_http::StatusCode::ok : nx_http::StatusCode::forbidden , QnTransactionTransport::TUNNEL_CONTENT_TYPE);
+        sendResponse(
+            lockOK ? nx_http::StatusCode::noContent : nx_http::StatusCode::forbidden,
+            QnTransactionTransport::TUNNEL_CONTENT_TYPE );
         if (!lockOK)
             return;
 
@@ -208,8 +210,8 @@ void QnTransactionTcpProcessor::run()
     d->response.headers.emplace( "Connection", "close" );
     if( fail )
     {
-        sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
+        sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
     }
     else
     {
@@ -217,7 +219,6 @@ void QnTransactionTcpProcessor::run()
         if( base64EncodingRequiredHeaderIter != d->request.headers.end() )
             d->response.headers.insert( *base64EncodingRequiredHeaderIter );
 
-        sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
             std::move(d->socket),
@@ -226,6 +227,7 @@ void QnTransactionTcpProcessor::run()
             remoteSystemIdentityTime,
             d->request,
             contentEncoding );
+        sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
         d->socket.clear();
     }
 }

@@ -139,9 +139,9 @@ public:
     virtual int getMaxOnvifRequestTries() const { return 1; }
 
     //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QStringList getRelayOutputList() const override;
+    virtual QnIOPortDataList getRelayOutputList() const override;
     //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QStringList getInputPortList() const override;
+    virtual QnIOPortDataList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
     /*!
         Actual request is performed asynchronously. This method only posts task to the queue

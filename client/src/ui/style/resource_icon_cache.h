@@ -33,6 +33,7 @@ public:
         VideoWallMatrix,
         OtherSystem,
         OtherSystems,
+        IOModule,
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,

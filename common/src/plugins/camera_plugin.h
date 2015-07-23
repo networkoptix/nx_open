@@ -125,11 +125,10 @@ namespace nxcip
             It is recommended that this method works in asynchronous mode (only returning list of already found cameras).
             This method is called periodically.
             \param[out] cameras Array of size \a CAMERA_INFO_ARRAY_SIZE. Implementation filles this array with found camera(s) information
-            \param[in] localInterfaceIPAddr String representation of local interface ip (ipv4 or ipv6). 
-                If not NULL, camera search should be done on that interface only
+            \param[in] serverURL Server URL. If camera do not have own URL it should use this one
             \return > 0 - number of found cameras, < 0 - on error. 0 - nothing found
         */
-        virtual int findCameras( CameraInfo* cameras, const char* localInterfaceIPAddr ) = 0;
+        virtual int findCameras( CameraInfo* cameras, const char* serverURL ) = 0;
         //!Check host for camera presence
         /*!
             Plugin should investigate \a address for supported camera presence and fill \a cameras array with found camera(s) information
@@ -362,8 +361,8 @@ namespace nxcip
 #else
 #define PACKED __attribute__((__packed__))
 #endif
-    /// Standard-layouted memory for LiveStreamConfig hierarchy
-    /// Derived classes may have only static data members or functions.
+    /*!
+    */
     struct PACKED LiveStreamConfig
     {
         enum LiveStreamFlags
@@ -390,7 +389,6 @@ namespace nxcip
     // {D1C7F082-B6F9-45F3-82D6-3CFE3EAE0260}
     static const nxpl::NX_GUID IID_CameraMediaEncoder3 = { { 0xd1, 0xc7, 0xf0, 0x82, 0xb6, 0xf9, 0x45, 0xf3, 0x82, 0xd6, 0x3c, 0xfe, 0x3e, 0xae, 0x2, 0x60 } };
 
-    //!Extends \a CameraMediaEncoder2 by adding configurede stream opening and
     class CameraMediaEncoder3
     :
         public CameraMediaEncoder2

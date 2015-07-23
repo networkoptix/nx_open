@@ -77,8 +77,16 @@ static struct sigaction originalHandlers[_NSIG] = {};
 
 static std::string getCrashPrefix()
 {
+    const std::string program(program_invocation_name);
+    const auto lastSlash = program.rfind('/');
+
     std::ostringstream ss;
-    ss << program_invocation_name << "_" << fullVersionId;
+    if (lastSlash == std::string::npos)
+        ss << program;
+    else
+        ss << program.substr(lastSlash + 1);
+
+    ss << "_" << fullVersionId;
     return ss.str();
 }
 
@@ -195,8 +203,8 @@ void linux_exception::installCrashSignalHandler()
     for (auto sig = &SIGNALS[0]; sig != &SIGNALS[sizeof(SIGNALS)/sizeof(int)]; ++sig)
         if (sigaction(*sig, &action, &originalHandlers[*sig]))
         {
-            qDebug() << "Could not setup handler for " << strsignal(*sig)
-                     << " (" << *sig << ")";
+            qDebug() << "linux_exception Could not setup handler for "
+                     << strsignal(*sig) << " (" << *sig << ")";
             return;
         }
 
@@ -223,6 +231,8 @@ void linux_exception::setSignalHandlingDisabled(bool isDisabled)
     pthread_mutex_lock(&mutex);
     isSignalHandlingEnabled = !isDisabled;
     pthread_mutex_unlock(&mutex);
+
+    qDebug() << "linux_exception::setSignalHandlingDisabled" << isDisabled;
 }
 
 std::string linux_exception::getCrashDirectory()

@@ -41,8 +41,8 @@ public:
         Flag_CanOfflineRange     = 16,      // delegate can return range immediately without opening archive
         Flag_CanSeekImmediatly   = 32,      // delegate can perform seek operation immediately, without 'open' function call
         Flag_CanOfflineLayout    = 64,      // delegate can return audio/video layout immediately without opening archive
-        Flag_UnsyncTime          = 128      // delegate may provide media data with not synced time (non equal to Server time)
-    
+        Flag_UnsyncTime          = 128,     // delegate may provide media data with not synced time (non equal to Server time)
+        Flag_CanOfflineHasVideo  = 256      // delegate may provide info if media has video stream without opening
     };
     Q_DECLARE_FLAGS(Flags, Flag);
 
@@ -62,6 +62,7 @@ public:
     virtual qint64 seek (qint64 time, bool findIFrame) = 0;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() = 0;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() = 0;
+    virtual bool hasVideo() const { return true; }
 
     virtual AVCodecContext* setAudioChannel(int num) { Q_UNUSED(num); return 0; }
     

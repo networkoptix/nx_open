@@ -171,6 +171,7 @@ void CLServerPushStreamReader::run()
         }
 
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
+        QnCompressedAudioDataPtr audioData = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
 
         if (mFramesLost>0) // we are alive again
         {
@@ -212,6 +213,13 @@ void CLServerPushStreamReader::run()
             if (lp)
                 lp->onGotVideoFrame(videoData, m_currentLiveParams, m_openedWithStreamCtrl);
         }
+        else
+        if (audioData)
+        {
+            if (lp)
+                lp->onGotAudioFrame(audioData);
+        }
+
         if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 

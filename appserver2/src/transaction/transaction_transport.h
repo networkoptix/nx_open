@@ -161,7 +161,7 @@ public:
     bool isNeedResync() const { return m_needResync; }
     void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
 
-    QUrl remoteAddr() const       { return m_remoteAddr; }
+    QUrl remoteAddr() const;
 
     ApiPeerData remotePeer() const { return m_remotePeer; }
 

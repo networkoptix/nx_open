@@ -43,6 +43,7 @@
 #include "model/configure_reply.h"
 #include "model/upload_update_reply.h"
 #include "http/custom_headers.h"
+#include "model/recording_stats_reply.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -90,6 +91,7 @@ namespace {
         (Restart,                  "restart")
         (ConfigureObject,          "configure")
         (PingSystemObject,         "pingSystem")
+        (RecordingStatsObject,     "recStats")
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
@@ -254,6 +256,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case PingSystemObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
+        break;
+    case RecordingStatsObject:
+        processJsonReply<QnRecordingStatsReply>(this, response, handle);
         break;
     case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
@@ -776,13 +781,16 @@ int QnMediaServerConnection::restart(QObject *target, const char *slot) {
     return sendAsyncGetRequest(Restart, QnRequestParamList(), NULL, target, slot);
 }
 
-int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot) {
+int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash,
+    const QByteArray &passwordDigest, const QByteArray &cryptSha512Hash, int port, QObject *target, const char *slot)
+{
     QnRequestParamList params;
     params << QnRequestParam("wholeSystem", wholeSystem ? lit("true") : lit("false"));
     params << QnRequestParam("systemName", systemName);
     params << QnRequestParam("password", password);
     params << QnRequestParam("passwordHash", QString::fromLatin1(passwordHash));
     params << QnRequestParam("passwordDigest", QString::fromLatin1(passwordDigest));
+    params << QnRequestParam("cryptSha512Hash", QString::fromLatin1(cryptSha512Hash) );
     params << QnRequestParam("port", port);
 
     return sendAsyncGetRequest(ConfigureObject, params, QN_STRINGIZE_TYPE(QnConfigureReply), target, slot);
@@ -795,6 +803,12 @@ int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &use
     params << QnRequestParam("password", password);
 
     return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
+}
+
+int QnMediaServerConnection::getRecordingStatisticsAsync(qint64 bitrateAnalizePeriodMs, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("bitrateAnalizePeriodMs", bitrateAnalizePeriodMs);
+    return sendAsyncGetRequest(RecordingStatsObject, params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
 }
 
 int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {

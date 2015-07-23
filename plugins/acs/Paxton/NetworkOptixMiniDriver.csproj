@@ -52,7 +52,9 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Paxton.Net2.OemDvrInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=d6bad0497ee6d215, processorArchitecture=MSIL" />
+    <Reference Include="Paxton.Net2.OemDvrInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=d6bad0497ee6d215, processorArchitecture=MSIL">
+      <HintPath>.\Paxton.Net2.OemDvrInterfaces.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />

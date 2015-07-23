@@ -450,6 +450,7 @@ void QnLicenseManagerWidget::at_removeButton_clicked()
 
 void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license)
 {
+    QN_UNUSED(reqID, license);
     if (errorCode == ec2::ErrorCode::ok) {
         QModelIndex index = ui->gridLicenses->selectionModel()->currentIndex();
         ui->gridLicenses->model()->removeRow(index.row());

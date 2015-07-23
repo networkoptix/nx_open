@@ -285,7 +285,7 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
         //resolution = info.resolutionCloseTo(320);
         resolution = info.primaryStreamResolution();
     }
-
+    m_resolution = resolution;
 
     QString result;
     QTextStream t(&result);
@@ -470,8 +470,8 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
         videoData->m_data.finishWriting(-1);
 
     videoData->compressionType = CODEC_ID_MJPEG;
-    videoData->width = 1920;
-    videoData->height = 1088;
+    videoData->width = m_resolution.width();
+    videoData->height = m_resolution.height();
     videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     videoData->channelNumber = 0;
     videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;

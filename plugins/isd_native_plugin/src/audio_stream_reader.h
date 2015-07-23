@@ -33,6 +33,7 @@ public:
     AudioStreamReader();
     ~AudioStreamReader();
 
+    bool isAudioAvailable();
     //!Be sure to call this after constructing object to see whether it is valid or not
     bool initializeIfNeeded();
     /*!
@@ -50,13 +51,13 @@ private:
     nxcip::AudioFormat m_audioFormat;
     size_t m_prevReceiverID;
     std::unique_ptr<Pollable> m_pollable;
-    std::atomic<bool> m_initializedInitially;
+    bool m_initializedInitially;
     PtsToClockMapper m_ptsMapper;
     int m_framesSinceTimeResync;
 
     virtual void eventTriggered( Pollable* obj, aio::EventType eventType ) throw();
 
-    bool initializeAmux();
+    bool initializeAmux( bool getFormatOnly = false );
     int readAudioData();
     void fillAudioFormat();
 };

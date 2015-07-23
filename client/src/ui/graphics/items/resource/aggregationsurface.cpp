@@ -326,9 +326,6 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 
             glBindTexture( GL_TEXTURE_2D, texture->id() );
 
-            GLfloat w0 = 0;
-            GLfloat h0 = 0;
-
             Q_ASSERT( m_buffers[i].pitch >= qPower2Ceil(r_w[i],ROUND_COEFF) );
 
             #ifndef USE_PBO

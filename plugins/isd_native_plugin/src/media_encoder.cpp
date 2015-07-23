@@ -12,6 +12,8 @@
 #include <utils/network/simple_http_client.h>
 
 #include "camera_manager.h"
+#include "plugin.h"
+#include "settings.h"
 #include "stream_reader.h"
 
 
@@ -198,12 +200,17 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
     }
 #endif
 
+    const float vbrMinCoeff = IsdNativePlugin::instance()->getSetting<int>(
+        isd_edge_settings::vbrMinPercent, isd_edge_settings::vbrMinPercentDefault ) / 100.0;
+    const float vbrMaxCoeff = IsdNativePlugin::instance()->getSetting<int>(
+        isd_edge_settings::vbrMaxPercent, isd_edge_settings::vbrMaxPercentDefault ) / 100.0;
+
     //std::cout<<"MediaEncoder::setBitrate "<<bitrateKbps<<" Kbps"<<std::endl;
     QString result;
     QTextStream t(&result);
     t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateControl=vbr\r\n";
-    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMin=" << (bitrateKbps / 5) << "\r\n";
-    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMax=" << (bitrateKbps / 5 * 6) << "\r\n";    //*1.2
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMin=" << (int)(bitrateKbps * vbrMinCoeff) << "\r\n";
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMax=" << (int)(bitrateKbps * vbrMaxCoeff) << "\r\n";    //*1.2
     t.flush();
     return setCameraParam( result );
 }
@@ -229,7 +236,7 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
 #ifndef NO_ISD_AUDIO
-    if( !m_audioStreamReader->initializeIfNeeded() )
+    if( !m_audioStreamReader->isAudioAvailable() )
         return nxcip::NX_IO_ERROR;
     *audioFormat = m_audioStreamReader->getAudioFormat();
     return nxcip::NX_NO_ERROR;

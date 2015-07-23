@@ -12,6 +12,7 @@
 #include <utils/common/log.h>
 
 #include "core/resource/camera_resource.h"
+#include "core/resource/media_server_resource.h"
 #include "core/resource_management/camera_driver_restriction_list.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "core/resource_management/resource_pool.h"
@@ -216,6 +217,11 @@ QnResourceList ThirdPartyResourceSearcher::findResources()
 
 QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
 {
+    QString dafaultURL;
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if( server )
+        dafaultURL = server->getApiUrl();
+
     QVector<nxcip::CameraInfo> cameraInfoTempArray;
 
     for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
@@ -223,7 +229,7 @@ QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
         it != m_thirdPartyCamPlugins.end();
         ++it )
     {
-        int result = it->findCameras( &cameraInfoTempArray, QString() );
+        int result = it->findCameras( &cameraInfoTempArray, dafaultURL );
         if( result <= 0 )
             continue;
 
@@ -290,10 +296,10 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     else
         resource->setName( QString::fromUtf8("%1-%2").arg(vendor).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
+    resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
     resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid).trimmed()) );
     resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
-    resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
     resource->setVendor( vendor );
     if( strlen(cameraInfo.auxiliaryData) > 0 )
         resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );

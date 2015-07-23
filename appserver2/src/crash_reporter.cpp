@@ -71,7 +71,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     #else
         const QDir crashDir;
         const QString crashFilter;
-        return; // do nothing
+        return false; // do nothing. not implemented
     #endif
 
     const QString configApi = admin->getProperty(Ec2StaticticsReporter::SR_SERVER_API);
@@ -90,6 +90,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
 
         crashes.pop_back();
     }
+
     return false;
 }
 
@@ -119,7 +120,7 @@ bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSetting
         return false;
     }
 
-    auto httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    auto httpClient = nx_http::AsyncHttpClient::create();
     auto report = new ReportData(crash, settings, *this, httpClient.get());
     QObject::connect(httpClient.get(), &nx_http::AsyncHttpClient::done,
                     report, &ReportData::finishReport, Qt::DirectConnection);
@@ -162,6 +163,9 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
         return;
     }
 
+    qDebug() << "CrashReporter::finishReport: crash" << m_crashFile.absoluteFilePath()
+             << "has been sent successfully";
+
     const auto now = qnSyncTime->currentDateTime().toUTC();
     QFile::remove(m_crashFile.absoluteFilePath());
 
@@ -171,16 +175,20 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
 
 nx_http::HttpHeaders ReportData::makeHttpHeaders() const
 {
-    auto fileName = m_crashFile.fileName();
+    const auto fileName = m_crashFile.fileName();
+
 #if defined( _WIN32 )
-    auto binName = fileName.split(QChar('.')).first(); // remove extension (.exe)
+    const auto binName = fileName.split(QChar('.')).first(); // remove extension (.exe)
 #else
-    auto binName = fileName.split(QChar('_')).first();
+    const auto binName = fileName.split(QChar('_')).first();
 #endif
-    auto version = QnAppInfo::applicationFullVersion();
-    auto systemInfo = QnAppInfo::applicationSystemInfo();
-    auto timestamp = m_crashFile.created().toUTC().toString("yyyy-MM-dd_hh-mm-ss");
-    auto extension = fileName.split(QChar('.')).last();
+
+    const auto version = QnAppInfo::applicationFullVersion();
+    const auto systemInfo = QnSystemInformation::currentSystemInformation()
+            .toString().replace(QChar(' '), QChar('-'));
+
+    const auto timestamp = m_crashFile.created().toUTC().toString("yyyy-MM-dd_hh-mm-ss");
+    const auto extension = fileName.split(QChar('.')).last();
 
     nx_http::HttpHeaders headers;
     headers.insert(std::make_pair("Nx-Binary", binName.toStdString().c_str()));

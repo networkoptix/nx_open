@@ -152,6 +152,7 @@
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
 #include "network/authenticate_helper.h"
+#include "ui/widgets/iomodule/iostate_display_widget.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -230,6 +231,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
     connect(action(Qn::OpenBookmarksSearchAction),              SIGNAL(triggered()),    this,   SLOT(at_openBookmarksSearchAction_triggered()));
+    connect(action(Qn::RecordingStatisticsAction),              SIGNAL(triggered()),    this,   SLOT(at_openRecordingStatsAction_triggered()));
     connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
@@ -313,6 +315,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
+    connect(action(Qn::OpenIOMonitorAction),              SIGNAL(triggered()),    this,   SLOT(at_openIOMonitorAction_triggered()));
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -492,6 +495,10 @@ QnBusinessRulesDialog *QnWorkbenchActionHandler::businessRulesDialog() const {
 
 QnEventLogDialog *QnWorkbenchActionHandler::businessEventsLogDialog() const {
     return m_businessEventsLogDialog.data();
+}
+
+QnRecordingStatsDialog *QnWorkbenchActionHandler::recordingStatsDialog() const {
+    return m_recordingStatsDialog.data();
 }
 
 QnCameraListDialog *QnWorkbenchActionHandler::cameraListDialog() const {
@@ -797,6 +804,18 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
         layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QnUuid()));
 
         workbench()->setCurrentLayout(layout);
+    }
+}
+
+void QnWorkbenchActionHandler::at_openIOMonitorAction_triggered() 
+{
+    foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
+        QnServerCameraPtr cameraResource = resource.dynamicCast<QnServerCamera>();
+        if(cameraResource) {
+            QnIOStateDisplayWidget* ioStateDisplay = new QnIOStateDisplayWidget(mainWindow());
+            ioStateDisplay->setCamera(cameraResource);
+            ioStateDisplay->show();
+        }
     }
 }
 
@@ -1187,6 +1206,16 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
         businessEventsLogDialog()->setCameraList(cameras);
         businessEventsLogDialog()->enableUpdateData();
     }
+}
+
+void QnWorkbenchActionHandler::at_openRecordingStatsAction_triggered() 
+{
+    QnNonModalDialogConstructor<QnRecordingStatsDialog> dialogConstructor(m_recordingStatsDialog, mainWindow());
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaServerResourcePtr server;
+    if (!parameters.resources().isEmpty())
+        server = parameters.resource().dynamicCast<QnMediaServerResource>();
+    recordingStatsDialog()->setServer(server);
 }
 
 void QnWorkbenchActionHandler::at_cameraListAction_triggered() {
@@ -2482,20 +2511,15 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-    auto result = QMessageBox::information(
+    QMessageBox::information(
         mainWindow(),
         tr("Anonymous Usage Statistics"),                                   
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
-           "If you would like to disable this feature you can do so in the System Settings dialog."),
-        QMessageBox::Ok | QMessageBox::Cancel,
-        QMessageBox::Ok);
+           "If you would like to disable this feature you can do so in the System Settings dialog.")
+           );
 
-    if (result == QMessageBox::Ok) {
-        ec2::Ec2StaticticsReporter::setAllowed(servers, true);
-        propertyDictionary->saveParamsAsync(idListFromResList(servers));
-    } else {
-        menu()->triggerIfPossible(Qn::SystemAdministrationAction);
-    }
+    ec2::Ec2StaticticsReporter::setAllowed(servers, true);
+    propertyDictionary->saveParamsAsync(idListFromResList(servers));
 }
 
 

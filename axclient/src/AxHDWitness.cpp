@@ -37,6 +37,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include "core/resource/resource_directory_browser.h"
+#include <core/resource/storage_plugin_factory.h>
 
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
@@ -63,8 +64,9 @@
 
 #include <plugins/resource/server_camera/server_camera_factory.h>
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
-#include <utils/common/log.h>
 
+#include <utils/common/log.h>
+#include <utils/common/synctime.h>
 
 
 #include "ui/workbench/workbench_item.h"

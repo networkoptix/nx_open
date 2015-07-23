@@ -20,12 +20,11 @@
 #include "auth_tools.h"
 #include "version.h"
 
-
 //TODO: #ak persistent connection support
 //TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
 //TODO: #ak reconnect support
 
-static const int DEFAULT_CONNECT_TIMEOUT = 3000;
+static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
 //static const int DEFAULT_HTTP_PORT = 80;
 
@@ -44,6 +43,7 @@ namespace nx_http
         m_terminated( false ),
         m_totalBytesRead( 0 ),
         m_contentEncodingUsed( true ),
+        m_sendTimeoutMs( DEFAULT_SEND_TIMEOUT ),
         m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
         m_msgBodyReadTimeoutMs( 0 ),
         m_authType(authBasicAndDigest),
@@ -105,6 +105,9 @@ namespace nx_http
     */
     bool AsyncHttpClient::doGet( const QUrl& url )
     {
+        if( !url.isValid() )
+            return false;
+
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::GET );
@@ -116,6 +119,9 @@ namespace nx_http
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody)
     {
+        if( !url.isValid() )
+            return false;
+
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::POST );
@@ -132,6 +138,9 @@ namespace nx_http
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody )
     {
+        if( !url.isValid() )
+            return false;
+
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::PUT );
@@ -227,6 +236,11 @@ namespace nx_http
         m_userPassword = userPassword;
     }
 
+    void AsyncHttpClient::setSendTimeoutMs( unsigned int sendTimeoutMs )
+    {
+        m_sendTimeoutMs = sendTimeoutMs;
+    }
+
     void AsyncHttpClient::setResponseReadTimeoutMs( unsigned int _responseReadTimeoutMs )
     {
         m_responseReadTimeoutMs = _responseReadTimeoutMs;
@@ -242,10 +256,10 @@ namespace nx_http
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
         QnMutexLocker lk( &m_mutex );
-
-        Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
             return;
+
+        Q_ASSERT( sock == m_socket.data() );
 
         if( m_state != sWaitingConnectToHost )
         {
@@ -287,10 +301,10 @@ namespace nx_http
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
         QnMutexLocker lk( &m_mutex );
-
-        Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
             return;
+
+        Q_ASSERT( sock == m_socket.data() );
 
         if( m_state != sSendingRequest )
         {
@@ -349,10 +363,10 @@ namespace nx_http
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
         QnMutexLocker lk( &m_mutex );
-
-        Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
             return;
+
+        Q_ASSERT( sock == m_socket.data() );
 
         if( errorCode != SystemError::noError )
         {
@@ -622,7 +636,7 @@ namespace nx_http
         m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(m_url.scheme() == lit("https")));
         m_connectionClosed = false;
         if( !m_socket->setNonBlockingMode( true ) ||
-            !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
+            !m_socket->setSendTimeout( m_sendTimeoutMs ) ||
             !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
         {
             NX_LOG( lit("Failed to put socket to non blocking mode. %1").
@@ -780,6 +794,11 @@ namespace nx_http
         return false;
     }
 
+    AsyncHttpClientPtr AsyncHttpClient::create()
+    {
+        return AsyncHttpClientPtr( std::shared_ptr<AsyncHttpClient>( new AsyncHttpClient() ) );
+    }
+
     bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
@@ -904,7 +923,7 @@ namespace nx_http
         const nx_http::HttpHeaders& extraHeaders,
         const QAuthenticator &auth)
     {
-        nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();       
+        nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
         httpClientCaptured->addRequestHeaders(extraHeaders);
         if (!auth.isNull()) {
             httpClientCaptured->setUserName(auth.user());

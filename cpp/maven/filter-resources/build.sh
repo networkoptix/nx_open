@@ -3,13 +3,16 @@
 CONFIG=${build.configuration}
 ARTIFACT=${project.artifactId}
 PLATFORM=`uname -s`
-QTCHECK=`ldd ${libdir}/lib/${build.configuration}/libQt5Core.so.5 | grep libglib-2.0.so.0`
+
 DEBUG=
 
-if [ $PLATFORM == 'Linux' ] && [ "${arch}" != "arm"  ] && [ -z "$QTCHECK" ]; then
-     echo '+++++++++++++ Invalid QT - does not support libglib. Compilation terminated +++++++++++++'
-     exit 1
-fi
+if [ $PLATFORM == 'Linux' ] && [ "${arch}" != "arm"  ]; then
+    QTCHECK=`ldd ${libdir}/lib/${build.configuration}/libQt5Core.so.5 | grep libglib-2.0.so.0`
+    if [ -z "$QTCHECK" ]; then
+	 echo '+++++++++++++ Invalid QT - does not support libglib. Compilation terminated +++++++++++++'
+         exit 1
+    fi
+fi    
 
 if [ "${box}" == "rpi" ] || [ "${box}" == "bpi" ]; then
      QTCHECK_ARM=`/usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-ldd --root ${libdir}/lib/${build.configuration} ${libdir}/lib/${build.configuration}/libQt5Core.so.5 | grep libglib-2.0.so.0`

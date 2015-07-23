@@ -67,6 +67,7 @@ bool MultipleInternetTimeFetcher::getTimeAsync( std::function<void(qint64, Syste
                 this, ctx.get(), _1, _2 ) ) )
         {
             ++m_awaitedAnswers;
+            ctx->errorCode = SystemError::noError;
             ctx->state = TimeFetcherContext::working;
         }
         else
@@ -100,6 +101,8 @@ void MultipleInternetTimeFetcher::timeFetchingDone(
     qint64 utcMillis,
     SystemError::ErrorCode errorCode )
 {
+    QnMutexLocker lk( &m_mutex );
+
     ctx->utcMillis = utcMillis;
     ctx->errorCode = errorCode;
     ctx->state = TimeFetcherContext::done;
@@ -107,8 +110,6 @@ void MultipleInternetTimeFetcher::timeFetchingDone(
     Q_ASSERT( m_awaitedAnswers > 0 );
     if( (--m_awaitedAnswers) > 0 )
         return;
-
-    QnMutexLocker lk( &m_mutex );
 
     if( m_terminated )
         return;

@@ -14,6 +14,7 @@
 #include "utils/network/http/httptypes.h"
 #include "utils/network/multicodec_rtp_reader.h"
 #include "utils/common/log.h"
+#include "utils/media/ffmpeg_helper.h"
 
 #include "core/datapacket/third_party_audio_data_packet.h"
 #include "core/datapacket/third_party_video_data_packet.h"
@@ -30,6 +31,8 @@ namespace
     {
         CodecID codecId = packet->compressionType;
 
+        Q_ASSERT_X( codecId == CODEC_ID_H264, "IFrame detection", "only CODEC_ID_H264 is supported" );
+
         if( !packet || codecId != CODEC_ID_H264 )
             return false;
 
@@ -38,6 +41,7 @@ namespace
 
         FrameTypeExtractor frameTypeEx(codecId);
         auto type = frameTypeEx.getFrameType( udata, packet->dataSize() );
+
         switch(type)
         {
             case FrameTypeExtractor::I_Frame:

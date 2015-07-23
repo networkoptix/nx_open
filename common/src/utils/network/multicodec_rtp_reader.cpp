@@ -478,14 +478,13 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
             for (int i = 0; i < m_numberOfVideoChannels; ++i)
                 m_customVideoLayout->setChannel(i, 0, i); // arrange multi video layout from left to right
             newVideoLayout = m_customVideoLayout->toString();
-        }
-
-        QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
-        if (camRes && m_role == Qn::CR_LiveVideo) {
-            QString oldVideoLayout = camRes->getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
-            if (newVideoLayout != oldVideoLayout) {
-                camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
-                camRes->saveParams();
+            QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
+            if (camRes && m_role == Qn::CR_LiveVideo) {
+                QString oldVideoLayout = camRes->getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
+                if (newVideoLayout != oldVideoLayout) {
+                    camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
+                    camRes->saveParams();
+                }
             }
         }
     }
