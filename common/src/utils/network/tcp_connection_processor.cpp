@@ -4,6 +4,7 @@
 
 #include <utils/common/log.h>
 #include <utils/common/util.h>
+#include <utils/network/flash_socket/types.h>
 #include <utils/network/http/httptypes.h>
 
 #include "http/http_mod_manager.h"
@@ -54,7 +55,7 @@ int QnTCPConnectionProcessor::isFullMessage(
     const QByteArray& message,
     boost::optional<qint64>* const fullMessageSize )
 {
-    if( message.startsWith("<policy-file-request/>") )
+    if( message.startsWith(nx_flash_sock::POLICY_FILE_REQUEST_NAME) )
         return message.size();
 
     if( fullMessageSize && fullMessageSize->is_initialized() )

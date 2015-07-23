@@ -10,6 +10,7 @@
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
 #include "http/custom_headers.h"
+#include "utils/network/flash_socket/types.h"
 
 
 static const int AUTH_TIMEOUT = 60 * 1000;
@@ -140,9 +141,9 @@ void QnUniversalRequestProcessor::run()
 
     while (1)
     {
-        if( d->clientRequest.startsWith("<policy-file-request/>") )
+        if( d->clientRequest.startsWith(nx_flash_sock::POLICY_FILE_REQUEST_NAME) )
         {
-            QFile f( lit( ":/static/crossdomain.xml" ) );
+            QFile f( QString::fromLatin1(nx_flash_sock::CROSS_DOMAIN_XML_PATH) );
             if( f.open( QIODevice::ReadOnly ) )
                 sendData( f.readAll() );
             break;
