@@ -115,7 +115,7 @@ private:
         QByteArray xmlDevInfo;
     };
 
-    typedef std::map<std::shared_ptr<nx_http::AsyncHttpClient>, DiscoveredDeviceInfo> HttpClientsDict;
+    typedef std::map<nx_http::AsyncHttpClientPtr, DiscoveredDeviceInfo> HttpClientsDict;
 
     class UPNPDescriptionCacheItem
     {

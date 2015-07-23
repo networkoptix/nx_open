@@ -13,8 +13,7 @@ public:
     explicit Guard(const Callback& callback);
     explicit Guard(Callback&& callback);
 
-    Guard(const Guard&) = delete;
-    Guard(Guard&&) = default;
+    Guard(Guard&&);
 
     /** Fires this guard */
     ~Guard();
@@ -27,6 +26,8 @@ public:
 
 private:
     Callback m_callback;
+
+    Guard(const Guard&);
 };
 
 #endif // GUARD_H

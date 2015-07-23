@@ -340,7 +340,7 @@ void DeviceSearcher::startFetchDeviceXml(
         }
 
         //TODO: #ak linear search is not among fastest ones known to humanity
-        for( std::map<std::shared_ptr<nx_http::AsyncHttpClient>, DiscoveredDeviceInfo>::const_iterator
+        for( auto
             it = m_httpClients.begin();
             it != m_httpClients.end();
             ++it )
@@ -349,7 +349,7 @@ void DeviceSearcher::startFetchDeviceXml(
                 return; //if there is unfinished request to url descriptionUrl or to device with id uuidStr, then return
         }
 
-        httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+        httpClient = nx_http::AsyncHttpClient::create();
         m_httpClients[httpClient] = std::move(info);
     }
 

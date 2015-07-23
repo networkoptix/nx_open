@@ -10,6 +10,11 @@ Guard::Guard(Callback&& callback)
 {
 }
 
+Guard::Guard(Guard&& rhs)
+    : m_callback(std::move(rhs.m_callback))
+{
+}
+
 Guard::~Guard()
 {
     try
