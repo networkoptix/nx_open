@@ -937,7 +937,7 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePerio
 {
     QnRecordingStatsData result;
     QnRecordingStatsData bitrateStats;
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     if (m_chunks.empty())
         return QnRecordingStatsData();

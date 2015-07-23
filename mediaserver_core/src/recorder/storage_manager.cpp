@@ -792,7 +792,7 @@ QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 bitrateAnalize
     QnRecordingStatsReply result;
     QSet<QString> cameras;
     {
-        QMutexLocker lock(&m_mutexCatalog);
+        QnMutexLocker lock(&m_mutexCatalog);
         for(const auto& uniqueId: m_devFileCatalog[QnServer::HiQualityCatalog].keys())
             cameras << uniqueId;
         for(const auto& uniqueId: m_devFileCatalog[QnServer::LowQualityCatalog].keys())
@@ -811,7 +811,7 @@ QnRecordingStatsReply QnStorageManager::getChunkStatistics(qint64 bitrateAnalize
 
 QnRecordingStatsData QnStorageManager::getChunkStatisticsByCamera(qint64 bitrateAnalizePeriodMs, const QString& uniqueId)
 {
-    QMutexLocker lock(&m_mutexCatalog);
+    QnMutexLocker lock(&m_mutexCatalog);
     auto catalogHi = m_devFileCatalog[QnServer::HiQualityCatalog].value(uniqueId);
     auto catalogLow = m_devFileCatalog[QnServer::LowQualityCatalog].value(uniqueId);
 
@@ -831,8 +831,8 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     QnRecordingStatsData bitrateStats; // temp stats for virtual bitrate calculation
     qint64 archiveStartTimeMs = -1;
     qint64 bitrateThreshold = DATETIME_NOW;
-    QMutexLocker lock1(&catalogHi->m_mutex);
-    QMutexLocker lock2(&catalogLow->m_mutex);
+    QnMutexLocker lock1(&catalogHi->m_mutex);
+    QnMutexLocker lock2(&catalogLow->m_mutex);
 
     if (catalogHi && !catalogHi->m_chunks.empty()) {
         archiveStartTimeMs = catalogHi->m_chunks[0].startTimeMs;
@@ -1496,7 +1496,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 
 QnStorageResourcePtr QnStorageManager::getStorageByUrlExact(const QString& storageUrl)
 {
-    QMutexLocker lock(&m_mutexStorages);
+    QnMutexLocker lock(&m_mutexStorages);
     int matchLen = 0;
     for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {

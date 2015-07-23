@@ -340,9 +340,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsXAnimator(NULL),
     m_notificationsOpacityAnimatorGroup(NULL),
 
+    m_calendarItem(NULL),
     m_calendarPinButton(nullptr),
     m_dayTimeMinimizeButton(nullptr),
-    m_calendarItem(NULL),
     m_calendarSizeAnimator(NULL),
     m_calendarOpacityAnimatorGroup(NULL),
     m_calendarOpacityProcessor(NULL),

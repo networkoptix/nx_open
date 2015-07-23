@@ -1,5 +1,6 @@
 #include <QUrlQuery>
 #include <QWaitCondition>
+#include <QMutex>
 
 #include "iomonitor_tcp_server.h"
 #include <QtCore/QCoreApplication>

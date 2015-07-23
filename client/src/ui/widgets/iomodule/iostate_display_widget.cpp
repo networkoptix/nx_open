@@ -175,7 +175,7 @@ void QnIOStateDisplayWidget::at_buttonClicked()
             auto ioConfigData = itr.value().ioConfigData;
             
             QnBusinessEventParameters eventParams;
-            eventParams.setEventTimestamp(qnSyncTime->currentMSecsSinceEpoch());
+            eventParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
 
             QnBusinessActionParameters params;
             params.relayOutputId = ioConfigData.id;
