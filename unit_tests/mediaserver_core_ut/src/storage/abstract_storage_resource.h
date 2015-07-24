@@ -1,6 +1,7 @@
 #ifndef __ABSTRACT_STORAGE_RESOURCE_TEST__
 #define __ABSTRACT_STORAGE_RESOURCE_TEST__
 
+#include <memory>
 #include <algorithm>
 #include <utility>
 #include <cstring>
@@ -20,10 +21,12 @@
 
 namespace test
 {
+    const char *const defaultUrl = "ftp://127.0.0.1/tmp";
     struct StorageTestGlobals
     {
-        void prepare() 
+        void prepare(const QString &ftpStorageUrl) 
         {
+            this->ftpStorageUrl = ftpStorageUrl.isEmpty() ? defaultUrl : ftpStorageUrl;
             runnablePool = std::unique_ptr<QnLongRunnablePool>(
                 new QnLongRunnablePool
             );
@@ -70,6 +73,7 @@ namespace test
             }
         }
 
+        QString                             ftpStorageUrl;
         std::vector<QnStorageResource *>    storages;
         std::unique_ptr<QnStorageManager>   storageManager;
         std::unique_ptr<QnResourcePool>     resourcePool;

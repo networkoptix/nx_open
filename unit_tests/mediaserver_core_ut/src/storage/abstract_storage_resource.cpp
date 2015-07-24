@@ -17,21 +17,24 @@ TEST(AbstractStorageResourceTest, Init)
         );
     ASSERT_TRUE(fileStorage);
     fileStorage->setUrl(fileStorageUrl);
-    
+
     tg.storages.push_back(fileStorage);
 
-    const char * ftpStorageUrl = "ftp://anonymous:@10.0.2.131/tmp";
     QnStorageResource *ftpStorage = 
         QnStoragePluginFactory::instance()->createStorage(
-            ftpStorageUrl,
+            tg.ftpStorageUrl,
             false
         );
-    ASSERT_TRUE(ftpStorage);
-    if (ftpStorage)
+    EXPECT_TRUE(ftpStorage && ftpStorage->isAvailable());
+    if (ftpStorage && ftpStorage->isAvailable())
     {
-        ftpStorage->setUrl(ftpStorageUrl);
+        ftpStorage->setUrl(tg.ftpStorageUrl);
         tg.storages.push_back(ftpStorage);
     }
+    else
+        std::cout
+            << "Ftp storage is unavailable. Check if server is online and url is correct."
+            << std::endl;
 }
 
 TEST(AbstractStorageResourceTest, Capabilities)
@@ -103,11 +106,11 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
                     QIODevice::WriteOnly
                 )
             );
-            if (!ioDevice)
-            {
-                std::cout << "ioDevice creation failed: " << fileName.toStdString() << std::endl;
-            }
-            ASSERT_TRUE(ioDevice);
+            ASSERT_TRUE(ioDevice) 
+                << "ioDevice creation failed: " 
+                << fileName.toStdString() 
+                << std::endl;
+
             ASSERT_TRUE(ioDevice->write(dummyData, dummyDataLen) == dummyDataLen);
         }
 
@@ -149,6 +152,26 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
         recursiveRemover(rootFileList);
         rootFileList = storage->getFileList(storage->getUrl());
         ASSERT_TRUE(rootFileList.isEmpty());
+
+        // rename file
+        QString fileName = closeDirPath(storage->getUrl()) + lit("old_name.tmp");
+        QString newFileName = closeDirPath(storage->getUrl()) + lit("new_name.tmp");
+        std::unique_ptr<QIODevice> ioDevice = std::unique_ptr<QIODevice>(
+            storage->open(
+                fileName.toLatin1().constData(),
+                QIODevice::WriteOnly
+            )
+        );
+
+        ASSERT_TRUE(ioDevice) 
+            << "ioDevice creation failed: " 
+            << fileName.toStdString() 
+            << std::endl;
+
+        ASSERT_TRUE(ioDevice->write(dummyData, dummyDataLen) == dummyDataLen);
+        ioDevice.reset();
+        ASSERT_TRUE(storage->renameFile(fileName, newFileName));
+        ASSERT_TRUE(storage->removeFile(newFileName));
     }
 }
 
@@ -222,6 +245,17 @@ TEST(AbstractStorageResourceTest, IODevice)
         }
 
         ASSERT_TRUE(memcmp(readData.constData(), data.data(), dataSize) == 0);
+
+        // random seeks/reads
+        const size_t readSize = 10;
+        for (size_t i = 0; i < seekCount; ++i)
+        {
+            const qint64 seekPos = seekDistribution(gen);
+            ASSERT_TRUE(ioDevice->seek(seekPos));
+            QByteArray buf = ioDevice->read(readSize);
+            ASSERT_TRUE(memcmp(buf.constData(), data.data(), readSize));
+        }
+
         ioDevice->close();
         ASSERT_TRUE(storage->removeFile(fileName));
     }
