@@ -19,6 +19,7 @@
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
         <DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
+        <nxtool>false</nxtool>
         <final.artifact.name>${installer.name}</final.artifact.name>
     </properties>
 
@@ -48,6 +49,14 @@
             <type>pom</type> 
             <scope>system</scope>
             <systemPath>${root.dir}/mediaserver/pom.xml</systemPath>            
+        </dependency>	
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nxtool</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/nxtool/pom.xml</systemPath>            
         </dependency>					
     </dependencies>		
 
@@ -290,7 +299,22 @@
                     </execution>	                    
                 </executions>				
             </plugin> 	            
-
         </plugins>
     </build>       
+    <profiles>
+        <profile>
+            <id>nxtool-installer</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <file>
+                    <missing>../customization/${customization}/nxtool.skip</missing>
+                </file>
+            </activation>
+            <properties>
+                <nxtool>true</nxtool>
+            </properties>            
+        </profile>    
+    </profiles>    
 </project>
