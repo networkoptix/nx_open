@@ -362,7 +362,6 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>
-                <module>nxtool</module>
                 <module>clientexe</module>
                 <module>wixsetup</module>
             </modules>
@@ -416,10 +415,21 @@
                 <module>plugins/nxcontrol</module>     
                 <module>plugins/acs/paxton</module>     
                 <module>plugins/acs/paxton-installer</module>     
-                <!-- Uncomment this when 2.3.1_paxton is merged -->
-                <!-- <module>plugins/acs/paxton</module>
-                <module>plugins/acs/paxton-installer</module> -->
             </modules>            
+        </profile>
+        <profile>
+            <id>nxtool</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <file>
+                    <missing>customization/${customization}/nxtool.skip</missing>
+                </file>
+            </activation>
+            <modules>
+                <module>nxtool</module>
+            </modules>    
         </profile>
 
         <profile>
