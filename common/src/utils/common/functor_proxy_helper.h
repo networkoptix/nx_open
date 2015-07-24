@@ -67,7 +67,6 @@ namespace nx
     template<typename T, typename R, class ObjType TYPENAME_ARG_LIST>                               \
     std::function<R( ARG_TYPE_LIST )> bind_only_1st( R( T::*func )(ARG_TYPE_LIST), ObjType* obj )   \
     {                                                                                               \
-        using namespace std::placeholders;                                                          \
         return std::bind( func, obj PLACEHOLDERS_WITH_COMMA );                                      \
     }                                                                                               \
                                                                                                     \
@@ -91,7 +90,7 @@ namespace nx
         arg1,
         Arg1,
         COMMA Arg1,
-        COMMA _1 )
+        COMMA std::placeholders::_1 )
     DEFINE_PROXY_FUNC_HELPERS(
         2,
         COMMA typename Arg1 COMMA typename Arg2,
@@ -99,7 +98,7 @@ namespace nx
         arg1 COMMA arg2,
         Arg1 COMMA Arg2,
         COMMA Arg1 COMMA Arg2,
-        COMMA _1 COMMA _2 )
+        COMMA std::placeholders::_1 COMMA std::placeholders::_2 )
     DEFINE_PROXY_FUNC_HELPERS(
         3,
         COMMA typename Arg1 COMMA typename Arg2 COMMA typename Arg3,
@@ -107,7 +106,7 @@ namespace nx
         arg1 COMMA arg2 COMMA arg3,
         Arg1 COMMA Arg2 COMMA Arg3,
         COMMA Arg1 COMMA Arg2 COMMA Arg3,
-        COMMA _1 COMMA _2 COMMA _3 )
+        COMMA std::placeholders::_1 COMMA std::placeholders::_2 COMMA std::placeholders::_3 )
     DEFINE_PROXY_FUNC_HELPERS(
         4,
         COMMA typename Arg1 COMMA typename Arg2 COMMA typename Arg3 COMMA typename Arg4,
@@ -115,7 +114,7 @@ namespace nx
         arg1 COMMA arg2 COMMA arg3 COMMA arg4,
         Arg1 COMMA Arg2 COMMA Arg3 COMMA Arg4,
         COMMA Arg1 COMMA Arg2 COMMA Arg3 COMMA Arg4,
-        COMMA _1 COMMA _2 COMMA _3 COMMA _4 )
+        COMMA std::placeholders::_1 COMMA std::placeholders::_2 COMMA std::placeholders::_3 COMMA std::placeholders::_4 )
 }
 
 #endif  //FUNCTOR_PROXY_HELPER_H
