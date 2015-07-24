@@ -63,64 +63,6 @@ namespace
             , info.extraInfo().password, command);
     }
     
-    QJsonValue extractReplyBody(const QJsonObject &object)
-    {
-        static const QString &kReplyTag = "reply";
-        return (object.contains(kReplyTag) ? object.value(kReplyTag) : QJsonValue());
-    }
-    
-    bool isErrorReply(const QJsonObject &object)
-    {
-        static const QString &kErrorTag = "error";
-        const int code = (!object.contains(kErrorTag) ? 0
-            : object.value(kErrorTag).toString().toInt());
-        return code;
-    }
-    
-    QString getErrorDescription(const QJsonObject &object)
-    {
-        static const QString &kReasonTag = "errorString";
-        return (object.contains(kReasonTag) ? 
-            object.value(kReasonTag).toString() : QString());
-    }
-    
-    rtu::HttpClient::ReplyCallback makeReplyCallback(const rtu::OperationCallback &callback
-        , rtu::AffectedEntities affected)
-    {
-        const auto &result = [callback, affected](const QByteArray &data)
-        {
-            if (!callback)
-                return;
-            
-            const QJsonDocument &doc = QJsonDocument::fromJson(data.data());
-            const QJsonObject &object = doc.object();
-            if (isErrorReply(object))
-            {
-                callback(getErrorDescription(object), affected);
-            }
-            else
-            {
-                callback(QString(), affected);
-            }
-        };
-        
-        return result;
-    }
-    
-    rtu::HttpClient::ErrorCallback makeErrorCallback(const rtu::OperationCallback &callback
-        , rtu::AffectedEntities affected)
-    {
-        const auto result = [callback, affected](const QString &reason, int)
-        {
-            if (!callback)
-                return;
-            
-            callback(reason, affected);
-        };
-        
-        return result;
-    }
-
     typedef QHash<QString, std::function<void (const QJsonObject &object
         , rtu::BaseServerInfo &info)> > KeyParserContainer;
     const KeyParserContainer parser = []() -> KeyParserContainer
@@ -160,10 +102,186 @@ namespace
     }();
 }
 
-/// Forward declarations
-bool parseExtraInfoCommand(const QString &cmdName
-    , const QJsonObject &object
-    , rtu::ExtraServerInfo &extraInfo);
+namespace /// Parsers stuff
+{
+    bool isErrorReply(const QJsonObject &object)
+    {
+        static const QString &kErrorTag = "error";
+        const int code = (!object.contains(kErrorTag) ? 0
+            : object.value(kErrorTag).toString().toInt());
+        return code;
+    }
+   
+    ///
+
+    QString getErrorDescription(const QJsonObject &object)
+    {
+        static const QString &kReasonTag = "errorString";
+        return (object.contains(kReasonTag) ? 
+            object.value(kReasonTag).toString() : QString());
+    }
+    
+    ///
+    typedef std::function<bool (const QJsonObject &object
+        , rtu::ExtraServerInfo &extraInfo)> ParseFunction;
+
+    rtu::HttpClient::ReplyCallback makeReplyCallbackEx(
+        const rtu::ExtraServerInfoSuccessCallback &successful
+        , const rtu::OperationCallback &failed
+        , const QUuid &id
+        , const QString &password
+        , rtu::AffectedEntities affected
+        , const ParseFunction &parser)
+    {
+        const auto &result = [successful, failed, id, password, affected, parser](const QByteArray &data)
+        {
+            rtu::ExtraServerInfo extraInfo;
+            const bool parsed = parser(QJsonDocument::fromJson(data.data()).object(), extraInfo);
+                
+            if (parsed)
+            {
+                if (successful)
+                {
+                    extraInfo.password = password;
+                    successful(id, extraInfo);
+                }
+            }
+            else if (failed)
+            {
+                failed(kErrorDesc, affected);
+            }
+        };
+
+        return result;
+    }
+
+    rtu::HttpClient::ReplyCallback makeReplyCallback(const rtu::OperationCallback &callback
+        , rtu::AffectedEntities affected)
+    {
+        const auto &result = [callback, affected](const QByteArray &data)
+        {
+            if (!callback)
+                return;
+            
+            const QJsonDocument &doc = QJsonDocument::fromJson(data.data());
+            const QJsonObject &object = doc.object();
+            if (isErrorReply(object))
+            {
+                callback(getErrorDescription(object), affected);
+            }
+            else
+            {
+                callback(QString(), affected);
+            }
+        };
+        
+        return result;
+    }
+    
+    ///
+
+    rtu::HttpClient::ErrorCallback makeErrorCallback(const rtu::OperationCallback &callback
+        , rtu::AffectedEntities affected)
+    {
+        const auto result = [callback, affected](const QString &reason, int)
+        {
+            if (!callback)
+                return;
+            
+            callback(reason, affected);
+        };
+        
+        return result;
+    }
+
+    ///
+
+    QJsonValue extractReplyBody(const QJsonObject &object)
+    {
+        static const QString &kReplyTag = "reply";
+        return (object.contains(kReplyTag) ? object.value(kReplyTag) : QJsonValue());
+    }
+    ///
+
+    bool parseIfListCmd(const QJsonObject &object
+        , rtu::ExtraServerInfo &extraInfo)
+    {
+        if (isErrorReply(object))
+            return false;
+
+        const QJsonArray &ifArray = extractReplyBody(object).toArray();
+        if (ifArray.isEmpty())
+            return false;
+    
+        rtu::InterfaceInfoList interfaces;
+        for(const QJsonValue &interface: ifArray)
+        {
+            static const QString &kDHCPTag = "dhcp";
+            static const QString &kGateWayTag = "gateway";
+            static const QString &kIpAddressTag = "ipAddr";
+            static const QString &kMacAddressTag = "mac";
+            static const QString &kNameTag = "name";
+            static const QString &kMaskTag = "netMask";
+            static const QString &kDnsTag = "dns_servers";
+
+            const QJsonObject &ifObject = interface.toObject();
+            if (!ifObject.contains(kDHCPTag) || !ifObject.contains(kGateWayTag)
+                || !ifObject.contains(kIpAddressTag) || !ifObject.contains(kMacAddressTag)
+                || !ifObject.contains(kNameTag) || !ifObject.contains(kMaskTag)
+                || !ifObject.contains(kDnsTag))
+            {
+                return false;
+            }
+        
+            const rtu::InterfaceInfo &ifInfo = rtu::InterfaceInfo(
+                ifObject.value(kNameTag).toString()
+                , ifObject.value(kIpAddressTag).toString()
+                , ifObject.value(kMacAddressTag).toString()
+                , ifObject.value(kMaskTag).toString()
+                , ifObject.value(kGateWayTag).toString()
+                , ifObject.value(kDnsTag).toString().split(' ').front()
+                , ifObject.value(kDHCPTag).toBool() ? Qt::Checked : Qt::Unchecked);
+            interfaces.push_back(ifInfo);
+        }
+    
+        extraInfo.interfaces = interfaces;
+        return true;
+    }
+
+    ///
+
+    bool parseGetTimeCmd(const QJsonObject &object
+        , rtu::ExtraServerInfo &extraInfo)
+    {
+        if (isErrorReply(object))
+            return false;
+    
+        const QJsonObject &timeData = extractReplyBody(object).toObject();
+        if (timeData.isEmpty())
+            return false;
+    
+        static const QString kUtcTimeTag = "utcTime";
+        static const QString kTimeZoneIdTag = "timezoneId";
+        static const QString kTimeZoneOffsetTag = "timeZoneOffset";
+    
+        const bool containsTimeZoneId = timeData.contains(kTimeZoneIdTag);
+        if (!timeData.contains(kUtcTimeTag) 
+            || (!timeData.contains(kTimeZoneIdTag) && !timeData.contains(kTimeZoneOffsetTag)))
+            return false;
+    
+        const QByteArray &timeZoneId = containsTimeZoneId 
+            ? timeData.value(kTimeZoneIdTag).toString().toUtf8()
+            : QTimeZone(timeData.value(kTimeZoneOffsetTag).toInt()).id();
+
+        const qint64 msecs = timeData.value(kUtcTimeTag).toString().toLongLong();
+    
+        extraInfo.timeZoneId = timeZoneId;
+        extraInfo.utcDateTimeMs = msecs;
+        extraInfo.timestampMs = QDateTime::currentMSecsSinceEpoch();
+
+        return true;
+    }
+}
 
 ///
 
@@ -188,6 +306,8 @@ const QStringList &rtu::defaultAdminPasswords()
     return result;
 }
 
+///
+
 void rtu::parseModuleInformationReply(const QJsonObject &reply
     , rtu::BaseServerInfo &baseInfo)
 {
@@ -198,144 +318,6 @@ void rtu::parseModuleInformationReply(const QJsonObject &reply
         if (itHandler != parser.end())
             (*itHandler)(reply, baseInfo);
     }
-}
-
-///
-
-bool parseIfListCmd(const QJsonObject &object
-    , rtu::ExtraServerInfo &extraInfo)
-{
-    if (isErrorReply(object))
-        return false;
-
-    const QJsonArray &ifArray = extractReplyBody(object).toArray();
-    if (ifArray.isEmpty())
-        return false;
-    
-    rtu::InterfaceInfoList interfaces;
-    for(const QJsonValue &interface: ifArray)
-    {
-        static const QString &kDHCPTag = "dhcp";
-        static const QString &kGateWayTag = "gateway";
-        static const QString &kIpAddressTag = "ipAddr";
-        static const QString &kMacAddressTag = "mac";
-        static const QString &kNameTag = "name";
-        static const QString &kMaskTag = "netMask";
-        static const QString &kDnsTag = "dns_servers";
-
-        const QJsonObject &ifObject = interface.toObject();
-        if (!ifObject.contains(kDHCPTag) || !ifObject.contains(kGateWayTag)
-            || !ifObject.contains(kIpAddressTag) || !ifObject.contains(kMacAddressTag)
-            || !ifObject.contains(kNameTag) || !ifObject.contains(kMaskTag)
-            || !ifObject.contains(kDnsTag))
-        {
-            return false;
-        }
-        
-        const rtu::InterfaceInfo &ifInfo = rtu::InterfaceInfo(
-            ifObject.value(kNameTag).toString()
-            , ifObject.value(kIpAddressTag).toString()
-            , ifObject.value(kMacAddressTag).toString()
-            , ifObject.value(kMaskTag).toString()
-            , ifObject.value(kGateWayTag).toString()
-            , ifObject.value(kDnsTag).toString().split(' ').front()
-            , ifObject.value(kDHCPTag).toBool() ? Qt::Checked : Qt::Unchecked);
-        interfaces.push_back(ifInfo);
-    }
-    
-    extraInfo.interfaces = interfaces;
-    return true;
-}
-
-///
-
-bool parseGetTimeCmd(const QJsonObject &object
-    , rtu::ExtraServerInfo &extraInfo)
-{
-    if (isErrorReply(object))
-        return false;
-    
-    const QJsonObject &timeData = extractReplyBody(object).toObject();
-    if (timeData.isEmpty())
-        return false;
-    
-    static const QString kUtcTimeTag = "utcTime";
-    static const QString kTimeZoneIdTag = "timezoneId";
-    static const QString kTimeZoneOffsetTag = "timeZoneOffset";
-    
-    const bool containsTimeZoneId = timeData.contains(kTimeZoneIdTag);
-    if (!timeData.contains(kUtcTimeTag) 
-        || (!timeData.contains(kTimeZoneIdTag) && !timeData.contains(kTimeZoneOffsetTag)))
-        return false;
-    
-    const QByteArray &timeZoneId = containsTimeZoneId 
-        ? timeData.value(kTimeZoneIdTag).toString().toUtf8()
-        : QTimeZone(timeData.value(kTimeZoneOffsetTag).toInt()).id();
-
-    const qint64 msecs = timeData.value(kUtcTimeTag).toString().toLongLong();
-    
-    extraInfo.timeZoneId = timeZoneId;
-    extraInfo.utcDateTimeMs = msecs;
-    extraInfo.timestampMs = QDateTime::currentMSecsSinceEpoch();
-
-    return true;
-}
-
-///
-
-bool parseGetServerExtraInfoCmd(const QJsonObject &object
-    , rtu::ExtraServerInfo &extraInfo)
-{
-    if (isErrorReply(object))
-        return false;
-    
-    const QJsonObject &body = extractReplyBody(object).toObject();
-    if (body.isEmpty())
-        return false;
-    
-    if (!body.contains(kGetTimeCommand))
-        return false;
-    
-    if (!parseExtraInfoCommand(kGetTimeCommand
-        , body.value(kGetTimeCommand).toObject(), extraInfo))
-    {
-        return false;
-    }
-    
-    if (body.contains(kIfListCommand))
-        parseIfListCmd(body.value(kIfListCommand).toObject(), extraInfo);
-    
-    return true;
-}
-
-///
-
-bool parseExtraInfoCommand(const QString &cmdName
-    , const QJsonObject &object
-    , rtu::ExtraServerInfo &extraInfo)
-{
-    typedef std::function<bool (const QJsonObject &object
-        , rtu::ExtraServerInfo &extraInfo)> ParseFunction;
-    
-    typedef QHash<QString, ParseFunction> Parsers;
-    
-    static const Parsers parsers = []() -> Parsers 
-    {
-        Parsers result;
-        result.insert(kGetTimeCommand, [](const QJsonObject &object
-            , rtu::ExtraServerInfo &extraInfo) { return parseGetTimeCmd(object, extraInfo); });            
-        result.insert(kIfListCommand, [](const QJsonObject &object
-            , rtu::ExtraServerInfo &extraInfo) { return parseIfListCmd(object, extraInfo); });            
-        result.insert(kGetServerExtraInfoCommand, [](const QJsonObject &object
-            , rtu::ExtraServerInfo &extraInfo) { return parseGetServerExtraInfoCmd(object, extraInfo); });            
-        return result;
-    }();
-    
-    const auto &itParser = parsers.find(cmdName);
-    if (itParser == parsers.end())
-        return false;
-    
-    return itParser.value()(object, extraInfo);
 }
 
 ///
@@ -366,30 +348,47 @@ void rtu::getTime(HttpClient *client
         url.setQuery(query);
     }
 
-    const QUuid &id = baseInfo.id;
-    const auto &localSuccessful = [id, password, successful, failed](const QByteArray &data)
-    {
-        rtu::ExtraServerInfo extraInfo;
-        const bool parsed = parseGetTimeCmd(
-            QJsonDocument::fromJson(data.data()).object(), extraInfo);
-                
-        if (parsed)
-        {
-            if (successful)
-            {
-                extraInfo.password = password;
-                successful(id, extraInfo);
-            }
-        }
-        else if (failed)
-        {
-            failed(kErrorDesc, affected);
-        }
+    const auto &parser = [](const QJsonObject &object, ExtraServerInfo &extraInfo)
+    { 
+        return parseGetTimeCmd(object, extraInfo);
     };
+    const auto &localSuccessful = makeReplyCallbackEx(
+        successful, failed, baseInfo.id, password, affected, parser);
 
     client->sendGet(url, localSuccessful
         , makeErrorCallback(failed, affected), timeout);
 }
+
+///
+
+void rtu::getIfList(HttpClient *client
+    , const BaseServerInfo &baseInfo
+    , const QString &password
+    , const ExtraServerInfoSuccessCallback &successful
+    , const OperationCallback &failed
+    , int timeout)
+{
+    static const AffectedEntities affected = kAllAddressFlagsAffected;
+    if (!client)
+    {
+        if (failed)
+            failed(kInvalidRequest, affected);
+        return;
+    }
+
+    const auto &parser = [](const QJsonObject &object, ExtraServerInfo &extraInfo)
+    { 
+        return parseIfListCmd(object, extraInfo);
+    };
+
+    const auto &ifListSuccessfull = makeReplyCallbackEx(
+        successful, failed, baseInfo.id, password, affected, parser);
+
+    const QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port, password, kIfListCommand);
+    client->sendGet(url, ifListSuccessfull, makeErrorCallback(failed, affected), timeout);
+}
+
+///
 
 void rtu::getServerExtraInfo(HttpClient *client
     , const BaseServerInfo &baseInfo
@@ -408,48 +407,35 @@ void rtu::getServerExtraInfo(HttpClient *client
         return;
     }
 
-    if (!(baseInfo.flags & Constants::AllowChangeDateTimeFlag)
-        || !(baseInfo.flags & Constants::AllowIfConfigFlag))
+    const auto &getTimeFailed = [failed](const QString &reason, AffectedEntities affected)
     {
-        return getTime(client, baseInfo, password, successful, failed, timeout);
-    }
+        if (failed)
+            failed(reason, affected);
+    };
 
-    static const QString kCmdTag = "exec_cmd";
-
-    QUrlQuery query;
-    query.addQueryItem(kCmdTag, kGetTimeCommand);
-    query.addQueryItem(kLocalTimeFlagTag, QString());
-    query.addQueryItem(kCmdTag, kIfListCommand);
-    
-    QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port
-        , password, kGetServerExtraInfoCommand);
-    url.setQuery(query);
-
-    const QUuid &id = baseInfo.id;
-    
-    const auto &successfulCallback = 
-        [id, successful, failed, password, timeout](const QByteArray &data)
+    const auto &getTimeSuccessfull = [client, baseInfo, password, successful, timeout]
+        (const QUuid &id, const rtu::ExtraServerInfo &extraInfo) 
     {
-        rtu::ExtraServerInfo extraInfo;
-        const bool parsed = parseExtraInfoCommand(kGetServerExtraInfoCommand
-            , QJsonDocument::fromJson(data.data()).object(), extraInfo);
-                
-        if (parsed)
+        /// getTime command is successfully executed up to now
+        const auto &ifListFailed = [successful, id, extraInfo](const QString &, AffectedEntities)
+        {
+            if (successful)
+                successful(id, extraInfo);
+        };
+
+        const auto &ifListSuccessful = [successful, extraInfo](const QUuid &id, const rtu::ExtraServerInfo &ifListExtraInfo)
         {
             if (successful)
             {
-                extraInfo.password = password;
-                successful(id, extraInfo);
+                successful(id, ExtraServerInfo(extraInfo.password, extraInfo.timestampMs
+                    , extraInfo.utcDateTimeMs, extraInfo.timeZoneId, ifListExtraInfo.interfaces));
             }
-        }
-        else if (failed)
-        {
-            failed(kErrorDesc, affected);
-        }
+        };
+
+        getIfList(client, baseInfo, password, ifListSuccessful, ifListFailed, timeout);
     };
 
-    client->sendGet(url, successfulCallback
-        , makeErrorCallback(failed, affected), timeout);
+    return getTime(client, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout);
 }
 
 ///

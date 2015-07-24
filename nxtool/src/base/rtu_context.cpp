@@ -203,7 +203,7 @@ QString rtu::RtuContext::toolDisplayName() const
 
 bool rtu::RtuContext::isBeta() const
 {
-    return (QN_BETA == "true");
+    return (QStringLiteral("true") == QStringLiteral(QN_BETA));
 }
 
 QString rtu::RtuContext::toolVersion() const
