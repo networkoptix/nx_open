@@ -159,6 +159,7 @@ unix:!mac {
   } else {
     LIBS -= -lssl
     LIBS += ${linux.arm.oslibs}
+    QMAKE_CXXFLAGS += -ggdb1 -fno-omit-frame-pointer
   }
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
