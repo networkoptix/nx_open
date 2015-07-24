@@ -15,7 +15,7 @@
 
 
 static const int32_t MAX_PTS_DRIFT_MS = 1000;    //1 second
-static const int32_t DEFAULT_FRAME_DURATION = 3000;    //30 fps
+static const int32_t DEFAULT_FRAME_DURATION_MS = 33;    //30 fps
 static const int64_t MSEC_IN_SEC = 1000;
 static const int64_t USEC_IN_SEC = 1000 * MSEC_IN_SEC;
 //static const int64_t USEC_IN_MSEC = 1000;
@@ -65,6 +65,7 @@ PtsToClockMapper::PtsToClockMapper(
             ? std::numeric_limits<pts_type>::max()
             : ((1 << ptsBits) - 1) ),
     m_maxPtsDrift( MAX_PTS_DRIFT_MS * ptsFrequency / MSEC_IN_SEC ),
+    m_ptsDeltaInCaseOfDiscontinuity( ptsFrequency * DEFAULT_FRAME_DURATION_MS / MSEC_IN_SEC ),
     m_ptsOverflowCount( 0 ),
     m_timeSynchro( timeSynchro ),
     m_sourceID( sourceID == -1 ? rand() : sourceID ),
@@ -73,13 +74,18 @@ PtsToClockMapper::PtsToClockMapper(
     m_baseClock( 0 ),
     m_baseClockOnSource( 0 ),
     m_sharedSynchroModificationSequence( 0 ),
-    m_prevPtsValid( false )
+    m_prevPtsValid( false ),
+    m_prevTimestamp( 0 ),
+    m_correction( 0 )
 {
+    assert( ptsBits < sizeof(pts_type)*CHAR_BIT );
 }
 
 PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )
 {
     Q_ASSERT( pts <= m_ptsMask );
+
+    pts = (pts - m_correction) & m_ptsMask;
 
     if( !m_prevPtsValid )
     {
@@ -96,6 +102,8 @@ PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )
 #endif
     }
 
+    const pts_type ptsDelta = (pts - m_prevPts) & m_ptsMask;
+
     //calculating abs diff of pts and m_prevPts
     if( absDiff( pts, m_prevPts ) > m_maxPtsDrift )
     {
@@ -104,17 +112,35 @@ PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )
 #endif
         //pts discontinuity
         NX_LOG( lit("Stream %1. Pts discontinuity (current %2, prev %3)").arg(m_sourceID).arg(pts).arg(m_prevPts), cl_logWARNING );
-        m_ptsBase = (m_ptsBase + ((pts - m_prevPts) & m_ptsMask) - DEFAULT_FRAME_DURATION) & m_ptsMask;
+        const pts_type localCorrection = (m_ptsBase + ptsDelta - m_ptsDeltaInCaseOfDiscontinuity) & m_ptsMask;
+        recalcPtsCorrection( localCorrection, &pts );
     }
-    else if( diff(pts, m_prevPts) < m_maxPtsDrift && (pts < m_prevPts) )
+    else
     {
-        //pts overflow
-        ++m_ptsOverflowCount;
+        //no discontinuity
+        //checking for overflow
+        if( (ptsDelta < m_maxPtsDrift) && (pts < m_prevPts) )
+        {
+            //pts overflow
+            ++m_ptsOverflowCount;
+        }
+
+        if( (ptsDelta > (m_ptsMask >> 1))   //ptsDelta is negative
+            && (pts > m_prevPts) )          //overflow between pts and m_prevPts
+        {
+            //pts underflow
+            --m_ptsOverflowCount;
+        }
     }
 
     m_prevPts = pts;
-    const ts_type currentTimestamp = m_baseClock
-        + ((ts_type)(pts - m_ptsBase) + (m_ptsOverflowCount * ((ts_type)m_ptsMask+1)) )* USEC_IN_SEC / m_ptsFrequency;
+    const ts_type totalPtsChange = 
+           (ts_type)((pts - m_ptsBase) & m_ptsMask)         //current pts
+           + m_ptsOverflowCount * ((ts_type)m_ptsMask+1);   //overflows
+
+    const ts_type currentTimestamp = 
+        m_baseClock + totalPtsChange * USEC_IN_SEC / m_ptsFrequency;
+    m_prevTimestamp = currentTimestamp;
 
     NX_LOG( lit("pts %1, timestamp %2, %3").arg(pts).arg(currentTimestamp).arg(m_sourceID), cl_logDEBUG2 );
 #ifdef DEBUG_OUTPUT
@@ -139,6 +165,11 @@ void PtsToClockMapper::updateTimeMapping( pts_type pts, int64_t localTimeOnSourc
 #endif
 }
 
+PtsToClockMapper::pts_type PtsToClockMapper::ptsDeltaInCaseOfDiscontinuity() const
+{
+    return m_ptsDeltaInCaseOfDiscontinuity;
+}
+
 PtsToClockMapper::pts_type PtsToClockMapper::absDiff(
     PtsToClockMapper::pts_type one,
     PtsToClockMapper::pts_type two ) const
@@ -146,9 +177,13 @@ PtsToClockMapper::pts_type PtsToClockMapper::absDiff(
     return std::min<pts_type>((one - two) & m_ptsMask, (two - one) & m_ptsMask);
 }
 
-PtsToClockMapper::pts_type PtsToClockMapper::diff(
-    PtsToClockMapper::pts_type one,
-    PtsToClockMapper::pts_type two ) const
+void PtsToClockMapper::recalcPtsCorrection(
+    PtsToClockMapper::pts_type ptsCorrection,
+    pts_type* const pts )
 {
-    return (one - two) & m_ptsMask;
+    m_prevPts = (m_prevPts - ptsCorrection) & m_ptsMask;
+    *pts = (*pts - ptsCorrection) & m_ptsMask;
+
+    m_correction = (m_correction + ptsCorrection) & m_ptsMask;
+    m_ptsBase = 0;
 }

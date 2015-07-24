@@ -12,7 +12,7 @@
 #include <utils/media/pts_to_clock_mapper.h>
 
 
-typedef PtsToClockMapper::pts_type pts_type;
+typedef uint64_t pts_type;
 typedef PtsToClockMapper::ts_type ts_type;
 
 TEST( PtsToClockMapper, test )
@@ -38,26 +38,80 @@ TEST( PtsToClockMapper, general )
     static const size_t PTS_BITS = 12;
     static const size_t PTS_MASK = (1<<PTS_BITS) -1;
 
-    PtsToClockMapper::TimeSynchronizationData timeSync;
+    typedef PtsToClockMapper MapperType;
 
-    PtsToClockMapper ptsToClockMapper(
+    for( int j = 0; j < 100; ++j )
+    {
+
+    MapperType::TimeSynchronizationData timeSync;
+
+    MapperType ptsToClockMapper(
         PTS_FREQUENCY,
         PTS_BITS,
         &timeSync );
 
     static const pts_type MIN_PTS = 100;
     static const pts_type MAX_PTS = 100 * 1000;
-    static const pts_type STEPS = 500;
-    static const pts_type STEP_VALUE = (MAX_PTS - MIN_PTS) / STEPS;
+    //static const pts_type STEPS = 500;
+    //static const pts_type STEP_VALUE = (MAX_PTS - MIN_PTS) / STEPS;
+    static const pts_type STEP_VALUE = 350;
+    static const pts_type STEPS = (MAX_PTS - MIN_PTS) / STEP_VALUE;
 
-    boost::optional<ts_type> firstTimestamp;
-    for( pts_type pts = MIN_PTS; pts < MAX_PTS; pts += STEP_VALUE )
+    MapperType::ts_type firstTimestamp = -1;
+    MapperType::ts_type prevTimestamp = -1;
+    pts_type pts = MIN_PTS;
+    pts_type prevEffectivePts = 0;
+    pts_type ptsDelta = 0;
+
+    //for( pts_type pts = MIN_PTS; pts < MAX_PTS; pts += STEP_VALUE )
+    for( int i = 0; i < STEPS; ++i )
     {
-        auto timestamp = ptsToClockMapper.getTimestamp( pts & PTS_MASK );
-        if( !firstTimestamp )
+        auto effectivePts = pts;
+
+        bool nonMonotonic = false;
+        bool discontinuity = false;
+        if( i > 0 )
+        {
+            if( rand() % 7 == 0 )
+            {
+                //emulating non-monotonic pts 
+                effectivePts -= STEP_VALUE + STEP_VALUE/2;
+                nonMonotonic = true;
+            }
+            else if( rand() % 15 == 0 )
+            {
+                //emulation pts discontinuity
+                ptsDelta -= pts - prevEffectivePts; //rolling back to prevEffectivePts
+
+                pts += PTS_MASK / 2;
+                effectivePts = pts;
+                ptsDelta += ptsToClockMapper.ptsDeltaInCaseOfDiscontinuity();
+                discontinuity = true;
+            }
+        }
+
+#if 1
+        std::cout<<"pts "<<(pts & PTS_MASK)<<" ("<<pts<<"), effectivePts "<<(effectivePts & PTS_MASK)<<" ("<< effectivePts <<")";
+        if( nonMonotonic )
+            std::cout<<", nonMonotonic";
+        if( discontinuity )
+            std::cout << ", discontinuity";
+        std::cout<<std::endl;
+#endif
+
+        auto timestamp = ptsToClockMapper.getTimestamp( effectivePts & PTS_MASK );
+        if( firstTimestamp == -1 )
             firstTimestamp = timestamp;
-        const auto tsDiff = timestamp - firstTimestamp.get();
-        const auto ptsDiff = pts - MIN_PTS;
+        const auto tsDiff = timestamp - firstTimestamp;
+        //const auto ptsDiff = effectivePts - MIN_PTS;
+        const auto ptsDiff = ptsDelta - (pts - effectivePts);
         ASSERT_EQ( tsDiff, ptsDiff * PTS_FREQUENCY );
+
+        prevEffectivePts = effectivePts;
+        pts += STEP_VALUE;
+        ptsDelta += STEP_VALUE;
+
+        prevTimestamp = timestamp;
+    }
     }
 }

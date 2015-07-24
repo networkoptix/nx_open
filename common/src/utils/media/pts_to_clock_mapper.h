@@ -62,6 +62,7 @@ public:
         \a localTimeOnSource Usec. Absolute time on source corresponding to \a pts
     */
     void updateTimeMapping( pts_type pts, int64_t localTimeOnSourceUSec );
+    pts_type ptsDeltaInCaseOfDiscontinuity() const;
 
 private:
     //void resyncTime( int32_t pts, int64_t absoluteSourceTimeUsec );
@@ -70,7 +71,8 @@ private:
     const size_t m_ptsBits;
     const pts_type m_ptsMask;
     const pts_type m_maxPtsDrift;
-    size_t m_ptsOverflowCount;
+    const pts_type m_ptsDeltaInCaseOfDiscontinuity;
+    int m_ptsOverflowCount;
     TimeSynchronizationData* const m_timeSynchro;
     const int m_sourceID;
     pts_type m_prevPts;
@@ -79,13 +81,13 @@ private:
     ts_type m_baseClockOnSource;
     size_t m_sharedSynchroModificationSequence;
     bool m_prevPtsValid;
+    ts_type m_prevTimestamp;
+    pts_type m_correction;
 
     pts_type absDiff(
         PtsToClockMapper::pts_type one,
         PtsToClockMapper::pts_type two ) const;
-    pts_type diff(
-        PtsToClockMapper::pts_type one,
-        PtsToClockMapper::pts_type two ) const;
+    void recalcPtsCorrection( pts_type ptsCorrection, pts_type* const pts );
 };
 
 #endif  //PTS_TO_CLOCK_MAPPER_H
