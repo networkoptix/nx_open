@@ -3,8 +3,8 @@
 '''
 
 from storages import FileStorage
-from utils import sendmail
-from flask import Flask, request
+from utils import sendmailAsync
+from flask import Flask, request, send_file
 
 import json
 
@@ -24,8 +24,8 @@ def getStorage():
 
 def mailNotify(info):
     addr, mail = getattr(app, 'download', None), getattr(app, 'sendmail', None)
-    if addr and mail:
-        sendmail(text=MAIL_FORM % dict(addr=addr, **info), **mail)
+    if info and addr and mail:
+        sendmailAsync(text=MAIL_FORM % dict(addr=addr, **info), **mail)
 
 @app.route('/api/report', methods=['POST'])
 def report():
@@ -42,8 +42,7 @@ def report():
 
 def getStorageTemplate(method, wrap=json.dumps):
     try:
-        args = {name: value[0] for name, value in request.args.items()}
-        print args
+        args = {k: v for k, v in request.args.items()}
         call = getattr(getStorage(), method)
         return wrap(call(**args)), 200
     except (IndexError, OSError):
@@ -58,7 +57,7 @@ def list_(): return getStorageTemplate('list')
 def last(): return getStorageTemplate('last')
 
 @app.route('/api/get', methods=['GET'])
-def get(): return getStorageTemplate('read', wrap=lambda x: x)
+def get(): return getStorageTemplate('read', wrap=send_file)
 
 @app.route('/api/delete', methods=['GET'])
 def delete(): return getStorageTemplate('delete')
