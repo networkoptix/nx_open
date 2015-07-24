@@ -34,7 +34,7 @@
         <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
         <mediaproxy.display.name>${company.name} Media Proxy</mediaproxy.display.name>
-        <nxtool.name>${company.name} ${product.name} Server Configuration Tool</nxtool.name>
+        <nxtool.name>${company.name} ${display.product.name} Server Configuration Tool</nxtool.name>
         <nxtool.display.name>${company.name} ${display.product.name} Server Configuration Tool</nxtool.display.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
         <traytool.name>${product.name} Tray Assistant</traytool.name>
@@ -613,7 +613,6 @@
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
-                <additional.defines>debug_in_release</additional.defines>
                 <modification>rpi</modification>
             </properties>
             <modules>
@@ -642,7 +641,6 @@
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
-                <additional.defines>debug_in_release</additional.defines>
                 <modification>bpi</modification>
             </properties>
             <modules>
