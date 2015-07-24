@@ -16,11 +16,12 @@
     <properties>
         <root.dir>${basedir}/..</root.dir>
         <template>app</template>
+        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
     </properties>
     
     <modules>
         <module>common_ut</module>
-        <module>image_library_plugin_ut</module>
+        <!--module>image_library_plugin_ut</module-->
     </modules>       
     <!-- The following section is to rebuild the required artifact as lib. As soon as everything will be built as lib, this may be deleted -->
 <!--    <profiles>
