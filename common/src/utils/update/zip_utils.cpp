@@ -1,5 +1,7 @@
 #include "zip_utils.h"
 
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
@@ -146,3 +148,5 @@ QStringList QnZipExtractor::fileList() {
 
     return result;
 }
+
+#endif
