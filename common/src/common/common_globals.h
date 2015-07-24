@@ -537,6 +537,8 @@ public:
         RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
         RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
         RecordingStatForecastDataRole,              /**< Return qreal for chart. Forecast value. Used in QnRecordingStatsModel */
+        
+        AuditRecordDataRole,                        /**< Return QnAuditRecord object */
 
         LastItemDataRole
     };

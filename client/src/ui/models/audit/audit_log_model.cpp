@@ -20,7 +20,7 @@ typedef QnBusinessActionData* QnLightBusinessActionP;
 // -------------------------------------------------------------------------- //
 // QnEventLogModel::DataIndex
 // -------------------------------------------------------------------------- //
-class QnAuditLogSessionModel::DataIndex
+class QnAuditLogModel::DataIndex
 {
 public:
     DataIndex(): m_sortCol(TimestampColumn), m_sortOrder(Qt::DescendingOrder)
@@ -96,6 +96,11 @@ public:
         return d1.userHost < d2.userHost;
     }
 
+    static bool lessThanEventType(const QnAuditRecord &d1, const QnAuditRecord &d2)
+    {
+        return d1.eventType < d2.eventType;
+    }
+
     void updateIndex()
     {
         LessFunc lessThan = &lessThanTimestamp;
@@ -115,6 +120,9 @@ public:
             case UserHostColumn:
                 lessThan = &lessThanUserHost;
                 break;
+            case EventTypeColumn:
+                lessThan = &lessThanEventType;
+                break;
         }
 
         qSort(m_data.begin(), m_data.end(), lessThan);
@@ -130,49 +138,59 @@ private:
 // -------------------------------------------------------------------------- //
 // QnEventLogModel
 // -------------------------------------------------------------------------- //
-QnAuditLogSessionModel::QnAuditLogSessionModel(QObject *parent):
+QnAuditLogModel::QnAuditLogModel(QObject *parent):
     base_type(parent)
 {
     m_index = new DataIndex();
 }
 
-QnAuditLogSessionModel::~QnAuditLogSessionModel() {
+QnAuditLogModel::~QnAuditLogModel() {
     delete m_index;
 }
 
-void QnAuditLogSessionModel::setData(const QnAuditRecordList &data) {
+void QnAuditLogModel::setData(const QnAuditRecordList &data) {
     beginResetModel();
     m_index->setData(data);
     endResetModel();
 }
 
-void QnAuditLogSessionModel::clear() {
+void QnAuditLogModel::clear() {
     beginResetModel();
     m_index->clear();
     endResetModel();
 }
 
-QModelIndex QnAuditLogSessionModel::index(int row, int column, const QModelIndex &parent) const 
+QModelIndex QnAuditLogModel::index(int row, int column, const QModelIndex &parent) const 
 {
     return hasIndex(row, column, parent) 
         ? createIndex(row, column, (void*)0) 
         : QModelIndex();
 }
 
-QModelIndex QnAuditLogSessionModel::parent(const QModelIndex &) const {
+QModelIndex QnAuditLogModel::parent(const QModelIndex &) const {
     return QModelIndex();
 }
 
-QString QnAuditLogSessionModel::getResourceNameString(QnUuid id) {
+QString QnAuditLogModel::getResourceNameString(QnUuid id) const {
     return getResourceName(qnResPool->getResourceById(id));
 }
 
-QString QnAuditLogSessionModel::formatDateTime(int timestampSecs) const
+QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime) const
 {
-    return QDateTime::fromMSecsSinceEpoch(timestampSecs * 1000ll).toString(Qt::DefaultLocaleShortDate);
+    if (timestampSecs == 0)
+        return QString();
+    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(timestampSecs * 1000ll);
+    if (showDate && showTime)
+        return dateTime.toString(Qt::DefaultLocaleShortDate);
+    else if (showDate)
+        return dateTime.date().toString(Qt::DefaultLocaleShortDate);
+    else if (showTime)
+        return dateTime.time().toString(Qt::DefaultLocaleShortDate);
+    else
+        return QString();
 }
 
-QString QnAuditLogSessionModel::formatDuration(int duration) const
+QString QnAuditLogModel::formatDuration(int duration) const
 {
     int seconds = duration % 60;
     duration /= 60;
@@ -194,14 +212,74 @@ QString QnAuditLogSessionModel::formatDuration(int duration) const
     return result;
 }
 
-QString QnAuditLogSessionModel::textData(const Column& column,const QnAuditRecord& data) const
+QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType recordType) const
+{
+    switch (recordType)
+    {
+    case Qn::AR_NotDefined:
+            return tr("Unknown");
+        case Qn::AR_UnauthorizedLogin:
+            return tr("Unsuccessful login");
+        case Qn::AR_Login:
+            return tr("Login");
+        case Qn::AR_SystemNameChanged:
+            return tr("System name changed");
+        case Qn::AR_SystemmMerge:
+            return tr("Merge systems");
+        case Qn::AR_CameraUpdate:
+            return tr("Camera(s) updated");
+        case Qn::AR_ServerUpdate:
+            return tr("Server updated");
+        case Qn::AR_GeneralSettingsChange:
+            return tr("General settings changed");
+        case Qn::AR_ViewArchive:
+            return tr("Watching archive");
+        case Qn::AR_ViewLive:
+            return tr("Watching live");
+    }
+    return QString();
+}
+
+QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord& data) const
+{
+    QString resListText;
+    for (const auto& res: data.resources)
+    {
+        if (!resListText.isEmpty())
+            resListText += lit(",");
+        resListText += getResourceNameString(res);
+    }
+
+    switch (data.eventType)
+    {
+    case Qn::AR_ViewArchive:
+    case Qn::AR_ViewLive:
+    case Qn::AR_CameraUpdate:
+        return tr("Cameras: ") + resListText;
+    case Qn::AR_ServerUpdate:
+        return tr("Servers:") + resListText;
+    }
+    return QString();
+}
+
+QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord& data, int row) const
 {
     switch(column) {
     case TimestampColumn:
-        return formatDateTime(data.timestamp);
+        return formatDateTime(data.timestamp, true, true);
+    case DateColumn:
+        if (row > 0) {
+            QDate d1 = QDateTime::fromMSecsSinceEpoch(data.timestamp*1000).date();
+            QDate d2 = QDateTime::fromMSecsSinceEpoch(m_index->at(row-1).timestamp*1000).date();
+            if (d1 == d2)
+                return QString();
+        }
+        return formatDateTime(data.timestamp, true, false);
+    case TimeColumn:
+        return formatDateTime(data.timestamp, false, true);
     case EndTimestampColumn:
         if (data.eventType == Qn::AR_Login)
-            return formatDateTime(data.endTimestamp);
+            return formatDateTime(data.endTimestamp, true, true);
         else if(data.eventType == Qn::AR_UnauthorizedLogin)
             return tr("Unsuccessful login");
         break;
@@ -215,30 +293,35 @@ QString QnAuditLogSessionModel::textData(const Column& column,const QnAuditRecor
     case UserHostColumn:
         return data.userHost;
         break;
+    case EventTypeColumn:
+        return eventTypeToString(data.eventType);
+    case DescriptionColumn:
+        return eventDescriptionText(data);
     }
 
     return QString();
 }
 
-void QnAuditLogSessionModel::sort(int column, Qt::SortOrder order) {
+void QnAuditLogModel::sort(int column, Qt::SortOrder order) {
     beginResetModel();
     m_index->setSort(column, order);
     endResetModel();
 }
 
-int QnAuditLogSessionModel::columnCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent);
-    return ColumnCount;
-}
-
-int QnAuditLogSessionModel::rowCount(const QModelIndex &parent) const {
+int QnAuditLogModel::rowCount(const QModelIndex &parent) const {
     Q_UNUSED(parent);
     return m_index->size(); // TODO: #Elric incorrect, should return zero for non-root nodes.
 }
 
-QVariant QnAuditLogSessionModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, int role) const 
+{
+    if (section >= m_columns.size())
+        return QVariant();
+
+    const Column &column = m_columns[section];
+
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-        switch(section) {
+        switch(column) {
             case TimestampColumn:
                 return tr("Session begins");
             case EndTimestampColumn:
@@ -251,26 +334,44 @@ QVariant QnAuditLogSessionModel::headerData(int section, Qt::Orientation orienta
                 return tr("IP");
             case UserActivityColumn:
                 return tr("Activity");
-        default:
-            break;
+            case EventTypeColumn:
+                return tr("Activity");
+            case DateColumn:
+                return tr("Date");
+            case TimeColumn:
+                return tr("Time");
+            case DescriptionColumn:
+                return tr("Description");
+            case PlayButtonColumn:
+                return QString();
         }
     }
     return base_type::headerData(section, orientation, role);
 }
 
-QVariant QnAuditLogSessionModel::data(const QModelIndex &index, int role) const 
+QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const 
 {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
+
+    const Column &column = m_columns[index.column()];
+
 
     const QnAuditRecord &record = m_index->at(index.row());
     
     switch(role) {
     case Qt::DisplayRole:
-        return QVariant(textData((Column) index.column(), record));
+        return QVariant(textData((Column) column, record, index.row()));
+    case Qn::AuditRecordDataRole:
+        return QVariant::fromValue<QnAuditRecord>(m_index->at(index.row()));
     default:
         break;
     }
 
     return QVariant();
+}
+
+void QnAuditLogModel::setColumns(const QList<Column> &columns)
+{
+    m_columns = columns;
 }

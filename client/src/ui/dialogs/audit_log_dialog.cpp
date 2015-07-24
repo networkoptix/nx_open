@@ -21,7 +21,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/models/audit_log_model.h>
+#include <ui/models/audit/audit_log_session_model.h>
+#include <ui/models/audit/audit_log_detail_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
@@ -34,6 +35,30 @@ namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
 }
 
+bool isLoginType(Qn::AuditRecordType eventType)
+{
+    return eventType == Qn::AR_Login || eventType == Qn::AR_UnauthorizedLogin;
+}
+
+QnAuditRecordList QnAuditLogDialog::filteredChildData(const QModelIndexList& selection)
+{
+    QSet<QnUuid> selectedSessions;
+    for (const auto& index: selection) 
+    {
+        QVariant data = index.data(Qn::AuditRecordDataRole);
+        if (!data.canConvert<QnAuditRecord>())
+            continue;
+        QnAuditRecord record = data.value<QnAuditRecord>();
+        selectedSessions << record.sessionId;
+    }
+
+    QnAuditRecordList result;
+    auto filter = [&selectedSessions] (const QnAuditRecord& record) { 
+        return selectedSessions.contains(record.sessionId) && !isLoginType(record.eventType);
+    };
+    std::copy_if(m_allData.begin(), m_allData.end(), std::back_inserter(result), filter);
+    return result;
+}
 
 QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     base_type(parent),
@@ -47,8 +72,42 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
 
 
-    m_model = new QnAuditLogSessionModel(this);
-    ui->gridMaster->setModel(m_model);
+    m_sessionModel = new QnAuditLogSessionModel(this);
+
+    QList<QnAuditLogModel::Column> columns;
+    columns << 
+        QnAuditLogModel::TimestampColumn <<
+        QnAuditLogModel::EndTimestampColumn <<
+        QnAuditLogModel::DurationColumn <<
+        QnAuditLogModel::UserNameColumn <<
+        QnAuditLogModel::UserHostColumn;
+
+    m_sessionModel->setColumns(columns);
+
+
+    ui->gridMaster->setModel(m_sessionModel);
+
+    connect
+    (
+        ui->gridMaster->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+        [this] (const QItemSelection &selected, const QItemSelection &deselected)
+        { 
+            m_detailModel->setData(filteredChildData(ui->gridMaster->selectionModel()->selectedIndexes()));
+        }
+    );
+
+    m_detailModel = new QnAuditLogDetailModel(this);
+
+    columns.clear();
+    columns << 
+        QnAuditLogModel::DateColumn <<
+        QnAuditLogModel::TimeColumn <<
+        QnAuditLogModel::EventTypeColumn <<
+        QnAuditLogModel::DescriptionColumn <<
+        QnAuditLogModel::PlayButtonColumn;
+
+    m_detailModel->setColumns(columns);
+    ui->gridDetails->setModel(m_detailModel);
 
     QDate dt = QDateTime::currentDateTime().date();
     ui->dateEditFrom->setDate(dt);
@@ -170,17 +229,23 @@ void QnAuditLogDialog::at_gotdata(int httpStatus, const QnAuditRecordList& recor
 
 void QnAuditLogDialog::requestFinished()
 {
-    m_model->setData(m_allData);
-    m_allData.clear();
+    auto sessionFilter = [] (const QnAuditRecord& record) { return isLoginType(record.eventType);  };
+    QnAuditRecordList sessions;
+    for (const auto& record: m_allData) {
+        if (sessionFilter(record))
+            sessions << record;
+    }
+    m_sessionModel->setData(sessions);
+
     ui->gridMaster->setDisabled(false);
     setCursor(Qt::ArrowCursor);
     //updateHeaderWidth();
     if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
-        ui->statusLabel->setText(tr("Audit log for period from %1 to %2 - %n session(s) found", "", m_model->rowCount())
+        ui->statusLabel->setText(tr("Audit log for period from %1 to %2 - %n session(s) found", "", m_sessionModel->rowCount())
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
         .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate)));
     else
-        ui->statusLabel->setText(tr("Audit log for %1 - %n session(s) found", "", m_model->rowCount())
+        ui->statusLabel->setText(tr("Audit log for %1 - %n session(s) found", "", m_sessionModel->rowCount())
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
     ui->loadingProgressBar->hide();
 }
@@ -204,7 +269,7 @@ void QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested(const QPoint&)
     QModelIndex idx = ui->gridMaster->currentIndex();
     if (idx.isValid())
     {
-        QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr resource = ui->gridMaster->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
         if (resource) {
             menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resource));

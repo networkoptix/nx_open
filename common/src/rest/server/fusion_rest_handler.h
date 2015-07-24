@@ -49,14 +49,14 @@ namespace QnFusionRestHandlerDetail
             {
                 QnUbjsonRestResult restReply(_restResult);
                 restReply.setReply(outputData);
-                result = QnUbjson::serialized(outputData);
+                result = QnUbjson::serialized(restReply);
                 break;
             }
         case Qn::JsonFormat:
             {
                 QnJsonRestResult restReply(_restResult);
                 restReply.setReply(outputData);
-                result = QJson::serialized(result);
+                result = QJson::serialized(restReply);
                 if (params.contains(lit("extraFormatting")))
                     formatJSonString(result);
                 break;

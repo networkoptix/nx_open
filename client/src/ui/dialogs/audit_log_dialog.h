@@ -11,6 +11,7 @@
 #include "api/model/audit/audit_record.h"
 
 class QnAuditLogSessionModel;
+class QnAuditLogDetailModel;
 
 namespace Ui {
     class AuditLogDialog;
@@ -53,10 +54,12 @@ private:
      */
     void query(qint64 fromMsec, qint64 toMsec);
 
+    QnAuditRecordList filteredChildData(const QModelIndexList& selection);
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 
-    QnAuditLogSessionModel *m_model;
+    QnAuditLogSessionModel *m_sessionModel;
+    QnAuditLogDetailModel *m_detailModel;
     QSet<int> m_requests;
 
     QnAuditRecordList m_allData;

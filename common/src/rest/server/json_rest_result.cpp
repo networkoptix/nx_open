@@ -28,6 +28,7 @@ void QnRestResult::setError(Error error, const QString &errorText) {
 }
 
 QN_FUSION_DEFINE_FUNCTIONS(QnRestResult::Error, (numeric))
+QN_FUSION_DEFINE_FUNCTIONS(QnUbjsonRestResult, (ubjson))
 
 QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnRestResult, 
     (json),
