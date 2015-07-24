@@ -227,7 +227,8 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
 #endif
 
     const auto version = QnAppInfo::applicationFullVersion();
-    const auto systemInfo = QnAppInfo::applicationSystemInfo();
+    const auto systemInfo = QnSystemInformation::currentSystemInformation()
+        .toString().replace( QChar( ' ' ), QChar( '-' ) );
     const auto timestamp = m_crashFile.created().toUTC().toString("yyyy-MM-dd_hh-mm-ss");
     const auto extension = fileName.split(QChar('.')).last();
 
