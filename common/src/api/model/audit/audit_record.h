@@ -24,7 +24,7 @@ struct QnAuditRecord
 
     QnByteArrayConstRef extractParam(const QnLatin1Array& name) const;
     void addParam(const QnLatin1Array& name, const QnLatin1Array& value);
-
+    void removeParam(const QnLatin1Array& name);
 
     int createdTimeSec; // audit record creation time
     int rangeStartSec; // payload range start. Viewed archive range for playback or session time for login.

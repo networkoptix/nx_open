@@ -35,7 +35,9 @@ public:
     virtual ~QnAuditLogModel();
 
     void setData(const QnAuditRecordList &data);
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     QnAuditRecordList data() const;
+    
 
     QList<Column> columns() const;
     virtual void setColumns(const QList<Column> &columns);

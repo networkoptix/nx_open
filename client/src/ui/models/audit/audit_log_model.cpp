@@ -276,7 +276,8 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data
     {
         QString txt = tr("%n cameras", "", data.resources.size());
         result +=  QString(lit("<a href=\"cameras\">%1</a><br>")).arg(txt);
-        if (!data.extractParam("detail").isEmpty()) 
+        bool showDetail = data.extractParam("detail") == "1";
+        if (showDetail) 
         {
             auto archiveData = data.extractParam("archiveExist");
             int index = 0;
@@ -382,6 +383,25 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
     }
     return base_type::headerData(section, orientation, role);
 }
+
+bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+        return false;
+
+    if (role == Qn::AuditRecordDataRole)
+    {
+        if (!value.canConvert<QnAuditRecord>())
+            return false;
+        QnAuditRecord record = value.value<QnAuditRecord>();
+        m_index->at(index.row()) = record;
+        return true;
+    }
+    else {
+        return base_type::setData(index, value, role);
+    }
+}
+
 
 QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const 
 {

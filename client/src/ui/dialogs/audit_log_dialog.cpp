@@ -42,20 +42,29 @@ namespace {
 QSize QnAuditDetailItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
-    if (column != QnAuditLogModel::DescriptionColumn) {
+    if (column != QnAuditLogModel::DescriptionColumn)
         return base_type::sizeHint(option, index);
-    }
+
+    QVariant data = index.data(Qn::AuditRecordDataRole);
+    if (!data.canConvert<QnAuditRecord>())
+        return base_type::sizeHint(option, index);
+    QnAuditRecord record = data.value<QnAuditRecord>();
 
     QTextDocument txtDocument;
     txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
-    return txtDocument.size().toSize();
+    QSize size = txtDocument.size().toSize();
+    bool showDetail = record.extractParam("detail") == "1";
+    if (!showDetail)
+        size.setHeight(m_defaultSectionSize);
+    return size;
 }
 
 void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
 
-    if (column == QnAuditLogModel::DescriptionColumn) {
+    if (column == QnAuditLogModel::DescriptionColumn) 
+    {
         QTextDocument txtDocument;
         txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
 
@@ -176,9 +185,9 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     ui->gridDetails->setModel(m_detailModel);
     QnAuditDetailItemDelegate* delegate = new QnAuditDetailItemDelegate(this);
     delegate->setButtonExtraSize(calcButtonSize(ui->gridMaster->font()));
+    delegate->setDefaultSectionHeight(ui->gridDetails->verticalHeader()->defaultSectionSize());
     ui->gridDetails->setItemDelegate(delegate);
 
-    
     connect(ui->gridDetails, &QTableView::pressed, this, &QnAuditLogDialog::at_ItemPressed);
 
 
@@ -219,6 +228,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     connect(ui->gridMaster,         &QTableView::customContextMenuRequested, this, &QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested);
     connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridMaster, &QAbstractItemView::reset);
 
+    connect(ui->gridDetails,         &QTableView::clicked,               this,   &QnAuditLogDialog::at_eventsGrid_clicked);
+
     ui->mainGridLayout->activate();
     //updateHeaderWidth();
 }
@@ -226,6 +237,25 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 QnAuditLogDialog::~QnAuditLogDialog() {
 }
 
+
+void QnAuditLogDialog::at_eventsGrid_clicked(const QModelIndex& index)
+{
+    if (index.data(Qn::ColumnDataRole) != QnAuditLogModel::DescriptionColumn)
+        return;
+
+    QVariant data = index.data(Qn::AuditRecordDataRole);
+    if (!data.canConvert<QnAuditRecord>())
+        return;
+    QnAuditRecord record = data.value<QnAuditRecord>();
+    bool showDetail = record.extractParam("detail") == "1";
+    showDetail = !showDetail;
+    record.addParam("detail", showDetail ? "1" : "0");
+    
+    ui->gridDetails->model()->setData(index, QVariant::fromValue(record), Qn::AuditRecordDataRole);
+
+    int height = ui->gridDetails->itemDelegate()->sizeHint(QStyleOptionViewItem(), index).height();
+    ui->gridDetails->setRowHeight(index.row(), height);
+}
 
 void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
 {

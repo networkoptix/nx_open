@@ -22,14 +22,16 @@ class QnAuditDetailItemDelegate: public QStyledItemDelegate
     typedef QStyledItemDelegate base_type;
 
 public:
-    explicit QnAuditDetailItemDelegate(QObject *parent = NULL): base_type(parent) {}
+    explicit QnAuditDetailItemDelegate(QObject *parent = NULL): base_type(parent), m_defaultSectionSize(0) {}
     virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override;
 
     virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override;
     void setButtonExtraSize(const QSize& value) { m_btnSize = value; }
+    void setDefaultSectionHeight(int value) { m_defaultSectionSize = value;}
 
 private:
     QSize m_btnSize;
+    int m_defaultSectionSize;
 };
 
 
