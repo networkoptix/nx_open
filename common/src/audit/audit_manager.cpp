@@ -26,7 +26,7 @@ QnAuditRecord QnAuditManager::prepareRecord(const QnAuthSession& authInfo, Qn::A
 {
     QnAuditRecord result;
     result.fillAuthInfo(authInfo);
-    result.timestamp = qnSyncTime->currentMSecsSinceEpoch() / 1000;
+    result.createdTimeSec = qnSyncTime->currentMSecsSinceEpoch() / 1000;
     result.eventType = recordType;
     return result;
 }
@@ -48,7 +48,8 @@ void QnAuditManager::at_connectionClosed(const QnAuthSession &data)
     auto itr = m_openedConnections.find(data.sessionId);
     if (itr != m_openedConnections.end()) {
         AuditConnection& connection = itr.value();
-        connection.record.endTimestamp = qnSyncTime->currentMSecsSinceEpoch() / 1000;
+        connection.record.rangeStartSec = connection.record.createdTimeSec;
+        connection.record.rangeEndSec = qnSyncTime->currentMSecsSinceEpoch() / 1000;
         updateAuditRecord(connection.internalId, connection.record);
     }
     m_openedConnections.remove(data.sessionId);
@@ -60,6 +61,7 @@ int QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, const Qn
     pbInfo.session = session;
     pbInfo.cameraId = cameraId;
     pbInfo.startTimeUsec = timestampUsec;
+    pbInfo.creationTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     pbInfo.timeout.restart();
     int handle = ++m_internalIdCounter;
     QMutexLocker lock(&m_mutex);
@@ -127,8 +129,9 @@ void QnAuditManager::at_timer()
                     else
                         ++itr;
                 }
-                record.timestamp = pbInfo.period.startTimeMs / 1000;
-                record.endTimestamp = pbInfo.period.endTimeMs() / 1000;
+                record.createdTimeSec = pbInfo.creationTimeMs / 1000;
+                record.rangeStartSec = pbInfo.period.startTimeMs / 1000;
+                record.rangeEndSec = pbInfo.period.endTimeMs() / 1000;
                 recordsToAdd.push_back(std::move(record));
                 recordProcessed = true;
                 break;

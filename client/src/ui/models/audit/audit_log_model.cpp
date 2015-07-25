@@ -73,17 +73,17 @@ public:
 
     static bool lessThanTimestamp(const QnAuditRecord &d1, const QnAuditRecord &d2)
     {
-        return d1.timestamp < d2.timestamp;
+        return d1.createdTimeSec < d2.createdTimeSec;
     }
 
     static bool lessThanEndTimestamp(const QnAuditRecord &d1, const QnAuditRecord &d2)
     {
-        return d1.endTimestamp < d2.endTimestamp;
+        return d1.rangeEndSec < d2.rangeEndSec;
     }
 
     static bool lessThanDuration(const QnAuditRecord &d1, const QnAuditRecord &d2)
     {
-        return (d1.endTimestamp - d1.timestamp) < (d2.endTimestamp - d2.timestamp);
+        return (d1.rangeEndSec - d1.rangeStartSec) < (d2.rangeEndSec - d2.rangeStartSec);
     }
 
     static bool lessThanUserName(const QnAuditRecord &d1, const QnAuditRecord &d2)
@@ -262,30 +262,64 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord& data) const
     return QString();
 }
 
+QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data, int row) const
+{
+    if (column != DescriptionColumn)
+        return textData(column, data, row);
+    QString result;
+    switch (data.eventType)
+    {
+    case Qn::AR_ViewArchive:
+    case Qn::AR_ViewLive:
+        result = tr("%1 - %2, ").arg(formatDateTime(data.rangeStartSec)).arg(formatDateTime(data.rangeEndSec));
+    case Qn::AR_CameraUpdate:
+    {
+        QString txt = tr("%n cameras", "", data.resources.size());
+        result +=  QString(lit("<a href=\"cameras\">%1</a><br>")).arg(txt);
+        if (!data.extractParam("detail").isEmpty()) 
+        {
+            auto archiveData = data.extractParam("archiveExist");
+            int index = 0;
+            for (const auto& camera: data.resources) 
+            {
+                bool isRecordExist = archiveData.size() > index && archiveData[index] == '1';
+                index++;
+                QChar circleSymbol = isRecordExist ? QChar(0x25CF) : QChar(0x25CB);
+                result += QString(lit("<br> <font color=red>%1</font> %2")).arg(circleSymbol).arg(getResourceNameString(camera));
+            }
+        }
+        return result;
+    }
+    }
+    
+    return textData(column, data, row);
+}
+
+
 QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord& data, int row) const
 {
     switch(column) {
     case TimestampColumn:
-        return formatDateTime(data.timestamp, true, true);
+        return formatDateTime(data.createdTimeSec, true, true);
     case DateColumn:
         if (row > 0) {
-            QDate d1 = QDateTime::fromMSecsSinceEpoch(data.timestamp*1000).date();
-            QDate d2 = QDateTime::fromMSecsSinceEpoch(m_index->at(row-1).timestamp*1000).date();
+            QDate d1 = QDateTime::fromMSecsSinceEpoch(data.createdTimeSec*1000).date();
+            QDate d2 = QDateTime::fromMSecsSinceEpoch(m_index->at(row-1).createdTimeSec*1000).date();
             if (d1 == d2)
                 return QString();
         }
-        return formatDateTime(data.timestamp, true, false);
+        return formatDateTime(data.createdTimeSec, true, false);
     case TimeColumn:
-        return formatDateTime(data.timestamp, false, true);
+        return formatDateTime(data.createdTimeSec, false, true);
     case EndTimestampColumn:
         if (data.eventType == Qn::AR_Login)
-            return formatDateTime(data.endTimestamp, true, true);
+            return formatDateTime(data.rangeEndSec, true, true);
         else if(data.eventType == Qn::AR_UnauthorizedLogin)
             return tr("Unsuccessful login");
         break;
     case DurationColumn:
-        if (data.endTimestamp)
-            return formatDuration(data.endTimestamp - data.timestamp);
+        if (data.rangeEndSec)
+            return formatDuration(data.rangeEndSec - data.rangeStartSec);
         else
             return QString();
     case UserNameColumn:
@@ -343,7 +377,7 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
             case DescriptionColumn:
                 return tr("Description");
             case PlayButtonColumn:
-                return QString();
+                return tr("View it");
         }
     }
     return base_type::headerData(section, orientation, role);
@@ -361,9 +395,15 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
     
     switch(role) {
     case Qt::DisplayRole:
-        return QVariant(textData((Column) column, record, index.row()));
+        return QVariant(textData(column, record, index.row()));
     case Qn::AuditRecordDataRole:
         return QVariant::fromValue<QnAuditRecord>(m_index->at(index.row()));
+    case Qn::DisplayHtmlRole:
+        return htmlData(column, record, index.row());
+    case Qn::ColumnDataRole:
+        return column;
+    //case Qt::SizeHintRole:
+    //    return QSize(64, 32);
     default:
         break;
     }

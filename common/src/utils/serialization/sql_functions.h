@@ -6,6 +6,7 @@
 #include "sql.h"
 #include "sql_macros.h"
 #include "enum.h"
+#include "recording/time_period.h"
 
 // TODO: #Elric enumz!
 // TODO: #Elric #EC2 static assert for enum size.
@@ -141,6 +142,5 @@ inline void deserialize_field(const QVariant &value, std::vector<QnUuid> *target
     for(; data < dataEnd; data += 16)
         target->push_back(QnUuid::fromRfc4122(QByteArray::fromRawData(data, 16)));
 }
-
 
 #endif // QN_SERIALIZATION_SQL_FUNCTIONS_H

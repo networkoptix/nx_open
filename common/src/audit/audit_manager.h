@@ -59,12 +59,13 @@ private:
 
     struct CameraPlaybackInfo
     {
-        CameraPlaybackInfo(): startTimeUsec(0) {}
+        CameraPlaybackInfo(): startTimeUsec(0), creationTimeMs(0) {}
 
         QnAuthSession session;       // user's session
         QnUuid cameraId;        // watching camera
         QnTimePeriod period;    // watching playback range
         qint64 startTimeUsec;       // startTime from PLAY command
+        qint64 creationTimeMs;       // record creation time
         QElapsedTimer timeout;  // how many ms session is alive
     };
 

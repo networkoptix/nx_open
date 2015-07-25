@@ -30,15 +30,67 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include "utils/common/event_processors.h"
+#include <utils/common/scoped_painter_rollback.h>
+#include "ui/actions/actions.h"
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
 }
 
-bool isLoginType(Qn::AuditRecordType eventType)
+// --------------------------- QnAuditDetailItemDelegate ------------------------
+
+QSize QnAuditDetailItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
-    return eventType == Qn::AR_Login || eventType == Qn::AR_UnauthorizedLogin;
+    QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
+    if (column != QnAuditLogModel::DescriptionColumn) {
+        return base_type::sizeHint(option, index);
+    }
+
+    QTextDocument txtDocument;
+    txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
+    return txtDocument.size().toSize();
 }
+
+void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
+{
+    QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
+
+    if (column == QnAuditLogModel::DescriptionColumn) {
+        QTextDocument txtDocument;
+        txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
+
+        QnScopedPainterTransformRollback rollback(painter);
+        QRect rect = option.rect;
+        QPoint shift = rect.topLeft();
+        painter->translate(shift);
+        rect.translate(-shift);
+        txtDocument.drawContents(painter, rect);
+    }
+    else if (column == QnAuditLogModel::PlayButtonColumn) 
+    {
+        QStyleOptionButton button;
+        button.text = lit("Play this");
+        if (option.state & QStyle::State_MouseOver)
+            button.icon = qnSkin->icon("slider/navigation/play_hovered.png");
+        else
+            button.icon = qnSkin->icon("slider/navigation/play.png");
+        button.iconSize = QSize(16,16);
+        button.state = option.state;
+
+        QFontMetrics fm(option.font);
+        QSize sizeHint = fm.size(Qt::TextShowMnemonic, button.text);
+        sizeHint += m_btnSize;
+        int dx = (option.rect.width() - sizeHint.width()) /2;
+        button.rect.setTopLeft(option.rect.topLeft() + QPoint(dx, 4));
+        button.rect.setSize(sizeHint);
+        QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);
+    }
+    else {
+        base_type::paint(painter, option, index);
+    }
+}
+
+// ---------------------- QnAuditLogDialog ------------------------------
 
 QnAuditRecordList QnAuditLogDialog::filteredChildData(const QModelIndexList& selection)
 {
@@ -54,10 +106,23 @@ QnAuditRecordList QnAuditLogDialog::filteredChildData(const QModelIndexList& sel
 
     QnAuditRecordList result;
     auto filter = [&selectedSessions] (const QnAuditRecord& record) { 
-        return selectedSessions.contains(record.sessionId) && !isLoginType(record.eventType);
+        return selectedSessions.contains(record.sessionId) && !record.isLoginType();
     };
     std::copy_if(m_allData.begin(), m_allData.end(), std::back_inserter(result), filter);
     return result;
+}
+
+QSize calcButtonSize(const QFont& font)
+{
+    static const QString TEST_TXT(lit("TEST"));
+    QFontMetrics fm(font);
+    QSize size1 = fm.size(Qt::TextShowMnemonic, TEST_TXT);
+
+    std::unique_ptr<QPushButton> button(new QPushButton());
+    button->setText(TEST_TXT);
+
+    QSize size2 = button->minimumSizeHint();
+    return QSize(size2.width() - size1.width(), size2.height() - size1.height());
 }
 
 QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
@@ -93,6 +158,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
         [this] (const QItemSelection &selected, const QItemSelection &deselected)
         { 
             m_detailModel->setData(filteredChildData(ui->gridMaster->selectionModel()->selectedIndexes()));
+            ui->gridDetails->resizeRowsToContents();
         }
     );
 
@@ -108,6 +174,13 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
     m_detailModel->setColumns(columns);
     ui->gridDetails->setModel(m_detailModel);
+    QnAuditDetailItemDelegate* delegate = new QnAuditDetailItemDelegate(this);
+    delegate->setButtonExtraSize(calcButtonSize(ui->gridMaster->font()));
+    ui->gridDetails->setItemDelegate(delegate);
+
+    
+    connect(ui->gridDetails, &QTableView::pressed, this, &QnAuditLogDialog::at_ItemPressed);
+
 
     QDate dt = QDateTime::currentDateTime().date();
     ui->dateEditFrom->setDate(dt);
@@ -151,6 +224,42 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 }
 
 QnAuditLogDialog::~QnAuditLogDialog() {
+}
+
+
+void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
+{
+    if (index.data(Qn::ColumnDataRole) != QnAuditLogModel::PlayButtonColumn)
+        return;
+
+    QVariant data = index.data(Qn::AuditRecordDataRole);
+    if (!data.canConvert<QnAuditRecord>())
+        return;
+    QnAuditRecord record = data.value<QnAuditRecord>();
+    QnResourceList resList;
+    QnByteArrayConstRef archiveData = record.extractParam("archiveExist");
+    int i = 0;
+    for (const auto& id: record.resources) {
+        bool archiveExist = archiveData.size() > i && archiveData[i] == '1';
+        i++;
+        QnResourcePtr res = qnResPool->getResourceById(id);
+        if (res && archiveExist)
+            resList << res;
+    }
+
+    QnActionParameters params(resList);
+    if (record.isPlaybackType()) 
+    {
+        if (resList.isEmpty()) {
+            QMessageBox::information(this, tr("Information"), tr("No archive data for that position left"));
+            return;
+        }
+
+        params.setArgument(Qn::ItemTimeRole, record.rangeStartSec * 1000ll);
+        context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+    }
+    if (isMaximized())
+        showNormal();
 }
 
 void QnAuditLogDialog::updateData()
@@ -229,7 +338,7 @@ void QnAuditLogDialog::at_gotdata(int httpStatus, const QnAuditRecordList& recor
 
 void QnAuditLogDialog::requestFinished()
 {
-    auto sessionFilter = [] (const QnAuditRecord& record) { return isLoginType(record.eventType);  };
+    auto sessionFilter = [] (const QnAuditRecord& record) { return record.isLoginType();  };
     QnAuditRecordList sessions;
     for (const auto& record: m_allData) {
         if (sessionFilter(record))

@@ -770,6 +770,17 @@ bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
     return itr->distanceToTime(timeMs) <= eps;
 }
 
+bool DeviceFileCatalog::containTime(const QnTimePeriod& period) const
+{
+    QMutexLocker lk( &m_mutex );
+
+    if (m_chunks.empty())
+        return false;
+
+    ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin(), m_chunks.end(), period.startTimeMs);
+    return itr != m_chunks.end() && itr->startTimeMs < period.endTimeMs();
+}
+
 bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
 {
     QMutexLocker lock(&m_mutex);

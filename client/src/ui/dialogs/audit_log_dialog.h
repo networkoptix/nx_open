@@ -17,6 +17,23 @@ namespace Ui {
     class AuditLogDialog;
 }
 
+class QnAuditDetailItemDelegate: public QStyledItemDelegate 
+{
+    typedef QStyledItemDelegate base_type;
+
+public:
+    explicit QnAuditDetailItemDelegate(QObject *parent = NULL): base_type(parent) {}
+    virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override;
+
+    virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override;
+    void setButtonExtraSize(const QSize& value) { m_btnSize = value; }
+
+private:
+    QSize m_btnSize;
+};
+
+
+
 class QnAuditLogDialog: public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
@@ -41,7 +58,8 @@ private slots:
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
-
+    void at_ItemPressed(const QModelIndex& index);
+    void at_eventsGrid_clicked(const QModelIndex& idx);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     void requestFinished();

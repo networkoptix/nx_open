@@ -539,6 +539,7 @@ public:
         RecordingStatForecastDataRole,              /**< Return qreal for chart. Forecast value. Used in QnRecordingStatsModel */
         
         AuditRecordDataRole,                        /**< Return QnAuditRecord object */
+        ColumnDataRole,                             /**< convert index col count to column enumerator */
 
         LastItemDataRole
     };

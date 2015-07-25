@@ -90,14 +90,15 @@ bool QnEventsDB::createDatabase()
         ddlQuery.prepare(
             "CREATE TABLE \"audit_log\" ("
             "id INTEGER NOT NULL PRIMARY KEY autoincrement,"
-            "timestamp INTEGER NOT NULL,"
-            "end_timestamp INTEGER NOT NULL,"
-            "event_type SMALLINT NOT NULL,"
+            "createdTimeSec INTEGER NOT NULL,"
+            "rangeStartSec INTEGER NOT NULL,"
+            "rangeEndSec INTEGER NOT NULL,"
+            "eventType SMALLINT NOT NULL,"
             "resources BLOB,"
             "params TEXT,"
-            "session_id BLOB(16),"
-            "user_name TEXT,"
-            "user_host TEXT)"
+            "sessionId BLOB(16),"
+            "userName TEXT,"
+            "userHost TEXT)"
 
         );
         if (!ddlQuery.exec())
@@ -107,7 +108,7 @@ bool QnEventsDB::createDatabase()
     if (!isObjectExists(lit("index"), lit("auditTimeIdx"), m_sdb)) {
         QSqlQuery ddlQuery(m_sdb);
         ddlQuery.prepare(
-            "CREATE INDEX \"auditTimeIdx\" ON \"audit_log\" (timestamp, session_id)"
+            "CREATE INDEX \"auditTimeIdx\" ON \"audit_log\" (createdTimeSec, sessionId)"
             );
         if (!ddlQuery.exec())
             return false;
@@ -126,9 +127,9 @@ int QnEventsDB::addAuditRecord(const QnAuditRecord& data)
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO audit_log"
-        "(timestamp, end_timestamp, event_type, resources, params, session_id, user_name, user_host)"
+        "(createdTimeSec, rangeStartSec, rangeEndSec, eventType, resources, params, sessionId, userName, userHost)"
         "VALUES"
-        "(:timestamp, :endTimestamp, :eventType, :resources, :extraParams, :sessionId, :userName, :userHost)"
+        "(:createdTimeSec, :rangeStartSec, :rangeEndSec, :eventType, :resources, :params, :sessionId, :userName, :userHost)"
         );
     QnSql::bind(data, &insQuery);
 
@@ -150,8 +151,8 @@ int QnEventsDB::updateAuditRecord(int internalId, const QnAuditRecord& data)
 
     QSqlQuery updQuery(m_sdb);
     updQuery.prepare("UPDATE audit_log SET "
-        "timestamp = :timestamp, end_timestamp = :endTimestamp, event_type = :eventType, resources = :resources, "
-        "params = :extraParams, session_id = :sessionId, user_name = :userName, user_host = :userHost WHERE id = :id"
+        "createdTimeSec = :createdTimeSec, rangeStartSec = :rangeStartSec, rangeEndSec = :rangeEndSec, eventType = :eventType, resources = :resources, "
+        "params = :params, sessionId = :sessionId, userName = :userName, userHost = :userHost WHERE id = :id"
         );
     QnSql::bind(data, &updQuery);
     updQuery.bindValue(":id", internalId);
@@ -167,14 +168,12 @@ QnAuditRecordList QnEventsDB::getAuditData(const QnTimePeriod& period, const QnU
 {
     QnAuditRecordList result;
     QString request = QString::fromLatin1(
-        "SELECT "
-        "timestamp, end_timestamp as endTimestamp, event_type as eventType, resources, params as extraParams, "
-        "session_id as sessionId, user_name as userName, user_host as userHost "
+        "SELECT * "
         "FROM audit_log "
-        "WHERE timestamp BETWEEN ? and ? ");
+        "WHERE createdTimeSec BETWEEN ? and ? ");
     if (!sessionId.isNull())
-        request += lit("AND session_id = ? ");
-    request += lit("ORDER BY timestamp");
+        request += lit("AND sessionId = ? ");
+    request += lit("ORDER BY createdTimeSec");
 
         
 
@@ -221,7 +220,7 @@ bool QnEventsDB::cleanupAuditLog()
     {
         m_auditCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
-        delQuery.prepare("DELETE FROM audit_log where timestamp < :timestamp");
+        delQuery.prepare("DELETE FROM audit_log where createdTimeSec < :createdTimeSec");
         int utc = (currentTime - m_eventKeepPeriod)/1000000ll;
         delQuery.bindValue(":timestamp", utc);
         rez = delQuery.exec();
