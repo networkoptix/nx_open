@@ -167,57 +167,11 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(const QnVirtualC
     if ((dstSize.width() > 0 && dstSize.width() <= 480) || (dstSize.height() > 0 && dstSize.height() <= 316))
         useHQ = false;
 
-    if (rotation == -1)
-        rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
-
-    QnServerArchiveDelegate serverDelegate;
-    if (!useHQ)
-        serverDelegate.setQuality(MEDIA_Quality_Low, true);
-
-    QnConstResourceVideoLayoutPtr layout = res->getVideoLayout();
-    QList<QnAbstractImageFilterPtr> filterChain;
-
-    CLVideoDecoderOutputPtr outFrame;
-    int channelMask = (1 << layout->channelCount()) -1;
-    bool gotNullFrame = false;
-    for (int i = 0; i < layout->channelCount(); ++i) 
-    {
-        CLVideoDecoderOutputPtr frame = readFrame(time, useHQ, roundMethod, res, serverDelegate, i);
-        if (!frame) {
-            gotNullFrame = true;
-            if (i == 0)
-                return QSharedPointer<CLVideoDecoderOutput>();
-            else
-                continue;
-        }
-        channelMask &= ~(1 << frame->channel);
-        if (i == 0) {
-            dstSize = updateDstSize(res, dstSize, frame);
-            if (dstSize.width() <= 16 || dstSize.height() <= 8)
-                return CLVideoDecoderOutputPtr();
-            filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
-            filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
-            filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));
-        }
-        for(auto filter: filterChain)
-            frame = filter->updateImage(frame);
-        if (frame)
-            outFrame = frame;
-    }
-    // read more archive frames to get all channels for pano cameras
-    if (channelMask && !gotNullFrame)
-    {
-        for (int i = 0; i < 10; ++i) {
-            CLVideoDecoderOutputPtr frame = readFrame(time, useHQ, roundMethod, res, serverDelegate, 0);
-            if (frame) {
-                channelMask &= ~(1 << frame->channel);
-                for(auto filter: filterChain)
-                    frame = filter->updateImage(frame);
-                outFrame = frame;
-            }
-        }
-    }
-    return outFrame;
+    auto frame = getImageWithCertainQuality( useHQ, res, time, dstSize, roundMethod, rotation );
+    if( frame )
+        return frame;
+    //trying different quality if could not find frame
+    return getImageWithCertainQuality( !useHQ, res, time, dstSize, roundMethod, rotation );
 }
 
 PixelFormat updatePixelFormat(PixelFormat fmt)
@@ -265,4 +219,68 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
     QnFfmpegHelper::deleteCodecContext(videoEncoderCodecCtx);
 
     return result;
+}
+
+QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQuality(
+    bool useHQ, const QnVirtualCameraResourcePtr& res, qint64 time,
+    const QSize& size, RoundMethod roundMethod, int rotation )
+{
+    QSize dstSize = size;
+
+    if( rotation == -1 )
+        rotation = res->getProperty( QnMediaResource::rotationKey() ).toInt();
+
+    QnConstResourceVideoLayoutPtr layout = res->getVideoLayout();
+
+    QnServerArchiveDelegate serverDelegate;
+    if( !useHQ )
+        serverDelegate.setQuality( MEDIA_Quality_Low, true );
+
+    QList<QnAbstractImageFilterPtr> filterChain;
+
+    CLVideoDecoderOutputPtr outFrame;
+    int channelMask = (1 << layout->channelCount()) - 1;
+    bool gotNullFrame = false;
+    for( int i = 0; i < layout->channelCount(); ++i )
+    {
+        CLVideoDecoderOutputPtr frame = readFrame( time, useHQ, roundMethod, res, serverDelegate, i );
+        if( !frame )
+        {
+            gotNullFrame = true;
+            if( i == 0 )
+                return QSharedPointer<CLVideoDecoderOutput>();
+            else
+                continue;
+        }
+        channelMask &= ~(1 << frame->channel);
+        if( i == 0 )
+        {
+            dstSize = updateDstSize( res, dstSize, frame );
+            if( dstSize.width() <= 16 || dstSize.height() <= 8 )
+                return CLVideoDecoderOutputPtr();
+            filterChain << QnAbstractImageFilterPtr( new QnScaleImageFilter( dstSize ) );
+            filterChain << QnAbstractImageFilterPtr( new QnTiledImageFilter( layout ) );
+            filterChain << QnAbstractImageFilterPtr( new QnRotateImageFilter( rotation ) );
+        }
+        for( auto filter : filterChain )
+            frame = filter->updateImage( frame );
+        if( frame )
+            outFrame = frame;
+    }
+    // read more archive frames to get all channels for pano cameras
+    if( channelMask && !gotNullFrame )
+    {
+        for( int i = 0; i < 10; ++i )
+        {
+            CLVideoDecoderOutputPtr frame = readFrame( time, useHQ, roundMethod, res, serverDelegate, 0 );
+            if( frame )
+            {
+                channelMask &= ~(1 << frame->channel);
+                for( auto filter : filterChain )
+                    frame = filter->updateImage( frame );
+                outFrame = frame;
+            }
+        }
+    }
+    return outFrame;
 }
