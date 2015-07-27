@@ -4,6 +4,7 @@
 #define GTEST_USE_OWN_TR1_TUPLE 1
 
 #include <sstream>
+#define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 
 test::StorageTestGlobals tg;
@@ -106,7 +107,7 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
                     QIODevice::WriteOnly
                 )
             );
-            ASSERT_TRUE(ioDevice) 
+            ASSERT_TRUE((bool)ioDevice)
                 << "ioDevice creation failed: " 
                 << fileName.toStdString() 
                 << std::endl;
@@ -163,7 +164,7 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
             )
         );
 
-        ASSERT_TRUE(ioDevice) 
+        ASSERT_TRUE((bool)ioDevice)
             << "ioDevice creation failed: " 
             << fileName.toStdString() 
             << std::endl;
@@ -187,7 +188,7 @@ TEST(AbstractStorageResourceTest, IODevice)
                 QIODevice::WriteOnly
             )
         );
-        ASSERT_TRUE(ioDevice);
+        ASSERT_TRUE((bool)ioDevice);
 
         const size_t dataSize = 10*1024*1024;
         const size_t seekCount = 10000;
@@ -228,7 +229,7 @@ TEST(AbstractStorageResourceTest, IODevice)
                 QIODevice::ReadOnly
             )
         );
-        ASSERT_TRUE(ioDevice);
+        ASSERT_TRUE((bool)ioDevice);
         QByteArray readData = ioDevice->readAll();
         ASSERT_TRUE(readData.size() == dataSize);
         if (memcmp(readData.constData(), data.data(), dataSize) != 0)

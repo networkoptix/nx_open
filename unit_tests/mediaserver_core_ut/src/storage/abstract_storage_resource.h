@@ -19,6 +19,11 @@
 #include <core/resource_management/status_dictionary.h>
 #include "utils/common/util.h"
 
+#ifndef _WIN32
+#   include <platform/monitoring/global_monitor.h>
+#   include <platform/platform_abstraction.h>
+#endif
+
 namespace test
 {
     const char *const defaultUrl = "ftp://127.0.0.1/tmp";
@@ -27,6 +32,7 @@ namespace test
         void prepare(const QString &ftpStorageUrl) 
         {
             this->ftpStorageUrl = ftpStorageUrl.isEmpty() ? defaultUrl : ftpStorageUrl;
+
             runnablePool = std::unique_ptr<QnLongRunnablePool>(
                 new QnLongRunnablePool
             );
@@ -38,6 +44,12 @@ namespace test
             storageManager = std::unique_ptr<QnStorageManager>(
                 new QnStorageManager
             );
+
+#ifndef _WIN32
+            platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(
+                new QnPlatformAbstraction
+            );
+#endif
 
             QnStoragePluginFactory::instance()->registerStoragePlugin(
                 "file", 
@@ -79,6 +91,10 @@ namespace test
         std::unique_ptr<QnResourcePool>     resourcePool;
         std::unique_ptr<QnLongRunnablePool> runnablePool;
         QnResourceStatusDictionary          rdict;
+
+#ifndef _WIN32
+        std::unique_ptr<QnPlatformAbstraction > platformAbstraction;
+#endif
     };
 }
 #endif

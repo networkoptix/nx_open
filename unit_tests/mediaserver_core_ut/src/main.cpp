@@ -1,3 +1,4 @@
+#define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 #include <qcoreapplication.h>
 #include <QCommandLineParser>
