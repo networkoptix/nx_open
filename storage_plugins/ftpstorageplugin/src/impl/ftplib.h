@@ -33,6 +33,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <sys/ioctl.h>
 #endif
 
 #ifndef _WIN32
