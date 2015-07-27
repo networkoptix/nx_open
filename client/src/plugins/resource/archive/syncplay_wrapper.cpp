@@ -84,7 +84,8 @@ public:
 
 // ------------------- QnArchiveSyncPlayWrapper ----------------------------
 
-QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapper():
+QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapper(QObject *parent):
+    QObject(parent),
     d_ptr(new QnArchiveSyncPlayWrapperPrivate())
 {
 }

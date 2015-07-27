@@ -5,9 +5,17 @@
 from nx_statistics.crashserver import app
 
 app.storage = dict(
-    path = '/tmp/statserver_crashes',
+    path = '/tmp/crashserver',
     limit = 1 * 1024 * 1024 * 1024, # 1gb
 )
+
+app.sendmail = dict(
+    sender = 'crashserver@test.test',
+    reciever = 'developer@test.test',
+    subject = 'Crash Report',
+)
+
+app.download = 'http://localhost:8002/api/get?path='
 
 appRun = dict(
     host = '127.0.0.1',

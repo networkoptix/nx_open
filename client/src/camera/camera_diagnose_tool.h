@@ -10,6 +10,7 @@
 
 #include <api/api_fwd.h>
 #include <api/model/camera_diagnostics_reply.h>
+#include <core/resource/resource_fwd.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
 
@@ -98,7 +99,7 @@ namespace CameraDiagnostics
         State m_state;
         Step::Value m_step;
         QString m_serverHostAddress;
-        QnMediaServerConnectionPtr m_serverConnection;
+        QnMediaServerResourcePtr m_server;
         bool m_result;
         QString m_errorMessage;
 

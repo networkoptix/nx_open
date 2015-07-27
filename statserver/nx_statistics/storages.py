@@ -5,6 +5,7 @@
 from datetime import datetime
 
 import glob
+import time
 import os
 
 SIZE_TAB = ('', 'KB', 'MB', 'GB', 'TB', 'PB')
@@ -25,8 +26,10 @@ def fileDate(timestamp):
 
 class FileStorage(object):
     '''File system storage, backed by simple hierarcy:
-        [path]/[binary]/[version]/[timestamp]_[system].[extension]
+        [path]/[binary]/[version]/[timestamp]_[system]_[uuid].[extension]
     '''
+    DUPLICATE_DELAY = 23 * 60 * 60 # a little less than a day
+
     def __init__(self, path, limit, log):
         '''Initializes storage to work with [path]
         '''
@@ -37,12 +40,16 @@ class FileStorage(object):
     def write(self, data, **keyArgs):
         '''Writes file data into filesystem according to [keyArgs]
         '''
-        filePath = self._filePath(**keyArgs)
-        self._log.info('Recieved crash report %s, saved to %s (%s)' %
-                (keyArgs, filePath, fileSize(len(data))))
-        dirPath = os.path.dirname(filePath)
-        self._cleanupIfFull(len(bytes(data)))
+        if self._isDuplicate(**keyArgs):
+            self._log.info('Reject crash report %s as duplicate' % keyArgs)
+            return None
 
+        self._cleanupIfFull(len(bytes(data)))
+        filePath = self._filePath(**keyArgs)
+        self._log.info('Save crash report %s to %s (%s)' %
+                (keyArgs, filePath, fileSize(len(data))))
+
+        dirPath = os.path.dirname(filePath)
         if not os.path.exists(dirPath): os.makedirs(dirPath)
         with open(filePath, 'wb') as fd: fd.write(data)
         return self._displayFiles([filePath])[0]
@@ -50,8 +57,7 @@ class FileStorage(object):
     def read(self, **keyArgs):
         '''Reads file data from file system at [keyArgs]
         '''
-        with open(self._filePath(**keyArgs), 'rb') as fd:
-            return fd.read()
+        return open(self._filePath(**keyArgs), 'rb')
 
     def list(self, **keyArgs):
         '''Returns a list of files by [keyArgs] pattern
@@ -77,12 +83,23 @@ class FileStorage(object):
         if not files: raise OSError("No such files: %s" % filt)
         for f in files: os.remove(f)
 
-    def _filePath(self, path=None, binary='*', version='*', system='*', timestamp='*', extension='*', **unused):
+    def _filePath(self, path=None, binary='*', version='*', uuid='',
+                  system='*', timestamp='*', extension='*', **unused):
         '''Calculates absolute file name in file system
         '''
-        if path: return os.path.join(self._path, path)
-        name = '%s_%s.%s' % (timestamp, system, extension)
+        if path: return os.path.join(self._path, path.strip(os.path.sep))
+        if uuid: uuid = '_' + uuid
+        name = '%s_%s%s.%s' % (timestamp, system, uuid, extension)
         return os.path.join(self._path, binary, version, name)
+
+    def _isDuplicate(self, timestamp, **keyArgs):
+        '''Checks if similar dump was recently reported
+        '''
+        if not keyArgs.get('uuid', None): return False
+        similars = glob.glob(self._filePath(**keyArgs))
+        if not similars: return False
+        lastTime = os.path.getctime(similars[-1:][0])
+        return abs(lastTime - time.time()) < self.DUPLICATE_DELAY
 
     def _displayFiles(self, files):
         '''Returns shorted paths, sizes and creation date of [files]
