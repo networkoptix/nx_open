@@ -196,8 +196,6 @@ private:
     mutable QMutex m_csvMigrationMutex;
     bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
-
-    QString m_lastDeletedDir;
 };
 
 #define qnStorageMan QnStorageManager::instance()
