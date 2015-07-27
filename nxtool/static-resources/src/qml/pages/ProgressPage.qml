@@ -51,6 +51,7 @@ Base.Column
     {
         id: changesProgressBar;
 
+        indeterminate: true;
         height: Common.SizeManager.clickableSizes.base;
         anchors
         {
