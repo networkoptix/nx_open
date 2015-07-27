@@ -20,7 +20,11 @@ Item
         id: row;
         spacing: Common.SizeManager.spacing.base;
 
-        anchors.left: parent.left;
+        anchors
+        {
+            left: parent.left;
+            verticalCenter: parent.verticalCenter;
+        }
 
         Base.CheckBox
         {
