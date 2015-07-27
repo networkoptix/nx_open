@@ -83,6 +83,7 @@ public:
     QnStorageResourceList getStoragesInLexicalOrder() const;
 
     void clearSpace();
+    void removeEmptyDirs(const QnStorageResourcePtr &storage);
     
     void clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
     void clearMaxDaysData();

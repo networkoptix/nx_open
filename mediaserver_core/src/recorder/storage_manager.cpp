@@ -33,11 +33,13 @@
 #include "media_server/settings.h"
 #include "utils/serialization/lexical_enum.h"
 
+#include <chrono>
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
 static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
 static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
+static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
 class ArchiveScanPosition
@@ -929,6 +931,48 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     return result;
 }
 
+
+void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
+{
+    std::function<bool (const QnAbstractStorageResource::FileInfoList &)> recursiveRemover =
+        [&](const QnAbstractStorageResource::FileInfoList &fl)
+    {
+        for (const auto& entry : fl)
+        {
+            if (entry.isDir())
+            {
+                QnAbstractStorageResource::FileInfoList dirFileList =
+                    storage->getFileList(
+                        entry.absoluteFilePath()
+                    );
+                if (!dirFileList.isEmpty())
+                {
+                    if (!recursiveRemover(dirFileList))
+                        return false;
+                    else
+                        storage->removeDir(entry.absoluteFilePath());
+                }
+            }
+            else
+                return false;
+        }
+        return true;
+    }; 
+
+    auto qualityFileList = storage->getFileList(storage->getUrl());
+    for (const auto &qualityEntry : qualityFileList)
+    {
+        if (qualityEntry.isDir()) // quality 
+        {
+            auto cameraFileList = storage->getFileList(qualityEntry.absoluteFilePath());
+            for (const auto &cameraEntry : cameraFileList)
+            {   // for every year folder
+                recursiveRemover(storage->getFileList(cameraEntry.absoluteFilePath()));
+            }
+        }
+    }
+}
+
 void QnStorageManager::clearSpace()
 {
     testOfflineStorages();
@@ -950,6 +994,18 @@ void QnStorageManager::clearSpace()
     for(const QnStorageResourcePtr& storage: storages)
         clearOldestSpace(storage, false);
 
+    // 3. Remove empty dirs
+    static auto lastEmptyDirCheck = std::chrono::high_resolution_clock::now();
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    
+    if (currentTime > lastEmptyDirCheck + std::chrono::milliseconds(EMPTY_DIRS_CLEANUP_INTERVAL))
+    {
+        lastEmptyDirCheck = currentTime;
+        for (const QnStorageResourcePtr &storage : storages)
+            removeEmptyDirs(storage);
+    }
+
+    // 4. DB cleanup
     {
         QMutexLocker lock(&m_sdbMutex);
         for(const QnStorageDbPtr& sdb: m_chunksDB) {
