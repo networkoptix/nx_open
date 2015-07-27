@@ -36,36 +36,17 @@ TextInput
         bottom: 0;
     }
 
-    Keys.onBacktabPressed:
-    {
-        impl.moveToPrevOctet();
-    }
-
-    Keys.onTabPressed:
-    {
-        impl.moveToNextOctet();
-    }
-
-    Keys.onRightPressed:
-    {
-        if (cursorPosition === length)
-            impl.moveToNextOctet();
-        else
-            ++cursorPosition;
-    }
-
-    Keys.onLeftPressed:
-    {
-        if (!cursorPosition)
-            impl.moveToPrevOctet();
-        else
-            --cursorPosition;
-    }
+    KeyNavigation.backtab: prevOctet;
+    KeyNavigation.tab: nextOctet;
+    KeyNavigation.left: prevOctet;
+    KeyNavigation.right: nextOctet;
 
     Keys.onPressed:
     {
         if ((event.key === Qt.Key_Backspace) && !length)
             impl.moveToPrevOctet();
+        else
+            event.accepted = false;
     }
 
     onTextChanged:

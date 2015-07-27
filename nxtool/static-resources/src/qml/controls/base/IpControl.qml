@@ -18,7 +18,7 @@ FocusScope
 
     property string initialText;
 
-    Component.onCompleted:
+    onInitialTextChanged:
     {
         /// fills octets with initial values
         var arr = initialText.split(".");
