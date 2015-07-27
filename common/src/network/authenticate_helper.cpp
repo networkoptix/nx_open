@@ -119,16 +119,11 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     if( allowedAuthMethods & AuthMethod::urlQueryParam )
     {
         QUrlQuery urlQuery( request.requestLine.url.query() );
-        const QByteArray& urlQueryParam = urlQuery.queryItemValue( isProxy ? lit("proxy_auth") : lit("auth") ).toLatin1();
-        if( !urlQueryParam.isEmpty() )
+        const QByteArray& authQueryParam = urlQuery.queryItemValue( isProxy ? lit( "proxy_auth" ) : lit( "auth" ) ).toLatin1();
+        if( !authQueryParam.isEmpty() )
         {
-            const QByteArray& decodedAuthQueryItem = QByteArray::fromBase64( urlQueryParam, QByteArray::Base64UrlEncoding );
-            const QList<QByteArray>& authTokens = decodedAuthQueryItem.split( ':' );
-            if( authTokens.size() == 3 )
-            {
-                if( authenticate( QString::fromUtf8(authTokens[0]), authTokens[2] ) )
-                    return true;
-            }
+            if( authenticateByUrl( authQueryParam, request.requestLine.method ) )
+                return true;
         }
     }
 
@@ -264,21 +259,44 @@ QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()
     return &m_authMethodRestrictionList;
 }
 
-QByteArray QnAuthHelper::createUserPasswordDigest( const QString& userName, const QString& password )
+QByteArray QnAuthHelper::createUserPasswordDigest(
+    const QString& userName,
+    const QString& password,
+    const QString& realm )
 {
     QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(QString(lit("%1:NetworkOptix:%2")).arg(userName, password).toLatin1());
+    md5.addData(QString(lit("%1:%2:%3")).arg(userName, realm, password).toLatin1());
     return md5.result().toHex();
 }
 
-QByteArray QnAuthHelper::createHttpQueryAuthParam( const QString& userName, const QString& password )
+QByteArray QnAuthHelper::createHttpQueryAuthParam(
+    const QString& userName,
+    const QString& password,
+    const QString& realm,
+    const QByteArray method )
 {
-    //TODO #ak it is very bad that authQueryItem value is valid permanently
-        //Note that mediaserver should allow such authentication for only some requests
-    //TODO #ak encrypt authQueryItem or remove this authentication method at all?
-    const QByteArray& digest = QnAuthHelper::createUserPasswordDigest( userName, password );
-    const QByteArray& authQueryItem = (userName.toUtf8() + ":" + QByteArray::number(rand()) + ":" + digest).toBase64(QByteArray::Base64UrlEncoding);
-    return authQueryItem;
+    //calculating user digest
+    const QByteArray& ha1 = createUserPasswordDigest( userName, password, realm );
+
+    //calculating "HA2"
+    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+    md5Hash.addData( method );
+    md5Hash.addData( ":" );
+    const QByteArray nedoHa2 = md5Hash.result().toHex();
+
+    //nonce
+    auto nonce = QByteArray::number( qnSyncTime->currentUSecsSinceEpoch(), 16 );
+
+    //calculating auth digest
+    md5Hash.reset();
+    md5Hash.addData( ha1 );
+    md5Hash.addData( ":" );
+    md5Hash.addData( nonce );
+    md5Hash.addData( ":" );
+    md5Hash.addData( nedoHa2 );
+    const QByteArray& authDigest = md5Hash.result().toHex();
+
+    return (userName.toUtf8() + ":" + nonce + ":" + authDigest).toBase64();
 }
 
 //!Splits \a data by \a delimiter not closed within quotes
@@ -516,7 +534,7 @@ void QnAuthHelper::addAuthHeader(nx_http::Response& response, bool isProxy)
         nx_http::HttpHeader(headerName, auth.arg(REALM).arg(QLatin1String(getNonce())).toLatin1() ) );
 }
 
-bool QnAuthHelper::isNonceValid(const QByteArray& nonce)
+bool QnAuthHelper::isNonceValid(const QByteArray& nonce) const
 {
     {
         // nonce cache will help if time just changed
@@ -568,4 +586,45 @@ QByteArray QnAuthHelper::symmetricalEncode(const QByteArray& data)
     for (int i = 0; i < result.size(); ++i)
         result.data()[i] ^= mask.data()[i % maskSize];
     return result;
+}
+
+bool QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, const QByteArray& method ) const
+{
+    auto authRecord = QByteArray::fromBase64( authRecordBase64 );
+    auto authFields = authRecord.split( ':' );
+    if( authFields.size() != 3 )
+        return false;
+
+    const auto& userName = authFields[0];
+    const auto& nonce = authFields[1];
+    const auto& authDigest = authFields[2];
+
+    if( !isNonceValid( nonce ) )
+        return false;
+
+    QMutexLocker lock( &m_mutex );
+    for( const QnUserResourcePtr& user : m_users )
+    {
+        if( user->getName().toUtf8().toLower() != userName )
+            continue;
+
+        const QByteArray& ha1 = user->getDigest();
+
+        QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+        md5Hash.addData( method );
+        md5Hash.addData( ":" );
+        const QByteArray nedoHa2 = md5Hash.result().toHex();
+
+        md5Hash.reset();
+        md5Hash.addData( ha1 );
+        md5Hash.addData( ":" );
+        md5Hash.addData( nonce );
+        md5Hash.addData( ":" );
+        md5Hash.addData( nedoHa2 );
+        const QByteArray calcResponse = md5Hash.result().toHex();
+
+        return calcResponse == authDigest;
+    }
+
+    return false;
 }
