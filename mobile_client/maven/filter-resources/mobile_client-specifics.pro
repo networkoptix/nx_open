@@ -14,7 +14,9 @@ INCLUDEPATH += \
     ${root.dir}/appserver2/src/ \
     ${root.dir}/client.core/src/
 
-QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+!ios {
+    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+}
 
 android {
     QT += androidextras
@@ -33,4 +35,9 @@ android {
 
     OTHER_FILES += \
         $$ANDROID_PACKAGE_SOURCE_DIR/AndroidManifest.xml
+}
+
+ios {
+    QMAKE_INFO_PLIST = ${basedir}/${arch}/Info.plist
+    OTHER_FILES += $${QMAKE_INFO_PLIST}
 }

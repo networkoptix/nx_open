@@ -33,13 +33,15 @@
 #   include <sys/sysctl.h>
 #   include <net/if.h>
 #   include <net/if_dl.h>
-#   include <net/route.h>
 #   include <netinet/in.h>
-#   include <netinet/if_ether.h>
 #   include <arpa/inet.h>
 #   include <err.h>
 #   include <stdio.h>
 #   include <stdlib.h>
+#   ifndef Q_OS_IOS
+#      include <net/route.h>
+#      include <netinet/if_ether.h>
+#   endif
 #endif
 
 /*
@@ -497,6 +499,12 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 #elif defined(Q_OS_MAC)
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
+#ifdef Q_OS_IOS
+QString getMacByIP(const QHostAddress& ip, bool /*net*/) {
+    return QString();
+}
+#else
+
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 
 QString getMacByIP(const QHostAddress& ip, bool /*net*/)
@@ -554,6 +562,8 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     return QString();
 }
+#endif
+
 #else // Linux
 void removeARPrecord(const QHostAddress& ip) {Q_UNUSED(ip)}
 

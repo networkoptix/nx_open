@@ -84,6 +84,19 @@
                 <buildLib>staticlib</buildLib>
             </properties>
         </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
 
         <profile>
             <!-- Common Profile for Linux, Mac, Arm -->

@@ -1,6 +1,7 @@
 #ifndef QNTIMELINECHUNKPAINTER_H
 #define QNTIMELINECHUNKPAINTER_H
 
+#include <array>
 #include <QtQuick/QSGGeometry>
 #include <QtGui/QColor>
 

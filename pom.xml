@@ -796,6 +796,8 @@
                 <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
+                <openssl.version>1.0.0-SNAPSHOT</openssl.version>
+                <compile.option1/>
             </properties>
         </profile>
         <profile>
@@ -809,6 +811,34 @@
             </activation>
             <properties>
                 <qt.classifier>${platform}-${arch}-release</qt.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>mac</family>
+                </os>
+                <property>
+                    <name>mobile</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <build>
+                <directory>target</directory>
+            </build>
+            <properties>
+                <platform>ios</platform>
+                <toolchain.version>ios</toolchain.version>
+                <qt.spec>macx-ios-clang</qt.spec>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
+                <libdir>${root.dir}/build_environment/target</libdir>
+                <compiler>clang</compiler>
+                <additional.compiler>clang</additional.compiler>
+                <profile.classifier>${platform}-${arch}</profile.classifier>
+                <openssl.version>1.0.2d-SNAPSHOT</openssl.version>
+                <compile.option1/>
             </properties>
         </profile>
     </profiles>

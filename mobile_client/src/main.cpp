@@ -54,6 +54,10 @@ int runUi(QGuiApplication *application) {
     QQmlFileSelector qmlFileSelector(&engine);
     qmlFileSelector.setSelector(&fileSelector);
 
+#ifdef Q_OS_IOS
+    engine.addImportPath(lit("qt_qml"));
+#endif
+
     engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
     engine.addImageProvider(lit("icon"), iconProvider);
     engine.rootContext()->setContextObject(&context);

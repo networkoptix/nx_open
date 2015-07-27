@@ -5,6 +5,8 @@
 
 #include "process.h"
 
+#ifndef QT_NO_PROCESS
+
 #ifdef _WIN32
 #include <Windows.h>
 #else
@@ -106,3 +108,4 @@ namespace nx
 #endif
 }
 
+#endif // QT_NO_PROCESS

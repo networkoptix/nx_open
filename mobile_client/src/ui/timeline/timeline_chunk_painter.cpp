@@ -1,7 +1,5 @@
 #include "timeline_chunk_painter.h"
 
-#include <array>
-
 namespace {
     /** Minimal color coefficient for the most noticeable chunk color in range */
     const qreal lineBarMinNoticeableFraction = 0.5;

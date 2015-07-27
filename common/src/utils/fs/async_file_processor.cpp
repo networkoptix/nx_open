@@ -10,6 +10,9 @@
 #include <memory>
 #include <typeinfo>
 
+#ifdef Q_OS_IOS
+#define stat64 stat
+#endif
 
 class FileTask
 {
@@ -181,6 +184,7 @@ void AsyncFileProcessor::doStat( const AsyncStatTask* task )
     if( _wstat64( reinterpret_cast<const wchar_t*>(task->filePath.utf16()), &fInfo ) < 0 )
 #else
     struct stat64 fInfo;
+
     if( stat64( task->filePath.toUtf8().constData(), &fInfo ) < 0 )
 #endif
         task->handler->done( SystemError::getLastOSErrorCode(), -1 );

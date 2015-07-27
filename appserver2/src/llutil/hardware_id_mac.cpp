@@ -1,5 +1,9 @@
 #include <string>
+
+#ifndef Q_OS_IOS
 #include <IOKit/IOKitLib.h>
+#endif
+
 #include <cassert>
 
 #include <QList>
@@ -46,6 +50,8 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
     Q_UNUSED(settings)
     #define MAX_HWID_SIZE 1024
 
+#ifndef Q_OS_IOS
+
     char buf[MAX_HWID_SIZE];
 
     io_registry_entry_t ioRegistryRoot = IORegistryEntryFromPath(kIOMasterPortDefault, "IOService:/");
@@ -55,5 +61,6 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
     CFRelease(uuidCf);
 
     hardwareIds[0] = hardwareIds[1] = hardwareIds[2] = hardwareIds[3] = hardwareIds[4] = hardwareIds[5] = buf;
+#endif
 }
 }

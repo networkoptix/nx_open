@@ -12,7 +12,7 @@
 
 #include "security_cam_resource.h"
 
-#ifdef Q_OS_ANDROID
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 #define AVCodecID int
 #define CODEC_ID_NONE 0
 #endif

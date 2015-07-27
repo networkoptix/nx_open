@@ -1,6 +1,6 @@
 #include "window_utils.h"
 
-#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+#if !defined(Q_OS_ANDROID)// && !defined(Q_OS_IOS)
 
 void prepareWindow() {}
 

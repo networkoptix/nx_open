@@ -1,5 +1,6 @@
-
 #include "environment.h"
+
+#ifndef QT_NO_PROCESS
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
@@ -10,7 +11,7 @@
 #include <QtWidgets/QMessageBox>
 #endif
 
-#include <utils/common/string.h>
+#include <utils/common/string_tools.h>
 #include <utils/mac_utils.h>
 
 
@@ -84,3 +85,5 @@ QString QnEnvironment::getUniqueFileName(const QString &dirName, const QString &
     QString name = generateUniqueString(existingFiles, baseName, baseName + lit("_%1"));
     return QFileInfo(dirName, name).absoluteFilePath();
 }
+
+#endif // QT_NO_PROCESS

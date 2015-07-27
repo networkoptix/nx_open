@@ -54,7 +54,9 @@ extern "C" {
 
 #ifdef __cplusplus
 
+#ifdef ENABLE_DATA_PROVIDERS
 #include "utils/media/sse_helper.h"
+#endif
 
 /* STL headers. */
 #include <algorithm>

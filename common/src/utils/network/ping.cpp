@@ -9,8 +9,10 @@
 #   include <sys/socket.h>
 #   include <arpa/inet.h>
 #   include <netinet/ip.h>
-#   include <netinet/ip_icmp.h>
 #   include <unistd.h>
+#   ifndef Q_OS_IOS
+#      include <netinet/ip_icmp.h>
+#   endif
 #endif
 
 #include <QtCore/QProcess>
@@ -31,7 +33,7 @@ bool CLPing::ping(const QString& ip, int retry, int /*timeoutPerRetry*/, int pac
     process.start(cmd.arg(ip).arg(retry).arg(packetSize));
     process.waitForFinished();
     return process.exitCode() == 0;
-#elif defined(Q_OS_ANDROID)
+#elif defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     return false; // TODO: #android
 #else
     QString cmd = QLatin1String("/bin/ping %1 -c %2 -s %3");

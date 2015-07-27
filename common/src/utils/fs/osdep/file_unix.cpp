@@ -22,6 +22,10 @@
 #define O_LARGEFILE 0
 #endif
 
+#ifdef Q_OS_IOS
+#define stat64 stat
+#define fstat64 fstat
+#endif
 
 void makeUnixOpenFlags( 
     const QIODevice::OpenMode& oflag,

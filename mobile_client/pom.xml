@@ -26,6 +26,7 @@
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
         <android.defines/>
+        <ios.defines/>
         <linux.defines/>
 
         <project.version.code>${buildNumber}</project.version.code>

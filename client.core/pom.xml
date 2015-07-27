@@ -37,6 +37,7 @@
         <product.title>${client.name} Core</product.title>
         <product.display.title>${client.display.name} Core</product.display.title>
         <!--Global libs-->
+        <template>lib</template>
         <qt.libs>core gui network multimedia concurrent sql</qt.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
         <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale</global.libs>
@@ -85,6 +86,19 @@
                 <property>
                     <name>mobile</name>
                     <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>ios</value>
                 </property>
             </activation>
             <properties>

@@ -11,7 +11,6 @@ ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
 
 ## GLOBAL CONFIGURATIONS
-QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
 DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
@@ -19,7 +18,7 @@ DEFINES += ${customization.defines}
 DEFINES += ${additional.defines}
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
-android {
+if (android | ios) {
   DEFINES += \
     DISABLE_ALL_VENDORS \
     DISABLE_THIRD_PARTY \
@@ -220,7 +219,8 @@ unix:!android:!mac {
 }
 
 ## MAC OS
-mac {
+macx {
+  QMAKE_INFO_PLIST = Info.plist
   QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.7 -stdlib=libc++
   QMAKE_CFLAGS += -msse4.1
   LIBS += ${mac.oslibs}

@@ -20,7 +20,7 @@
 namespace {
 
 #ifdef Q_OS_IOS
-    QString nativeProtocol = lit("hls");
+    QString nativeStreamProtocol = lit("hls");
 #else
     QString nativeStreamProtocol = lit("rtsp");
 #endif

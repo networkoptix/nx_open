@@ -23,6 +23,7 @@
     <properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <!--Global libs-->
+        <template>lib</template>
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <template>lib</template>
         <global.libs></global.libs>
@@ -121,6 +122,19 @@
                 <property>
                     <name>mobile</name>
                     <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>ios</value>
                 </property>
             </activation>
             <properties>
