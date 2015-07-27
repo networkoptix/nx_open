@@ -21,7 +21,6 @@
     
     <modules>
         <module>common_ut</module>
-        <!--module>image_library_plugin_ut</module-->
         <module>mediaserver_core_ut</module>
     </modules>       
     <!-- The following section is to rebuild the required artifact as lib. As soon as everything will be built as lib, this may be deleted -->
