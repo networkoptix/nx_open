@@ -149,7 +149,7 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
     auto complete = [ this, callback ]( const nx_http::AsyncHttpClientPtr& ptr )
     {
         {
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk(&m_mutex);
             m_httpClients.erase( ptr );
         }
 
@@ -184,7 +184,7 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
     QObject::connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
                       httpClient.get(), std::move( complete ), Qt::DirectConnection );
 
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk(&m_mutex);
     m_httpClients.insert( httpClient );
     if( !httpClient->doPost( url, "text/xml", request.toUtf8() ) )
     {

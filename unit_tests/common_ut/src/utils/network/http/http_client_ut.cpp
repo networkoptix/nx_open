@@ -18,8 +18,9 @@
 
 #include "test_http_server.h"
 
+namespace nx_http {
 
-class AsyncHttpClientTest
+class HttpClientTest
 :
     public ::testing::Test
 {
@@ -38,11 +39,11 @@ private:
     static std::unique_ptr<TestHttpServer> testHttpServer;
 };
 
-std::unique_ptr<TestHttpServer> AsyncHttpClientTest::testHttpServer;
+std::unique_ptr<TestHttpServer> HttpClientTest::testHttpServer;
 
 //TODO #ak introduce built-in http server to automate AsyncHttpClient tests
 
-TEST( HttpClient, DISABLED_KeepAlive )
+TEST( HttpClientTest, DISABLED_KeepAlive )
 {
     //TODO #ak use local http server
 
@@ -67,7 +68,7 @@ TEST( HttpClient, DISABLED_KeepAlive )
     }
 }
 
-TEST( HttpClient, DISABLED_KeepAlive2 )
+TEST( HttpClientTest, DISABLED_KeepAlive2 )
 {
     QUrl url( "http://192.168.0.1:7001/ec2/testConnection" );
     url.setUserName( "admin" );
@@ -91,7 +92,7 @@ TEST( HttpClient, DISABLED_KeepAlive2 )
     }
 }
 
-TEST( HttpClient, DISABLED_KeepAlive3 )
+TEST( HttpClientTest, DISABLED_KeepAlive3 )
 {
     QUrl url( "http://192.168.0.194:7001/ec2/events?guid=%7Be7209f3e-9ebe-6ebb-3e99-e5acd61c228c%7D&runtime-guid=%7B83862a97-b7b8-4dbc-bb8f-64847f23e6d5%7D&system-identity-time=0" );
     url.setUserName( "admin" );
@@ -119,6 +120,8 @@ TEST( HttpClient, DISABLED_KeepAlive3 )
 /*!
     This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
 */
-TEST_F( AsyncHttpClientTest, KeepAliveConnection )
+TEST_F( HttpClientTest, KeepAliveConnection )
 {
 }
+
+} // namespace nx_http

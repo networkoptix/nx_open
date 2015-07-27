@@ -91,7 +91,7 @@ public:
 
 private:
     // TODO: replace with single httpClient when pipeline is supported
-    QMutex m_mutex;
+    QnMutex m_mutex;
     std::set< nx_http::AsyncHttpClientPtr > m_httpClients;
 };
 

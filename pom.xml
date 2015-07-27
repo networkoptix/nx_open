@@ -315,8 +315,8 @@
                 </property>
             </activation>
             <modules>
-                <module>unit_tests/common</module>
-                <module>unit_tests/connection_mediator</module>
+                <module>unit_tests/common_ut</module>
+                <module>unit_tests/connection_mediator_ut</module>
             </modules>
         </profile>
        <profile>
@@ -332,7 +332,7 @@
                 <module>nx_sdk</module>
                 <module>plugins/genericrtspplugin</module>
                 <module>storage_plugins/ftpstorageplugin</module>
-                <!--module>storage_plugins/storage_plugin_test_client</module-->                
+                <!--module>storage_plugins/storage_plugin_test_client</module-->
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>
