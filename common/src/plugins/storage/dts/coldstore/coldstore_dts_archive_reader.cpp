@@ -185,7 +185,7 @@ void QnColdStoreDelegate::close()
     m_opend = false;
 }
 
-qint64 QnColdStoreDelegate::startTime()
+qint64 QnColdStoreDelegate::startTime() const
 {
     return m_startTime;
 //    if (!m_opend)
@@ -194,7 +194,7 @@ qint64 QnColdStoreDelegate::startTime()
 //    return m_datafileList.at(0).mks;
 }
 
-qint64 QnColdStoreDelegate::endTime()
+qint64 QnColdStoreDelegate::endTime() const
 {
     return m_endTime;
 //    if (!m_opend)

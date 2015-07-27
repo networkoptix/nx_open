@@ -64,12 +64,12 @@ void ThirdPartyArchiveDelegate::close()
     }
 }
 
-qint64 ThirdPartyArchiveDelegate::startTime()
+qint64 ThirdPartyArchiveDelegate::startTime() const
 {
     return m_archiveReader->startTime();
 }
 
-qint64 ThirdPartyArchiveDelegate::endTime()
+qint64 ThirdPartyArchiveDelegate::endTime() const
 {
     return m_archiveReader->endTime();
 }

@@ -139,12 +139,12 @@ QnAviArchiveDelegate::~QnAviArchiveDelegate()
     close();
 }
 
-qint64 QnAviArchiveDelegate::startTime()
+qint64 QnAviArchiveDelegate::startTime() const
 {
     return m_startTime;
 }
 
-qint64 QnAviArchiveDelegate::endTime()
+qint64 QnAviArchiveDelegate::endTime() const
 {
     //if (!m_streamsFound && !findStreams())
     //    return 0;
