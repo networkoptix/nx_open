@@ -61,6 +61,7 @@ private slots:
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
     void at_ItemPressed(const QModelIndex& index);
+    void at_ItemEntered(const QModelIndex& index);
     void at_eventsGrid_clicked(const QModelIndex& idx);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;

@@ -35,6 +35,8 @@
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
+    const int BTN_ICON_SIZE = 16;
+    const int EXTRA_ROW_SPACING = 8;
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
@@ -42,21 +44,32 @@ namespace {
 QSize QnAuditDetailItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
-    if (column != QnAuditLogModel::DescriptionColumn)
+    if (column == QnAuditLogModel::DescriptionColumn)
+    {
+        QVariant data = index.data(Qn::AuditRecordDataRole);
+        if (!data.canConvert<QnAuditRecord>())
+            return base_type::sizeHint(option, index);
+        QnAuditRecord record = data.value<QnAuditRecord>();
+
+        QTextDocument txtDocument;
+        txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
+        QSize size = txtDocument.size().toSize();
+        bool showDetail = record.extractParam("detail") == "1";
+        if (!showDetail)
+            size.setHeight(m_defaultSectionSize);
+        return size;
+    }
+    if (column == QnAuditLogModel::PlayButtonColumn) 
+    {
+        QFontMetrics fm(option.font);
+        QSize sizeHint = fm.size(Qt::TextShowMnemonic, lit("Play this"));
+        sizeHint += m_btnSize;
+        sizeHint.setWidth(sizeHint.width() + BTN_ICON_SIZE);
+        return sizeHint;
+    }
+    else 
         return base_type::sizeHint(option, index);
 
-    QVariant data = index.data(Qn::AuditRecordDataRole);
-    if (!data.canConvert<QnAuditRecord>())
-        return base_type::sizeHint(option, index);
-    QnAuditRecord record = data.value<QnAuditRecord>();
-
-    QTextDocument txtDocument;
-    txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
-    QSize size = txtDocument.size().toSize();
-    bool showDetail = record.extractParam("detail") == "1";
-    if (!showDetail)
-        size.setHeight(m_defaultSectionSize);
-    return size;
 }
 
 void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
@@ -83,7 +96,7 @@ void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionView
             button.icon = qnSkin->icon("slider/navigation/play_hovered.png");
         else
             button.icon = qnSkin->icon("slider/navigation/play.png");
-        button.iconSize = QSize(16,16);
+        button.iconSize = QSize(BTN_ICON_SIZE, BTN_ICON_SIZE);
         button.state = option.state;
 
         QFontMetrics fm(option.font);
@@ -160,6 +173,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
 
     ui->gridMaster->setModel(m_sessionModel);
+    ui->gridMaster->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     connect
     (
@@ -167,7 +181,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
         [this] (const QItemSelection &selected, const QItemSelection &deselected)
         { 
             m_detailModel->setData(filteredChildData(ui->gridMaster->selectionModel()->selectedIndexes()));
-            ui->gridDetails->resizeRowsToContents();
+            //ui->gridDetails->resizeColumnToContents();
         }
     );
 
@@ -187,8 +201,12 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     delegate->setButtonExtraSize(calcButtonSize(ui->gridMaster->font()));
     delegate->setDefaultSectionHeight(ui->gridDetails->verticalHeader()->defaultSectionSize());
     ui->gridDetails->setItemDelegate(delegate);
+    ui->gridDetails->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->gridDetails->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    ui->gridDetails->setMouseTracking(true);
 
     connect(ui->gridDetails, &QTableView::pressed, this, &QnAuditLogDialog::at_ItemPressed);
+    connect(ui->gridDetails, &QTableView::entered, this, &QnAuditLogDialog::at_ItemEntered);
 
 
     QDate dt = QDateTime::currentDateTime().date();
@@ -255,6 +273,14 @@ void QnAuditLogDialog::at_eventsGrid_clicked(const QModelIndex& index)
 
     int height = ui->gridDetails->itemDelegate()->sizeHint(QStyleOptionViewItem(), index).height();
     ui->gridDetails->setRowHeight(index.row(), height);
+}
+
+void QnAuditLogDialog::at_ItemEntered(const QModelIndex& index)
+{
+    if (index.data(Qn::ColumnDataRole) == QnAuditLogModel::DescriptionColumn)
+        ui->gridDetails->setCursor(Qt::PointingHandCursor);
+    else
+        ui->gridDetails->setCursor(Qt::ArrowCursor);
 }
 
 void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
