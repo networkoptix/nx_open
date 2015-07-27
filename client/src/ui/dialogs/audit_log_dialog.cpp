@@ -32,11 +32,11 @@
 #include "utils/common/event_processors.h"
 #include <utils/common/scoped_painter_rollback.h>
 #include "ui/actions/actions.h"
+#include "utils/math/color_transformations.h"
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
     const int BTN_ICON_SIZE = 16;
-    const int EXTRA_ROW_SPACING = 8;
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
@@ -79,7 +79,10 @@ void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionView
     if (column == QnAuditLogModel::DescriptionColumn) 
     {
         QTextDocument txtDocument;
-        txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
+        if (option.state & QStyle::State_MouseOver)
+            txtDocument.setHtml(index.data(Qn::DisplayHtmlHoveredRole).toString());
+        else
+            txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
 
         QnScopedPainterTransformRollback rollback(painter);
         QRect rect = option.rect;

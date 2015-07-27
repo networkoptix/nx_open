@@ -262,7 +262,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord& data) const
     return QString();
 }
 
-QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data, int row) const
+QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data, int row, bool hovered) const
 {
     if (column != DescriptionColumn)
         return textData(column, data, row);
@@ -274,8 +274,12 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data
         result = tr("%1 - %2, ").arg(formatDateTime(data.rangeStartSec)).arg(formatDateTime(data.rangeEndSec));
     case Qn::AR_CameraUpdate:
     {
+        QString LINK_COLOR(lit("NavajoWhite")); // todo: move it to skin
         QString txt = tr("%n cameras", "", data.resources.size());
-        result +=  QString(lit("<a href=\"cameras\">%1</a><br>")).arg(txt);
+        if (hovered)
+            result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(LINK_COLOR).arg(txt);
+        else
+            result +=  QString(lit("<font color=%1><b>%2</b></font>")).arg(LINK_COLOR).arg(txt);
         bool showDetail = data.extractParam("detail") == "1";
         if (showDetail) 
         {
@@ -419,7 +423,9 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
     case Qn::AuditRecordDataRole:
         return QVariant::fromValue<QnAuditRecord>(m_index->at(index.row()));
     case Qn::DisplayHtmlRole:
-        return htmlData(column, record, index.row());
+        return htmlData(column, record, index.row(), false);
+    case Qn::DisplayHtmlHoveredRole:
+        return htmlData(column, record, index.row(), true);
     case Qn::ColumnDataRole:
         return column;
     //case Qt::SizeHintRole:

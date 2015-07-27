@@ -59,7 +59,7 @@ private:
 
     QString getResourceNameString(QnUuid id) const;
     QString textData(const Column& column,const QnAuditRecord& action, int row) const;
-    QString htmlData(const Column& column,const QnAuditRecord& data, int row) const;
+    QString htmlData(const Column& column,const QnAuditRecord& data, int row, bool hovered) const;
     QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true) const;
     QString formatDuration(int durationSecs) const;
     QString eventTypeToString(Qn::AuditRecordType recordType) const;

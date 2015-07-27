@@ -515,6 +515,7 @@ public:
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
         DisplayHtmlRole,                            /**< Same as Display role, but use HTML format. */
+        DisplayHtmlHoveredRole,                     /**< Same as DisplayHtmlRole role, but used if mouse over a element */
 
         ModifiedRole,                               /**< Role for modified state. Value of type bool. */
         DisabledRole,                               /**< Role for disabled state. Value of type bool. */
