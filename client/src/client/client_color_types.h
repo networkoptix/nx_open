@@ -177,6 +177,21 @@ struct QnRoutingManagementColors {
 };
 #define QnRoutingManagementColors_Fields (readOnly)
 
+struct QnAuditLogColors {
+    QnAuditLogColors();
+
+    QColor httpLink;
+};
+#define QnAuditLogColors_Fields (httpLink)
+
+struct QnRecordingStatsColors {
+    QnRecordingStatsColors();
+
+    QColor chartMainColor;
+    QColor chartForecastColor;
+};
+#define QnRecordingStatsColors_Fields (chartMainColor)(chartForecastColor)
+
 struct QnServerUpdatesColors {
     QnServerUpdatesColors();
 
@@ -190,7 +205,7 @@ struct QnServerUpdatesColors {
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
-    (QnRoutingManagementColors)(QnVideowallManageWidgetColors) \
+    (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
     (QnServerUpdatesColors)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

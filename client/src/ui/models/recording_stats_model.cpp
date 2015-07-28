@@ -234,6 +234,8 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
         return chartData(index, false);
     case Qn::RecordingStatForecastDataRole:
         return chartData(index, true);
+    case Qn::RecordingStatColorsDataRole:
+        return QVariant::fromValue<QnRecordingStatsColors>(m_colors);
     default:
         break;
     }
@@ -309,4 +311,14 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
     result.push_back(std::move(footer)); // add footer
 
     endResetModel();
+}
+
+QnRecordingStatsColors QnRecordingStatsModel::colors() const
+{
+    return m_colors;
+}
+
+void QnRecordingStatsModel::setColors(const QnRecordingStatsColors &colors)
+{
+    m_colors = colors;
 }

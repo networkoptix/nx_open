@@ -128,6 +128,16 @@ QnRoutingManagementColors::QnRoutingManagementColors() {
     readOnly = Qt::lightGray;
 }
 
+QnAuditLogColors::QnAuditLogColors() {
+    httpLink = QColor(0xFF, 0xDE, 0xAD); // HTTP NavajoWhite
+}
+
+QnRecordingStatsColors::QnRecordingStatsColors()
+{
+    chartMainColor = QColor(7, 98, 129);
+    chartForecastColor = QColor(12, 81, 105);
+}
+
 QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
     desktop = Qt::darkGray;
     freeSpace = Qt::lightGray;

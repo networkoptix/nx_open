@@ -107,6 +107,13 @@
         }}
     },
 
+    "QnAuditLogModel": {
+        "colors": {
+            "httpLink": "#0000FF"
+        }
+    },
+
+	
     "QnTimeSlider": {
         "colors": {
             "_": "Time slider colors.",

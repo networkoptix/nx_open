@@ -8,13 +8,15 @@
 #include <core/resource/resource_fwd.h>
 
 #include "api/model/audit/audit_record.h"
+#include "client/client_color_types.h"
+#include <ui/customization/customized.h>
 
-
-class QnAuditLogModel: public QAbstractItemModel 
+class QnAuditLogModel: public Customized<QAbstractItemModel>
 {
     Q_OBJECT
-    typedef QAbstractItemModel base_type;
-
+    Q_PROPERTY(QnAuditLogColors colors READ colors WRITE setColors)
+    
+    typedef Customized<QAbstractItemModel> base_type;
 public:
     enum Column {
         TimestampColumn,
@@ -52,6 +54,9 @@ public:
 
     bool hasMotionUrl(const QModelIndex &index) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override  { return m_columns.size(); }
+
+    QnAuditLogColors colors() const;
+    void setColors(const QnAuditLogColors &colors);
 public slots:
     void clear();
 private:
@@ -67,6 +72,7 @@ private:
 private:
     DataIndex* m_index;
     QList<Column> m_columns;
+    QnAuditLogColors m_colors;
 };
 
 #endif // QN_AUDIT_LOG_MODEL_H

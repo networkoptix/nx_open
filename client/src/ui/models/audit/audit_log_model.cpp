@@ -274,12 +274,12 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data
         result = tr("%1 - %2, ").arg(formatDateTime(data.rangeStartSec)).arg(formatDateTime(data.rangeEndSec));
     case Qn::AR_CameraUpdate:
     {
-        QString LINK_COLOR(lit("NavajoWhite")); // todo: move it to skin
         QString txt = tr("%n cameras", "", data.resources.size());
+        QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
         if (hovered)
-            result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(LINK_COLOR).arg(txt);
+            result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(linkColor).arg(txt);
         else
-            result +=  QString(lit("<font color=%1><b>%2</b></font>")).arg(LINK_COLOR).arg(txt);
+            result +=  QString(lit("<font color=%1><b>%2</b></font>")).arg(linkColor).arg(txt);
         bool showDetail = data.extractParam("detail") == "1";
         if (showDetail) 
         {
@@ -440,4 +440,14 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
 void QnAuditLogModel::setColumns(const QList<Column> &columns)
 {
     m_columns = columns;
+}
+
+QnAuditLogColors QnAuditLogModel::colors() const
+{
+    return m_colors;
+}
+
+void QnAuditLogModel::setColors(const QnAuditLogColors &colors)
+{
+    m_colors = colors;
 }
