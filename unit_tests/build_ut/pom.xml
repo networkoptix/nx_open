@@ -15,6 +15,7 @@
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
+        <template>app</template>
     </properties>
 
 <!-- The following section is to rebuild the required artifact as lib. As soon as everything will be built as lib, this may be deleted -->
