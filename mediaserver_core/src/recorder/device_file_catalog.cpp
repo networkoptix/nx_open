@@ -724,7 +724,7 @@ QString DeviceFileCatalog::Chunk::fileName() const
     return baseName + QString(".mkv");
 }
 
-QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
+QString DeviceFileCatalog::fileDir(const Chunk& chunk) const
 {
     QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
     if (!storage)
@@ -732,7 +732,13 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 
     QString root = rootFolder(storage, m_catalog);
     QString separator = getPathSeparator(root);
-    return root + QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone, separator) + chunk.fileName();
+
+    return root + QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone, separator);
+}
+
+QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
+{
+    return fileDir(chunk) + chunk.fileName();
 }
 
 qint64 DeviceFileCatalog::minTime() const

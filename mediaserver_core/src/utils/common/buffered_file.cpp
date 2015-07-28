@@ -290,7 +290,10 @@ bool QBufferedFile::updatePos()
     if (bufferOffset < 0 || bufferOffset > m_cycleBuffer.size())
     {
         flushBuffer();
-        m_filePos = qPower2Floor((quint64) m_lastSeekPos, SECTOR_SIZE);
+        if (m_isDirectIO)
+            m_filePos = qPower2Floor((quint64) m_lastSeekPos, SECTOR_SIZE);
+        else
+            m_filePos = m_lastSeekPos;
         if (!m_fileEngine->seek(m_filePos))
             return false;
         m_actualFileSize = qMax(m_lastSeekPos, m_actualFileSize); // extend file on seek if need
@@ -330,10 +333,11 @@ qint64 QBufferedFile::writeData ( const char * data, qint64 len )
     int rez = len;
     while (len > 0)
     {
-        if (m_cachedBuffer.size() < (uint)SECTOR_SIZE && m_cachedBuffer.size() == m_filePos + m_bufferPos)
-        {
-            int copyLen = qMin((int) len, (int) (SECTOR_SIZE - m_cachedBuffer.size()));
-            m_cachedBuffer.write(data, copyLen);
+        qint64 currentPos = m_filePos + m_bufferPos;
+        if (currentPos < (uint)SECTOR_SIZE) {
+            // update cached data (first sector is cached in m_cachedBuffer)
+            int copyLen = qMin((int) len, (int) (SECTOR_SIZE - currentPos));
+            m_cachedBuffer.writeAt(data, copyLen, currentPos);
         }
 
         int toWrite = qMin((int) len, m_cycleBuffer.maxSize() - m_bufferPos);
@@ -364,7 +368,9 @@ bool QBufferedFile::prepareBuffer(int bufferSize)
     }
     else {
         qint64 toRead = qPower2Ceil((quint32) bufferSize, SECTOR_SIZE);
-        int readed = m_fileEngine->read(m_tmpBuffer.data(), toRead);
+        int readed = 0;
+        if (toRead > 0)
+            readed = m_fileEngine->read(m_tmpBuffer.data(), toRead);
         if (readed == -1)
             return false;
         m_cycleBuffer.push_back(m_tmpBuffer.data(), qMin((qint64) readed, m_actualFileSize - m_filePos));

@@ -34,6 +34,13 @@
   }
 ```
 
+## Send mail Testing
+
+```
+    # This script just saves mails to /tmp/sendmail.$DATETIME
+    sudo cp sendmail /usr/sbin/sendmail
+```
+
 ## Wanna see a demo ststistics?
 
 Run a script `statserver_fake_report.py` a couple times to generate randome reports and
