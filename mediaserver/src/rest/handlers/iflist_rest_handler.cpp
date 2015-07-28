@@ -64,8 +64,21 @@ int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &
     Q_UNUSED(params)
 
     QnNetworkAddressEntryList entryList;
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces()) 
+
+    const bool allInterfaces = 
+#if defined(Q_OS_LINUX) && defined(__arm__)
+        true;
+#else
+        false;
+#endif
+
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(allInterfaces)) 
     {
+#if defined(Q_OS_LINUX) && defined(__arm__)
+        static const QChar kColon = ':';
+        if (iface.name.contains(kColon))
+            continue;
+#endif
         QnNetworkAddressEntry entry;
         entry.name = iface.netIf.name();
         entry.ipAddr = iface.address.toString();

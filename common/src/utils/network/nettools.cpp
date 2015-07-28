@@ -64,7 +64,7 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
 }
 */
 
-QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
+QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
 {
     static QList<QnInterfaceAndAddr> lastResult;
     static QElapsedTimer timer;
@@ -91,6 +91,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
             continue;
 #endif
 
+        bool addressFound = false;
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address: addresses)
         {
@@ -130,9 +131,15 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
                     result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
+                    addressFound = true;
                     break;
                 }
             }
+        }
+
+        if (!addressFound && allowItfWithoutAddress)
+        {
+            result.append(QnInterfaceAndAddr(iface.name(), QHostAddress(), QHostAddress(), iface));
         }
     }
 
