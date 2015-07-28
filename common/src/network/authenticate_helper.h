@@ -169,7 +169,7 @@ private:
     /*!
         \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
     */
-    bool authenticateByUrl( const QByteArray& authRecord, const QByteArray& method ) const;
+    bool authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId ) const;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

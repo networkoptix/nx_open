@@ -124,7 +124,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         const QByteArray& authQueryParam = urlQuery.queryItemValue( isProxy ? lit( "proxy_auth" ) : lit( "auth" ) ).toLatin1();
         if( !authQueryParam.isEmpty() )
         {
-            if( authenticateByUrl( authQueryParam, request.requestLine.method ) )
+            if( authenticateByUrl( authQueryParam, request.requestLine.method, authUserId ) )
                 return true;
         }
     }
@@ -593,7 +593,7 @@ QByteArray QnAuthHelper::symmetricalEncode(const QByteArray& data)
     return result;
 }
 
-bool QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, const QByteArray& method ) const
+bool QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, const QByteArray& method, QnUuid* authUserId ) const
 {
     auto authRecord = QByteArray::fromBase64( authRecordBase64 );
     auto authFields = authRecord.split( ':' );
@@ -612,7 +612,8 @@ bool QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, const 
     {
         if( user->getName().toUtf8().toLower() != userName )
             continue;
-
+        if (authUserId)
+            *authUserId = user->getId();
         const QByteArray& ha1 = user->getDigest();
 
         QCryptographicHash md5Hash( QCryptographicHash::Md5 );
