@@ -33,6 +33,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include "ui/actions/actions.h"
 #include "utils/math/color_transformations.h"
+#include "camera_addition_dialog.h"
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -117,17 +118,11 @@ void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionView
 
 // ---------------------- QnAuditLogDialog ------------------------------
 
-QnAuditRecordList QnAuditLogDialog::filteredChildData(const QModelIndexList& selection)
+QnAuditRecordList QnAuditLogDialog::filteredChildData()
 {
     QSet<QnUuid> selectedSessions;
-    for (const auto& index: selection) 
-    {
-        QVariant data = index.data(Qn::AuditRecordDataRole);
-        if (!data.canConvert<QnAuditRecord>())
-            continue;
-        QnAuditRecord record = data.value<QnAuditRecord>();
+    for (const auto& record: m_sessionModel->checkedRows()) 
         selectedSessions << record.sessionId;
-    }
 
     QnAuditRecordList result;
     auto filter = [&selectedSessions] (const QnAuditRecord& record) { 
@@ -166,6 +161,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
     QList<QnAuditLogModel::Column> columns;
     columns << 
+        QnAuditLogModel::SelectRowColumn <<
         QnAuditLogModel::TimestampColumn <<
         QnAuditLogModel::EndTimestampColumn <<
         QnAuditLogModel::DurationColumn <<
@@ -174,10 +170,17 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
     m_sessionModel->setColumns(columns);
 
-
     ui->gridMaster->setModel(m_sessionModel);
     ui->gridMaster->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
+    m_masterHeaders = new QnCheckBoxedHeaderView(this);
+    connect (m_masterHeaders, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnAuditLogDialog::at_headerCheckStateChanged);
+    ui->gridMaster->setHorizontalHeader(m_masterHeaders);
+    m_masterHeaders->setVisible(true);
+    m_masterHeaders->setSectionResizeMode(QHeaderView::ResizeToContents);
+    m_masterHeaders->setSectionsClickable(true);
+
+    /*
     connect
     (
         ui->gridMaster->selectionModel(), &QItemSelectionModel::selectionChanged, this,
@@ -186,6 +189,16 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
             m_detailModel->setData(filteredChildData(ui->gridMaster->selectionModel()->selectedIndexes()));
             //ui->gridDetails->resizeColumnToContents();
         }
+    );
+    */
+    connect
+        (
+        m_sessionModel, &QAbstractItemModel::dataChanged, this,
+        [this] (const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+    { 
+        if (roles.contains(Qt::CheckStateRole))
+            m_detailModel->setData(filteredChildData());
+    }
     );
 
     m_detailModel = new QnAuditLogDetailModel(this);
@@ -208,6 +221,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     ui->gridDetails->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     ui->gridDetails->setMouseTracking(true);
 
+
+    connect(ui->gridMaster, &QTableView::pressed, this, &QnAuditLogDialog::at_masterItemPressed);
     connect(ui->gridDetails, &QTableView::pressed, this, &QnAuditLogDialog::at_ItemPressed);
     connect(ui->gridDetails, &QTableView::entered, this, &QnAuditLogDialog::at_ItemEntered);
 
@@ -284,6 +299,25 @@ void QnAuditLogDialog::at_ItemEntered(const QModelIndex& index)
         ui->gridDetails->setCursor(Qt::PointingHandCursor);
     else
         ui->gridDetails->setCursor(Qt::ArrowCursor);
+}
+
+void QnAuditLogDialog::at_headerCheckStateChanged(Qt::CheckState state)
+{
+    m_sessionModel->setCheckState(state);
+}
+
+void QnAuditLogDialog::at_masterItemPressed(const QModelIndex& index)
+{
+    if (index.data(Qn::ColumnDataRole) != QnAuditLogModel::SelectRowColumn)
+        return;
+
+    Qt::CheckState checkState = (Qt::CheckState) index.data(Qt::CheckStateRole).toInt();
+    if (checkState == Qt::Checked)
+        checkState = Qt::Unchecked;
+    else
+        checkState = Qt::Checked;
+    ui->gridMaster->model()->setData(index, checkState, Qt::CheckStateRole);
+    m_masterHeaders->setCheckState(m_sessionModel->checkState());
 }
 
 void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
@@ -404,6 +438,7 @@ void QnAuditLogDialog::requestFinished()
             sessions << record;
     }
     m_sessionModel->setData(sessions);
+    m_masterHeaders->setCheckState(Qt::Unchecked);
 
     ui->gridMaster->setDisabled(false);
     setCursor(Qt::ArrowCursor);

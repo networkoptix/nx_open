@@ -105,6 +105,7 @@ public:
     {
         LessFunc lessThan = &lessThanTimestamp;
         switch(m_sortCol) {
+            case SelectRowColumn:
             case TimestampColumn:
                 lessThan = &lessThanTimestamp;
                 break;
@@ -290,7 +291,10 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data
                 bool isRecordExist = archiveData.size() > index && archiveData[index] == '1';
                 index++;
                 QChar circleSymbol = isRecordExist ? QChar(0x25CF) : QChar(0x25CB);
-                result += QString(lit("<br> <font color=red>%1</font> %2")).arg(circleSymbol).arg(getResourceNameString(camera));
+                if (isRecordExist)
+                    result += QString(lit("<br> <font size=5 color=red>%1</font> %2")).arg(circleSymbol).arg(getResourceNameString(camera));
+                else
+                    result += QString(lit("<br> <font size=5>%1</font> %2")).arg(circleSymbol).arg(getResourceNameString(camera));
             }
         }
         return result;
@@ -304,6 +308,8 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data
 QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord& data, int row) const
 {
     switch(column) {
+    case SelectRowColumn:
+        return QString();
     case TimestampColumn:
         return formatDateTime(data.createdTimeSec, true, true);
     case DateColumn:
@@ -361,6 +367,8 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
 
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         switch(column) {
+            case SelectRowColumn:
+                return QVariant();
             case TimestampColumn:
                 return tr("Session begins");
             case EndTimestampColumn:
@@ -388,6 +396,49 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
     return base_type::headerData(section, orientation, role);
 }
 
+Qt::CheckState QnAuditLogModel::checkState() const
+{
+    bool onExist = false;
+    bool offExist = false;
+
+    if (m_index->size() == 0)
+        return Qt::Unchecked;
+
+    for (int i = 0; i < m_index->size(); ++i)
+    {
+        if (m_index->at(i).extractParam("checked") ==  "1")
+            onExist = true;
+        else
+            offExist = true;
+    }
+    if (onExist && offExist)
+        return Qt::PartiallyChecked;
+    else if (onExist)
+        return Qt::Checked;
+    else
+        return Qt::Unchecked;
+}
+
+void QnAuditLogModel::setCheckState(Qt::CheckState state)
+{
+    if (state == Qt::Checked) {
+        for (int i = 0; i < m_index->size(); ++i)
+        {
+            m_index->at(i).addParam("checked", "1");
+        }
+    } 
+    else if (state == Qt::Unchecked) {
+        for (int i = 0; i < m_index->size(); ++i)
+        {
+            m_index->at(i).removeParam("checked");
+        }
+    }
+    else {
+        return; // partial checked
+    }
+    emit dataChanged(index(0,0), index(m_index->size(), m_columns.size()), QVector<int>() << Qt::CheckStateRole);
+}
+
 bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
@@ -399,6 +450,16 @@ bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, i
             return false;
         QnAuditRecord record = value.value<QnAuditRecord>();
         m_index->at(index.row()) = record;
+        emit dataChanged(index, index, QVector<int>() << role);
+        return true;
+    }
+    else if (role == Qt::CheckStateRole)
+    {
+        if (value == Qt::Checked)
+            m_index->at(index.row()).addParam("checked", "1");
+        else
+            m_index->at(index.row()).removeParam("checked");
+        emit dataChanged(index, index, QVector<int>() << role);
         return true;
     }
     else {
@@ -406,6 +467,16 @@ bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, i
     }
 }
 
+QnAuditRecordList QnAuditLogModel::checkedRows()
+{
+    QnAuditRecordList result;
+    for (const auto& record: m_index->data())
+    {
+        if (record.extractParam("checked") == "1")
+            result.push_back(record);
+    }
+    return result;
+}
 
 QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const 
 {
@@ -418,6 +489,11 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
     const QnAuditRecord &record = m_index->at(index.row());
     
     switch(role) {
+    case Qt::CheckStateRole:
+        if (column == SelectRowColumn)
+            return record.extractParam("checked") == "1" ? Qt::Checked : Qt::Unchecked;
+        else
+            return QVariant();
     case Qt::DisplayRole:
         return QVariant(textData(column, record, index.row()));
     case Qn::AuditRecordDataRole:

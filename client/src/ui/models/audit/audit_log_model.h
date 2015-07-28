@@ -19,6 +19,7 @@ class QnAuditLogModel: public Customized<QAbstractItemModel>
     typedef Customized<QAbstractItemModel> base_type;
 public:
     enum Column {
+        SelectRowColumn,
         TimestampColumn,
         EndTimestampColumn,
         DurationColumn,
@@ -39,6 +40,7 @@ public:
     void setData(const QnAuditRecordList &data);
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     QnAuditRecordList data() const;
+    QnAuditRecordList checkedRows();
     
 
     QList<Column> columns() const;
@@ -57,6 +59,8 @@ public:
 
     QnAuditLogColors colors() const;
     void setColors(const QnAuditLogColors &colors);
+    void setCheckState(Qt::CheckState state);
+    Qt::CheckState checkState() const;
 public slots:
     void clear();
 private:

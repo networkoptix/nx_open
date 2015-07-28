@@ -12,6 +12,7 @@
 
 class QnAuditLogSessionModel;
 class QnAuditLogDetailModel;
+class QnCheckBoxedHeaderView;
 
 namespace Ui {
     class AuditLogDialog;
@@ -60,9 +61,11 @@ private slots:
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
+    void at_masterItemPressed(const QModelIndex& index);
     void at_ItemPressed(const QModelIndex& index);
     void at_ItemEntered(const QModelIndex& index);
     void at_eventsGrid_clicked(const QModelIndex& idx);
+    void at_headerCheckStateChanged(Qt::CheckState state);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     void requestFinished();
@@ -75,7 +78,7 @@ private:
      */
     void query(qint64 fromMsec, qint64 toMsec);
 
-    QnAuditRecordList filteredChildData(const QModelIndexList& selection);
+    QnAuditRecordList filteredChildData();
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 
@@ -90,6 +93,7 @@ private:
     QAction *m_selectAllAction;
     QAction *m_exportAction;
     QAction *m_clipboardAction;
+    QnCheckBoxedHeaderView* m_masterHeaders;
 };
 
 #endif // QN_AUDIT_LOG_DIALOG_H
