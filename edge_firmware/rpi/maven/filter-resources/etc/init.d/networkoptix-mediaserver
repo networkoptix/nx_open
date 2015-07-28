@@ -36,10 +36,12 @@ function process_core_dump {
     CORE=$CORE_ORIG.$TIME
     mv $CORE_ORIG $CORE 2>/dev/null
     if [ $? -eq 0 ]; then
-        REPORT=~/${MODULE_NAME}_$($BIN_PATH --version)_$TIME.gdb-bt
+        REPORT=${MODULE_NAME}_$($BIN_PATH --version)_$TIME.gdb-bt
 
         echo Generate crash report $REPORT...        BACKGROUND
-        gdb $BIN_PATH $CORE 2&>1 >$REPORT <<< "t apply all bt 25" &
+        gdb $BIN_PATH $CORE 2&>1 >/tmp/$REPORT <<< "t apply all bt 25" && \
+            mv /tmp/$REPORT ~/$REPORT &
+
         ls $CORE_ORIG.* | grep -v $CORE | xargs rm 2>/dev/null
     fi
 }
