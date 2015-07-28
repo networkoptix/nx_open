@@ -40,7 +40,7 @@ Expandable.MaskedSettingsPanel
             {
                 if (systemName.changed)
                 {
-                    if (systemName.text.length === 0)
+                    if (systemName.text.trim().length === 0)
                     {
                         errorDialog.message = errorTemplate.arg(qsTr("system name"));
                         errorDialog.show();
@@ -53,7 +53,7 @@ Expandable.MaskedSettingsPanel
                 }
                 if (password.changed)
                 {
-                    if (password.text.length === 0)
+                    if (password.text.trim().length === 0)
                     {
                         errorDialog.message = errorTemplate.arg(qsTr("password"));
                         errorDialog.show();
@@ -88,9 +88,13 @@ Expandable.MaskedSettingsPanel
                 {
                     id: systemName;
                     
+                    readonly property string kDifferentSystems: qsTr("<different systems>");
+
                     implicitWidth: implicitHeight * 6;
-                    initialText: (rtuContext.selection && rtuContext.selection !== null ?
-                        rtuContext.selection.systemName : "");
+
+                    clearOnInitValue: (rtuContext.selection.systemName.length === 0);
+                    initialText: (clearOnInitValue ?
+                        kDifferentSystems : rtuContext.selection.systemName);
                 }
 
                 Item
@@ -110,8 +114,13 @@ Expandable.MaskedSettingsPanel
                 {
                     id: password;
 
+                    readonly property string kDifferentPasswords: qsTr("<different passwords>");
+
                     implicitWidth: systemName.implicitWidth;
-                    initialText: rtuContext.selection.password;
+
+                    clearOnInitValue: (rtuContext.selection.password.length === 0);
+                    initialText: (clearOnInitValue ?
+                        kDifferentPasswords : rtuContext.selection.password);
                 }
             }
         }

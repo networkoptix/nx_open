@@ -72,7 +72,7 @@ namespace
         if (servers.empty())
             return QString();
         
-        static const QString kDifferentServerNames = "<different>";
+        static const QString kDifferentServerNames = QString();
 
         const auto &getter = [](const rtu::ServerInfo &info)
         {
@@ -88,7 +88,7 @@ namespace
         if (servers.empty())
             return QString();
 
-        static const QString kDifferentPasswords = QT_TR_NOOP("<Different passwords>");
+        static const QString kDifferentPasswords = QString();
         const auto &getter = [](const rtu::ServerInfo &info) -> QString
         {
             return (info.hasExtraInfo() ? info.extraInfo().password : QString()); 
