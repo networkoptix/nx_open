@@ -17,8 +17,6 @@ class QnAuditLogDetailModel: public QnAuditLogModel
 public:
     QnAuditLogDetailModel(QObject *parent = NULL): QnAuditLogModel(parent) {}
 
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
     virtual ~QnAuditLogDetailModel() {}
 };
 

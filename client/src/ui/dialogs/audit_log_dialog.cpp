@@ -21,8 +21,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/models/audit/audit_log_session_model.h>
-#include <ui/models/audit/audit_log_detail_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
@@ -34,6 +32,8 @@
 #include "ui/actions/actions.h"
 #include "utils/math/color_transformations.h"
 #include "camera_addition_dialog.h"
+#include <ui/models/audit/audit_log_session_model.h>
+#include <ui/models/audit/audit_log_detail_model.h>
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -94,6 +94,13 @@ void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionView
     }
     else if (column == QnAuditLogModel::PlayButtonColumn) 
     {
+        QVariant data = index.data(Qn::AuditRecordDataRole);
+        if (!data.canConvert<QnAuditRecord>())
+            return base_type::paint(painter, option, index);
+        QnAuditRecord record = data.value<QnAuditRecord>();
+        if (!record.isPlaybackType())
+            return base_type::paint(painter, option, index);
+
         QStyleOptionButton button;
         button.text = lit("Play this");
         if (option.state & QStyle::State_MouseOver)
@@ -118,15 +125,15 @@ void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionView
 
 // ---------------------- QnAuditLogDialog ------------------------------
 
-QnAuditRecordList QnAuditLogDialog::filteredChildData()
+QnAuditRecordList QnAuditLogDialog::filteredChildData(const QnAuditRecordList& checkedRows)
 {
     QSet<QnUuid> selectedSessions;
-    for (const auto& record: m_sessionModel->checkedRows()) 
+    for (const auto& record: checkedRows) 
         selectedSessions << record.sessionId;
 
     QnAuditRecordList result;
     auto filter = [&selectedSessions] (const QnAuditRecord& record) { 
-        return selectedSessions.contains(record.sessionId) && !record.isLoginType();
+        return selectedSessions.contains(record.sessionId); // && !record.isLoginType();
     };
     std::copy_if(m_allData.begin(), m_allData.end(), std::back_inserter(result), filter);
     return result;
@@ -143,6 +150,22 @@ QSize calcButtonSize(const QFont& font)
 
     QSize size2 = button->minimumSizeHint();
     return QSize(size2.width() - size1.width(), size2.height() - size1.height());
+}
+
+QList<QnAuditLogModel::Column> detailSessionColumns(bool masterMultiselected)
+{
+    QList<QnAuditLogModel::Column> columns;
+    columns << 
+        QnAuditLogModel::DateColumn <<
+        QnAuditLogModel::TimeColumn;
+    if (masterMultiselected)
+        columns << QnAuditLogModel::UserNameColumn << QnAuditLogModel::UserHostColumn;
+    columns <<
+        QnAuditLogModel::EventTypeColumn <<
+        QnAuditLogModel::DescriptionColumn <<
+        QnAuditLogModel::PlayButtonColumn;
+    
+    return columns;
 }
 
 QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
@@ -180,38 +203,22 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     m_masterHeaders->setSectionResizeMode(QHeaderView::ResizeToContents);
     m_masterHeaders->setSectionsClickable(true);
 
-    /*
-    connect
-    (
-        ui->gridMaster->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-        [this] (const QItemSelection &selected, const QItemSelection &deselected)
-        { 
-            m_detailModel->setData(filteredChildData(ui->gridMaster->selectionModel()->selectedIndexes()));
-            //ui->gridDetails->resizeColumnToContents();
-        }
-    );
-    */
     connect
         (
         m_sessionModel, &QAbstractItemModel::dataChanged, this,
         [this] (const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
     { 
-        if (roles.contains(Qt::CheckStateRole))
-            m_detailModel->setData(filteredChildData());
+        if (roles.contains(Qt::CheckStateRole)) {
+            QnAuditRecordList checkedRows = m_sessionModel->checkedRows();
+            m_detailModel->setData(filteredChildData(checkedRows));
+            m_detailModel->setColumns(detailSessionColumns(checkedRows.size() > 1));
+        }
     }
     );
 
     m_detailModel = new QnAuditLogDetailModel(this);
 
-    columns.clear();
-    columns << 
-        QnAuditLogModel::DateColumn <<
-        QnAuditLogModel::TimeColumn <<
-        QnAuditLogModel::EventTypeColumn <<
-        QnAuditLogModel::DescriptionColumn <<
-        QnAuditLogModel::PlayButtonColumn;
-
-    m_detailModel->setColumns(columns);
+    m_detailModel->setColumns(detailSessionColumns(false));
     ui->gridDetails->setModel(m_detailModel);
     QnAuditDetailItemDelegate* delegate = new QnAuditDetailItemDelegate(this);
     delegate->setButtonExtraSize(calcButtonSize(ui->gridMaster->font()));

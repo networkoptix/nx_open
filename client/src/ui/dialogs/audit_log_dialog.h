@@ -78,7 +78,7 @@ private:
      */
     void query(qint64 fromMsec, qint64 toMsec);
 
-    QnAuditRecordList filteredChildData();
+    QnAuditRecordList filteredChildData(const QnAuditRecordList& checkedRows);
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 
