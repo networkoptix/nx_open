@@ -54,7 +54,6 @@ public:
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    bool hasMotionUrl(const QModelIndex &index) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override  { return m_columns.size(); }
 
     QnAuditLogColors colors() const;
@@ -63,6 +62,8 @@ public:
     Qt::CheckState checkState() const;
 public slots:
     void clear();
+protected:
+    QnAuditRecord rawData(int row) const;
 private:
     class DataIndex;
 
@@ -73,7 +74,7 @@ private:
     QString formatDuration(int durationSecs) const;
     QString eventTypeToString(Qn::AuditRecordType recordType) const;
     QString eventDescriptionText(const QnAuditRecord& data) const;
-private:
+protected:
     DataIndex* m_index;
     QList<Column> m_columns;
     QnAuditLogColors m_colors;

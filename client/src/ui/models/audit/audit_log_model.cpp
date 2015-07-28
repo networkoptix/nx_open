@@ -206,7 +206,7 @@ QString QnAuditLogModel::formatDuration(int duration) const
         result += tr("%1d ").arg(days);
     if (hours > 0)
         result += tr("%1h ").arg(hours);
-    if (minutes > 0 && days == 0)
+    if ((minutes > 0 && days == 0) || result.isEmpty())
         result += tr("%1m ").arg(minutes);
     //if (seconds > 0 && days == 0 && hours == 0)
     //    result += tr("%1s ").arg(seconds);
@@ -326,13 +326,13 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord& data
         if (data.eventType == Qn::AR_Login)
             return formatDateTime(data.rangeEndSec, true, true);
         else if(data.eventType == Qn::AR_UnauthorizedLogin)
-            return tr("Unsuccessful login");
+            return eventTypeToString(data.eventType);
         break;
     case DurationColumn:
         if (data.rangeEndSec)
             return formatDuration(data.rangeEndSec - data.rangeStartSec);
         else
-            return QString();
+            return formatDuration(0);
     case UserNameColumn:
         return data.userName;
     case UserHostColumn:
@@ -476,6 +476,11 @@ QnAuditRecordList QnAuditLogModel::checkedRows()
             result.push_back(record);
     }
     return result;
+}
+
+QnAuditRecord QnAuditLogModel::rawData(int row) const
+{
+    return m_index->at(row);
 }
 
 QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const 

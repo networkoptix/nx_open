@@ -16,7 +16,7 @@ class QnAuditLogSessionModel: public QnAuditLogModel
 
 public:
     QnAuditLogSessionModel(QObject *parent = NULL): QnAuditLogModel(parent) {}
-
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     virtual ~QnAuditLogSessionModel() {}
 };
 

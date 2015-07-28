@@ -98,7 +98,7 @@ public:
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side
-    bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0);
+    bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, bool* authInProgress = 0);
     //!Authenticates request on client side
     /*!
         Usage:\n
@@ -136,10 +136,10 @@ private:
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce);
     bool isCookieNonceValid(const QByteArray& nonce);
-    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
+    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, bool* authInProgress, char delimiter, 
                       std::function<bool(const QByteArray&)> checkNonceFunc);
     bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
-    bool doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
+    bool doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId, bool* authInProgress);
 
     mutable QMutex m_mutex;
     static QnAuthHelper* m_instance;
