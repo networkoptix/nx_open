@@ -58,15 +58,16 @@ public:
         \return Synchronized absolute local time (usec) corresponding to frame generation
     */
     ts_type getTimestamp( pts_type pts );
+    //!Resets timestamp calculation to supplied values
     /*!
         \a localTimeOnSource Usec. Absolute time on source corresponding to \a pts
+        \note \a pts MUST be close to current pts generator value. I.e., difference between \a pts and 
+            next pts reported to \a PtsToClockMapper::getTimestamp MUST not overflow
     */
     void updateTimeMapping( pts_type pts, int64_t localTimeOnSourceUSec );
     pts_type ptsDeltaInCaseOfDiscontinuity() const;
 
 private:
-    //void resyncTime( int32_t pts, int64_t absoluteSourceTimeUsec );
-
     const int64_t m_ptsFrequency;
     const size_t m_ptsBits;
     const pts_type m_ptsMask;
@@ -76,12 +77,10 @@ private:
     TimeSynchronizationData* const m_timeSynchro;
     const int m_sourceID;
     pts_type m_prevPts;
-    pts_type m_ptsBase;
     ts_type m_baseClock;
     ts_type m_baseClockOnSource;
     size_t m_sharedSynchroModificationSequence;
     bool m_prevPtsValid;
-    ts_type m_prevTimestamp;
     pts_type m_correction;
 
     pts_type absDiff(

@@ -64,9 +64,12 @@ TEST( PtsToClockMapper, general )
         pts_type prevEffectivePts = 0;
         pts_type ptsDelta = 0;
 
+        ptsToClockMapper.updateTimeMapping( MIN_PTS, rand() );
+
         //for( pts_type pts = MIN_PTS; pts < MAX_PTS; pts += STEP_VALUE )
         for( int i = 0; i < STEPS; ++i )
         {
+
             auto effectivePts = pts;
 
             bool nonMonotonic = false;
@@ -100,13 +103,18 @@ TEST( PtsToClockMapper, general )
             std::cout<<std::endl;
     #endif
 
-            auto timestamp = ptsToClockMapper.getTimestamp( effectivePts & PTS_MASK );
+            const auto timestamp = ptsToClockMapper.getTimestamp( effectivePts & PTS_MASK );
             if( firstTimestamp == -1 )
                 firstTimestamp = timestamp;
             const auto tsDiff = timestamp - firstTimestamp;
             //const auto ptsDiff = effectivePts - MIN_PTS;
             const auto ptsDiff = ptsDelta - (pts - effectivePts);
             ASSERT_EQ( tsDiff, ptsDiff * PTS_FREQUENCY );
+
+#if 1
+            if( rand() % 50 == 0 )
+                ptsToClockMapper.updateTimeMapping( effectivePts & PTS_MASK, timestamp );
+#endif
 
             prevEffectivePts = effectivePts;
             pts += STEP_VALUE;
