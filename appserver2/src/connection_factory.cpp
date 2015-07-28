@@ -353,7 +353,8 @@ namespace ec2
 
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
-        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
+        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest(
+            loginInfo.login, addr.password(), QnAuthHelper::REALM );
         loginInfo.clientInfo = clientInfo;
 
         {
@@ -588,7 +589,8 @@ namespace ec2
 
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
-        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
+        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest(
+            loginInfo.login, addr.password(), QnAuthHelper::REALM );
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
         m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(
