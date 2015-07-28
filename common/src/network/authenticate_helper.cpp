@@ -1,8 +1,9 @@
 
 #include "authenticate_helper.h"
 
-#include <utils/common/uuid.h>
 #include <QtCore/QCryptographicHash>
+
+#include <utils/common/uuid.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -15,8 +16,6 @@
 #include "core/resource/media_server_resource.h"
 #include "http/custom_headers.h"
 
-
-static const QString COOKIE_DIGEST_AUTH(lit("Authorization=Digest"));
 
 ////////////////////////////////////////////////////////////
 //// class QnAuthMethodRestrictionList
@@ -69,9 +68,12 @@ QnAuthHelper* QnAuthHelper::m_instance;
 
 static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
 static const qint64 COOKIE_EXPERATION_PERIOD = 3600;
+static const QString COOKIE_DIGEST_AUTH( lit( "Authorization=Digest" ) );
+static const QString TEMP_AUTH_KEY_NAME = lit( "authKey" );
 
 // TODO: #2.4 replace with customization value
 const QString QnAuthHelper::REALM(lit("NetworkOptix"));
+const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 * 1000;
 
 QnAuthHelper::QnAuthHelper()
 {
@@ -102,9 +104,24 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     if (authUserId)
         *authUserId = QnUuid();
 
+    const QUrlQuery urlQuery( request.requestLine.url.query() );
+
     const unsigned int allowedAuthMethods = m_authMethodRestrictionList.getAllowedAuthMethods( request );
     if( allowedAuthMethods == 0 )
         return false;   //NOTE assert?
+
+    {
+        QMutexLocker lk( &m_mutex );
+        if( urlQuery.hasQueryItem( TEMP_AUTH_KEY_NAME ) )
+        {
+            auto it = m_authenticatedPaths.find( urlQuery.queryItemValue( TEMP_AUTH_KEY_NAME ) );
+            if( it != m_authenticatedPaths.end() &&
+                it->second.path == request.requestLine.url.path() )
+            {
+                return true;
+            }
+        }
+    }
 
     if( allowedAuthMethods & AuthMethod::noAuth )
         return true;
@@ -118,7 +135,6 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
 
     if( allowedAuthMethods & AuthMethod::urlQueryParam )
     {
-        QUrlQuery urlQuery( request.requestLine.url.query() );
         const QByteArray& urlQueryParam = urlQuery.queryItemValue( isProxy ? lit("proxy_auth") : lit("auth") ).toLatin1();
         if( !urlQueryParam.isEmpty() )
         {
@@ -262,6 +278,37 @@ bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest 
 QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()
 {
     return &m_authMethodRestrictionList;
+}
+
+QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath( const QString& path, unsigned int periodMillis )
+{
+    QString authKey = QnUuid::createUuid().toString();
+    if( authKey.isEmpty() )
+        return QPair<QString, QString>();   //bad guid, failure
+    authKey.replace( lit( "{" ), QString() );
+    authKey.replace( lit("}"), QString() );
+
+    //disabling authentication
+    QMutexLocker lk( &m_mutex );
+
+    //adding active period
+    TimerManager::TimerGuard timerGuard(
+        TimerManager::instance()->addTimer(
+            std::bind(&QnAuthHelper::authenticationExpired, this, authKey, std::placeholders::_1),
+            std::min(periodMillis, MAX_AUTHENTICATION_KEY_LIFE_TIME_MS ) ) );
+
+    TempAuthenticationKeyCtx ctx;
+    ctx.timeGuard = std::move( timerGuard );
+    ctx.path = path;
+    m_authenticatedPaths.emplace( authKey, std::move( ctx ) );
+
+    return QPair<QString, QString>( TEMP_AUTH_KEY_NAME, authKey );
+}
+
+void QnAuthHelper::authenticationExpired( const QString& authKey, quint64 /*timerID*/ )
+{
+    QMutexLocker lk( &m_mutex );
+    m_authenticatedPaths.erase( authKey );
 }
 
 QByteArray QnAuthHelper::createUserPasswordDigest( const QString& userName, const QString& password )
