@@ -3,6 +3,7 @@
 
 #include <map>
 
+#include <QAuthenticator>
 #include <QtCore/QMap>
 #include <QElapsedTimer>
 #include <QCache>
