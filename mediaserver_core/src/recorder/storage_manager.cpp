@@ -34,6 +34,7 @@
 #include "utils/serialization/lexical_enum.h"
 
 #include <chrono>
+#include <memory>
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
@@ -945,13 +946,9 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
                     storage->getFileList(
                         entry.absoluteFilePath()
                     );
-                if (!dirFileList.isEmpty())
-                {
-                    if (!recursiveRemover(dirFileList))
-                        return false;
-                    else
-                        storage->removeDir(entry.absoluteFilePath());
-                }
+                if (!dirFileList.isEmpty() && !recursiveRemover(dirFileList))
+                    return false;
+                storage->removeDir(entry.absoluteFilePath());
             }
             else
                 return false;
