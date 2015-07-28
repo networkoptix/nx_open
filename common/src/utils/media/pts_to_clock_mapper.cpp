@@ -102,7 +102,7 @@ PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )
 #endif
     }
 
-    const pts_type ptsDelta = (pts - m_prevPts) & m_ptsMask;
+    pts_type ptsDelta = (pts - m_prevPts) & m_ptsMask;
 
     //calculating abs diff of pts and m_prevPts
     if( absDiff( pts, m_prevPts ) > m_maxPtsDrift )
@@ -110,27 +110,26 @@ PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )
 #ifdef DEBUG_OUTPUT
         std::cout<<"stream "<<m_sourceID<<". discontinuity found"<<std::endl;
 #endif
-        //pts discontinuity
+        //pts discontinuity. Considering as if pts grows by m_ptsDeltaInCaseOfDiscontinuity
         NX_LOG( lit("Stream %1. Pts discontinuity (current %2, prev %3)").arg(m_sourceID).arg(pts).arg(m_prevPts), cl_logWARNING );
         const pts_type localCorrection = (m_ptsBase + ptsDelta - m_ptsDeltaInCaseOfDiscontinuity) & m_ptsMask;
         recalcPtsCorrection( localCorrection, &pts );
+        m_prevPts = (pts - m_ptsDeltaInCaseOfDiscontinuity) & m_ptsMask;
+        ptsDelta = (pts - m_prevPts) & m_ptsMask;
     }
-    else
-    {
-        //no discontinuity
-        //checking for overflow
-        if( (ptsDelta < m_maxPtsDrift) && (pts < m_prevPts) )
-        {
-            //pts overflow
-            ++m_ptsOverflowCount;
-        }
 
-        if( (ptsDelta > (m_ptsMask >> 1))   //ptsDelta is negative
-            && (pts > m_prevPts) )          //overflow between pts and m_prevPts
-        {
-            //pts underflow
-            --m_ptsOverflowCount;
-        }
+    //checking for overflow
+    if( (ptsDelta < m_maxPtsDrift) && (pts < m_prevPts) )
+    {
+        //pts overflow
+        ++m_ptsOverflowCount;
+    }
+
+    if( (ptsDelta > (m_ptsMask >> 1))   //ptsDelta is negative
+        && (pts > m_prevPts) )          //overflow between pts and m_prevPts
+    {
+        //pts underflow
+        --m_ptsOverflowCount;
     }
 
     m_prevPts = pts;
