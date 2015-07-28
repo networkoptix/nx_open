@@ -52,7 +52,7 @@ private:
 };
 
 void* MessageSerializer::MessageSerializerBuffer::Poke( std::size_t size ) {
-    if( size + buffer_->size() > buffer_->capacity() ) 
+    if( static_cast<int>(size) + buffer_->size() > buffer_->capacity() )
         return NULL;
     else {
         void* ret = buffer_->data() + buffer_->size();
@@ -168,17 +168,20 @@ nx_api::SerializerState::Type MessageSerializer::serializeHeader( MessageSeriali
 }
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer , const attr::Attribute* attribute  , std::uint16_t** value_pos ) {
-    if( attribute->type == attr::AttributeType::unknownAttribute ) {
+    if( attribute->type() == attr::AttributeType::unknownAttribute ) {
         const UnknownAttribute* ua = static_cast<const UnknownAttribute*>(attribute);
         if( buffer->WriteUint16(static_cast<std::uint16_t>(ua->user_type)) == NULL ) {
             return nx_api::SerializerState::needMoreBufferSpace;
         }
     } else {
-        if( buffer->WriteUint16(static_cast<std::uint16_t>(attribute->type)) == NULL ) {
+        if( buffer->WriteUint16(static_cast<std::uint16_t>(attribute->type())) == NULL ) {
             return nx_api::SerializerState::needMoreBufferSpace;
         }
     }
-    *value_pos = reinterpret_cast<std::uint16_t*>(buffer->WriteUint16(static_cast<std::uint16_t>(attribute->length)));
+
+    // NOTE: actual attribute lenght gets rewrited in /fn serializeAttributes
+    // TODO: refactor to get rig of this dummy place holder
+    *value_pos = reinterpret_cast<std::uint16_t*>(buffer->WriteUint16(0));
     if( *value_pos == NULL ) {
         return nx_api::SerializerState::needMoreBufferSpace;
     }
@@ -186,7 +189,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength
 }
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( MessageSerializerBuffer* buffer ,const attr::Attribute* attribute , std::size_t* value ) {
-    switch( attribute->type ) {
+    switch( attribute->type() ) {
     case AttributeType::errorCode:
         return serializeAttributeValue_ErrorCode( buffer , *static_cast<const ErrorDescription*>(attribute) ,value);
     case AttributeType::fingerprint:
@@ -369,12 +372,9 @@ bool MessageSerializer::checkMessageIntegratiy() {
         // Checking the error code message
         ErrorDescription* error_code = static_cast<ErrorDescription*>(
             ib->second.get());
-        if( error_code->_class <3 || error_code->_class >6 )
+        if( error_code->getClass() < 3 || error_code->getClass() > 6 )
             return false;
-        if( error_code->code < 300 || error_code->code >= 700 )
-            return false;
-        // class code should match the hundreds of full error code
-        if( error_code->_class != (error_code->code/100) )
+        if( error_code->getNumber() < 0 || error_code->getNumber() >= 99 )
             return false;
         // RFC: The reason phrase string will at most be 127 characters
         if( error_code->reasonPhrase.size() > 127 )

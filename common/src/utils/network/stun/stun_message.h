@@ -13,6 +13,8 @@
 #include <vector>
 #include <array>
 
+#include <utils/common/cpp14.h>
+
 //!Implementation of STUN protocol (rfc5389)
 namespace nx_stun
 {
@@ -33,6 +35,7 @@ namespace nx_stun
     {
         static const std::size_t TRANSACTION_ID_LENGTH = 12;
         char bytes[TRANSACTION_ID_LENGTH];
+
         // Using union to pack struct is behavior undefined
         // here, since we cannot rely on 1) layout of structure,
         // 2) alignment cross complier. Default behavior is 
@@ -47,6 +50,10 @@ namespace nx_stun
         void set( std::uint32_t high , std::uint64_t low ) {
             memcpy(bytes,&low,sizeof(low));
             memcpy(bytes+sizeof(low),&high,sizeof(high));
+        }
+
+        TransactionID( std::uint32_t high = 0, std::uint64_t low = 0 ) {
+            set( high, low );
         }
     };
 
@@ -71,17 +78,11 @@ namespace nx_stun
     public:
         MessageClass messageClass;
         int method;
-        int messageLength;
         TransactionID transactionID;
 
-        Header()
-        :
-            messageClass( MessageClass::request ),
-            method( 0 ),
-            messageLength( 0 ),
-            transactionID()
-        {
-        }
+        Header( MessageClass messageClass_ = MessageClass::request,
+                int method_ = 0,
+                TransactionID transactionID_ = TransactionID() );
     };
 
     namespace ErrorCode
@@ -122,8 +123,8 @@ namespace nx_stun
         class Attribute
         {
         public:
-            AttributeType type;
-            int length;
+            virtual ~Attribute() {}
+            virtual AttributeType type() const = 0;
         };
 
         /*!
@@ -134,23 +135,33 @@ namespace nx_stun
             public Attribute
         {
         public:
+            virtual AttributeType type() const override
+            { return AttributeType::xorMappedAddress; }
+
             enum {
                 IPV4 = 1,
                 IPV6
             };
             int family;
             int port;
+
+            union Ipv6
+            {
+                struct {
+                    uint64_t hi;
+                    uint64_t lo;
+                } numeric;
+                uint16_t array[8];
+            };
             union
             {
                 uint32_t ipv4;
-                union {
-                    struct {
-                        uint64_t hi;
-                        uint64_t lo;
-                    } numeric;
-                    uint16_t array[8];
-                } ipv6;
+                Ipv6 ipv6;
             } address;  //!< address in host byte order
+
+            XorMappedAddress();
+            XorMappedAddress( int port_, uint32_t ipv4_ );
+            XorMappedAddress( int port_, Ipv6 ipv6_ );
         };
 
         //!ERROR-CODE attribute [rfc5389, 15.6]
@@ -159,12 +170,18 @@ namespace nx_stun
             public Attribute
         {
         public:
-            //!contains hundreds of \a code
-            int _class;
-            //!This value is full error code (not modulo 100)
+            virtual AttributeType type() const override
+            { return AttributeType::errorCode; }
+
+            ErrorDescription( int code_, std::string phrase = std::string() );
+
+            //!This value is full error code
             int code;
             //!utf8 string, limited to 127 characters
             std::string reasonPhrase;
+
+            inline int getClass() { return code / 100; }
+            inline int getNumber() { return code % 100; }
         };
 
         class FingerPrint
@@ -172,6 +189,11 @@ namespace nx_stun
             public Attribute
         {
         public:
+            virtual AttributeType type() const override
+            { return AttributeType::fingerprint; }
+
+            FingerPrint( uint32_t crc32_ );
+
             uint32_t crc32;
         };
 
@@ -181,14 +203,26 @@ namespace nx_stun
             public Attribute
         {
         public:
+            virtual AttributeType type() const override
+            { return AttributeType::messageIntegrity; }
+
             static const int SHA1_HASH_SIZE = 20;
             // for me to avoid raw loop when doing copy.
             std::array<uint8_t,SHA1_HASH_SIZE> hmac;
         };
 
-        struct UnknownAttribute : public Attribute {
-            nx::Buffer value;
+        class UnknownAttribute
+        :
+            public Attribute
+        {
+        public:
+            virtual AttributeType type() const override
+            { return AttributeType::unknownAttribute; }
+
+            UnknownAttribute( int user_type_, nx::Buffer value_ );
+
             int user_type;
+            nx::Buffer value;
         };
 
         class UnknownAttributes
@@ -202,11 +236,6 @@ namespace nx_stun
         bool parse( const UnknownAttribute& unknownAttr, StringAttributeType* val );
         bool serialize( UnknownAttribute* unknownAttr, const StringAttributeType& val , int user_type );
     }
-
-} // namespace nx_stun
-
-
-namespace nx_stun {
 
     // A specialized hash class for C++11 since it doesn't comes with built-in enum hash
     // function. Not a specialized template for hash class in namespace std .
@@ -223,17 +252,19 @@ namespace nx_stun {
         Header header;
         typedef std::unordered_multimap<attr::AttributeType, std::unique_ptr<attr::Attribute> , StunHash<attr::AttributeType> > AttributesMap;
         AttributesMap attributes;
-        Message( Message&& message ) :
-            header( std::move(message.header) ),
-            attributes( std::move(message.attributes) ) {}
-        Message& operator = ( Message&& message ) {
-            if( this == &message ) return *this;
-            attributes = std::move(message.attributes);
-            header = message.header;
-            return *this;
-        }
-        Message(){}
-        ~Message(){}
+
+        explicit Message( Header header = Header() );
+
+        Message( Message&& message );
+        Message& operator = ( Message&& message );
+
+        // TODO: Uncomment when variadic templates are supported
+        //
+        // template< typename T, typename ... Args >
+        // void addAttribute(Args ... args)
+        // { addAttribute( std::make_unique< T >( args ) ); }
+
+        void addAttribute( std::unique_ptr<attr::Attribute>&& attribute );
         void clear();
 
     private:

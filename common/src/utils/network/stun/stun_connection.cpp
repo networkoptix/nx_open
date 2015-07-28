@@ -225,7 +225,7 @@ namespace nx_stun
 
     bool StunClientConnection::hasErrorAttribute( const nx_stun::Message& msg ) {
         for( auto& attr : msg.attributes ) {
-            if(attr.second->type == nx_stun::attr::AttributeType::errorCode )
+            if( attr.second->type() == nx_stun::attr::AttributeType::errorCode )
                 return true;
         }
         return false;

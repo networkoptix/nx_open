@@ -53,7 +53,7 @@ void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& reques
 
     for( const nx_stun::Message::AttributesMap::value_type& attr: request.attributes )
     {
-        if(attr.second->type != nx_stun::attr::AttributeType::unknownAttribute ) {
+        if( attr.second->type() != nx_stun::attr::AttributeType::unknownAttribute ) {
             sendErrorReply( request.header.transactionID , nx_stun::ErrorCode::badRequest );
             return;
         }
@@ -115,20 +115,16 @@ void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& reques
 }
 
 void StunServerConnection::sendSuccessReply( const nx_stun::TransactionID& transaction_id ) {
-    nx_stun::Message message;
-    message.header.messageClass = nx_stun::MessageClass::successResponse;
-    message.header.method = static_cast<int>(nx_stun::MethodType::binding);
-    message.header.transactionID = transaction_id;
+    nx_stun::Message message( nx_stun::Header(
+        nx_stun::MessageClass::successResponse,
+        static_cast<int>(nx_stun::MethodType::binding), transaction_id ) );
+
     std::unique_ptr<nx_stun::attr::XorMappedAddress> addr( new nx_stun::attr::XorMappedAddress() );
-    addr->type = nx_stun::attr::AttributeType::xorMappedAddress;
     addr->family = nx_stun::attr::XorMappedAddress::IPV4;
     SocketAddress peer_addr( peer_address_ );
     addr->address.ipv4 = peer_addr.address.ipv4(); // The endian is in host order 
     addr->port = peer_addr.port;
-    message.attributes.insert(
-        std::make_pair(addr->type,
-        std::unique_ptr<nx_stun::attr::Attribute>(addr.get())));
-    addr.release();
+    message.addAttribute( std::move( addr ) );
 
     bool ret = sendMessage(std::move(message),
         std::bind(
@@ -150,16 +146,15 @@ void StunServerConnection::processProprietaryRequest( nx_stun::Message&& request
 void StunServerConnection::sendErrorReply( const nx_stun::TransactionID& transaction_id , nx_stun::ErrorCode::Type errorCode )
 {
     // Currently for the reason phase, we just put empty string there
-    nx_stun::Message message;
-    message.header.messageClass = nx_stun::MessageClass::errorResponse;
-    message.header.method = nx_hpm::StunMethods::listen;
-    message.header.transactionID = transaction_id;
+    nx_stun::Message message( nx_stun::Header(
+        nx_stun::MessageClass::errorResponse,
+        nx_hpm::StunMethods::listen, transaction_id ));
+
     std::unique_ptr<nx_stun::attr::ErrorDescription> error_code( new nx_stun::attr::ErrorDescription() );
-    error_code->type = nx_stun::attr::AttributeType::errorCode;
     error_code->_class= errorCode / 100;
     error_code->code = errorCode;
-    message.attributes.insert(std::make_pair(error_code->type,
-        std::unique_ptr<nx_stun::attr::Attribute>(error_code.release())));
+    message.addAttribute( std::move( error_code ) );
+
     bool ret = sendMessage(std::move(message),
         std::bind(
         &StunServerConnection::onSendComplete,

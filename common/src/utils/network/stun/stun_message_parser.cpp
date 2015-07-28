@@ -52,8 +52,8 @@ bool MessageParser::MessageParserBuffer::Ensure( std::size_t byte_size , void* b
     if( available_bytes < byte_size ) {
         // Drain the user buffer here
         if( temp_buffer_ != NULL ) {
-            for( std::size_t i = position_ ; i < buffer_.size() ; ++i )
-                temp_buffer_->push_back(buffer_.at(static_cast<int>(i)));
+            for( int i = position_ ; i < buffer_.size() ; ++i )
+                temp_buffer_->push_back(buffer_.at(i));
             // Modify the position pointer here 
             position_ = buffer_.size();
         }
@@ -122,8 +122,6 @@ Attribute* MessageParser::parseXORMappedAddress() {
 
     // Parsing the family 
     std::unique_ptr<XorMappedAddress> attribute( new XorMappedAddress() );
-    attribute->length = attribute_.length;
-    attribute->type = AttributeType::xorMappedAddress;
     std::uint16_t family = buffer.NextUint16(&ok);
     Q_ASSERT(ok);
     // We only need the lower part of the word.
@@ -177,74 +175,68 @@ Attribute* MessageParser::parseErrorCode() {
     Q_ASSERT(ok);
     // The first 21 bits is for reservation, but the RFC says it SHOULD be zero, so ignore it.
     std::bitset<16> value(val & 0x0000ffff);
+
     // First comes 3 bits class
-    std::unique_ptr<ErrorDescription> attribute( new ErrorDescription() );
-    attribute->length = attribute_.length;
-    attribute->type = AttributeType::errorCode;
-    attribute->_class =0;
-    attribute->_class |= static_cast<int>( value[8] );
-    attribute->_class |= static_cast<int>( value[9] ) << 1;
-    attribute->_class |= static_cast<int>( value[10]) << 2;
+    int _class = 0;
+    _class |= static_cast<int>( value[8] );
+    _class |= static_cast<int>( value[9] ) << 1;
+    _class |= static_cast<int>( value[10]) << 2;
     // Checking the class value for the attribute _class 
-    if( attribute->_class < 3 || attribute->_class > 6 ) 
+    if( _class < 3 || _class > 6 )
         return NULL;
     // Get the least significant byte from the 32 bits dword
     // but the code must not be the value that is the modular, so we need
     // to compute the class and add it to the code as well
-    attribute->code = (val & 0x000000ff);
-    if( attribute->code < 0 && attribute->code >= 100 ) 
+    int number = (val & 0x000000ff);
+    if( number < 0 && number >= 100 )
         return NULL;
-    attribute->code+= attribute->_class*100;
+    int code = _class * 100 + number;
+
     // Parsing the UTF encoded error string 
     std::size_t phrase_length = attribute_.value.size() - 4;
+    std::string phrase;
     if( phrase_length > 0 ) {
         QByteArray utf8_byte_array( attribute_.value.constData() + 4 , static_cast<int>(phrase_length) );
-        attribute->reasonPhrase = QString::fromUtf8(utf8_byte_array).toStdString();
+        phrase = QString::fromUtf8(utf8_byte_array).toStdString();
         // The RFC says that the decoded UTF8 string should only contain less than 127 characters
-        if( attribute->reasonPhrase.size() >127 ) {
+        if( phrase.size() > 127 ) {
             return NULL;
         }
     }
-    return attribute.release();
+
+    return new ErrorDescription( code, phrase );
 }
 
 Attribute* MessageParser::parseFingerprint() {
     if( attribute_.value.size() != 4 )
         return NULL;
+
     MessageParserBuffer buffer(attribute_.value);
     bool ok;
-    // We don't do any validation for the message, we just fetch the CRC 32 bits out of the packet
-    std::unique_ptr<FingerPrint> attribute( new FingerPrint() );
-    attribute->length = attribute_.length;
-    attribute->type = AttributeType::fingerprint;
     std::uint32_t xor_crc_32 = buffer.NextUint32(&ok);
     Q_ASSERT(ok);
+
     // XOR back the value that we get from our CRC32 value
-    attribute->crc32 = 
+    uint32_t crc32 =
       ((xor_crc_32 & 0x000000ff) ^ STUN_FINGERPRINT_XORMASK[0]) |
       ((xor_crc_32 & 0x0000ff00) ^ STUN_FINGERPRINT_XORMASK[1]) |
       ((xor_crc_32 & 0x00ff0000) ^ STUN_FINGERPRINT_XORMASK[2]) |
       ((xor_crc_32 & 0xff000000) ^ STUN_FINGERPRINT_XORMASK[3]);
-    return attribute.release();
+
+    // We don't do any validation for the message, we just fetch the CRC 32 bits out of the packet
+    return new FingerPrint( crc32 );
 }
 
 Attribute* MessageParser::parseMessageIntegrity() {
     if( attribute_.value.size() != MessageIntegrity::SHA1_HASH_SIZE )
         return NULL;
     std::unique_ptr<MessageIntegrity> attribute( new MessageIntegrity() );
-    attribute->length = attribute_.length;
-    attribute->type = AttributeType::messageIntegrity;
     qCopy( attribute_.value.begin() , attribute_.value.end() , attribute->hmac.begin() );
     return attribute.release();
 }
 
 Attribute* MessageParser::parseUnknownAttribute() {
-    std::unique_ptr< UnknownAttribute > attribute( new UnknownAttribute() );
-    attribute->length = attribute_.length;
-    attribute->type = AttributeType::unknownAttribute;
-    attribute->user_type = attribute_.type;
-    attribute->value = attribute_.value;
-    return attribute.release();
+    return new UnknownAttribute( attribute_.type, attribute_.value );
 }
 
 Attribute* MessageParser::parseValue() {
@@ -348,7 +340,6 @@ int MessageParser::parseHeaderTransactionID( MessageParserBuffer& buffer ) {
     left_message_length_ = header_.message_length;
     // Populate the header
     output_message_->header.messageClass = static_cast<MessageClass>(header_.message_class);
-    output_message_->header.messageLength= static_cast<int>(header_.message_length);
     output_message_->header.method = static_cast<int>(header_.message_method);
     output_message_->header.transactionID = header_.transaction_id;
 
@@ -415,8 +406,8 @@ int MessageParser::parseAttributeValue( MessageParserBuffer& buffer ) {
     if( ret != SECTION_FINISH ) return ret;
     Attribute* attr = parseValue();
     if( attr == NULL ) return FAILED;
-    output_message_->attributes.emplace( attr->type , std::unique_ptr<Attribute>(attr) );
-    switch( attr->type ) {
+    output_message_->attributes.emplace( attr->type(), std::unique_ptr<Attribute>(attr) );
+    switch( attr->type() ) {
     case AttributeType::fingerprint:
         state_ = END_FINGERPRINT;
         break;
