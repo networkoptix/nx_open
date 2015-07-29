@@ -64,7 +64,7 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
 }
 */
 
-QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
+QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
 {
     static QList<QnInterfaceAndAddr> lastResult;
     static QElapsedTimer timer;
@@ -78,11 +78,10 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
     }
 
     QList<QnInterfaceAndAddr> result;
-
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface: interfaces)
     {
-        if (!(iface.flags() & QNetworkInterface::IsUp))
+        if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
             continue;
 
 #if defined(Q_OS_LINUX) && defined(__arm__)
@@ -91,10 +90,14 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
             continue;
 #endif
 
+        bool addInterfaceAnyway = allowItfWithoutAddress;
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address: addresses)
         {
-            if (address.ip().protocol() == QAbstractSocket::IPv4Protocol && address.ip() != QHostAddress::LocalHost)
+            const bool isLocalHost = (address.ip() == QHostAddress::LocalHost);
+            const bool isIpV4 = (address.ip().protocol() == QAbstractSocket::IPv4Protocol);
+
+            if (isIpV4 && !isLocalHost)
             {
                 static bool allowedInterfaceReady = false;
                 static QList<QHostAddress> allowedInterfaces;
@@ -130,10 +133,14 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
                     result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
+                    addInterfaceAnyway = false;
                     break;
                 }
             }
         }
+
+        if (addInterfaceAnyway)
+            result.append(QnInterfaceAndAddr(iface.name(), QHostAddress(), QHostAddress(), iface));
     }
 
     QMutexLocker lock(&mutex);
