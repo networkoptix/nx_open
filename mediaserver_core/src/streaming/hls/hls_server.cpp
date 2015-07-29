@@ -17,6 +17,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_resource.h>
 
+#include <network/authenticate_helper.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>
@@ -61,7 +62,6 @@ namespace nx_hls
         m_useChunkedTransfer( false ),
         m_bytesSent( 0 )
     {
-        m_readBuffer.reserve( READ_BUFFER_SIZE );
         setObjectName( "QnHttpLiveStreamingProcessor" );
     }
 
@@ -85,13 +85,24 @@ namespace nx_hls
 
     void QnHttpLiveStreamingProcessor::run()
     {
+        Q_D( QnTCPConnectionProcessor );
+
         while( !needToStop() )
         {
             switch( m_state )
             {
                 case sReceiving:
-                    if( !receiveRequest() )
+                    if( !readSingleRequest() )
+                    {
+                        NX_LOG( lit( "Error reading/parsing request from %1 (%2). Terminating connection..." ).
+                            arg( remoteHostAddress().toString() ), cl_logWARNING );
                         m_state = sDone;
+                        break;
+                    }
+
+                    m_state = sProcessingMessage;
+                    m_useChunkedTransfer = false;
+                    processRequest( d->request );
                     break;
 
                 case sProcessingMessage:
@@ -142,72 +153,6 @@ namespace nx_hls
                         arg(remoteHostAddress().toString()).arg(m_bytesSent), cl_logDEBUG1 );
                     return;
             }
-        }
-    }
-
-    bool QnHttpLiveStreamingProcessor::receiveRequest()
-    {
-        Q_D(QnTCPConnectionProcessor);
-        if( !d->clientRequest.isEmpty() )
-            m_readBuffer = std::move(d->clientRequest);
-
-        if( m_readBuffer.isEmpty() )
-        {
-            m_readBuffer.resize( READ_BUFFER_SIZE );
-            int bytesRead = readSocket( (quint8*)m_readBuffer.data(), m_readBuffer.size() );
-            if( bytesRead < 0 )
-            {
-                NX_LOG( QString::fromLatin1("Error reading socket from %1 (%2). Terminating connection...").
-                    arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
-                return false;
-            }
-            if( bytesRead == 0 )
-            {
-                NX_LOG( QString::fromLatin1("Client %1 closed connection").arg(remoteHostAddress().toString()), cl_logINFO );
-                return false; 
-            }
-            m_readBuffer.resize( bytesRead );
-        }
-
-        size_t bytesProcessed = 0;
-        if( !m_httpStreamReader.parseBytes( m_readBuffer, m_readBuffer.size(), &bytesProcessed ) )
-        {
-            NX_LOG( QString::fromLatin1("Error parsing http message from %1 (%2). Terminating connection...").
-                arg(remoteHostAddress().toString()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
-            return false;
-        }
-        m_readBuffer.remove( 0, bytesProcessed );
-
-        switch( m_httpStreamReader.state() )
-        {
-            case HttpStreamReader::readingMessageHeaders:
-                //continuing reading
-                return true;
-
-            case HttpStreamReader::messageDone:
-            case HttpStreamReader::pullingLineEndingBeforeMessageBody:
-            case HttpStreamReader::readingMessageBody:
-            case HttpStreamReader::waitingMessageStart:
-                if( m_httpStreamReader.message().type != MessageType::request )
-                {
-                    NX_LOG( QString::fromLatin1("Received %1 from %2 while expecting request. Terminating connection...").
-                        arg(MessageType::toString(m_httpStreamReader.message().type)).arg(remoteHostAddress().toString()), cl_logWARNING );
-                    return false;
-                }
-                m_state = sProcessingMessage;
-                m_useChunkedTransfer = false;
-                processRequest( *m_httpStreamReader.message().request );
-                return true;
-
-            case HttpStreamReader::parseError:
-                //bad request format, terminating connection...
-                NX_LOG( QString::fromLatin1("Error parsing http message from %1 (%2). Terminating connection...").
-                    arg(remoteHostAddress().toString()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
-                return false;
-
-            default:
-                Q_ASSERT( false );
-                return false;
         }
     }
 
@@ -471,6 +416,7 @@ namespace nx_hls
             }
 
             const nx_http::StatusCode::Value result = createSession(
+                request.requestLine.url.path(),
                 sessionID,
                 requestParams,
                 camResource,
@@ -545,10 +491,12 @@ namespace nx_hls
                 ++it;
         }
         QUrlQuery playlistDataQuery;
+        queryItems.push_front( session->playlistAuthenticationQueryItem() );
         playlistDataQuery.setQueryItems( queryItems );
         playlistDataQuery.addQueryItem( StreamingParams::CHUNKED_PARAM_NAME, QString() );
         playlistDataQuery.addQueryItem( StreamingParams::SESSION_ID_PARAM_NAME, session->id() );
 
+        //adding hi stream playlist
         if( session->streamQuality() == MEDIA_Quality_High || session->streamQuality() == MEDIA_Quality_Auto )
         {
             playlistData.bandwidth = estimateStreamBitrate(
@@ -561,6 +509,7 @@ namespace nx_hls
             playlist.playlists.push_back(playlistData);
         }
 
+        //adding lo stream playlist
         if( (session->streamQuality() == MEDIA_Quality_Low || session->streamQuality() == MEDIA_Quality_Auto) && camResource->hasDualStreaming() )
         {
             playlistData.bandwidth = estimateStreamBitrate(
@@ -668,6 +617,7 @@ namespace nx_hls
             }
         }
 
+        const auto chunkAuthenticationQueryItem = session->chunkAuthenticationQueryItem();
         for( std::vector<nx_hls::AbstractPlaylistManager::ChunkData>::size_type
             i = 0;
             i < chunkList.size();
@@ -677,6 +627,9 @@ namespace nx_hls
             hlsChunk.duration = chunkList[i].duration / (double)USEC_IN_SEC;
             hlsChunk.url = baseChunkUrl;
             QUrlQuery hlsChunkUrlQuery( hlsChunk.url.query() );
+            hlsChunkUrlQuery.addQueryItem(
+                chunkAuthenticationQueryItem.first,
+                chunkAuthenticationQueryItem.second );
             for( RequestParamsType::value_type param: commonChunkParams )
                 hlsChunkUrlQuery.addQueryItem( param.first, param.second );
             if( chunkList[i].alias )
@@ -865,6 +818,7 @@ namespace nx_hls
     }
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::createSession(
+        const QString& requestedPlaylistPath,
         const QString& sessionID,
         const std::multimap<QString, QString>& requestParams,
         const QnSecurityCamResourcePtr& camResource,
@@ -937,6 +891,16 @@ namespace nx_hls
                 newHlsSession->setPlaylistManager( quality, archivePlaylistManager );
             }
         }
+
+        const auto& chunkAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
+            HLS_PREFIX + camResource->getUniqueId(),
+            QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
+        newHlsSession->setChunkAuthenticationQueryItem( chunkAuthenticationKey );
+
+        const auto& playlistAuthenticationKey = QnAuthHelper::instance()->createAuthenticationQueryItemForPath(
+            requestedPlaylistPath,
+            QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS );
+        newHlsSession->setPlaylistAuthenticationQueryItem( playlistAuthenticationKey );
 
         *session = newHlsSession.release();
         return nx_http::StatusCode::ok;
