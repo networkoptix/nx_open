@@ -78,12 +78,12 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
     }
 
     QList<QnInterfaceAndAddr> result;
-
+    NX_LOG("----------", cl_logALWAYS);
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface: interfaces)
     {
         if (allowItfWithoutAddress)
-            NX_LOG(lit("found interface" ) + iface.name(), cl_logALWAYS);
+            NX_LOG(lit("found interface " ) + iface.name(), cl_logALWAYS);
 
         if (!(iface.flags() & QNetworkInterface::IsUp) && !allowItfWithoutAddress)
             continue;
@@ -100,6 +100,13 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
         {
             const bool isLocalHost = (address.ip() == QHostAddress::LocalHost);
             const bool isIpV4 = (address.ip().protocol() == QAbstractSocket::IPv4Protocol);
+
+            NX_LOG(lit("Address for iface " ) + iface.name() + lit(" ") + address.ip().toString()
+                + lit(" is local(") + (isLocalHost ? lit("true") : lit("false")) 
+                + lit("), is ipv4(") + (isIpV4 ? lit("true") : lit("false")) + lit(") ")
+                + address.ip().toString()
+                , cl_logALWAYS);
+
             if (isIpV4 && !isLocalHost)
             {
                 static bool allowedInterfaceReady = false;
