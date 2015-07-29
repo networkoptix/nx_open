@@ -155,6 +155,7 @@ QnFlickable {
                     x: dp(16)
                     rotation: settings.hiddenCamerasCollapsed ? 180 : 0
                     Behavior on rotation { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+                    scale: iconScale()
                 }
 
                 Text {

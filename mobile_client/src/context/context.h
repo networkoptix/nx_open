@@ -46,8 +46,13 @@ public:
         return m_settings;
     }
 
+    QnResolutionUtil *resolutionUtil() const {
+        return m_resolutionUtil.data();
+    }
+
     Q_INVOKABLE int dp(qreal dpix) const;
     Q_INVOKABLE int sp(qreal dpix) const;
+    Q_INVOKABLE qreal iconScale() const;
 
     Q_INVOKABLE void enterFullscreen();
     Q_INVOKABLE void exitFullscreen();

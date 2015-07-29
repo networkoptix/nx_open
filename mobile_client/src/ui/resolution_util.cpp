@@ -10,16 +10,22 @@
 namespace {
     const qreal referencePpi = 160.0;
 
-    qreal densityMultiplier() {
+    qreal densityMultiplier(qreal *pixelRatio = nullptr) {
 #if defined(Q_OS_ANDROID)
         QAndroidJniObject qtActivity = QAndroidJniObject::callStaticObjectMethod("org/qtproject/qt5/android/QtNative", "activity", "()Landroid/app/Activity;");
         QAndroidJniObject resources = qtActivity.callObjectMethod("getResources", "()Landroid/content/res/Resources;");
         QAndroidJniObject displayMetrics = resources.callObjectMethod("getDisplayMetrics", "()Landroid/util/DisplayMetrics;");
         qreal ppi = displayMetrics.getField<int>("densityDpi");
+        if (pixelRatio)
+            *pixelRatio = 1.0;
 #elif defined(Q_OS_IOS)
-        qreal ppi = QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio();
+        qreal ppi = QGuiApplication::primaryScreen()->physicalDotsPerInch();
+        if (pixelRatio)
+            *pixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
 #else
         qreal ppi = QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio();
+        if (pixelRatio)
+            *pixelRatio = 1.0;
 #endif
         return ppi / referencePpi;
     }
@@ -70,15 +76,16 @@ QString QnResolutionUtil::densityName(QnResolutionUtil::DensityClass densityClas
 }
 
 QnResolutionUtil::QnResolutionUtil() {
-    m_multiplier = ::densityMultiplier();
-    m_densityClass = ::densityClass(m_multiplier);
-    m_classScale = m_multiplier / densityMultiplier(m_densityClass);
+    m_multiplier = ::densityMultiplier(&m_pixelRatio);
+    m_densityClass = ::densityClass(m_multiplier * m_pixelRatio);
+    m_classScale = m_multiplier * m_pixelRatio / densityMultiplier(m_densityClass);
 }
 
 QnResolutionUtil::QnResolutionUtil(QnResolutionUtil::DensityClass customDensityClass):
     m_densityClass(customDensityClass),
     m_multiplier(densityMultiplier(m_densityClass)),
-    m_classScale(1.0)
+    m_classScale(1.0),
+    m_pixelRatio(1.0)
 {
 }
 
@@ -104,4 +111,8 @@ int QnResolutionUtil::sp(qreal dpix) const {
 
 qreal QnResolutionUtil::classScale() const {
     return m_classScale;
+}
+
+qreal QnResolutionUtil::pixelRatio() const {
+    return m_pixelRatio;
 }

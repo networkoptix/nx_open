@@ -12,6 +12,8 @@ QnSideNavigationItem {
         id: icon
         anchors.verticalCenter: parent.verticalCenter
         x: dp(16)
+        scale: iconScale()
+        transformOrigin: Item.Left
     }
 
     Text {

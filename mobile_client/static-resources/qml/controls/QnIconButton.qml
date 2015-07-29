@@ -27,5 +27,6 @@ Item {
     Image {
         id: image
         anchors.centerIn: parent
+        scale: iconScale()
     }
 }

@@ -30,11 +30,13 @@ public:
     int dp(qreal dpix) const;
     int sp(qreal dpix) const;
     qreal classScale() const;
+    qreal pixelRatio() const;
 
 private:
     DensityClass m_densityClass;
     qreal m_multiplier;
     qreal m_classScale;
+    qreal m_pixelRatio;
 };
 
 #endif // RESOLUTION_UTIL_H

@@ -34,6 +34,7 @@ Item {
             id: icon
             anchors.verticalCenter: parent.verticalCenter
             visible: source ? true : false
+            scale: iconScale()
         }
 
         Text {

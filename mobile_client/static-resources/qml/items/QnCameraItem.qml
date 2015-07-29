@@ -72,6 +72,8 @@ Item {
                     Image {
                         anchors.horizontalCenter: parent.horizontalCenter
                         source: d.unauthorized ? "image://icon/camera_locked.png" : "image://icon/camera_offline.png"
+                        width: dp(64)
+                        height: dp(64)
                     }
 
                     Text {
@@ -116,12 +118,12 @@ Item {
 
                 Text {
                     id: label
-                    width: parent.width - statusIndicator.width - 2 * anchors.margins
+                    width: parent.width - x - parent.spacing
                     maximumLineCount: 2
                     font.pixelSize: sp(16)
                     font.weight: d.offline ? Font.DemiBold : Font.Normal
                     elide: Text.ElideRight
-                    wrapMode: Text.WordWrap
+                    wrapMode: Text.Wrap
                     color: d.offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
                 }
             }

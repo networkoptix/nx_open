@@ -39,6 +39,10 @@ int QnContext::sp(qreal dpix) const {
     return m_resolutionUtil->sp(dpix);
 }
 
+qreal QnContext::iconScale() const {
+    return 1.0 / m_resolutionUtil->pixelRatio();
+}
+
 void QnContext::exitFullscreen() {
     showSystemUi();
 }

@@ -56,6 +56,7 @@ Item {
             id: icon
             visible: status == Image.Ready
             anchors.verticalCenter: parent.verticalCenter
+            scale: iconScale()
         }
 
         Text {
