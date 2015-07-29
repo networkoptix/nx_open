@@ -94,11 +94,13 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
             continue;
 #endif
 
-        bool addressFound = false;
+        bool addEmpty = true;
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address: addresses)
         {
-            if (address.ip().protocol() == QAbstractSocket::IPv4Protocol && address.ip() != QHostAddress::LocalHost)
+            const bool isLocalHost = (address.ip() == QHostAddress::LocalHost);
+            const bool isIpV4 = (address.ip().protocol() == QAbstractSocket::IPv4Protocol);
+            if (isIpV4 && !isLocalHost)
             {
                 static bool allowedInterfaceReady = false;
                 static QList<QHostAddress> allowedInterfaces;
@@ -134,16 +136,20 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
                     result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
-                    addressFound = true;
+                    addEmpty = false;
                     if (allowItfWithoutAddress)
                         NX_LOG(lit("found address for interface " ) + iface.name() + lit(" ") + address.ip().toString(), cl_logALWAYS);
 
                     break;
                 }
             }
+            else 
+            {
+                addEmpty = false;
+            }
         }
 
-        if (!addressFound && allowItfWithoutAddress)
+        if (addEmpty && allowItfWithoutAddress)
         {
             NX_LOG(lit("Add empty interface " ) + iface.name(), cl_logALWAYS);
             result.append(QnInterfaceAndAddr(iface.name(), QHostAddress(), QHostAddress(), iface));
