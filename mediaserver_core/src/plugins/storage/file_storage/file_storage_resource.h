@@ -52,7 +52,7 @@ private:
 
 private:
     mutable QMutex  m_mutexPermission;
-    int             m_capabilities;
+    mutable int     m_capabilities;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

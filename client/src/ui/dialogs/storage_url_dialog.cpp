@@ -105,15 +105,12 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
         }
     }
     
-    if (login.isEmpty()) {
-        return normalizePath(path);
-    }
-    else {
-        QUrl url = QString(lit("file:///%1")).arg(normalizePath(path));
+    QUrl url = QString(lit("file:///%1")).arg(normalizePath(path));
+    if (!login.isEmpty())
         url.setUserName(login);
+    if (!password.isEmpty())
         url.setPassword(password);
-        return url.toString();
-    }
+    return url.toString();
 }
 
 void QnStorageUrlDialog::accept() 

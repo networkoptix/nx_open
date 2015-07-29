@@ -33,7 +33,6 @@
 #include "media_server/settings.h"
 #include "utils/serialization/lexical_enum.h"
 
-#include <chrono>
 #include <memory>
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -275,6 +274,7 @@ QnStorageManager::QnStorageManager():
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
     m_clearMotionTimer.restart();
+    m_removeEmtyDirTimer.restart();
 }
 
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -948,9 +948,10 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
                     );
                 if (!dirFileList.isEmpty() && !recursiveRemover(dirFileList))
                     return false;
+                // ignore error here, trying to clean as much as we can
                 storage->removeDir(entry.absoluteFilePath());
             }
-            else
+            else // we've met file. solid reason to stop
                 return false;
         }
         return true;
@@ -992,12 +993,9 @@ void QnStorageManager::clearSpace()
         clearOldestSpace(storage, false);
 
     // 3. Remove empty dirs
-    static auto lastEmptyDirCheck = std::chrono::high_resolution_clock::now();
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    
-    if (currentTime > lastEmptyDirCheck + std::chrono::milliseconds(EMPTY_DIRS_CLEANUP_INTERVAL))
+    if (m_removeEmtyDirTimer.elapsed() > EMPTY_DIRS_CLEANUP_INTERVAL)
     {
-        lastEmptyDirCheck = currentTime;
+        m_removeEmtyDirTimer.restart();
         for (const QnStorageResourcePtr &storage : storages)
             removeEmptyDirs(storage);
     }

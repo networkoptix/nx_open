@@ -150,6 +150,8 @@ bool QnFileStorageResource::checkDBCap() const
 
 int QnFileStorageResource::getCapabilities() const
 {
+    if (checkDBCap())
+        m_capabilities |= QnAbstractStorageResource::cap::DBReady;
     return m_capabilities | (checkWriteCap() ? QnAbstractStorageResource::cap::WriteFile : 0);
 }
 
@@ -168,9 +170,6 @@ QnFileStorageResource::QnFileStorageResource():
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
     m_capabilities |= QnAbstractStorageResource::cap::ReadFile;
-
-    if (checkDBCap())
-        m_capabilities |= QnAbstractStorageResource::cap::DBReady;
 };
 
 QnFileStorageResource::~QnFileStorageResource()
