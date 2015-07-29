@@ -19,7 +19,8 @@ QnNetworkProxyFactory::QnNetworkProxyFactory() {}
 QnNetworkProxyFactory::~QnNetworkProxyFactory() {}
 
 QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName) {
-    const QNetworkProxy &proxy = proxyToResource(resource);
+    QnMediaServerResourcePtr via;
+    const QNetworkProxy &proxy = proxyToResource(resource, &via);
 
     switch (proxy.type()) {
     case QNetworkProxy::NoProxy:
@@ -37,8 +38,15 @@ QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourceP
         url.setPort(proxy.port());
 
         if (!proxy.user().isEmpty()) {
+            Q_ASSERT( via );
             QUrlQuery urlQuery(url);
-            urlQuery.addQueryItem(lit("proxy_auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam(proxy.user(), proxy.password())));
+            urlQuery.addQueryItem(
+                lit("proxy_auth"),
+                QLatin1String(QnAuthHelper::createHttpQueryAuthParam(
+                    proxy.user(),
+                    proxy.password(),
+                    via->realm(),
+                    nx_http::Method::GET )) );
             url.setQuery(urlQuery);
         }
 
@@ -76,7 +84,10 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
 	return QList<QNetworkProxy>() << proxyToResource(qnResPool->getIncompatibleResourceById(resourceGuid, true));
 }
 
-QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resource) {
+QNetworkProxy QnNetworkProxyFactory::proxyToResource(
+    const QnResourcePtr &resource,
+    QnMediaServerResourcePtr* const via )
+{
     if (!QnRouter::instance())
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
@@ -104,6 +115,9 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resour
             if (route.reverseConnect)
                 // reverse connection is not supported for a client
                 return QNetworkProxy(QNetworkProxy::NoProxy);
+
+            if( via )
+                *via = qnResPool->getResourceById<QnMediaServerResource>( route.id );
 
             const auto& url = QnAppServerConnectionFactory::url();
             return QNetworkProxy(QNetworkProxy::HttpProxy,

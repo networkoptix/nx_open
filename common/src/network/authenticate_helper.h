@@ -3,6 +3,7 @@
 
 #include <map>
 
+#include <QAuthenticator>
 #include <QtCore/QMap>
 #include <QElapsedTimer>
 #include <QCache>
@@ -131,8 +132,19 @@ public:
     */
     QPair<QString, QString> createAuthenticationQueryItemForPath( const QString& path, unsigned int periodMillis );
 
-    static QByteArray createUserPasswordDigest( const QString& userName, const QString& password );
-    static QByteArray createHttpQueryAuthParam( const QString& userName, const QString& password );
+    //!Calculates HA1 (see rfc 2617)
+    /*!
+        \warning \a realm is not used currently
+    */
+    static QByteArray createUserPasswordDigest(
+        const QString& userName,
+        const QString& password,
+        const QString& realm );
+    static QByteArray createHttpQueryAuthParam(
+        const QString& userName,
+        const QString& password,
+        const QString& realm,
+        const QByteArray method );
 
     static QByteArray symmetricalEncode(const QByteArray& data);
 
@@ -171,7 +183,7 @@ private:
 
     void addAuthHeader(nx_http::Response& responseHeaders, bool isProxy);
     QByteArray getNonce();
-    bool isNonceValid(const QByteArray& nonce);
+    bool isNonceValid(const QByteArray& nonce) const;
     bool isCookieNonceValid(const QByteArray& nonce);
     bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
                       std::function<bool(const QByteArray&)> checkNonceFunc);
@@ -194,6 +206,10 @@ private:
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
 
     void authenticationExpired( const QString& path, quint64 timerID );
+    /*!
+        \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
+    */
+    bool authenticateByUrl( const QByteArray& authRecord, const QByteArray& method ) const;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

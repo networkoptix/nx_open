@@ -44,7 +44,7 @@ QnServerArchiveDelegate::~QnServerArchiveDelegate()
 {
 }
 
-qint64 QnServerArchiveDelegate::startTime()
+qint64 QnServerArchiveDelegate::startTime() const
 {
     QMutexLocker lk( &m_mutex );
 
@@ -63,7 +63,7 @@ qint64 QnServerArchiveDelegate::startTime()
         return AV_NOPTS_VALUE;
 }
 
-qint64 QnServerArchiveDelegate::endTime()
+qint64 QnServerArchiveDelegate::endTime() const
 {
     QMutexLocker lk( &m_mutex );
 

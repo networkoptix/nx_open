@@ -1557,7 +1557,10 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     QString login = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
     QUrlQuery urlQuery(url);
-    urlQuery.addQueryItem(lit("auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam(login, password)));
+    urlQuery.addQueryItem(
+        lit("auth"),
+        QLatin1String(QnAuthHelper::createHttpQueryAuthParam(
+            login, password, server->realm(), nx_http::Method::GET)));
     urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
     url.setQuery(urlQuery);
     url = QnNetworkProxyFactory::instance()->urlToResource(url, server);
