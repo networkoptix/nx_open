@@ -58,7 +58,7 @@ void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& reques
             return;
         }
         const nx_stun::attr::UnknownAttribute& unknown_attr = static_cast<const nx_stun::attr::UnknownAttribute&>(*attr.second);
-        switch( unknown_attr.user_type ) {
+        switch( unknown_attr.userType ) {
         case nx_hpm::StunParameters::systemName:
             {
                 nx_stun::attr::StringAttributeType system_name;
@@ -149,11 +149,7 @@ void StunServerConnection::sendErrorReply( const nx_stun::TransactionID& transac
     nx_stun::Message message( nx_stun::Header(
         nx_stun::MessageClass::errorResponse,
         nx_hpm::StunMethods::listen, transaction_id ));
-
-    std::unique_ptr<nx_stun::attr::ErrorDescription> error_code( new nx_stun::attr::ErrorDescription() );
-    error_code->_class= errorCode / 100;
-    error_code->code = errorCode;
-    message.addAttribute( std::move( error_code ) );
+    message.addAttribute( std::make_unique< nx_stun::attr::ErrorDescription >( errorCode ) );
 
     bool ret = sendMessage(std::move(message),
         std::bind(

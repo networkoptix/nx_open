@@ -101,7 +101,7 @@ namespace nx_stun
     //!Contains STUN attributes
     namespace attr
     {
-        enum class AttributeType
+        enum AttributeType
         {
             mappedAddress = 0x01,
             username = 0x06,
@@ -124,7 +124,7 @@ namespace nx_stun
         {
         public:
             virtual ~Attribute() {}
-            virtual AttributeType type() const = 0;
+            virtual int type() const = 0;
         };
 
         /*!
@@ -135,8 +135,8 @@ namespace nx_stun
             public Attribute
         {
         public:
-            virtual AttributeType type() const override
-            { return AttributeType::xorMappedAddress; }
+            static const AttributeType s_type = AttributeType::xorMappedAddress;
+            virtual int type() const override { return s_type; }
 
             enum {
                 IPV4 = 1,
@@ -170,18 +170,17 @@ namespace nx_stun
             public Attribute
         {
         public:
-            virtual AttributeType type() const override
-            { return AttributeType::errorCode; }
-
             ErrorDescription( int code_, std::string phrase = std::string() );
+            static const AttributeType s_type = AttributeType::errorCode;
+            virtual int type() const override { return s_type; }
 
             //!This value is full error code
             int code;
             //!utf8 string, limited to 127 characters
             std::string reasonPhrase;
 
-            inline int getClass() { return code / 100; }
-            inline int getNumber() { return code % 100; }
+            inline int getClass() const { return code / 100; }
+            inline int getNumber() const { return code % 100; }
         };
 
         class FingerPrint
@@ -189,10 +188,9 @@ namespace nx_stun
             public Attribute
         {
         public:
-            virtual AttributeType type() const override
-            { return AttributeType::fingerprint; }
-
             FingerPrint( uint32_t crc32_ );
+            static const AttributeType s_type = AttributeType::fingerprint;
+            virtual int type() const override { return s_type; }
 
             uint32_t crc32;
         };
@@ -203,8 +201,8 @@ namespace nx_stun
             public Attribute
         {
         public:
-            virtual AttributeType type() const override
-            { return AttributeType::messageIntegrity; }
+            static const AttributeType s_type = AttributeType::messageIntegrity;
+            virtual int type() const override { return s_type; }
 
             static const int SHA1_HASH_SIZE = 20;
             // for me to avoid raw loop when doing copy.
@@ -216,12 +214,11 @@ namespace nx_stun
             public Attribute
         {
         public:
-            virtual AttributeType type() const override
-            { return AttributeType::unknownAttribute; }
+            UnknownAttribute( int userType_, nx::Buffer value_ );
+            static const AttributeType s_type = AttributeType::unknownAttribute;
+            virtual int type() const override { return userType; }
 
-            UnknownAttribute( int user_type_, nx::Buffer value_ );
-
-            int user_type;
+            int userType;
             nx::Buffer value;
         };
 
@@ -234,7 +231,7 @@ namespace nx_stun
 
         typedef std::string StringAttributeType;
         bool parse( const UnknownAttribute& unknownAttr, StringAttributeType* val );
-        bool serialize( UnknownAttribute* unknownAttr, const StringAttributeType& val , int user_type );
+        bool serialize( UnknownAttribute* unknownAttr, const StringAttributeType& val , int userType );
     }
 
     // A specialized hash class for C++11 since it doesn't comes with built-in enum hash
@@ -250,13 +247,15 @@ namespace nx_stun
     {
     public:
         Header header;
-        typedef std::unordered_multimap<attr::AttributeType, std::unique_ptr<attr::Attribute> , StunHash<attr::AttributeType> > AttributesMap;
+        typedef std::unordered_multimap<int, std::unique_ptr<attr::Attribute> > AttributesMap;
         AttributesMap attributes;
 
         explicit Message( Header header = Header() );
 
         Message( Message&& message );
         Message& operator = ( Message&& message );
+
+        void clear();
 
         // TODO: Uncomment when variadic templates are supported
         //
@@ -265,7 +264,24 @@ namespace nx_stun
         // { addAttribute( std::make_unique< T >( args ) ); }
 
         void addAttribute( std::unique_ptr<attr::Attribute>&& attribute );
-        void clear();
+
+        template< typename T >
+        const T* getAttribute( int aType = T::s_type, size_t index = 0 )
+        {
+            auto it = attributes.find( aType );
+            if( it == attributes.end() )
+                return nullptr;
+
+            while( index )
+            {
+                ++it;
+                --index;
+                if( it == attributes.end() || it->first != aType )
+                    return nullptr;
+            }
+
+            return static_cast<T*>( it->second.get() );
+        }
 
     private:
         Message( const Message& );

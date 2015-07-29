@@ -168,15 +168,8 @@ nx_api::SerializerState::Type MessageSerializer::serializeHeader( MessageSeriali
 }
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer , const attr::Attribute* attribute  , std::uint16_t** value_pos ) {
-    if( attribute->type() == attr::AttributeType::unknownAttribute ) {
-        const UnknownAttribute* ua = static_cast<const UnknownAttribute*>(attribute);
-        if( buffer->WriteUint16(static_cast<std::uint16_t>(ua->user_type)) == NULL ) {
-            return nx_api::SerializerState::needMoreBufferSpace;
-        }
-    } else {
-        if( buffer->WriteUint16(static_cast<std::uint16_t>(attribute->type())) == NULL ) {
-            return nx_api::SerializerState::needMoreBufferSpace;
-        }
+    if( buffer->WriteUint16(static_cast<std::uint16_t>(attribute->type())) == NULL ) {
+        return nx_api::SerializerState::needMoreBufferSpace;
     }
 
     // NOTE: actual attribute lenght gets rewrited in /fn serializeAttributes
@@ -185,6 +178,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength
     if( *value_pos == NULL ) {
         return nx_api::SerializerState::needMoreBufferSpace;
     }
+
     return nx_api::SerializerState::done;
 }
 
@@ -198,9 +192,11 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( Messag
         return serializeAttributeValue_XORMappedAddress( buffer , *static_cast<const XorMappedAddress*>(attribute) ,value);
     case AttributeType::messageIntegrity:
         return serializeAttributeValue_MessageIntegrity( buffer , *static_cast<const MessageIntegrity*>(attribute) ,value);
-    case AttributeType::unknownAttribute:
-        return serializeAttributeValue_UnknownAttribute( buffer , *static_cast<const UnknownAttribute*>(attribute) ,value);
-    default: Q_ASSERT(0); return nx_api::SerializerState::done;
+    default:
+        if( attribute->type() > AttributeType::unknownAttribute )
+            return serializeAttributeValue_UnknownAttribute( buffer , *static_cast<const UnknownAttribute*>(attribute) ,value);
+        Q_ASSERT(0);
+        return nx_api::SerializerState::done;
     }
 }
 

@@ -49,8 +49,8 @@ namespace nx_stun
         {
         }
 
-        UnknownAttribute::UnknownAttribute( int user_type_, nx::Buffer value_ )
-            : user_type( user_type_ )
+        UnknownAttribute::UnknownAttribute( int userType_, nx::Buffer value_ )
+            : userType( userType_ )
             , value( value_ )
         {
         }
@@ -77,8 +77,7 @@ namespace nx_stun
 
     void Message::addAttribute( std::unique_ptr<attr::Attribute>&& attribute )
     {
-        attributes.insert( std::pair<
-            attr::AttributeType, std::unique_ptr<attr::Attribute> >(
+        attributes.insert( AttributesMap::value_type(
                 attribute->type(), std::move( attribute ) ) );
     }
 
@@ -95,9 +94,9 @@ namespace nx_stun
             return true;
         }
 
-        bool serialize( UnknownAttribute* unknownAttr , const StringAttributeType& val , int user_type ) 
+        bool serialize( UnknownAttribute* unknownAttr , const StringAttributeType& val , int userType )
         {
-            unknownAttr->user_type = user_type;
+            unknownAttr->userType = userType;
             unknownAttr->value = nx::Buffer(val.c_str());
             return true;
         }
