@@ -74,6 +74,7 @@ private:
     QString formatDuration(int durationSecs) const;
     QString eventTypeToString(Qn::AuditRecordType recordType) const;
     QString eventDescriptionText(const QnAuditRecord& data) const;
+    QVariant colorForType(Qn::AuditRecordType actionType) const;
 protected:
     DataIndex* m_index;
     QList<Column> m_columns;

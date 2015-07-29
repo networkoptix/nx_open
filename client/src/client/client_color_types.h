@@ -181,8 +181,19 @@ struct QnAuditLogColors {
     QnAuditLogColors();
 
     QColor httpLink;
+    
+    QColor loginAction;
+    QColor updUsers;
+    QColor watchingLive;
+    QColor watchingArchive;
+    QColor exportVideo;
+    QColor updCamera;
+    QColor systemActions;
+    QColor updServer;
+    QColor eventRules;
+    QColor emailSettings;
 };
-#define QnAuditLogColors_Fields (httpLink)
+#define QnAuditLogColors_Fields (httpLink)(loginAction)(updUsers)(watchingLive)(watchingArchive)(exportVideo)(updCamera)(systemActions)(updServer)(eventRules)(emailSettings)
 
 struct QnRecordingStatsColors {
     QnRecordingStatsColors();

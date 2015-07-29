@@ -130,6 +130,17 @@ QnRoutingManagementColors::QnRoutingManagementColors() {
 
 QnAuditLogColors::QnAuditLogColors() {
     httpLink = QColor(0xFF, 0xDE, 0xAD); // HTTP NavajoWhite
+
+    loginAction = Qt::darkGreen;
+    updUsers = QColor(140, 35, 187);
+    watchingLive = QColor(98, 156, 217);
+    watchingArchive = watchingLive;
+    exportVideo = QColor(210, 139, 0);
+    updCamera = QColor(165, 0, 135);
+    systemActions = QColor(178, 0, 0);
+    updServer = systemActions;
+    eventRules = Qt::black;
+    emailSettings = eventRules;
 }
 
 QnRecordingStatsColors::QnRecordingStatsColors()

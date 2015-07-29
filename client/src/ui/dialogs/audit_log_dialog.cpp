@@ -42,7 +42,12 @@ namespace {
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
 
-QSize QnAuditDetailItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
+void QnAuditItemDelegate::setDefaultSectionHeight(int value) 
+{ 
+    m_defaultSectionSize = value;
+}
+
+QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
     if (column == QnAuditLogModel::DescriptionColumn)
@@ -73,11 +78,50 @@ QSize QnAuditDetailItemDelegate::sizeHint(const QStyleOptionViewItem & option, c
 
 }
 
-void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
+void QnAuditItemDelegate::paintRichDateTime(QPainter * painter, const QStyleOptionViewItem & option, int dateTimeSecs) const
+{
+    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(dateTimeSecs * 1000ll);
+    QString dateStr = dateTime.date().toString(Qt::DefaultLocaleShortDate) + QString(lit(" "));
+    QString timeStr = dateTime.time().toString(Qt::DefaultLocaleShortDate);
+    
+    QFontMetrics fm(option.font);
+    int timeXOffset = fm.size(0, dateStr).width();
+    painter->drawText(option.rect, Qt::AlignLeft | Qt::AlignVCenter, dateStr);
+
+    QnScopedPainterFontRollback rollback(painter);
+    QFont font = option.font;
+    font.setBold(true);
+    painter->setFont(font);
+    QRect rect(option.rect);
+    rect.adjust(timeXOffset, 0, 0, 0);
+    painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, timeStr);
+}
+
+void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
-
-    if (column == QnAuditLogModel::DescriptionColumn) 
+    int yShift = 0;
+    switch (column)
+    {
+    case QnAuditLogModel::TimestampColumn:
+    {
+        QVariant data = index.data(Qn::AuditRecordDataRole);
+        if (!data.canConvert<QnAuditRecord>())
+            base_type::paint(painter, option, index);
+        QnAuditRecord record = data.value<QnAuditRecord>();
+        paintRichDateTime(painter, option, record.createdTimeSec);
+        break;
+    }
+    case QnAuditLogModel::EndTimestampColumn:
+    {
+        QVariant data = index.data(Qn::AuditRecordDataRole);
+        if (!data.canConvert<QnAuditRecord>())
+            base_type::paint(painter, option, index);
+        QnAuditRecord record = data.value<QnAuditRecord>();
+        paintRichDateTime(painter, option, record.rangeEndSec);
+        break;
+    }
+    case QnAuditLogModel::DescriptionColumn:
     {
         QTextDocument txtDocument;
         if (option.state & QStyle::State_MouseOver)
@@ -91,8 +135,9 @@ void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionView
         painter->translate(shift);
         rect.translate(-shift);
         txtDocument.drawContents(painter, rect);
+        break;
     }
-    else if (column == QnAuditLogModel::PlayButtonColumn) 
+    case QnAuditLogModel::PlayButtonColumn:
     {
         QVariant data = index.data(Qn::AuditRecordDataRole);
         if (!data.canConvert<QnAuditRecord>())
@@ -117,8 +162,9 @@ void QnAuditDetailItemDelegate::paint(QPainter * painter, const QStyleOptionView
         button.rect.setTopLeft(option.rect.topLeft() + QPoint(dx, 4));
         button.rect.setSize(sizeHint);
         QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);
+        break;
     }
-    else {
+    default:
         base_type::paint(painter, option, index);
     }
 }
@@ -168,6 +214,14 @@ QList<QnAuditLogModel::Column> detailSessionColumns(bool masterMultiselected)
     return columns;
 }
 
+void QnAuditLogDialog::setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes)
+{
+    QPalette palette = checkbox->palette();
+    palette.setColor(checkbox->foregroundRole(), color);
+    checkbox->setPalette(palette);
+    checkbox->setProperty("filter", (int) filteredTypes);
+}
+
 QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::AuditLogDialog),
@@ -181,6 +235,22 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
 
     m_sessionModel = new QnAuditLogSessionModel(this);
+
+    QnAuditLogColors colors = m_sessionModel->colors();
+    setupFilterCheckbox(ui->checkBoxLogin, colors.loginAction, Qn::AR_UnauthorizedLogin | Qn::AR_Login);
+    setupFilterCheckbox(ui->checkBoxUsers, colors.updUsers, Qn::AR_UserUpdate);
+    setupFilterCheckbox(ui->checkBoxLive, colors.watchingLive, Qn::AR_ViewLive);
+    setupFilterCheckbox(ui->checkBoxArchive, colors.watchingArchive, Qn::AR_ViewArchive);
+    setupFilterCheckbox(ui->checkBoxExport, colors.exportVideo, Qn::AR_ExportVideo);
+    setupFilterCheckbox(ui->checkBoxCameras, colors.updCamera, Qn::AR_CameraUpdate);
+    setupFilterCheckbox(ui->checkBoxSystem, colors.systemActions, Qn::AR_SystemNameChanged | Qn::AR_SystemmMerge | Qn::AR_GeneralSettingsChange);
+    setupFilterCheckbox(ui->checkBoxServers, colors.updServer, Qn::AR_ServerUpdate);
+    setupFilterCheckbox(ui->checkBoxBRules, colors.eventRules, Qn::AR_BEventUpdate);
+    setupFilterCheckbox(ui->checkBoxEmail, colors.emailSettings, Qn::AR_EmailSettings);
+
+    QnAuditItemDelegate* itemDelegate = new QnAuditItemDelegate(this);
+    itemDelegate->setButtonExtraSize(calcButtonSize(ui->gridMaster->font()));
+    itemDelegate->setDefaultSectionHeight(ui->gridDetails->verticalHeader()->defaultSectionSize());
 
     QList<QnAuditLogModel::Column> columns;
     columns << 
@@ -215,24 +285,19 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
         }
     }
     );
+    ui->gridMaster->setItemDelegate(itemDelegate);
 
     m_detailModel = new QnAuditLogDetailModel(this);
-
     m_detailModel->setColumns(detailSessionColumns(false));
     ui->gridDetails->setModel(m_detailModel);
-    QnAuditDetailItemDelegate* delegate = new QnAuditDetailItemDelegate(this);
-    delegate->setButtonExtraSize(calcButtonSize(ui->gridMaster->font()));
-    delegate->setDefaultSectionHeight(ui->gridDetails->verticalHeader()->defaultSectionSize());
-    ui->gridDetails->setItemDelegate(delegate);
+    ui->gridDetails->setItemDelegate(itemDelegate);
     ui->gridDetails->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->gridDetails->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     ui->gridDetails->setMouseTracking(true);
 
-
     connect(ui->gridMaster, &QTableView::pressed, this, &QnAuditLogDialog::at_masterItemPressed);
     connect(ui->gridDetails, &QTableView::pressed, this, &QnAuditLogDialog::at_ItemPressed);
     connect(ui->gridDetails, &QTableView::entered, this, &QnAuditLogDialog::at_ItemEntered);
-
 
     QDate dt = QDateTime::currentDateTime().date();
     ui->dateEditFrom->setDate(dt);

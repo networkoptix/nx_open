@@ -365,15 +365,21 @@ public:
         AR_NotDefined,
         AR_UnauthorizedLogin,
         AR_Login,
+        AR_UserUpdate,
+        AR_ViewLive,
+        AR_ViewArchive,
+        AR_ExportVideo,
+        AR_CameraUpdate,
         AR_SystemNameChanged,
         AR_SystemmMerge,
-        AR_CameraUpdate,
-        AR_ServerUpdate,
         AR_GeneralSettingsChange,
-        AR_ViewArchive,
-        AR_ViewLive
+        AR_ServerUpdate,
+        AR_BEventUpdate,
+        AR_EmailSettings
     };
 
+    Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(AuditRecordTypes)
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuditRecordType)
     
     enum IODefaultState {

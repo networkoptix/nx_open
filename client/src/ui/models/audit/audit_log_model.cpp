@@ -265,40 +265,47 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord& data) const
 
 QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data, int row, bool hovered) const
 {
-    if (column != DescriptionColumn)
-        return textData(column, data, row);
-    QString result;
-    switch (data.eventType)
+    if (column == TimestampColumn)
     {
-    case Qn::AR_ViewArchive:
-    case Qn::AR_ViewLive:
-        result = tr("%1 - %2, ").arg(formatDateTime(data.rangeStartSec)).arg(formatDateTime(data.rangeEndSec));
-    case Qn::AR_CameraUpdate:
-    {
-        QString txt = tr("%n cameras", "", data.resources.size());
-        QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
-        if (hovered)
-            result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(linkColor).arg(txt);
-        else
-            result +=  QString(lit("<font color=%1><b>%2</b></font>")).arg(linkColor).arg(txt);
-        bool showDetail = data.extractParam("detail") == "1";
-        if (showDetail) 
-        {
-            auto archiveData = data.extractParam("archiveExist");
-            int index = 0;
-            for (const auto& camera: data.resources) 
-            {
-                bool isRecordExist = archiveData.size() > index && archiveData[index] == '1';
-                index++;
-                QChar circleSymbol = isRecordExist ? QChar(0x25CF) : QChar(0x25CB);
-                if (isRecordExist)
-                    result += QString(lit("<br> <font size=5 color=red>%1</font> %2")).arg(circleSymbol).arg(getResourceNameString(camera));
-                else
-                    result += QString(lit("<br> <font size=5>%1</font> %2")).arg(circleSymbol).arg(getResourceNameString(camera));
-            }
-        }
-        return result;
+        QString dateStr = formatDateTime(data.createdTimeSec, true, false);
+        QString timeStr = formatDateTime(data.createdTimeSec, false, true);
+        return lit("%1 <b>%2</b>").arg(dateStr).arg(timeStr);
     }
+    else if (column == DescriptionColumn) 
+    {
+        QString result;
+        switch (data.eventType)
+        {
+        case Qn::AR_ViewArchive:
+        case Qn::AR_ViewLive:
+            result = tr("%1 - %2, ").arg(formatDateTime(data.rangeStartSec)).arg(formatDateTime(data.rangeEndSec));
+        case Qn::AR_CameraUpdate:
+        {
+            QString txt = tr("%n cameras", "", data.resources.size());
+            QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
+            if (hovered)
+                result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(linkColor).arg(txt);
+            else
+                result +=  QString(lit("<font color=%1><b>%2</b></font>")).arg(linkColor).arg(txt);
+            bool showDetail = data.extractParam("detail") == "1";
+            if (showDetail) 
+            {
+                auto archiveData = data.extractParam("archiveExist");
+                int index = 0;
+                for (const auto& camera: data.resources) 
+                {
+                    bool isRecordExist = archiveData.size() > index && archiveData[index] == '1';
+                    index++;
+                    QChar circleSymbol = isRecordExist ? QChar(0x25CF) : QChar(0x25CB);
+                    if (isRecordExist)
+                        result += QString(lit("<br> <font size=5 color=red>%1</font> %2")).arg(circleSymbol).arg(getResourceNameString(camera));
+                    else
+                        result += QString(lit("<br> <font size=5>%1</font> %2")).arg(circleSymbol).arg(getResourceNameString(camera));
+                }
+            }
+            return result;
+        }
+        }
     }
     
     return textData(column, data, row);
@@ -483,6 +490,38 @@ QnAuditRecord QnAuditLogModel::rawData(int row) const
     return m_index->at(row);
 }
 
+QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
+{
+    switch (actionType)
+    {
+    case Qn::AR_UnauthorizedLogin:
+    case Qn::AR_Login:
+        return m_colors.loginAction;
+    case Qn::AR_UserUpdate:
+        return m_colors.updUsers;
+    case Qn::AR_ViewLive:
+        return m_colors.watchingLive;
+    case Qn::AR_ViewArchive:
+        return m_colors.watchingArchive;
+    case Qn::AR_ExportVideo:
+        return m_colors.exportVideo;
+    case Qn::AR_CameraUpdate:
+        return m_colors.updCamera;
+    case Qn::AR_SystemNameChanged:
+    case Qn::AR_SystemmMerge:
+    case Qn::AR_GeneralSettingsChange:
+        return m_colors.systemActions;
+    case Qn::AR_ServerUpdate:
+        return m_colors.updServer;
+    case Qn::AR_BEventUpdate:
+        return m_colors.eventRules;
+    case Qn::AR_EmailSettings:
+        return m_colors.emailSettings;
+    default:
+        return QVariant();
+    }
+}
+
 QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const 
 {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
@@ -509,8 +548,19 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
         return htmlData(column, record, index.row(), true);
     case Qn::ColumnDataRole:
         return column;
-    //case Qt::SizeHintRole:
-    //    return QSize(64, 32);
+    case Qt::ForegroundRole:
+        if (column == EventTypeColumn)
+            return colorForType(record.eventType);
+        else
+            return QVariant();
+    case Qt::FontRole:
+        if (column == DateColumn) {
+            QFont font;
+            font.setBold(true);
+            return font;
+        }
+        else
+            return QVariant();
     default:
         break;
     }
