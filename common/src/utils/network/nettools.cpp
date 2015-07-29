@@ -64,17 +64,25 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
 }
 */
 
-QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
+QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
 {
-    static QList<QnInterfaceAndAddr> lastResult;
-    static QElapsedTimer timer;
-    static QMutex mutex;
+    struct LocalCache
+    {
+        QnInterfaceAndAddrList value;
+        QElapsedTimer timer;
+        QMutex guard;
+    };
 
+    enum { kCacheLinesCount = 2};
+    static LocalCache caches[kCacheLinesCount];
+
+    LocalCache &cache = caches[allowItfWithoutAddress ? 1 : 0];
     {
         // speed optimization
-        QMutexLocker lock(&mutex);
-        if (!lastResult.isEmpty() && timer.elapsed() < 5000)
-            return lastResult;
+        QMutexLocker lock(&cache.guard);
+        enum { kCacheTimeout = 5000 };
+        if (!cache.value.isEmpty() && (cache.timer.elapsed() < kCacheTimeout))
+            return cache.value;
     }
 
     QList<QnInterfaceAndAddr> result;
@@ -143,9 +151,9 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
             result.append(QnInterfaceAndAddr(iface.name(), QHostAddress(), QHostAddress(), iface));
     }
 
-    QMutexLocker lock(&mutex);
-    timer.restart();
-    lastResult = result;
+    QMutexLocker lock(&cache.guard);
+    cache.timer.restart();
+    cache.value = result;
 
     return result;
 }
