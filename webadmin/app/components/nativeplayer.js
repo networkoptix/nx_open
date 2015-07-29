@@ -25,9 +25,7 @@ var nativePlayer = new (function () {
     };
 
     this.addEventListener = function(event,handler){
-        console.log("try to subscribe",event,handler);
         if(currentVideo) {
-            console.log("subscribe",event,handler);
             currentVideo.addEventListener(event,handler);
         }
     };
@@ -38,7 +36,7 @@ var nativePlayer = new (function () {
     };
 
     this.load = function(url,type){
-        console.log("load native ",url,type);
-        currentVideo = $("<video controls src='" + url + /*"' type='" + type +*/ "'>").appendTo(node).get(0);
+        // controls
+        currentVideo = $("<video  src='" + url + /*"' type='" + type +*/ "'>").appendTo(node).get(0);
     };
 })();

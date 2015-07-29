@@ -18,7 +18,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             'application/x-rtsp'
         ];
 
-        $scope.settings = {id: null};
+        $scope.settings = {id: ""};
         mediaserver.getSettings().then(function (r) {
             $scope.settings = {
                 id: r.data.reply.id
@@ -41,6 +41,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.playerReady = function(API){
             console.log("playerReady",API);
             $scope.playerAPI = API;
+            $scope.switchPlaying(true);
         };
         function updateVideoSource(playing) {
             var live = !playing;
@@ -52,16 +53,11 @@ angular.module('webadminApp').controller('ViewCtrl',
             if(!$scope.positionProvider){
                 return;
             }
+            console.log("init playing",playing);
             $scope.positionProvider.init(playing);
             var cameraId = $scope.activeCamera.physicalId;
-            var server = getCamerasServer($scope.activeCamera);
             var serverUrl = '';
             var rtspUrl = 'rtsp://' + window.location.host;
-
-            if ($scope.settings.id && ($scope.settings.id.replace('{', '').replace('}', '') !== server.id.replace('{', '').replace('}', ''))) {
-                serverUrl = '/proxy/' + window.location.protocol.replace(':','') + '/' + getServerUrl(server);
-                rtspUrl += '/proxy/rtsp/';
-            }
 
             var mediaDemo = mediaserver.mediaDemo();
             if(mediaDemo){
@@ -69,7 +65,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 rtspUrl = "rtsp:" + mediaDemo;
             }
             var authParam = "&auth=" + mediaserver.authForMedia();
-
+            var rstpAuthPararm = "&auth=" + mediaserver.authForRtsp();
 
             var positionMedia = !live ? "&pos=" + (playing) : "";
             var positionHls = !live ? "&startTimestamp=" + (playing) : "";
@@ -79,14 +75,11 @@ angular.module('webadminApp').controller('ViewCtrl',
                 //{ src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls   + extParam ), type: 'application/x-mpegURL'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + authParam ), type: 'video/webm' },
 
-                // require duration, download-only links
-                // { src: ( serverUrl + '/hls/'   + cameraId + '.mkv?resolution='    + $scope.activeResolution + positionHls   + extParam ), type: 'video/x-matroska'},
-                // { src: ( serverUrl + '/hls/'   + cameraId + '.ts?resolution='     + $scope.activeResolution + positionHls   + extParam ), type: 'video/MP2T'},
-
+                // Not supported:
                 // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: 'video/x-motion-jpeg'},
 
                 // Require plugin
-                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + authParam ), type: 'application/x-rtsp'}
+                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm ), type: 'application/x-rtsp'}
             ],function(src){
                 return $scope.activeFormat == 'Auto'|| $scope.activeFormat == src.type;
             });
@@ -175,7 +168,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                 function cameraSorter(camera) {
                     camera.url = extractDomain(camera.url);
-                    camera.preview = mediaserver.previewUrl(camera.physicalId, false, 70);
+                    camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
 
                     var num = 0;
                     var addrArray = camera.url.split('.');
@@ -279,6 +272,11 @@ angular.module('webadminApp').controller('ViewCtrl',
                 server.collapsed = server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
             });
             $scope.mediaServers = data.data;
+
+            _.forEach( $scope.mediaServers,function(server){
+                server.collapsed =  $scope.settings.id.replace('{','').replace('}','') != server.id.replace('{','').replace('}','');
+            });
+
             getCameras();
 
             $scope.selectCameraById($routeParams.cameraId,$location.search().time || false);

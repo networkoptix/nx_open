@@ -77,6 +77,10 @@ angular.module('webadminApp')
                         return "webm";
                     }
 
+                    if(window.jscd.os == "Android" && weHaveWebm){
+                        return "webm";
+                    }
+
                     if(window.jscd.mobile && weHaveHls){
                         return "native-hls"; // Only one choice on mobile
                     }
@@ -96,9 +100,14 @@ angular.module('webadminApp')
 
                             return false; // IE9 - No other supported formats
 
+
+                        case "Safari":
+                            if(weHaveHls) {
+                                return "native-hls";
+                            }
+
                         case "Chrome":
                         case "Firefox":
-                        case "Safari":
                         case "Opera":
                         case "Webkit":
                         default:
@@ -133,16 +142,18 @@ angular.module('webadminApp')
                     nativePlayer.init(element.find("#videowindow"), function (api) {
                         console.log("videowindow ready");
                         scope.vgApi = api;
-                        scope.vgPlayerReady({$API:api});
 
                         if (scope.vgSrc) {
                             scope.vgApi.load(getFormatSrc(format),mimeTypes[format]);
 
-                            api.addEventListener("timeupdate",function(){
-                                console.log("timeupdate",api.currentTime);
-                                scope.vgUpdateTime({$currentTime:api.currentTime, $duration: api.duration});
+                            scope.vgApi.addEventListener("timeupdate",function(event,arg2,arg3){
+                                //console.log("timeupdate",event,arg2,arg3,scope.vgApi, scope.vgApi.currentTime);
+                                scope.vgUpdateTime({$currentTime:event.srcElement.currentTime, $duration: event.srcElement.duration});
                             });
                         }
+
+
+                        scope.vgPlayerReady({$API:scope.vgApi});
                     }, function (api) {
                         console.alert("some error");
                     });

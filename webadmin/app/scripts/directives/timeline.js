@@ -21,7 +21,7 @@ angular.module('webadminApp')
                     zoomSpeed: 0.025, // Zoom speed for buttons 0 -> 1 = full zoom
                     maxVerticalScrollForZoom: 50, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
-                    animationDuration: 1000, // 300, // 200-400 for smooth animation
+                    animationDuration: 500, // 300, // 200-400 for smooth animation
 
                     levelsSettings:{
                         labels:{
@@ -474,7 +474,6 @@ angular.module('webadminApp')
                         }
                         if (instantLevelIndex != scope[targetName]) { // Start animation here
                             scope[targetName] = instantLevelIndex;
-                            console.log("animate",levelName,scope[targetName],scope[currentName]);
                             animateScope.progress(scope, animationName).then(function () {
                                 scope[currentName] = scope[targetName];
                             });

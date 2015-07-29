@@ -34,20 +34,23 @@ angular.module('webadminApp')
                 var realm = ipCookie('realm');
                 var nonce = ipCookie('nonce');
 
-                var hash1 = md5(lowercaseLogin + ':' + realm + ':' + $scope.user.password);
-                var cnonce = md5("GET:");
-                var rtspcnonce = md5("PLAY:");
-                var response = md5(hash1 + ':' + nonce + ':' + cnonce);
-
-                var rtspAuth = md5(hash1 + ':' + nonce + ':' + rtspcnonce);
-                ipCookie('rtspAuth',rtspAuth, { path: '/' });
-
-                ipCookie('response',response, { path: '/' });
-                ipCookie('username',lowercaseLogin, { path: '/' });
-
-                var auth = Base64.encode(lowercaseLogin + ':0:' + hash1)
+                var digest = md5(lowercaseLogin + ':' + realm + ':' + $scope.user.password);
+                var method = md5("GET:");
+                var auth_digest = md5(digest + ':' + nonce + ':' + method);
+                var auth = Base64.encode(lowercaseLogin + ':' + nonce + ':' + auth_digest);
                 ipCookie('auth',auth, { path: '/' });
 
+                var rtspmethod = md5("PLAY:");
+                var rtsp_digest = md5(digest + ':' + nonce + ':' + rtspmethod);
+                var auth_rtsp = Base64.encode(lowercaseLogin + ':' + nonce + ':' + rtsp_digest);
+                ipCookie('auth_rtsp',auth_rtsp, { path: '/' });
+
+
+                //Old cookies:
+                ipCookie('response',auth_digest, { path: '/' }); // TODO: REMOVE
+                ipCookie('username',lowercaseLogin, { path: '/' }); // TODO: REMOVE
+                var authKey = Base64.encode(lowercaseLogin + ':0:' + digest); // TODO: REMOVE
+                ipCookie('authKey',auth, { path: '/' }); // TODO: REMOVE
 
 
                 // Check auth again

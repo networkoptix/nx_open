@@ -90,14 +90,20 @@ angular.module('webadminApp')
                 return proxy + '/api/showLog' + (params||'');
             },
             authForMedia:function(){
+                return ipCookie('authKey'); // TODO: REMOVE
                 return ipCookie('auth');
             },
+            authForRtsp:function(){
+                return ipCookie('authKey'); // TODO: REMOVE
+                return ipCookie('auth_rtsp');
+            },
+
             previewUrl:function(cameraPhysicalId,time,width,height){
                 return proxy + '/api/image' +
                     '?physicalId=' + cameraPhysicalId +
-                    //(width? '&width=' + width:'') +
-                    //(height? '&height=' + height:'') +
-                    ('&time=' + (time || 'NOW')); // mb LATEST?
+                    (width? '&width=' + width:'') +
+                    (height? '&height=' + height:'') +
+                    ('&time=' + (time || 'LATEST')); // mb LATEST?
 
             },
             hasProxy:function(){
