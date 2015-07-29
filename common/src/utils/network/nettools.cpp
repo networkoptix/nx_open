@@ -64,11 +64,17 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
 }
 */
 
-QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
+QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
 {
-    static QList<QnInterfaceAndAddr> lastResult;
-    static QElapsedTimer timer;
-    static QMutex mutex;
+    static QnInterfaceAndAddrList lastResultArray[] = { QnInterfaceAndAddrList(), QnInterfaceAndAddrList() };
+    static QElapsedTimer timerArray[] = { QElapsedTimer(), QElapsedTimer() };
+    static QMutex mutexWithAddress;
+    static QMutex mutexWithoutAdderss;
+
+    const int requestTypeIndex = (allowItfWithoutAddress ? 1 : 0);
+    QnInterfaceAndAddrList &lastResult = lastResultArray[requestTypeIndex];
+    QElapsedTimer &timer = timerArray[requestTypeIndex];
+    QMutex &mutex = (allowItfWithoutAddress ? mutexWithoutAdderss : mutexWithAddress);
 
     {
         // speed optimization
