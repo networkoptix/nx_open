@@ -1536,6 +1536,7 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );   //allowed by default for now
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/gettime"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
