@@ -110,6 +110,9 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     if( allowedAuthMethods == 0 )
         return false;   //NOTE assert?
 
+    if( allowedAuthMethods & AuthMethod::noAuth )
+        return true;
+
     {
         QMutexLocker lk( &m_mutex );
         if( urlQuery.hasQueryItem( TEMP_AUTH_KEY_NAME ) )
@@ -122,9 +125,6 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
             }
         }
     }
-
-    if( allowedAuthMethods & AuthMethod::noAuth )
-        return true;
 
     if( allowedAuthMethods & AuthMethod::videowall )
     {

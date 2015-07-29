@@ -26,6 +26,12 @@ private:
         const nx_http::Request& request,
         const QUrlQuery urlQuery,
         QnResourcePtr* const res );
+    bool findCameraUniqueIDInPath(
+        const nx_http::Request& request,
+        QnResourcePtr* const res );
+    bool findCameraUniqueIDInQuery(
+        const QUrlQuery urlQuery,
+        QnResourcePtr* const res );
 };
 
 #endif  //NX_AUTO_REQUEST_FORWARDER_H
