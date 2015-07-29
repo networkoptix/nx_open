@@ -58,6 +58,8 @@ bool readExtraFields(QnNetworkAddressEntryList& entryList)
     return true;
 }
 
+#include <utils/common/log.h>
+
 int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
     Q_UNUSED(path)
@@ -72,13 +74,17 @@ int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &
         false;
 #endif
 
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(allInterfaces)) 
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(true)) 
     {
-#if defined(Q_OS_LINUX) && defined(__arm__)
         static const QChar kColon = ':';
         if (iface.name.contains(kColon))
+        {
+            NX_LOG(lit("Skipping interface" ) + iface.name, cl_logALWAYS);
+
             continue;
-#endif
+        }
+
+        NX_LOG(lit("Reading extra interface data " ) + iface.name, cl_logALWAYS);
         QnNetworkAddressEntry entry;
         entry.name = iface.netIf.name();
         entry.ipAddr = iface.address.toString();

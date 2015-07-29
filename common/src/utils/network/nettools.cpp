@@ -82,7 +82,10 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface: interfaces)
     {
-        if (!(iface.flags() & QNetworkInterface::IsUp))
+        if (allowItfWithoutAddress)
+            NX_LOG(lit("found interface" ) + iface.name(), cl_logALWAYS);
+
+        if (!(iface.flags() & QNetworkInterface::IsUp) && !allowItfWithoutAddress)
             continue;
 
 #if defined(Q_OS_LINUX) && defined(__arm__)
@@ -132,6 +135,9 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
                 {
                     result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
                     addressFound = true;
+                    if (allowItfWithoutAddress)
+                        NX_LOG(lit("found address for interface " ) + iface.name() + lit(" ") + address.ip().toString(), cl_logALWAYS);
+
                     break;
                 }
             }
@@ -139,6 +145,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
 
         if (!addressFound && allowItfWithoutAddress)
         {
+            NX_LOG(lit("Add empty interface " ) + iface.name(), cl_logALWAYS);
             result.append(QnInterfaceAndAddr(iface.name(), QHostAddress(), QHostAddress(), iface));
         }
     }
