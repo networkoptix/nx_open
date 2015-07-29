@@ -123,7 +123,10 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
         if (!data.canConvert<QnAuditRecord>())
             base_type::paint(painter, option, index);
         QnAuditRecord record = data.value<QnAuditRecord>();
-        paintRichDateTime(painter, option, record.rangeEndSec);
+        if (record.eventType == Qn::AR_UnauthorizedLogin)
+            base_type::paint(painter, option, index);
+        else
+            paintRichDateTime(painter, option, record.rangeEndSec);
         break;
     }
     case QnAuditLogModel::DescriptionColumn:

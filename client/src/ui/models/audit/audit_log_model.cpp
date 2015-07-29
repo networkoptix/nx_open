@@ -276,16 +276,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord& data) const
         resListText += getResourceNameString(res);
     }
 
-    switch (data.eventType)
-    {
-    case Qn::AR_ViewArchive:
-    case Qn::AR_ViewLive:
-    case Qn::AR_CameraUpdate:
-        return tr("Cameras: ") + resListText;
-    case Qn::AR_ServerUpdate:
-        return tr("Servers:") + resListText;
-    }
-    return QString();
+    return resListText;
 }
 
 QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data, int row, bool hovered) const
