@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/network/tcp_connection_priv.h>
 #include <common/common_module.h>
+#include <utils/common/app_info.h>
 #include "utils/network/http/linesplitter.h"
 #include "network_address_entry.h"
 
@@ -58,9 +59,6 @@ bool readExtraFields(QnNetworkAddressEntryList& entryList)
     return true;
 }
 
-#include <utils/common/log.h>
-#include <utils/common/app_info.h>
-
 int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
     Q_UNUSED(path)
@@ -73,12 +71,7 @@ int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &
     {
         static const QChar kColon = ':';
         if (allInterfaces && iface.name.contains(kColon))
-        {
-            NX_LOG(lit("Skipping interface" ) + iface.name, cl_logALWAYS);
             continue;
-        }
-
-        NX_LOG(lit("Reading extra interface data " ) + iface.name, cl_logALWAYS);
 
         QnNetworkAddressEntry entry;
         entry.name = iface.netIf.name();

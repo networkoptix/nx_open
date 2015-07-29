@@ -82,9 +82,6 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface: interfaces)
     {
-        if (allowItfWithoutAddress)
-            NX_LOG(lit("found interface " ) + iface.name() + lit(" ") + QString::number(iface.flags()), cl_logALWAYS);
-
         if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
             continue;
 
@@ -100,12 +97,6 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
         {
             const bool isLocalHost = (address.ip() == QHostAddress::LocalHost);
             const bool isIpV4 = (address.ip().protocol() == QAbstractSocket::IPv4Protocol);
-
-            NX_LOG(lit("Address for iface " ) + iface.name() + lit(" ") + address.ip().toString()
-                + lit(" is local(") + (isLocalHost ? lit("true") : lit("false")) 
-                + lit("), is ipv4(") + (isIpV4 ? lit("true") : lit("false")) + lit(") ")
-                + address.ip().toString() + lit(" ") + QString::number(address.ip().protocol())
-                , cl_logALWAYS);
 
             if (isIpV4 && !isLocalHost)
             {
@@ -144,19 +135,13 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
                 {
                     result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
                     addEmpty = false;
-                    if (allowItfWithoutAddress)
-                        NX_LOG(lit("found address for interface " ) + iface.name() + lit(" ") + address.ip().toString(), cl_logALWAYS);
-
                     break;
                 }
             }
         }
 
         if (addEmpty && allowItfWithoutAddress)
-        {
-            NX_LOG(lit("Add empty interface " ) + iface.name(), cl_logALWAYS);
             result.append(QnInterfaceAndAddr(iface.name(), QHostAddress(), QHostAddress(), iface));
-        }
     }
 
     QMutexLocker lock(&mutex);
