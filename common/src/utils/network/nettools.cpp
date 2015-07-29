@@ -78,7 +78,6 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
     }
 
     QList<QnInterfaceAndAddr> result;
-    NX_LOG("----------", cl_logALWAYS);
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface: interfaces)
     {
