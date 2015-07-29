@@ -85,8 +85,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
         if (allowItfWithoutAddress)
             NX_LOG(lit("found interface " ) + iface.name() + lit(" ") + QString::number(iface.flags()), cl_logALWAYS);
 
-        if ((!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
-            && !allowItfWithoutAddress)
+        if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
             continue;
 
 #if defined(Q_OS_LINUX) && defined(__arm__)
@@ -150,10 +149,6 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
 
                     break;
                 }
-            }
-            else 
-            {
-                addEmpty = false;
             }
         }
 
