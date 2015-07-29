@@ -5,6 +5,7 @@
 
 #include <QAuthenticator>
 #include <QtCore/QMap>
+#include <QtCore/QMutex>
 #include <QElapsedTimer>
 #include <QCache>
 
