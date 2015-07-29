@@ -90,7 +90,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
             continue;
 #endif
 
-        bool addEmpty = true;
+        bool addInterfaceAnyway = allowItfWithoutAddress;
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address: addresses)
         {
@@ -133,13 +133,13 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress)
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
                     result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
-                    addEmpty = false;
+                    addInterfaceAnyway = false;
                     break;
                 }
             }
         }
 
-        if (addEmpty && allowItfWithoutAddress)
+        if (addInterfaceAnyway)
             result.append(QnInterfaceAndAddr(iface.name(), QHostAddress(), QHostAddress(), iface));
     }
 
