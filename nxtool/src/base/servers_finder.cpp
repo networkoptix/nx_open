@@ -64,6 +64,17 @@ namespace
         return (setsockopt( handle, IPPROTO_IP, IP_ADD_MEMBERSHIP
             , reinterpret_cast<const char*>(&request), sizeof(request)) == kNoError);
     }
+
+    
+    bool isDifferentFlags(const rtu::BaseServerInfo &first
+        , const rtu::BaseServerInfo &second
+        , rtu::Constants::ServerFlags excludeFlags)
+    {
+        const rtu::Constants::ServerFlags firstFlags = (first.flags & ~excludeFlags);
+        const rtu::Constants::ServerFlags secondFlags = (second.flags & ~excludeFlags);
+        return (firstFlags != secondFlags);
+    }
+
 }
 
 namespace
@@ -453,7 +464,8 @@ bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl
             displayAddressOutdated = true;
         }
 
-        if ((info != it->info) || displayAddressOutdated)
+        if ((info != it->info) || displayAddressOutdated
+            || isDifferentFlags(info, it->info, Constants::IsFactoryFlag))
         {
             oldInfo.name = info.name;
             oldInfo.systemName = info.systemName;

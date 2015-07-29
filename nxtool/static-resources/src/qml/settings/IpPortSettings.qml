@@ -114,7 +114,7 @@ Expandable.MaskedSettingsPanel
                 Base.Text
                 {
                     thin: false;
-                    text: qsTr("Port:");
+                    text: qsTr("Port");
                 }
                 
                 Base.PortControl
