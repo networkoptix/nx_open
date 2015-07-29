@@ -65,13 +65,18 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
             size.setHeight(m_defaultSectionSize);
         return size;
     }
-    if (column == QnAuditLogModel::PlayButtonColumn) 
+    else if (column == QnAuditLogModel::PlayButtonColumn) 
     {
         QFontMetrics fm(option.font);
         QSize sizeHint = fm.size(Qt::TextShowMnemonic, lit("Play this"));
         sizeHint += m_btnSize;
         sizeHint.setWidth(sizeHint.width() + BTN_ICON_SIZE);
         return sizeHint;
+    }
+    else if (column == QnAuditLogModel::TimestampColumn || column == QnAuditLogModel::EndTimestampColumn) {
+        QSize result =  base_type::sizeHint(option, index);
+        result.setWidth(result.width() + 4); // reserver a bit extra space because of time bold font
+        return result;
     }
     else 
         return base_type::sizeHint(option, index);
@@ -143,15 +148,16 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
         if (!data.canConvert<QnAuditRecord>())
             return base_type::paint(painter, option, index);
         QnAuditRecord record = data.value<QnAuditRecord>();
-        if (!record.isPlaybackType())
-            return base_type::paint(painter, option, index);
 
         QStyleOptionButton button;
-        button.text = lit("Play this");
+        button.text = index.data(Qt::DisplayRole).toString();
+        if (button.text.isEmpty())
+            return base_type::paint(painter, option, index);
+        
         if (option.state & QStyle::State_MouseOver)
-            button.icon = qnSkin->icon("slider/navigation/play_hovered.png");
+            button.icon = index.data(Qn::DecorationHoveredRole).value<QIcon>(); 
         else
-            button.icon = qnSkin->icon("slider/navigation/play.png");
+            button.icon = index.data(Qt::DecorationRole).value<QIcon>();
         button.iconSize = QSize(BTN_ICON_SIZE, BTN_ICON_SIZE);
         button.state = option.state;
 
@@ -392,15 +398,8 @@ void QnAuditLogDialog::at_masterItemPressed(const QModelIndex& index)
     m_masterHeaders->setCheckState(m_sessionModel->checkState());
 }
 
-void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
+void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord& record)
 {
-    if (index.data(Qn::ColumnDataRole) != QnAuditLogModel::PlayButtonColumn)
-        return;
-
-    QVariant data = index.data(Qn::AuditRecordDataRole);
-    if (!data.canConvert<QnAuditRecord>())
-        return;
-    QnAuditRecord record = data.value<QnAuditRecord>();
     QnResourceList resList;
     QnByteArrayConstRef archiveData = record.extractParam("archiveExist");
     int i = 0;
@@ -413,16 +412,51 @@ void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
     }
 
     QnActionParameters params(resList);
-    if (record.isPlaybackType()) 
-    {
-        if (resList.isEmpty()) {
-            QMessageBox::information(this, tr("Information"), tr("No archive data for that position left"));
-            return;
-        }
-
-        params.setArgument(Qn::ItemTimeRole, record.rangeStartSec * 1000ll);
-        context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+    if (resList.isEmpty()) {
+        QMessageBox::information(this, tr("Information"), tr("No archive data for that position left"));
+        return;
     }
+
+    params.setArgument(Qn::ItemTimeRole, record.rangeStartSec * 1000ll);
+    context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+}
+
+void QnAuditLogDialog::triggerAction(const QnAuditRecord& record, Qn::ActionId ActionId, const QString& objectName)
+{
+    QnResourceList resList;
+    for (const auto& id: record.resources) {
+        if (QnResourcePtr res = qnResPool->getResourceById(id))
+            resList << res;
+    }
+
+    QnActionParameters params(resList);
+    if (resList.isEmpty()) {
+        QMessageBox::information(this, tr("Information"), tr("All updated %1 already removed from the system"));
+        return;
+    }
+    
+    params.setArgument(Qn::ItemTimeRole, record.rangeStartSec * 1000ll);
+    context()->menu()->trigger(ActionId, params);
+}
+
+void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
+{
+    if (index.data(Qn::ColumnDataRole) != QnAuditLogModel::PlayButtonColumn)
+        return;
+
+    QVariant data = index.data(Qn::AuditRecordDataRole);
+    if (!data.canConvert<QnAuditRecord>())
+        return;
+    QnAuditRecord record = data.value<QnAuditRecord>();
+    if (record.isPlaybackType())
+        processPlaybackAction(record);
+    else if (record.eventType == Qn::AR_UserUpdate)
+        triggerAction(record, Qn::UserSettingsAction,   tr("user(s)"));
+    else if (record.eventType == Qn::AR_ServerUpdate)
+        triggerAction(record, Qn::ServerSettingsAction, tr("server(s)"));
+    else if (record.eventType == Qn::AR_CameraUpdate)
+        triggerAction(record, Qn::CameraSettingsAction,   tr("camera(s)"));
+
     if (isMaximized())
         showNormal();
 }

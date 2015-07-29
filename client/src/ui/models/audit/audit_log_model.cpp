@@ -14,6 +14,7 @@
 #include <plugins/resource/server_camera/server_camera.h>
 #include "client/client_settings.h"
 #include <ui/common/ui_resource_name.h>
+#include "ui/style/skin.h"
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
@@ -213,9 +214,9 @@ QString QnAuditLogModel::formatDuration(int duration) const
     return result;
 }
 
-QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType recordType) const
+QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType) const
 {
-    switch (recordType)
+    switch (eventType)
     {
     case Qn::AR_NotDefined:
             return tr("Unknown");
@@ -223,20 +224,44 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType recordType) const
             return tr("Unsuccessful login");
         case Qn::AR_Login:
             return tr("Login");
+        case Qn::AR_UserUpdate:
+            return tr("User updated");
+        case Qn::AR_ViewLive:
+            return tr("Watching live");
+        case Qn::AR_ViewArchive:
+            return tr("Watching archive");
+        case Qn::AR_ExportVideo:
+            return tr("Exporting video");
+        case Qn::AR_CameraUpdate:
+            return tr("Camera updated");
         case Qn::AR_SystemNameChanged:
             return tr("System name changed");
         case Qn::AR_SystemmMerge:
-            return tr("Merge systems");
-        case Qn::AR_CameraUpdate:
-            return tr("Camera(s) updated");
+            return tr("System merge");
+        case Qn::AR_GeneralSettingsChange:
+            return tr("General settings updated");
         case Qn::AR_ServerUpdate:
             return tr("Server updated");
-        case Qn::AR_GeneralSettingsChange:
-            return tr("General settings changed");
-        case Qn::AR_ViewArchive:
-            return tr("Watching archive");
-        case Qn::AR_ViewLive:
-            return tr("Watching live");
+        case Qn::AR_BEventUpdate:
+            return tr("Business rule updated");
+        case Qn::AR_EmailSettings:
+            return tr("E-mail updated");
+    }
+    return QString();
+}
+
+QString QnAuditLogModel::buttonNameForEvent(Qn::AuditRecordType eventType) const
+{
+    switch (eventType)
+    {
+    case Qn::AR_ViewLive:
+    case Qn::AR_ViewArchive:
+    case Qn::AR_ExportVideo:
+        return tr("Play this");
+    case Qn::AR_UserUpdate:
+    case Qn::AR_ServerUpdate:
+    case Qn::AR_CameraUpdate:
+        return tr("Settings");
     }
     return QString();
 }
@@ -294,13 +319,18 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data
                 int index = 0;
                 for (const auto& camera: data.resources) 
                 {
-                    bool isRecordExist = archiveData.size() > index && archiveData[index] == '1';
-                    index++;
-                    QChar circleSymbol = isRecordExist ? QChar(0x25CF) : QChar(0x25CB);
-                    if (isRecordExist)
-                        result += QString(lit("<br> <font size=5 color=red>%1</font> %2")).arg(circleSymbol).arg(getResourceNameString(camera));
-                    else
-                        result += QString(lit("<br> <font size=5>%1</font> %2")).arg(circleSymbol).arg(getResourceNameString(camera));
+                    result += lit("<br> ");
+                    if (data.isPlaybackType())
+                    {
+                        bool isRecordExist = archiveData.size() > index && archiveData[index] == '1';
+                        index++;
+                        QChar circleSymbol = isRecordExist ? QChar(0x25CF) : QChar(0x25CB);
+                        if (isRecordExist)
+                            result += QString(lit("<font size=5 color=red>%1</font>")).arg(circleSymbol);
+                        else
+                            result += QString(lit("<font size=5>%1</font>")).arg(circleSymbol);
+                    }
+                    result += getResourceNameString(camera);
                 }
             }
             return result;
@@ -349,6 +379,8 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord& data
         return eventTypeToString(data.eventType);
     case DescriptionColumn:
         return eventDescriptionText(data);
+    case PlayButtonColumn:
+        return buttonNameForEvent(data.eventType);
     }
 
     return QString();
@@ -561,6 +593,24 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
         }
         else
             return QVariant();
+    case Qt::DecorationRole:
+    case Qn::DecorationHoveredRole:
+    {
+        if (column != PlayButtonColumn)
+            return QVariant();
+        if (record.isPlaybackType()) {
+            if (role == Qt::DecorationRole)
+                return qnSkin->icon("slider/navigation/play.png");
+            else
+                return qnSkin->icon("slider/navigation/play_hovered.png");
+        }
+        else if (record.eventType == Qn::AR_UserUpdate)
+            return qnSkin->icon("tree/user.png");
+        else if (record.eventType == Qn::AR_ServerUpdate)
+            return qnSkin->icon("tree/server.png");
+        else if (record.eventType == Qn::AR_CameraUpdate)
+            return qnSkin->icon("tree/camera.png");
+    }
     default:
         break;
     }

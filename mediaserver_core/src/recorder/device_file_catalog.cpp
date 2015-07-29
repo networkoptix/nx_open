@@ -784,7 +784,12 @@ bool DeviceFileCatalog::containTime(const QnTimePeriod& period) const
         return false;
 
     ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin(), m_chunks.end(), period.startTimeMs);
-    return itr != m_chunks.end() && itr->startTimeMs < period.endTimeMs();
+    if (itr != m_chunks.end() && itr->startTimeMs < period.endTimeMs())
+        return true;
+    if (itr == m_chunks.begin())
+        return false;
+    --itr;
+    return itr->endTimeMs() >= period.startTimeMs;
 }
 
 bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const

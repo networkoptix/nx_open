@@ -548,6 +548,7 @@ public:
         
         AuditRecordDataRole,                        /**< Return QnAuditRecord object */
         ColumnDataRole,                             /**< convert index col count to column enumerator */
+        DecorationHoveredRole,                      /**< Same as Qt::DecorationRole but for hovered item */
 
         LastItemDataRole
     };

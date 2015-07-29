@@ -9,6 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 #include "api/model/audit/audit_record.h"
+#include "ui/actions/actions.h"
 
 class QnAuditLogSessionModel;
 class QnAuditLogDetailModel;
@@ -81,6 +82,8 @@ private:
 
     QnAuditRecordList filteredChildData(const QnAuditRecordList& checkedRows);
     void setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes);
+    void processPlaybackAction(const QnAuditRecord& record);
+    void triggerAction(const QnAuditRecord& record, Qn::ActionId ActionId, const QString& objectName);
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 
