@@ -9,6 +9,8 @@
 #include <QtCore/QSharedPointer>
 
 #include "utils/common/request_param.h"
+#include "utils/common/string.h"
+
 
 class TCPSocket;
 class QnRestConnectionProcessor;
@@ -49,7 +51,6 @@ public:
 protected:
     void setPath(const QString &path) { m_path = path; }
     
-    qint64 parseDateTime(const QString &dateTime) const;
     QString extractAction(const QString &path) const;
 
 protected:

@@ -45,6 +45,15 @@ inline QString datetimeSaveDialogSuggestion(const QDateTime& dt) {
     return dt.toString(lit("yyyy-MMM-dd_hh_mm_ss"));
 }
 
+/*!
+    \param dateTime Can be one of following:\n
+        - usec since epoch
+        - date in ISO format (YYYY-MM-DDTHH:mm:ss)
+        - special value "now". In this case \a DATETIME_NOW is returned
+    \return usec since epoch
+*/
+qint64 parseDateTime( const QString& dateTime );
+
 /**
  * \param size                          File size to format. Can be negative.
  * \param precision                     Maximal number of decimal digits after comma.

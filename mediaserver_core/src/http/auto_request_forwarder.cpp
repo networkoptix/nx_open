@@ -7,12 +7,19 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
+#include <utils/common/string.h>
 #include <utils/fs/file.h>
 #include <utils/network/rtsp/rtsp_types.h>
 
+#include "streaming/streaming_params.h"
+
+
+static const qint64 USEC_PER_MS = 1000;
 
 void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
 {
@@ -32,20 +39,37 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
         //detecting owner of res and adding SERVER_GUID_HEADER_NAME
         Q_ASSERT( cameraRes );
 
-        //TODO checking for the time requested to select desired server
+        //checking for the time requested to select desired server
+        const qint64 timestampMs = fetchTimestamp( *request, urlQuery );
 
-        auto parentRes = cameraRes->getParentResource();
-        if( dynamic_cast<QnMediaServerResource*>(parentRes.data()) == nullptr )
-            return;
+        QnMediaServerResourcePtr serverRes =
+            cameraRes->getParentResource().dynamicCast<QnMediaServerResource>();
+        if( timestampMs != -1 )
+        {
+            //searching server for timestamp
+            QnCameraHistoryPtr history =
+                QnCameraHistoryPool::instance()->getCameraHistory( cameraRes );
+            if( history )
+            {
+                QnMediaServerResourcePtr mediaServer = 
+                    history->getMediaServerOnTime( timestampMs, false );
+                if( mediaServer )
+                    serverRes = mediaServer;
+            }
+        }
+        if( !serverRes )
+            return; //no current server?
+        if( serverRes->getId() == qnCommon->moduleGUID() )
+            return; //target server is this one
         request->headers.emplace(
             Qn::SERVER_GUID_HEADER_NAME,
-            parentRes->getId().toByteArray() );
+            serverRes->getId().toByteArray() );
     }
 }
 
 bool QnAutoRequestForwarder::findCameraGuid(
     const nx_http::Request& request,
-    const QUrlQuery urlQuery,
+    const QUrlQuery& urlQuery,
     QnResourcePtr* const res )
 {
     QnUuid cameraGuid;
@@ -70,7 +94,7 @@ bool QnAutoRequestForwarder::findCameraGuid(
 
 bool QnAutoRequestForwarder::findCameraUniqueID(
     const nx_http::Request& request,
-    const QUrlQuery urlQuery,
+    const QUrlQuery& urlQuery,
     QnResourcePtr* const res )
 {
     return findCameraUniqueIDInPath( request, res ) ||
@@ -81,9 +105,6 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
     const nx_http::Request& request,
     QnResourcePtr* const res )
 {
-    if( request.requestLine.version == nx_rtsp::rtsp_1_0 )
-        int x = 0;
-
     //path containing camera unique_id looks like: /[something/]unique_id[.extension]
 
     const QString& requestedResourcePath = QnFile::fileName( request.requestLine.url.path() );
@@ -98,7 +119,7 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
 }
 
 bool QnAutoRequestForwarder::findCameraUniqueIDInQuery(
-    const QUrlQuery urlQuery,
+    const QUrlQuery& urlQuery,
     QnResourcePtr* const res )
 {
     const auto uniqueID = urlQuery.queryItemValue( Qn::CAMERA_UNIQUE_ID_HEADER_NAME );
@@ -106,4 +127,42 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInQuery(
         return false;
     *res = qnResPool->getResourceByUniqueId( uniqueID );
     return *res;
+}
+
+qint64 QnAutoRequestForwarder::fetchTimestamp(
+    const nx_http::Request& request,
+    const QUrlQuery& urlQuery )
+{
+    if( urlQuery.hasQueryItem(lit("time")) )    //in /api/image
+    {
+        const auto timeStr = urlQuery.queryItemValue( lit("time") );
+        if( timeStr.toLower().trimmed() == "latest" )
+            return -1;
+        else
+            return parseDateTime( timeStr.toLatin1() ) / USEC_PER_MS;
+    }
+
+    if( urlQuery.hasQueryItem( lit( "pos" ) ) )
+    {
+        const auto posStr = urlQuery.queryItemValue( lit( "pos" ) );
+        const auto ts = parseDateTime( posStr );
+        if( ts == DATETIME_NOW )
+            return -1;
+        //in rtsp "pos" is in usec. In http "pos" is in millis
+        return request.requestLine.version == nx_rtsp::rtsp_1_0 ? ts / USEC_PER_MS : ts;
+    }
+
+    if( urlQuery.hasQueryItem( StreamingParams::START_TIMESTAMP_PARAM_NAME ) )
+    {
+        const auto tsStr = urlQuery.queryItemValue( StreamingParams::START_TIMESTAMP_PARAM_NAME );
+        return tsStr.toLongLong();
+    }
+
+    if( urlQuery.hasQueryItem( StreamingParams::START_DATETIME_PARAM_NAME ) )
+    {
+        const auto tsStr = urlQuery.queryItemValue( StreamingParams::START_DATETIME_PARAM_NAME );
+        return QDateTime::fromString( tsStr, Qt::ISODate ).toMSecsSinceEpoch();
+    }
+
+    return -1;
 }

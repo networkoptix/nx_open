@@ -4,6 +4,7 @@
 
 #include "util.h"
 
+
 QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement) {
     if(!symbols)
         return string;
@@ -23,6 +24,24 @@ QString replaceCharacters(const QString &string, const char *symbols, const QCha
     }
 
     return result;
+}
+
+qint64 parseDateTime( const QString& dateTime )
+{
+    if( dateTime.toLower().trimmed() == lit( "now" ) )
+    {
+        return DATETIME_NOW;
+    }
+    else if( dateTime.contains( L'T' ) || (dateTime.contains( L'-' ) && !dateTime.startsWith( L'-' )) )
+    {
+        const QStringList dateTimeParts = dateTime.split( L'.' );
+        QDateTime tmpDateTime = QDateTime::fromString( dateTimeParts[0], Qt::ISODate );
+        if( dateTimeParts.size() > 1 )
+            tmpDateTime = tmpDateTime.addMSecs( dateTimeParts[1].toInt() / 1000 );
+        return tmpDateTime.toMSecsSinceEpoch() * 1000;
+    }
+    else
+        return dateTime.toLongLong();
 }
 
 QString formatFileSize(qint64 size, int precision, int prefixThreshold, Qn::MetricPrefix minPrefix, Qn::MetricPrefix maxPrefix, bool useBinaryPrefixes, const QString pattern) {
