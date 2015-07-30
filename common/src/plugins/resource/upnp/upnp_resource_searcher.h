@@ -85,7 +85,7 @@ protected:
     */
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const SocketAddress& host,
+        const SocketAddress& deviceEndpoint,
         const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) = 0;

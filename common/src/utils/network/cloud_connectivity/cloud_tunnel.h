@@ -124,7 +124,7 @@ namespace nx_cc
             \note Request interleaving is allowed
         */
         template<class Handler>
-        bool connect( unsigned int timeoutMillis, Handler&& completionHandler )
+        bool connect( unsigned int /*timeoutMillis*/, Handler&& completionHandler )
         {
             m_connectCompletionHandler = std::forward<Handler>( completionHandler );
             //TODO
