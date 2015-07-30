@@ -3,8 +3,10 @@
 #include <common/common_globals.h>
 #include <utils/network/connection_server/multi_address_server.h>
 #include <utils/network/stun/stun_connection.h>
+#include <utils/network/stun/stun_message.h>
 #include <stun/stun_server_connection.h>
 #include <stun/stun_stream_socket_server.h>
+#include <stun/custom_stun.h>
 
 #include <QMutex>
 #include <QWaitCondition>
@@ -40,6 +42,8 @@ private:
     Result m_result;
 };
 
+namespace nx_stun {
+
 TEST( Stun, Simple )
 {
     SocketAddress localhost( lit( "127.0.0.1"), 3345 );
@@ -51,7 +55,7 @@ TEST( Stun, Simple )
     ASSERT_TRUE( server.bind() );
     ASSERT_TRUE( server.listen() );
 
-    nx_stun::StunClientConnection client( localhost );
+    StunClientConnection client( localhost );
     {
         AsyncWaiter< SystemError::ErrorCode > waiter;
         ASSERT_TRUE( client.openConnection(
@@ -60,10 +64,17 @@ TEST( Stun, Simple )
         ASSERT_EQ( waiter.get(), SystemError::noError );
     }
     {
-        nx_stun::Message request;
-        // TODE: fill req
+        Message request( Header( MessageClass::request,
+                                 static_cast< int >( MethodType::binding ),
+                                 TransactionID::generateNew() ) );
+        request.addAttribute( std::make_unique<nx_stun::attr::UnknownAttribute>(
+                nx_hpm::StunParameters::systemName, QByteArray( "system1" ) ) );
+        request.addAttribute( std::make_unique<nx_stun::attr::UnknownAttribute>(
+                nx_hpm::StunParameters::serverId, QByteArray( "{uuid1}" ) ) );
+        request.addAttribute( std::make_unique<nx_stun::attr::UnknownAttribute>(
+                nx_hpm::StunParameters::authorization, QByteArray( "auth" ) ) );
 
-        AsyncWaiter< nx_stun::Message > waiter;
+        AsyncWaiter< Message > waiter;
         ASSERT_TRUE( client.sendRequest( std::move( request ),
             [ &waiter ]( SystemError::ErrorCode code,
                          nx_stun::Message&& message )
@@ -73,6 +84,14 @@ TEST( Stun, Simple )
         } ) );
 
         nx_stun::Message response = waiter.get();
-        // TODO: resp expects
+        ASSERT_EQ( response.header.messageClass, MessageClass::successResponse );
+        ASSERT_EQ( response.header.method, static_cast< int >( MethodType::binding ) );
+
+        const auto addr = response.getAttribute<attr::XorMappedAddress>();
+        ASSERT_NE( addr, nullptr );
+        ASSERT_EQ( addr->family, nx_stun::attr::XorMappedAddress::IPV4 );
+        ASSERT_EQ( addr->address.ipv4, localhost.address.ipv4() );
     }
 }
+
+} // namespace nx_stun

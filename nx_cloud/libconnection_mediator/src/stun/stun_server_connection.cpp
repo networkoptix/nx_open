@@ -15,12 +15,9 @@ StunServerConnection::StunServerConnection(
     StreamConnectionHolder<StunServerConnection>* socketServer,
     std::unique_ptr<AbstractCommunicatingSocket> sock )
 :
-    BaseType( socketServer, std::move( sock ) )
+    BaseType( socketServer, std::move( sock ) ),
+    peer_address_( BaseType::getForeignAddress() )
 {
-    peer_address_ = BaseType::getForeignAddress();
-    // No way to detect error here
-    bool ret = startReadingConnection();
-    Q_ASSERT(ret);
 }
 
 void StunServerConnection::processMessage( nx_stun::Message&& message )

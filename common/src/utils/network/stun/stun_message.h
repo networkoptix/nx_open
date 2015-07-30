@@ -55,6 +55,13 @@ namespace nx_stun
         TransactionID( std::uint32_t high = 0, std::uint64_t low = 0 ) {
             set( high, low );
         }
+        static TransactionID generateNew() {
+            TransactionID id;
+            id.set( static_cast< std::uint32_t >( qrand() ),
+                    static_cast< std::uint64_t >( qrand() ) +
+                    ( static_cast< std::uint64_t >( qrand() ) << 32 ) );
+            return id;
+        }
     };
 
     enum class MessageClass

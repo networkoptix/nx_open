@@ -491,7 +491,7 @@ nx_api::ParserState::Type MessageParser::parse( const nx::Buffer& user_buffer , 
                 break;
             default:
                 Q_ASSERT(0);
-                return 0;
+                return nx_api::ParserState::failed;
         }
 
         switch(ret) {                                       
