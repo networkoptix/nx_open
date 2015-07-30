@@ -503,7 +503,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenAuditLogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Audit Log..."));
+        text(tr("Audit trail..."));
 
     factory(Qn::OpenBusinessRulesAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).

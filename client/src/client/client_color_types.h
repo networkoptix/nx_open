@@ -183,6 +183,7 @@ struct QnAuditLogColors {
     QColor httpLink;
     
     QColor loginAction;
+    QColor unsucessLoginAction;
     QColor updUsers;
     QColor watchingLive;
     QColor watchingArchive;

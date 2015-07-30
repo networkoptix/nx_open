@@ -180,17 +180,50 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
 
 // ---------------------- QnAuditLogDialog ------------------------------
 
+QnAuditRecordList QnAuditLogDialog::filterDataByText() const
+{
+    if (ui->filterLineEdit->text().isEmpty())
+        return m_allData;
+
+    QnAuditRecordList result;
+    QStringList keywords = ui->filterLineEdit->text().split(lit(" "));
+
+    auto filter = [&keywords] (const QnAuditRecord& record) 
+    {
+        bool matched = true;
+        QString wholeText = QnAuditLogModel::makeSearchPattern(record);
+        for (const auto& keyword: keywords) {
+            if (!wholeText.contains(keyword, Qt::CaseInsensitive)) {
+                matched = false;
+                break;
+            }
+        }
+        return matched;
+    };
+    std::copy_if(m_allData.begin(), m_allData.end(), std::back_inserter(result), filter);
+    return result;
+}
+
+
 QnAuditRecordList QnAuditLogDialog::filteredChildData(const QnAuditRecordList& checkedRows)
 {
     QSet<QnUuid> selectedSessions;
     for (const auto& record: checkedRows) 
         selectedSessions << record.sessionId;
 
+    Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
+    for (const QCheckBox* checkBox: m_filterCheckboxes) 
+    {
+        if (!checkBox->isChecked()) 
+            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
+    }
+    
+
     QnAuditRecordList result;
-    auto filter = [&selectedSessions] (const QnAuditRecord& record) { 
-        return selectedSessions.contains(record.sessionId); // && !record.isLoginType();
+    auto filter = [&selectedSessions, &disabledTypes] (const QnAuditRecord& record) {
+        return selectedSessions.contains(record.sessionId) && !(disabledTypes & record.eventType);
     };
-    std::copy_if(m_allData.begin(), m_allData.end(), std::back_inserter(result), filter);
+    std::copy_if(m_filteredData.begin(), m_filteredData.end(), std::back_inserter(result), filter);
     return result;
 }
 
@@ -229,6 +262,31 @@ void QnAuditLogDialog::setupFilterCheckbox(QCheckBox* checkbox, const QColor& co
     palette.setColor(checkbox->foregroundRole(), color);
     checkbox->setPalette(palette);
     checkbox->setProperty("filter", (int) filteredTypes);
+    m_filterCheckboxes << checkbox;
+    connect(checkbox, &QCheckBox::stateChanged, this, &QnAuditLogDialog::at_updateDetailModel);
+}
+
+void QnAuditLogDialog::at_filterChanged()
+{
+    m_filteredData = filterDataByText();
+    QSet<QnUuid> filteredSessions;
+    for (const auto& record: m_filteredData)
+        filteredSessions << record.sessionId;
+    
+    QnAuditRecordList sessions;
+    for (const auto& record: m_allData) {
+        if (record.isLoginType() && filteredSessions.contains(record.sessionId))
+            sessions << record;
+    }
+
+    m_sessionModel->setData(sessions);
+}
+
+void QnAuditLogDialog::at_updateDetailModel()
+{
+    QnAuditRecordList checkedRows = m_sessionModel->checkedRows();
+    m_detailModel->setData(filteredChildData(checkedRows));
+    m_detailModel->setColumns(detailSessionColumns(checkedRows.size() > 1));
 }
 
 QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
@@ -252,7 +310,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     setupFilterCheckbox(ui->checkBoxArchive, colors.watchingArchive, Qn::AR_ViewArchive);
     setupFilterCheckbox(ui->checkBoxExport, colors.exportVideo, Qn::AR_ExportVideo);
     setupFilterCheckbox(ui->checkBoxCameras, colors.updCamera, Qn::AR_CameraUpdate);
-    setupFilterCheckbox(ui->checkBoxSystem, colors.systemActions, Qn::AR_SystemNameChanged | Qn::AR_SystemmMerge | Qn::AR_GeneralSettingsChange);
+    setupFilterCheckbox(ui->checkBoxSystem, colors.systemActions, Qn::AR_SystemNameChanged | Qn::AR_SystemmMerge | Qn::AR_SettingsChange);
     setupFilterCheckbox(ui->checkBoxServers, colors.updServer, Qn::AR_ServerUpdate);
     setupFilterCheckbox(ui->checkBoxBRules, colors.eventRules, Qn::AR_BEventUpdate);
     setupFilterCheckbox(ui->checkBoxEmail, colors.emailSettings, Qn::AR_EmailSettings);
@@ -286,12 +344,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
         (
         m_sessionModel, &QAbstractItemModel::dataChanged, this,
         [this] (const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
-    { 
-        if (roles.contains(Qt::CheckStateRole)) {
-            QnAuditRecordList checkedRows = m_sessionModel->checkedRows();
-            m_detailModel->setData(filteredChildData(checkedRows));
-            m_detailModel->setColumns(detailSessionColumns(checkedRows.size() > 1));
-        }
+    {
+        at_updateDetailModel();
     }
     );
     ui->gridMaster->setItemDelegate(itemDelegate);
@@ -348,12 +402,13 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     connect(ui->gridDetails,         &QTableView::clicked,               this,   &QnAuditLogDialog::at_eventsGrid_clicked);
 
     ui->mainGridLayout->activate();
-    //updateHeaderWidth();
+    
+    ui->filterLineEdit->setPlaceholderText(tr("Search"));
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
 }
 
 QnAuditLogDialog::~QnAuditLogDialog() {
 }
-
 
 void QnAuditLogDialog::at_eventsGrid_clicked(const QModelIndex& index)
 {
@@ -512,6 +567,7 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
 {
     m_requests.clear();
     m_allData.clear();
+    m_filteredData.clear();
 
 
     QList<QnMediaServerResourcePtr> mediaServerList = getServerList();
@@ -540,24 +596,18 @@ void QnAuditLogDialog::at_gotdata(int httpStatus, const QnAuditRecordList& recor
 
 void QnAuditLogDialog::requestFinished()
 {
-    auto sessionFilter = [] (const QnAuditRecord& record) { return record.isLoginType();  };
-    QnAuditRecordList sessions;
-    for (const auto& record: m_allData) {
-        if (sessionFilter(record))
-            sessions << record;
-    }
-    m_sessionModel->setData(sessions);
     m_masterHeaders->setCheckState(Qt::Unchecked);
+    at_filterChanged();
 
     ui->gridMaster->setDisabled(false);
     setCursor(Qt::ArrowCursor);
     //updateHeaderWidth();
     if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
-        ui->statusLabel->setText(tr("Audit log for period from %1 to %2 - %n session(s) found", "", m_sessionModel->rowCount())
+        ui->statusLabel->setText(tr("Audit trail for period from %1 to %2 - %n session(s) found", "", m_sessionModel->rowCount())
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
         .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate)));
     else
-        ui->statusLabel->setText(tr("Audit log for %1 - %n session(s) found", "", m_sessionModel->rowCount())
+        ui->statusLabel->setText(tr("Audit trail for %1 - %n session(s) found", "", m_sessionModel->rowCount())
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
     ui->loadingProgressBar->hide();
 }

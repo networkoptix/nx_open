@@ -68,6 +68,8 @@ private slots:
     void at_ItemEntered(const QModelIndex& index);
     void at_eventsGrid_clicked(const QModelIndex& idx);
     void at_headerCheckStateChanged(Qt::CheckState state);
+    void at_updateDetailModel();
+    void at_filterChanged();
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     void requestFinished();
@@ -84,6 +86,7 @@ private:
     void setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes);
     void processPlaybackAction(const QnAuditRecord& record);
     void triggerAction(const QnAuditRecord& record, Qn::ActionId ActionId, const QString& objectName);
+    QnAuditRecordList filterDataByText() const;
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 
@@ -92,6 +95,7 @@ private:
     QSet<int> m_requests;
 
     QnAuditRecordList m_allData;
+    QnAuditRecordList m_filteredData;
     bool m_updateDisabled;
     bool m_dirty;
 
@@ -99,6 +103,7 @@ private:
     QAction *m_exportAction;
     QAction *m_clipboardAction;
     QnCheckBoxedHeaderView* m_masterHeaders;
+    QList<QCheckBox*> m_filterCheckboxes;
 };
 
 #endif // QN_AUDIT_LOG_DIALOG_H

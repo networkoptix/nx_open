@@ -362,20 +362,20 @@ public:
 
     enum AuditRecordType
     {
-        AR_NotDefined,
-        AR_UnauthorizedLogin,
-        AR_Login,
-        AR_UserUpdate,
-        AR_ViewLive,
-        AR_ViewArchive,
-        AR_ExportVideo,
-        AR_CameraUpdate,
-        AR_SystemNameChanged,
-        AR_SystemmMerge,
-        AR_GeneralSettingsChange,
-        AR_ServerUpdate,
-        AR_BEventUpdate,
-        AR_EmailSettings
+        AR_NotDefined        = 0x0000,
+        AR_UnauthorizedLogin = 0x0001,
+        AR_Login             = 0x0002,
+        AR_UserUpdate        = 0x0004,
+        AR_ViewLive          = 0x0008,
+        AR_ViewArchive       = 0x0010,
+        AR_ExportVideo       = 0x0020,
+        AR_CameraUpdate      = 0x0040,
+        AR_SystemNameChanged = 0x0080,
+        AR_SystemmMerge      = 0x0100,
+        AR_SettingsChange    = 0x0200,
+        AR_ServerUpdate      = 0x0400,
+        AR_BEventUpdate      = 0x0800,
+        AR_EmailSettings     = 0x1000
     };
 
     Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)

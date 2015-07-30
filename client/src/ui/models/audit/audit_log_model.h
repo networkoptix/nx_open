@@ -60,6 +60,8 @@ public:
     void setColors(const QnAuditLogColors &colors);
     void setCheckState(Qt::CheckState state);
     Qt::CheckState checkState() const;
+
+    static QString makeSearchPattern(const QnAuditRecord& record);
 public slots:
     void clear();
 protected:
@@ -67,15 +69,16 @@ protected:
 private:
     class DataIndex;
 
-    QString getResourceNameString(QnUuid id) const;
-    QString textData(const Column& column,const QnAuditRecord& action, int row) const;
+    static QString getResourceNameString(QnUuid id);
     QString htmlData(const Column& column,const QnAuditRecord& data, int row, bool hovered) const;
-    QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true) const;
-    QString formatDuration(int durationSecs) const;
-    QString eventTypeToString(Qn::AuditRecordType recordType) const;
-    QString eventDescriptionText(const QnAuditRecord& data) const;
+    static QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true);
+    static QString formatDuration(int durationSecs);
+    static QString eventTypeToString(Qn::AuditRecordType recordType);
+    static QString eventDescriptionText(const QnAuditRecord& data);
     QVariant colorForType(Qn::AuditRecordType actionType) const;
-    QString buttonNameForEvent(Qn::AuditRecordType eventType) const;
+    static QString buttonNameForEvent(Qn::AuditRecordType eventType);
+    static QString textData(const Column& column,const QnAuditRecord& action);
+    bool skipDate(const QnAuditRecord &record, int row) const;
 protected:
     DataIndex* m_index;
     QList<Column> m_columns;

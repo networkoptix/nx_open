@@ -154,6 +154,7 @@ void QnAuditLogModel::setData(const QnAuditRecordList &data) {
     beginResetModel();
     m_index->setData(data);
     endResetModel();
+    emit dataChanged(index(0,0), index(m_index->size(), m_columns.size()), QVector<int>());
 }
 
 void QnAuditLogModel::clear() {
@@ -173,11 +174,12 @@ QModelIndex QnAuditLogModel::parent(const QModelIndex &) const {
     return QModelIndex();
 }
 
-QString QnAuditLogModel::getResourceNameString(QnUuid id) const {
+QString QnAuditLogModel::getResourceNameString(QnUuid id) 
+{
     return getResourceName(qnResPool->getResourceById(id));
 }
 
-QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime) const
+QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime)
 {
     if (timestampSecs == 0)
         return QString();
@@ -192,7 +194,7 @@ QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool s
         return QString();
 }
 
-QString QnAuditLogModel::formatDuration(int duration) const
+QString QnAuditLogModel::formatDuration(int duration)
 {
     int seconds = duration % 60;
     duration /= 60;
@@ -214,7 +216,7 @@ QString QnAuditLogModel::formatDuration(int duration) const
     return result;
 }
 
-QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType) const
+QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
 {
     switch (eventType)
     {
@@ -238,7 +240,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType) const
             return tr("System name changed");
         case Qn::AR_SystemmMerge:
             return tr("System merge");
-        case Qn::AR_GeneralSettingsChange:
+        case Qn::AR_SettingsChange:
             return tr("General settings updated");
         case Qn::AR_ServerUpdate:
             return tr("Server updated");
@@ -250,7 +252,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType) const
     return QString();
 }
 
-QString QnAuditLogModel::buttonNameForEvent(Qn::AuditRecordType eventType) const
+QString QnAuditLogModel::buttonNameForEvent(Qn::AuditRecordType eventType)
 {
     switch (eventType)
     {
@@ -266,7 +268,7 @@ QString QnAuditLogModel::buttonNameForEvent(Qn::AuditRecordType eventType) const
     return QString();
 }
 
-QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord& data) const
+QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord& data)
 {
     QString resListText;
     for (const auto& res: data.resources)
@@ -329,11 +331,33 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data
         }
     }
     
-    return textData(column, data, row);
+    if (column == DateColumn && skipDate(data, row))
+        return QString();
+    else
+        return textData(column, data);
 }
 
 
-QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord& data, int row) const
+QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord& record)
+{
+    Column columnsToFilter[] = 
+    {
+        TimestampColumn,
+        EndTimestampColumn,
+        DurationColumn,
+        UserNameColumn,
+        UserHostColumn,
+        EventTypeColumn,
+        DescriptionColumn,
+        PlayButtonColumn
+    };
+    QString result;
+    for(const auto& column: columnsToFilter)
+        result += textData(column, record);
+    return result;
+}
+
+QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord& data)
 {
     switch(column) {
     case SelectRowColumn:
@@ -341,12 +365,6 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord& data
     case TimestampColumn:
         return formatDateTime(data.createdTimeSec, true, true);
     case DateColumn:
-        if (row > 0) {
-            QDate d1 = QDateTime::fromMSecsSinceEpoch(data.createdTimeSec*1000).date();
-            QDate d2 = QDateTime::fromMSecsSinceEpoch(m_index->at(row-1).createdTimeSec*1000).date();
-            if (d1 == d2)
-                return QString();
-        }
         return formatDateTime(data.createdTimeSec, true, false);
     case TimeColumn:
         return formatDateTime(data.createdTimeSec, false, true);
@@ -518,6 +536,7 @@ QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
     switch (actionType)
     {
     case Qn::AR_UnauthorizedLogin:
+        return m_colors.unsucessLoginAction;
     case Qn::AR_Login:
         return m_colors.loginAction;
     case Qn::AR_UserUpdate:
@@ -532,7 +551,7 @@ QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
         return m_colors.updCamera;
     case Qn::AR_SystemNameChanged:
     case Qn::AR_SystemmMerge:
-    case Qn::AR_GeneralSettingsChange:
+    case Qn::AR_SettingsChange:
         return m_colors.systemActions;
     case Qn::AR_ServerUpdate:
         return m_colors.updServer;
@@ -543,6 +562,16 @@ QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
     default:
         return QVariant();
     }
+}
+
+bool QnAuditLogModel::skipDate(const QnAuditRecord &record, int row) const
+{
+    if (row < 1) 
+        return false;
+
+    QDate d1 = QDateTime::fromMSecsSinceEpoch(record.createdTimeSec*1000).date();
+    QDate d2 = QDateTime::fromMSecsSinceEpoch(m_index->at(row-1).createdTimeSec*1000).date();
+    return d1 == d2;
 }
 
 QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const 
@@ -562,7 +591,12 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
         else
             return QVariant();
     case Qt::DisplayRole:
-        return QVariant(textData(column, record, index.row()));
+    {
+        if (column == DateColumn && skipDate(record, index.row()))
+            return QString();
+        else
+            return QVariant(textData(column, record));
+    }
     case Qn::AuditRecordDataRole:
         return QVariant::fromValue<QnAuditRecord>(m_index->at(index.row()));
     case Qn::DisplayHtmlRole:
