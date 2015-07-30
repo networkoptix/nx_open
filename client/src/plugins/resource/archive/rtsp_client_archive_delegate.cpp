@@ -670,7 +670,7 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
    // RtpHeader* rtpHeader = (RtpHeader*) data;
     const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
     QByteArray ba((const char*)payload, data + dataSize - payload);
-    if (ba.startsWith("npt="))
+    if (ba.startsWith("clock="))
         m_rtspSession.parseRangeHeader(QLatin1String(ba));
     else if (ba.startsWith("drop-report"))
         emit dataDropped(m_reader);

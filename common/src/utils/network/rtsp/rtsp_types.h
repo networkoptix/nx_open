@@ -27,11 +27,11 @@ namespace nx_rtsp
     //!Parses Range header ([rfc2326, 12.29])
     /*!
         Returns range in microseconds
-        \note only \a npt is supported
+        \note only \a clock is supported. Though, it MUST contain UTC timestamp (millis or usec). I.e., not rfc2326-compliant
         \note for \a now constant \a DATETIME_NOW is returned
-        \warning \a npt is considered to be millis or usec since epoch
+        \return \a true if \a startTime and \a endTime were filled with values 
     */
-    void parseRangeHeader( const nx_http::StringType& rangeStr, qint64* startTime, qint64* endTime );
+    bool parseRangeHeader( const nx_http::StringType& rangeStr, qint64* startTime, qint64* endTime );
 }
 
 #endif  //NX_RTSP_TYPES_H

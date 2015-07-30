@@ -31,12 +31,12 @@ namespace nx_rtsp
         const nx_http::StringType Range::NAME = "Range";
     }
 
-    void parseRangeHeader( const nx_http::StringType& rangeStr, qint64* startTime, qint64* endTime )
+    bool parseRangeHeader( const nx_http::StringType& rangeStr, qint64* startTime, qint64* endTime )
     {
         const auto rangeType = rangeStr.trimmed().split('=');
         if (rangeType.size() < 2)
-            return;
-        if (rangeType[0] == "npt")
+            return false;
+        if (rangeType[0] == "clock")
         {
             const auto values = rangeType[1].split('-');
         
@@ -45,6 +45,9 @@ namespace nx_rtsp
                 extractNptTime(values[1], endTime);
             else
                 *endTime = DATETIME_NOW;
+            return true;
         }
+
+        return false;
     }
 }

@@ -563,7 +563,7 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
     QStringList rangeType = rangeStr.trimmed().split(QLatin1Char('='));
     if (rangeType.size() < 2)
         return;
-    if (rangeType[0] == QLatin1String("npt"))
+    if (rangeType[0] == QLatin1String("clock"))
     {
         int index = rangeType[1].lastIndexOf(QLatin1Char('-'));
         QString start = rangeType[1].mid(0, index);
@@ -1132,16 +1132,16 @@ void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPo
     {
         nx_http::StringType rangeVal;
         if (startPos != DATETIME_NOW)
-            rangeVal += "npt=" + nx_http::StringType::number(startPos);
+            rangeVal += "clock=" + nx_http::StringType::number(startPos);
         else
-            rangeVal += "npt=now";
+            rangeVal += "clock=now";
         rangeVal += '-';
         if (endPos != qint64(AV_NOPTS_VALUE))
         {
             if (endPos != DATETIME_NOW)
                 rangeVal += nx_http::StringType::number(endPos);
             else
-                rangeVal += "now";
+                rangeVal += "clock";
         }
         request->headers.insert( nx_http::HttpHeader( "Range", rangeVal ) );
     }

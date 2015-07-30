@@ -454,7 +454,7 @@ QByteArray QnRtspConnectionProcessor::getRangeStr()
         if (d->useProprietaryFormat)
         {
             // range in usecs since UTC
-            range = "npt=";
+            range = "clock=";
             if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += "now";
             else

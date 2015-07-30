@@ -162,21 +162,13 @@ qint64 QnAutoRequestForwarder::fetchTimestamp(
     if( request.requestLine.version == nx_rtsp::rtsp_1_0 )
     {
         //searching for position in headers
-        auto userAgentIter = request.headers.find( "User-Agent" );
-        if( userAgentIter == request.headers.end() || 
-            (userAgentIter->second != RTPSession::USER_AGENT_STR) )
-        {
-            //Analyzing requests from Nx client only since we use incorrect Range header format
-            return -1;
-        }
-
         auto rangeIter = request.headers.find( nx_rtsp::header::Range::NAME );
         if( rangeIter != request.headers.end() )
         {
             qint64 startTimestamp = 0;
             qint64 endTimestamp = 0;
-            nx_rtsp::parseRangeHeader( rangeIter->second, &startTimestamp, &endTimestamp );
-            return startTimestamp / USEC_PER_MS;
+            if( nx_rtsp::parseRangeHeader( rangeIter->second, &startTimestamp, &endTimestamp ) )
+                return startTimestamp / USEC_PER_MS;
         }
     }
 
