@@ -12,7 +12,7 @@
     #include <signal.h>
 #endif
 
-static MediatorProcess* serviceInstance = NULL;
+static nx::hpm::MediatorProcess* serviceInstance = NULL;
 
 void stopServer( int /*signal*/ )
 {
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
     signal(SIGTERM, stopServer);
 #endif
 
-    MediatorProcess service(argc, argv);
+    nx::hpm::MediatorProcess service(argc, argv);
     serviceInstance = &service;
     const int result = service.exec();
 
