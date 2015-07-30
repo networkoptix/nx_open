@@ -114,8 +114,8 @@
                                 </goals>
                                 <configuration>
                                     <target>
-                                        <chmod file="${project.build.directory}/deploy.sh" perm="755"/>
-                                        <exec dir="${project.build.directory}" executable="${project.build.directory}/deploy.sh" failifexecutionfails="true" />
+                                        <chmod file="${project.build.directory}/deploy-android.sh" perm="755"/>
+                                        <exec dir="${project.build.directory}" executable="${project.build.directory}/deploy-android.sh" failifexecutionfails="true" />
                                     </target>
                                 </configuration>
                             </execution>
