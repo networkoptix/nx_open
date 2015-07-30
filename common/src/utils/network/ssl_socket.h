@@ -99,6 +99,7 @@ private:
     int asyncSendInternal( const void* buffer , unsigned int bufferLen );
     IOMode readMode() const;
     IOMode writeMode() const;
+    void init();
 };
 
 //!Can be used to accept both SSL and non-SSL connections on single port

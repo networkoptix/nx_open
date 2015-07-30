@@ -245,7 +245,7 @@ namespace nx_stun
     // function. Not a specialized template for hash class in namespace std .
     template< typename T > struct StunHash {};
     template<> struct StunHash<attr::AttributeType> {
-        std::size_t operator () ( const attr::AttributeType& a ) const noexcept {
+        std::size_t operator () ( const attr::AttributeType& a ) const {
             return static_cast<std::size_t>(a);
         }
     };

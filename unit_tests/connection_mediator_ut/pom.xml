@@ -20,9 +20,9 @@
         <product.title>HD Cloud Connection Mediator Unit Tests</product.title>
         <!--Global libs-->
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lcommon -ludt -lconnection_mediator -lgtest</global.libs>
+        <global.libs>-lcommon -ludt -lconnection_mediator</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs></windows.oslibs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lssleay32 -llibeay32</windows.oslibs>
         <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac</linux.oslibs>
         <linux.arm.oslibs></linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
@@ -31,7 +31,7 @@
         <!--Global defines-->
         <global.defines></global.defines>
         <!--Specific os defines-->
-        <windows.defines></windows.defines>
+        <windows.defines>_VARIADIC_MAX=10</windows.defines>
         <linux.defines/>
         <mac.defines/>
     </properties>
