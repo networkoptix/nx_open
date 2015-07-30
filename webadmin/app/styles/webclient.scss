@@ -17,11 +17,13 @@
 .dark-theme{
   color:white;
   background-color: #1C2327;
-  height:800px;
   position:absolute;
   top:0px;
   height:100%;
   padding-top:52px;
+}
+.videowindow{
+  background-color: #1C2327;
 }
 .dark-theme videogular{
   background-color: #1C2327;
@@ -96,6 +98,7 @@ table.webclient-window>tbody>tr>td{
   width:100%;
   height:100%;
 
+  padding: 0px 20px;
   background-color: rgba(28, 35, 39, 0.6);
 }
 
@@ -105,7 +108,6 @@ table.webclient-window>tbody>tr>td{
 .videowindow{
   width:100%;
   height: 100%;
-  padding:0px 20px;
   overflow: hidden;
 }
 .videowindow #videowindow{

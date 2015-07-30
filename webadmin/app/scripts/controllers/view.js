@@ -304,7 +304,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.fullScreen = function(){
-            $scope.playerAPI.toggleFullScreen();
+            if (screenfull.enabled) {
+                screenfull.request($(".videowindow").get(0));
+            }
         };
 
         $scope.$watch('allcameras', function () {
