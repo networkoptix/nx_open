@@ -15,6 +15,7 @@
 #include <utils/common/string.h>
 #include <utils/fs/file.h>
 #include <utils/network/rtsp/rtsp_types.h>
+#include <utils/network/rtpsession.h>
 
 #include "streaming/streaming_params.h"
 
@@ -142,26 +143,41 @@ qint64 QnAutoRequestForwarder::fetchTimestamp(
             return parseDateTime( timeStr.toLatin1() ) / USEC_PER_MS;
     }
 
-    if( urlQuery.hasQueryItem( lit( "pos" ) ) )
+    if( urlQuery.hasQueryItem( StreamingParams::START_POS_PARAM_NAME ) )
     {
-        const auto posStr = urlQuery.queryItemValue( lit( "pos" ) );
+        //in rtsp "pos" is usec only, no date! In http "pos" is in millis or iso date
+        const auto posStr = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME );
         const auto ts = parseDateTime( posStr );
         if( ts == DATETIME_NOW )
             return -1;
-        //in rtsp "pos" is in usec. In http "pos" is in millis
-        return request.requestLine.version == nx_rtsp::rtsp_1_0 ? ts / USEC_PER_MS : ts;
+        return ts / USEC_PER_MS;
     }
 
     if( urlQuery.hasQueryItem( StreamingParams::START_TIMESTAMP_PARAM_NAME ) )
     {
         const auto tsStr = urlQuery.queryItemValue( StreamingParams::START_TIMESTAMP_PARAM_NAME );
-        return tsStr.toLongLong();
+        return tsStr.toLongLong() / USEC_PER_MS;
     }
 
-    if( urlQuery.hasQueryItem( StreamingParams::START_DATETIME_PARAM_NAME ) )
+    if( request.requestLine.version == nx_rtsp::rtsp_1_0 )
     {
-        const auto tsStr = urlQuery.queryItemValue( StreamingParams::START_DATETIME_PARAM_NAME );
-        return QDateTime::fromString( tsStr, Qt::ISODate ).toMSecsSinceEpoch();
+        //searching for position in headers
+        auto userAgentIter = request.headers.find( "User-Agent" );
+        if( userAgentIter == request.headers.end() || 
+            (userAgentIter->second != RTPSession::USER_AGENT_STR) )
+        {
+            //Analyzing requests from Nx client only since we use incorrect Range header format
+            return -1;
+        }
+
+        auto rangeIter = request.headers.find( nx_rtsp::header::Range::NAME );
+        if( rangeIter != request.headers.end() )
+        {
+            qint64 startTimestamp = 0;
+            qint64 endTimestamp = 0;
+            nx_rtsp::parseRangeHeader( rangeIter->second, &startTimestamp, &endTimestamp );
+            return startTimestamp / USEC_PER_MS;
+        }
     }
 
     return -1;

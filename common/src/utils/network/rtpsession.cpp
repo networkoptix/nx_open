@@ -38,7 +38,6 @@ static const quint32 CSRC_CONST = 0xe8a9552a;
 static const int TCP_CONNECT_TIMEOUT = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
-static const char USER_AGENT_STR[] = "Network Optix";
 //static const int TIME_RESYNC_THRESHOLD = 15;
 //static const int TIME_FUTURE_THRESHOLD = 4;
 //static const double TIME_RESYNC_THRESHOLD2 = 30;
@@ -374,6 +373,8 @@ static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64*1024;
 static std::atomic<int> RTPSessionInstanceCounter(0);
 
 // ================================================== RTPSession ==========================================
+const char RTPSession::USER_AGENT_STR[] = "Network Optix";
+
 RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
 :
     m_csec(2),
@@ -557,6 +558,8 @@ void RTPSession::parseSDP()
 
 void RTPSession::parseRangeHeader(const QString& rangeStr)
 {
+    //TODO use nx_rtsp::parseRangeHeader
+
     QStringList rangeType = rangeStr.trimmed().split(QLatin1Char('='));
     if (rangeType.size() < 2)
         return;

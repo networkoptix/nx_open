@@ -18,8 +18,10 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/resource_media_layout.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
+#include <utils/common/string.h>
 
 #include "utils/network/tcp_connection_priv.h"
+#include "utils/network/rtsp/rtsp_types.h"
 #include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "camera/camera_pool.h"
 #include "utils/network/rtpsession.h"
@@ -42,6 +44,7 @@
 #include <utils/common/model_functions.h>
 #include "http/custom_headers.h"
 #include "media_server/settings.h"
+#include "streaming/streaming_params.h"
 
 
 class QnTcpListener;
@@ -259,11 +262,11 @@ void QnRtspConnectionProcessor::parseRequest()
             d->codecId = CODEC_ID_NONE;
     };
 
-    QString pos = urlQuery.queryItemValue("pos").split('/')[0];
+    const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
     if (pos.isEmpty())
         processRangeHeader();
     else
-        d->startTime = pos.toLongLong();
+        d->startTime = parseDateTime( pos ); //pos.toLongLong();
     QByteArray resolutionStr = urlQuery.queryItemValue("resolution").split('/')[0].toUtf8();
     if (!resolutionStr.isEmpty())
     {
@@ -865,45 +868,14 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
         return AV_NOPTS_VALUE;
 }
 
-void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* dst)
-{
-    if (strValue == "now")
-    {
-        //*dst = getRtspTime();
-        *dst = DATETIME_NOW;
-    }
-    else {
-        double val = strValue.toDouble();
-        // some client got time in seconds, some in microseconds, convert all to microseconds
-        *dst = val < 1000000 ? val * 1000000.0 : val;
-    }
-}
-
 void QnRtspConnectionProcessor::processRangeHeader()
 {
     Q_D(QnRtspConnectionProcessor);
-    QString rangeStr = nx_http::getHeaderValue(d->request.headers, "Range");
+    const auto rangeStr = nx_http::getHeaderValue(d->request.headers, "Range");
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-    parseRangeHeader(rangeStr, &d->startTime, &d->endTime);
+    nx_rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime);
     if (cameraResource && d->startTime == 0 && !d->useProprietaryFormat)
         d->startTime = DATETIME_NOW;
-}
-
-void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64* startTime, qint64* endTime)
-{
-    QStringList rangeType = rangeStr.trimmed().split("=");
-    if (rangeType.size() < 2)
-        return;
-    if (rangeType[0] == "npt")
-    {
-        QStringList values = rangeType[1].split("-");
-        
-        extractNptTime(values[0], startTime);
-        if (values.size() > 1 && !values[1].isEmpty())
-            extractNptTime(values[1], endTime);
-        else
-            *endTime = DATETIME_NOW;
-    }
 }
 
 void QnRtspConnectionProcessor::at_camera_resourceChanged()

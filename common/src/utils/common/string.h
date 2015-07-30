@@ -1,8 +1,12 @@
 #ifndef QN_STRING_H
 #define QN_STRING_H
 
+#include <QtCore/QDateTime>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+
+#include "common/common_globals.h"
+
 
 namespace Qn {
     enum MetricPrefix {
@@ -47,7 +51,7 @@ inline QString datetimeSaveDialogSuggestion(const QDateTime& dt) {
 
 /*!
     \param dateTime Can be one of following:\n
-        - usec since epoch
+        - usec or millis since since 1971-01-01 (not supporting 1970 to be able to distinguish millis and usec)
         - date in ISO format (YYYY-MM-DDTHH:mm:ss)
         - special value "now". In this case \a DATETIME_NOW is returned
     \return usec since epoch

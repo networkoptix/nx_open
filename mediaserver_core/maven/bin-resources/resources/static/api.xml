@@ -1571,7 +1571,8 @@
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>By default server opens camera from live position. This parameter defines position in an archive in microseconds in a UTC format.
+                            <description>By default server opens camera from live position. This parameter defines position in an archive in 
+                                                        milliseconds since epoch, microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
                                                         Position can be passed via standard RTSP attribute as well as via URL parameter</description>
                             <optional>true</optional>
                         </param>
@@ -1653,7 +1654,9 @@
                         </param>
                         <param>
                             <name>pos</name>
-                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions in milliseconds from epoch (1970-01-01 00:00, UTC). Otherwise, LIVE stream is provided</description>
+                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions 
+                                         milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
+                                         Otherwise, LIVE stream is provided</description>
                             <optional>true</optional>
                         </param>
                         <param>

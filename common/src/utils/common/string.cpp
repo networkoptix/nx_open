@@ -28,6 +28,14 @@ QString replaceCharacters(const QString &string, const char *symbols, const QCha
 
 qint64 parseDateTime( const QString& dateTime )
 {
+    static const qint64 MIN_PER_HOUR = 60;
+    static const qint64 SEC_PER_MIN = 60;
+    static const qint64 HOUR_PER_DAY = 24;
+    static const qint64 DAY_PER_NON_LEAP_YEAR = 365;
+    static const qint64 DAY_PER_LEAP_YEAR = 366;
+    static const qint64 MS_PER_SEC = 1000;
+    static const qint64 USEC_PER_MS = 1000;
+
     if( dateTime.toLower().trimmed() == lit( "now" ) )
     {
         return DATETIME_NOW;
@@ -38,10 +46,17 @@ qint64 parseDateTime( const QString& dateTime )
         QDateTime tmpDateTime = QDateTime::fromString( dateTimeParts[0], Qt::ISODate );
         if( dateTimeParts.size() > 1 )
             tmpDateTime = tmpDateTime.addMSecs( dateTimeParts[1].toInt() / 1000 );
-        return tmpDateTime.toMSecsSinceEpoch() * 1000;
+        return tmpDateTime.toMSecsSinceEpoch() * USEC_PER_MS;
     }
     else
-        return dateTime.toLongLong();
+    {
+        auto somethingSinceEpoch = dateTime.toLongLong();
+        //detecting millis or usec?
+        if( somethingSinceEpoch < (DAY_PER_NON_LEAP_YEAR * HOUR_PER_DAY * MIN_PER_HOUR * SEC_PER_MIN * MS_PER_SEC * USEC_PER_MS) )
+            return somethingSinceEpoch * USEC_PER_MS;   //dateTime is in millis
+        else
+            return somethingSinceEpoch;
+    }
 }
 
 QString formatFileSize(qint64 size, int precision, int prefixThreshold, Qn::MetricPrefix minPrefix, Qn::MetricPrefix maxPrefix, bool useBinaryPrefixes, const QString pattern) {
