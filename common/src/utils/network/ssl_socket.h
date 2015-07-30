@@ -85,12 +85,13 @@ public:
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
 
-    enum {
+protected:
+    enum IOMode
+    {
         ASYNC,
         SYNC
     };
 
-protected:
     friend int sock_read(BIO *b, char *out, int outl);
     friend int sock_write(BIO *b, const char *in, int inl);
 
@@ -111,8 +112,10 @@ private:
     // Async version
     int asyncRecvInternal( void* buffer , unsigned int bufferLen );
     int asyncSendInternal( const void* buffer , unsigned int bufferLen );
-    int mode() const;
+    IOMode readMode() const;
+    IOMode writeMode() const;
     void init();
+
 protected:
     Q_DECLARE_PRIVATE(QnSSLSocket);
     QnSSLSocketPrivate *d_ptr;
