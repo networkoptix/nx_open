@@ -477,19 +477,36 @@
                 <!--<module>plugins/xvbadecoder</module>-->
             </modules>
         </profile>
+
         <profile>
-            <id>macosx</id>
+            <id>mac_common</id>
             <activation>
                 <os>
                     <family>mac</family>
                 </os>
             </activation>
             <properties>
-                <platform>macosx</platform>
                 <additional.compiler>clang</additional.compiler>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
+                <python.executable>python</python.executable>
+                <python.virtualenv>virtualenv</python.virtualenv>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>macosx</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+                <property>
+                    <name>!mobile</name>
+                </property>
+            </activation>
+            <properties>
+                <platform>macosx</platform>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
@@ -837,7 +854,7 @@
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
-                <openssl.version>1.0.2d-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.1i-SNAPSHOT</openssl.version>
                 <compile.option1/>
             </properties>
         </profile>

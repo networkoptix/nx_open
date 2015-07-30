@@ -142,5 +142,38 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>build-ipa</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <chmod file="${project.build.directory}/deploy-ios.sh" perm="755"/>
+                                        <exec dir="${project.build.directory}" executable="${project.build.directory}/deploy-ios.sh" failifexecutionfails="true" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
