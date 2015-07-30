@@ -67,13 +67,13 @@ public:
     //!Implementation of \a AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
 
-    enum
+protected:
+    enum IOMode
     {
         ASYNC,
         SYNC
     };
 
-protected:
     Q_DECLARE_PRIVATE(QnSSLSocket);
     QnSSLSocketPrivate *d_ptr;
 
@@ -97,8 +97,8 @@ private:
     // Async version
     int asyncRecvInternal( void* buffer , unsigned int bufferLen );
     int asyncSendInternal( const void* buffer , unsigned int bufferLen );
-    int mode() const;
-    void init();
+    IOMode readMode() const;
+    IOMode writeMode() const;
 };
 
 //!Can be used to accept both SSL and non-SSL connections on single port

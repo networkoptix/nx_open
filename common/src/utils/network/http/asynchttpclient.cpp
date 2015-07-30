@@ -633,7 +633,7 @@ namespace nx_http
 
         m_state = sInit;
 
-        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(m_url.scheme() == lit("https")));
+        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*m_url.scheme() == lit("https")*/));
         m_connectionClosed = false;
         if( !m_socket->setNonBlockingMode( true ) ||
             !m_socket->setSendTimeout( m_sendTimeoutMs ) ||
