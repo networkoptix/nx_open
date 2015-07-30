@@ -203,6 +203,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnIOPortData>();
     qRegisterMetaType<QnIOStateData>();
     qRegisterMetaType<QnAuditRecord>();
+    qRegisterMetaType<QnAuditRecord*>();
 
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();

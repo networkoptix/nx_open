@@ -37,10 +37,15 @@ public:
     QnAuditLogModel(QObject *parent = NULL);
     virtual ~QnAuditLogModel();
 
-    void setData(const QnAuditRecordList &data);
+    /*
+    * Model uses reference to the data. Data MUST be alive till model clear call
+    */
+    void setData(const QnAuditRecordRefList &data);
+    void clearData();
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    QnAuditRecordList data() const;
-    QnAuditRecordList checkedRows();
+    void setData(const QModelIndexList &indexList, const QVariant &value, int role = Qt::EditRole);
+    QnAuditRecordRefList data() const;
+    QnAuditRecordRefList checkedRows();
     
 
     QList<Column> columns() const;
@@ -61,24 +66,24 @@ public:
     void setCheckState(Qt::CheckState state);
     Qt::CheckState checkState() const;
 
-    static QString makeSearchPattern(const QnAuditRecord& record);
+    static QString makeSearchPattern(const QnAuditRecord* record);
 public slots:
     void clear();
 protected:
-    QnAuditRecord rawData(int row) const;
+    QnAuditRecord* rawData(int row) const;
 private:
     class DataIndex;
 
     static QString getResourceNameString(QnUuid id);
-    QString htmlData(const Column& column,const QnAuditRecord& data, int row, bool hovered) const;
+    QString htmlData(const Column& column,const QnAuditRecord* data, int row, bool hovered) const;
     static QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true);
     static QString formatDuration(int durationSecs);
     static QString eventTypeToString(Qn::AuditRecordType recordType);
-    static QString eventDescriptionText(const QnAuditRecord& data);
+    static QString eventDescriptionText(const QnAuditRecord* data);
     QVariant colorForType(Qn::AuditRecordType actionType) const;
     static QString buttonNameForEvent(Qn::AuditRecordType eventType);
-    static QString textData(const Column& column,const QnAuditRecord& action);
-    bool skipDate(const QnAuditRecord &record, int row) const;
+    static QString textData(const Column& column,const QnAuditRecord* action);
+    bool skipDate(const QnAuditRecord *record, int row) const;
 protected:
     DataIndex* m_index;
     QList<Column> m_columns;

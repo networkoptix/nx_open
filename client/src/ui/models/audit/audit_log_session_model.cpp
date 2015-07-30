@@ -9,8 +9,8 @@ QVariant QnAuditLogSessionModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     const Column &column = m_columns[index.column()];
-    const QnAuditRecord &record = rawData(index.row());
-    if (record.eventType == Qn::AR_UnauthorizedLogin && column != SelectRowColumn && column != TimestampColumn)
+    const QnAuditRecord* record = rawData(index.row());
+    if (record->eventType == Qn::AR_UnauthorizedLogin && column != SelectRowColumn && column != TimestampColumn)
         return m_colors.unsucessLoginAction;
     else
         return QVariant();

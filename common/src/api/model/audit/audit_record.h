@@ -39,10 +39,12 @@ struct QnAuditRecord
     QString userHost;
 };
 typedef QVector<QnAuditRecord> QnAuditRecordList;
+typedef QVector<QnAuditRecord*> QnAuditRecordRefList;
 
 
 #define QnAuditRecord_Fields (createdTimeSec)(rangeStartSec)(rangeEndSec)(eventType)(resources)(params)(sessionId)(userName)(userHost)
 Q_DECLARE_METATYPE(QnAuditRecord)
+Q_DECLARE_METATYPE(QnAuditRecord*)
 Q_DECLARE_METATYPE(QnAuditRecordList)
 
 

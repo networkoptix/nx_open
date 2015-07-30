@@ -41,13 +41,13 @@ public:
         updateIndex();
     }
 
-    void setData(const QnAuditRecordList &data)
+    void setData(const QnAuditRecordRefList &data)
     { 
         m_data = data;
         updateIndex();
     }
 
-    QnAuditRecordList data() const
+    QnAuditRecordRefList data() const
     {
         return m_data;
     }
@@ -63,43 +63,43 @@ public:
     }
 
 
-    inline QnAuditRecord& at(int row)
+    inline QnAuditRecord* at(int row)
     {
         return m_sortOrder == Qt::AscendingOrder ? m_data[row] : m_data[m_data.size()-1-row];
     }
 
     // comparators
 
-    typedef bool (*LessFunc)(const QnAuditRecord &d1, const QnAuditRecord &d2);
+    typedef bool (*LessFunc)(const QnAuditRecord *d1, const QnAuditRecord *d2);
 
-    static bool lessThanTimestamp(const QnAuditRecord &d1, const QnAuditRecord &d2)
+    static bool lessThanTimestamp(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return d1.createdTimeSec < d2.createdTimeSec;
+        return d1->createdTimeSec < d2->createdTimeSec;
     }
 
-    static bool lessThanEndTimestamp(const QnAuditRecord &d1, const QnAuditRecord &d2)
+    static bool lessThanEndTimestamp(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return d1.rangeEndSec < d2.rangeEndSec;
+        return d1->rangeEndSec < d2->rangeEndSec;
     }
 
-    static bool lessThanDuration(const QnAuditRecord &d1, const QnAuditRecord &d2)
+    static bool lessThanDuration(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return (d1.rangeEndSec - d1.rangeStartSec) < (d2.rangeEndSec - d2.rangeStartSec);
+        return (d1->rangeEndSec - d1->rangeStartSec) < (d2->rangeEndSec - d2->rangeStartSec);
     }
 
-    static bool lessThanUserName(const QnAuditRecord &d1, const QnAuditRecord &d2)
+    static bool lessThanUserName(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return d1.userName < d2.userName;
+        return d1->userName < d2->userName;
     }
 
-    static bool lessThanUserHost(const QnAuditRecord &d1, const QnAuditRecord &d2)
+    static bool lessThanUserHost(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return d1.userHost < d2.userHost;
+        return d1->userHost < d2->userHost;
     }
 
-    static bool lessThanEventType(const QnAuditRecord &d1, const QnAuditRecord &d2)
+    static bool lessThanEventType(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return d1.eventType < d2.eventType;
+        return d1->eventType < d2->eventType;
     }
 
     void updateIndex()
@@ -133,7 +133,7 @@ public:
 private:
     Column m_sortCol;
     Qt::SortOrder m_sortOrder;
-    QnAuditRecordList m_data;
+    QnAuditRecordRefList m_data;
 };
 
 
@@ -150,11 +150,18 @@ QnAuditLogModel::~QnAuditLogModel() {
     delete m_index;
 }
 
-void QnAuditLogModel::setData(const QnAuditRecordList &data) {
+void QnAuditLogModel::setData(const QnAuditRecordRefList &data) {
     beginResetModel();
     m_index->setData(data);
     endResetModel();
     emit dataChanged(index(0,0), index(m_index->size(), m_columns.size()), QVector<int>());
+}
+
+void QnAuditLogModel::clearData()
+{
+    beginResetModel();
+    m_index->clear();
+    endResetModel();
 }
 
 void QnAuditLogModel::clear() {
@@ -268,10 +275,10 @@ QString QnAuditLogModel::buttonNameForEvent(Qn::AuditRecordType eventType)
     return QString();
 }
 
-QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord& data)
+QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
 {
     QString resListText;
-    for (const auto& res: data.resources)
+    for (const auto& res: data->resources)
     {
         if (!resListText.isEmpty())
             resListText += lit(",");
@@ -281,39 +288,39 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord& data)
     return resListText;
 }
 
-QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data, int row, bool hovered) const
+QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data, int row, bool hovered) const
 {
     if (column == TimestampColumn)
     {
-        QString dateStr = formatDateTime(data.createdTimeSec, true, false);
-        QString timeStr = formatDateTime(data.createdTimeSec, false, true);
+        QString dateStr = formatDateTime(data->createdTimeSec, true, false);
+        QString timeStr = formatDateTime(data->createdTimeSec, false, true);
         return lit("%1 <b>%2</b>").arg(dateStr).arg(timeStr);
     }
     else if (column == DescriptionColumn) 
     {
         QString result;
-        switch (data.eventType)
+        switch (data->eventType)
         {
         case Qn::AR_ViewArchive:
         case Qn::AR_ViewLive:
-            result = tr("%1 - %2, ").arg(formatDateTime(data.rangeStartSec)).arg(formatDateTime(data.rangeEndSec));
+            result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
         case Qn::AR_CameraUpdate:
         {
-            QString txt = tr("%n cameras", "", data.resources.size());
+            QString txt = tr("%n cameras", "", data->resources.size());
             QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
             if (hovered)
                 result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(linkColor).arg(txt);
             else
                 result +=  QString(lit("<font color=%1><b>%2</b></font>")).arg(linkColor).arg(txt);
-            bool showDetail = data.extractParam("detail") == "1";
+            bool showDetail = data->extractParam("detail") == "1";
             if (showDetail) 
             {
-                auto archiveData = data.extractParam("archiveExist");
+                auto archiveData = data->extractParam("archiveExist");
                 int index = 0;
-                for (const auto& camera: data.resources) 
+                for (const auto& camera: data->resources) 
                 {
                     result += lit("<br> ");
-                    if (data.isPlaybackType())
+                    if (data->isPlaybackType())
                     {
                         bool isRecordExist = archiveData.size() > index && archiveData[index] == '1';
                         index++;
@@ -338,7 +345,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord& data
 }
 
 
-QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord& record)
+QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record)
 {
     Column columnsToFilter[] = 
     {
@@ -357,39 +364,39 @@ QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord& record)
     return result;
 }
 
-QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord& data)
+QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data)
 {
     switch(column) {
     case SelectRowColumn:
         return QString();
     case TimestampColumn:
-        return formatDateTime(data.createdTimeSec, true, true);
+        return formatDateTime(data->createdTimeSec, true, true);
     case DateColumn:
-        return formatDateTime(data.createdTimeSec, true, false);
+        return formatDateTime(data->createdTimeSec, true, false);
     case TimeColumn:
-        return formatDateTime(data.createdTimeSec, false, true);
+        return formatDateTime(data->createdTimeSec, false, true);
     case EndTimestampColumn:
-        if (data.eventType == Qn::AR_Login)
-            return formatDateTime(data.rangeEndSec, true, true);
-        else if(data.eventType == Qn::AR_UnauthorizedLogin)
-            return eventTypeToString(data.eventType);
+        if (data->eventType == Qn::AR_Login)
+            return formatDateTime(data->rangeEndSec, true, true);
+        else if(data->eventType == Qn::AR_UnauthorizedLogin)
+            return eventTypeToString(data->eventType);
         break;
     case DurationColumn:
-        if (data.rangeEndSec)
-            return formatDuration(data.rangeEndSec - data.rangeStartSec);
+        if (data->rangeEndSec)
+            return formatDuration(data->rangeEndSec - data->rangeStartSec);
         else
             return formatDuration(0);
     case UserNameColumn:
-        return data.userName;
+        return data->userName;
     case UserHostColumn:
-        return data.userHost;
+        return data->userHost;
         break;
     case EventTypeColumn:
-        return eventTypeToString(data.eventType);
+        return eventTypeToString(data->eventType);
     case DescriptionColumn:
         return eventDescriptionText(data);
     case PlayButtonColumn:
-        return buttonNameForEvent(data.eventType);
+        return buttonNameForEvent(data->eventType);
     }
 
     return QString();
@@ -454,7 +461,7 @@ Qt::CheckState QnAuditLogModel::checkState() const
 
     for (int i = 0; i < m_index->size(); ++i)
     {
-        if (m_index->at(i).extractParam("checked") ==  "1")
+        if (m_index->at(i)->extractParam("checked") ==  "1")
             onExist = true;
         else
             offExist = true;
@@ -472,13 +479,13 @@ void QnAuditLogModel::setCheckState(Qt::CheckState state)
     if (state == Qt::Checked) {
         for (int i = 0; i < m_index->size(); ++i)
         {
-            m_index->at(i).addParam("checked", "1");
+            m_index->at(i)->addParam("checked", "1");
         }
     } 
     else if (state == Qt::Unchecked) {
         for (int i = 0; i < m_index->size(); ++i)
         {
-            m_index->at(i).removeParam("checked");
+            m_index->at(i)->removeParam("checked");
         }
     }
     else {
@@ -487,26 +494,26 @@ void QnAuditLogModel::setCheckState(Qt::CheckState state)
     emit dataChanged(index(0,0), index(m_index->size(), m_columns.size()), QVector<int>() << Qt::CheckStateRole);
 }
 
+void QnAuditLogModel::setData(const QModelIndexList &indexList, const QVariant &value, int role)
+{
+    blockSignals(true);
+    for (const auto& index: indexList)
+        setData(index, value, role);
+    blockSignals(false);
+    emit dataChanged(index(0,0), index(m_index->size(), m_columns.size()), QVector<int>() << role);
+}
+
 bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return false;
-
-    if (role == Qn::AuditRecordDataRole)
-    {
-        if (!value.canConvert<QnAuditRecord>())
-            return false;
-        QnAuditRecord record = value.value<QnAuditRecord>();
-        m_index->at(index.row()) = record;
-        emit dataChanged(index, index, QVector<int>() << role);
-        return true;
-    }
-    else if (role == Qt::CheckStateRole)
+    
+    if (role == Qt::CheckStateRole)
     {
         if (value == Qt::Checked)
-            m_index->at(index.row()).addParam("checked", "1");
+            m_index->at(index.row())->addParam("checked", "1");
         else
-            m_index->at(index.row()).removeParam("checked");
+            m_index->at(index.row())->removeParam("checked");
         emit dataChanged(index, index, QVector<int>() << role);
         return true;
     }
@@ -515,18 +522,18 @@ bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, i
     }
 }
 
-QnAuditRecordList QnAuditLogModel::checkedRows()
+QnAuditRecordRefList QnAuditLogModel::checkedRows()
 {
-    QnAuditRecordList result;
+    QnAuditRecordRefList result;
     for (const auto& record: m_index->data())
     {
-        if (record.extractParam("checked") == "1")
+        if (record->extractParam("checked") == "1")
             result.push_back(record);
     }
     return result;
 }
 
-QnAuditRecord QnAuditLogModel::rawData(int row) const
+QnAuditRecord* QnAuditLogModel::rawData(int row) const
 {
     return m_index->at(row);
 }
@@ -564,13 +571,13 @@ QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
     }
 }
 
-bool QnAuditLogModel::skipDate(const QnAuditRecord &record, int row) const
+bool QnAuditLogModel::skipDate(const QnAuditRecord *record, int row) const
 {
     if (row < 1) 
         return false;
 
-    QDate d1 = QDateTime::fromMSecsSinceEpoch(record.createdTimeSec*1000).date();
-    QDate d2 = QDateTime::fromMSecsSinceEpoch(m_index->at(row-1).createdTimeSec*1000).date();
+    QDate d1 = QDateTime::fromMSecsSinceEpoch(record->createdTimeSec*1000).date();
+    QDate d2 = QDateTime::fromMSecsSinceEpoch(m_index->at(row-1)->createdTimeSec*1000).date();
     return d1 == d2;
 }
 
@@ -582,12 +589,12 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
     const Column &column = m_columns[index.column()];
 
 
-    const QnAuditRecord &record = m_index->at(index.row());
+    const QnAuditRecord *record = m_index->at(index.row());
     
     switch(role) {
     case Qt::CheckStateRole:
         if (column == SelectRowColumn)
-            return record.extractParam("checked") == "1" ? Qt::Checked : Qt::Unchecked;
+            return record->extractParam("checked") == "1" ? Qt::Checked : Qt::Unchecked;
         else
             return QVariant();
     case Qt::DisplayRole:
@@ -598,7 +605,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
             return QVariant(textData(column, record));
     }
     case Qn::AuditRecordDataRole:
-        return QVariant::fromValue<QnAuditRecord>(m_index->at(index.row()));
+        return QVariant::fromValue<QnAuditRecord*>(m_index->at(index.row()));
     case Qn::DisplayHtmlRole:
         return htmlData(column, record, index.row(), false);
     case Qn::DisplayHtmlHoveredRole:
@@ -607,7 +614,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
         return column;
     case Qt::ForegroundRole:
         if (column == EventTypeColumn)
-            return colorForType(record.eventType);
+            return colorForType(record->eventType);
         else
             return QVariant();
     case Qt::FontRole:
@@ -623,17 +630,17 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
     {
         if (column != PlayButtonColumn)
             return QVariant();
-        if (record.isPlaybackType()) {
+        if (record->isPlaybackType()) {
             if (role == Qt::DecorationRole)
                 return qnSkin->icon("slider/navigation/play.png");
             else
                 return qnSkin->icon("slider/navigation/play_hovered.png");
         }
-        else if (record.eventType == Qn::AR_UserUpdate)
+        else if (record->eventType == Qn::AR_UserUpdate)
             return qnSkin->icon("tree/user.png");
-        else if (record.eventType == Qn::AR_ServerUpdate)
+        else if (record->eventType == Qn::AR_ServerUpdate)
             return qnSkin->icon("tree/server.png");
-        else if (record.eventType == Qn::AR_CameraUpdate)
+        else if (record->eventType == Qn::AR_CameraUpdate)
             return qnSkin->icon("tree/camera.png");
     }
     default:
