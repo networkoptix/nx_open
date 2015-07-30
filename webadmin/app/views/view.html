@@ -10,11 +10,13 @@
                                 <li ng-repeat="server in mediaServers">
                                     <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
                                        ng-click="server.collapsed = !server.collapsed" class="collapse-group" ng-class="{offline:server.status!='Online'}">
-                                        <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-up pull-right" title-true="collapse" ></icon>
-                                        <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-down pull-right" title-true="expand"  ></icon>
-
-                                        <icon for="server.status=='Unauthorized'" on-true="lock" title="Unauthorized" ></icon>
-                                        &nbsp;{{server.name}} ({{server.url}}) {{settings.id.replace('{','').replace('}','') == server.id.replace('{','').replace('}','')?'(current)':''}}
+                                        <span class="server-underline caption-row">
+                                            <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-up pull-right" title-true="collapse" ></icon>
+                                            <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-down pull-right" title-true="expand"  ></icon>
+                                            <icon for="server.status=='Unauthorized'" on-true="lock" title="Unauthorized" ></icon>
+                                            &nbsp;
+                                            {{server.name}} ({{server.url}}) {{settings.id.replace('{','').replace('}','') == server.id.replace('{','').replace('}','')?'(current)':''}}
+                                        </span>
                                     </a>
                                     <ul class="nav "
                                         collapse="server.collapsed"
@@ -37,7 +39,7 @@
                             <div class="stick-to-top">
                                 <div class="webclient-panel webclient-bottom-border">
                                     <div class="pull-right" >
-                                        <div class="webclient-button btn-group webclient-left-border" ng-click="formatCollapsed = !formatCollapsed">
+                                        <div class="webclient-button caption-row btn-group webclient-left-border" ng-click="formatCollapsed = !formatCollapsed">
                                             <span >
                                                 Format: {{activeFormat}} <span class="caret"></span>
                                             </span>
@@ -47,7 +49,7 @@
                                             </ul>
                                         </div>
 
-                                        <div class="webclient-button btn-group webclient-left-border" ng-click="resolutionCollapsed = !resolutionCollapsed">
+                                        <div class="webclient-button caption-row btn-group webclient-left-border" ng-click="resolutionCollapsed = !resolutionCollapsed">
                                                 <span >
                                                     {{activeResolution}} <span class="caret"></span>
                                                 </span>
@@ -57,13 +59,13 @@
                                             </ul>
                                         </div>
 
-                                        <span class="webclient-button webclient-left-border"
+                                        <span class="webclient-button caption-row webclient-left-border"
                                               ng-click="fullScreen()">
                                             <span class="glyphicon glyphicon-fullscreen"></span>
                                         </span>
                                     </div>
                                     <div>
-                                            <span class="webclient-button">
+                                            <span class="webclient-button caption-row ">
 
                                                 <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger">&#x25E6;</span>
                                                 <span ng-if="activeCamera.status=='Recording' " class="danger">&#x25CF;</span>

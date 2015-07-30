@@ -20,7 +20,7 @@
   position:absolute;
   top:0px;
   height:100%;
-  padding-top:52px;
+  padding-top:50px;
 }
 .videowindow{
   background-color: #1C2327;
@@ -45,10 +45,8 @@
 table.webclient-window>tbody>tr>td{
   overflow:hidden;
   height:100%;
-}
-
-.webclient-window>tbody>tr>td{
   vertical-align: top;
+  padding:0;
 }
 .cameras-panel{
   overflow-y: auto;
@@ -133,7 +131,7 @@ table.webclient-window>tbody>tr>td{
   font-size: 120%;
   min-height: 60px;
   margin: 0px 20px;
-  padding: 5px 0px;
+  padding: 10px 0px;
 }
 
 .webclient-panel>div.text-left,
@@ -147,7 +145,7 @@ table.webclient-window>tbody>tr>td{
 }
 
 .webclient-button{
-  padding:10px;
+  margin:5px 0;
   display: inline-block;
   cursor:pointer;
 }
@@ -217,9 +215,23 @@ table.webclient-window>tbody>tr>td{
 }
 
 .webclient-window .tree li>.collapse-group{
-  padding:15px 10px;
+  padding:10px;
 }
 
+.server-underline{
+  display: inline-block;
+  width:100%;
+  border-bottom: 1px solid #263137;;
+}
+.caption-row {
+  height: 30px;
+  line-height: 30px;
+}
+
+.caption-row .glyphicon{
+  top:50%;
+  transform: translateY(-50%);
+}
 .camera-preview{
   width:70px !important;
   height:40px !important;
