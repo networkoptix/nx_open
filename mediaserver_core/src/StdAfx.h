@@ -28,3 +28,38 @@ extern "C" {
     #include <libswscale/swscale.h>
     #include <libavutil/avstring.h>
 }
+
+#ifdef __cplusplus
+
+#include <QtCore/QObject>
+#include <QtCore/QBuffer>
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QFileInfoList>
+#include <QtCore/QIODevice>
+#include <QtCore/QDateTime>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QPair>
+#include <QtCore/QQueue>
+#include <QtCore/QSet>
+#include <QtCore/QSemaphore>
+#include <QtCore/QThread>
+#include <QtCore/QThreadPool>
+#include <QtCore/QTime>
+#include <QtCore/QTimer>
+#include <QtCore/qmath.h>
+#include <QtCore/QtDebug>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
+#include <QtNetwork/QHostAddress>
+#include <QtNetwork/QAuthenticator>
+#include <utils/common/uuid.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
+
+#endif

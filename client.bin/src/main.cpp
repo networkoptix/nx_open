@@ -68,26 +68,19 @@ extern "C"
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 
-#include "plugins/resource/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 //#include <plugins/resource/server_camera/server_camera.h>
 #include <plugins/resource/server_camera/server_camera_factory.h>
 
 
-#include "plugins/resource/axis/axis_resource_searcher.h"
 #include "plugins/plugin_manager.h"
 
 #ifdef _DEBUG
 #include "tests/auto_tester.h"
 #endif
 
-#include "plugins/resource/d-link/dlink_resource_searcher.h"
 #include "api/session_manager.h"
-#include "plugins/resource/droid/droid_resource_searcher.h"
 #include "ui/actions/action_manager.h"
-#include "plugins/resource/iqinvision/iqinvision_resource_searcher.h"
-#include "plugins/resource/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
-#include "plugins/resource/isd/isd_resource_searcher.h"
 #include "utils/network/socket.h"
 
 

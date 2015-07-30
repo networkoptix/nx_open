@@ -17,7 +17,7 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "core/resource_management/resource_pool.h"
 #include "common/common_module.h"
-#include "../../plugin_manager.h"
+#include "plugins/plugin_manager.h"
 
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );

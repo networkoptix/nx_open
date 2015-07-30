@@ -25,7 +25,7 @@
         <!--Global libs-->
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <template>lib</template>
-        <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lonvif -lquazip</global.libs>
+        <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
         <linux.oslibs>-lssl -lsigar</linux.oslibs>

@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     // Each user may have it's own traytool running.
     QCoreApplication app(argc, argv);
 
-    QnCommonModule common(argc, argv);
+    QnCommonModule common;
     QnSyncTime syncTime;
 
     new QnLongRunnablePool();
