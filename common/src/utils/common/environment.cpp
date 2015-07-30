@@ -11,7 +11,7 @@
 #include <QtWidgets/QMessageBox>
 #endif
 
-#include <utils/common/string_tools.h>
+#include <utils/common/string.h>
 #include <utils/mac_utils.h>
 
 
