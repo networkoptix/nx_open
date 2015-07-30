@@ -21,7 +21,7 @@ namespace
     enum 
     {
         kIfListRequestsPeriod = 2 * 1000
-        , kWaitTriesCount = 60
+        , kWaitTriesCount = 90
 
         /// Accepted wait time is 120 seconds due to restart on network interface parameters change
         , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount   
@@ -400,8 +400,9 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
                 , baseInfo.hostAddress, newInterfaces);
         }
         
-        onChangesetApplied(request.changesCount);
+        const int changesCount = request.changesCount;
         m_itfChanges.erase(it);
+        onChangesetApplied(changesCount);
     };
     
     const auto &successful =
@@ -445,6 +446,10 @@ void rtu::ChangesManager::Impl::onChangesetApplied(int changesCount)
     }
     
     m_changeset.reset();
+    m_itfChanges.clear();
+    m_targetServers.clear();
+    m_serverValues.clear();
+    m_requests.clear();
     m_context->setCurrentPage(Constants::SummaryPage);
 }
 
@@ -605,9 +610,9 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
                 for (const auto &change: changes)
                     addUpdateInfoSummaryItem(*info, errorReason, change, affected);
 
-                onChangesetApplied(it.value().changesCount);
+                const int changesCount = it.value().changesCount;
                 m_itfChanges.erase(it);
-
+                onChangesetApplied(changesCount);
             };
 
             const auto &callback = 
