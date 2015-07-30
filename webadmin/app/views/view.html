@@ -64,8 +64,11 @@
                                     </div>
                                     <div>
                                             <span class="webclient-button">
-                                                <icon for="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" title-true="Schedule Enabled" on-true="record"></icon>
-                                                <icon for="activeCamera.status=='Recording'" title-true="Recording" on-true="record" class="danger"></icon>
+
+                                                <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger">&#x25E6;</span>
+                                                <span ng-if="activeCamera.status=='Recording' " class="danger">&#x25CF;</span>
+                                                <span ng-if="activeCamera.status!='Recording' && !activeCamera.scheduleEnabled">&nbsp;</span>
+
                                                   {{activeCamera.name}}
                                             </span>
                                     </div>
