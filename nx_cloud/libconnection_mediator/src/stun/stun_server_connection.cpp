@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#include <common/common_globals.h>
+
 #include "stun_server_connection.h"
 
 #include "stun/stun_message_dispatcher.h"
@@ -10,6 +12,9 @@
 
 #include "stun_stream_socket_server.h"
 #include <functional>
+
+namespace nx {
+namespace hpm {
 
 StunServerConnection::StunServerConnection(
     StreamConnectionHolder<StunServerConnection>* socketServer,
@@ -20,14 +25,14 @@ StunServerConnection::StunServerConnection(
 {
 }
 
-void StunServerConnection::processMessage( nx_stun::Message&& message )
+void StunServerConnection::processMessage( stun::Message&& message )
 {
     switch( message.header.messageClass )
     {
-        case nx_stun::MessageClass::request:
-            switch( static_cast< nx_stun::MethodType >( message.header.method ) )
+        case stun::MessageClass::request:
+            switch( static_cast< stun::MethodType >( message.header.method ) )
             {
-                case nx_stun::MethodType::binding:
+                case stun::MethodType::binding:
                     processGetIPAddressRequest( std::move(message) );
                     break;
 
@@ -42,82 +47,59 @@ void StunServerConnection::processMessage( nx_stun::Message&& message )
     }
 }
 
-void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& request )
+void StunServerConnection::processGetIPAddressRequest( stun::Message&& request )
 {
-    bool system_name_ok = false;
-    bool server_id_ok = false;
-    bool authorization_ok = false;
-
-    for( const nx_stun::Message::AttributesMap::value_type& attr: request.attributes )
-    {
-        if( attr.second->type() != nx_stun::attr::AttributeType::unknownAttribute ) {
-            sendErrorReply( request.header.transactionID , nx_stun::ErrorCode::badRequest );
-            return;
-        }
-        const nx_stun::attr::UnknownAttribute& unknown_attr = static_cast<const nx_stun::attr::UnknownAttribute&>(*attr.second);
-        switch( unknown_attr.userType ) {
-        case nx_hpm::StunParameters::systemName:
-            {
-                nx_stun::attr::StringAttributeType system_name;
-                if( !nx_stun::attr::parse( unknown_attr, &system_name ) ) {
-                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
-                    return;
-                }
-                system_name_ok = verifyServerName(system_name);
-                if(!system_name_ok) {
-                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
-                }
-                break;
-            }
-        case nx_hpm::StunParameters::serverId:
-            {
-                nx_stun::attr::StringAttributeType server_id;
-                if( !nx_stun::attr::parse( unknown_attr, &server_id ) ) {
-                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
-                    return;
-                }
-                server_id_ok = verifyServerId(server_id);
-                if(!server_id_ok) {
-                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
-                    return;
-                }
-                break;
-            }
-        case nx_hpm::StunParameters::authorization:
-            {
-                nx_stun::attr::StringAttributeType authorization;
-                if( !nx_stun::attr::parse( unknown_attr, &authorization ) ) {
-                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
-                    return;
-                }
-                authorization_ok = verifyAuthroization(authorization);
-                if(!authorization_ok) {
-                    sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::unauthorized );
-                    return;
-                }
-                break;
-            }
-        default: 
-            {
-                sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::unknownAttribute );
-                return;
-            }
-        }
+    const auto systemAttr = request.getAttribute< attr::SystemName >();
+    if( !systemAttr ) {
+        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
+                        "Attribute systemName is required" );
+        return;
     }
 
-    if( !system_name_ok || !server_id_ok || !authorization_ok ) {
-        return sendErrorReply( request.header.transactionID, nx_stun::ErrorCode::badRequest );
+    const auto systemName = systemAttr->value;
+    if( !verifySystemName( systemName ) ) {
+        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
+                        String( "Wrong systemName: " ) + systemName );
+        return;
     }
+
+    const auto serverAttr = request.getAttribute< attr::ServerId >();
+    if( !serverAttr ) {
+        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
+                        "Attribute serverId is required" );
+        return;
+    }
+
+    const auto serverId = serverAttr->uuid();
+    if( !verifyServerId( serverId ) ) {
+        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
+                        String( "Wrong serverId: " ) + serverId.toByteArray() );
+        return;
+    }
+
+    const auto authAttr = request.getAttribute< attr::Authorization >();
+    if( !authAttr ) {
+        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
+                        "Attribute authorization is required" );
+        return;
+    }
+    if( !verifyAuthroization( authAttr->value ) ) {
+        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
+                        String( "Authroization did not pass" ) );
+        return;
+
+    }
+
     sendSuccessReply( request.header.transactionID );
 }
 
-void StunServerConnection::sendSuccessReply( const nx_stun::TransactionID& transaction_id ) {
-    nx_stun::Message message( nx_stun::Header(
-        nx_stun::MessageClass::successResponse,
-        static_cast<int>(nx_stun::MethodType::binding), transaction_id ) );
+void StunServerConnection::sendSuccessReply( const stun::TransactionID& transaction_id ) {
+    stun::Message message( stun::Header(
+        stun::MessageClass::successResponse,
+        stun::MethodType::binding, transaction_id ) );
 
-    std::unique_ptr<nx_stun::attr::XorMappedAddress> addr( new nx_stun::attr::XorMappedAddress() );
-    addr->family = nx_stun::attr::XorMappedAddress::IPV4;
+    std::unique_ptr<stun::attr::XorMappedAddress> addr( new stun::attr::XorMappedAddress() );
+    addr->family = stun::attr::XorMappedAddress::IPV4;
     SocketAddress peer_addr( peer_address_ );
     addr->address.ipv4 = peer_addr.address.ipv4(); // The endian is in host order 
     addr->port = peer_addr.port;
@@ -132,7 +114,7 @@ void StunServerConnection::sendSuccessReply( const nx_stun::TransactionID& trans
     Q_ASSERT(ret);
 }
 
-void StunServerConnection::processProprietaryRequest( nx_stun::Message&& request )
+void StunServerConnection::processProprietaryRequest( stun::Message&& request )
 {
     if( !STUNMessageDispatcher::instance()->dispatchRequest( this, std::move(request) ) )
     {
@@ -140,13 +122,16 @@ void StunServerConnection::processProprietaryRequest( nx_stun::Message&& request
     }
 }
 
-void StunServerConnection::sendErrorReply( const nx_stun::TransactionID& transaction_id , nx_stun::ErrorCode::Type errorCode )
+void StunServerConnection::sendErrorReply( const stun::TransactionID& transaction_id,
+                                           stun::ErrorCode::Type errorCode,
+                                           nx::String description )
 {
     // Currently for the reason phase, we just put empty string there
-    nx_stun::Message message( nx_stun::Header(
-        nx_stun::MessageClass::errorResponse,
-        nx_hpm::StunMethods::listen, transaction_id ));
-    message.addAttribute( std::make_unique< nx_stun::attr::ErrorDescription >( errorCode ) );
+    stun::Message message( stun::Header(
+        stun::MessageClass::errorResponse,
+        Methods::listen, transaction_id ));
+    message.addAttribute( std::make_unique< stun::attr::ErrorDescription >(
+        errorCode, description ) );
 
     bool ret = sendMessage(std::move(message),
         std::bind(
@@ -156,18 +141,20 @@ void StunServerConnection::sendErrorReply( const nx_stun::TransactionID& transac
     Q_ASSERT(ret);
 }
 
-bool StunServerConnection::verifyAuthroization( const nx_stun::attr::StringAttributeType& name ) {
+bool StunServerConnection::verifySystemName( const String& name ) {
     Q_UNUSED(name);
     return true;
 }
 
-bool StunServerConnection::verifyServerId( const nx_stun::attr::StringAttributeType& name ) {
-    Q_UNUSED(name);
+bool StunServerConnection::verifyServerId( const QnUuid& id ) {
+    Q_UNUSED(id);
     return true;
 }
 
-bool StunServerConnection::verifyServerName( const nx_stun::attr::StringAttributeType& name ) {
-    Q_UNUSED(name);
+bool StunServerConnection::verifyAuthroization( const String& auth ) {
+    Q_UNUSED(auth);
     return true;
 }
 
+} // namespace hpm
+} // namespace nx

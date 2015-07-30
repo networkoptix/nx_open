@@ -956,10 +956,8 @@ private:
                 AsyncSSL::AsyncRecv(data.buffer, std::move(data.completionHandler));
             } else {
                 // request a common async recv
-                bool ret = socket()->readSomeAsync(data.buffer, std::move(data.completionHandler));
-                if( !ret ) {
-                    data.completionHandler(SystemError::getLastOSErrorCode(),std::numeric_limits<std::size_t>::max());
-                }
+                data.buffer->append(sniffer_buffer_);
+                data.completionHandler(SystemError::noError, data.buffer->size());
             }
         }
     }

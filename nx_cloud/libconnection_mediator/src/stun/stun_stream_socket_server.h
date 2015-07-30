@@ -10,6 +10,8 @@
 
 #include "stun_server_connection.h"
 
+namespace nx {
+namespace hpm {
 
 class StunStreamSocketServer
 :
@@ -24,5 +26,8 @@ public:
     {
     }
 };
+
+} // namespace hpm
+} // namespace nx
 
 #endif  //STUN_STREAM_SOCKET_SERVER_H

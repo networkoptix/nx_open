@@ -30,6 +30,13 @@ namespace nx
         Currently, using QByteArray, but fully new implementation will be provided in 2.4
     */
     typedef QByteArray Buffer;
+
+    /*!
+        Some effective buffer is required. Following is desired:\n
+            - all features of \class Buffer
+            - QString compartability (with checkups for non ASCII symbols)
+     */
+    typedef QByteArray String;
 }
 
 #endif  //NX_BUFFER_H

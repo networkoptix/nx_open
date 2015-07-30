@@ -16,8 +16,9 @@
 #include <utils/common/cpp14.h>
 
 //!Implementation of STUN protocol (rfc5389)
-namespace nx_stun
-{
+namespace nx {
+namespace stun {
+
     static const std::uint32_t MAGIC_COOKIE = 0x2112A442;
     // Four components for MAGIC_COOKIE which is used for parsing/serialization of XorMappedAddress
     static const std::uint16_t MAGIC_COOKIE_HIGH = static_cast<std::uint16_t>( MAGIC_COOKIE >> 16 );
@@ -73,7 +74,7 @@ namespace nx_stun
     };
 
     //!Contains STUN method types defined in RFC
-    enum class MethodType
+    enum MethodType
     {
         binding = 1,
         //!Starting value for custom STUN methods
@@ -177,14 +178,14 @@ namespace nx_stun
             public Attribute
         {
         public:
-            ErrorDescription( int code_, std::string phrase = std::string() );
+            ErrorDescription( int code_, nx::String phrase = nx::String() );
             static const AttributeType s_type = AttributeType::errorCode;
             virtual int type() const override { return s_type; }
 
             //!This value is full error code
             int code;
             //!utf8 string, limited to 127 characters
-            std::string reasonPhrase;
+            nx::String reasonPhrase;
 
             inline int getClass() const { return code / 100; }
             inline int getNumber() const { return code % 100; }
@@ -234,11 +235,6 @@ namespace nx_stun
         public:
             std::vector<int> attributeTypes;
         };
-
-
-        typedef std::string StringAttributeType;
-        bool parse( const UnknownAttribute& unknownAttr, StringAttributeType* val );
-        bool serialize( UnknownAttribute* unknownAttr, const StringAttributeType& val , int userType );
     }
 
     // A specialized hash class for C++11 since it doesn't comes with built-in enum hash
@@ -295,6 +291,7 @@ namespace nx_stun
         Message& operator=( const Message& );
     };
 
-}
+} // namespase stun
+} // namespase nx
 
 #endif  //STUN_MESSAGE_H

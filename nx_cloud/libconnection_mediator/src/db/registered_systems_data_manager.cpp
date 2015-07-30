@@ -1,14 +1,14 @@
 
 #include "registered_systems_data_manager.h"
 
+namespace nx {
+namespace hpm {
 
-namespace nx_hpm
-{
     bool RegisteredDomainsDataManager::saveDomainDataAsync(
         const DomainRegistrationData& registrationData,
         std::function<void(DbErrorCode)>&& completionHandler )
     {
-        //TODO 
+        //TODO
         return false;
     }
 
@@ -20,7 +20,9 @@ namespace nx_hpm
         const QString& domain,
         std::function<void(DbErrorCode, const DomainRegistrationData&)>&& completionHandler )
     {
-        //TODO 
+        //TODO
         return false;
     }
-}
+
+} // namespace hpm
+} // namespace nx

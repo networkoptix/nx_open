@@ -5,8 +5,8 @@
 
 #include "stun_connection.h"
 
-namespace nx_stun
-{
+namespace nx {
+namespace stun {
 
     StunClientConnection::StunClientConnection(
         const SocketAddress& stunServerEndpoint,
@@ -40,7 +40,7 @@ namespace nx_stun
             completionHandler();
     }
 
-    void StunClientConnection::enqueuePendingRequest( nx_stun::Message&& msg , std::function<void(SystemError::ErrorCode,nx_stun::Message&&)>&& func ) {
+    void StunClientConnection::enqueuePendingRequest( Message&& msg , std::function<void(SystemError::ErrorCode,Message&&)>&& func ) {
         std::lock_guard<std::mutex> lock(m_mutex);
         Q_ASSERT(!m_outstandingRequest);
         m_outstandingRequest.reset( new PendingRequest(std::move(msg),std::move(func)) );
@@ -70,7 +70,7 @@ namespace nx_stun
         m_baseConnection.reset( new BaseConnectionType( this, std::move(m_socket) ) );
         using namespace std::placeholders;
         m_baseConnection->setMessageHandler(
-            [this]( nx_stun::Message&& msg ) {
+            [this]( Message&& msg ) {
                 processMessage( std::move( msg ) );
             } );
 
@@ -87,7 +87,7 @@ namespace nx_stun
         if( !ret ) {
             if( m_outstandingRequest ) {
                 m_outstandingRequest->completion_handler(
-                    SystemError::getLastOSErrorCode(),nx_stun::Message());
+                    SystemError::getLastOSErrorCode(),Message());
                 resetOutstandingRequest();
             }
         }
@@ -95,7 +95,7 @@ namespace nx_stun
 
     void StunClientConnection::onRequestSend( SystemError::ErrorCode ec ) {
         if( ec ) {
-            m_outstandingRequest->completion_handler(ec,nx_stun::Message());
+            m_outstandingRequest->completion_handler(ec,Message());
             resetOutstandingRequest();
         }
     }
@@ -112,12 +112,12 @@ namespace nx_stun
             m_outstandingRequest->execute = true;
         }
         if( ec ) {
-            m_outstandingRequest->completion_handler(ec,nx_stun::Message());
+            m_outstandingRequest->completion_handler(ec,Message());
             return false;
         }
         // Dequeue the request from the pending request queue
         return m_baseConnection->sendMessage( 
-            nx_stun::Message(std::move(m_outstandingRequest->request_message)),
+            Message(std::move(m_outstandingRequest->request_message)),
             std::bind(
                 &StunClientConnection::onRequestSend,
                 this,
@@ -137,16 +137,16 @@ namespace nx_stun
                 std::move(completionHandler) ) );
     }
 
-    void StunClientConnection::registerIndicationHandler( std::function<void(nx_stun::Message&&)>&& indicationHandler )
+    void StunClientConnection::registerIndicationHandler( std::function<void(Message&&)>&& indicationHandler )
     {
         m_indicationHandler = indicationHandler;
     }
 
     bool StunClientConnection::sendRequest(
-        nx_stun::Message&& request,
-        std::function<void(SystemError::ErrorCode, nx_stun::Message&&)>&& completionHandler )
+        Message&& request,
+        std::function<void(SystemError::ErrorCode, Message&&)>&& completionHandler )
     {
-        Q_ASSERT( request.header.messageClass == nx_stun::MessageClass::request );
+        Q_ASSERT( request.header.messageClass == MessageClass::request );
         enqueuePendingRequest(
             std::move( request ),
             std::move( completionHandler ) );
@@ -157,7 +157,7 @@ namespace nx_stun
                 {
                     if( code != SystemError::noError )
                     {
-                        m_outstandingRequest->completion_handler( code, nx_stun::Message() );
+                        m_outstandingRequest->completion_handler( code, Message() );
                         resetOutstandingRequest();
                     }
                 } );
@@ -186,10 +186,10 @@ namespace nx_stun
             m_socket->close();
     }
 
-    void StunClientConnection::onRequestMessageRecv( nx_stun::Message&& msg )
+    void StunClientConnection::onRequestMessageRecv( Message&& msg )
     {
         // Checking the message to see whether it is an valid message or not
-        if( msg.header.messageClass == nx_stun::MessageClass::errorResponse ) {
+        if( msg.header.messageClass == MessageClass::errorResponse ) {
             if( !hasErrorAttribute((msg) ) ) {
                 m_outstandingRequest->completion_handler(STUN_REPLY_PACKAGE_BROKEN,std::move(msg));
             } else {
@@ -202,20 +202,20 @@ namespace nx_stun
         resetOutstandingRequest();
     }
 
-    void StunClientConnection::onIndicationMessageRecv( nx_stun::Message&& msg )
+    void StunClientConnection::onIndicationMessageRecv( Message&& msg )
     {
         if( m_indicationHandler )
             m_indicationHandler(std::move(msg));
     }
 
-    void StunClientConnection::processMessage( nx_stun::Message&& msg )
+    void StunClientConnection::processMessage( Message&& msg )
     {
         switch(msg.header.messageClass) {
-            case nx_stun::MessageClass::errorResponse:
-            case nx_stun::MessageClass::successResponse:
+            case MessageClass::errorResponse:
+            case MessageClass::successResponse:
                 onRequestMessageRecv(std::move(msg));
                 return;
-            case nx_stun::MessageClass::indication:
+            case MessageClass::indication:
                 onIndicationMessageRecv(std::move(msg));
                 return;
             default:
@@ -223,11 +223,13 @@ namespace nx_stun
         }
     }
 
-    bool StunClientConnection::hasErrorAttribute( const nx_stun::Message& msg ) {
+    bool StunClientConnection::hasErrorAttribute( const Message& msg ) {
         for( auto& attr : msg.attributes ) {
-            if( attr.second->type() == nx_stun::attr::AttributeType::errorCode )
+            if( attr.second->type() == attr::AttributeType::errorCode )
                 return true;
         }
         return false;
     }
-}
+
+} // namespase stun
+} // namespase nx

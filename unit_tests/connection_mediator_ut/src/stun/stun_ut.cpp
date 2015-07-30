@@ -42,7 +42,11 @@ private:
     Result m_result;
 };
 
-namespace nx_stun {
+namespace nx {
+namespace test {
+
+using namespace stun;
+using namespace hpm;
 
 TEST( Stun, Simple )
 {
@@ -64,34 +68,31 @@ TEST( Stun, Simple )
         ASSERT_EQ( waiter.get(), SystemError::noError );
     }
     {
-        Message request( Header( MessageClass::request,
-                                 static_cast< int >( MethodType::binding ),
+        Message request( Header( MessageClass::request, MethodType::binding,
                                  TransactionID::generateNew() ) );
-        request.addAttribute( std::make_unique<nx_stun::attr::UnknownAttribute>(
-                nx_hpm::StunParameters::systemName, QByteArray( "system1" ) ) );
-        request.addAttribute( std::make_unique<nx_stun::attr::UnknownAttribute>(
-                nx_hpm::StunParameters::serverId, QByteArray( "{uuid1}" ) ) );
-        request.addAttribute( std::make_unique<nx_stun::attr::UnknownAttribute>(
-                nx_hpm::StunParameters::authorization, QByteArray( "auth" ) ) );
+        request.addAttribute( std::make_unique<hpm::attr::SystemName>( "system1" ) );
+        request.addAttribute( std::make_unique<hpm::attr::ServerId>( "{uuid1}" ) );
+        request.addAttribute( std::make_unique<hpm::attr::Authorization>( "auth" ) );
 
         AsyncWaiter< Message > waiter;
         ASSERT_TRUE( client.sendRequest( std::move( request ),
             [ &waiter ]( SystemError::ErrorCode code,
-                         nx_stun::Message&& message )
+                         Message&& message )
         {
              ASSERT_EQ( code, SystemError::noError );
              waiter.set( std::move( message ) );
         } ) );
 
-        nx_stun::Message response = waiter.get();
+        Message response = waiter.get();
         ASSERT_EQ( response.header.messageClass, MessageClass::successResponse );
-        ASSERT_EQ( response.header.method, static_cast< int >( MethodType::binding ) );
+        ASSERT_EQ( response.header.method, MethodType::binding );
 
-        const auto addr = response.getAttribute<attr::XorMappedAddress>();
+        const auto addr = response.getAttribute<stun::attr::XorMappedAddress>();
         ASSERT_NE( addr, nullptr );
-        ASSERT_EQ( addr->family, nx_stun::attr::XorMappedAddress::IPV4 );
+        ASSERT_EQ( addr->family, stun::attr::XorMappedAddress::IPV4 );
         ASSERT_EQ( addr->address.ipv4, localhost.address.ipv4() );
     }
 }
 
-} // namespace nx_stun
+} // namespace test
+} // namespase nx

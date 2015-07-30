@@ -6,7 +6,9 @@
 #include <QtEndian>
 #include <QString>
 
-namespace nx_stun{
+namespace nx {
+namespace stun {
+
 using namespace attr;
 
 // This message parser buffer add a simple workaround with the original partial data buffer.
@@ -194,10 +196,9 @@ Attribute* MessageParser::parseErrorCode() {
 
     // Parsing the UTF encoded error string 
     std::size_t phrase_length = attribute_.value.size() - 4;
-    std::string phrase;
+    nx::String phrase;
     if( phrase_length > 0 ) {
-        QByteArray utf8_byte_array( attribute_.value.constData() + 4 , static_cast<int>(phrase_length) );
-        phrase = QString::fromUtf8(utf8_byte_array).toStdString();
+        phrase = nx::String( attribute_.value.constData() + 4, static_cast<int>(phrase_length) );
         // The RFC says that the decoded UTF8 string should only contain less than 127 characters
         if( phrase.size() > 127 ) {
             return NULL;
@@ -513,4 +514,5 @@ nx_api::ParserState::Type MessageParser::parse( const nx::Buffer& user_buffer , 
     } while( true );
 }
 
-}// namespace nx_stun
+} // namespase stun
+} // namespase nx

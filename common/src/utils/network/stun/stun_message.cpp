@@ -5,9 +5,9 @@
 
 #include "stun_message.h"
 
+namespace nx {
+namespace stun {
 
-namespace nx_stun
-{
     Header::Header( MessageClass messageClass_ , int method_,
                     TransactionID transactionID_ )
         : messageClass( messageClass_ )
@@ -38,7 +38,7 @@ namespace nx_stun
             address.ipv6 = ipv6_;
         }
 
-        ErrorDescription::ErrorDescription( int code_, std::string phrase )
+        ErrorDescription::ErrorDescription( int code_, nx::String phrase )
             : code( code_ )
             , reasonPhrase( phrase )
         {
@@ -51,7 +51,7 @@ namespace nx_stun
 
         UnknownAttribute::UnknownAttribute( int userType_, nx::Buffer value_ )
             : userType( userType_ )
-            , value( value_ )
+            , value( std::move( value_ ) )
         {
         }
     }
@@ -86,20 +86,5 @@ namespace nx_stun
         attributes.clear();
     }
 
-    namespace attr
-    {
-        bool parse( const UnknownAttribute& unknownAttr, StringAttributeType* val )
-        {
-            val->assign(unknownAttr.value.constData(),unknownAttr.value.size());
-            return true;
-        }
-
-        bool serialize( UnknownAttribute* unknownAttr , const StringAttributeType& val , int userType )
-        {
-            unknownAttr->userType = userType;
-            unknownAttr->value = nx::Buffer(val.c_str());
-            return true;
-        }
-    }
-
-}
+} // namespase stun
+} // namespase nx

@@ -25,6 +25,8 @@
 #include "listening_peer_pool.h"
 #include "version.h"
 
+namespace nx {
+namespace hpm {
 
 MediatorProcess::MediatorProcess( int argc, char **argv )
 : 
@@ -112,7 +114,7 @@ int MediatorProcess::executeApplication()
     }
 
     //TODO opening database
-    nx_hpm::RegisteredDomainsDataManager registeredDomainsDataManager;
+    RegisteredDomainsDataManager registeredDomainsDataManager;
 
     nx_http::ServerManagers httpServerManagers;
 
@@ -135,13 +137,13 @@ int MediatorProcess::executeApplication()
 
     STUNMessageDispatcher stunMessageDispatcher;
     stunMessageDispatcher.registerRequestProcessor(
-        nx_hpm::StunMethods::listen,
-        [&listeningPeerPool](StunServerConnection* connection, nx_stun::Message&& message) -> bool {
+        Methods::listen,
+        [&listeningPeerPool](StunServerConnection* connection, stun::Message&& message) -> bool {
             return listeningPeerPool.processListenRequest( connection, std::move(message) );
         } );
     stunMessageDispatcher.registerRequestProcessor(
-        nx_hpm::StunMethods::connect,
-        [&listeningPeerPool](StunServerConnection* connection, nx_stun::Message&& message) -> bool {
+        Methods::connect,
+        [&listeningPeerPool](StunServerConnection* connection, stun::Message&& message) -> bool {
             return listeningPeerPool.processConnectRequest( connection, std::move(message) );
         } );
 
@@ -211,3 +213,6 @@ int MediatorProcess::printHelp()
 
     return 0;
 }
+
+} // namespace hpm
+} // namespace nx

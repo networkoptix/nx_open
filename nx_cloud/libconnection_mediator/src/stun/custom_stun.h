@@ -7,31 +7,63 @@
 #define NX_CUSTOM_STUN_H
 
 #include <utils/network/stun/stun_message.h>
+#include <utils/common/uuid.h>
 
+namespace nx {
+namespace hpm { // hpm stands for "Hole Punching Mediator"
 
-//!hpm stands for "Hole Punching Mediator". This namespace is to contain all mediator types (maybe)
-namespace nx_hpm
+namespace Methods
 {
-    namespace StunMethods
+    enum Value
     {
-        enum Value
-        {
-            listen = static_cast<int>( nx_stun::MethodType::userMethod ),
-            connect,
-            connectionRequested
-        };
+        listen = stun::MethodType::userMethod,
+        connect,
+        connectionRequested
+    };
+};
+
+//TODO custom stun requests parameters
+namespace Attributes
+{
+    enum Value
+    {
+        systemName = stun::attr::AttributeType::userDefine,
+        authorization,
+        serverId
+    };
+}
+
+namespace attr
+{
+    struct SystemName : stun::attr::UnknownAttribute
+    {
+        SystemName( nx::String value )
+            : stun::attr::UnknownAttribute( s_type, value ) {}
+
+        static const int s_type = Attributes::systemName;
     };
 
-    //TODO custom stun requests parameters
-    namespace StunParameters
+    struct Authorization : stun::attr::UnknownAttribute
     {
-        enum Value
-        {
-            systemName = static_cast<int>( nx_stun::attr::AttributeType::userDefine ),
-            authorization,
-            serverId
-        };
-    }
+        Authorization( nx::String value )
+            : stun::attr::UnknownAttribute( s_type, value ) {}
+
+        // TODO: introduce some way of parsing subattributes
+        static const int s_type = Attributes::authorization;
+    };
+
+    struct ServerId : stun::attr::UnknownAttribute
+    {
+        ServerId( QnUuid value )
+            : stun::attr::UnknownAttribute( s_type, value.toRfc4122() ) {}
+
+        QnUuid uuid() const { return QnUuid::fromRfc4122( value ); }
+
+        static const int s_type = Attributes::serverId;
+    };
 }
+
+} // namespace hpm
+} // namespace nx
 
 #endif  //NX_CUSTOM_STUN_H

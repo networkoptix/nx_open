@@ -9,6 +9,8 @@
 #include <utils/network/http/buffer_source.h>
 #include <utils/network/http/server/http_stream_socket_server.h>
 
+namespace nx {
+namespace hpm {
 
 const QString RegisterSystemHttpHandler::HANDLER_PATH = QLatin1String("/register");
 
@@ -29,3 +31,6 @@ void RegisterSystemHttpHandler::processRequest(
             "text/html",
             "<html><h1>Hello, world</h1></html>\n" ) );
 }
+
+} // namespace hpm
+} // namespace nx

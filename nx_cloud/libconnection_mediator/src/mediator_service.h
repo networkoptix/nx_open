@@ -19,6 +19,8 @@
 
 #include "stun/stun_stream_socket_server.h"
 
+namespace nx {
+namespace hpm {
 
 class MediatorProcess
 :
@@ -46,5 +48,8 @@ private:
     QString getDataDirectory();
     int printHelp();
 };
+
+} // namespace hpm
+} // namespace nx
 
 #endif  //HOLE_PUNCHER_SERVICE_H

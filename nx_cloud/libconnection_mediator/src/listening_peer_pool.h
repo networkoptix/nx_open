@@ -9,6 +9,8 @@
 #include "db/registered_systems_data_manager.h"
 #include "stun/stun_server_connection.h"
 
+namespace nx {
+namespace hpm {
 
 //!This class instance keeps information about all currently listening peers, processes STUN requests \a bind, \a connect and sends \a connection_requested indication
 /*!
@@ -24,13 +26,16 @@ public:
     /*!
         \note Follows \a STUNMessageDispatcher::MessageProcessorType signature
     */
-    bool processListenRequest( StunServerConnection* connection, nx_stun::Message&& message );
+    bool processListenRequest( StunServerConnection* connection, stun::Message&& message );
     /*!
         \note Follows \a STUNMessageDispatcher::MessageProcessorType signature
     */
-    bool processConnectRequest( StunServerConnection* connection, nx_stun::Message&& message );
+    bool processConnectRequest( StunServerConnection* connection, stun::Message&& message );
 
     static ListeningPeerPool* instance();
 };
+
+} // namespace hpm
+} // namespace nx
 
 #endif  //LISTENING_PEER_POOL_H

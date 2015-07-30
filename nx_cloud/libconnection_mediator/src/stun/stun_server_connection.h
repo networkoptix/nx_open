@@ -16,43 +16,48 @@
 #include <utils/network/connection_server/base_stream_protocol_connection.h>
 #include <utils/network/connection_server/stream_socket_server.h>
 
+namespace nx {
+namespace hpm {
+
 class StunServerConnection
 :
     public nx_api::BaseStreamProtocolConnection<
         StunServerConnection,
         StreamConnectionHolder<StunServerConnection>,
-        nx_stun::Message,
-        nx_stun::MessageParser,
-        nx_stun::MessageSerializer>
+        stun::Message,
+        stun::MessageParser,
+        stun::MessageSerializer>
 {
 public:
     typedef BaseStreamProtocolConnection<
         StunServerConnection,
         StreamConnectionHolder<StunServerConnection>,
-        nx_stun::Message,
-        nx_stun::MessageParser,
-        nx_stun::MessageSerializer
+        stun::Message,
+        stun::MessageParser,
+        stun::MessageSerializer
     > BaseType;
 
     StunServerConnection(
         StreamConnectionHolder<StunServerConnection>* socketServer,
         std::unique_ptr<AbstractCommunicatingSocket> sock );
 
-    void processMessage( nx_stun::Message&& request );
+    void processMessage( stun::Message&& request );
 
 private:
-    void processGetIPAddressRequest( nx_stun::Message&& request );
-    void processProprietaryRequest( nx_stun::Message&& request );
-    void sendErrorReply( const nx_stun::TransactionID& transaciton_id , nx_stun::ErrorCode::Type errorCode );
-    void sendSuccessReply( const nx_stun::TransactionID& transaction_id );
+    void processGetIPAddressRequest( stun::Message&& request );
+    void processProprietaryRequest( stun::Message&& request );
+    void sendErrorReply( const stun::TransactionID& transaciton_id,
+                         stun::ErrorCode::Type errorCode,\
+                         nx::String description );
+    void sendSuccessReply( const stun::TransactionID& transaction_id );
 
     // Verification routine for Bind session
     // TODO:: Once these steps clear, we can add verification function for each
     // attributes. 
 
-    bool verifyServerName( const nx_stun::attr::StringAttributeType& name );
-    bool verifyServerId( const nx_stun::attr::StringAttributeType& name );
-    bool verifyAuthroization( const nx_stun::attr::StringAttributeType& name );
+    bool verifySystemName( const String& name );
+    bool verifyServerId( const QnUuid& id );
+    bool verifyAuthroization( const String& auth );
 
     void onSendComplete( SystemError::ErrorCode ec ) {
         Q_UNUSED(ec);
@@ -64,5 +69,8 @@ private:
 private:
     SocketAddress peer_address_;
 };
+
+} // namespace hpm
+} // namespace nx
 
 #endif  //STUN_SERVER_CONNECTION_H

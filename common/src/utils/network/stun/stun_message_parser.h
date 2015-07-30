@@ -15,9 +15,9 @@
 
 #include "../connection_server/base_protocol_message_types.h"
 
+namespace nx {
+namespace stun {
 
-namespace nx_stun
-{
     class MessageParser {
     private:
         enum {
@@ -160,6 +160,8 @@ namespace nx_stun
         // This is for opaque usage  
         std::deque<char> temp_buffer_;
     };
-}
+
+} // namespase stun
+} // namespase nx
 
 #endif  //STUN_MESSAGE_PARSER_H

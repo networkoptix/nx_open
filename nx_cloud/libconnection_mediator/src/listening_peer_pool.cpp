@@ -3,6 +3,8 @@
 
 #include <atomic>
 
+namespace nx {
+namespace hpm {
 
 static std::atomic<ListeningPeerPool*> ListeningPeerPool_instance;
 
@@ -19,7 +21,7 @@ ListeningPeerPool::~ListeningPeerPool()
 }
 
 bool ListeningPeerPool::processListenRequest( StunServerConnection* /*connection*/,
-                                              nx_stun::Message&& /*message*/ )
+                                              stun::Message&& /*message*/ )
 {
     //retrieving requests parameters:
         //peer id
@@ -37,7 +39,7 @@ bool ListeningPeerPool::processListenRequest( StunServerConnection* /*connection
 }
 
 bool ListeningPeerPool::processConnectRequest( StunServerConnection* /*connection*/,
-                                               nx_stun::Message&& /*message*/ )
+                                               stun::Message&& /*message*/ )
 {
     //retrieving requests parameters:
         //address to connect to. This address has following format: {server_guid}.{system_name} or just {system_name}. 
@@ -60,3 +62,6 @@ ListeningPeerPool* ListeningPeerPool::instance()
 {
     return ListeningPeerPool_instance.load( std::memory_order_relaxed );
 }
+
+} // namespace hpm
+} // namespace nx

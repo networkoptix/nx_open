@@ -3,33 +3,34 @@
 #include <utils/network/stun/stun_message_serializer.h>
 #include <utils/network/stun/stun_message_parser.h>
 
-namespace nx_stun {
+namespace nx {
+namespace stun {
 
 /** Parses @param message by @param partSize chunks in @param @parser */
-void partialParse( MessageParser& parser, const QByteArray& message, size_t partSize )
+void partialParse( MessageParser& parser, const Buffer& message, size_t partSize )
 {
     size_t parsedNow;
     size_t parsedTotal = 0;
     for ( ; parsedTotal < message.size() - partSize; parsedTotal += partSize )
     {
-        const QByteArray part( message.data() + parsedTotal, partSize );
+        const Buffer part( message.data() + parsedTotal, partSize );
         ASSERT_EQ( parser.parse(part, &parsedNow), nx_api::ParserState::inProgress );
         ASSERT_EQ( parsedNow, partSize );
     }
 
     const size_t lastPartSize = message.size() - parsedTotal;
-    const QByteArray lastPart(message.data() + parsedTotal, lastPartSize);
+    const Buffer lastPart(message.data() + parsedTotal, lastPartSize);
     ASSERT_EQ( parser.parse(lastPart, &parsedNow), nx_api::ParserState::done );
     ASSERT_EQ( parsedNow, lastPartSize );
 }
 
 TEST( StunMessageSerialization, BindingRequest )
 {
-    Message request( Header( MessageClass::request, static_cast< int >( MethodType::binding ) ) );
+    Message request( Header( MessageClass::request, MethodType::binding ) );
     request.header.transactionID.set( 0x01234567, 0x0123456789ABCDEF );
 
     size_t serializedSize;
-    QByteArray serializedMessage;
+    Buffer serializedMessage;
     serializedMessage.reserve( 100 );
 
     MessageSerializer serializer;
@@ -37,7 +38,7 @@ TEST( StunMessageSerialization, BindingRequest )
     ASSERT_EQ( serializer.serialize( &serializedMessage, &serializedSize ),
                nx_api::SerializerState::done );
 
-    static const QByteArray MESSAGE(
+    static const Buffer MESSAGE(
         "0001" "0000" "2112A442"    // request: binding, length, magic cookie
         "EFCDAB896745230167452301"  // transaction id (rev)
     );
@@ -50,7 +51,7 @@ TEST( StunMessageSerialization, BindingRequest )
     partialParse(parser, serializedMessage, 1); // parse by 1 byte chunks
 
     ASSERT_EQ( parsed.header.messageClass, MessageClass::request );
-    ASSERT_EQ( parsed.header.method, static_cast< int >( MethodType::binding ) );
+    ASSERT_EQ( parsed.header.method, MethodType::binding );
     ASSERT_EQ( parsed.attributes.size(), 0 );
 
     uint32_t highId;
@@ -62,14 +63,13 @@ TEST( StunMessageSerialization, BindingRequest )
 
 TEST( StunMessageSerialization, BindingResponse )
 {
-    Message response( Header( MessageClass::successResponse,
-                             static_cast< int >( MethodType::binding ) ) );
+    Message response( Header( MessageClass::successResponse, MethodType::binding ) );
     response.header.transactionID.set( 0x01234567, 0x0123456789ABCDEF );
     response.addAttribute( std::make_unique< attr::XorMappedAddress >(
                               0x1234, 0x12345678 ) );
 
     size_t serializedSize;
-    QByteArray serializedMessage;
+    Buffer serializedMessage;
     serializedMessage.reserve( 100 );
 
     MessageSerializer serializer;
@@ -77,7 +77,7 @@ TEST( StunMessageSerialization, BindingResponse )
     ASSERT_EQ( serializer.serialize( &serializedMessage, &serializedSize ),
                nx_api::SerializerState::done );
 
-    static const QByteArray MESSAGE(
+    static const Buffer MESSAGE(
         "0101" "000C" "2112A442"    // reponse: binding, lenght=12, magic cookie
         "EFCDAB896745230167452301"  // transaction id (rev)
         "0020" "0008" "0001"        // xor-mapped-address, ipv4
@@ -93,7 +93,7 @@ TEST( StunMessageSerialization, BindingResponse )
 
     ASSERT_EQ( serializedMessage.size(), serializedSize );
     ASSERT_EQ( parsed.header.messageClass, MessageClass::successResponse );
-    ASSERT_EQ( parsed.header.method, static_cast< int >( MethodType::binding ) );
+    ASSERT_EQ( parsed.header.method, MethodType::binding );
     ASSERT_EQ( parsed.attributes.size(), 1 );
 
     const auto address = parsed.getAttribute< attr::XorMappedAddress >();
@@ -103,14 +103,13 @@ TEST( StunMessageSerialization, BindingResponse )
 
 TEST( StunMessageSerialization, BindingError )
 {
-    Message response( Header( MessageClass::errorResponse,
-                             static_cast< int >( MethodType::binding ) ) );
+    Message response( Header( MessageClass::errorResponse, MethodType::binding ) );
     response.header.transactionID.set( 0x01234567, 0x0123456789ABCDEF );
     response.addAttribute( std::make_unique< attr::ErrorDescription >(
                               401, "Unauthorized" ) );
 
     size_t serializedSize;
-    QByteArray serializedMessage;
+    Buffer serializedMessage;
     serializedMessage.reserve( 100 );
 
     MessageSerializer serializer;
@@ -118,11 +117,11 @@ TEST( StunMessageSerialization, BindingError )
     ASSERT_EQ( serializer.serialize( &serializedMessage, &serializedSize ),
                nx_api::SerializerState::done );
 
-    static const QByteArray MESSAGE = QByteArray(
+    static const auto MESSAGE = Buffer(
             "0111" "0014" "2112A442"    // reponse: binding, lenght=20, magic cookie
             "EFCDAB896745230167452301"  // transaction id (rev)
             "0009" "0010" "00000401"    // error code 0x3 0x77
-        ) + QByteArray( "Unauthorized" ).toHex().toUpper();
+        ) + Buffer( "Unauthorized" ).toHex().toUpper();
 
     ASSERT_EQ( serializedMessage.size(), serializedSize );
     EXPECT_EQ( MESSAGE, serializedMessage.toHex().toUpper() );
@@ -134,26 +133,25 @@ TEST( StunMessageSerialization, BindingError )
 
     ASSERT_EQ( serializedMessage.size(), serializedSize );
     ASSERT_EQ( parsed.header.messageClass, MessageClass::errorResponse );
-    ASSERT_EQ( parsed.header.method, static_cast< int >( MethodType::binding ) );
+    ASSERT_EQ( parsed.header.method, MethodType::binding );
     ASSERT_EQ( parsed.attributes.size(), 1 );
 
     const auto error = parsed.getAttribute< attr::ErrorDescription >();
     ASSERT_NE( error, nullptr );
     ASSERT_EQ( error->getClass(), 4 );
     ASSERT_EQ( error->getNumber(), 1 );
-    ASSERT_EQ( error->reasonPhrase, std::string( "Unauthorized" ) );
+    ASSERT_EQ( error->reasonPhrase, String( "Unauthorized" ) );
 }
 
 TEST( StunMessageSerialization, CustomIndication )
 {
-    Message response( Header( MessageClass::indication,
-                             static_cast< int >( MethodType::userMethod ) + 1 ) );
+    Message response( Header( MessageClass::indication, MethodType::userMethod + 1 ) );
     response.header.transactionID.set( 0x01234567, 0x0123456789ABCDEF );
     response.addAttribute( std::make_unique< attr::UnknownAttribute >( 0x9001, "ua1v" ) );
     response.addAttribute( std::make_unique< attr::UnknownAttribute >( 0x9002, "ua2v" ) );
 
     size_t serializedSize;
-    QByteArray serializedMessage;
+    Buffer serializedMessage;
     serializedMessage.reserve( 100 );
 
     MessageSerializer serializer;
@@ -161,11 +159,11 @@ TEST( StunMessageSerialization, CustomIndication )
     ASSERT_EQ( serializer.serialize( &serializedMessage, &serializedSize ),
                nx_api::SerializerState::done );
 
-    static const QByteArray MESSAGE = QByteArray(
+    static const auto MESSAGE = Buffer(
             "0013" "0010" "2112A442"        // indication 3, lenght=12, magic cookie
             "EFCDAB896745230167452301" )    // transaction id (rev)
-        + QByteArray( "9002" "0004" ) + QByteArray( "ua2v" ).toHex().toUpper()
-        + QByteArray( "9001" "0004" ) + QByteArray( "ua1v" ).toHex().toUpper();
+        + Buffer( "9002" "0004" ) + Buffer( "ua2v" ).toHex().toUpper()
+        + Buffer( "9001" "0004" ) + Buffer( "ua1v" ).toHex().toUpper();
 
     ASSERT_EQ( serializedMessage.size(), serializedSize );
     EXPECT_EQ( MESSAGE, serializedMessage.toHex().toUpper() );
@@ -177,18 +175,19 @@ TEST( StunMessageSerialization, CustomIndication )
 
     ASSERT_EQ( serializedMessage.size(), serializedSize );
     ASSERT_EQ( parsed.header.messageClass, MessageClass::indication );
-    ASSERT_EQ( parsed.header.method, static_cast< int >( MethodType::userMethod ) + 1 );
+    ASSERT_EQ( parsed.header.method, MethodType::userMethod + 1 );
     ASSERT_EQ( parsed.attributes.size(), 2 );
 
     const auto attr1 = parsed.getAttribute< attr::UnknownAttribute >( 0x9001 );
     ASSERT_NE( attr1, nullptr );
-    ASSERT_EQ( attr1->value, QByteArray( "ua1v" ) );
+    ASSERT_EQ( attr1->value, Buffer( "ua1v" ) );
 
     const auto attr2 = parsed.getAttribute< attr::UnknownAttribute >( 0x9002 );
     ASSERT_NE( attr2, nullptr );
-    ASSERT_EQ( attr2->value, QByteArray( "ua2v" ) );
+    ASSERT_EQ( attr2->value, Buffer( "ua2v" ) );
 }
 
 // TODO: add some more test when we support some
 
-} // namespace nx_stun
+} // namespase stun
+} // namespase nx

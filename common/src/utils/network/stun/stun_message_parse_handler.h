@@ -8,9 +8,9 @@
 
 #include "stun_message.h"
 
+namespace nx {
+namespace stun {
 
-namespace nx_stun
-{
     class MessageParseHandler
     {
     public:
@@ -49,6 +49,8 @@ namespace nx_stun
     private:
         Message* m_message;
     };
-}
+
+} // namespase stun
+} // namespase nx
 
 #endif  //STUN_MESSAGE_PARSE_HANDLER_H

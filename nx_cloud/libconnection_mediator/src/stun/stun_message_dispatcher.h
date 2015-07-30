@@ -16,6 +16,8 @@
 
 #include "stun_server_connection.h"
 
+namespace nx {
+namespace hpm {
 
 //!Dispatches STUN protocol messages to corresponding processor
 /*!
@@ -26,7 +28,7 @@ class STUNMessageDispatcher
     public Singleton<STUNMessageDispatcher>
 {
 public:
-    typedef std::function<bool(StunServerConnection*, nx_stun::Message&&)> MessageProcessorType;
+    typedef std::function<bool(StunServerConnection*, stun::Message&&)> MessageProcessorType;
 
     /*!
         \param messageProcessor Ownership of this object is not passed
@@ -47,7 +49,7 @@ public:
     */
     bool dispatchRequest(
         StunServerConnection* connection,
-        nx_stun::Message&& message )
+        stun::Message&& message )
     {
         auto it = m_processors.find( message.header.method );
         if( it == m_processors.end() )
@@ -60,5 +62,8 @@ public:
 private:
     std::unordered_map<int, MessageProcessorType> m_processors;
 };
+
+} // namespace hpm
+} // namespace nx
 
 #endif  //STUN_MESSAGE_DISPATCHER_H

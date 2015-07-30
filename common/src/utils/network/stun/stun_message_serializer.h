@@ -14,8 +14,9 @@
 #include "../connection_server/base_protocol_message_types.h"
 
 
-namespace nx_stun
-{
+namespace nx {
+namespace stun {
+
     //!Serializes message to buffer
     class MessageSerializer
     {
@@ -64,6 +65,7 @@ namespace nx_stun
         bool initialized_;
     };
 
-}
+} // namespase stun
+} // namespase nx
 
 #endif  //STUN_MESSAGE_SERIALIZER_H

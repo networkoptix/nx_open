@@ -14,6 +14,8 @@
 
 #include "db/registered_systems_data_manager.h"
 
+namespace nx {
+namespace hpm {
 
 class RegisterSystemHttpHandler
 :
@@ -32,5 +34,8 @@ protected:
             const nx_http::StatusCode::Value statusCode,
             std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) override;
 };
+
+} // namespace hpm
+} // namespace nx
 
 #endif  //NX_REGISTER_HTTP_HANDLER_H

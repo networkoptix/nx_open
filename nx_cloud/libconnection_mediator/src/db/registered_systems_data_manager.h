@@ -10,9 +10,9 @@
 
 #include <QtCore/QString>
 
+namespace nx {
+namespace hpm {
 
-namespace nx_hpm
-{
     class DomainRegistrationData
     {
     public:
@@ -45,6 +45,8 @@ namespace nx_hpm
 
         static DomainRegistrationData* instance();
     };
-}
+
+} // namespace hpm
+} // namespace nx
 
 #endif  //REGISTERED_SYSTEMS_DATA_MANAGER_H

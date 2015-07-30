@@ -20,6 +20,8 @@
 class QnUuid
 {
 public:
+    static const size_t RFC4122_SIZE = 16;
+
     QnUuid();
     QnUuid( const char* text );
     QnUuid( const QString& text );

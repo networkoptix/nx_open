@@ -20,8 +20,9 @@
 #include "stun_message_serializer.h"
 
 
-namespace nx_stun
-{
+namespace nx {
+namespace stun {
+
     //!Connects to STUN server, sends requests, receives responses and indications
     /*!
         \note Methods of this class are not thread-safe
@@ -34,9 +35,9 @@ namespace nx_stun
     public:
         typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
             StunClientConnection,
-            nx_stun::Message,
-            nx_stun::MessageParser,
-            nx_stun::MessageSerializer
+            Message,
+            MessageParser,
+            MessageSerializer
         > BaseConnectionType;
         //!As required by \a nx_api::BaseServerConnection
         typedef BaseConnectionType ConnectionType;
@@ -65,7 +66,7 @@ namespace nx_stun
         /*!
             \note \a indicationHandler will be invoked in aio thread
         */
-        void registerIndicationHandler( std::function<void(nx_stun::Message&&)>&& indicationHandler );
+        void registerIndicationHandler( std::function<void(Message&&)>&& indicationHandler );
         //!Sends message asynchronously
         /*!
             \param completionHandler Triggered after response has been received or error has occured. 
@@ -75,8 +76,8 @@ namespace nx_stun
             \note It is valid to call this method after If \a StunClientConnection::openConnection has been called and not completed yet
         */
         bool sendRequest(
-            nx_stun::Message&& request,
-            std::function<void(SystemError::ErrorCode, nx_stun::Message&&)>&& completionHandler );
+            Message&& request,
+            std::function<void(SystemError::ErrorCode, Message&&)>&& completionHandler );
 
         /*!
             \note Required by \a nx_api::BaseServerConnection
@@ -97,11 +98,11 @@ namespace nx_stun
         /*!
             \note Required by \a nx_api::BaseStreamProtocolConnection
         */
-        void processMessage( nx_stun::Message&& msg );
+        void processMessage( Message&& msg );
 
-        void onRequestMessageRecv( nx_stun::Message&& msg );
+        void onRequestMessageRecv( Message&& msg );
 
-        void onIndicationMessageRecv( nx_stun::Message&& msg );
+        void onIndicationMessageRecv( Message&& msg );
         
         void onConnectionComplete( SystemError::ErrorCode , const std::function<void(SystemError::ErrorCode)>& func );
 
@@ -109,9 +110,9 @@ namespace nx_stun
 
         bool dispatchPendingRequest( SystemError::ErrorCode ec );
 
-        bool hasErrorAttribute( const nx_stun::Message& msg );
+        bool hasErrorAttribute( const Message& msg );
 
-        void enqueuePendingRequest( nx_stun::Message&& , std::function<void(SystemError::ErrorCode,nx_stun::Message&&)>&& );
+        void enqueuePendingRequest( Message&& , std::function<void(SystemError::ErrorCode,Message&&)>&& );
 
         void resetOutstandingRequest();
 
@@ -131,10 +132,10 @@ namespace nx_stun
 
         struct PendingRequest {
             bool execute;
-            nx_stun::Message request_message;
-            std::function<void(SystemError::ErrorCode, nx_stun::Message&&)> completion_handler;
+            Message request_message;
+            std::function<void(SystemError::ErrorCode, Message&&)> completion_handler;
             PendingRequest() : execute(false) {}
-            PendingRequest( nx_stun::Message&& msg , std::function<void(SystemError::ErrorCode,nx_stun::Message&&)>&& func ):
+            PendingRequest( Message&& msg , std::function<void(SystemError::ErrorCode,Message&&)>&& func ):
                 execute(false),
                 request_message(std::move(msg)),
                 completion_handler(std::move(func)){}
@@ -145,13 +146,15 @@ namespace nx_stun
         std::mutex m_mutex;
 
         // Indication handler 
-        std::function<void(nx_stun::Message&&)> m_indicationHandler;
+        std::function<void(Message&&)> m_indicationHandler;
 
-        nx_stun::MessageParser m_messageParser;
-        nx_stun::MessageSerializer m_messageSerializer;
+        MessageParser m_messageParser;
+        MessageSerializer m_messageSerializer;
 
         Q_DISABLE_COPY(StunClientConnection)
     };
-}
+
+} // namespase stun
+} // namespase nx
 
 #endif  //NX_STUN_CONNECTION_H

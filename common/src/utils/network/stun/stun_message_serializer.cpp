@@ -9,7 +9,9 @@
 
 #include <boost/crc.hpp>
 
-namespace nx_stun {
+namespace nx {
+namespace stun {
+
 using namespace attr;
 
 class MessageSerializer::MessageSerializerBuffer {
@@ -287,13 +289,14 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCo
         return nx_api::SerializerState::needMoreBufferSpace;
     if( attribute.reasonPhrase.size() == 0 ) {
         // This is an empty reason phase 
+        *value = buffer->position() - cur_pos;
         return nx_api::SerializerState::done;
     }
     // UTF8 string 
-    QByteArray utf8_bytes = QString::fromStdString(attribute.reasonPhrase).toUtf8();
+    nx::Buffer utf8_bytes = attribute.reasonPhrase;
     if( buffer->WriteBytes( utf8_bytes.constData() , utf8_bytes.size() ) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace;
-    *value = buffer->position()-cur_pos;
+    *value = buffer->position() - cur_pos;
     // Padding
     std::size_t padding_size = calculatePaddingSize(utf8_bytes.size());
     for( std::size_t i = utf8_bytes.size() ; i < padding_size ; ++i ) {
@@ -399,4 +402,5 @@ nx_api::SerializerState::Type MessageSerializer::serialize( nx::Buffer* const us
     return nx_api::SerializerState::done;
 }
 
-}// namespace nx_api
+} // namespase stun
+} // namespase nx
