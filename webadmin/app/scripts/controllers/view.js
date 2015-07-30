@@ -290,13 +290,19 @@ angular.module('webadminApp').controller('ViewCtrl',
             // So we fix size of cameras-panel
             var $window = $(window);
             var $top = $("#top");
-            var updateHeight = function() {
+            var $viewPanel = $(".view-panel");
+            var $camerasPanel = $(".cameras-panel");
+            var updateHeights = function() {
                 var windowHeight = $window.height();
                 var topHeight = $top.height();
-                $(".cameras-panel").css("height", (windowHeight - topHeight) + "px");
+                var viewportHeight = (windowHeight - topHeight) + "px";
+
+                $camerasPanel.css("height",viewportHeight );
+                $viewPanel.css("height",viewportHeight );
+
             };
-            updateHeight();
-            $window.resize(updateHeight);
+            updateHeights();
+            $window.resize(updateHeights);
 
 
         }

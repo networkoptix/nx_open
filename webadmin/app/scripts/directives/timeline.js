@@ -56,7 +56,7 @@ angular.module('webadminApp')
                         }
                     },
 
-                    timelineBgColor: [28,35,39], //Color for ruler marks and labels
+                    timelineBgColor: [28,35,39,0.6], //Color for ruler marks and labels
                     font:'Roboto',//'sans-serif',
 
                     labelPadding: 10,
@@ -326,7 +326,8 @@ angular.module('webadminApp')
                 function clearTimeline(){
                     var context = canvas.getContext('2d');
                     context.fillStyle = blurColor(timelineConfig.timelineBgColor,1);
-                    context.fillRect(0, 0, scope.viewportWidth, scope.viewportHeight);
+                    context.clearRect(0, 0, scope.viewportWidth, scope.viewportHeight);
+                    //context.fillRect(0, 0, scope.viewportWidth, scope.viewportHeight);
                     context.lineWidth = timelineConfig.lineWidth;
                     return context;
                 }
@@ -731,7 +732,7 @@ angular.module('webadminApp')
                                 break;
                             case "above":
                             default:
-                                context.fillRect(x, textStart - font.size, textWidth, font.size); // above
+                                context.clearRect(x, textStart - font.size, textWidth, font.size); // above
                                 break;
                         }
                     }
