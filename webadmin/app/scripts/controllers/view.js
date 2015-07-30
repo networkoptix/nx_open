@@ -285,4 +285,19 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
 
+        if(window.jscd.browser == 'Microsoft Internet Explorer' || window.jscd.mobile){
+            // IE works bad with overflow and height:100% (http://www.local-pc-guy.com/web-dev/internet-explorer-9-10-css-bug-with-overflow-y)
+            // So we fix size of cameras-panel
+            var $window = $(window);
+            var $top = $("#top");
+            var updateHeight = function() {
+                var windowHeight = $window.height();
+                var topHeight = $top.height();
+                $(".cameras-panel").css("height", (windowHeight - topHeight) + "px");
+            };
+            updateHeight();
+            $window.resize(updateHeight);
+
+
+        }
     });
