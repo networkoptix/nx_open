@@ -43,6 +43,8 @@ angular.module('webadminApp')
 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
+                    console.log("playing source",src?src.src:null);
+
                     return src?src.src:null;
                 }
 
@@ -73,18 +75,28 @@ angular.module('webadminApp')
                     var weHaveHls = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['hls'];});
                     var weHaveRtsp = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['rtsp'];});
 
+                    // Test native support. Native is always better choice
                     if(weHaveWebm && canPlayNatively("webm")){ // webm is our best format for now
                         return "webm";
                     }
 
+                    if(weHaveHls && canPlayNatively("hls")){ // webm is our best format for now
+                        return "native-hls";
+                    }
+
+                    // Hardcode native support
                     if(window.jscd.os == "Android" && weHaveWebm){
-                        return "webm";
+                        console.warn("hardcoded support for webm on android");
+                        return "webm"; // TODO: Try removing this line.
                     }
 
                     if(window.jscd.mobile && weHaveHls){
-                        return "native-hls"; // Only one choice on mobile
+                        console.warn("hardcoded support for hls on mobile");
+                        return "native-hls"; // Only one choice on mobile.
+                        // TODO: Try removing this line.
                     }
 
+                    // No native support
                     //Presume we are on desktop:
                     switch(window.jscd.browser){
                         case 'Microsoft Internet Explorer':
@@ -101,7 +113,7 @@ angular.module('webadminApp')
                             return false; // IE9 - No other supported formats
 
 
-                        case "Safari":
+                        case "Safari": // TODO: Try removing this line.
                             if(weHaveHls) {
                                 return "native-hls";
                             }
@@ -127,20 +139,29 @@ angular.module('webadminApp')
                 }
 
 
-                function flushPlayer(){
-                    element.find("#videowindow").html("");
+                //TODO: remove ID, generate it dynamically
 
-                    scope.vgPlayerReady({$API:null});
+                var activePlayer = null;
+                function recyclePlayer(player){
+                    if(activePlayer != player) {
+                        element.find("#videowindow").html("");
+                        scope.vgPlayerReady({$API: null});
+                    }
+                    activePlayer = player;
+
                 }
 
                 function initVideogular() {
                     scope.videogular = true;
                 }
 
+                // TODO: Create common interface for each player, html5 compatible or something
+                // TODO: move supported info to config
+                // TODO: Support new players
+
                 function initNativePlayer(format){
                     scope.videogular = false;
                     nativePlayer.init(element.find("#videowindow"), function (api) {
-                        console.log("videowindow ready");
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
@@ -152,7 +173,6 @@ angular.module('webadminApp')
                             });
                         }
 
-
                         scope.vgPlayerReady({$API:scope.vgApi});
                     }, function (api) {
                         console.alert("some error");
@@ -162,7 +182,6 @@ angular.module('webadminApp')
                 function initFlashls() {
                     scope.videogular = false;
                     flashlsAPI.init("videowindow", function (api) {
-                        console.log("videowindow ready");
                         scope.vgApi = api;
                         
                         if (scope.vgSrc) {
@@ -179,7 +198,6 @@ angular.module('webadminApp')
                     scope.videogular = false;
 
                     jshlsAPI.init( element.find("#videowindow"), function (api) {
-                        console.log("videowindow ready");
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
@@ -197,7 +215,6 @@ angular.module('webadminApp')
                     scope.videogular = false;
                     var locomote = new Locomote('videowindow', /*'bower_components/locomote/dist/Player.swf'/**/'components/Player.swf'/**/);
                     locomote.on('apiReady', function() {
-                        console.log("play rtsp");
                         scope.vgApi = locomote;
 
                         /* Tell Locomote to play the specified media */
@@ -230,9 +247,10 @@ angular.module('webadminApp')
 
 
                 scope.$watch("vgSrc",function(){
-                    flushPlayer();// Remove old player. TODO: recycle it later
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         var format = detectBestFormat();
+                        recyclePlayer(format);// Remove old player. TODO: recycle it later
+
                         switch(format){
                             case "flashls":
                                 initFlashls();

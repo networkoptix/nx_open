@@ -37,6 +37,11 @@ var nativePlayer = new (function () {
 
     this.load = function(url,type){
         // controls
-        currentVideo = $("<video  src='" + url + /*"' type='" + type +*/ "'>").appendTo(node).get(0);
+        if(!currentVideo) {
+            currentVideo = $("<video  src='" + url + "' type='" + type + "'>").appendTo(node).get(0);
+        }else{
+            currentVideo.pause();
+            $(currentVideo).attr("src",url).attr("type",type);
+        }
     };
 })();

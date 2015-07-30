@@ -7,8 +7,59 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.cameras = {};
         $scope.activeCamera = null;
 
-        $scope.activeResolution = '320p';
-        $scope.availableResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
+        $scope.activeResolution = 'Auto';
+        // detect max resolution here?
+        var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
+        var nativeResolutions = ['Auto', 'hi', 'lo'];
+        var mimeTypes = {
+            'hls': 'application/x-mpegURL',
+            'webm': 'video/webm',
+            'rtsp': 'application/x-rtsp',
+            'flv': 'video/x-flv',
+            'mp4': 'video/mp4',
+            'mjpeg':'video/x-motion-jpeg'
+        };
+
+        function cameraSupports(type){
+            if(!$scope.activeCamera){
+                return null;
+            }
+            return _.find($scope.activeCamera.mediaStreams,function(stream){
+                return stream.transports.indexOf(type)>0;
+            });
+        }
+        function browserSupports(type){
+
+            var res = false;
+            var v = document.createElement('video');
+            if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
+                res = true; // we have webm codec!
+            }
+            return res;
+        }
+
+        function formatSupported(type){
+            return cameraSupports('webm') && browserSupports("webm");
+        }
+        function updateAvailableResolutions() {
+            if(!$scope.activeCamera){
+                $scope.activeResolution = 'Auto';
+                $scope.availableResolutions = ['Auto'];
+            }
+
+            //1. Does browser and server support webm?
+            if(formatSupported('webm')){
+                $scope.availableResolutions = transcodingResolutions;
+            }else{
+                $scope.availableResolutions = nativeResolutions;
+            }
+
+            if($scope.availableResolutions.indexOf($scope.activeResolution)<0){
+                $scope.activeResolution = $scope.availableResolutions[0];
+            }
+        }
+        updateAvailableResolutions();
+
 
         $scope.activeFormat = 'Auto';
         $scope.availableFormats = [
@@ -24,37 +75,28 @@ angular.module('webadminApp').controller('ViewCtrl',
                 id: r.data.reply.id
             };
         });
-
+/*
         function getCamerasServer(camera) {
             return _.find($scope.mediaServers, function (server) {
                 return server.id === camera.parentId;
             });
         }
-
-        function getServerUrl(server) {
-            if ($scope.settings.id === server.id.replace('{', '').replace('}', '')) {
-                return '';
-            }
-            return server.apiUrl.replace('http://', '').replace('https://', '');
-        }
-
+*/
         $scope.playerReady = function(API){
-            console.log("playerReady",API);
             $scope.playerAPI = API;
             $scope.switchPlaying(true);
         };
         function updateVideoSource(playing) {
             var live = !playing;
-            if(live){
-                playing = (new Date()).getTime();
-            }
-
 
             if(!$scope.positionProvider){
                 return;
             }
-            console.log("init playing",playing);
+
             $scope.positionProvider.init(playing);
+            if(live){
+                playing = (new Date()).getTime();
+            }
             var cameraId = $scope.activeCamera.physicalId;
             var serverUrl = '';
             var rtspUrl = 'rtsp://' + window.location.host;
@@ -70,21 +112,19 @@ angular.module('webadminApp').controller('ViewCtrl',
             var positionMedia = !live ? "&pos=" + (playing) : "";
             var positionHls = !live ? "&startTimestamp=" + (playing) : "";
 
+            // TODO: check resolution ? 
             $scope.acitveVideoSource = _.filter([
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?' + positionHls + authParam + '&chunked&hi'), type: 'application/x-mpegURL'},
-                //{ src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls   + extParam ), type: 'application/x-mpegURL'},
-                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + authParam ), type: 'video/webm' },
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?' + positionHls + authParam + '&chunked&' + $scope.activeResolution), type: mimeTypes['hls'], transport:'hls'},
+                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
 
                 // Not supported:
-                // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: 'video/x-motion-jpeg'},
+                // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: mimeTypes['mjpeg'] , transport:'mjpeg'},
 
                 // Require plugin
-                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm ), type: 'application/x-rtsp'}
+                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm  + '&stream=' + ($scope.activeResolution=='lo'?1:0)), type: mimeTypes['rtsp'], transport:'rtsp'}
             ],function(src){
-                return $scope.activeFormat == 'Auto'|| $scope.activeFormat == src.type;
+                return formatSupported(src.transport) && $scope.activeFormat == 'Auto'|| $scope.activeFormat == src.type;
             });
-
-            console.log("video source", $scope.activeFormat, $scope.acitveVideoSource[0].src  , $scope.acitveVideoSource);
         }
 
         $scope.activeVideoRecords = null;
@@ -115,7 +155,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
 
                 updateVideoSource(position);
-
+                updateAvailableResolutions();
                 $scope.switchPlaying(true);
             }
         };
@@ -138,8 +178,6 @@ angular.module('webadminApp').controller('ViewCtrl',
                 if ($scope.positionProvider) {
                     $scope.positionProvider.playing = play;
                 }
-            }else{
-                console.log("no api!",$scope.playerAPI);
             }
         };
 
@@ -166,9 +204,16 @@ angular.module('webadminApp').controller('ViewCtrl',
                 var cameras = data.data;
 
 
+                var findMediaStream = function(param){
+                    return param.name == "mediaStreams";
+                };
                 function cameraSorter(camera) {
                     camera.url = extractDomain(camera.url);
                     camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
+
+                    var mediaStreams = _.find(camera.addParams,findMediaStream);
+                    camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
+
 
                     var num = 0;
                     var addrArray = camera.url.split('.');
@@ -243,7 +288,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.selectFormat = function(format){
             $scope.activeFormat = format;
-            updateVideoSource($scope.positionProvider.playedPosition);
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         };
 
         $scope.selectResolution = function(resolution){
@@ -255,7 +300,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return;
             }
             $scope.activeResolution = resolution;
-            updateVideoSource($scope.positionProvider.playedPosition);
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         };
 
         $scope.fullScreen = function(){
