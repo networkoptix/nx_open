@@ -248,7 +248,7 @@ QList<QnAuditLogModel::Column> detailSessionColumns(bool masterMultiselected)
     columns << 
         QnAuditLogModel::DateColumn <<
         QnAuditLogModel::TimeColumn;
-    if (masterMultiselected)
+    //if (masterMultiselected)
         columns << QnAuditLogModel::UserNameColumn << QnAuditLogModel::UserHostColumn;
     columns <<
         QnAuditLogModel::EventTypeColumn <<
