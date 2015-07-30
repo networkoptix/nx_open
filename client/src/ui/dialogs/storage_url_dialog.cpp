@@ -59,6 +59,13 @@ QString QnStorageUrlDialog::normalizePath(QString path) {
     result = path.replace(L'\\', separator);
     if (result.endsWith(separator))
         result.chop(1);
+    if (separator == lit("/"))
+    {
+        int i = 0;
+        while (result[i] == separator[0])
+            ++i;
+        return result.mid(i);
+    }
     return result;
 }
 
@@ -105,7 +112,9 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
         }
     }
     
-    QUrl url = QString(lit("file:///%1")).arg(normalizePath(path));
+    QString urlString = normalizePath(path);
+    urlString = lit("file://%1").arg(urlString);
+    QUrl url(urlString);
     if (!login.isEmpty())
         url.setUserName(login);
     if (!password.isEmpty())
