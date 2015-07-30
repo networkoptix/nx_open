@@ -35,21 +35,13 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>client</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type> 
-            <scope>system</scope>
-            <systemPath>${root.dir}/mediaserver/pom.xml</systemPath>            
-        </dependency>
-        
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>clientexe</artifactId>
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/mediaserver/pom.xml</systemPath>            
-        </dependency>	
+            <systemPath>${root.dir}/clientexe/pom.xml</systemPath>            
+        </dependency>
+        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nxtool</artifactId>
