@@ -49,6 +49,9 @@ namespace {
     }
 
     QImage makeStripesImage(int size, const QColor &color, const QColor &background) {
+        if ((size - 1) & size) // not power of 2
+            size = qNextPowerOfTwo(size);
+
         int stripeWidth = size / 2;
 
         QImage image(size, size, QImage::Format_RGB888);
