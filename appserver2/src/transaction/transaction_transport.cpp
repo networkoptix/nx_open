@@ -365,6 +365,17 @@ QUrl QnTransactionTransport::remoteAddr() const
     return m_remoteAddr;
 }
 
+SocketAddress QnTransactionTransport::remoteSocketAddr() const
+{
+    QMutexLocker lock(&m_mutex);
+    SocketAddress addr = SocketAddress(
+        m_remoteAddr.host(),
+        m_remoteAddr.port()
+    );
+
+    return addr;
+}
+
 QnTransactionTransport::State QnTransactionTransport::getState() const
 {
     QMutexLocker lock(&m_mutex);
