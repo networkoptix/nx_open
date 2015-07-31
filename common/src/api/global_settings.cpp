@@ -9,6 +9,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/email.h>
+#include <utils/common/ldap.h>
 
 #include <nx_ec/data/api_resource_data.h>
 
@@ -45,7 +46,12 @@ namespace {
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
-    
+
+    const QString ldapHost(lit("ldapHost"));
+    const QString ldapPort(lit("ldapPort"));
+    const QString ldapAdminDn(lit("ldapAdminDn"));
+    const QString ldapAdminPassword(lit("ldapAdminPassword"));
+    const QString ldapSearchBase(lit("ldapSearchBase"));
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent): 
@@ -53,6 +59,13 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
 {
     assert(qnResPool);
     
+/*                  #define NX_LDAP_HOST lit("192.168.11.2")
+                    #define NX_LDAP_PORT 389
+
+                    #define LDAP_ADMIN_DN lit("Administrator@corp.hdw.mx")
+                    #define LDAP_ADMIN_PW lit("QWEasd123")
+                    #define LDAP_SEARCH_BASE lit("dc=corp,dc=hdw,dc=mx") */
+
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
     m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
@@ -68,6 +81,12 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmailSettings::defaultTimeoutSec(), this);
     m_simpleAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameSimple, true, this);
 
+    m_ldapHostAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapHost, QString(), this);
+    m_ldapPortAdaptor = new QnLexicalResourcePropertyAdaptor<int>(ldapPort, 389, this);
+    m_ldapAdminDnAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapAdminDn, QString(), this);
+    m_ldapAdminPasswordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapAdminPassword, QString(), this);
+    m_ldapSearchBaseAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapSearchBase, QString(), this);
+
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
         << m_serverAdaptor
@@ -82,12 +101,21 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << m_simpleAdaptor
         ;
 
+    QList<QnAbstractResourcePropertyAdaptor*> ldapAdaptors;
+    ldapAdaptors << 
+        m_ldapHostAdaptor,
+        m_ldapPortAdaptor,
+        m_ldapAdminDnAdaptor,
+        m_ldapAdminPasswordAdaptor,
+        m_ldapSearchBaseAdaptor;
+
     m_allAdaptors 
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_serverAutoDiscoveryEnabledAdaptor
         << m_updateNotificationsEnabledAdaptor
         << emailAdaptors
+        << ldapAdaptors
         ;
 
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
@@ -96,6 +124,9 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
 
     for(QnAbstractResourcePropertyAdaptor* adaptor: emailAdaptors)
         connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::emailSettingsChanged, Qt::QueuedConnection);
+
+    for(QnAbstractResourcePropertyAdaptor* adaptor: ldapAdaptors)
+        connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::ldapSettingsChanged, Qt::QueuedConnection);
 
     connect(qnResPool,                              &QnResourcePool::resourceAdded,                     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
     connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
@@ -171,6 +202,24 @@ ec2::ApiResourceParamDataList QnGlobalSettings::allSettings() const {
         return ec2::ApiResourceParamDataList();
 
     return m_admin->getProperties();
+}
+
+QnLdapSettings QnGlobalSettings::ldapSettings() const {
+    QnLdapSettings result;
+    result.host = m_ldapHostAdaptor->value();
+    result.port = m_ldapPortAdaptor->value();
+    result.adminDn = m_ldapAdminDnAdaptor->value();
+    result.adminPassword = m_ldapAdminPasswordAdaptor->value();
+    result.searchBase = m_ldapSearchBaseAdaptor->value();
+    return result;
+}
+
+void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings) {
+    m_ldapHostAdaptor->setValue(settings.host);
+    m_ldapPortAdaptor->setValue(settings.port);
+    m_ldapAdminDnAdaptor->setValue(settings.adminDn);
+    m_ldapAdminPasswordAdaptor->setValue(settings.adminPassword);
+    m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
 }
 
 QnEmailSettings QnGlobalSettings::emailSettings() const {

@@ -6,7 +6,9 @@
 
 QnUserResource::QnUserResource():
     m_permissions(0),
-    m_isAdmin(false)
+    m_isAdmin(false),
+	m_isLdap(false),
+	m_isEnabled(true)
 {
     addFlags(Qn::user | Qn::remote);
 }
@@ -142,6 +144,34 @@ void QnUserResource::setAdmin(bool isAdmin)
         m_isAdmin = isAdmin;
     }
     emit adminChanged(::toSharedPointer(this));
+}
+
+bool QnUserResource::isLdap() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_isLdap;
+}
+
+void QnUserResource::setLdap(bool isLdap)
+{
+    QMutexLocker locker(&m_mutex);
+    if (m_isLdap == isLdap)
+        return;
+    m_isLdap = isLdap;
+}
+
+bool QnUserResource::isEnabled() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_isEnabled;
+}
+
+void QnUserResource::setEnabled(bool isEnabled)
+{
+    QMutexLocker locker(&m_mutex);
+    if (m_isEnabled == isEnabled)
+        return;
+    m_isEnabled = isEnabled;
 }
 
 QString QnUserResource::getEmail() const

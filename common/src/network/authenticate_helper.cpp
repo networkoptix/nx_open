@@ -14,6 +14,7 @@
 #include "common/common_module.h"
 #include "core/resource/media_server_resource.h"
 #include "http/custom_headers.h"
+#include "ldap/ldap_manager.h"
 
 
 static const QString COOKIE_DIGEST_AUTH(lit("Authorization=Digest"));
@@ -68,6 +69,7 @@ void QnAuthMethodRestrictionList::deny( const QString& pathMask, AuthMethod::Val
 QnAuthHelper* QnAuthHelper::m_instance;
 
 static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
+static const qint64 LDAP_TIMEOUT = 1000000ll * 60 * 5;
 static const qint64 COOKIE_EXPERATION_PERIOD = 3600;
 
 // TODO: #2.4 replace with customization value
@@ -79,6 +81,7 @@ QnAuthHelper::QnAuthHelper()
     connect(qnResPool, SIGNAL(resourceChanged(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     m_digestNonceCache.setMaxCost(100);
+    m_ldapAuthCache.setMaxCost(100);
 }
 
 QnAuthHelper::~QnAuthHelper()
@@ -155,7 +158,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
                 {
                     if( user->getName().toUtf8().toLower() == nxUserName )
                     {
-                        if( user->getDigest().isEmpty() )
+                        if( true || user->getDigest().isEmpty() )
                         {
                             //using basic authentication to allow fill user's digest
                             nx_http::insertOrReplaceHeader(
@@ -430,14 +433,49 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     {
         if (user->getName().toLower() == userName)
         {
-            if (user->checkPassword(password))
-            {
-                if (user->getDigest().isEmpty())
-                    emit emptyDigestDetected(user, userName, password);
-                if (authUserId)
-                    *authUserId = user->getId();
-                return true;
-            }
+			if (!user->isEnabled())
+				continue;
+
+			if (user->isLdap())
+			{
+				try {
+                    QString credentials = userName + lit(":") + password;
+                    {
+                        // nonce cache will help if time just changed
+                        QMutexLocker lock(&m_ldapMtx);
+                        if (m_ldapAuthCache.contains(credentials) && m_ldapAuthCache[credentials]->elapsed() < LDAP_TIMEOUT)
+                            return true;
+                    }
+
+                    #define NX_LDAP_HOST lit("192.168.11.2")
+                    #define NX_LDAP_PORT 389
+
+                    #define LDAP_ADMIN_DN lit("Administrator@corp.hdw.mx")
+                    #define LDAP_ADMIN_PW lit("QWEasd123")
+                    #define LDAP_SEARCH_BASE lit("dc=corp,dc=hdw,dc=mx")
+
+					QnLdapManager ldapManager(NX_LDAP_HOST, NX_LDAP_PORT, LDAP_ADMIN_DN, LDAP_ADMIN_PW, LDAP_SEARCH_BASE);
+					bool authResult = ldapManager.verifyCredentials(userName, password);
+                    if (authResult) {
+                        QElapsedTimer* timeout = new QElapsedTimer();
+                        timeout->restart();
+                        QMutexLocker lock(&m_nonceMtx);
+                        m_ldapAuthCache.insert(credentials, timeout);
+                    }
+				} catch (const LdapException& e) {
+					return false;
+				}
+			} else
+			{
+				if (user->checkPassword(password))
+				{
+					if (user->getDigest().isEmpty())
+						emit emptyDigestDetected(user, userName, password);
+					if (authUserId)
+						*authUserId = user->getId();
+					return true;
+				}
+			}
         }
     }
 

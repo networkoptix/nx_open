@@ -9,6 +9,7 @@
 #include "statistics_reply.h"
 #include "connection_info.h"
 #include "test_email_settings_reply.h"
+#include "test_ldap_settings_reply.h"
 #include "ping_reply.h"
 #include "recording_stats_reply.h"
 #include "camera_list_reply.h"

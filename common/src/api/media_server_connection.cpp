@@ -89,6 +89,7 @@ namespace {
         (RecordingStatsObject,     "recStats")
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
+        (TestLdapSettingsObject,   "testLdapSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
     );
 #if 0
@@ -684,6 +685,15 @@ int QnMediaServerConnection::testEmailSettingsAsync(const QnEmailSettings &setti
     ec2::ApiEmailSettingsData data;
     ec2::fromResourceToApi(settings, data);
     return sendAsyncPostRequest(TestEmailSettingsObject, headers, QnRequestParamList(), QJson::serialized(data), QN_STRINGIZE_TYPE(QnTestEmailSettingsReply), target, slot);
+}
+
+int QnMediaServerConnection::testLdapSettingsAsync(const QnLdapSettings &settings, QObject *target, const char *slot) 
+{
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+    ec2::ApiLdapSettingsData data;
+    ec2::fromResourceToApi(settings, data);
+    return sendAsyncPostRequest(TestLdapSettingsObject, headers, QnRequestParamList(), QJson::serialized(data), QN_STRINGIZE_TYPE(QnTestLdapSettingsReply), target, slot);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(

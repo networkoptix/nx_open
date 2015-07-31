@@ -152,7 +152,9 @@ private:
     mutable QMutex m_cookieNonceCacheMutex;
 
     QCache<QByteArray, QElapsedTimer> m_digestNonceCache;
+    QCache<QString, QElapsedTimer> m_ldapAuthCache;
     mutable QMutex m_nonceMtx;
+    mutable QMutex m_ldapMtx;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

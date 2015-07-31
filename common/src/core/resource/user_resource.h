@@ -36,6 +36,12 @@ public:
     bool isAdmin() const;
     void setAdmin(bool isAdmin);
 
+    bool isLdap() const;
+    void setLdap(bool isLdap);
+
+    bool isEnabled() const;
+    void setEnabled(bool isEnabled);
+
     QString getEmail() const;
     void setEmail(const QString &email);
     virtual Qn::ResourceStatus getStatus() const override;
@@ -59,6 +65,8 @@ private:
     QByteArray m_cryptSha512Hash;
     quint64 m_permissions;
     bool m_isAdmin;
+	bool m_isLdap;
+	bool m_isEnabled;
     QString m_email;
 };
 

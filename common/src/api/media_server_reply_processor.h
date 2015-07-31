@@ -14,6 +14,7 @@
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
 #include "api/model/test_email_settings_reply.h"
+#include "api/model/test_ldap_settings_reply.h"
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/camera_list_reply.h>

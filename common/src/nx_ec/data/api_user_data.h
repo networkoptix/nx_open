@@ -16,8 +16,10 @@ namespace ec2
         QnLatin1Array hash;
         //!Hash suitable to be used in /etc/shadow file
         QnLatin1Array cryptSha512Hash;
+		bool isLdap;
+		bool isEnabled;
     };
-#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)(cryptSha512Hash)
+#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)(cryptSha512Hash)(isLdap)(isEnabled)
 
 }
 
