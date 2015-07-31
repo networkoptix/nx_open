@@ -25,7 +25,8 @@ namespace
     };
 
     ServerModelInfo::ServerModelInfo()
-        : selectedState()
+        : updateTimestamp(0)
+        , selectedState()
         , serverInfo()
     {}
 
