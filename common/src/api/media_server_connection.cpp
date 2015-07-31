@@ -293,7 +293,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnRecordingStatsReply>(this, response, handle);
         break;
     case AuditLogObject:
-        processJsonReply<QnAuditRecordList>(this, response, handle);
+        processUbjsonReply<QnAuditRecordList>(this, response, handle);
         break;
     case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
@@ -855,6 +855,7 @@ int QnMediaServerConnection::getAuditLogAsync(qint64 startTimeMs, qint64 endTime
     QnRequestParamList params;
     params << QnRequestParam("startTimeMs", startTimeMs);
     params << QnRequestParam("endTimeMs", endTimeMs);
+    params << QnRequestParam("format", "ubjson");
     return sendAsyncGetRequest(AuditLogObject, params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
 

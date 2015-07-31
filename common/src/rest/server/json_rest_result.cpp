@@ -40,3 +40,8 @@ QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnJsonRestResult,
 (json),
 ((&QnJsonRestResult::m_reply,       &QnJsonRestResult::m_reply,         "reply"))
 )
+
+QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnUbjsonRestResult, 
+(json),
+((&QnUbjsonRestResult::m_reply,       &QnUbjsonRestResult::m_reply,     "reply"))
+)

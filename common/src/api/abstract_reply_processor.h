@@ -99,7 +99,12 @@ protected:
         T reply;
         if(status == 0) {
             QnUbjsonRestResult result;
-            bool deserialized = QnUbjson::deserialize(response.data, &result);
+            bool deserialized = false;
+            result = QnUbjson::deserialized<QnUbjsonRestResult>(response.data, QnUbjsonRestResult(), &deserialized);
+
+            if (deserialized && !result.reply().isNull())
+                reply = QnUbjson::deserialized<T>(result.reply(), T(), &deserialized);
+
             if (!deserialized) {
 #ifdef JSON_REPLY_DEBUG
                 qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
