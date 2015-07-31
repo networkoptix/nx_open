@@ -1,6 +1,7 @@
 
 #include "resource_discovery_manager.h"
 
+#include <exception>
 #include <list>
 
 #include <QtConcurrent>
@@ -273,6 +274,15 @@ static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input)
     try
     {
         return input.checkHostAddr();
+    }
+    catch (const std::exception& e)
+    {
+        qWarning()
+            << "CheckHostAddrAsync exception ("<<e.what()<<") caught\n"
+            << "\t\tresource type:" << input.resType->getName() << "\n"
+            << "\t\tresource url:" << input.url << "\n";
+
+        return QnResourceList();
     }
     catch (...)
     {
