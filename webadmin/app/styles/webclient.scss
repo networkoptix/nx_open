@@ -145,9 +145,15 @@ table.webclient-window>tbody>tr>td{
 }
 
 .webclient-button{
-  margin:5px 0;
+  padding:0 10px;
   display: inline-block;
+  vertical-align: top;
+  min-width: 40px;
+  text-align: center;
   cursor:pointer;
+}
+.webclient-button:hover{
+  background-color: rgba(198,234,255,0.05);
 }
 
 
@@ -158,18 +164,6 @@ table.webclient-window>tbody>tr>td{
 .webclient-bottom-border{
   border-bottom: 1px solid #263137;
   margin-bottom:20px;
-}
-.webclient-left-border{
-
-  border-left: 1px solid #263137;
-  margin-left:20px;
-  padding-left:20px;
-}
-.webclient-right-border{
-
-  border-right: 1px solid #263137;
-  margin-right:20px;
-  padding-right:20px;
 }
 
 .webclient-panel .webclient-button.active{
@@ -221,17 +215,40 @@ table.webclient-window>tbody>tr>td{
 .server-underline{
   display: inline-block;
   width:100%;
-  border-bottom: 1px solid #263137;;
+  border-bottom: 1px solid #263137;
 }
-.caption-row {
+.webclient-panel-border{
   height: 30px;
-  line-height: 30px;
+  position: relative;
+  vertical-align: top;
+  margin: 5px 10px;
+  border-left: 1px solid #263137;
+  display: inline-block;
 }
 
-.caption-row .glyphicon{
-  top:50%;
-  transform: translateY(-50%);
+.webclient-panel .dropdown-menu{
+  background-color: #E1E7EA;
+  padding: 10px 0;
 }
+
+.webclient-panel .dropdown-menu > li > a{
+  line-height:24px;
+  text-align:left;
+  padding-left:15px;
+}
+
+.webclient-panel .dropdown-menu > li > a.active{
+  background-color: #00AEEF;
+}
+
+.webclient-panel .dropdown-menu > li > a:hover{
+  background-color: #F5F7F8;
+}
+
+.caption-row {
+  line-height: 40px;
+}
+
 .camera-preview{
   width:70px !important;
   height:40px !important;

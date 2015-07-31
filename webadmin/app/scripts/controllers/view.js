@@ -331,10 +331,11 @@ angular.module('webadminApp').controller('ViewCtrl',
             console.error('network problem');
         });
 
+        (function (){
+            // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
+            // But I kept it for all browsers to avoid future possible bugs in different browsers
+            // Now every browser behaves the same way
 
-        if(window.jscd.browser == 'Microsoft Internet Explorer' || window.jscd.mobile){
-            // IE works bad with overflow and height:100% (http://www.local-pc-guy.com/web-dev/internet-explorer-9-10-css-bug-with-overflow-y)
-            // So we fix size of cameras-panel
             var $window = $(window);
             var $top = $("#top");
             var $viewPanel = $(".view-panel");
@@ -350,7 +351,5 @@ angular.module('webadminApp').controller('ViewCtrl',
             };
             updateHeights();
             $window.resize(updateHeights);
-
-
-        }
+        })();
     });
