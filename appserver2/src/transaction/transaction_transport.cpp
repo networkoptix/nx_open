@@ -535,14 +535,11 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
         Qn::EC2_CONNECTION_STATE_HEADER_NAME,
         toString(getState()).toLatin1() );
 
-    {
-        QMutexLocker lk(&m_mutex);
-        QUrl url = remoteAddr();
-        url.setPath(url.path() + lit("/") + toString(getState()));
-        if (!m_httpClient->doGet(url)) {
-            qWarning() << Q_FUNC_INFO << "Failed to execute m_httpClient->doGet. Reconnect transaction transport";
-            setState(Error);
-        }
+    QUrl url = remoteAddr();
+    url.setPath(url.path() + lit("/") + toString(getState()));
+    if (!m_httpClient->doGet(url)) {
+        qWarning() << Q_FUNC_INFO << "Failed to execute m_httpClient->doGet. Reconnect transaction transport";
+        setState(Error);
     }
 }
 
@@ -608,13 +605,10 @@ void QnTransactionTransport::repeatDoGet()
     m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
     m_httpClient->addAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
     
-    {
-        QMutexLocker lk(&m_mutex);
-        QUrl url = remoteAddr();
-        url.setPath(url.path() + lit("/") + toString(getState()));
-        if (!m_httpClient->doGet(url))
-            cancelConnecting();
-    }
+    QUrl url = remoteAddr();
+    url.setPath(url.path() + lit("/") + toString(getState()));
+    if (!m_httpClient->doGet(url))
+        cancelConnecting();
 }
 
 void QnTransactionTransport::cancelConnecting()
@@ -1106,7 +1100,6 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         else {
             QnUuid guid(nx_http::getHeaderValue( client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME ));
             if (!guid.isNull()) {
-                QMutexLocker lk(&m_mutex);
                 emit peerIdDiscovered(remoteAddr(), guid);
                 emit remotePeerUnauthorized(guid);
             }
@@ -1155,10 +1148,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         m_remotePeer.dataFormat = Qn::UbjsonFormat;
     #endif
 
-    {
-        QMutexLocker lk(&m_mutex);
-        emit peerIdDiscovered(remoteAddr(), m_remotePeer.id);
-    }
+    emit peerIdDiscovered(remoteAddr(), m_remotePeer.id);
 
     if( (statusCode/100) != (nx_http::StatusCode::ok/100) ) //checking that statusCode is 2xx
     {
