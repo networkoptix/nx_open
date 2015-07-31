@@ -1174,13 +1174,13 @@ bool QnTransactionMessageBus::isPeerUsing(const QUrl& url)
     const SocketAddress& addr1 = getUrlAddr(url);
     for (int i = 0; i < m_connectingConnections.size(); ++i)
     {
-        const SocketAddress& addr2 = getUrlAddr(m_connectingConnections[i]->remoteAddr());
+        const SocketAddress& addr2 = m_connectingConnections[i]->remoteSocketAddr();
         if (addr2 == addr1)
             return true;
     }
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) {
         QnTransactionTransport* transport =  itr.value();
-        if (getUrlAddr(transport->remoteAddr()) == addr1)
+        if (transport->remoteSocketAddr() == addr1)
             return true;
     }
     return false;
