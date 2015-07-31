@@ -76,6 +76,8 @@ namespace rtu
             , const QString &password);
 
     signals:
+        void layoutChanged();
+
         void selectionOutdatedChanged();
 
         void selectionChanged();
