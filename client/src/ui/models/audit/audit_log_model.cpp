@@ -154,7 +154,6 @@ void QnAuditLogModel::setData(const QnAuditRecordRefList &data) {
     beginResetModel();
     m_index->setData(data);
     endResetModel();
-    emit dataChanged(index(0,0), index(m_index->size(), m_columns.size()), QVector<int>());
 }
 
 void QnAuditLogModel::clearData()
@@ -275,6 +274,18 @@ QString QnAuditLogModel::buttonNameForEvent(Qn::AuditRecordType eventType)
     return QString();
 }
 
+QString QnAuditLogModel::getResourcesString(const std::vector<QnUuid>& resources)
+{
+    QString result;
+    for (const auto& res: resources)
+    {
+        if (!result.isEmpty())
+            result += lit(",");
+        result += getResourceNameString(res);
+    }
+    return result;
+}
+
 QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
 {
     QString result;
@@ -288,12 +299,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
         result +=  tr("%n cameras", "", data->resources.size());
         break;
     default:
-        for (const auto& res: data->resources)
-        {
-            if (!result.isEmpty())
-                result += lit(",");
-            result += getResourceNameString(res);
-        }
+        result = getResourcesString(data->resources);
     }
     return result;
 }
@@ -370,9 +376,18 @@ QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record)
     };
     QString result;
     for(const auto& column: columnsToFilter)
-        result += textData(column, record);
+        result += searchData(column, record);
     return result;
 }
+
+QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* data)
+{
+    if (column == DescriptionColumn)
+        return getResourcesString(data->resources);
+    else
+        return textData(column ,data);
+}
+
 
 QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data)
 {
@@ -423,14 +438,48 @@ int QnAuditLogModel::rowCount(const QModelIndex &parent) const {
     return m_index->size(); // TODO: #Elric incorrect, should return zero for non-root nodes.
 }
 
+int QnAuditLogModel::minWidthForColumn(const Column &column) const
+{
+    switch(column) {
+    case SelectRowColumn:
+        return 8;
+    case TimestampColumn:
+    case EndTimestampColumn:
+    case DurationColumn:
+        return 64;
+    case UserNameColumn:
+    case UserHostColumn:
+        return 48;
+    case UserActivityColumn:
+        return 80;
+    case EventTypeColumn:
+    case DateColumn:
+    case TimeColumn:
+        return 64;
+    case DescriptionColumn:
+        return 128;
+    case PlayButtonColumn:
+        return 64;
+    default:
+        return 64;
+    }
+}
+
 QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, int role) const 
 {
     if (section >= m_columns.size())
         return QVariant();
 
     const Column &column = m_columns[section];
-
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+    if (orientation != Qt::Horizontal)
+        return base_type::headerData(section, orientation, role);
+    
+    if (role == Qt::SizeHintRole)
+    {
+        return QSize(minWidthForColumn(column), m_headerHeight);
+    }
+    else if (role == Qt::DisplayRole) 
+    {
         switch(column) {
             case SelectRowColumn:
                 return QVariant();
@@ -673,4 +722,20 @@ QnAuditLogColors QnAuditLogModel::colors() const
 void QnAuditLogModel::setColors(const QnAuditLogColors &colors)
 {
     m_colors = colors;
+}
+
+void QnAuditLogModel::calcColorInterleaving()
+{
+    QnUuid prevSessionId;
+    int colorIndex = 0;
+    m_interleaveInfo.resize(m_index->size());
+    for (int i = 0; i < m_index->size(); ++i)
+    {
+        QnAuditRecord* record = m_index->at(i);
+        if (record->sessionId != prevSessionId) {
+            colorIndex = (colorIndex + 1) % 2;
+            prevSessionId = record->sessionId;
+        }
+        m_interleaveInfo[i] = colorIndex;
+    }
 }

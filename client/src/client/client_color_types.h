@@ -193,6 +193,7 @@ struct QnAuditLogColors {
     QColor updServer;
     QColor eventRules;
     QColor emailSettings;
+    QColor interleaveColors[2];
 };
 #define QnAuditLogColors_Fields (httpLink)(loginAction)(updUsers)(watchingLive)(watchingArchive)(exportVideo)(updCamera)(systemActions)(updServer)(eventRules)(emailSettings)
 

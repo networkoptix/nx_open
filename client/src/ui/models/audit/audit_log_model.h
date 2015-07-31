@@ -41,6 +41,11 @@ public:
     * Model uses reference to the data. Data MUST be alive till model clear call
     */
     void setData(const QnAuditRecordRefList &data);
+    
+    /*
+    * Interleave colors for grouping records from a same session
+    */
+    void calcColorInterleaving();
     void clearData();
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     void setData(const QModelIndexList &indexList, const QVariant &value, int role = Qt::EditRole);
@@ -67,6 +72,8 @@ public:
     Qt::CheckState checkState() const;
 
     static QString makeSearchPattern(const QnAuditRecord* record);
+
+    void setheaderHeight(int value) { m_headerHeight = value; }
 public slots:
     void clear();
 protected:
@@ -84,10 +91,18 @@ private:
     static QString buttonNameForEvent(Qn::AuditRecordType eventType);
     static QString textData(const Column& column,const QnAuditRecord* action);
     bool skipDate(const QnAuditRecord *record, int row) const;
+    
+    int minWidthForColumn(const Column &column) const;
+    QSize sectionSizeFromContents(int logicalIndex) const;
+    static QString getResourcesString(const std::vector<QnUuid>& resources);
+    static QString searchData(const Column& column, const QnAuditRecord* data);
 protected:
     DataIndex* m_index;
     QList<Column> m_columns;
     QnAuditLogColors m_colors;
+    int m_headerHeight;
+    QVector<int> m_interleaveInfo;
+private:
 };
 
 #endif // QN_AUDIT_LOG_MODEL_H

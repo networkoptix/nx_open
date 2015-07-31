@@ -14,6 +14,7 @@
 class QnAuditLogSessionModel;
 class QnAuditLogDetailModel;
 class QnCheckBoxedHeaderView;
+class QnAuditItemDelegate;
 
 namespace Ui {
     class AuditLogDialog;
@@ -28,13 +29,14 @@ public:
     virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override;
 
     virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override;
-    void setButtonExtraSize(const QSize& value) { m_btnSize = value; }
+    void setPlayButtonSize(const QSize& size) { m_playBottonSize = size; }
+    QSize playButtonSize() const { return m_playBottonSize; }
     void setDefaultSectionHeight(int value);
 private:
     void paintRichDateTime(QPainter * painter, const QStyleOptionViewItem & option, int dateTimeSecs) const;
 private:
-    QSize m_btnSize;
     int m_defaultSectionHeight;
+    QSize m_playBottonSize;
     mutable int m_widthHint;
 };
 
@@ -88,6 +90,7 @@ private:
     void processPlaybackAction(const QnAuditRecord* record);
     void triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId, const QString& objectName);
     QnAuditRecordRefList filterDataByText();
+    QSize calcButtonSize(const QFont& font) const;
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 
@@ -110,6 +113,7 @@ private:
     bool m_skipNextPressSignal;
     QModelIndex m_skipNextSelIndex;
     QModelIndex m_lastPressIndex;
+    QnAuditItemDelegate* m_itemDelegate;
 };
 
 #endif // QN_AUDIT_LOG_DIALOG_H

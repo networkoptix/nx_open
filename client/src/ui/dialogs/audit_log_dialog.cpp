@@ -82,10 +82,7 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
     }
     else if (column == QnAuditLogModel::PlayButtonColumn) 
     {
-        QFontMetrics fm(option.font);
-        result = fm.size(Qt::TextShowMnemonic, lit("Play this"));
-        result += m_btnSize;
-        result.setWidth(result.width() + BTN_ICON_SIZE);
+        return QSize(m_playBottonSize.width() + COLUMN_SPACING*2, m_defaultSectionHeight);
     }
     else {
         result = base_type::sizeHint(option, index);
@@ -191,12 +188,8 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
         button.iconSize = QSize(BTN_ICON_SIZE, BTN_ICON_SIZE);
         button.state = option.state;
 
-        QFontMetrics fm(option.font);
-        QSize sizeHint = fm.size(Qt::TextShowMnemonic, button.text);
-        sizeHint += m_btnSize;
-        int dx = (option.rect.width() - sizeHint.width()) /2;
-        button.rect.setTopLeft(option.rect.topLeft() + QPoint(dx, 4));
-        button.rect.setSize(sizeHint);
+        button.rect.setTopLeft(option.rect.topLeft() + QPoint(4, 4));
+        button.rect.setSize(m_playBottonSize);
         QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);
         break;
     }
@@ -255,26 +248,22 @@ QnAuditRecordRefList QnAuditLogDialog::filteredChildData(const QnAuditRecordRefL
     return result;
 }
 
-QSize calcButtonSize(const QFont& font)
+QSize QnAuditLogDialog::calcButtonSize(const QFont& font) const
 {
-    static const QString TEST_TXT(lit("TEST"));
-    QFontMetrics fm(font);
-    QSize size1 = fm.size(Qt::TextShowMnemonic, TEST_TXT);
-
     std::unique_ptr<QPushButton> button(new QPushButton());
-    button->setText(TEST_TXT);
-
-    QSize size2 = button->minimumSizeHint();
-    return QSize(size2.width() - size1.width(), size2.height() - size1.height());
+    button->setText(tr("Play this"));
+    QSize result = button->minimumSizeHint();
+    result.setWidth(result.width() + BTN_ICON_SIZE);
+    return result;
 }
 
-QList<QnAuditLogModel::Column> detailSessionColumns(bool masterMultiselected)
+QList<QnAuditLogModel::Column> detailSessionColumns(bool showUser)
 {
     QList<QnAuditLogModel::Column> columns;
     columns << 
         QnAuditLogModel::DateColumn <<
         QnAuditLogModel::TimeColumn;
-    //if (masterMultiselected)
+    if (showUser)
         columns << QnAuditLogModel::UserNameColumn << QnAuditLogModel::UserHostColumn;
     columns <<
         QnAuditLogModel::EventTypeColumn <<
@@ -313,8 +302,34 @@ void QnAuditLogDialog::at_filterChanged()
 void QnAuditLogDialog::at_updateDetailModel()
 {
     QnAuditRecordRefList checkedRows = m_sessionModel->checkedRows();
-    m_detailModel->setData(filteredChildData(checkedRows));
-    m_detailModel->setColumns(detailSessionColumns(checkedRows.size() > 1));
+    auto data = filteredChildData(checkedRows);
+    m_detailModel->setData(data);
+    m_detailModel->calcColorInterleaving();
+}
+
+int calcHeaderHeight(QHeaderView* header)
+{
+    // otherwise use the contents
+    QStyleOptionHeader opt;
+
+    opt.initFrom(header);
+    opt.state = QStyle::State_None | QStyle::State_Raised;
+    opt.orientation = Qt::Horizontal;
+    opt.state |= QStyle::State_Horizontal;
+    opt.state |= QStyle::State_Enabled;
+    opt.section = 0;
+
+    QFont fnt = header->font();
+    fnt.setBold(true);
+    opt.fontMetrics = QFontMetrics(fnt);
+    QSize size = header->style()->sizeFromContents(QStyle::CT_HeaderSection, &opt, QSize(), header);
+
+    if (header->isSortIndicatorShown())
+    {
+        int margin = header->style()->pixelMetric(QStyle::PM_HeaderMargin, &opt, header);
+        size.setHeight(size.height() +  margin);
+    }
+    return size.height();
 }
 
 QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
@@ -344,9 +359,9 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     setupFilterCheckbox(ui->checkBoxBRules, colors.eventRules, Qn::AR_BEventUpdate);
     setupFilterCheckbox(ui->checkBoxEmail, colors.emailSettings, Qn::AR_EmailSettings);
 
-    QnAuditItemDelegate* itemDelegate = new QnAuditItemDelegate(this);
-    itemDelegate->setButtonExtraSize(calcButtonSize(ui->gridMaster->font()));
-    itemDelegate->setDefaultSectionHeight(ui->gridDetails->verticalHeader()->defaultSectionSize());
+    m_itemDelegate = new QnAuditItemDelegate(this);
+    m_itemDelegate->setPlayButtonSize(calcButtonSize(ui->gridMaster->font()));
+    m_itemDelegate->setDefaultSectionHeight(ui->gridDetails->verticalHeader()->defaultSectionSize());
 
     QList<QnAuditLogModel::Column> columns;
     columns << 
@@ -409,20 +424,45 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     );
 
 
-    ui->gridMaster->setItemDelegate(itemDelegate);
+    ui->gridMaster->setItemDelegate(m_itemDelegate);
     ui->gridMaster->setMouseTracking(true);
 
     m_detailModel = new QnAuditLogDetailModel(this);
-    m_detailModel->setColumns(detailSessionColumns(false));
+    m_detailModel->setColumns(detailSessionColumns(true));
     ui->gridDetails->setModel(m_detailModel);
-    ui->gridDetails->setItemDelegate(itemDelegate);
+    ui->gridDetails->setItemDelegate(m_itemDelegate);
+
+    m_detailModel->setheaderHeight(calcHeaderHeight(ui->gridDetails->horizontalHeader()));
+    m_sessionModel->setheaderHeight(calcHeaderHeight(ui->gridMaster->horizontalHeader()));
+
+    ui->gridDetails->horizontalHeader()->setMinimumSectionSize(48);
+    
     ui->gridDetails->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->gridDetails->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    ui->gridDetails->horizontalHeader()->setStretchLastSection(true);
+    //ui->gridDetails->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+
     ui->gridDetails->setMouseTracking(true);
+
 
     connect(ui->gridMaster, &QTableView::pressed, this, &QnAuditLogDialog::at_masterItemPressed); // put selection changed before item pressed
     connect(ui->gridDetails, &QTableView::pressed, this, &QnAuditLogDialog::at_ItemPressed);
     connect(ui->gridDetails, &QTableView::entered, this, &QnAuditLogDialog::at_ItemEntered);
+
+    connect (ui->gridDetails->horizontalHeader(), &QHeaderView::sectionResized, this, 
+        [this] (int logicalIndex, int oldSize, int newSize) 
+        {
+            int w = 0;
+            const QHeaderView* headers = ui->gridDetails->horizontalHeader();
+            for (int i = 0; i < headers->count() - 1; ++i)
+                w += headers->sectionSize(i);
+            w += m_itemDelegate->playButtonSize().width() + COLUMN_SPACING*2;
+            w += ui->gridDetails->verticalScrollBar()->width() + 2;
+            bool needAdjust =  ui->gridDetails->width() < w;
+            ui->gridDetails->setMinimumSize(w, -1);
+            if (needAdjust)
+                ui->gridDetails->adjustSize();
+        }, Qt::QueuedConnection
+    );
 
     QDate dt = QDateTime::currentDateTime().date();
     ui->dateEditFrom->setDate(dt);
@@ -669,7 +709,9 @@ void QnAuditLogDialog::at_gotdata(int httpStatus, const QnAuditRecordList& recor
 
 void QnAuditLogDialog::requestFinished()
 {
+    m_masterHeaders->blockSignals(true);
     m_masterHeaders->setCheckState(Qt::Unchecked);
+    m_masterHeaders->blockSignals(false);
     at_filterChanged();
 
     ui->gridMaster->setDisabled(false);
