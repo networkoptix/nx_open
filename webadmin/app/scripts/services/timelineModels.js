@@ -739,9 +739,10 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth,stickToLiveMs){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
+    this.stickToLiveMs = stickToLiveMs;
 
     this.levels = {
         top:  {index:0,level:RulerModel.levels[0]},
@@ -824,10 +825,18 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.updateLevels();
 };
 
-ScaleManager.prototype.tryToSetLiveDate = function(date){
+ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode){
     var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
-    if(0 <= targetPoint && targetPoint <= 1){ // Check if date is on screen
+    if(this.anchorDate == date){
+        return;
+    }
+    if(0 <= targetPoint && targetPoint <= 1 ){ // Live mode
         this.setAnchorDateAndPoint(date, this.anchorPoint);
+    }
+
+    if(liveMode && targetPoint > 1 && this.end - this.visibleEnd < this.stickToLiveMs ){
+        this.setEnd(date);
+        this.setAnchorDateAndPoint(date, 1);
     }
 };
 

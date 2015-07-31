@@ -15,6 +15,7 @@ angular.module('webadminApp')
             link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
                     initialInterval: 1000*60 *60*24*365 /* *24*365*/, // no records - show small interval
+                    stickToLiveMs: 1000, // Value to stick viewpoert to Live - 1 second
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
                     minMsPerPixel: 1, // Minimum level for zooming:
 
@@ -163,7 +164,7 @@ angular.module('webadminApp')
                     oldStyle:false,
 
                     marksColor:[83,112,127,0]
-                },{
+                }, {
                     topLabelAlign: "left", // center, left, above
                     topLabelMarkerColor: [105,135,150], // Color for mark for top label
                     topLabelBgColor: false,
@@ -258,7 +259,7 @@ angular.module('webadminApp')
                 var timeMarker = element.find(".timeMarker.playing");
                 var pointerMarker = element.find(".timeMarker.pointer");
                 var canvas = element.find('canvas').get(0);
-                scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100); //Init boundariesProvider
+                scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100, timelineConfig.stickToLiveMs); //Init boundariesProvider
 
                 // !!! Initialization functions
                 function updateTimelineHeight(){
@@ -279,17 +280,18 @@ angular.module('webadminApp')
 
                 // !!! Drawing and redrawing functions
                 function drawAll(){
-                    scope.scaleManager.setEnd((new Date()).getTime()); // Set right border
                     if(scope.positionProvider) {
-                        scope.scaleManager.tryToSetLiveDate(scope.positionProvider.playedPosition);
+                        scope.scaleManager.tryToSetLiveDate(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
                     }
+                    scope.scaleManager.setEnd((new Date()).getTime()); // Set right border
+
 
                     var context = clearTimeline();
                     drawTopLabels(context);
 
                     drawLabels(context);
 
-                    drawEvents(context);
+                    drawOrCheckEvents(context);
                     drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
                     drawPointerMarker(context);
@@ -333,21 +335,21 @@ angular.module('webadminApp')
                 }
 
                 // !!! Labels logic
-                var currentTopLabelLevelIndex = 0;
-                var targetTopLabelLevelIndex = 0;
+                //var currentTopLabelLevelIndex = 0;
+                //var targetTopLabelLevelIndex = 0;
                 scope.changingTopLevel = 1;
                 function drawTopLabels(context){
                     var instantLevelIndex = scope.scaleManager.levels.top.index;
-                    if(instantLevelIndex != targetTopLabelLevelIndex){ // Start animation here
+                    /*if(instantLevelIndex != targetTopLabelLevelIndex){ // Start animation here
                         targetTopLabelLevelIndex = instantLevelIndex;
                         animateScope.progress(scope,'changingTopLevel').then(function(){
                             currentTopLabelLevelIndex = targetTopLabelLevelIndex;
                         });
-                    }
+                    }*/
 
                     drawLabelsRow(context,
-                        currentTopLabelLevelIndex,
-                        targetTopLabelLevelIndex,
+                        instantLevelIndex,
+                        instantLevelIndex,
                         scope.changingTopLevel,
                         "topFormat",
                         timelineConfig.topLabelFixed,
@@ -693,11 +695,7 @@ angular.module('webadminApp')
 
                             case "above":
                             default:
-                                //x = scope.scaleManager.bound(
-                                //    timelineConfig.labelPadding,
                                 x = coordinate - textWidth / 2;
-                                //        stopcoordinate - nextWidth / 2 - textWidth - timelineConfig.labelPadding
-                                //);
                                 break;
                         }
                     }
@@ -744,11 +742,17 @@ angular.module('webadminApp')
                 }
 
                 // !!! Draw events
-                function drawEvents(context){
-                    context.fillStyle =   blurColor(timelineConfig.chunksBgColor,1);
+                function drawOrCheckEvents(context){
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
-                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+                    mouseInEvents = mouseRow > top && (mouseRow < top + timelineConfig.chunkHeight * scope.viewportHeight);
 
+                    if(!context){
+                        return;
+                    }
+
+                    context.fillStyle =   blurColor(timelineConfig.chunksBgColor,1);
+
+                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
 
                     var level = scope.scaleManager.levels.events.level;
                     var levelIndex = scope.scaleManager.levels.events.index;
@@ -814,7 +818,7 @@ angular.module('webadminApp')
 
                 // !!! Draw and position for timeMarker
                 function drawTimeMarker(context){
-                    if(!scope.positionProvider){
+                    if(!scope.positionProvider || scope.positionProvider.liveMode){
                         return;
                     }
 
@@ -822,7 +826,7 @@ angular.module('webadminApp')
                 }
 
                 function drawPointerMarker(context){
-                    if(!mouseCoordinate || mouseInScrollbar){
+                    if(!mouseCoordinate || !mouseInEvents){
                         return;
                     }
                     drawMarker(context, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),timelineConfig.pointerMarkerColor,timelineConfig.pointerMarkerTextColor);
@@ -891,6 +895,7 @@ angular.module('webadminApp')
                 var mouseCoordinate = null;
                 var mouseRow = 0;
                 var mouseInScrollbar = false;
+                var mouseInEvents = false;
                 var mouseInScrollbarRow = false;
                 var catchScrollBar = false;
 
@@ -901,6 +906,7 @@ angular.module('webadminApp')
                         mouseInScrollbar = false;
                         mouseInScrollbarRow = false;
                         catchScrollBar = false;
+                        mouseInEvents = false;
                         return;
                     }
 
@@ -912,7 +918,9 @@ angular.module('webadminApp')
                     }
                     mouseRow = event.offsetY;
 
+
                     drawOrCheckScrollBar();
+                    drawOrCheckEvents();
                 }
 
                 var zoomTarget = 0;
@@ -920,7 +928,6 @@ angular.module('webadminApp')
                     updateMouseCoordinate(event);
                     event.preventDefault();
                     if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
-                        //scope.scaleManager.setAnchorCoordinate( mouseCoordinate );// Set position to keep
                         if(window.jscd.touch ) {
 
                             zoomTarget = scope.scaleManager.zoom() - event.deltaY / timelineConfig.maxVerticalScrollForZoomWithTouch;
@@ -1034,8 +1041,20 @@ angular.module('webadminApp')
                 };
 
                 scope.goToLive = function(){
-                    scope.scaleManager.setAnchorCoordinate(1);// Set position to keep
-                    scope.positionHandler(false);
+                    var moveDate = scope.scaleManager.screenCoordinateToDate(1);
+                    animateScope.progress(scope, "goingToLive" ).then(
+                        function(){
+                            var activeDate = (new Date()).getTime();
+                            scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
+                        },
+                        function(){},
+                        function(val){
+                            var activeDate = moveDate + val * ((new Date()).getTime() - moveDate);
+                            scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
+                        });
+                    if(! scope.scaleManager.liveMode) {
+                        scope.positionHandler(false);
+                    }
                 };
 
                 scope.playPause = function(){
