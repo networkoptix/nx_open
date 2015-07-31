@@ -1,6 +1,7 @@
 
 #include "resource_discovery_manager.h"
 
+#include <exception>
 #include <list>
 
 #include <QtConcurrent>
@@ -268,7 +269,31 @@ void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
     }
 }
 
-static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
+static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) 
+{
+    try
+    {
+        return input.checkHostAddr();
+    }
+    catch (const std::exception& e)
+    {
+        qWarning()
+            << "CheckHostAddrAsync exception ("<<e.what()<<") caught\n"
+            << "\t\tresource type:" << input.resType->getName() << "\n"
+            << "\t\tresource url:" << input.url << "\n";
+
+        return QnResourceList();
+    }
+    catch (...)
+    {
+        qWarning()
+            << "CheckHostAddrAsync exception caught\n"
+            << "\t\tresource type:" << input.resType->getName() << "\n"
+            << "\t\tresource url:" << input.url << "\n";    
+        
+        return QnResourceList();
+    }
+}
 
 bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt)
 {
