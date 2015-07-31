@@ -362,7 +362,10 @@ void QnTransactionTransport::setStateNoLock(State state)
 QUrl QnTransactionTransport::remoteAddr() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_remoteAddr;
+    // Emulating deep copy here
+    QUrl tmpUrl(m_remoteAddr);
+    tmpUrl.setUserName(tmpUrl.userName());
+    return tmpUrl;
 }
 
 SocketAddress QnTransactionTransport::remoteSocketAddr() const
