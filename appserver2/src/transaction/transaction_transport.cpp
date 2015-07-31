@@ -988,6 +988,16 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             m_postTranUrl.setQuery( QString() );
 #endif
         }
+
+        nx_http::HttpHeaders additionalHeaders;
+        addHttpChunkExtensions( &additionalHeaders );
+        for( const auto& header: additionalHeaders )
+        {
+            //removing prev header value (if any)
+            m_outgoingTranClient->removeAdditionalHeader( header.first );
+            m_outgoingTranClient->addAdditionalHeader( header.first, header.second );
+        }
+
         if( !m_outgoingTranClient->doPost(
                 m_postTranUrl,
                 m_base64EncodeOutgoingTransactions
