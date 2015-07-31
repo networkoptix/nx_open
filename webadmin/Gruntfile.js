@@ -449,7 +449,8 @@ module.exports = function (grunt) {
                             'customization/*',
                             //'bower_components/**/*',
                             //'bower_components/videogular-themes-default/videogular.css',
-                            'images/{,*/}*.{webp}',
+                            'images/*',
+                            'images/**/*',
                             'fonts/*',
                             'components/*',
                             'components/**/*'

@@ -11,7 +11,7 @@
         "files": [
             {
                 "cwd": "dist",
-                "src": ["*.html", "*/.htaccess", "*/*.html", "*/*.png", "fonts/*", "components/*","components/**/*", "*.js", "*/*.js",  "*.json", "*/*.json", "*.css", "*/*.css", "*.py", "*/*.py","*/*/*.py", "*/*/*.mustache", "*/*/*.html"],
+                "src": ["**"],
                 "dest": "/home/ebalashov/public_html/webclient"
             }
         ]

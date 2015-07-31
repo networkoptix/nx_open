@@ -50,8 +50,7 @@ angular.module('webadminApp')
                 ipCookie('response',auth_digest, { path: '/' }); // TODO: REMOVE
                 ipCookie('username',lowercaseLogin, { path: '/' }); // TODO: REMOVE
                 var authKey = Base64.encode(lowercaseLogin + ':0:' + digest); // TODO: REMOVE
-                ipCookie('authKey',auth, { path: '/' }); // TODO: REMOVE
-
+                ipCookie('authKey',authKey, { path: '/' }); // TODO: REMOVE
 
                 // Check auth again
                 $scope.authorizing = true;
