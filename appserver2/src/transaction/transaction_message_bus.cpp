@@ -1543,7 +1543,7 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
     const SocketAddress& urlStr = getUrlAddr(url);
     for(QnTransactionTransport* transport: m_connections.values())
     {
-        if (getUrlAddr(transport->remoteAddr()) == urlStr) {
+        if (transport->remoteSocketAddr() == urlStr) {
             qWarning() << "Disconnected from peer" << url;
             transport->setState(QnTransactionTransport::Error);
         }
@@ -1553,6 +1553,8 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
 QList<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() const {
     QList<QnTransportConnectionInfo> connections;
 
+    QMutexLocker lock(&m_mutex);
+
     auto storeTransport = [&connections](const QnTransactionTransport *transport) {
         QnTransportConnectionInfo info;
         info.url = transport->remoteAddr();
@@ -1561,8 +1563,6 @@ QList<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() cons
         info.remotePeerId = transport->remotePeer().id;
         connections.append(info);
     };
-
-    QMutexLocker lock(&m_mutex);
 
     for (const QnTransactionTransport *transport: m_connections.values())
         storeTransport(transport);
