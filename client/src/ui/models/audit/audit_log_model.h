@@ -25,13 +25,13 @@ public:
         DurationColumn,
         UserNameColumn,
         UserHostColumn,
-        //ColumnCount,
         DateColumn,
         TimeColumn,
         UserActivityColumn, // not implemented yet
         EventTypeColumn,
         DescriptionColumn,
-        PlayButtonColumn
+        PlayButtonColumn,
+        ColumnCount
     };
 
     QnAuditLogModel(QObject *parent = NULL);

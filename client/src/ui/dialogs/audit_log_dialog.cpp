@@ -39,17 +39,19 @@
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
     const int BTN_ICON_SIZE = 16;
+    static const int COLUMN_SPACING = 4;
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
 
 void QnAuditItemDelegate::setDefaultSectionHeight(int value) 
 { 
-    m_defaultSectionSize = value;
+    m_defaultSectionHeight = value;
 }
 
 QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
+    QSize result;
     QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
     if (column == QnAuditLogModel::DescriptionColumn)
     {
@@ -57,31 +59,55 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
         if (!data.canConvert<QnAuditRecord*>())
             return base_type::sizeHint(option, index);
         QnAuditRecord* record = data.value<QnAuditRecord*>();
-
-        QTextDocument txtDocument;
-        txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
-        QSize size = txtDocument.size().toSize();
-        bool showDetail = record->extractParam("detail") == "1";
-        if (!showDetail)
-            size.setHeight(m_defaultSectionSize);
-        return size;
+        if (record->isPlaybackType() || record->eventType == Qn::AR_CameraUpdate)
+        {
+            bool showDetail = record->extractParam("detail") == "1";
+            if (showDetail || m_widthHint == -1) {
+                QTextDocument txtDocument;
+                txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
+                result = txtDocument.size().toSize();
+                if (m_widthHint == -1)
+                    m_widthHint = result.width() - base_type::sizeHint(option, index).width(); // extra width because of partially bold data
+            }
+            else {
+                result = base_type::sizeHint(option, index);
+                result.setWidth(result.width() + m_widthHint);
+            }
+            if (!showDetail)
+                result.setHeight(m_defaultSectionHeight);
+        }
+        else {
+            result = base_type::sizeHint(option, index);
+        }
     }
     else if (column == QnAuditLogModel::PlayButtonColumn) 
     {
         QFontMetrics fm(option.font);
-        QSize sizeHint = fm.size(Qt::TextShowMnemonic, lit("Play this"));
-        sizeHint += m_btnSize;
-        sizeHint.setWidth(sizeHint.width() + BTN_ICON_SIZE);
-        return sizeHint;
+        result = fm.size(Qt::TextShowMnemonic, lit("Play this"));
+        result += m_btnSize;
+        result.setWidth(result.width() + BTN_ICON_SIZE);
     }
-    else if (column == QnAuditLogModel::TimestampColumn || column == QnAuditLogModel::EndTimestampColumn) {
-        QSize result =  base_type::sizeHint(option, index);
-        result.setWidth(result.width() + 4); // reserver a bit extra space because of time bold font
-        return result;
+    else {
+        result = base_type::sizeHint(option, index);
     }
-    else 
-        return base_type::sizeHint(option, index);
 
+    int extraSpaceForColumns[QnAuditLogModel::ColumnCount] = 
+    {
+        0,                  //SelectRowColumn,
+        COLUMN_SPACING+2,   //TimestampColumn,
+        COLUMN_SPACING+2,   //EndTimestampColumn,
+        0,                  // DurationColumn,
+        COLUMN_SPACING,     //UserNameColumn,
+        COLUMN_SPACING,     //UserHostColumn,
+        COLUMN_SPACING,     // DateColumn,
+        COLUMN_SPACING,     // TimeColumn,
+        COLUMN_SPACING,     //UserActivityColumn, // not implemented yet
+        COLUMN_SPACING,     // EventTypeColumn,
+        COLUMN_SPACING,     //DescriptionColumn,
+        0                   //PlayButtonColumn
+    };
+    result.setWidth(result.width() + extraSpaceForColumns[column]);
+    return result;
 }
 
 void QnAuditItemDelegate::paintRichDateTime(QPainter * painter, const QStyleOptionViewItem & option, int dateTimeSecs) const

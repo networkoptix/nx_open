@@ -277,15 +277,25 @@ QString QnAuditLogModel::buttonNameForEvent(Qn::AuditRecordType eventType)
 
 QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
 {
-    QString resListText;
-    for (const auto& res: data->resources)
+    QString result;
+    switch (data->eventType)
     {
-        if (!resListText.isEmpty())
-            resListText += lit(",");
-        resListText += getResourceNameString(res);
+    case Qn::AR_ViewArchive:
+    case Qn::AR_ViewLive:
+    case Qn::AR_ExportVideo:
+        result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
+    case Qn::AR_CameraUpdate:
+        result +=  tr("%n cameras", "", data->resources.size());
+        break;
+    default:
+        for (const auto& res: data->resources)
+        {
+            if (!result.isEmpty())
+                result += lit(",");
+            result += getResourceNameString(res);
+        }
     }
-
-    return resListText;
+    return result;
 }
 
 QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data, int row, bool hovered) const

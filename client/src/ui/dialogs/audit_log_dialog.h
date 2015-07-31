@@ -24,7 +24,7 @@ class QnAuditItemDelegate: public QStyledItemDelegate
     typedef QStyledItemDelegate base_type;
 
 public:
-    explicit QnAuditItemDelegate(QObject *parent = NULL): base_type(parent), m_defaultSectionSize(0) {}
+    explicit QnAuditItemDelegate(QObject *parent = NULL): base_type(parent), m_defaultSectionHeight(0), m_widthHint(-1) {}
     virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override;
 
     virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override;
@@ -34,7 +34,8 @@ private:
     void paintRichDateTime(QPainter * painter, const QStyleOptionViewItem & option, int dateTimeSecs) const;
 private:
     QSize m_btnSize;
-    int m_defaultSectionSize;
+    int m_defaultSectionHeight;
+    mutable int m_widthHint;
 };
 
 

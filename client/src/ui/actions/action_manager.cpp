@@ -500,11 +500,6 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(qnSkin->icon("events/log.png")).
         text(tr("Event Log..."));
 
-    factory(Qn::OpenAuditLogAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Audit trail..."));
-
     factory(Qn::OpenBusinessRulesAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
@@ -824,6 +819,11 @@ QnActionManager::QnActionManager(QObject *parent):
         //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false);
+
+    factory(Qn::OpenAuditLogAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Audit trail..."));
 
     factory().
         flags(Qn::Main).
