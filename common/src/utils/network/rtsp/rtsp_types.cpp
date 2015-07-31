@@ -34,11 +34,13 @@ namespace nx_rtsp
     bool parseRangeHeader( const nx_http::StringType& rangeStr, qint64* startTime, qint64* endTime )
     {
         const auto rangeType = rangeStr.trimmed().split('=');
-        if (rangeType.size() < 2)
+        if (rangeType.size() != 2)
             return false;
         if (rangeType[0] == "clock")
         {
             const auto values = rangeType[1].split('-');
+            if( values.isEmpty() || values.sise() > 2 )
+                return false;
         
             extractNptTime(values[0], startTime);
             if (values.size() > 1 && !values[1].isEmpty())
