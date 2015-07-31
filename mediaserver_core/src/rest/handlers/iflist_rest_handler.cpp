@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/network/tcp_connection_priv.h>
 #include <common/common_module.h>
+#include <utils/common/app_info.h>
 #include "utils/network/http/linesplitter.h"
 #include "network_address_entry.h"
 
@@ -64,8 +65,14 @@ int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &
     Q_UNUSED(params)
 
     QnNetworkAddressEntryList entryList;
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces()) 
+
+    const bool allInterfaces = (QnAppInfo::armBox() == "bpi");
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(allInterfaces)) 
     {
+        static const QChar kColon = ':';
+        if (allInterfaces && iface.name.contains(kColon))
+            continue;
+
         QnNetworkAddressEntry entry;
         entry.name = iface.netIf.name();
         entry.ipAddr = iface.address.toString();
