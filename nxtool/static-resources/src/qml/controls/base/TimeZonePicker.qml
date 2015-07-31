@@ -8,26 +8,44 @@ import "../../common" as Common;
 ComboBox
 {
     id: thisComponent;
-    
+
     clip: true;
+
+    dontUseWheel: true;
+
+    onHoveredChanged:
+    {
+        if (hovered)
+            toolTip.show()
+        else
+            toolTip.hide();
+    }
+
+    onPressedChanged:
+    {
+        if (pressed)
+            toolTip.hide();
+    }
+
     signal timeZoneChanged(int from, int to);
-    
+
     property bool changed: (currentIndex !== initIndex);
-    
+
     property int initIndex: init;
     property int lastSelectedIndex;
     property int fontSize: Common.SizeManager.fontSizes.base;
-    
+
     height: Common.SizeManager.clickableSizes.medium;
     width: height * 5;
+
     opacity: enabled ? 1.0 : 0.5;
 
     currentIndex: initIndex;
-    
+
     textRole: "display";
-    
+
     property bool firstTimeChange: true;
-    
+
     onCurrentIndexChanged:
     {
         if ((currentIndex == initIndex) && firstTimeChange)
@@ -38,13 +56,13 @@ ComboBox
 
         if (!model.isValidValue(currentIndex))
             return;
-      
+
         if (currentIndex !== lastSelectedIndex)
             timeZoneChanged(lastSelectedIndex, currentIndex);
 
         lastSelectedIndex = currentIndex;
     }
-    
+
     style: ComboBoxStyle
     {
         label: Base.Text
@@ -52,8 +70,35 @@ ComboBox
             font.pixelSize: fontSize;
             text: thisComponent.currentText;
             verticalAlignment: Text.AlignVCenter;
+            clip: true;
+
+            anchors
+            {
+                left: parent.left;
+                 right: parent.right;
+                rightMargin: dropDownButtonWidth * 1.5;
+            }
         }
     }
 
-    onTimeZoneChanged: console.log(from + ":" + to);
+    Base.ToolTip
+    {
+        id: toolTip;
+
+        globalParent: parent.parent;
+        text: thisComponent.currentText;
+
+        x: thisComponent.x;
+        y: thisComponent.height;
+    }
+
 }
+
+
+
+
+
+
+
+
+
