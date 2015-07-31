@@ -8,7 +8,7 @@ Item
     id: thisComponent;
 
     property alias text: textControl.text;
-    property int margin: Common.SizeManager.spacing.base;;
+    property int margin: Common.SizeManager.spacing.base;
 
 
     width: textControl.width + margin * 2;
