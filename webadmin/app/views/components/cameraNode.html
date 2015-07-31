@@ -7,8 +7,8 @@
     <span ng-if="camera.status=='Recording' " class="camera-status danger">&#x25CF;</span>
     <span ng-if="camera.status!='Recording' && !camera.scheduleEnabled" class="camera-status">&nbsp;</span>
 
-    &nbsp;{{camera.name}}<br/>
+    {{camera.name}}<br/>
 
     <span class="camera-status">&nbsp;</span>
-    <small>&nbsp;{{camera.url}}</small>
+    <small>{{camera.url}}</small>
 </a>

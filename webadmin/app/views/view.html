@@ -8,14 +8,14 @@
                         <div class="cameras-panel">
                             <ul class="tree nav" >
                                 <li ng-repeat="server in mediaServers">
-                                    <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
+                                    <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 " title="{{server.url}}"
                                        ng-click="server.collapsed = !server.collapsed" class="collapse-group" ng-class="{offline:server.status!='Online'}">
-                                        <span class="server-underline caption-row">
+                                        <span class="server-underline caption-row" >
                                             <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-up pull-right" title-true="collapse" ></icon>
                                             <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-down pull-right" title-true="expand"  ></icon>
                                             <icon for="server.status=='Unauthorized'" on-true="lock" title="Unauthorized" ></icon>
                                             &nbsp;
-                                            {{server.name}} ({{server.url}}) {{settings.id.replace('{','').replace('}','') == server.id.replace('{','').replace('}','')?'(current)':''}}
+                                            {{server.name}} {{settings.id.replace('{','').replace('}','') == server.id.replace('{','').replace('}','')?'(current)':''}}
                                         </span>
                                     </a>
                                     <ul class="nav "
@@ -71,11 +71,11 @@
                                         </span>
                                     </div>
                                     <div>
-                                            <span class="webclient-button caption-row ">
+                                            <span class="caption-row ">
 
-                                                <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger">&#x25E6;</span>
-                                                <span ng-if="activeCamera.status=='Recording' " class="danger">&#x25CF;</span>
-                                                <span ng-if="activeCamera.status!='Recording' && !activeCamera.scheduleEnabled">&nbsp;</span>
+                                                <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger camera-status">&#x25E6;</span>
+                                                <span ng-if="activeCamera.status=='Recording' " class="danger camera-status">&#x25CF;</span>
+                                                <span ng-if="activeCamera.status!='Recording' && !activeCamera.scheduleEnabled" class="camera-status">&nbsp;</span>
 
                                                   {{activeCamera.name}}
                                             </span>

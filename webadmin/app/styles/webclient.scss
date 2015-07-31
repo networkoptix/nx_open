@@ -41,6 +41,7 @@
   width:100%;
   height:100%;
   user-select:none;
+  cursor:default;
 }
 table.webclient-window>tbody>tr>td{
   overflow:hidden;
@@ -56,6 +57,11 @@ table.webclient-window>tbody>tr>td{
 
   background-color: #171C1F;
   border-right: 1px solid #121517;
+}
+.camera-status{
+  display:inline-block;
+  width:1em;
+  text-align: center;
 }
 .view-wrapper{
   width:100%;
@@ -253,6 +259,7 @@ table.webclient-window>tbody>tr>td{
   width:70px !important;
   height:40px !important;
   margin-right: 10px;
+  background-color: black;
 }
 
 
