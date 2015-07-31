@@ -278,7 +278,7 @@ static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input)
     {
         qWarning()
             << "CheckHostAddrAsync exception caught\n"
-            << "\t\tresource type:" << input.resType << "\n"
+            << "\t\tresource type:" << input.resType->getName() << "\n"
             << "\t\tresource url:" << input.url << "\n";    
         
         return QnResourceList();
