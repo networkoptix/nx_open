@@ -22,7 +22,7 @@ public:
     /* notify new playback was started from position timestamp
     *  return internal ID of started session
     */
-    int notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& id, qint64 timestampUsec);
+    int notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& id, qint64 timestampUsec, bool isExport);
     void notifyPlaybackFinished(int internalId);
     void notifyPlaybackInProgress(int internalId, qint64 timestampUsec);
 
@@ -59,7 +59,7 @@ private:
 
     struct CameraPlaybackInfo
     {
-        CameraPlaybackInfo(): startTimeUsec(0), creationTimeMs(0) {}
+        CameraPlaybackInfo(): startTimeUsec(0), creationTimeMs(0), isExport(false) {}
 
         QnAuthSession session;       // user's session
         QnUuid cameraId;        // watching camera
@@ -67,6 +67,7 @@ private:
         qint64 startTimeUsec;       // startTime from PLAY command
         qint64 creationTimeMs;       // record creation time
         QElapsedTimer timeout;  // how many ms session is alive
+        bool isExport;
     };
 
     QMap<int, CameraPlaybackInfo> m_alivePlaybackInfo;   // opened cameras

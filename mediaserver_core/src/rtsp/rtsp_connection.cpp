@@ -1253,7 +1253,8 @@ int QnRtspConnectionProcessor::composePlay()
         if (d->auditRecordId)
             qnAuditManager->notifyPlaybackFinished(d->auditRecordId);
         qint64 startTimeUces = d->liveMode == Mode_Live ? DATETIME_NOW : d->startTime;
-        d->auditRecordId = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUces);
+        bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
+        d->auditRecordId = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUces, isExport);
     }
 
     return CODE_OK;

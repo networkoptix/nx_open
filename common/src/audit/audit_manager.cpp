@@ -55,13 +55,14 @@ void QnAuditManager::at_connectionClosed(const QnAuthSession &data)
     m_openedConnections.remove(data.sessionId);
 }
 
-int QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& cameraId, qint64 timestampUsec)
+int QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& cameraId, qint64 timestampUsec, bool isExport)
 {
     CameraPlaybackInfo pbInfo;
     pbInfo.session = session;
     pbInfo.cameraId = cameraId;
     pbInfo.startTimeUsec = timestampUsec;
     pbInfo.creationTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    pbInfo.isExport = isExport;
     pbInfo.timeout.restart();
     int handle = ++m_internalIdCounter;
     QMutexLocker lock(&m_mutex);
@@ -99,6 +100,8 @@ void QnAuditManager::notifyPlaybackInProgress(int internalId, qint64 timestampUs
 
 bool QnAuditManager::canJoinRecords(const CameraPlaybackInfo& left, const CameraPlaybackInfo& right)
 {
+    if (left.isExport != right.isExport)
+        return false;
     bool peridOK = qAbs(left.startTimeUsec - right.startTimeUsec) < MAX_FRAME_DURATION * 1000ll;
     bool sessionOK = left.session == right.session;
     return peridOK && sessionOK;
@@ -118,7 +121,14 @@ void QnAuditManager::at_timer()
             {
                 // aggregate data. join other records to this one
                 CameraPlaybackInfo pbInfo = *itr;
-                QnAuditRecord record = prepareRecord(pbInfo.session, pbInfo.startTimeUsec == DATETIME_NOW ? Qn::AR_ViewLive : Qn::AR_ViewArchive);
+                Qn::AuditRecordType eventType;
+                if (pbInfo.isExport)
+                    eventType = Qn::AR_ExportVideo;
+                else if (pbInfo.startTimeUsec == DATETIME_NOW)
+                     eventType = Qn::AR_ViewLive;
+                else
+                    eventType = Qn::AR_ViewArchive;
+                QnAuditRecord record = prepareRecord(pbInfo.session, eventType);
                 while (itr != m_closedPlaybackInfo.end())
                 {
                     if (canJoinRecords(pbInfo, *itr)) {
