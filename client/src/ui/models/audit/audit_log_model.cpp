@@ -160,6 +160,7 @@ void QnAuditLogModel::clearData()
 {
     beginResetModel();
     m_index->clear();
+    m_interleaveInfo.clear();
     endResetModel();
 }
 
@@ -671,6 +672,8 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
         return htmlData(column, record, index.row(), true);
     case Qn::ColumnDataRole:
         return column;
+    case Qn::AlternateColorRole:
+        return m_interleaveInfo.size() == m_index->size() && m_interleaveInfo[index.row()];
     case Qt::ForegroundRole:
         if (column == EventTypeColumn)
             return colorForType(record->eventType);

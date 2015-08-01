@@ -126,10 +126,19 @@ void QnAuditItemDelegate::paintRichDateTime(QPainter * painter, const QStyleOpti
     painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, timeStr);
 }
 
-void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
+void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & _option, const QModelIndex & index) const
 {
+    QStyleOptionViewItem option = _option;
+    if (index.data(Qn::AlternateColorRole).toInt() > 0) 
+    {
+        const QWidget *widget = option.widget;
+        QStyle *style = widget ? widget->style() : QApplication::style();
+        option.features |= QStyleOptionViewItem::Alternate;
+        style->drawPrimitive(QStyle::PE_PanelItemViewRow, &option, painter, widget);
+    }
+
+
     QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
-    int yShift = 0;
     switch (column)
     {
     case QnAuditLogModel::TimestampColumn:
