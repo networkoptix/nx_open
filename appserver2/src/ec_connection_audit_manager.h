@@ -32,6 +32,8 @@ namespace ec2
         void addAuditRecord( const ApiMediaServerUserAttributesDataList& params, const QnAuthSession& authInfo);
         void addAuditRecord( const ApiUserData& params, const QnAuthSession& authInfo);
         void addAuditRecord( const ApiUserDataList& params, const QnAuthSession& authInfo);
+        void addAuditRecord( const ApiBusinessRuleData& params, const QnAuthSession& authInfo);
+        void addAuditRecord( const ApiBusinessRuleDataList& params, const QnAuthSession& authInfo);
     };
 
 }

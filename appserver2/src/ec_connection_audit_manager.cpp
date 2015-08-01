@@ -55,4 +55,19 @@ namespace ec2
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
+    void ECConnectionAuditManager::addAuditRecord( const ApiBusinessRuleData& params, const QnAuthSession& authInfo)
+    {
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
+        auditRecord.resources.push_back(params.id);
+        qnAuditManager->addAuditRecord(auditRecord);
+    }
+
+    void ECConnectionAuditManager::addAuditRecord( const ApiBusinessRuleDataList& params, const QnAuthSession& authInfo)
+    {
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
+        for (const auto& value: params)
+            auditRecord.resources.push_back(value.id);
+        qnAuditManager->addAuditRecord(auditRecord);
+    }
+
 }

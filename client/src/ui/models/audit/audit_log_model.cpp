@@ -15,6 +15,8 @@
 #include "client/client_settings.h"
 #include <ui/common/ui_resource_name.h>
 #include "ui/style/skin.h"
+#include "api/common_message_processor.h"
+#include "business/business_strings_helper.h"
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
@@ -310,6 +312,15 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
     case Qn::AR_CameraUpdate:
         result +=  tr("%n cameras", "", data->resources.size());
         break;
+    case Qn::AR_BEventUpdate:
+        if (!data->resources.empty()) {
+            QnBusinessEventRulePtr bRule = QnCommonMessageProcessor::instance()->businessRules().value(data->resources[0]);
+            if (bRule) 
+            {
+                result = QnBusinessStringsHelper::bruleDescriptionText(bRule);
+            }
+        }
+        break;
     default:
         result = getResourcesString(data->resources);
     }
@@ -393,10 +404,10 @@ QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record)
 
 QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* data)
 {
-    if (column == DescriptionColumn)
-        return getResourcesString(data->resources);
-    else
-        return textData(column ,data);
+    QString result = textData(column, data);
+    if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate))
+        result += getResourcesString(data->resources); // text description doesn't contain resources for that types, but their names need for search
+    return result;
 }
 
 
