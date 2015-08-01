@@ -61,7 +61,7 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
         QnAuditRecord* record = data.value<QnAuditRecord*>();
         if (record->isPlaybackType() || record->eventType == Qn::AR_CameraUpdate)
         {
-            bool showDetail = record->extractParam("detail") == "1";
+            bool showDetail = QnAuditLogModel::hasDetail(record);
             if (showDetail || m_widthHint == -1) {
                 QTextDocument txtDocument;
                 txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
@@ -530,9 +530,9 @@ void QnAuditLogDialog::at_eventsGrid_clicked(const QModelIndex& index)
     if (!data.canConvert<QnAuditRecord*>())
         return;
     QnAuditRecord* record = data.value<QnAuditRecord*>();
-    bool showDetail = record->extractParam("detail") == "1";
+    bool showDetail = QnAuditLogModel::hasDetail(record);
     showDetail = !showDetail;
-    record->addParam("detail", showDetail ? "1" : "0");
+    QnAuditLogModel::setDetail(record, showDetail);
     
     int height = ui->gridDetails->itemDelegate()->sizeHint(QStyleOptionViewItem(), index).height();
     ui->gridDetails->setRowHeight(index.row(), height);

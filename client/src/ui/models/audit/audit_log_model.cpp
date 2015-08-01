@@ -140,6 +140,17 @@ private:
 // -------------------------------------------------------------------------- //
 // QnEventLogModel
 // -------------------------------------------------------------------------- //
+
+bool QnAuditLogModel::hasDetail(const QnAuditRecord* record)
+{
+    return record->extractParam("detail") == "1";
+}
+
+void QnAuditLogModel::setDetail(QnAuditRecord* record, bool showDetail)
+{
+    record->addParam("detail", showDetail ? "1" : "0");
+}
+
 QnAuditLogModel::QnAuditLogModel(QObject *parent):
     base_type(parent)
 {
@@ -329,8 +340,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
                 result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(linkColor).arg(txt);
             else
                 result +=  QString(lit("<font color=%1><b>%2</b></font>")).arg(linkColor).arg(txt);
-            bool showDetail = data->extractParam("detail") == "1";
-            if (showDetail) 
+            if (hasDetail(data)) 
             {
                 auto archiveData = data->extractParam("archiveExist");
                 int index = 0;
@@ -641,6 +651,22 @@ bool QnAuditLogModel::skipDate(const QnAuditRecord *record, int row) const
     return d1 == d2;
 }
 
+QString QnAuditLogModel::descriptionTooltip(const QnAuditRecord *record) const
+{
+    if (record->resources.empty())
+        return QString();
+
+    QString result;
+    if (!hasDetail(record))
+        result = tr("Click to expand");
+    if (!record->isPlaybackType())
+        return result;
+    if (!result.isEmpty())
+        result += lit("\n");
+    result += tr("Red mark means that an archive is still available");
+    return result;
+}
+
 QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const 
 {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
@@ -705,6 +731,9 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
         else if (record->eventType == Qn::AR_CameraUpdate)
             return qnSkin->icon("tree/camera.png");
     }
+    case Qt::ToolTipRole:
+        if (column == DescriptionColumn)
+            return descriptionTooltip(record);
     default:
         break;
     }

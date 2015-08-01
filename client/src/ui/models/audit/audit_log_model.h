@@ -74,6 +74,9 @@ public:
     static QString makeSearchPattern(const QnAuditRecord* record);
 
     void setheaderHeight(int value) { m_headerHeight = value; }
+
+    static bool hasDetail(const QnAuditRecord* record);
+    static void setDetail(QnAuditRecord* record, bool showDetail);
 public slots:
     void clear();
 protected:
@@ -96,6 +99,7 @@ private:
     QSize sectionSizeFromContents(int logicalIndex) const;
     static QString getResourcesString(const std::vector<QnUuid>& resources);
     static QString searchData(const Column& column, const QnAuditRecord* data);
+    QString descriptionTooltip(const QnAuditRecord *record) const;
 protected:
     DataIndex* m_index;
     QList<Column> m_columns;
