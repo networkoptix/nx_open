@@ -713,6 +713,10 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     } else {
         // TODO: #Elric server & media resources only!
 
+        QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole, QnTimePeriod());
+        if (period.durationMs > 0)
+            layout->setLocalRange(period);
+
         QnResourceList resources = parameters.resources();
         if(!resources.isEmpty()) {
             AddToLayoutParams addParams;

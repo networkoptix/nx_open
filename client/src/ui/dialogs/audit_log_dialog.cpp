@@ -595,7 +595,14 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
         return;
     }
 
-    params.setArgument(Qn::ItemTimeRole, record->rangeStartSec * 1000ll);
+    QnTimePeriod period;
+    period.startTimeMs = record->rangeStartSec * 1000ll;
+    period.durationMs = (record->rangeEndSec - record->rangeStartSec) * 1000ll;
+
+    params.setArgument(Qn::ItemTimeRole, period.startTimeMs);
+    if (period.durationMs > 0)
+        params.setArgument(Qn::TimePeriodRole, period);
+    
     context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);
 }
 
