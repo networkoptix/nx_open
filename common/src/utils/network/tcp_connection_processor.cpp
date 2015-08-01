@@ -496,6 +496,11 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
         result.userName = userRes->getName();
     result.sessionId = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (result.sessionId.isNull()) {
+        result.sessionId = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+        if (result.sessionId.isNull())
+            result.sessionId = QnUuid::createUuid();
+    }
     result.userHost = d->socket->getForeignAddress().address.toString();
 
     return result;

@@ -424,7 +424,7 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data
         return formatDateTime(data->createdTimeSec, false, true);
     case EndTimestampColumn:
         if (data->eventType == Qn::AR_Login)
-            return formatDateTime(data->rangeEndSec, true, true);
+            return data->rangeEndSec ? formatDateTime(data->rangeEndSec, true, true) : QString();
         else if(data->eventType == Qn::AR_UnauthorizedLogin)
             return eventTypeToString(data->eventType);
         break;
