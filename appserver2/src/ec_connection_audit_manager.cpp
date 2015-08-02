@@ -1,6 +1,8 @@
 #include "ec_connection_audit_manager.h"
 #include "audit/audit_manager.h"
 #include "utils/common/synctime.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource/user_resource.h"
 
 namespace ec2
 {
@@ -70,4 +72,16 @@ namespace ec2
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
+    void ECConnectionAuditManager::addAuditRecord( const ApiResourceParamWithRefDataList& params, const QnAuthSession& authInfo)
+    {
+        QnUserResourcePtr adminUser = qnResPool->getAdministrator();
+        if (!adminUser)
+            return;
+        QnUuid adminId = adminUser->getId();
+        for (const ApiResourceParamWithRefData& param: params)
+        {
+            if (param.resourceId == adminId) 
+                qnAuditManager->notifySettingsChanged(authInfo, param.name);
+        }
+    }
 }

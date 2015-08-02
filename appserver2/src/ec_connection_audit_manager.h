@@ -34,6 +34,8 @@ namespace ec2
         void addAuditRecord( const ApiUserDataList& params, const QnAuthSession& authInfo);
         void addAuditRecord( const ApiBusinessRuleData& params, const QnAuthSession& authInfo);
         void addAuditRecord( const ApiBusinessRuleDataList& params, const QnAuthSession& authInfo);
+
+        void addAuditRecord( const ApiResourceParamWithRefDataList& params, const QnAuthSession& authInfo);
     };
 
 }

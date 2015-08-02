@@ -9,6 +9,29 @@ namespace
     const int MIN_PLAYBACK_TIME_TO_LOG = 1000 * 5;
 }
 
+QnAuditRecord QnAuditManager::CameraPlaybackInfo::toAuditRecord() const
+{
+    Qn::AuditRecordType eventType;
+    if (isExport)
+        eventType = Qn::AR_ExportVideo;
+    else if (startTimeUsec == DATETIME_NOW)
+        eventType = Qn::AR_ViewLive;
+    else
+        eventType = Qn::AR_ViewArchive;
+
+    QnAuditRecord record = QnAuditManager::prepareRecord(session, eventType);
+    record.createdTimeSec = creationTimeMs / 1000;
+    record.rangeStartSec = period.startTimeMs / 1000;
+    record.rangeEndSec = period.endTimeMs() / 1000;
+    record.resources.push_back(cameraId);
+    return record;
+}
+
+QnAuditRecord QnAuditManager::ChangedSettingInfo::toAuditRecord() const
+{
+    return QnAuditManager::prepareRecord(session, eventType);
+}
+
 QnAuditManager* QnAuditManager::instance()
 {
     return m_globalInstance;
@@ -98,16 +121,36 @@ void QnAuditManager::notifyPlaybackInProgress(int internalId, qint64 timestampUs
     }
 }
 
-bool QnAuditManager::canJoinRecords(const CameraPlaybackInfo& left, const CameraPlaybackInfo& right)
+bool QnAuditManager::canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right)
 {
-    if (left.isExport != right.isExport)
+    if (left.eventType != right.eventType)
         return false;
-    bool peridOK = qAbs(left.startTimeUsec - right.startTimeUsec) < MAX_FRAME_DURATION * 1000ll;
-    bool sessionOK = left.session == right.session;
+    bool peridOK = qAbs(left.rangeStartSec - right.rangeStartSec) * 1000ll < MAX_FRAME_DURATION;
+    bool sessionOK = left.sessionId == right.sessionId && left.userName == right.userName && left.userHost == right.userHost;
     return peridOK && sessionOK;
 }
 
+void QnAuditManager::notifySettingsChanged(const QnAuthSession& authInfo, const QString& paramName)
+{
+    ChangedSettingInfo info;
+    if (paramName.startsWith(lit("email")) || paramName.startsWith(lit("smtp")))
+        info.eventType = Qn::AR_EmailSettings;
+    else
+        info.eventType = Qn::AR_SettingsChange;
+    info.session = authInfo;
+    info.timeout.restart();
+    QMutexLocker lock(&m_mutex);
+    m_changedSettings << info;
+}
+
 void QnAuditManager::at_timer()
+{
+    processDelayedRecords(m_closedPlaybackInfo);
+    processDelayedRecords(m_changedSettings);
+}
+
+template <class T>
+void QnAuditManager::processDelayedRecords(QVector<T>& recordsToAggregate)
 {
     std::vector<QnAuditRecord> recordsToAdd;
     bool recordProcessed;
@@ -115,33 +158,28 @@ void QnAuditManager::at_timer()
     {
         QMutexLocker lock(&m_mutex);
         recordProcessed = false;
-        for (auto itr = m_closedPlaybackInfo.begin(); itr != m_closedPlaybackInfo.end(); ++itr)
+        for (auto itr = recordsToAggregate.begin(); itr != recordsToAggregate.end(); ++itr)
         {
             if (itr->timeout.elapsed() > MIN_PLAYBACK_TIME_TO_LOG) 
             {
                 // aggregate data. join other records to this one
-                CameraPlaybackInfo pbInfo = *itr;
-                Qn::AuditRecordType eventType;
-                if (pbInfo.isExport)
-                    eventType = Qn::AR_ExportVideo;
-                else if (pbInfo.startTimeUsec == DATETIME_NOW)
-                     eventType = Qn::AR_ViewLive;
-                else
-                    eventType = Qn::AR_ViewArchive;
-                QnAuditRecord record = prepareRecord(pbInfo.session, eventType);
-                while (itr != m_closedPlaybackInfo.end())
+                QnAuditRecord record = itr->toAuditRecord();
+                while (itr != recordsToAggregate.end())
                 {
-                    if (canJoinRecords(pbInfo, *itr)) {
-                        record.resources.push_back(itr->cameraId);
-                        pbInfo.period.addPeriod(itr->period); // use union for all periods if they similar to each other
-                        itr = m_closedPlaybackInfo.erase(itr);
+                    QnAuditRecord newRecord = itr->toAuditRecord();
+                    if (canJoinRecords(record, newRecord)) {
+                        for (const auto& res: newRecord.resources) {
+                            if( std::find(record.resources.begin(), record.resources.end(), res) == record.resources.end())
+                                record.resources.push_back(res);
+                        }
+                        record.createdTimeSec = qMin(record.createdTimeSec, newRecord.createdTimeSec);
+                        record.rangeStartSec = qMin(record.rangeStartSec, newRecord.rangeStartSec);
+                        record.rangeEndSec = qMax(record.rangeEndSec, newRecord.rangeEndSec);
+                        itr = recordsToAggregate.erase(itr);
                     }
                     else
                         ++itr;
                 }
-                record.createdTimeSec = pbInfo.creationTimeMs / 1000;
-                record.rangeStartSec = pbInfo.period.startTimeMs / 1000;
-                record.rangeEndSec = pbInfo.period.endTimeMs() / 1000;
                 recordsToAdd.push_back(std::move(record));
                 recordProcessed = true;
                 break;
