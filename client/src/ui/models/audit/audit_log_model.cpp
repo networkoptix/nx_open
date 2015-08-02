@@ -268,6 +268,18 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
             return tr("Business rule updated");
         case Qn::AR_EmailSettings:
             return tr("E-mail updated");
+        case Qn::AR_CameraRemove:
+            return tr("Camera removed");
+        case Qn::AR_ServerRemove:
+            return tr("Server removed");
+        case Qn::AR_BEventRemove:
+            return tr("Business rule removed");
+        case Qn::AR_UserRemove:
+            return tr("User removed");
+        case Qn::AR_BEventReset:
+            return tr("Business rule reseted");
+        case Qn::AR_DatabaseRestore:
+            return tr("Database restored");
     }
     return QString();
 }
@@ -305,6 +317,12 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
     QString result;
     switch (data->eventType)
     {
+    case Qn::AR_CameraRemove:
+    case Qn::AR_ServerRemove:
+    case Qn::AR_BEventRemove:
+    case Qn::AR_UserRemove:
+        result = QString::fromUtf8(data->extractParam("description"));
+        break;
     case Qn::AR_ViewArchive:
     case Qn::AR_ViewLive:
     case Qn::AR_ExportVideo:
@@ -316,9 +334,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
         if (!data->resources.empty()) {
             QnBusinessEventRulePtr bRule = QnCommonMessageProcessor::instance()->businessRules().value(data->resources[0]);
             if (bRule) 
-            {
                 result = QnBusinessStringsHelper::bruleDescriptionText(bRule);
-            }
         }
         break;
     default:
@@ -628,6 +644,7 @@ QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
     case Qn::AR_Login:
         return m_colors.loginAction;
     case Qn::AR_UserUpdate:
+    case Qn::AR_UserRemove:
         return m_colors.updUsers;
     case Qn::AR_ViewLive:
         return m_colors.watchingLive;
@@ -636,14 +653,19 @@ QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
     case Qn::AR_ExportVideo:
         return m_colors.exportVideo;
     case Qn::AR_CameraUpdate:
+    case Qn::AR_CameraRemove:
         return m_colors.updCamera;
     case Qn::AR_SystemNameChanged:
     case Qn::AR_SystemmMerge:
     case Qn::AR_SettingsChange:
+    case Qn::AR_DatabaseRestore:
         return m_colors.systemActions;
     case Qn::AR_ServerUpdate:
+    case Qn::AR_ServerRemove:
         return m_colors.updServer;
+    case Qn::AR_BEventReset:
     case Qn::AR_BEventUpdate:
+    case Qn::AR_BEventRemove:
         return m_colors.eventRules;
     case Qn::AR_EmailSettings:
         return m_colors.emailSettings;

@@ -66,7 +66,7 @@ private:
         ChangedSettingInfo() {}
 
         QnAuthSession session;         // user's session
-        Qn::AuditRecordType eventType;
+        QString paramName;
         QElapsedTimer timeout;         // how many ms session is alive
 
         QnAuditRecord toAuditRecord() const;

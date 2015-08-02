@@ -375,7 +375,13 @@ public:
         AR_SettingsChange    = 0x0200,
         AR_ServerUpdate      = 0x0400,
         AR_BEventUpdate      = 0x0800,
-        AR_EmailSettings     = 0x1000
+        AR_EmailSettings     = 0x1000,
+        AR_CameraRemove      = 0x2000,
+        AR_ServerRemove      = 0x4000,
+        AR_BEventRemove      = 0x8000,
+        AR_UserRemove        = 0x10000,
+        AR_BEventReset       = 0x20000,
+        AR_DatabaseRestore   = 0x40000
     };
 
     Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)

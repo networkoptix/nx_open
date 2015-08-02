@@ -29,6 +29,12 @@ QnAuditRecord QnAuditManager::CameraPlaybackInfo::toAuditRecord() const
 
 QnAuditRecord QnAuditManager::ChangedSettingInfo::toAuditRecord() const
 {
+    Qn::AuditRecordType eventType;
+    if (paramName.startsWith(lit("email")) || paramName.startsWith(lit("smtp")))
+        eventType = Qn::AR_EmailSettings;
+    else
+        eventType = Qn::AR_SettingsChange;
+
     return QnAuditManager::prepareRecord(session, eventType);
 }
 
@@ -133,10 +139,7 @@ bool QnAuditManager::canJoinRecords(const QnAuditRecord& left, const QnAuditReco
 void QnAuditManager::notifySettingsChanged(const QnAuthSession& authInfo, const QString& paramName)
 {
     ChangedSettingInfo info;
-    if (paramName.startsWith(lit("email")) || paramName.startsWith(lit("smtp")))
-        info.eventType = Qn::AR_EmailSettings;
-    else
-        info.eventType = Qn::AR_SettingsChange;
+    info.paramName = paramName;
     info.session = authInfo;
     info.timeout.restart();
     QMutexLocker lock(&m_mutex);

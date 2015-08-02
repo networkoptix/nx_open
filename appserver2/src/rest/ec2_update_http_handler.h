@@ -139,8 +139,8 @@ namespace ec2
 
              // update local data
             if (errorCode == ErrorCode::ok) {
+                m_connection->auditManager()->addAuditRecord(tran.command, tran.params, owner->authSession()); // add audit record before notification to ensure removed resource still alive
                 m_connection->notificationManager()->triggerNotification(tran);
-                m_connection->auditManager()->addAuditRecord(tran.params, owner->authSession());
             }
 
             return (errorCode == ErrorCode::ok)
