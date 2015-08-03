@@ -27,6 +27,7 @@ Bug #5731 - Motion Detection didn't work for mjpeg stream. Fixed.
 Bug #5747 - Fixed authentication issue if server time has been changed.
 Bug #5749 - Server should not send multicast packets for cameras discovery if enable camera auto discovery is disabled and server has no failover enabled or only one server in the system.
 Bug #5766 - Login dialog displays servers with different protocol version as compatible. Fixed
+Bug #6075 - Server time is different on different Servers in the same System. Fixed.
 
 
 ----------------------------------------------2.3.1.xxxx-------------------------------------------
