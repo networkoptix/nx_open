@@ -13,7 +13,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QSharedPointer>
-#include <QAuthenticator>
 
 #include "utils/network/abstract_socket.h"
 
@@ -383,7 +382,7 @@ namespace nx_http
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-        const QAuthenticator &auth = QAuthenticator());
+        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
     //!Calls previous function and waits for completion
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,

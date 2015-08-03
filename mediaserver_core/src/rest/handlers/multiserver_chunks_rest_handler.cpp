@@ -88,14 +88,13 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataLi
         apiUrl.setPort(route.addr.port);
     }
 
-    QAuthenticator auth;
     if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
-        auth.setUser(admin->getName());
-        auth.setPassword(QString::fromUtf8(admin->getDigest()));
+        apiUrl.setUserName(admin->getName());
+        apiUrl.setPassword(QString::fromUtf8(admin->getDigest()));
     }
 
     QnMutexLocker lock(&ctx->mutex);
-    if (nx_http::downloadFileAsync( apiUrl, requestCompletionFunc, headers, auth))
+    if (nx_http::downloadFileAsync( apiUrl, requestCompletionFunc, headers, nx_http::AsyncHttpClient::authDigestWithPasswordHash ))
         ctx->requestsInProgress++;
 }
 

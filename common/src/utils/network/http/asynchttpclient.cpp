@@ -1086,15 +1086,11 @@ namespace nx_http
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders,
-        const QAuthenticator &auth)
+        AsyncHttpClient::AuthType authType )
     {
         nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
         httpClientCaptured->addRequestHeaders(extraHeaders);
-        if (!auth.isNull()) {
-            httpClientCaptured->setUserName(auth.user());
-            httpClientCaptured->setUserPassword(auth.password());
-            httpClientCaptured->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
-        }
+        httpClientCaptured->setAuthType(authType);
 
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
             ( nx_http::AsyncHttpClientPtr httpClient ) mutable
