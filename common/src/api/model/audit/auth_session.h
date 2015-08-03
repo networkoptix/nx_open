@@ -9,9 +9,10 @@ struct QnAuthSession
     QnUuid sessionId;
     QString userName;
     QString userHost;
+    QString userAgent;
 };
 
-#define QnAuthSession_Fields (sessionId)(userName)(userHost)
+#define QnAuthSession_Fields (sessionId)(userName)(userHost)(userAgent)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnAuthSession), (eq))
 
 

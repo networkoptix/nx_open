@@ -40,6 +40,7 @@ namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
     const int BTN_ICON_SIZE = 16;
     static const int COLUMN_SPACING = 4;
+    static const int MAX_DESCR_COL_LEN = 300;
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
@@ -78,7 +79,9 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
         }
         else {
             result = base_type::sizeHint(option, index);
+            result.setHeight(m_defaultSectionHeight);
         }
+        result.setWidth(qMin(result.width(), MAX_DESCR_COL_LEN));
     }
     else if (column == QnAuditLogModel::PlayButtonColumn) 
     {
@@ -440,6 +443,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     m_detailModel->setColumns(detailSessionColumns(true));
     ui->gridDetails->setModel(m_detailModel);
     ui->gridDetails->setItemDelegate(m_itemDelegate);
+    ui->gridDetails->setWordWrap(true);
 
     m_detailModel->setheaderHeight(calcHeaderHeight(ui->gridDetails->horizontalHeader()));
     m_sessionModel->setheaderHeight(calcHeaderHeight(ui->gridMaster->horizontalHeader()));

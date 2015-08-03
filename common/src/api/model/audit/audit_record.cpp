@@ -18,7 +18,7 @@ QnByteArrayConstRef QnAuditRecord::extractParam(const QnLatin1Array& name) const
     int pos = params.indexOf(name);
     if (pos == -1)
         return QnLatin1Array();
-    int pos2 = params.indexOf(pos, ';');
+    int pos2 = params.indexOf(';', pos);
     if (pos2 == -1)
         pos2 = params.size();
     pos += name.size() + 1;

@@ -219,6 +219,7 @@ void QnTransactionTcpProcessor::run()
         std::function<void ()> ttFinishCallback;
         if (remotePeer.isClient()) {
             auto session = authSession();
+            //session.userAgent = toString(remotePeer.peerType);
             qnAuditManager->at_connectionOpened(session);
             ttFinishCallback = std::bind(&QnAuditManager::at_connectionClosed, qnAuditManager, session);
         }

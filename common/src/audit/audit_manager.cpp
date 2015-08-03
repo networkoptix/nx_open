@@ -57,6 +57,8 @@ QnAuditRecord QnAuditManager::prepareRecord(const QnAuthSession& authInfo, Qn::A
     result.fillAuthInfo(authInfo);
     result.createdTimeSec = qnSyncTime->currentMSecsSinceEpoch() / 1000;
     result.eventType = recordType;
+    if (result.isLoginType() && !authInfo.userAgent.isEmpty())
+        result.addParam("description", authInfo.userAgent.toUtf8());
     return result;
 }
 

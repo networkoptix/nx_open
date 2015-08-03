@@ -496,12 +496,23 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
         result.userName = userRes->getName();
     result.sessionId = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
-    if (result.sessionId.isNull()) {
+    if (result.sessionId.isNull())
         result.sessionId = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
-        if (result.sessionId.isNull())
-            result.sessionId = QnUuid::createUuid();
+    if (result.sessionId.isNull()) {
+        QUrlQuery query(d->request.requestLine.url.query());
+        result.sessionId = query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
     }
+    if (result.sessionId.isNull())
+        result.sessionId = QnUuid::createUuid();
+
     result.userHost = d->socket->getForeignAddress().address.toString();
+    result.userAgent = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, "User-Agent"));
+
+    int trimmedPos = result.userAgent.indexOf(lit("/"));
+    if (trimmedPos != -1) {
+        trimmedPos = result.userAgent.indexOf(lit(" "), trimmedPos);
+        result.userAgent = result.userAgent.left(trimmedPos);
+    }
 
     return result;
 }
