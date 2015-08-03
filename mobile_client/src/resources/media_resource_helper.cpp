@@ -21,8 +21,10 @@ namespace {
 
 #ifdef Q_OS_IOS
     QString nativeStreamProtocol = lit("hls");
+    QString httpFormat = lit("mpjpeg");
 #else
     QString nativeStreamProtocol = lit("rtsp");
+    QString httpFormat = lit("webm");
 #endif
 
     QString getAuth(const QnUserResourcePtr &user) {
@@ -31,7 +33,7 @@ namespace {
     }
 
     qint64 convertPosition(qint64 position, const QString &protocol) {
-        return protocol == lit("rtsp") ? position * 1000 : position;
+        return protocol == nativeStreamProtocol ? position * 1000 : position;
     }
 
 } // anonymous namespace
@@ -120,25 +122,36 @@ void QnMediaResourceHelper::updateUrl() {
 
     QUrlQuery query;
 
-    QString protocol;
+    QString protocol = m_transcodingSupported ? lit("http") : nativeStreamProtocol;
+    QnUserResourcePtr user = qnCommon->instance<QnUserWatcher>()->user();
 
-    if (m_transcodingSupported) {
-        protocol = lit("http");
-        url.setScheme(protocol);
-        url.setPath(lit("/media/%1.webm").arg(camera->getMAC().toString()));
-        query.addQueryItem(lit("resolution"), m_resolution.isEmpty() ? optimalResolution() : m_resolution);
+    if (protocol == lit("hls")) {
+        url.setScheme(lit("http"));
+        url.setPath(lit("/hls/%1.m3u").arg(camera->getMAC().toString()));
+
+        query.addQueryItem(m_nativeStreamIndex == 0 ? lit("hi") : lit("lo"), QString());
+
+        if (m_position >= 0)
+            query.addQueryItem(lit("startTimestamp"), QString::number(convertPosition(m_position, protocol)));
+
+        url.setUserName(QnAppServerConnectionFactory::url().userName());
+        url.setPassword(QnAppServerConnectionFactory::url().password());
     } else {
-        protocol = nativeStreamProtocol;
         url.setScheme(protocol);
-        url.setPath(lit("/%1").arg(camera->getMAC().toString()));
-        query.addQueryItem(lit("stream"), QString::number(m_nativeStreamIndex));
+        if (m_transcodingSupported) {
+            url.setPath(lit("/media/%1.%2").arg(camera->getMAC().toString()).arg(httpFormat));
+            query.addQueryItem(lit("resolution"), m_resolution.isEmpty() ? optimalResolution() : m_resolution);
+        } else {
+            url.setPath(lit("/%1").arg(camera->getMAC().toString()));
+            query.addQueryItem(lit("stream"), QString::number(m_nativeStreamIndex));
+        }
+
+        if (m_position >= 0)
+            query.addQueryItem(lit("pos"), QString::number(convertPosition(m_position, protocol)));
+
+        if (user)
+            query.addQueryItem(lit("auth"), getAuth(user));
     }
-
-    if (m_position >= 0)
-        query.addQueryItem(lit("pos"), QString::number(convertPosition(m_position, protocol)));
-
-    if (QnUserResourcePtr user = qnCommon->instance<QnUserWatcher>()->user())
-        query.addQueryItem(lit("auth"), getAuth(user));
 
     url.setQuery(query);
 
