@@ -170,7 +170,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.0</version>
+                <version>1.3</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -179,10 +179,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <doCheck>false</doCheck>
-                    <doUpdate>true</doUpdate>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
