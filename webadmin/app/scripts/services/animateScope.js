@@ -8,6 +8,7 @@ angular.module('webadminApp')
         var updationLimit = null;// Limit animations to stop process at some point
         var defaultDuration = 1000;
         var defaultScope = null;
+        var defaultAnimation = "linear";
         function Animation(scope,value,target,duration,dependency){
             this.scope = scope;
             this.value = value;
@@ -16,7 +17,7 @@ angular.module('webadminApp')
             this.started = (new Date()).getTime();
             this.initialValue = scope[value];
             this.isFinished = false;
-            this.dependency = dependency;
+            this.dependency = dependency || defaultAnimation;
 
             this.deferred = $q.defer();
 
@@ -25,11 +26,11 @@ angular.module('webadminApp')
         Animation.prototype.interpolate = function(start,stop,time,duration, dependency) {
             switch(dependency){
                 case "smooth":
-                default:
                     return this.smooth(start,stop,time,duration);
                 case "fading":
                     return this.fading(start,stop,time,duration);
                 case "linear":
+                default:
                     return this.linear(start,stop,time,duration);
             }
         };
@@ -57,7 +58,7 @@ angular.module('webadminApp')
             if(time > duration) {
                 time = duration;
             }
-            var delta = 1 - Math.cos(time/duration * Math.PI / 2);
+            var delta = Math.sin(time/duration * Math.PI / 2);
             return  start + (stop - start) *delta;
         };
         Animation.prototype.breakAnimation = function(){
@@ -127,12 +128,12 @@ angular.module('webadminApp')
             if(typeof(animationHandler)!=='undefined' && animationHandler !== null && animationHandler !== false) {
                 animationHandler();
             }
-            if(defaultScope.$root.$$phase && !digestContext ){
+            /*if(defaultScope.$root.$$phase && !digestContext ){
                 console.error('wrong phase',defaultScope.$root.$$phase);
             }
             if(defaultScope !== null && !digestContext) {
                 defaultScope.$apply();
-            }
+            }*/
             if(updationLimit!==0) {
                 window.animationFrame(animationFunction);
                 if(updationLimit) {
@@ -149,13 +150,16 @@ angular.module('webadminApp')
             stop:function(){
                 animationRunning = false;
             },
+            process:function(){
+                process();
+            },
             animating:function(scope,value){
                 var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
                     return anim.scope === scope && anim.value === value;
                 });
                 return targetAnimation;
             },
-            animate:function(scope,value,target,duration,dependency){
+            animate:function(scope,value,target,dependency,duration){
 
                 if(typeof(duration) === 'undefined')
                 {
@@ -172,9 +176,9 @@ angular.module('webadminApp')
                 animations.push(animation);
                 return animation.deferred.promise;
             },
-            progress:function(scope,value,duration,dependency){ // Animate progress from 0 to 1
+            progress:function(scope,value,dependency,duration){ // Animate progress from 0 to 1
                 scope[value] = 0;
-                return this.animate(scope,value,1,duration,dependency);
+                return this.animate(scope,value,1,dependency,duration);
             },
             setDuration:function(duration){
                 defaultDuration = duration;

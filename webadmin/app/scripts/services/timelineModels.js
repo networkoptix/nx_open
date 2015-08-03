@@ -866,14 +866,12 @@ ScaleManager.prototype.fullZoomOut = function(){ // Reset zoom level to show all
     this.updateCurrentInterval();
 };
 
-ScaleManager.prototype.updateLevels = function() {
-    //3. Select actual level
-
-    var levels = this.levels;
+ScaleManager.prototype.calcLevels = function(msPerPixel) {
+    var levels = {};
     for (var i = 0; i < RulerModel.levels.length; i++) {
         var level = RulerModel.levels[i];
 
-        var pixelsPerLevel = (level.interval.getMilliseconds() / this.msPerPixel );
+        var pixelsPerLevel = (level.interval.getMilliseconds() / msPerPixel );
 
         if (typeof(level.topW) !== 'undefined' &&
             pixelsPerLevel >= level.topW) {
@@ -909,6 +907,10 @@ ScaleManager.prototype.updateLevels = function() {
         }while(!levels.top.level.topW && levels.top.index);
     }
     return levels;
+};
+ScaleManager.prototype.updateLevels = function() {
+    //3. Select actual level
+    this.levels = this.calcLevels(this.msPerPixel);
 };
 
 ScaleManager.prototype.alignStart = function(level){ // Align start by the grid using level
@@ -1035,6 +1037,12 @@ ScaleManager.prototype.msToZoom = function(ms){
 ScaleManager.prototype.availableZoomProportion = function(){
     return (this.msToZoom(this.maxMsPerPixel) - this.msToZoom(this.minMsPerPixel)) / this.msToZoom(this.absMaxMsPerPixel);
 };
+
+ScaleManager.prototype.targetLevels = function(zoomTarget){
+    var msPerPixel = this.zoomToMs(zoomTarget);
+    return this.calcLevels(msPerPixel);
+};
+
 ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
     if(typeof(zoomValue)=="undefined"){
         return this.msToZoom(this.msPerPixel);

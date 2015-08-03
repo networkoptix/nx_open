@@ -20,7 +20,7 @@ angular.module('webadminApp')
                     minMsPerPixel: 1, // Minimum level for zooming:
 
                     zoomSpeed: 0.025, // Zoom speed for buttons 0 -> 1 = full zoom
-                    maxVerticalScrollForZoom: 50, // value for adjusting zoom
+                    maxVerticalScrollForZoom: 500, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
                     animationDuration: 500, // 300, // 200-400 for smooth animation
 
@@ -49,7 +49,7 @@ angular.module('webadminApp')
                             fontSize:0,
                             labelPositionFix:-10
                         },
-                        none:{
+                        events:{
                             markSize:0,
                             transparency:0,
                             fontSize:0,
@@ -451,6 +451,9 @@ angular.module('webadminApp')
                         timelineConfig.marksHeight );
                 }
 
+
+                var targetLevels = scope.scaleManager.levels;
+                var currentLevels = {"events":{index:0},"labels":{index:0},"middle":{index:0},"small":{index:0},"marks":{index:0}};
                 function drawLabelsOldStyle(context,
                     labelFormat, labelFixed, levelTop, levelHeight,
                     font, labelAlign, bgColor, bgOddColor, markColor, markAttach, levelsSettings){
@@ -463,33 +466,8 @@ angular.module('webadminApp')
                     //2. Every level can be animated
                     //3. Animation includes changing of height and font-size and transparency for colors
 
-                    var animations = {none:0};
-                    var targets    = {none:100};
-                    var currents   = {none:100};
-
-                    function animateLevel(levelName) { // Check previous and current value for this level and run smooth transition if needed
-                        var instantLevelIndex = scope.scaleManager.levels[levelName].index;
-                        var targetName = levelName + "TargetIndex";
-                        var currentName = levelName + "CurrentIndex";
-                        var animationName = levelName + "IndexChanging";
-                        if(!scope[currentName]){
-                            scope[currentName] = 0;
-                        }
-                        if (instantLevelIndex != scope[targetName]) { // Start animation here
-                            scope[targetName] = instantLevelIndex;
-                            animateScope.progress(scope, animationName).then(function () {
-                                scope[currentName] = scope[targetName];
-                            });
-                        }
-
-                        //Cache for this iteration
-                        animations[levelName] = scope[animationName];
-                        targets[levelName] = scope[targetName];
-                        currents[levelName] = scope[currentName];
-                    }
-
                     function getPointAnimation(pointLevelIndex, levelName){ // Get transition value for animation for this level
-                        var animation = animations[levelName];
+                        var animation = scope.zooming;
 
                         var minLevel = getLevelMinValue(levelName);
 
@@ -497,7 +475,11 @@ angular.module('webadminApp')
                             return null; // Do not animate
                         }
 
-                        if(targets[levelName] > currents[levelName]){ // Increasing
+                        if(targetLevels[levelName].index == currentLevels[levelName].index) { // Do not animate
+                            return null;
+                        }
+
+                        if(targetLevels[levelName].index > currentLevels[levelName].index){ // Increasing
                             return 1-animation;
                         }
 
@@ -505,11 +487,11 @@ angular.module('webadminApp')
                     }
 
                     function getLevelMinValue(levelName){ // Get lower levelinex for this level
-                        return Math.min(currents[levelName],targets[levelName]);
+                        return Math.min(currentLevels[levelName].index,targetLevels[levelName].index);
                     }
 
                     function getLevelMaxValue(levelName){
-                        return Math.max(currents[levelName],targets[levelName]);
+                        return Math.max(currentLevels[levelName].index,targetLevels[levelName].index);
                     }
 
                     function getBestLevelName(pointLevelIndex){ // Find best level for this levelindex
@@ -525,8 +507,25 @@ angular.module('webadminApp')
                         if(pointLevelIndex <= getLevelMaxValue("marks"))
                             return "marks";
 
-                        return "none";
+                        return "events";
                     }
+
+                    function getPrevLevelName(pointLevelIndex){
+                        if(pointLevelIndex <= getLevelMinValue("labels"))
+                            return "labels";
+
+                        if(pointLevelIndex <= getLevelMinValue("middle"))
+                            return "middle";
+
+                        if(pointLevelIndex <= getLevelMinValue("small"))
+                            return "small";
+
+                        if(pointLevelIndex <= getLevelMinValue("marks"))
+                            return "marks";
+
+                        return "events";
+                    }
+
 
                     function getLowerLevelName(levelName){
                         switch(levelName){
@@ -540,11 +539,11 @@ angular.module('webadminApp')
                                 return "marks";
 
                             case "marks":
-                                return "none";
+                                return "events";
 
-                            case "none":
+                            case "events":
                             default:
-                                return "none";
+                                return "events";
                         }
                     }
                     function getUpperLevelName(levelName){ // Next level
@@ -559,7 +558,7 @@ angular.module('webadminApp')
                             case "marks":
                                 return "small";
 
-                            case "none":
+                            case "events":
                             default:
                                 return "marks";
                         }
@@ -569,13 +568,8 @@ angular.module('webadminApp')
                         return min + alpha * (max - min);
                     }
 
-                    animateLevel("labels"); // Run animation for levels if needed
-                    animateLevel("middle");
-                    animateLevel("small");
-                    animateLevel("marks");
 
-
-                    var levelIndex = Math.max(scope.scaleManager.levels.marks.index, scope.marksTargetIndex); // Target level is lowest of visible
+                    var levelIndex = Math.max(scope.scaleManager.levels.marks.index, targetLevels.marks.index); // Target level is lowest of visible
                     var level = RulerModel.levels[levelIndex]; // Actual calculating level
 
                     var start1 = scope.scaleManager.alignStart(level);
@@ -596,7 +590,7 @@ angular.module('webadminApp')
                         var labelPositionFix = levelsSettings[levelName].labelPositionFix;
 
                         if(animation !== null){ //scaling between upperLevel and levelName to up
-                            var animationLevelName = getLowerLevelName(levelName);
+                            var animationLevelName = getPrevLevelName(pointLevelIndex);
                             markSize = interpolate(animation, markSize, levelsSettings[animationLevelName].markSize);
                             transparency = interpolate(animation, transparency, levelsSettings[animationLevelName].transparency);
                             fontSize = interpolate(animation, fontSize, levelsSettings[animationLevelName].fontSize);
@@ -929,35 +923,16 @@ angular.module('webadminApp')
                     event.preventDefault();
                     if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
                         if(window.jscd.touch ) {
-
                             zoomTarget = scope.scaleManager.zoom() - event.deltaY / timelineConfig.maxVerticalScrollForZoomWithTouch;
-
-                            scope.scaleManager.zoomAroundDate(
-                                zoomTarget,
-                                scope.scaleManager.screenCoordinateToDate(mouseCoordinate)
-                            );
-
                         }else{
                             // We need to smooth zoom here
-
-                            if(!animateScope.animating(scope,"zoomCurrent")){ // No animating - flush zoom value. Overwise - collect
-                                scope.zoomCurrent = scope.scaleManager.zoom();
-                                zoomTarget = scope.zoomCurrent;
-                            }
                             // Collect zoom changing in zoomTarget
                             zoomTarget -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
-
-                            animateScope.animate(scope,"zoomCurrent",zoomTarget).then(
-                                function(){},
-                                function(){},
-                                function(value){
-                                    scope.scaleManager.zoomAroundDate(
-                                        value,
-                                        scope.scaleManager.screenCoordinateToDate(mouseCoordinate)
-                                    );
-                                }
-                            );
                         }
+
+                        // TODO: DO INSTANT?
+                        scope.zoomTo(zoomTarget, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),window.jscd.touch);
+
                     } else {
                         scope.scaleManager.scrollByPixels(event.deltaX);
                     }
@@ -1029,15 +1004,45 @@ angular.module('webadminApp')
 
 
                 // !!! Functions for buttons on view
-                scope.zoom = function(zoomIn){
+                scope.zoom = function(zoomIn) {
                     scope.zoomTarget = scope.scaleManager.zoom();
-                    var zoomTarget = scope.zoomTarget - (zoomIn?1:-1) * timelineConfig.zoomSpeed;
-                    animateScope.animate(scope,"zoomTarget",zoomTarget).then(function(){},function(){},
-                        function(value){
+                    var zoomTarget = scope.zoomTarget - (zoomIn ? 1 : -1) * timelineConfig.zoomSpeed;
+                    scope.zoomTo(zoomTarget);
+                };
+
+                scope.zooming = 0; // init animation value
+                scope.zoomTo = function(zoomTarget, zoomDate, instant){
+                    targetLevels = scope.scaleManager.targetLevels(zoomTarget);
+
+                    if(instant) { // Forca animation calculate on touch devices
+                        animateScope.process();
+                    }
+
+                    // This allows us to continue (and slowdown, mb) animation every time
+                    animateScope.animate(scope,"zooming",1).then(function(){
+                        currentLevels = scope.scaleManager.levels;
+                        scope.zooming = 0;
+                    });
+
+                    function setZoom(value){
+                        if (zoomDate) {
+                            scope.scaleManager.zoomAroundDate(
+                                value,
+                                zoomDate
+                            );
+                        } else {
                             scope.scaleManager.zoom(value);
                         }
-                    );
+                    }
 
+                    if(!instant) {
+                        animateScope.animate(scope, "zoomTarget", zoomTarget, "smooth").then(
+                            function () {},
+                            function () {},
+                            setZoom);
+                    }else{
+                        setZoom(zoomTarget);
+                    }
                 };
 
                 scope.goToLive = function(){
