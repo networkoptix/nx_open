@@ -96,7 +96,6 @@ Expandable.MaskedSettingsPanel
 
                     property bool changed: (timeZonePicker.changed || timePicker.changed
                         || datePicker.changed || useCurrentTimeCheckbox.changed);
-                    enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
     
                     verticalItemAlignment: Grid.AlignVCenter;
                     
@@ -133,7 +132,9 @@ Expandable.MaskedSettingsPanel
                     Base.TimeZonePicker
                     {
                         id: timeZonePicker;
-                        
+
+                        pseudoEnabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
+
                         model: rtuContext.timeZonesModel(this);
                         initIndex: timeZonePicker.model.initIndex;
     
@@ -161,6 +162,8 @@ Expandable.MaskedSettingsPanel
 
                             initDate: (rtuContext.selection && rtuContext.selection !== null ?
                                 rtuContext.selection.dateTime : new Date());
+
+                            enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
                         }
 
                         Base.Button
@@ -168,7 +171,8 @@ Expandable.MaskedSettingsPanel
                             width: datePicker.height;
                             height: datePicker.height;
 
-                            enabled: !useCurrentTimeCheckbox.checked;
+                            enabled: !useCurrentTimeCheckbox.checked
+                                && (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
 
                             Dialogs.CalendarDialog
                             {
@@ -196,6 +200,7 @@ Expandable.MaskedSettingsPanel
                     {
                         id: timePicker;
                         
+                        enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
                         initTime: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
                     }
@@ -206,7 +211,8 @@ Expandable.MaskedSettingsPanel
         
                         text: qsTr("Set current date/time");
                         initialCheckedState: Qt.Unchecked;
-                        
+                        enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
+
                         onCheckedChanged: 
                         {
                             if (checked)

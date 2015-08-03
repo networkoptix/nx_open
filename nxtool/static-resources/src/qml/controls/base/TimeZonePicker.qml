@@ -13,6 +13,8 @@ ComboBox
 
     dontUseWheel: true;
 
+    property bool pseudoEnabled: true;
+
     onHoveredChanged:
     {
         if (hovered)
@@ -38,7 +40,7 @@ ComboBox
     height: Common.SizeManager.clickableSizes.medium;
     width: height * 5;
 
-    opacity: enabled ? 1.0 : 0.5;
+    opacity: pseudoEnabled ? 1.0 : 0.5;
 
     currentIndex: initIndex;
 
@@ -92,6 +94,14 @@ ComboBox
         y: thisComponent.height;
     }
 
+    MouseArea
+    {
+        visible: !pseudoEnabled;
+
+        anchors.fill: parent;
+        onEntered: { toolTip.show(); }
+        onExited: { toolTip.hide(); }
+    }
 }
 
 
