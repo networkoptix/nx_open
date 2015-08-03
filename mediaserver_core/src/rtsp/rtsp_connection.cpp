@@ -43,7 +43,6 @@
 #include "http/custom_headers.h"
 #include "media_server/settings.h"
 
-
 class QnTcpListener;
 
 static const QByteArray ENDL("\r\n");
@@ -213,6 +212,7 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStre
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
+    directDisconnectAll();
     stop();
 }
 
@@ -906,7 +906,7 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
     }
 }
 
-void QnRtspConnectionProcessor::at_camera_resourceChanged()
+void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & /*resource*/)
 {
     Q_D(QnRtspConnectionProcessor);
     QMutexLocker lock(&d->mutex);
@@ -923,7 +923,7 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
     }
 }
 
-void QnRtspConnectionProcessor::at_camera_parentIdChanged()
+void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr & /*resource*/)
 {
     Q_D(QnRtspConnectionProcessor);
 
@@ -976,8 +976,19 @@ void QnRtspConnectionProcessor::createDataProvider()
         if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner) && d->mediaRes->toResource()->isInitialized()) {
             d->liveDpHi = camera->getLiveReader(QnServer::HiQualityCatalog);
             if (d->liveDpHi) {
-                connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
-                connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
+                Qn::directConnect(
+                    d->liveDpHi->getResource().data(), 
+                    &QnResource::parentIdChanged, 
+                    this, 
+                    &QnRtspConnectionProcessor::at_camera_parentIdChanged
+                );
+
+                Qn::directConnect(
+                    d->liveDpHi->getResource().data(), 
+                    &QnResource::resourceChanged, 
+                    this, 
+                    &QnRtspConnectionProcessor::at_camera_resourceChanged
+                );
             }
         }
         if (d->liveDpHi) {
