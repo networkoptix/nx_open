@@ -9,7 +9,7 @@
 namespace nx {
 namespace stun {
 
-using namespace attr;
+using namespace attrs;
 
 // This message parser buffer add a simple workaround with the original partial data buffer.
 // It will consume all the data in the user buffer, but provide a more consistent interface
@@ -161,7 +161,8 @@ Attribute* MessageParser::parseXORMappedAddress() {
             xor_comp = buffer.NextUint16(&ok);
             Q_ASSERT(ok);
             attribute->address.ipv6.array[i+2] = 
-                xor_comp ^ *reinterpret_cast<const std::uint16_t*>(header_.transaction_id.bytes+i*2);
+                xor_comp ^ *reinterpret_cast< const std::uint16_t* >(
+                        header_.transaction_id.data() + i * 2 );
         }
     }
     return attribute.release();
@@ -237,16 +238,16 @@ Attribute* MessageParser::parseMessageIntegrity() {
 }
 
 Attribute* MessageParser::parseUnknownAttribute() {
-    return new UnknownAttribute( attribute_.type, attribute_.value );
+    return new Unknown( attribute_.type, attribute_.value );
 }
 
 Attribute* MessageParser::parseValue() {
     switch( attribute_.type ) {
-    case static_cast<int>(attr::AttributeType::xorMappedAddress) : return parseXORMappedAddress();
-    case static_cast<int>(attr::AttributeType::errorCode) : return parseErrorCode();
-    case static_cast<int>(attr::AttributeType::messageIntegrity) : return parseMessageIntegrity();
-    case static_cast<int>(attr::AttributeType::fingerprint) : return parseFingerprint();
-    default: return parseUnknownAttribute();
+        case attrs::XOR_MAPPED_ADDRESS: return parseXORMappedAddress();
+        case attrs::ERROR_CODE:         return parseErrorCode();
+        case attrs::MESSAGE_INTEGRITY:  return parseMessageIntegrity();
+        case attrs::FINGER_PRINT:       return parseFingerprint();
+        default:                        return parseUnknownAttribute();
     }
 }
 
@@ -332,7 +333,7 @@ int MessageParser::parseHeaderMagicCookie( MessageParserBuffer& buffer ) {
 int MessageParser::parseHeaderTransactionID( MessageParserBuffer& buffer ) {
     Q_ASSERT(state_ == HEADER_TRANSACTION_ID );
     bool ok;
-    buffer.NextBytes( header_.transaction_id.bytes , TransactionID::TRANSACTION_ID_LENGTH , &ok);
+    buffer.NextBytes( header_.transaction_id.data(), header_.transaction_id.size(), &ok );
     if(!ok) {
       return IN_PROGRESS;
     }
@@ -342,7 +343,7 @@ int MessageParser::parseHeaderTransactionID( MessageParserBuffer& buffer ) {
     // Populate the header
     output_message_->header.messageClass = static_cast<MessageClass>(header_.message_class);
     output_message_->header.method = static_cast<int>(header_.message_method);
-    output_message_->header.transactionID = header_.transaction_id;
+    output_message_->header.transactionId = header_.transaction_id;
 
     state_ = MORE_VALUE;
     return SECTION_FINISH;
@@ -409,10 +410,10 @@ int MessageParser::parseAttributeValue( MessageParserBuffer& buffer ) {
     if( attr == NULL ) return FAILED;
     output_message_->attributes.emplace( attr->type(), std::unique_ptr<Attribute>(attr) );
     switch( attr->type() ) {
-    case AttributeType::fingerprint:
+    case attrs::FINGER_PRINT:
         state_ = END_FINGERPRINT;
         break;
-    case AttributeType::messageIntegrity:
+    case attrs::MESSAGE_INTEGRITY:
         state_ = END_MESSAGE_INTEGRITY;
         break;
     default:

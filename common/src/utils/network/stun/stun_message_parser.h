@@ -52,7 +52,9 @@ namespace stun {
         MessageParser() :
             output_message_(NULL),
             left_message_length_(0),
-            state_(HEADER_INITIAL_AND_TYPE){
+            state_(HEADER_INITIAL_AND_TYPE)
+        {
+            header_.transaction_id.resize( Header::TRANSACTION_ID_SIZE );
         }
 
         //!set message object to parse to
@@ -84,12 +86,12 @@ namespace stun {
     private:
         class MessageParserBuffer;
         // Attribute value parsing
-        attr::Attribute* parseXORMappedAddress();
-        attr::Attribute* parseErrorCode();
-        attr::Attribute* parseFingerprint();
-        attr::Attribute* parseMessageIntegrity();
-        attr::Attribute* parseUnknownAttribute();
-        attr::Attribute* parseValue();
+        attrs::Attribute* parseXORMappedAddress();
+        attrs::Attribute* parseErrorCode();
+        attrs::Attribute* parseFingerprint();
+        attrs::Attribute* parseMessageIntegrity();
+        attrs::Attribute* parseUnknownAttribute();
+        attrs::Attribute* parseValue();
         // LAP implementation
         int parseHeaderInitialAndType( MessageParserBuffer& buffer );
         int parseHeaderLength( MessageParserBuffer& buffer );
@@ -117,7 +119,7 @@ namespace stun {
                 // integrity only fingerprint will need to handle. And we just check the
                 // fingerprint message followed by the STUN packet. If we have found one
                 // our parser state converts to a END_FINGERPINT states
-                if( attribute_.type == static_cast<int>(attr::AttributeType::fingerprint) ) {
+                if( attribute_.type == attrs::FINGER_PRINT ) {
                     state_ = END_FINGERPRINT;
                 } else {
                     state_ = MORE_VALUE;
@@ -140,7 +142,7 @@ namespace stun {
             int message_class;
             int message_method;
             std::size_t message_length;
-            TransactionID transaction_id;
+            nx::Buffer transaction_id;
         };
         struct STUNAttr {
             std::uint16_t length;

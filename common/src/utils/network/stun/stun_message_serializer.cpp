@@ -12,7 +12,7 @@
 namespace nx {
 namespace stun {
 
-using namespace attr;
+using namespace attrs;
 
 class MessageSerializer::MessageSerializerBuffer {
 public:
@@ -153,7 +153,8 @@ nx_api::SerializerState::Type MessageSerializer::serializeMagicCookieAndTransact
         return nx_api::SerializerState::needMoreBufferSpace;
     }
     // Transaction ID
-    if( buffer->WriteBytes( message_.header.transactionID.bytes,TransactionID::TRANSACTION_ID_LENGTH) == NULL ) {
+    if( buffer->WriteBytes( message_.header.transactionId.data(),
+                            message_.header.transactionId.size() ) == NULL ) {
         return nx_api::SerializerState::needMoreBufferSpace;
     }
     return nx_api::SerializerState::done;
@@ -169,7 +170,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeHeader( MessageSeriali
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer , const attr::Attribute* attribute  , std::uint16_t** value_pos ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer , const attrs::Attribute* attribute  , std::uint16_t** value_pos ) {
     if( buffer->WriteUint16(static_cast<std::uint16_t>(attribute->type())) == NULL ) {
         return nx_api::SerializerState::needMoreBufferSpace;
     }
@@ -184,25 +185,25 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( MessageSerializerBuffer* buffer ,const attr::Attribute* attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( MessageSerializerBuffer* buffer ,const attrs::Attribute* attribute , std::size_t* value ) {
     switch( attribute->type() ) {
-    case AttributeType::errorCode:
+    case attrs::ERROR_CODE:
         return serializeAttributeValue_ErrorCode( buffer , *static_cast<const ErrorDescription*>(attribute) ,value);
-    case AttributeType::fingerprint:
+    case attrs::FINGER_PRINT:
         return serializeAttributeValue_Fingerprint( buffer , *static_cast<const FingerPrint*>(attribute) ,value);
-    case AttributeType::xorMappedAddress:
+    case attrs::XOR_MAPPED_ADDRESS:
         return serializeAttributeValue_XORMappedAddress( buffer , *static_cast<const XorMappedAddress*>(attribute) ,value);
-    case AttributeType::messageIntegrity:
+    case attrs::MESSAGE_INTEGRITY:
         return serializeAttributeValue_MessageIntegrity( buffer , *static_cast<const MessageIntegrity*>(attribute) ,value);
     default:
-        if( attribute->type() > AttributeType::unknownAttribute )
-            return serializeAttributeValue_UnknownAttribute( buffer , *static_cast<const UnknownAttribute*>(attribute) ,value);
+        if( attribute->type() > attrs::UNKNOWN_ATTRIBUTE )
+            return serializeAttributeValue_UnknownAttribute( buffer , *static_cast<const Unknown*>(attribute) ,value);
         Q_ASSERT(0);
         return nx_api::SerializerState::done;
     }
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attr::XorMappedAddress& attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attrs::XorMappedAddress& attribute , std::size_t* value ) {
     Q_ASSERT( attribute.family == XorMappedAddress::IPV4 || attribute.family == XorMappedAddress::IPV6 );
     std::size_t cur_pos = buffer->position();
     if( buffer->WriteUint16(attribute.family) == NULL ) 
@@ -220,8 +221,9 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
         xor_addr[1] = attribute.address.ipv6.array[1] ^ MAGIC_COOKIE_HIGH;
         // XOR for the transaction id
         for( std::size_t i = 2 ; i < 8 ; ++i ) {
-            xor_addr[i] = *reinterpret_cast<std::uint16_t*>(
-                message_.header.transactionID.bytes+(i-2)*2) ^ attribute.address.ipv6.array[i];
+            const auto tid = message_.header.transactionId.data() + (i-2) * 2;
+            xor_addr[i] = *reinterpret_cast< std::uint16_t* >( tid ) ^
+                          attribute.address.ipv6.array[i];
         }
 
         if( buffer->WriteIPV6Address(xor_addr) == NULL )
@@ -231,7 +233,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attr::FingerPrint& attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attrs::FingerPrint& attribute , std::size_t* value ) {
     Q_ASSERT( buffer->size() >= 24 ); // Header + FingerprintHeader
     // Ignore original FingerPrint message
     Q_UNUSED(attribute);
@@ -258,13 +260,13 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerp
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* ,const attr::MessageIntegrity& , std::size_t* ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* ,const attrs::MessageIntegrity& , std::size_t* ) {
     Q_ASSERT(0);
     // Needs username/password to implement this , I don't know how to do it now :(
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attr::UnknownAttribute& attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attrs::Unknown& attribute , std::size_t* value ) {
     std::size_t cur_pos = buffer->position();
     if( buffer->WriteBytes( attribute.value.constData() , attribute.value.size() ) == NULL ) 
         return nx_api::SerializerState::needMoreBufferSpace ;
@@ -279,7 +281,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Unknown
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attr::ErrorDescription&  attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorDescription&  attribute , std::size_t* value ) {
     std::size_t cur_pos = buffer->position();
     std::uint32_t error_header = attribute.code % 100;
     // We don't use attribute->_class value since we can get what we want from code
@@ -287,13 +289,13 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCo
     error_header |= (attribute.code / 100)<<8;
     if( buffer->WriteUint32(error_header) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace;
-    if( attribute.reasonPhrase.size() == 0 ) {
+    if( attribute.reason.size() == 0 ) {
         // This is an empty reason phase 
         *value = buffer->position() - cur_pos;
         return nx_api::SerializerState::done;
     }
     // UTF8 string 
-    nx::Buffer utf8_bytes = attribute.reasonPhrase;
+    nx::Buffer utf8_bytes = attribute.reason;
     if( buffer->WriteBytes( utf8_bytes.constData() , utf8_bytes.size() ) == NULL )
         return nx_api::SerializerState::needMoreBufferSpace;
     *value = buffer->position() - cur_pos;
@@ -306,12 +308,11 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCo
     return nx_api::SerializerState::done;
 }
 
-bool MessageSerializer::travelAllAttributes( const std::function<bool(const attr::Attribute*)>& callback ) {
-    Message::AttributesMap::const_iterator message_integrity =
-        message_.attributes.find(AttributeType::messageIntegrity);
-    Message::AttributesMap::const_iterator fingerprint =
-        message_.attributes.find(AttributeType::fingerprint);
-    for( Message::AttributesMap::const_iterator ib = message_.attributes.cbegin() ; ib != message_.attributes.cend() ; ++ib ) {
+bool MessageSerializer::travelAllAttributes( const std::function<bool(const attrs::Attribute*)>& callback ) {
+    auto message_integrity = message_.attributes.find(attrs::MESSAGE_INTEGRITY);
+    auto fingerprint = message_.attributes.find(attrs::FINGER_PRINT);
+
+    for( auto ib = message_.attributes.cbegin() ; ib != message_.attributes.cend() ; ++ib ) {
         if( ib != message_integrity && ib != fingerprint ) {
             if(!callback(ib->second.get())) 
                 return false;
@@ -356,17 +357,17 @@ bool MessageSerializer::checkMessageIntegratiy() {
         return false;
     }
     // 2. Checking the attributes 
-    Message::AttributesMap::const_iterator ib = message_.attributes.find(AttributeType::fingerprint);
+    auto ib = message_.attributes.find(attrs::FINGER_PRINT);
     if( ib != message_.attributes.end() && ++ib != message_.attributes.end() ) {
         return false;
     }
-    ib = message_.attributes.find(AttributeType::messageIntegrity);
+    ib = message_.attributes.find(attrs::MESSAGE_INTEGRITY);
     if( ib != message_.attributes.end() && ++ib != message_.attributes.end() ) {
         return false;
     }
     // 3. Checking the validation for specific attributes
     // ErrorCode message
-    ib = message_.attributes.find(AttributeType::errorCode);
+    ib = message_.attributes.find(attrs::ERROR_CODE);
     if( ib !=  message_.attributes.end() ) {
         // Checking the error code message
         ErrorDescription* error_code = static_cast<ErrorDescription*>(
@@ -376,7 +377,7 @@ bool MessageSerializer::checkMessageIntegratiy() {
         if( error_code->getNumber() < 0 || error_code->getNumber() >= 99 )
             return false;
         // RFC: The reason phrase string will at most be 127 characters
-        if( error_code->reasonPhrase.size() > 127 )
+        if( error_code->reason.size() > 127 )
             return false;
     }
     return true;

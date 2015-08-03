@@ -141,9 +141,7 @@ namespace nx_api
             Initiates asynchoronous message send
         */
         template<class Handler>
-        bool sendMessage(
-            MessageType&& msg,
-            Handler&& handler = std::function<void(SystemError::ErrorCode)>() )
+        bool sendMessage( MessageType&& msg, Handler&& handler )
         {
             //TODO: #ak interleaving is not supported yet
             assert( m_isSendingMessage == 0 );
@@ -152,11 +150,14 @@ namespace nx_api
             sendMessageInternal( std::move(msg) );
             return true;
         }
+        bool sendMessage( MessageType&& msg ) // template can not be resolved by default value
+        {
+            return sendMessage( std::move(msg),
+                                std::function< void( SystemError::ErrorCode ) >() );
+        }
 
         template<class BufferType, class Handler>
-        bool sendData(
-            BufferType&& data,
-            Handler&& handler = std::function<void( SystemError::ErrorCode )>() )
+        bool sendData( BufferType&& data, Handler&& handler )
         {
             assert( m_isSendingMessage == 0 && m_writeBuffer.isEmpty() );
             m_sendCompletionHandler = std::forward<Handler>( handler );

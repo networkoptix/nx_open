@@ -30,131 +30,98 @@ void StunServerConnection::processMessage( stun::Message&& message )
     switch( message.header.messageClass )
     {
         case stun::MessageClass::request:
-            switch( static_cast< stun::MethodType >( message.header.method ) )
+            switch( message.header.method )
             {
-                case stun::MethodType::binding:
-                    processGetIPAddressRequest( std::move(message) );
+                case stun::BINDING:
+                    {
+                        stun::Message response( stun::Header(
+                            stun::MessageClass::successResponse,
+                            stun::BINDING, std::move( message.header.transactionId ) ) );
+
+                        SocketAddress peer( peer_address_ );
+                        response.newAttribute< stun::attrs::XorMappedAddress >(
+                                    peer.port, peer.address.ipv4() );
+
+                        Q_ASSERT( sendMessage( std::move( response ) ) );
+                    }
                     break;
 
                 default:
-                    processProprietaryRequest( std::move(message) );
+                    {
+                        if( auto disp = STUNMessageDispatcher::instance() )
+                            if( disp->dispatchRequest( this, std::move(message) ) )
+                                return;
+
+                        stun::Message response( stun::Header(
+                            stun::MessageClass::errorResponse,
+                            message.header.method,
+                            std::move( message.header.transactionId ) ) );
+
+                        // TODO: verify with RFC
+                        response.newAttribute< stun::attrs::ErrorDescription >(
+                            error::NOT_FOUND, "Method is not supported" );
+
+                        Q_ASSERT( sendMessage( std::move( response ) ) );
+
+                    }
                     break;
             }
             break;
 
         default:
-            assert(false);  //not supported yet
+            Q_ASSERT( false );  //not supported yet
     }
 }
 
-void StunServerConnection::processGetIPAddressRequest( stun::Message&& request )
+/*
+void StunServerConnection::processBindingRequest( stun::Message&& request )
 {
-    const auto systemAttr = request.getAttribute< attr::SystemName >();
+    const auto tid = std::move( request.header.transactionId );
+
+    const auto systemAttr = request.getAttribute< attrs::SystemId >();
     if( !systemAttr ) {
-        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
-                        "Attribute systemName is required" );
+        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::BAD_REQUEST,
+                        "Attribute systemId is required" );
         return;
     }
 
-    const auto systemName = systemAttr->value;
-    if( !verifySystemName( systemName ) ) {
-        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
-                        String( "Wrong systemName: " ) + systemName );
+    const auto systemId = systemAttr->get();
+    if( !verifySystemName( systemId ) ) {
+        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::BAD_REQUEST,
+                        String( "Wrong systemId: " ) + systemId.toByteArray() );
         return;
     }
 
-    const auto serverAttr = request.getAttribute< attr::ServerId >();
+    const auto serverAttr = request.getAttribute< attrs::ServerId >();
     if( !serverAttr ) {
-        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
+        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::BAD_REQUEST,
                         "Attribute serverId is required" );
         return;
     }
 
-    const auto serverId = serverAttr->uuid();
+    const auto serverId = serverAttr->get();
     if( !verifyServerId( serverId ) ) {
-        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
+        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::BAD_REQUEST,
                         String( "Wrong serverId: " ) + serverId.toByteArray() );
         return;
     }
 
-    const auto authAttr = request.getAttribute< attr::Authorization >();
+    const auto authAttr = request.getAttribute< attrs::Authorization >();
     if( !authAttr ) {
-        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
+        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::UNAUTHTORIZED,
                         "Attribute authorization is required" );
         return;
     }
     if( !verifyAuthroization( authAttr->value ) ) {
-        sendErrorReply( request.header.transactionID, stun::ErrorCode::badRequest,
+        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::UNAUTHTORIZED,
                         String( "Authroization did not pass" ) );
         return;
 
     }
 
-    sendSuccessReply( request.header.transactionID );
+
 }
-
-void StunServerConnection::sendSuccessReply( const stun::TransactionID& transaction_id ) {
-    stun::Message message( stun::Header(
-        stun::MessageClass::successResponse,
-        stun::MethodType::binding, transaction_id ) );
-
-    std::unique_ptr<stun::attr::XorMappedAddress> addr( new stun::attr::XorMappedAddress() );
-    addr->family = stun::attr::XorMappedAddress::IPV4;
-    SocketAddress peer_addr( peer_address_ );
-    addr->address.ipv4 = peer_addr.address.ipv4(); // The endian is in host order 
-    addr->port = peer_addr.port;
-    message.addAttribute( std::move( addr ) );
-
-    bool ret = sendMessage(std::move(message),
-        std::bind(
-        &StunServerConnection::onSendComplete,
-        this,
-        std::placeholders::_1));
-
-    Q_ASSERT(ret);
-}
-
-void StunServerConnection::processProprietaryRequest( stun::Message&& request )
-{
-    if( !STUNMessageDispatcher::instance()->dispatchRequest( this, std::move(request) ) )
-    {
-        //TODO creating and sending error response
-    }
-}
-
-void StunServerConnection::sendErrorReply( const stun::TransactionID& transaction_id,
-                                           stun::ErrorCode::Type errorCode,
-                                           nx::String description )
-{
-    // Currently for the reason phase, we just put empty string there
-    stun::Message message( stun::Header(
-        stun::MessageClass::errorResponse,
-        Methods::listen, transaction_id ));
-    message.addAttribute( std::make_unique< stun::attr::ErrorDescription >(
-        errorCode, description ) );
-
-    bool ret = sendMessage(std::move(message),
-        std::bind(
-        &StunServerConnection::onSendComplete,
-        this,
-        std::placeholders::_1));
-    Q_ASSERT(ret);
-}
-
-bool StunServerConnection::verifySystemName( const String& name ) {
-    Q_UNUSED(name);
-    return true;
-}
-
-bool StunServerConnection::verifyServerId( const QnUuid& id ) {
-    Q_UNUSED(id);
-    return true;
-}
-
-bool StunServerConnection::verifyAuthroization( const String& auth ) {
-    Q_UNUSED(auth);
-    return true;
-}
+    */
 
 } // namespace hpm
 } // namespace nx

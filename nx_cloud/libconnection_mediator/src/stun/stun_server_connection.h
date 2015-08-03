@@ -41,30 +41,11 @@ public:
         StreamConnectionHolder<StunServerConnection>* socketServer,
         std::unique_ptr<AbstractCommunicatingSocket> sock );
 
-    void processMessage( stun::Message&& request );
+    void processMessage( stun::Message&& message );
 
 private:
-    void processGetIPAddressRequest( stun::Message&& request );
-    void processProprietaryRequest( stun::Message&& request );
-    void sendErrorReply( const stun::TransactionID& transaciton_id,
-                         stun::ErrorCode::Type errorCode,\
-                         nx::String description );
-    void sendSuccessReply( const stun::TransactionID& transaction_id );
-
-    // Verification routine for Bind session
-    // TODO:: Once these steps clear, we can add verification function for each
-    // attributes. 
-
-    bool verifySystemName( const String& name );
-    bool verifyServerId( const QnUuid& id );
-    bool verifyAuthroization( const String& auth );
-
-    void onSendComplete( SystemError::ErrorCode ec ) {
-        Q_UNUSED(ec);
-        // After sending the request, then we start to read the response
-        bool ret = BaseType::startReadingConnection();
-        Q_ASSERT(ret);
-    }
+    void processBindingRequest( stun::Message&& request );
+    void processCustomRequest( stun::Message&& request );
 
 private:
     SocketAddress peer_address_;

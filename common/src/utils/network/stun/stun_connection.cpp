@@ -224,8 +224,8 @@ namespace stun {
     }
 
     bool StunClientConnection::hasErrorAttribute( const Message& msg ) {
-        for( auto& attr : msg.attributes ) {
-            if( attr.second->type() == attr::AttributeType::errorCode )
+        for( auto& attribute : msg.attributes ) {
+            if( attribute.second->type() == attrs::ERROR_CODE )
                 return true;
         }
         return false;

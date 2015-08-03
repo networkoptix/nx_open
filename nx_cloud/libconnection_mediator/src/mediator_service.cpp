@@ -134,18 +134,8 @@ int MediatorProcess::executeApplication()
 
     //STUN handlers
     ListeningPeerPool listeningPeerPool;
-
     STUNMessageDispatcher stunMessageDispatcher;
-    stunMessageDispatcher.registerRequestProcessor(
-        Methods::listen,
-        [&listeningPeerPool](StunServerConnection* connection, stun::Message&& message) -> bool {
-            return listeningPeerPool.processListenRequest( connection, std::move(message) );
-        } );
-    stunMessageDispatcher.registerRequestProcessor(
-        Methods::connect,
-        [&listeningPeerPool](StunServerConnection* connection, stun::Message&& message) -> bool {
-            return listeningPeerPool.processConnectRequest( connection, std::move(message) );
-        } );
+    listeningPeerPool.registerRequestProcessors( stunMessageDispatcher );
 
     //accepting STUN requests by both tcp and udt
     m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>( stunAddrToListenList, true, SocketFactory::nttAuto ) );

@@ -41,20 +41,20 @@ namespace stun {
         nx_api::SerializerState::Type serializeMagicCookieAndTransactionID( MessageSerializerBuffer* buffer );
         // attribute serialization
         nx_api::SerializerState::Type serializeAttributes( MessageSerializerBuffer* buffer , std::uint16_t* length );
-        nx_api::SerializerState::Type serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer ,const attr::Attribute* attribute , std::uint16_t** value_pos );
-        nx_api::SerializerState::Type serializeAttributeValue( MessageSerializerBuffer* buffer ,const attr::Attribute* attribute , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer ,const attrs::Attribute* attribute , std::uint16_t** value_pos );
+        nx_api::SerializerState::Type serializeAttributeValue( MessageSerializerBuffer* buffer ,const attrs::Attribute* attribute , std::size_t* value );
         // value 
-        nx_api::SerializerState::Type serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attr::XorMappedAddress& , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attr::FingerPrint& , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attr::ErrorDescription& , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* buffer ,const attr::MessageIntegrity& , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attr::UnknownAttribute& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attrs::XorMappedAddress& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attrs::FingerPrint& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorDescription& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_MessageIntegrity( MessageSerializerBuffer* buffer ,const attrs::MessageIntegrity& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_UnknownAttribute( MessageSerializerBuffer* buffer ,const attrs::Unknown& , std::size_t* value );
         // this function will do minimum checking for the message object
         bool checkMessageIntegratiy();
         // This helper function ensure that while we traveling the attributes of a message, the MessageIntegrity and the
         // FingerPrint will be ensured to exist at last. The RFC doesn't restrict the order of the attributes, but I guess
         // the unorder_map is OK here, as long as we ensure the MessageIntegrity and FingerPrint message order .
-        bool travelAllAttributes( const std::function<bool(const attr::Attribute*)>& );
+        bool travelAllAttributes( const std::function<bool(const attrs::Attribute*)>& );
         std::size_t calculatePaddingSize( std::size_t size ) {
             static const std::size_t kAlignMask = 3;
             return (size + kAlignMask) & ~kAlignMask;
