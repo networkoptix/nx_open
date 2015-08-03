@@ -13,8 +13,9 @@
 
 #include "utils/common/id.h"
 #include "utils/common/timermanager.h"
-#include "utils/network/http/httptypes.h"
 #include "utils/common/uuid.h"
+#include "utils/network/http/httptypes.h"
+#include "utils/thread/mutex.h"
 
 
 namespace AuthMethod

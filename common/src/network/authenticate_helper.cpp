@@ -111,7 +111,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         return false;   //NOTE assert?
 
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( urlQuery.hasQueryItem( TEMP_AUTH_KEY_NAME ) )
         {
             auto it = m_authenticatedPaths.find( urlQuery.queryItemValue( TEMP_AUTH_KEY_NAME ) );
@@ -284,7 +284,7 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath( cons
     authKey.replace( lit("}"), QString() );
 
     //disabling authentication
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     //adding active period
     TimerManager::TimerGuard timerGuard(
@@ -302,7 +302,7 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath( cons
 
 void QnAuthHelper::authenticationExpired( const QString& authKey, quint64 /*timerID*/ )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_authenticatedPaths.erase( authKey );
 }
 
@@ -649,7 +649,7 @@ bool QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, const 
     if( !isNonceValid( nonce ) )
         return false;
 
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     for( const QnUserResourcePtr& user : m_users )
     {
         if( user->getName().toUtf8().toLower() != userName )

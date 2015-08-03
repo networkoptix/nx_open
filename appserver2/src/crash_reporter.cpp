@@ -55,7 +55,7 @@ CrashReporter::~CrashReporter()
 {
     boost::optional<qint64> timerId;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         m_terminated = true;
         timerId = m_timerId;
     }
@@ -137,7 +137,7 @@ void CrashReporter::scanAndReportByTimer(QSettings* settings)
 {
     scanAndReportAsync(settings);
 
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk(&m_mutex);
     if (!m_terminated)
         m_timerId = TimerManager::instance()->addTimer(
             std::bind(&CrashReporter::scanAndReportByTimer, this, settings), SCAN_TIMER_CYCLE);
@@ -213,7 +213,7 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
     for (const auto crash : readCrashes())
         QFile::remove(crash.absoluteFilePath());
 
-    QMutexLocker lock(&m_host.m_mutex);
+    QnMutexLocker lock(&m_host.m_mutex);
     Q_ASSERT(!m_host.m_activeHttpClient || m_host.m_activeHttpClient == httpClient);
     m_host.m_activeHttpClient.reset();
 }
