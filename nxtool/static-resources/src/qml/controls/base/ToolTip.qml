@@ -33,7 +33,7 @@ Item
     {
         thisComponent.globalParent = thisComponent.parent;
         var p = thisComponent.parent;
-        while (p.parent != undefined && p.parent.parent != undefined);
+        while (p.parent != undefined && p.parent.parent != undefined)
             p = p.parent;
         thisComponent.parent = p;
 
