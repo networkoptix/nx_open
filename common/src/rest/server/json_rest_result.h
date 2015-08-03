@@ -4,9 +4,7 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
-#include <utils/common/model_functions_fwd.h>
-#include <utils/serialization/json.h>
-
+#include <utils/common/model_functions.h>
 
 // TODO: #MSAPI rename to QnRestResult.
 // 
