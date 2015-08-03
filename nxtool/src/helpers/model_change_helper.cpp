@@ -32,6 +32,7 @@ rtu::ModelChangeHelper::ModelChangeHelper(const RowsActionFunction &beginInsertR
     , const ActionFunction &beginResetModel
     , const ActionFunction &endResetModel
     , const RowsActionFunction &dataChangedFunction
+    , const ActionFunction &layoutChanged
     , QObject *parent)
     : QObject(parent)
     , m_beginInsertRows(beginInsertRows)
@@ -41,6 +42,7 @@ rtu::ModelChangeHelper::ModelChangeHelper(const RowsActionFunction &beginInsertR
     , m_beginResetModel(beginResetModel)
     , m_endResetModel(endResetModel)
     , m_dataChangedFunction(dataChangedFunction)
+    , m_layoutChanged(layoutChanged)
 {
 }
 
@@ -52,14 +54,26 @@ rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::insertRowsGuard(int startI
     , int finishIndex)
 {
     m_beginInsertRows(startIndex, finishIndex);
-    return Guard(new ChangeGuard(m_endInsertRows));
+    return Guard(new ChangeGuard([this]()
+    {
+        if (m_endInsertRows)
+            m_endInsertRows();
+        if (m_layoutChanged)
+            m_layoutChanged();
+    }));
 }
 
 rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::removeRowsGuard(int startIndex
     , int finishIndex)
 {
     m_beginRemoveRows(startIndex, finishIndex);
-    return Guard(new ChangeGuard(m_endRemoveRows));
+    return Guard(new ChangeGuard([this]()
+    {
+        if (m_endRemoveRows)
+            m_endRemoveRows();
+        if (m_layoutChanged)
+            m_layoutChanged();
+    }));
 }
 
 rtu::ModelChangeHelper::Guard rtu::ModelChangeHelper::resetModelGuard()

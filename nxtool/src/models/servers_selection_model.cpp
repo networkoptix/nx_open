@@ -25,7 +25,8 @@ namespace
     };
 
     ServerModelInfo::ServerModelInfo()
-        : selectedState()
+        : updateTimestamp(0)
+        , selectedState()
         , serverInfo()
     {}
 
@@ -1015,7 +1016,6 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
         ? QString() : info.baseInfo().systemName);
 
     int row = 0;
-    bool exist = true;
     SystemModelInfo *systemModelInfo = findSystemModelInfo(systemName, row);
     if (!systemModelInfo)
     {
@@ -1024,31 +1024,38 @@ void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
         SystemModelInfosVector::iterator place = std::lower_bound(m_systems.begin(), m_systems.end(), systemInfo,
             [](const SystemModelInfo &left, const SystemModelInfo &right) { 
                 return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0; });
+        
+        if (place == m_systems.end())
+        {
+            row = knownEntitiesCount();
+        }
+        else
+        {
+            findSystemModelInfo(place->name, row);
+        }
 
-        m_systems.insert(place, systemInfo);
-        systemModelInfo = findSystemModelInfo(systemName, row);
-        exist = false;
+        const auto &guard = m_changeHelper->insertRowsGuard(row, row);
+        systemModelInfo = m_systems.insert(place, systemInfo);
     }
 
-    /// TODO: #ynikitenkov change for QElapsedTimer implementation
-    systemModelInfo->servers.push_back(ServerModelInfo(QDateTime::currentMSecsSinceEpoch(), selected, info));
+    {
+        const int serverRow = (row + systemModelInfo->servers.size() + 1);
+        const auto &guard = m_changeHelper->insertRowsGuard(serverRow, serverRow);
+        Q_UNUSED(guard);
+    
+        /// TODO: #ynikitenkov change for QElapsedTimer implementation
+        systemModelInfo->servers.push_back(ServerModelInfo(QDateTime::currentMSecsSinceEpoch(), selected, info));
+    }
+
     systemModelInfo->loggedServers += (info.hasExtraInfo() ? 1 : 0);
 
     if (selected != Qt::Unchecked)
         ++systemModelInfo->selectedServers;
-
-    const int rowStart = (exist ? row + systemModelInfo->servers.size() : row);
-    const int rowFinish = (row + systemModelInfo->servers.size());
-    
-    const auto &modelChangeAction = m_changeHelper->insertRowsGuard(rowStart, rowFinish);
-    Q_UNUSED(modelChangeAction);
+    m_changeHelper->dataChanged(row, row);
 
     if (!info.hasExtraInfo())
         m_serverInfoManager->loginToServer(info.baseInfo()
             , m_updateExtra, m_updateExtraFailed);
-
-    if (exist)
-        m_changeHelper->dataChanged(row, row);
 
     emit m_owner->serversCountChanged();
 }
