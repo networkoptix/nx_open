@@ -335,22 +335,11 @@ angular.module('webadminApp')
                 }
 
                 // !!! Labels logic
-                //var currentTopLabelLevelIndex = 0;
-                //var targetTopLabelLevelIndex = 0;
-                scope.changingTopLevel = 1;
                 function drawTopLabels(context){
-                    var instantLevelIndex = scope.scaleManager.levels.top.index;
-                    /*if(instantLevelIndex != targetTopLabelLevelIndex){ // Start animation here
-                        targetTopLabelLevelIndex = instantLevelIndex;
-                        animateScope.progress(scope,'changingTopLevel').then(function(){
-                            currentTopLabelLevelIndex = targetTopLabelLevelIndex;
-                        });
-                    }*/
-
                     drawLabelsRow(context,
-                        instantLevelIndex,
-                        instantLevelIndex,
-                        scope.changingTopLevel,
+                        scope.scaleManager.levels.top.index,
+                        scope.scaleManager.levels.top.index,
+                        1,
                         "topFormat",
                         timelineConfig.topLabelFixed,
                         0,
@@ -365,8 +354,6 @@ angular.module('webadminApp')
                         timelineConfig.topLabelMarkerHeight);
                 }
 
-                var currentLabelLevelIndex = 0;
-                var targetLabelLevelIndex = 0;
                 scope.changingLevel = 1;
                 function drawLabels(context){
                     if(timelineConfig.oldStyle) {
@@ -387,21 +374,11 @@ angular.module('webadminApp')
                         return;
                     }
 
-
-                    var instantLevelIndex = scope.scaleManager.levels.labels.index;
-                    if(instantLevelIndex != targetLabelLevelIndex){ // Start animation here
-                        targetLabelLevelIndex = instantLevelIndex;
-                        animateScope.progress(scope,'changingLevel').then(function(){
-                            currentLabelLevelIndex = targetLabelLevelIndex;
-                        });
-                    }
-
-
                     drawLabelsRow(
                         context,
-                        currentLabelLevelIndex,
-                        targetLabelLevelIndex,
-                        scope.changingLevel,
+                        currentLevels.labels.index,
+                        targetLevels.labels.index,
+                        scope.zooming,
                         "format",
                         timelineConfig.labelFixed,
                         timelineConfig.topLabelHeight,
@@ -418,25 +395,12 @@ angular.module('webadminApp')
                     drawMarks(context);
                 }
 
-
-                var currentMarksLevelIndex = 0;
-                var targetMarksLevelIndex = 0;
-                scope.changingMarksLevel = 1;
                 function drawMarks(context){
-                    var instantLevelIndex = scope.scaleManager.levels.marks.index;
-                    if(instantLevelIndex != targetMarksLevelIndex){ // Start animation here
-                        targetMarksLevelIndex = instantLevelIndex;
-                        animateScope.progress(scope,'changingMarksLevel').then(function(){
-
-                            currentMarksLevelIndex = targetMarksLevelIndex;
-                        });
-                    }
-
                     drawLabelsRow(
                         context,
-                        currentMarksLevelIndex,
-                        targetMarksLevelIndex,
-                        scope.changingMarksLevel,
+                        currentLevels.marks.index,
+                        targetLevels.marks.index,
+                        scope.zooming,
                         false,// No format
                         "none",
                         timelineConfig.topLabelHeight,
@@ -526,44 +490,6 @@ angular.module('webadminApp')
                         return "events";
                     }
 
-
-                    function getLowerLevelName(levelName){
-                        switch(levelName){
-                            case "labels":
-                                return "middle";
-
-                            case "middle":
-                                return "small";
-
-                            case "small":
-                                return "marks";
-
-                            case "marks":
-                                return "events";
-
-                            case "events":
-                            default:
-                                return "events";
-                        }
-                    }
-                    function getUpperLevelName(levelName){ // Next level
-                        switch(levelName){
-                            case "labels":
-                            case "middle":
-                                return "labels";
-
-                            case "small":
-                                return "middle";
-
-                            case "marks":
-                                return "small";
-
-                            case "events":
-                            default:
-                                return "marks";
-                        }
-                    }
-
                     function interpolate(alpha, min, max){ // Find value during animation
                         return min + alpha * (max - min);
                     }
@@ -572,14 +498,19 @@ angular.module('webadminApp')
                     var levelIndex = Math.max(scope.scaleManager.levels.marks.index, targetLevels.marks.index); // Target level is lowest of visible
                     var level = RulerModel.levels[levelIndex]; // Actual calculating level
 
-                    var start1 = scope.scaleManager.alignStart(level);
-                    var start = scope.scaleManager.alignStart(level);
+                    var start = scope.scaleManager.alignStart(RulerModel.levels[levelIndex>0?(levelIndex-1):0]); // Align start by upper level!
+                    var point = start;
                     var end = scope.scaleManager.alignEnd(level);
 
-                    var counter = 2000;// Protection from neverending cycles.
-                    while(start <= end && counter-- > 0){
-                        var odd = Math.round((start.getTime() / level.interval.getMilliseconds())) % 2 === 1; // add or even for zebra coloring
-                        var pointLevelIndex = RulerModel.findBestLevelIndex(start);
+                    var counter = 0;// Protection from neverending cycles.
+
+                    while(point <= end && counter++ < 3000){
+                        var odd = bgColor!= bgOddColor || Math.round((point.getTime() / level.interval.getMilliseconds())) % 2 === 1; // add or even for zebra coloring
+
+                        var pointLevelIndex = levelIndex;
+                        //if(counter % level.contained == 0){
+                            pointLevelIndex = RulerModel.findBestLevelIndex(point, levelIndex);
+                        //}
 
                         var levelName = getBestLevelName(pointLevelIndex); // Here we detect best level for this particular point
 
@@ -600,14 +531,14 @@ angular.module('webadminApp')
                         font.size = fontSize; // Set font size for label
 
                         //Draw lebel, using calculated values
-                        drawLabel(context, start, level, transparency,
+                        drawLabel(context, point, level, transparency,
                             labelFormat, labelFixed, levelTop, levelHeight,
                             font, labelAlign, odd?bgColor: bgOddColor, markColor, labelPositionFix, markAttach, markSize);
 
-                        start = level.interval.addToDate(start);
+                        point = level.interval.addToDate(point);
                     }
-                    if(counter < 1){
-                        console.error("problem!", start1, start, end, level);
+                    if(counter == 3000){
+                        console.error("counter problem!", start,point, end, level);
                     }
                 }
 

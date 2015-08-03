@@ -169,9 +169,7 @@ var RulerModel = {
         { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , marksW:15, smallW: 30, middleW: 60, width: 90 },
         { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , marksW:15, smallW: 30, middleW: 60, width: 90 },
         { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , marksW:15, smallW: 30, middleW: 60, width: 90 , topW: 170, topFormat:'mmmm yyyy'},
-        //{ name:'15 Days'    , interval:  new Interval(  0, 0, 0, 0,15, 0, 0), format:'dd'   , width: 60 },
-        //{ name:'5 Days'     , interval:  new Interval(  0, 0, 0, 0, 5, 0, 0), format:'dd'   , width: 60 },
-        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , marksW:5,  smallW: 20, middleW: 40, width: 60 , topW: 170, topFormat:'d mmmm yyyy'},
+        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , marksW:5,  smallW: 20, middleW: 40, width: 60 , topW: 170, topFormat:'d mmmm yyyy' ,contained:1},
         { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 60, middleW: 80, width: 100},
         { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 60, width: 80 },
         { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 60, width: 80 },
@@ -194,26 +192,46 @@ var RulerModel = {
             return level.interval.getMilliseconds() < searchdetailization/width;
         }) ;
 
-        return typeof(targetLevel)!=='undefined' ? RulerModel.levels.indexOf(targetLevel) : RulerModel.levels.length-1;
+        return typeof(targetLevel)!=='undefined' ? this.levels.indexOf(targetLevel) : this.levels.length-1;
     },
 
 
-    findBestLevelIndex:function(date){
-        var idx = 0;
-        var findLevel = function(level,index){
-            if(level.interval.checkDate(date)) {
-                idx = index;
-                return true;
+    findBestLevelIndex:function(date, maxLevelIndex){
+        if(maxLevelIndex) {
+            var maxLevel = Math.min(maxLevelIndex - 1, this.levels.length - 1);
+
+            for (var i = maxLevel; i >= 0; i--) {
+                if (!this.levels[i].interval.checkDate(date)) {
+                    return i + 1;
+                }
             }
-            return false;
-        };
-        _.find(RulerModel.levels,findLevel);
-        return idx;
+            return i;
+        }
+
+        for (var i = 0; i < this.levels.length; i++) {
+            if (this.levels[i].interval.checkDate(date)) {
+                return i;
+            }
+        }
+        return this.levels.length-1;
+
     },
     findBestLevel:function(date){
         return this.levels[this.findBestLevelIndex(date)];
     }
 };
+
+
+(function initLevels(){
+    for(var i=0; i < RulerModel.levels.length - 1; i++){
+        if(typeof(RulerModel.levels[i+1].contained) == 'undefined'){
+            RulerModel.levels[i+1].contained = Math.round(RulerModel.levels[i].interval.getMilliseconds() / RulerModel.levels[i+1].interval.getMilliseconds());
+        }
+    }
+    if(typeof(RulerModel.levels[0].contained) == 'undefined') {
+        RulerModel.levels[0].contained = 1;
+    }
+})();
 
 
 
