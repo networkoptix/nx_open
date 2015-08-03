@@ -25,7 +25,7 @@ AudioStreamReader::AudioStreamReader()
 :
     m_prevReceiverID(0),
     m_initializedInitially(false),
-    m_ptsMapper(MS_PER_SEC, &TimeSynchronizationData::instance()->timeSyncData, AUDIO_ENCODER_ID),
+    m_ptsMapper(MS_PER_SEC, PTS_BITS, &TimeSynchronizationData::instance()->timeSyncData, AUDIO_ENCODER_ID),
     m_framesSinceTimeResync(MAX_FRAMES_BETWEEN_TIME_RESYNC)
 {
 }

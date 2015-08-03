@@ -59,14 +59,6 @@ bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
     if (!QFile::remove(fileName))
         return false;
-    QString dirName = fileName.left(fileName.lastIndexOf(QDir::separator()));
-    while(1) 
-    {
-        QDir dir (dirName);
-        if (!dir.rmdir(dirName))
-            break;
-        dirName = dirName.left(dirName.lastIndexOf(QDir::separator()));
-    }
     return true;
 }
 

@@ -31,7 +31,7 @@ namespace CameraDiagnostics
         QnMediaServerResourcePtr serverResource = camera->getParentServer();
         if( !serverResource )
             return;
-        m_serverConnection = serverResource->apiConnection();
+        m_server = serverResource;
         m_serverHostAddress = QUrl(serverResource->getApiUrl()).host();
     }
 
@@ -93,7 +93,7 @@ namespace CameraDiagnostics
         emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
 
         emit diagnosticsStepStarted( static_cast<Step::Value>(m_step+1) );
-        if( m_serverConnection->doCameraDiagnosticsStepAsync(
+        if( m_server->apiConnection()->doCameraDiagnosticsStepAsync(
                 m_cameraID,
                 static_cast<Step::Value>(m_step+1),
                 this,
@@ -155,7 +155,7 @@ namespace CameraDiagnostics
         m_step = nextStep;
         emit diagnosticsStepStarted( m_step );
 
-        if( m_serverConnection->doCameraDiagnosticsStepAsync(
+        if( m_server->apiConnection()->doCameraDiagnosticsStepAsync(
                 m_cameraID,
                 m_step,
                 this,
@@ -174,8 +174,8 @@ namespace CameraDiagnostics
     {
         emit diagnosticsStepStarted( m_step );
 
-        if( !m_serverConnection ||
-            m_serverConnection->getSystemNameAsync(
+        if( !m_server || !m_server->apiConnection() ||
+            m_server->apiConnection()->getSystemNameAsync(
                 this,
                 SLOT(onGetServerSystemNameResponse(int, QString, int)) ) == -1 )
         {

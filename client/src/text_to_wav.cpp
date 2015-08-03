@@ -11,6 +11,9 @@
 
 #include "text_to_wav.h"
 
+#ifdef QN_USE_VLD
+#include <vld.h>
+#endif
 
 static char festivalVoxPath[256];
 
@@ -227,11 +230,18 @@ class FestivalInitializer
 public:
     FestivalInitializer()
     {
+#ifdef QN_USE_VLD
+        VLDDisable();
+#endif
         initFestival();
+#ifdef QN_USE_VLD
+        VLDEnable();
+#endif
     }
 
     ~FestivalInitializer()
     {
+        festival_wait_for_spooler();
         festival_tidy_up();
     }
 };

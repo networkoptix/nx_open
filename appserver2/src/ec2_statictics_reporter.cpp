@@ -232,8 +232,7 @@ namespace ec2
     {
         if (!isAllowed(m_msManager))
         {
-            NX_LOG(lit("Ec2StaticticsReporter: Automatic report system is disabled"),
-                   cl_logDEBUG2);
+            NX_LOG(lit("Ec2StaticticsReporter: Automatic report system is disabled"), cl_logINFO);
 
             // Better luck next time (if report system will be enabled by another mediaserver)
             setupTimer();

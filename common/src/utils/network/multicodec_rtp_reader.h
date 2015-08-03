@@ -11,6 +11,7 @@
 #include "core/datapacket/media_data_packet.h"
 #include "utils/camera/camera_diagnostics.h"
 #include "utils/common/stoppable.h"
+#include <utils/common/safe_direct_connection.h>
 #include "utils/network/rtpsession.h"
 
 #include <business/business_fwd.h>
@@ -37,7 +38,8 @@ class QnMulticodecRtpReader
     public QObject,
     public QnResourceConsumer,
     public QnAbstractMediaStreamProvider,
-    public QnStoppable
+    public QnStoppable,
+    public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 

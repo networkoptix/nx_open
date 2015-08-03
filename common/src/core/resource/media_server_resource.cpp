@@ -20,6 +20,7 @@
 #include "core/resource/security_cam_resource.h"
 #include "core/resource_management/server_additional_addresses_dictionary.h"
 #include "nx_ec/ec_proto_version.h"
+#include <network/authenticate_helper.h>
 
 
 class QnMediaServerResourceGuard: public QObject {
@@ -504,4 +505,9 @@ QString QnMediaServerResource::getAuthKey() const
 void QnMediaServerResource::setAuthKey(const QString& authKey)
 {
     m_authKey = authKey;
+}
+
+QString QnMediaServerResource::realm() const
+{
+    return QnAuthHelper::REALM;
 }

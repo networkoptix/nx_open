@@ -14,7 +14,7 @@ void QnProgressBar::initStyleOption(QnStyleOptionProgressBar *option) const {
 }
 
 void QnProgressBar::paintEvent(QPaintEvent *event) {
-    static_cast<void>(event);
+    Q_UNUSED(event);
 
     QStylePainter paint(this);
     QnStyleOptionProgressBar opt;

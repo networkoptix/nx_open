@@ -48,7 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Подтвердите пароль</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Дополнительные параметры</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Разрешить системе оптимизировать настройки камер (рекомендуется)</String>   
-    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">Send anonymous usage and crash statistics to software developers</String>   
+    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">Отправлять разработчикам анонимную статистику использования и сбоев (рекомендуется)</String>   
     
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Воспроизвести с помощью ${display.product.name}</String>
@@ -56,6 +56,10 @@
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Ярлыки</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">Поместить ярлык на рабочий стол</String>
+    
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">Ярлыки</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">Поместить ярлык на рабочий стол</String>
     
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Установлена более поздняя версия [ProductName].</String> 
@@ -126,6 +130,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Запустить ${display.product.name} по окончании установки.</String>    
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">Запустить ${nxtool.name} по окончании установки.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">Этот продукт предназначен для 32-разрядной ОС. Установка будет закончена.</String>    
 
     <!-- SelectionWarningDlg -->

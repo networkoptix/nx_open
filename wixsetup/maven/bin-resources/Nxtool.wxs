@@ -86,46 +86,46 @@
         
         <ComponentGroup Id="QtQuickControlsFiles" Directory="QtQuickControls">
             <Component>
-                <File Id="qtquickcontrolsplugin$(var.suffix).dll" Name="qtquickcontrolsplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Controls\qtquickcontrolsplugin$(var.suffix).dll" DiskId="1"/>
+                <File Id="qtquickcontrolsplugin$(var.suffix).dll" Name="qtquickcontrolsplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Controls\qtquickcontrolsplugin$(var.suffix).dll" DiskId="1"/>
             </Component>  
             <Component>
-                <File Id="qtquickcontrolsplugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Controls\qmldir" DiskId="1"/>
+                <File Id="qtquickcontrolsplugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Controls\qmldir" DiskId="1"/>
             </Component>          
         </ComponentGroup>      
 
         <ComponentGroup Id="QtQuickDialogsFiles" Directory="QtQuickDialogs">
             <Component>
-                <File Id="dialogplugin$(var.suffix).dll" Name="dialogplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Dialogs\dialogplugin$(var.suffix).dll" DiskId="1"/>
+                <File Id="dialogplugin$(var.suffix).dll" Name="dialogplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Dialogs\dialogplugin$(var.suffix).dll" DiskId="1"/>
             </Component>  
             <Component>
-                <File Id="qquicklayoutsplugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Dialogs\qmldir" DiskId="1"/>
+                <File Id="qquicklayoutsplugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Dialogs\qmldir" DiskId="1"/>
             </Component>          
         </ComponentGroup>  
 
         <ComponentGroup Id="QtQuickLayoutsFiles" Directory="QtQuickLayouts">
             <Component>
-                <File Id="qquicklayoutsplugin$(var.suffix).dll" Name="qquicklayoutsplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Layouts\qquicklayoutsplugin$(var.suffix).dll" DiskId="1"/>
+                <File Id="qquicklayoutsplugin$(var.suffix).dll" Name="qquicklayoutsplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Layouts\qquicklayoutsplugin$(var.suffix).dll" DiskId="1"/>
             </Component>  
             <Component>
-                <File Id="qtquickcontrols_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Layouts\qmldir" DiskId="1"/>
+                <File Id="qtquickcontrols_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Layouts\qmldir" DiskId="1"/>
             </Component>          
         </ComponentGroup>  
 
         <ComponentGroup Id="QtQuickWindow2Files" Directory="QtQuickWindow2">
             <Component>
-                <File Id="windowplugin$(var.suffix).dll" Name="windowplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Window.2\windowplugin$(var.suffix).dll" DiskId="1"/>
+                <File Id="windowplugin$(var.suffix).dll" Name="windowplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Window.2\windowplugin$(var.suffix).dll" DiskId="1"/>
             </Component>  
             <Component>
-                <File Id="windowplugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick\Window.2\qmldir" DiskId="1"/>
+                <File Id="windowplugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Window.2\qmldir" DiskId="1"/>
             </Component>          
         </ComponentGroup>   
 
         <ComponentGroup Id="QtQuick2Files" Directory="QtQuick2">
             <Component>
-                <File Id="qtquick2plugin$(var.suffix).dll" Name="qtquick2plugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick.2\qtquick2plugin$(var.suffix).dll" DiskId="1"/>
+                <File Id="qtquick2plugin$(var.suffix).dll" Name="qtquick2plugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick.2\qtquick2plugin$(var.suffix).dll" DiskId="1"/>
             </Component>  
             <Component>
-                <File Id="qtquick2plugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\..\qml\QtQuick.2\qmldir" DiskId="1"/>
+                <File Id="qtquick2plugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\qml\QtQuick.2\qmldir" DiskId="1"/>
             </Component>          
         </ComponentGroup>           
         

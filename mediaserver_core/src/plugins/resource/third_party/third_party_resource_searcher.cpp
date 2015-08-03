@@ -31,9 +31,9 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher()
         std::back_inserter(m_thirdPartyCamPlugins) );
 
     //reading and registering camera driver restrictions
-    for( QList<nxcip_qt::CameraDiscoveryManager>::const_iterator
-        it = m_thirdPartyCamPlugins.begin();
-        it != m_thirdPartyCamPlugins.end();
+    for( auto
+        it = m_thirdPartyCamPlugins.cbegin();
+        it != m_thirdPartyCamPlugins.cend();
         ++it )
     {
         const QList<QString>& modelList = it->getReservedModelList();
@@ -68,7 +68,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
     nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;
     //vendor is required to find plugin to use
     //choosing correct plugin
-    for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
+    for( auto
         it = m_thirdPartyCamPlugins.begin();
         it != m_thirdPartyCamPlugins.end();
         ++it )
@@ -104,7 +104,7 @@ QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url,
 {
     QVector<nxcip::CameraInfo> cameraInfoTempArray;
 
-    for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
+    for( auto
         it = m_thirdPartyCamPlugins.begin();
         it != m_thirdPartyCamPlugins.end();
         ++it )
@@ -164,7 +164,7 @@ QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
 {
     QList<QnNetworkResourcePtr> localResults;
 
-    for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
+    for( auto
         it = m_thirdPartyCamPlugins.begin();
         it != m_thirdPartyCamPlugins.end();
         ++it )
@@ -191,7 +191,7 @@ void ThirdPartyResourceSearcher::processPacket(
 {
     QList<QnNetworkResourcePtr> localResults;
 
-    for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
+    for( auto
         it = m_thirdPartyCamPlugins.begin();
         it != m_thirdPartyCamPlugins.end();
         ++it )
@@ -224,7 +224,7 @@ QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
 
     QVector<nxcip::CameraInfo> cameraInfoTempArray;
 
-    for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
+    for( auto
         it = m_thirdPartyCamPlugins.begin();
         it != m_thirdPartyCamPlugins.end();
         ++it )

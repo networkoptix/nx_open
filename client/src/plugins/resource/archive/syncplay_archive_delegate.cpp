@@ -35,12 +35,12 @@ void QnSyncPlayArchiveDelegate::beforeClose()
     m_ownerDelegate->beforeClose();
 }
 
-qint64 QnSyncPlayArchiveDelegate::startTime()
+qint64 QnSyncPlayArchiveDelegate::startTime() const
 {
     return m_syncWrapper->minTime();
 }
 
-qint64 QnSyncPlayArchiveDelegate::endTime()
+qint64 QnSyncPlayArchiveDelegate::endTime() const
 {
     return m_syncWrapper->endTime();
 }

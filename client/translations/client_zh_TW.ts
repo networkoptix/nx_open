@@ -147,7 +147,7 @@
     </message>
     <message>
         <source>X</source>
-        <translation></translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -265,7 +265,7 @@
     </message>
     <message>
         <source>about:blank</source>
-        <translation>about:blank</translation>
+        <translation>空白</translation>
     </message>
 </context>
 <context>
@@ -390,7 +390,7 @@
     </message>
     <message>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>Tính toán bitrate mỗi GOP thay vì bitrate mỗi giây (Nó sẽ làm tăng tốc độ bit cho máy ảnh)</translation>
+        <translation>算GOP流量而非每秒流量(這會增加攝影機的流量)</translation>
     </message>
 </context>
 <context>
@@ -425,11 +425,11 @@
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation>Gửi sử dụng và sụp đổ số liệu thống kê vô danh với các nhà phát triển phần mềm (Recommended)</translation>
+        <translation>匿名寄送使用狀況和故障狀況給軟體開發商(建議)</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation>Kích hoạt máy ảnh và máy chủ phát hiện tự động</translation>
+        <translation>開啟攝影機與伺服器自動搜尋功能</translation>
     </message>
 </context>
 <context>
@@ -774,14 +774,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>System Settings</source>
-        <translation>Cài đặt hệ thống</translation>
+        <translation>系統設定</translation>
     </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
     <message>
         <source>Scroll here</source>
-        <translation>在此滾動</translation>
+        <translation>滾動至此</translation>
     </message>
     <message>
         <source>Left edge</source>
@@ -1577,7 +1577,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Fit in View</source>
-        <translation>填滿視圖</translation>
+        <translation>填滿視窗</translation>
     </message>
     <message>
         <source>Main Menu</source>
@@ -2529,7 +2529,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ask About Statistics Reporting</source>
-        <translation>Hỏi về kê Reporting</translation>
+        <translation>要求狀況報告</translation>
     </message>
 </context>
 <context>
@@ -3195,7 +3195,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>MAC address</source>
-        <translation>MAC address</translation>
+        <translation>MAC地址</translation>
     </message>
     <message>
         <source>Server</source>
@@ -3905,7 +3905,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This could lead to client software malfunction including crash.</source>
-        <translation>Điều này có thể dẫn đến sự cố phần mềm máy khách bao gồm cả tai nạn.</translation>
+        <translation>這可能導致客戶端軟體故障甚至崩潰.</translation>
     </message>
 </context>
 <context>
@@ -3942,7 +3942,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnHistogramWidget</name>
     <message>
         <source>Gamma %1</source>
-        <translation>伽瑪%1</translation>
+        <translation>伽瑪值%1</translation>
     </message>
 </context>
 <context>
@@ -4552,7 +4552,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Check</source>
-        <translation>kiểm tra</translation>
+        <translation>檢查</translation>
     </message>
 </context>
 <context>
@@ -5218,7 +5218,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>X</source>
-        <translation></translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -5401,11 +5401,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation>Xây dựng lại chỉ mục lưu trữ để lưu trữ &apos;%1&apos; là trong tiến trình</translation>
+        <translation>儲存空間 &apos;%1&apos; 的資料索引重建正在執行中</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation>Scan lưu trữ nhanh chóng cho việc lưu trữ &apos;%1&apos; là trong tiến trình</translation>
+        <translation>儲存空間 &apos;%1&apos; 的快速資料掃瞄正在執行中</translation>
     </message>
 </context>
 <context>
@@ -5789,15 +5789,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>FPS value is too high</source>
-        <translation>FPS trị là quá cao</translation>
+        <translation>FPS數值過高</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>Fps hiện trong lưới tiến độ là %1. Fps được giảm xuống tối đa camera fps%2.</translation>
+        <translation>目前排程表中的FPS值為%1. FPS值將自動降至攝影機可允許之最大FPS %2.</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>Đối với chuyển động phần mềm 2 fps được dành riêng cho các dòng thứ cấp. Fps hiện trong lưới tiến độ là %1. Fps được giảm xuống %2.</translation>
+        <translation>軟體位移偵測所須第二串流最低FPS為2. 目前排程表中的FPS為 %1. FPS將自動降至 %2.</translation>
     </message>
 </context>
 <context>
@@ -5914,7 +5914,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation>Vui lòng kiểm tra thông tin xác thực trong cài đặt camera</translation>
+        <translation>請檢查攝影機設定內的認証資訊</translation>
     </message>
 </context>
 <context>
@@ -6633,33 +6633,33 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Some components of the system are not updated</source>
-        <translation>Một số thành phần của hệ thống không được cập nhật</translation>
+        <translation>系統內某些元件未更新</translation>
     </message>
     <message>
         <source>Client v%1</source>
-        <translation>khách hàng v%1</translation>
+        <translation>客戶端 v%1</translation>
     </message>
     <message>
         <source>Server v%1 at %2</source>
-        <translation>Máy chủ v%1 tại %2</translation>
+        <translation>伺服器ủ v%1 於 %2</translation>
     </message>
     <message>
         <source>Server v%1</source>
-        <translation>Máy chủ v%1</translation>
+        <translation>伺服器ủ v%1</translation>
     </message>
     <message>
         <source>Please update all components to the latest version %1.</source>
-        <translation>Vui lòng cập nhật tất cả các thành phần với phiên bản mới nhất %1.</translation>
+        <translation>請更新所有元件至最新版本 %1.</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
-        <translation>Anonymous Cách sử dụng thống kê</translation>
+        <translation>匿名使用狀況</translation>
     </message>
     <message>
         <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
 If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation>Hệ thống sẽ gửi sử dụng và crash thống kê ẩn danh cho nhóm phát triển phần mềm để giúp chúng tôi cải thiện trải nghiệm người dùng của bạn.
-Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như vậy trong hộp thoại System Settings.</translation>
+        <translation>系統寄送匿名使用與故障狀況給軟體開發團隊以協助我們改善您的使用經驗.
+若您想關閉此功能, 您可在系統設定視窗內關閉.</translation>
     </message>
 </context>
 <context>
@@ -6713,7 +6713,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Could not connect to server...</source>
-        <translation>Không thể kết nối với máy chủ ...</translation>
+        <translation>無法連線至伺服器...</translation>
     </message>
 </context>
 <context>
@@ -6929,7 +6929,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>exported</source>
-        <translation>xuất khẩu</translation>
+        <translation>已匯出</translation>
     </message>
 </context>
 <context>
@@ -7365,11 +7365,11 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation>Màn hình của %1</translation>
+        <translation>%1的螢幕</translation>
     </message>
     <message>
         <source>%n cameras</source>
-        <translation>%n máy ảnh</translation>
+        <translation>%n支攝影機</translation>
     </message>
 </context>
 <context>

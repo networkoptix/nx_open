@@ -960,16 +960,14 @@
                         <param>
                             <name>height</name>
                             <description>Required image height. By default image have same size as
-                                source video stream.</description>
+                                source video stream. If only height is specified width is auto detected</description>
                             <optional>true</optional>
                             <values/>
                         </param>
                         <param>
                             <name>width</name>
                             <description>Required image width. By default image have same size as
-                                source video stream. If only width or height is specified other
-                                parameter is auto detected. Video aspect ratio is not
-                                changed.</description>
+                                source video stream. width cannot be specified without specifying height</description>
                             <optional>true</optional>
                             <values/>
                         </param>
@@ -1641,7 +1639,7 @@
                     <description>
                         Url format for opening camera stream using HTTP protocol. Codec and stream format can be specified in url parameters.
                         Live stream and archive can be downloaded. If required and possible, media stream transcoding is performed on-the-fly.
-                        Stream format can be one of following: webm, mpegts, mp4, 3gp, mjpeg (motion jpeg)                        
+                        Stream format can be one of following: webm, mpegts, mp4, 3gp, mpjpeg (motion jpeg)                        
                         Example: http://&lt;server_ip&gt;:&lt;port&gt;/media/12AB42FD5912.webm
                     </description>
                     <method>GET</method>

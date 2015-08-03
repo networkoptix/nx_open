@@ -159,7 +159,7 @@ Item
                 right: (visible ? parent.right : undefined);
             }
         
-            text: qsTr("enter password");
+            text: qsTr("enter the password");
             fontSize: Common.SizeManager.fontSizes.base;
             onClicked: { loginDialog.show(); }
             

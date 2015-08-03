@@ -1172,7 +1172,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         const SocketAddress& addr1 = getUrlAddr(url);
         for (int i = 0; i < m_connectingConnections.size(); ++i)
         {
-            const SocketAddress& addr2 = getUrlAddr(m_connectingConnections[i]->remoteAddr());
+            const SocketAddress& addr2 = m_connectingConnections[i]->>remoteSocketAddr();
             if (addr2 == addr1)
                 return true;
         }
@@ -1541,7 +1541,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         const SocketAddress& urlStr = getUrlAddr(url);
         for(QnTransactionTransport* transport: m_connections.values())
         {
-            if (getUrlAddr(transport->remoteAddr()) == urlStr) {
+            if (transport->>remoteSocketAddr() == urlStr) {
                 qWarning() << "Disconnected from peer" << url;
                 transport->setState(QnTransactionTransport::Error);
             }
@@ -1559,6 +1559,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             info.remotePeerId = transport->remotePeer().id;
             connections.append(info);
         };
+
 
         QnMutexLocker lock(&m_mutex);
 

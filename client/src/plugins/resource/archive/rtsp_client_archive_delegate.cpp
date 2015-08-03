@@ -353,7 +353,7 @@ void QnRtspClientArchiveDelegate::unlockTime()
     m_lockedTime = qint64(AV_NOPTS_VALUE);
 }
 
-qint64 QnRtspClientArchiveDelegate::startTime()
+qint64 QnRtspClientArchiveDelegate::startTime() const
 {
     QnMutexLocker lock( &m_timeMutex );
     if(m_lockedTime != qint64(AV_NOPTS_VALUE))
@@ -366,7 +366,7 @@ qint64 QnRtspClientArchiveDelegate::startTime()
         return DATETIME_NOW; // archive in a future
 }
 
-qint64 QnRtspClientArchiveDelegate::endTime()
+qint64 QnRtspClientArchiveDelegate::endTime() const
 {
     /*
     if (m_rtspSession.endTime() > qnSyncTime->currentUSecsSinceEpoch())
