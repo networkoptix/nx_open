@@ -18,6 +18,8 @@
 #include "types.h"
 
 
+namespace cdb {
+
 typedef DataChangeEvent SystemChangeEvent;
 typedef DataInsertUpdateEvent<SystemData> SystemInsertUpdateEvent;
 
@@ -98,5 +100,7 @@ private:
         const SystemData& newSystem,
         std::function<void(ResultCode, SystemData)> completionHandler );
 };
+
+}   //cdb
 
 #endif

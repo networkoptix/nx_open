@@ -17,6 +17,8 @@
 #include "types.h"
 
 
+namespace cdb {
+
 class AccountManager
 :
     public Singleton<AccountManager>
@@ -25,7 +27,7 @@ public:
     //!Adds account in "not activated" state and sends verification email to the provided address
     void addAccount(
         const AuthorizationInfo& authzInfo,
-        const AccountData& accountData,
+        const data::AccountData& accountData,
         std::function<void(ResultCode)> completionHandler );
     //!On success, account moved to "activated" state
     void verifyAccountEmailAddress(
@@ -37,7 +39,9 @@ public:
     void getAccountByLogin(
         const AuthenticationInfo& authInfo,
         const std::string& userName,
-        std::function<void(ResultCode, AccountData)> completionHandler );
+        std::function<void(ResultCode, data::AccountData)> completionHandler );
 };
+
+}   //cdb
 
 #endif

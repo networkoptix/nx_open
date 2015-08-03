@@ -12,6 +12,8 @@
 #include "managers/types.h"
 
 
+namespace cdb {
+
 //!Performs request authorization based on authentication info, requested entity and requested action type
 /*!
     \note Requests from other classes of same module (same process) are authorized by \a AccessRole::cloudDB
@@ -33,5 +35,7 @@ public:
         DataActionType requestedAction,
         AuthorizationInfo* const authzInfo ) const;
 };
+
+}   //cdb
 
 #endif

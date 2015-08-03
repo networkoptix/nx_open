@@ -10,6 +10,8 @@
 #include "db/db_manager.h"
 
 
+namespace cdb {
+
 void SystemManager::bindSystemToAccount(
     const AuthenticationInfo& authInfo,
     const QnUuid& accountID,
@@ -116,3 +118,5 @@ DBResult SystemManager::insertSystemToDB(
         newSystem );
     return dbResult;
 }
+
+}   //cdb

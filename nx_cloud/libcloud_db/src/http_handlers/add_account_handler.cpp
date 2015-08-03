@@ -7,25 +7,29 @@
 
 #include <utils/common/cpp14.h>
 #include <utils/network/http/server/http_stream_socket_server.h>
-#include <utils/network/http/buffer_source.h>
 
 #include "managers/account_manager.h"
 #include "managers/types.h"
 
 
-namespace cdb_api
+namespace cdb
 {
     const QString AddAccountHttpHandler::HANDLER_PATH = QLatin1String("/add_account");
 
+    AddAccountHttpHandler::~AddAccountHttpHandler()
+    {
+        int x = 0;
+    }
+
     void AddAccountHttpHandler::processRequest(
         const AuthorizationInfo& authzInfo,
-        const stree::AbstractResourceReader& inputParams,
-        nx_http::Response* const response,
+        const data::AccountData& accountData,
+        //const stree::AbstractResourceReader& inputParams,
+        nx_http::Response* const /*response*/,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler )
+            const data::EmailVerificationCode& output )>&& completionHandler )
     {
-        AccountData accountData;
         //TODO filling data from inputParams?
         AccountManager::instance()->addAccount(
             authzInfo,
@@ -42,19 +46,13 @@ namespace cdb_api
         ResultCode resultCode,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
+            const data::EmailVerificationCode& output )> completionHandler )
     {
         //TODO #ak
         completionHandler(
             resultCode == ResultCode::ok
                 ? nx_http::StatusCode::ok
                 : nx_http::StatusCode::forbidden,
-            //std::unique_ptr<nx_http::AbstractMsgBodySource>() );
-            std::make_unique<nx_http::BufferSource>(
-                "text/html",
-                "<html>"
-                    "<h1>Hello</h1>"
-                    "<body>Hello from base cloud_db add_account handler</body>"
-                "</html>\n" ) );
+            data::EmailVerificationCode() );
     }
 }

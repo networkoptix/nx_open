@@ -6,9 +6,12 @@
 #include "account_manager.h"
 
 
+namespace cdb {
+
+
 void AccountManager::addAccount(
     const AuthorizationInfo& authInfo,
-    const AccountData& accountData,
+    const data::AccountData& accountData,
     std::function<void(ResultCode)> completionHandler )
 {
     //TODO #ak
@@ -27,7 +30,9 @@ void AccountManager::verifyAccountEmailAddress(
 void AccountManager::getAccountByLogin(
     const AuthenticationInfo& authInfo,
     const std::string& userName,
-    std::function<void(ResultCode, AccountData)> completionHandler )
+    std::function<void(ResultCode, data::AccountData)> completionHandler )
 {
     //TODO #ak
 }
+
+}   //cdb

@@ -12,6 +12,8 @@
 #include <QtCore/QVariant>  //TODO #ak maybe boost::variant?
 
 
+namespace cdb {
+
 enum class ResultCode
 {
     ok,
@@ -51,5 +53,7 @@ private:
     //!map<field name, field value>
     std::map<std::string, QVariant> m_fields;
 };
+
+}
 
 #endif

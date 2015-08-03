@@ -6,6 +6,8 @@
 #include "authorization_manager.h"
 
 
+namespace cdb {
+
 bool AuthorizationManager::authorize(
     const AuthenticationInfo& authInfo,
     EntityType requestedEntity,
@@ -15,3 +17,5 @@ bool AuthorizationManager::authorize(
     //TODO #ak
     return false;
 }
+
+}   //cdb

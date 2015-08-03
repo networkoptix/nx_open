@@ -12,34 +12,40 @@
 
 #include "access_control/types.h"
 #include "base_http_handler.h"
+#include "data/account_data.h"
 #include "managers/types.h"
 
 
-namespace cdb_api
+namespace cdb
 {
-    class AddAccountHttpHandler
-    :
-        public BaseHttpHandler
-    {
-    public:
-        static const QString HANDLER_PATH;
 
-    protected:
-        virtual void processRequest(
-            const AuthorizationInfo& authzInfo,
-            const stree::AbstractResourceReader& inputParams,
-            nx_http::Response* const response,
-            std::function<void(
-                const nx_http::StatusCode::Value statusCode,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) override;
+class AddAccountHttpHandler
+:
+    public AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::EmailVerificationCode>
+{
+public:
+    static const QString HANDLER_PATH;
 
-    private:
-        void addAccountDone(
-            ResultCode resultCode,
-            std::function<void(
-                const nx_http::StatusCode::Value statusCode,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler );
-    };
+protected:
+    virtual ~AddAccountHttpHandler();
+
+    virtual void processRequest(
+        const AuthorizationInfo& authzInfo,
+        const data::AccountData& accountData,
+        //const stree::AbstractResourceReader& inputParams,
+        nx_http::Response* const response,
+        std::function<void(
+            const nx_http::StatusCode::Value statusCode,
+            const data::EmailVerificationCode& output )>&& completionHandler ) override;
+
+private:
+    void addAccountDone(
+        ResultCode resultCode,
+        std::function<void(
+            const nx_http::StatusCode::Value statusCode,
+            const data::EmailVerificationCode& output )> completionHandler );
+};
+
 }
 
 #endif  //cloud_db_add_account_handler_h
