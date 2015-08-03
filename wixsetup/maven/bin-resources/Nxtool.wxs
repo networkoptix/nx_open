@@ -90,6 +90,9 @@
             </Component>  
             <Component>
                 <File Id="qtquickcontrolsplugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Controls\qmldir" DiskId="1"/>
+            </Component>  
+            <Component>
+                <File Id="qtquickcontrolsplugin_combobox.qml" Name="combobox.qml" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Controls\ComboBox.qml" DiskId="1"/>
             </Component>          
         </ComponentGroup>      
 
