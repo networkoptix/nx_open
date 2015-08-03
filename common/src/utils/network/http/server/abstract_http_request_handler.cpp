@@ -12,8 +12,8 @@
 namespace nx_http
 {
     AbstractHttpRequestHandler::AbstractHttpRequestHandler()
-    :
-        m_prevReqSeq( 0 )
+    //:
+    //    m_prevReqSeq( 0 )
     {
     }
 
@@ -40,69 +40,79 @@ namespace nx_http
         const auto& request = *requestMsg.request;
         auto response = responseMsg.response;
 
-        size_t reqID = 0;
-        {
-            std::lock_guard<std::mutex> lk( m_mutex );
-            reqID = ++m_prevReqSeq;
-            m_idToReqCtx.emplace(
-                reqID,
-                RequestContext(
-                    std::move( requestMsg ),
-                    std::move( responseMsg ),
-                    std::move( completionHandler ) ) );
-        }
+        //size_t reqID = 0;
+        //{
+        //    std::lock_guard<std::mutex> lk( m_mutex );
+        //    reqID = ++m_prevReqSeq;
+        //    m_idToReqCtx.emplace(
+        //        reqID,
+        //        RequestContext(
+        //            std::move( requestMsg ),
+        //            std::move( responseMsg ),
+        //            std::move( completionHandler ) ) );
+        //}
 
-        auto sendResponseFunc = [reqID, this](
+        m_requestMsg = std::move( requestMsg );
+        m_responseMsg = std::move( responseMsg );
+        m_completionHandler = std::move( completionHandler );
+
+        auto sendResponseFunc = [/*reqID,*/ this](
             nx_http::StatusCode::Value statusCode,
             std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
         {
-            requestDone( reqID, statusCode, std::move( dataSource ) );
+            requestDone( /*reqID,*/ statusCode, std::move( dataSource ) );
         };
 
         processRequest(
             connection,
             request,
             response,
-            std::move( sendResponseFunc ) );
+            sendResponseFunc );
         return true;
     }
 
     void AbstractHttpRequestHandler::requestDone(
-        size_t reqID,
+        //size_t reqID,
         const nx_http::StatusCode::Value statusCode,
         std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
     {
-        Message responseMsg;
-        std::function<
-            void(
-                nx_http::Message&&,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> )
-        > completionHandler;
+        //Message responseMsg;
+        //std::function<
+        //    void(
+        //        nx_http::Message&&,
+        //        std::unique_ptr<nx_http::AbstractMsgBodySource> )
+        //> completionHandler;
 
-        {
-            std::lock_guard<std::mutex> lk( m_mutex );
-            auto it = m_idToReqCtx.find( reqID );
-            assert( it != m_idToReqCtx.end() );
-            responseMsg = std::move( it->second.responseMsg );
-            completionHandler = std::move( it->second.completionHandler );
-            m_idToReqCtx.erase( it );
-        }
+        //{
+        //    std::lock_guard<std::mutex> lk( m_mutex );
+        //    auto it = m_idToReqCtx.find( reqID );
+        //    assert( it != m_idToReqCtx.end() );
+        //    responseMsg = std::move( it->second.responseMsg );
+        //    completionHandler = std::move( it->second.completionHandler );
+        //    m_idToReqCtx.erase( it );
+        //}
 
-        responseMsg.response->statusLine.statusCode = statusCode;
-        responseMsg.response->statusLine.reasonPhrase = StatusCode::toString( statusCode );
+        m_responseMsg.response->statusLine.statusCode = statusCode;
+        m_responseMsg.response->statusLine.reasonPhrase = StatusCode::toString( statusCode );
         if( dataSource )
         {
-            responseMsg.response->headers.emplace( "Content-Type", dataSource->mimeType() );
+            m_responseMsg.response->headers.emplace( "Content-Type", dataSource->mimeType() );
             const auto contentLength = dataSource->contentLength();
             if( contentLength )
-                responseMsg.response->headers.emplace(
+                m_responseMsg.response->headers.emplace(
                     "Content-Size",
                     QByteArray::number( static_cast< qulonglong >(
                         contentLength.get() ) ) );
         }
 
-        completionHandler(
-            std::move( responseMsg ),
-            std::move( dataSource ) );
+        //this object is allowed to be removed within m_completionHandler, 
+        //  so creating local data
+        auto completionHandlerLocal = std::move( m_completionHandler );
+        auto responseMsgLocal = std::move( m_responseMsg );
+        auto dataSourceLocal = std::move( dataSource );
+
+        completionHandlerLocal(
+            std::move( responseMsgLocal ),
+            std::move( dataSourceLocal ) );
     }
 }

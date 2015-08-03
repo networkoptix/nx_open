@@ -74,7 +74,7 @@ namespace nx_http
         {
             //creating and sending error response
             nx_http::Message response( nx_http::MessageType::response );
-            response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
+            response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
             return prepareAndSendResponse( std::move( response ), nullptr );
         }
     }

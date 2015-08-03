@@ -43,6 +43,7 @@ namespace nx_http
         //!Implement this method to handle request
         /*!
             \param response Implementation is allowed to modify response as it wishes
+            \warning This object can be removed in \a completionHandler 
         */
         virtual void processRequest(
             const nx_http::HttpServerConnection& connection,
@@ -53,47 +54,49 @@ namespace nx_http
                 std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) = 0;
 
     private:
-        class RequestContext
-        {
-        public:
-            nx_http::Message requestMsg;
-            nx_http::Message responseMsg;
-            std::function<void(
-                nx_http::Message&&,
-                std::unique_ptr<nx_http::AbstractMsgBodySource>)> completionHandler;
+        //class RequestContext
+        //{
+        //public:
 
-            RequestContext(
-                nx_http::Message&& _requestMsg,
-                nx_http::Message&& _responseMsg,
-                std::function<void(
-                    nx_http::Message&&,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource>)> _completionHandler )
-            :
-                requestMsg( std::move( _requestMsg ) ),
-                responseMsg( std::move( _responseMsg ) ),
-                completionHandler( std::move(_completionHandler) )
-            {
-            }
+        //    RequestContext(
+        //        nx_http::Message&& _requestMsg,
+        //        nx_http::Message&& _responseMsg,
+        //        std::function<void(
+        //            nx_http::Message&&,
+        //            std::unique_ptr<nx_http::AbstractMsgBodySource>)> _completionHandler )
+        //    :
+        //        requestMsg( std::move( _requestMsg ) ),
+        //        responseMsg( std::move( _responseMsg ) ),
+        //        completionHandler( std::move(_completionHandler) )
+        //    {
+        //    }
 
-            RequestContext( RequestContext&& right )
-            :
-                requestMsg( std::move( right.requestMsg ) ),
-                responseMsg( std::move( right.responseMsg ) ),
-                completionHandler( std::move( right.completionHandler ) )
-            {
-            }
+        //    RequestContext( RequestContext&& right )
+        //    :
+        //        requestMsg( std::move( right.requestMsg ) ),
+        //        responseMsg( std::move( right.responseMsg ) ),
+        //        completionHandler( std::move( right.completionHandler ) )
+        //    {
+        //    }
 
-        private:
-            RequestContext& operator=( const RequestContext& );
-            RequestContext( const RequestContext& );
-        };
+        //private:
+        //    RequestContext& operator=( const RequestContext& );
+        //    RequestContext( const RequestContext& );
+        //};
 
-        size_t m_prevReqSeq;
-        std::map<size_t, RequestContext> m_idToReqCtx;
-        std::mutex m_mutex;
+        //size_t m_prevReqSeq;
+        //std::map<size_t, RequestContext> m_idToReqCtx;
+        //std::mutex m_mutex;
+
+
+        nx_http::Message m_requestMsg;
+        nx_http::Message m_responseMsg;
+        std::function<void(
+            nx_http::Message&&,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> )> m_completionHandler;
 
         void requestDone(
-            size_t reqID,
+            //size_t reqID,
             nx_http::StatusCode::Value statusCode,
             std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource );
     };

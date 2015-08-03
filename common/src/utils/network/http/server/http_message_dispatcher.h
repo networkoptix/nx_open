@@ -10,6 +10,8 @@
 #include "http_server_connection.h"
 #include "utils/network/connection_server/message_dispatcher.h"
 
+#define SINGLE_REQUEST_PROCESSOR_PER_REQUEST
+
 
 namespace nx_http
 {
@@ -26,6 +28,7 @@ namespace nx_http
         MessageDispatcher();
         virtual ~MessageDispatcher();
 
+#ifndef SINGLE_REQUEST_PROCESSOR_PER_REQUEST
         /*!
             \param messageProcessor Ownership of this object is not passed
             \note All processors MUST be registered before connection processing is started, since this class methods are not thread-safe
@@ -38,7 +41,15 @@ namespace nx_http
         {
             return m_processors.emplace( path, messageProcessor ).second;
         }
-
+#else
+        template<typename RequestHandlerType>
+        bool registerRequestProcessor( const QString& path )
+        {
+            return m_factories.emplace(
+                path,
+                []()->AbstractHttpRequestHandler*{ return new RequestHandlerType(); } ).second;
+        }
+#endif
         //!Pass message to corresponding processor
         /*!
             \param message This object is not moved in case of failure to find processor
@@ -52,6 +63,7 @@ namespace nx_http
         {
             assert( message.type == nx_http::MessageType::request );
 
+#ifndef SINGLE_REQUEST_PROCESSOR_PER_REQUEST
             auto it = m_processors.find( message.request->requestLine.url.path() );
             if( it == m_processors.end() )
                 return false;
@@ -59,10 +71,34 @@ namespace nx_http
                 conn,
                 std::move( message ),
                 std::forward<CompletionFuncRefType>( completionFunc ) );
+#else
+            auto it = m_factories.find( message.request->requestLine.url.path() );
+            if( it == m_factories.end() )
+                return false;
+            auto requestProcessor = it->second();
+
+            return requestProcessor->processRequest(
+                conn,
+                std::move( message ),
+                [completionFunc, requestProcessor](
+                    nx_http::Message&& responseMsg,
+                    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
+                {
+                    completionFunc( std::move(responseMsg), std::move(responseMsgBody) );
+                    delete requestProcessor;
+                } );
+#endif
         }
 
     private:
+#ifndef SINGLE_REQUEST_PROCESSOR_PER_REQUEST
         std::map<QString, AbstractHttpRequestHandler*> m_processors;
+#else
+        std::map<
+            QString,
+            std::function<AbstractHttpRequestHandler*()>    //TODO #ak return std::unique_ptr when general lambdas available
+            > m_factories;
+#endif
     };
 }
 
