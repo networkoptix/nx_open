@@ -36,10 +36,10 @@ TextInput
         bottom: 0;
     }
 
-    KeyNavigation.backtab: prevOctet;
-    KeyNavigation.tab: nextOctet;
-    KeyNavigation.left: prevOctet;
-    KeyNavigation.right: nextOctet;
+    KeyNavigation.backtab: (prevOctet ? prevOctet : null);
+    KeyNavigation.tab: (nextOctet ? nextOctet : null);
+    KeyNavigation.left: (prevOctet ? prevOctet : null);
+    KeyNavigation.right: (nextOctet ? nextOctet : null);
 
     Keys.onPressed:
     {

@@ -115,7 +115,7 @@ Base.Column
                 
                 if (item.dnsControl.changed)
                 {
-                    if (item.dnsControl.text.trim().length && !item.dnsControl.acceptableInput)
+                    if (!item.dnsControl.isEmptyAddress && !item.dnsControl.acceptableInput)
                     {
                         errorDialog.message = errorTemplate.arg(qsTr("dns")).arg(name);
                         errorDialog.show();
@@ -124,12 +124,13 @@ Base.Column
                         return false;
                     }
                     somethingChanged = true;
-                    rtuContext.changesManager().addDNSChange(name, item.dnsControl.text);
+                    rtuContext.changesManager().addDNSChange(name
+                        , (item.dnsControl.isEmptyAddress ? "" : item.dnsControl.text));
                 }
 
                 if (item.gatewayControl.changed)
                 {
-                    if (item.gatewayControl.text.trim().length && !item.gatewayControl.acceptableInput)
+                    if (!item.gatewayControl.isEmptyAddress && !item.gatewayControl.acceptableInput)
                     {
                         errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(name);
                         errorDialog.show();
@@ -138,7 +139,8 @@ Base.Column
                         return false;
                     }
                     somethingChanged = true;
-                    rtuContext.changesManager().addGatewayChange(name, item.gatewayControl.text);
+                    rtuContext.changesManager().addGatewayChange(name
+                        , (item.gatewayControl.isEmptyAddress ? "" : item.gatewayControl.text));
                 }
 
                 if (somethingChanged)
