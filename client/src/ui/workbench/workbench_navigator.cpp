@@ -193,13 +193,18 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         resetSyncedPeriods();
         updateSyncedPeriods(); 
     });
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
+        if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
+            QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(mediaRes));
+    });
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
     foreach(QnThumbnailsLoader *loader, m_thumbnailLoaderByResource)
-        QnRunnableCleanup::cleanup(loader);
+        QnRunnableCleanup::cleanupSync(loader);
     for (QnThreadedChunksMergeTool* tool: m_threadedChunksMergeTool)
-        QnRunnableCleanup::cleanup(tool);
+        QnRunnableCleanup::cleanupSync(tool);
 }
 
 QnTimeSlider *QnWorkbenchNavigator::timeSlider() const {

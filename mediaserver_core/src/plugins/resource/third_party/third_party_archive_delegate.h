@@ -27,9 +27,9 @@ public:
     //!Implementation of QnAbstractArchiveDelegate::close
     virtual void close() override;
     //!Implementation of QnAbstractArchiveDelegate::startTime
-    virtual qint64 startTime() override;
+    virtual qint64 startTime() const override;
     //!Implementation of QnAbstractArchiveDelegate::endTime
-    virtual qint64 endTime() override;
+    virtual qint64 endTime() const override;
     //!Implementation of QnAbstractArchiveDelegate::getNextData
     virtual QnAbstractMediaDataPtr getNextData() override;
     //!Implementation of QnAbstractArchiveDelegate::seek

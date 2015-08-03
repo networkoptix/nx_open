@@ -87,6 +87,7 @@ public:
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     void updateChunkDuration(Chunk& chunk);
+    QString fileDir(const Chunk& chunk) const;
     QString fullFileName(const Chunk& chunk) const;
     Chunk chunkAt(int index) const;
     bool isLastChunk(qint64 startTimeMs) const;

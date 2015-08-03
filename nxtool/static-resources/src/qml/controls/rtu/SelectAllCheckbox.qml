@@ -18,14 +18,20 @@ Item
     Row
     {
         id: row;
-        spacing: Common.SizeManager.spacing.base;
+        spacing: Common.SizeManager.spacing.medium;
 
-        anchors.centerIn: parent;
+        anchors
+        {
+            left: parent.left;
+            verticalCenter: parent.verticalCenter;
+        }
+
 
         Base.CheckBox
         {
             id: selectAllCheckbox;
 
+            anchors.verticalCenter: parent.verticalCenter;
             Binding
             {
                 target: selectAllCheckbox;
@@ -39,9 +45,13 @@ Item
             }
         }
 
+
         Base.Text
         {
+            anchors.verticalCenter: parent.verticalCenter;
             text: qsTr("select / unselect all");
+            font.pixelSize: Common.SizeManager.fontSizes.medium;
+            color: "#666666";
         }
     }
 

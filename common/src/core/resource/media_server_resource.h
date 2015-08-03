@@ -88,6 +88,9 @@ public:
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 
+    //!Returns realm to use in HTTP authentication
+    QString realm() const;
+
     static bool isEdgeServer(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 

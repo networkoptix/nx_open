@@ -18,7 +18,7 @@ public:
     virtual bool open(const QnResourcePtr& resource) override;
     virtual void close() override;
     virtual qint64 seek(qint64 time, bool findIFrame) override;
-    virtual qint64 endTime() override;
+    virtual qint64 endTime() const override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
 
     static QString addDirPath(const QString sourceDir, const QString& postfix);

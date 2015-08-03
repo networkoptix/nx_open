@@ -38,7 +38,7 @@ Base.Column
         font.pixelSize: Common.SizeManager.fontSizes.large;
         horizontalAlignment: Text.AlignHCenter;
 
-        text: qsTr("Auto-Detected Nx1 Devices and Systems.");
+        text: qsTr("Auto-Detected Servers and Systems.");
     }
 
     Rtu.SelectAllCheckbox

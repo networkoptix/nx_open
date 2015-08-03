@@ -53,9 +53,7 @@ namespace nx_hls
             sDone
         };
 
-        nx_http::HttpStreamReader m_httpStreamReader;
         State m_state;
-        nx::Buffer m_readBuffer;
         nx::Buffer m_writeBuffer;
         StreamingChunkPtr m_currentChunk;
         //!For reading data from \a m_currentChunk
@@ -67,10 +65,6 @@ namespace nx_hls
         QString m_currentFileName;
         size_t m_bytesSent;
 
-        /*!
-            \return false in case if error
-        */
-        bool receiveRequest();
         //!Processes \a request, generates and sends (asynchronously) response
         void processRequest( const nx_http::Request& request );
         //!
@@ -112,6 +106,7 @@ namespace nx_hls
             nx_http::Response* const response );
 
         nx_http::StatusCode::Value createSession(
+            const QString& requestedPlaylistPath,
             const QString& sessionID,
             const std::multimap<QString, QString>& requestParams,
             const QnSecurityCamResourcePtr& camResource,

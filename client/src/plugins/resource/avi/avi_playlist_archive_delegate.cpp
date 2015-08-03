@@ -384,9 +384,9 @@ QnConstResourceVideoLayoutPtr QnAVIPlaylistArchiveDelegate::getVideoLayout()
     return m_defaultVideoLayout;
 }
 
-qint64 QnAVIPlaylistArchiveDelegate::endTime() 
+qint64 QnAVIPlaylistArchiveDelegate::endTime() const
 {
-    if (!m_initialized && !findStreams())
+    if (!m_initialized && !const_cast<QnAVIPlaylistArchiveDelegate*>(this)->findStreams())
         return 0;        
     return m_totalContentLength; 
 }
