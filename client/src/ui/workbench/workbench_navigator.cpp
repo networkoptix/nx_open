@@ -195,8 +195,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     });
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
-        QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(resource));
-        delete m_loaderByResource.take(resource);
+        if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
+            QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(mediaRes));
     });
 }
     
