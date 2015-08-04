@@ -16,14 +16,16 @@
 
 #include "decoders/video/ffmpeg.h"
 #include "media_server/settings.h"
+#include "streaming/hls/hls_types.h"
 
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
 static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
 static const qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
-static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10*1000;
-static const quint64 MSEC_PER_SEC = 1000;
+static const qint64 MSEC_PER_SEC = 1000;
+static const qint64 USEC_PER_MSEC = 1000;
+static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10 * MSEC_PER_SEC;
 static const int CAMERA_PULLING_STOP_TIMEOUT = 1000 * 3;
 
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
@@ -253,7 +255,12 @@ void QnVideoCameraGopKeeper::clearVideoData()
 QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
 :
     m_resource(resource),
-    m_hlsInactivityPeriodMS( MSSettings::roSettings()->value( nx_ms_conf::HLS_INACTIVITY_PERIOD, nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
+    m_loStreamHlsInactivityPeriodMS( MSSettings::roSettings()->value(
+        nx_ms_conf::HLS_INACTIVITY_PERIOD,
+        nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC ),
+    m_hiStreamHlsInactivityPeriodMS( MSSettings::roSettings()->value(
+        nx_ms_conf::HLS_INACTIVITY_PERIOD,
+        nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
 {
     m_primaryGopKeeper = 0;
     m_secondaryGopKeeper = 0;
@@ -364,7 +371,23 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 				else
 					m_secondaryGopKeeper = gopKeeper;
 				reader->addDataProcessor(gopKeeper);
-			}			
+
+                //if camera has one stream only and it is suitable for motion then caching first stream
+                const bool isSingleStreamCameraAndHiSuitableForCaching =
+                    (catalog == QnServer::HiQualityCatalog && m_primaryReader &&
+                     !cameraResource->hasDualStreaming2() &&
+                     cameraResource->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability ));
+                const bool isLowQualityReader = catalog == QnServer::LowQualityCatalog && m_secondaryReader;
+                if( isSingleStreamCameraAndHiSuitableForCaching || isLowQualityReader )
+                {
+                    ensureLiveCacheStarted(
+                        catalog == QnServer::LowQualityCatalog ? MEDIA_Quality_Low : MEDIA_Quality_High,
+                        reader,
+                        MSSettings::roSettings()->value(
+                            nx_ms_conf::HLS_TARGET_DURATION_MS,
+                            nx_ms_conf::DEFAULT_TARGET_DURATION_MS ).toUInt() * USEC_PER_MSEC );
+                }
+            }
 		}
     }
 }
@@ -459,6 +482,8 @@ bool QnVideoCamera::isSomeActivity() const
 
 void QnVideoCamera::updateActivity()
 {
+    //this method is called periodically
+
     if (m_primaryGopKeeper)
         m_primaryGopKeeper->updateCameraActivity();
     if (m_secondaryGopKeeper)
@@ -475,25 +500,36 @@ void QnVideoCamera::stopIfNoActivity()
         &&
         (!m_liveCache[MEDIA_Quality_High] ||                                    //has hi quality live cache been started?
             (m_hlsLivePlaylistManager[MEDIA_Quality_High].unique() &&           //no one uses playlist
-             m_hlsLivePlaylistManager[MEDIA_Quality_High]->inactivityPeriod() > m_hlsInactivityPeriodMS &&  //checking inactivity timer
-             m_liveCache[MEDIA_Quality_High]->inactivityPeriod() > m_hlsInactivityPeriodMS))
+             m_hlsLivePlaylistManager[MEDIA_Quality_High]->inactivityPeriod() > m_hiStreamHlsInactivityPeriodMS &&  //checking inactivity timer
+             m_liveCache[MEDIA_Quality_High]->inactivityPeriod() > m_hiStreamHlsInactivityPeriodMS))
         &&
         (!m_liveCache[MEDIA_Quality_Low] ||
             (m_hlsLivePlaylistManager[MEDIA_Quality_Low].unique() &&
-             m_hlsLivePlaylistManager[MEDIA_Quality_Low]->inactivityPeriod() > m_hlsInactivityPeriodMS &&
-             m_liveCache[MEDIA_Quality_Low]->inactivityPeriod() > m_hlsInactivityPeriodMS)) )
+             m_hlsLivePlaylistManager[MEDIA_Quality_Low]->inactivityPeriod() > m_loStreamHlsInactivityPeriodMS &&
+             m_liveCache[MEDIA_Quality_Low]->inactivityPeriod() > m_loStreamHlsInactivityPeriodMS)) )
     {
         m_cameraUsers.remove(this);
 
         if( m_liveCache[MEDIA_Quality_High] )
         {
-            if( m_primaryReader )
-                m_primaryReader->removeDataProcessor( m_liveCache[MEDIA_Quality_High].get() );
-            m_hlsLivePlaylistManager[MEDIA_Quality_High].reset();
-            m_liveCache[MEDIA_Quality_High].reset();
+            //if single stream is available and that stream is suitable for motion
+            //  then stopping caching only if no one else fetches stream
+            const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
+            const bool isSingleStreamCameraAndHiSuitableForCaching =
+                cameraResource &&
+                !cameraResource->hasDualStreaming2() &&
+                cameraResource->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability );
+            if( !isSingleStreamCameraAndHiSuitableForCaching || !isSomeActivity() )
+            {
+                if( m_primaryReader )
+                    m_primaryReader->removeDataProcessor( m_liveCache[MEDIA_Quality_High].get() );
+                m_hlsLivePlaylistManager[MEDIA_Quality_High].reset();
+                m_liveCache[MEDIA_Quality_High].reset();
+            }
         }
 
-        if( m_liveCache[MEDIA_Quality_Low] )
+        if( m_liveCache[MEDIA_Quality_Low] &&
+            !isSomeActivity() )             //stopping low quality stream caching only if no one else fetches stream (i.e., no recording enabled)
         {
             if( m_secondaryReader )
                 m_secondaryReader->removeDataProcessor( m_liveCache[MEDIA_Quality_Low].get() );
@@ -588,7 +624,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
     }
 	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
-		return QnLiveStreamProviderPtr();		
+		return QnLiveStreamProviderPtr();
     return catalog == QnServer::HiQualityCatalog ? m_primaryReader : m_secondaryReader;
 }
 
@@ -601,6 +637,9 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     const QnLiveStreamProviderPtr& primaryReader,
     qint64 targetDurationUSec )
 {
+    if( streamQuality != MEDIA_Quality_Low )
+        int x = 0;
+
     primaryReader->startIfNotRunning();
 
     m_cameraUsers.insert(this);
