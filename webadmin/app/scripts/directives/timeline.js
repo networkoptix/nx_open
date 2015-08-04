@@ -20,7 +20,7 @@ angular.module('webadminApp')
                     minMsPerPixel: 1, // Minimum level for zooming:
 
                     zoomSpeed: 0.025, // Zoom speed for dblclick
-                    slowZoomSpeed: 0.003, // Zoom speed for holding buttons
+                    slowZoomSpeed: 0.01, // Zoom speed for holding buttons
                     maxVerticalScrollForZoom: 250, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
                     animationDuration: 300, // 300, // 200-400 for smooth animation
@@ -938,20 +938,21 @@ angular.module('webadminApp')
 
 
                 // !!! Functions for buttons on view
-                scope.zoom = function(zoomIn,slow) {
+                scope.zoom = function(zoomIn,slow,slowAnimation) {
                     var zoomTarget = scope.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?timelineConfig.slowZoomSpeed:timelineConfig.zoomSpeed);
-                    scope.zoomTo(zoomTarget);
+                    scope.zoomTo(zoomTarget,null,false,slowAnimation);
                 };
 
                 var zoomingNow = false;
                 var zoomingIn = false;
                 function processZooming(){ // renew zooming
                     if(zoomingNow) {
-                        scope.zoom(zoomingIn,true);
+                        scope.zoom(zoomingIn,true,false);
                     }
                 }
                 scope.stopZoom = function(zoomIn) {
                     zoomingNow = false;
+                    scope.zoom(zoomingIn,true,true);
                 };
                 scope.startZoom = function(zoomIn) {
                     zoomingNow = true;
@@ -981,7 +982,7 @@ angular.module('webadminApp')
 
                     return false;
                 }
-                scope.zoomTo = function(zoomTarget, zoomDate, instant){
+                scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 
                     var maxZoom = scope.scaleManager.fullZoomOutValue();
                     if(zoomTarget >= maxZoom ) {
@@ -1011,7 +1012,6 @@ angular.module('webadminApp')
                         // This allows us to continue (and slowdown, mb) animation every time
                         animateScope.animate(scope,"zooming",1,"dryResistance").then(function(){
                             currentLevels = scope.scaleManager.levels;
-                            console.log("animation finished!",scope.zooming);
                         },function(){
                             // ignore animation re-run
                         });
@@ -1019,8 +1019,6 @@ angular.module('webadminApp')
 
 
                     function setZoom(value){
-                        console.log("setZoom",value);
-
                         if (zoomDate) {
                             scope.scaleManager.zoomAroundDate(
                                 value,
@@ -1035,7 +1033,7 @@ angular.module('webadminApp')
                         if(!scope.zoomTarget) {
                             scope.zoomTarget = scope.scaleManager.zoom();
                         }
-                        animateScope.animate(scope, "zoomTarget", zoomTarget, "dryResistance").then(
+                        animateScope.animate(scope, "zoomTarget", zoomTarget, slow?"linear":"dryResistance").then(
                             function () {},
                             function () {},
                             setZoom);
