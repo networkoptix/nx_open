@@ -501,7 +501,7 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         {
             const bool hasMacAddress = info.hasExtraInfo() && !info.extraInfo().interfaces.empty();
             return (hasMacAddress ? info.extraInfo().interfaces.front().macAddress :
-                (searchInfo.serverInfoIterator->loginState == kDifferentNetwork ? "(different networks)" : ""));
+                (searchInfo.serverInfoIterator->loginState == kDifferentNetwork ? "Server is unavailable" : ""));
         }
         case kLoggedIn:
             return info.hasExtraInfo();
