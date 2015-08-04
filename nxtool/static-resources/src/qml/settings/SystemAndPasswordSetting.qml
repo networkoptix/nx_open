@@ -45,7 +45,7 @@ Expandable.MaskedSettingsPanel
                         errorDialog.message = errorTemplate.arg(qsTr("system name"));
                         errorDialog.show();
                         
-                        systemName.focus = true;
+                        systemName.forceActiveFocus();
                         return false;
                     }
 
@@ -58,7 +58,7 @@ Expandable.MaskedSettingsPanel
                         errorDialog.message = errorTemplate.arg(qsTr("password"));
                         errorDialog.show();
                         
-                        password.focus = true;
+                        password.forceActiveFocus();
                         return false;
                     }
 

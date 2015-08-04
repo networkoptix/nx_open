@@ -13,7 +13,10 @@ Expandable.MaskedSettingsPanel
     id: thisComponent;
     
     changed:  (maskedArea && maskedArea.changed?  true : false);
-    
+
+    extraWarned: !((NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+        || (rtuContext.selection.count === 1));
+
     function tryApplyChanges()
     {
         if (!changed)
@@ -48,6 +51,11 @@ Expandable.MaskedSettingsPanel
                 leftMargin: Common.SizeManager.spacing.base;
             }
 
+            Dialogs.ErrorDialog
+            {
+                id: errorDialog;
+            }
+
             item : Component
             {
                 id: dateTimePage;
@@ -60,21 +68,30 @@ Expandable.MaskedSettingsPanel
                     {
                         if (!timeZonePicker.model.isValidValue(timeZonePicker.currentIndex))
                         {
-                            timeZonePicker.focus = true;
-                            return false;
-                        }
-                        
-                        if (!useCurrentTimeCheckbox.checked && !timePicker.acceptableInput)
-                        {
-                            timePicker.focus = true;
+                            errorDialog.message = "Please choose time zone";
+                            errorDialog.show();
+                            timeZonePicker.forceActiveFocus();
+
                             return false;
                         }
                         
                         if (!useCurrentTimeCheckbox.checked && !datePicker.acceptableInput)
                         {
-                            datePicker.focus = true;
+                            errorDialog.message = "Please enter valid time";
+                            errorDialog.show();
+
+                            datePicker.forceActiveFocus();
                             return false;
                         }
+
+                        if (!useCurrentTimeCheckbox.checked && !timePicker.acceptableInput)
+                        {
+                            errorDialog.message = "Please enter valid time";
+                            errorDialog.show();
+
+                            timePicker.forceActiveFocus();
+                            return false;
+                        }                        
                         
                         var newDate = datePicker.date;
                         var newTime = timePicker.time;
@@ -140,7 +157,8 @@ Expandable.MaskedSettingsPanel
     
                         onTimeZoneChanged:
                         {
-                            if (useCurrentTimeCheckbox.checked)
+                            if (useCurrentTimeCheckbox.checked || !timePicker.acceptableInput
+                                    || !datePicker.acceptableInput)
                                 return;
                             
                             var prevZoneId = timeZonePicker.model.timeZoneIdByIndex(from);
@@ -148,7 +166,7 @@ Expandable.MaskedSettingsPanel
                             console.log("Chaning timezone from " + prevZoneId + " to " + curZoneId);
                             var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, prevZoneId, curZoneId);
                             datePicker.setDate(dateTime);
-                            timePicker.setTime(dateTime);
+                            timePicker.setTime(dateTime, true);
                         }
                     }
 
@@ -163,7 +181,8 @@ Expandable.MaskedSettingsPanel
                             initDate: (rtuContext.selection && rtuContext.selection !== null ?
                                 rtuContext.selection.dateTime : new Date());
 
-                            enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
+                            enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+                                && !useCurrentTimeCheckbox.checked;
                         }
 
                         Base.Button
@@ -196,11 +215,12 @@ Expandable.MaskedSettingsPanel
                         }
                     }
 
-                    Base.TimePicker
+                    Base.TimeEdit
                     {
                         id: timePicker;
                         
-                        enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
+                        enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+                            && !useCurrentTimeCheckbox.checked;
                         initTime: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
                     }
