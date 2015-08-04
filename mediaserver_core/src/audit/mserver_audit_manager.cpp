@@ -33,6 +33,9 @@ void QnMServerAuditManager::cleanupExpiredSessions()
 
 int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
 {
+    if (record.isLoginType())
+        Q_ASSERT(record.resources.empty());
+
     QMutexLocker lock(&m_mutex);
     if (m_sessionCleanupTimer.elapsed() >> SESSION_CLEANUP_INTERVAL_MS)
     {
@@ -64,6 +67,9 @@ int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
 
 int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAuditRecord& record)
 {
+    if (record.isLoginType())
+        Q_ASSERT(record.resources.empty());
+
     QMutexLocker lock(&m_mutex);
     if (record.isLoginType() && record.rangeEndSec)
         m_knownSessions.remove(record.sessionId);

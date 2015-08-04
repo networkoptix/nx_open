@@ -41,6 +41,8 @@ namespace {
     const int BTN_ICON_SIZE = 16;
     static const int COLUMN_SPACING = 4;
     static const int MAX_DESCR_COL_LEN = 300;
+    static const int SESSIONS_TAB = 0;
+    static const int CAMERAS_TAB = 1;
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
@@ -104,7 +106,10 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
         COLUMN_SPACING,     //UserActivityColumn, // not implemented yet
         COLUMN_SPACING,     // EventTypeColumn,
         COLUMN_SPACING,     //DescriptionColumn,
-        0                   //PlayButtonColumn
+        0,                   //PlayButtonColumn
+        COLUMN_SPACING,     // CameraNameColumn,
+        COLUMN_SPACING,     // CameraIpColumn,
+
     };
     result.setWidth(result.width() + extraSpaceForColumns[column]);
     return result;
@@ -238,7 +243,7 @@ QnAuditRecordRefList QnAuditLogDialog::filterDataByText()
 }
 
 
-QnAuditRecordRefList QnAuditLogDialog::filteredChildData(const QnAuditRecordRefList& checkedRows)
+QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRecordRefList& checkedRows)
 {
     QSet<QnUuid> selectedSessions;
     for (const QnAuditRecord* record: checkedRows) 
@@ -255,6 +260,35 @@ QnAuditRecordRefList QnAuditLogDialog::filteredChildData(const QnAuditRecordRefL
     QnAuditRecordRefList result;
     auto filter = [&selectedSessions, &disabledTypes] (const QnAuditRecord* record) {
         return selectedSessions.contains(record->sessionId) && !(disabledTypes & record->eventType);
+    };
+    std::copy_if(m_filteredData.begin(), m_filteredData.end(), std::back_inserter(result), filter);
+    return result;
+}
+
+QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRecordRefList& checkedRows)
+{
+    QSet<QnUuid> selectedCameras;
+    for (const QnAuditRecord* record: checkedRows)
+        selectedCameras << record->resources[0];
+
+    Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
+    for (const QCheckBox* checkBox: m_filterCheckboxes) 
+    {
+        if (!checkBox->isChecked()) 
+            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
+    }
+
+
+    QnAuditRecordRefList result;
+    auto filter = [&selectedCameras, &disabledTypes] (const QnAuditRecord* record) 
+    {
+        if (disabledTypes & record->eventType)
+            return false;
+        for (const auto& id: record->resources) {
+            if (selectedCameras.contains(id))
+                return true;
+        }
+        return false;
     };
     std::copy_if(m_filteredData.begin(), m_filteredData.end(), std::back_inserter(result), filter);
     return result;
@@ -298,25 +332,51 @@ void QnAuditLogDialog::setupFilterCheckbox(QCheckBox* checkbox, const QColor& co
 void QnAuditLogDialog::at_filterChanged()
 {
     m_filteredData = filterDataByText();
-    QSet<QnUuid> filteredSessions;
-    for (const QnAuditRecord* record: m_filteredData)
-        filteredSessions << record->sessionId;
-    
-    QnAuditRecordRefList sessions;
-    for (auto& record: m_allData) {
-        if (record.isLoginType() && filteredSessions.contains(record.sessionId))
-            sessions.push_back(&record);
-    }
 
-    m_sessionModel->setData(sessions);
+    if (ui->tabWidget->currentIndex() == SESSIONS_TAB)
+    {
+        QSet<QnUuid> filteredSessions;
+        for (const QnAuditRecord* record: m_filteredData)
+            filteredSessions << record->sessionId;
+    
+        QnAuditRecordRefList sessions;
+        for (auto& record: m_allData) {
+            if (record.isLoginType() && filteredSessions.contains(record.sessionId))
+                sessions.push_back(&record);
+        }
+
+        m_sessionModel->setData(sessions);
+    }
+    else {
+        QSet<QnUuid> filteredCameras;
+        for (const QnAuditRecord* record: m_filteredData) {
+            for (const auto& id: record->resources)
+            filteredCameras << id;
+        }
+
+        QnAuditRecordRefList cameras;
+        for (auto& record: m_cameraData) {
+            if (filteredCameras.contains(record.resources[0]))
+                cameras.push_back(&record);
+        }
+        m_camerasModel->setData(cameras);
+    }
 }
 
 void QnAuditLogDialog::at_updateDetailModel()
 {
-    QnAuditRecordRefList checkedRows = m_sessionModel->checkedRows();
-    auto data = filteredChildData(checkedRows);
-    m_detailModel->setData(data);
-    m_detailModel->calcColorInterleaving();
+    if (ui->tabWidget->currentIndex() == SESSIONS_TAB) 
+    {
+        QnAuditRecordRefList checkedRows = m_sessionModel->checkedRows();
+        auto data = filterChildDataBySessions(checkedRows);
+        m_detailModel->setData(data);
+        m_detailModel->calcColorInterleaving();
+    }
+    else {
+        QnAuditRecordRefList checkedRows = m_camerasModel->checkedRows();
+        auto data = filterChildDataByCameras(checkedRows);
+        m_detailModel->setData(data);
+    }
 }
 
 int calcHeaderHeight(QHeaderView* header)
@@ -360,6 +420,111 @@ void QnAuditLogDialog::at_updateCheckboxes()
     setupFilterCheckbox(ui->checkBoxEmail, colors.emailSettings, Qn::AR_EmailSettings);
 };
 
+void setGridGeneralCheckState(QTableView* gridMaster, Qt::CheckState checkState)
+{
+    QnCheckBoxedHeaderView* headers = (QnCheckBoxedHeaderView*) gridMaster->horizontalHeader();
+    QnAuditLogModel* model = (QnAuditLogModel*) gridMaster->model();
+    headers->blockSignals(true);
+    headers->setCheckState(checkState);
+    headers->blockSignals(false);
+}
+
+void QnAuditLogDialog::at_masterGridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    QnTableView* gridMaster = (QnTableView*) sender()->parent();
+    QModelIndex mouseIdx = gridMaster->mouseIndex();
+    QnAuditLogModel* model = (QnAuditLogModel*) gridMaster->model();
+    bool isCheckRow = mouseIdx.isValid() && mouseIdx.column() == 0;
+    if (isCheckRow) {
+        if (mouseIdx.data(Qt::CheckStateRole) == Qt::Unchecked)
+            m_skipNextPressSignal = true;
+    }
+    else {
+        model->blockSignals(true);
+        model->setCheckState(Qt::Unchecked);
+        model->blockSignals(false);
+    }
+
+    QModelIndexList indexes = gridMaster->selectionModel()->selectedRows();
+    if (m_skipNextSelIndex.isValid()) {
+        for (auto itr = indexes.begin(); itr != indexes.end(); ++itr) {
+            if (*itr == m_skipNextSelIndex) {
+                indexes.erase(itr);
+                m_skipNextPressSignal = false;
+                break;
+            }
+        }
+    }
+    m_skipNextSelIndex = QModelIndex();
+    model->setData(indexes, Qt::Checked, Qt::CheckStateRole);
+    setGridGeneralCheckState(gridMaster, model->checkState());
+}
+
+void QnAuditLogDialog::setupSessionsGrid()
+{
+    QList<QnAuditLogModel::Column> columns;
+    columns << 
+        QnAuditLogModel::SelectRowColumn <<
+        QnAuditLogModel::TimestampColumn <<
+        QnAuditLogModel::EndTimestampColumn <<
+        QnAuditLogModel::DurationColumn <<
+        QnAuditLogModel::UserNameColumn <<
+        QnAuditLogModel::UserHostColumn;
+
+    m_sessionModel = new QnAuditLogSessionModel(this);
+    m_sessionModel->setColumns(columns);
+    ui->gridMaster->setModel(m_sessionModel);
+
+    setupMasterGridCommon(ui->gridMaster);
+}
+
+void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
+{
+    QnAuditLogModel* model = static_cast<QnAuditLogModel*>(gridMaster->model());
+
+    gridMaster->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+
+    QnCheckBoxedHeaderView* headers = new QnCheckBoxedHeaderView(this);
+    headers->setVisible(true);
+    headers->setSectionsClickable(true);
+    headers->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    gridMaster->setHorizontalHeader(headers);
+    gridMaster->setItemDelegate(m_itemDelegate);
+    gridMaster->setMouseTracking(true);
+    model->setheaderHeight(calcHeaderHeight(gridMaster->horizontalHeader()));
+
+    gridMaster->addAction(m_clipboardAction);
+    gridMaster->addAction(m_exportAction);
+
+    connect(model, &QAbstractItemModel::dataChanged, this, &QnAuditLogDialog::at_updateDetailModel);
+    connect(model, &QAbstractItemModel::modelReset, this, &QnAuditLogDialog::at_updateDetailModel);
+
+    connect (headers,           &QnCheckBoxedHeaderView::checkStateChanged, this, &QnAuditLogDialog::at_headerCheckStateChanged);
+
+    connect(gridMaster->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QnAuditLogDialog::at_masterGridSelectionChanged);
+    connect(gridMaster,         &QTableView::pressed, this, &QnAuditLogDialog::at_masterItemPressed); // put selection changed before item pressed
+    connect(gridMaster,         &QTableView::clicked,               this,   &QnAuditLogDialog::at_sessionsGrid_clicked);
+    connect(gridMaster,         &QTableView::customContextMenuRequested, this, &QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested);
+    connect(m_selectAllAction,  &QAction::triggered,                gridMaster, &QTableView::selectAll);
+}
+
+void QnAuditLogDialog::setupCamerasGrid()
+{
+    QList<QnAuditLogModel::Column> columns;
+    columns << 
+        QnAuditLogModel::SelectRowColumn <<
+        QnAuditLogModel::CameraNameColumn <<
+        QnAuditLogModel::CameraIpColumn;
+
+    m_camerasModel = new QnAuditLogModel(this);
+    m_camerasModel->setColumns(columns);
+    ui->gridCameras->setModel(m_camerasModel);
+
+    setupMasterGridCommon(ui->gridCameras);
+    ui->gridCameras->horizontalHeader()->setStretchLastSection(true);
+}
+
 QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::AuditLogDialog),
@@ -372,99 +537,39 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
     //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
 
+    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
+    m_exportAction      = new QAction(tr("Export Selection to File..."), this);
+    m_selectAllAction   = new QAction(tr("Select All"), this);
+    m_selectAllAction->setShortcut(QKeySequence::SelectAll);
+    m_clipboardAction->setShortcut(QKeySequence::Copy);
 
-    m_sessionModel = new QnAuditLogSessionModel(this);
-
-    connect(m_sessionModel, &QnAuditLogModel::colorsChanged, this, &QnAuditLogDialog::at_updateCheckboxes);
-    at_updateCheckboxes();
 
     m_itemDelegate = new QnAuditItemDelegate(this);
     m_itemDelegate->setPlayButtonSize(calcButtonSize(ui->gridMaster->font()));
     m_itemDelegate->setDefaultSectionHeight(ui->gridDetails->verticalHeader()->defaultSectionSize());
 
-    QList<QnAuditLogModel::Column> columns;
-    columns << 
-        QnAuditLogModel::SelectRowColumn <<
-        QnAuditLogModel::TimestampColumn <<
-        QnAuditLogModel::EndTimestampColumn <<
-        QnAuditLogModel::DurationColumn <<
-        QnAuditLogModel::UserNameColumn <<
-        QnAuditLogModel::UserHostColumn;
+    setupSessionsGrid();
+    setupCamerasGrid();
+    connect(m_sessionModel, &QnAuditLogModel::colorsChanged, this, &QnAuditLogDialog::at_updateCheckboxes);
+    at_updateCheckboxes();
 
-    m_sessionModel->setColumns(columns);
-
-    ui->gridMaster->setModel(m_sessionModel);
-    ui->gridMaster->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-
-    m_masterHeaders = new QnCheckBoxedHeaderView(this);
-    connect (m_masterHeaders, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnAuditLogDialog::at_headerCheckStateChanged);
-    ui->gridMaster->setHorizontalHeader(m_masterHeaders);
-    m_masterHeaders->setVisible(true);
-    m_masterHeaders->setSectionResizeMode(QHeaderView::ResizeToContents);
-    m_masterHeaders->setSectionsClickable(true);
-
-    connect(m_sessionModel, &QAbstractItemModel::dataChanged, this, &QnAuditLogDialog::at_updateDetailModel);
-    connect(m_sessionModel, &QAbstractItemModel::modelReset, this, &QnAuditLogDialog::at_updateDetailModel);
-    
-    connect
-        (
-        ui->gridMaster->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-        [this] (const QItemSelection &selected, const QItemSelection &deselected)
-    { 
-        QModelIndex mouseIdx = ui->gridMaster->mouseIndex();
-        bool isCheckRow = mouseIdx.isValid() && mouseIdx.column() == 0;
-        if (isCheckRow) {
-            if (mouseIdx.data(Qt::CheckStateRole) == Qt::Unchecked)
-                m_skipNextPressSignal = true;
-        }
-        else {
-            m_sessionModel->blockSignals(true);
-            m_sessionModel->setCheckState(Qt::Unchecked);
-            m_sessionModel->blockSignals(false);
-        }
-
-        QModelIndexList indexes = ui->gridMaster->selectionModel()->selectedRows();
-        if (m_skipNextSelIndex.isValid()) {
-            for (auto itr = indexes.begin(); itr != indexes.end(); ++itr) {
-                if (*itr == m_skipNextSelIndex) {
-                    indexes.erase(itr);
-                    m_skipNextPressSignal = false;
-                    break;
-                }
-            }
-        }
-        m_skipNextSelIndex = QModelIndex();
-        m_sessionModel->setData(indexes, Qt::Checked, Qt::CheckStateRole);
-
-        m_masterHeaders->blockSignals(true);
-        m_masterHeaders->setCheckState(m_sessionModel->checkState());
-        m_masterHeaders->blockSignals(false);
-    }
-    );
-
-
-    ui->gridMaster->setItemDelegate(m_itemDelegate);
-    ui->gridMaster->setMouseTracking(true);
+    // setup detail grid
 
     m_detailModel = new QnAuditLogDetailModel(this);
     m_detailModel->setColumns(detailSessionColumns(true));
     ui->gridDetails->setModel(m_detailModel);
     ui->gridDetails->setItemDelegate(m_itemDelegate);
     ui->gridDetails->setWordWrap(true);
-
     m_detailModel->setheaderHeight(calcHeaderHeight(ui->gridDetails->horizontalHeader()));
-    m_sessionModel->setheaderHeight(calcHeaderHeight(ui->gridMaster->horizontalHeader()));
 
     ui->gridDetails->horizontalHeader()->setMinimumSectionSize(48);
     
     ui->gridDetails->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->gridDetails->horizontalHeader()->setStretchLastSection(true);
-    //ui->gridDetails->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     ui->gridDetails->setMouseTracking(true);
 
 
-    connect(ui->gridMaster, &QTableView::pressed, this, &QnAuditLogDialog::at_masterItemPressed); // put selection changed before item pressed
     connect(ui->gridDetails, &QTableView::pressed, this, &QnAuditLogDialog::at_ItemPressed);
     connect(ui->gridDetails, &QTableView::entered, this, &QnAuditLogDialog::at_ItemEntered);
 
@@ -488,38 +593,20 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     ui->dateEditFrom->setDate(dt);
     ui->dateEditTo->setDate(dt);
 
-    QHeaderView* headers = ui->gridMaster->horizontalHeader();
-    headers->setSectionResizeMode(QHeaderView::ResizeToContents);
-
     
-    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
-    m_exportAction      = new QAction(tr("Export Selection to File..."), this);
-    m_selectAllAction   = new QAction(tr("Select All"), this);
-    m_selectAllAction->setShortcut(QKeySequence::SelectAll);
-    m_clipboardAction->setShortcut(QKeySequence::Copy);
-
     QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
     mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
-    ui->gridMaster->viewport()->installEventFilter(mouseSignalizer);
-    connect(mouseSignalizer, &QnAbstractEventSignalizer::activated, this, &QnAuditLogDialog::at_mouseButtonRelease);
-
-    ui->gridMaster->addAction(m_clipboardAction);
-    ui->gridMaster->addAction(m_exportAction);
 
     ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
     ui->loadingProgressBar->hide();
 
     connect(m_clipboardAction,      &QAction::triggered,                this,   &QnAuditLogDialog::at_clipboardAction_triggered);
     connect(m_exportAction,         &QAction::triggered,                this,   &QnAuditLogDialog::at_exportAction_triggered);
-    connect(m_selectAllAction,      &QAction::triggered,                ui->gridMaster, &QTableView::selectAll);
 
     connect(ui->dateEditFrom,       &QDateEdit::dateChanged,            this,   &QnAuditLogDialog::updateData);
     connect(ui->dateEditTo,         &QDateEdit::dateChanged,            this,   &QnAuditLogDialog::updateData);
     connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnAuditLogDialog::updateData);
 
-    connect(ui->gridMaster,         &QTableView::clicked,               this,   &QnAuditLogDialog::at_sessionsGrid_clicked);
-    connect(ui->gridMaster,         &QTableView::customContextMenuRequested, this, &QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested);
-    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridMaster, &QAbstractItemView::reset);
 
     connect(ui->gridDetails,         &QTableView::clicked,               this,   &QnAuditLogDialog::at_eventsGrid_clicked);
 
@@ -527,6 +614,16 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->tabWidget, &QTabWidget::currentChanged, 
+        this, [this](int index) {
+            if (index == SESSION_ABORTED)
+                ui->gridDetails->adjustSize();
+            else
+                ui->gridCameras->adjustSize();
+            at_filterChanged();
+        }
+    );
+    
 }
 
 QnAuditLogDialog::~QnAuditLogDialog() {
@@ -559,11 +656,16 @@ void QnAuditLogDialog::at_ItemEntered(const QModelIndex& index)
 
 void QnAuditLogDialog::at_headerCheckStateChanged(Qt::CheckState state)
 {
-    m_sessionModel->setCheckState(state);
+    QHeaderView* headers = (QHeaderView*) sender();
+    QTableView* masterGrid = (QTableView*) headers->parent();
+    QnAuditLogModel* model = (QnAuditLogModel*) masterGrid->model();
+    model->setCheckState(state);
 }
 
 void QnAuditLogDialog::at_masterItemPressed(const QModelIndex& index)
 {
+    QnTableView* gridMaster = (QnTableView*) sender();
+
     if (m_skipNextPressSignal) {
         m_skipNextPressSignal = false;
         m_skipNextSelIndex = QModelIndex();
@@ -580,12 +682,13 @@ void QnAuditLogDialog::at_masterItemPressed(const QModelIndex& index)
         checkState = Qt::Unchecked;
     else
         checkState = Qt::Checked;
-    ui->gridMaster->model()->setData(index, checkState, Qt::CheckStateRole);
-    m_masterHeaders->blockSignals(true);
-    m_masterHeaders->setCheckState(m_sessionModel->checkState());
-    m_masterHeaders->blockSignals(false);
+    QnAuditLogModel* model = (QnAuditLogModel*) gridMaster->model();
+    model->setData(index, checkState, Qt::CheckStateRole);
+    QnCheckBoxedHeaderView* headers = (QnCheckBoxedHeaderView*) gridMaster->horizontalHeader();
+    headers->blockSignals(true);
+    headers->setCheckState(model->checkState());
+    headers->blockSignals(false);
 }
-
 
 void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 {
@@ -672,6 +775,7 @@ void QnAuditLogDialog::updateData()
 
     if (!m_requests.isEmpty()) {
         ui->gridMaster->setDisabled(true);
+        ui->gridCameras->setDisabled(true);
         ui->stackedWidget->setCurrentWidget(ui->gridPage);
         setCursor(Qt::BusyCursor);
         ui->loadingProgressBar->show();
@@ -704,6 +808,7 @@ QList<QnMediaServerResourcePtr> QnAuditLogDialog::getServerList() const
 void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
 {
     m_sessionModel->clearData();
+    m_camerasModel->clearData();
     m_detailModel->clearData();
     m_requests.clear();
     m_allData.clear();
@@ -734,14 +839,36 @@ void QnAuditLogDialog::at_gotdata(int httpStatus, const QnAuditRecordList& recor
     }
 }
 
+void QnAuditLogDialog::makeCameraData()
+{
+    m_cameraData.clear();
+    QSet<QnUuid> processedCameras;
+    for (const QnAuditRecord& record: m_allData)
+    {
+        if (record.isPlaybackType() || record.eventType == Qn::AR_CameraUpdate)
+        {
+            for (const QnUuid& cameraId: record.resources)
+            {
+                if (!record.resources.empty() && !processedCameras.contains(cameraId)) {
+                    processedCameras << cameraId;
+                    QnAuditRecord cameraRecord;
+                    cameraRecord.resources.push_back(cameraId);
+                    m_cameraData.push_back(cameraRecord);
+                }
+            }
+        }
+    }
+}
+
 void QnAuditLogDialog::requestFinished()
 {
-    m_masterHeaders->blockSignals(true);
-    m_masterHeaders->setCheckState(Qt::Unchecked);
-    m_masterHeaders->blockSignals(false);
+    setGridGeneralCheckState(ui->gridMaster, Qt::Unchecked);
+    setGridGeneralCheckState(ui->gridCameras, Qt::Unchecked);
+    makeCameraData();
     at_filterChanged();
 
     ui->gridMaster->setDisabled(false);
+    ui->gridCameras->setDisabled(false);
     setCursor(Qt::ArrowCursor);
     //updateHeaderWidth();
     if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
@@ -770,10 +897,11 @@ void QnAuditLogDialog::setDateRange(const QDate& from, const QDate& to)
 void QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested(const QPoint&)
 {
     QMenu* menu = 0;
-    QModelIndex idx = ui->gridMaster->currentIndex();
+    QTableView* gridMaster = (QTableView*) sender();
+    QModelIndex idx = gridMaster->currentIndex();
     if (idx.isValid())
     {
-        QnResourcePtr resource = ui->gridMaster->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr resource = gridMaster->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
         if (resource) {
             menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resource));
@@ -786,8 +914,8 @@ void QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested(const QPoint&)
     else
         menu = new QMenu(this);
 
-    m_clipboardAction->setEnabled(ui->gridMaster->selectionModel()->hasSelection());
-    m_exportAction->setEnabled(ui->gridMaster->selectionModel()->hasSelection());
+    m_clipboardAction->setEnabled(gridMaster->selectionModel()->hasSelection());
+    m_exportAction->setEnabled(gridMaster->selectionModel()->hasSelection());
 
     menu->addSeparator();
 
@@ -807,13 +935,6 @@ void QnAuditLogDialog::at_exportAction_triggered()
 void QnAuditLogDialog::at_clipboardAction_triggered()
 {
     QnGridWidgetHelper::copyToClipboard(ui->gridMaster);
-}
-
-void QnAuditLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
-{
-    Q_UNUSED(sender)
-    QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
-    //m_lastMouseButton = me->button();
 }
 
 void QnAuditLogDialog::disableUpdateData()

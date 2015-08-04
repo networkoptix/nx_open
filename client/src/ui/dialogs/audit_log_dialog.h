@@ -15,6 +15,8 @@ class QnAuditLogSessionModel;
 class QnAuditLogDetailModel;
 class QnCheckBoxedHeaderView;
 class QnAuditItemDelegate;
+class QnTableView;
+class QnAuditLogModel;
 
 namespace Ui {
     class AuditLogDialog;
@@ -65,7 +67,6 @@ private slots:
     void at_sessionsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
-    void at_mouseButtonRelease(QObject* sender, QEvent* event);
     void at_masterItemPressed(const QModelIndex& index);
     void at_ItemPressed(const QModelIndex& index);
     void at_ItemEntered(const QModelIndex& index);
@@ -74,6 +75,7 @@ private slots:
     void at_updateDetailModel();
     void at_filterChanged();
     void at_updateCheckboxes();
+    void at_masterGridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     void requestFinished();
@@ -86,20 +88,27 @@ private:
      */
     void query(qint64 fromMsec, qint64 toMsec);
 
-    QnAuditRecordRefList filteredChildData(const QnAuditRecordRefList& checkedRows);
+    QnAuditRecordRefList filterChildDataBySessions(const QnAuditRecordRefList& checkedRows);
+    QnAuditRecordRefList filterChildDataByCameras(const QnAuditRecordRefList& checkedRows);
     void setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes);
     void processPlaybackAction(const QnAuditRecord* record);
     void triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId, const QString& objectName);
     QnAuditRecordRefList filterDataByText();
     QSize calcButtonSize(const QFont& font) const;
+    void setupSessionsGrid();
+    void setupCamerasGrid();
+    void setupMasterGridCommon(QnTableView* gridMaster);
+    void makeCameraData();
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 
     QnAuditLogSessionModel *m_sessionModel;
+    QnAuditLogModel *m_camerasModel;
     QnAuditLogDetailModel *m_detailModel;
     QSet<int> m_requests;
 
     QnAuditRecordList m_allData;
+    QnAuditRecordList m_cameraData;
     QnAuditRecordRefList m_filteredData;
     bool m_updateDisabled;
     bool m_dirty;
@@ -107,7 +116,8 @@ private:
     QAction *m_selectAllAction;
     QAction *m_exportAction;
     QAction *m_clipboardAction;
-    QnCheckBoxedHeaderView* m_masterHeaders;
+    //QnCheckBoxedHeaderView* m_masterHeaders;
+    //QnCheckBoxedHeaderView* m_cameraHeaders;
     QList<QCheckBox*> m_filterCheckboxes;
     QModelIndex m_hoveredIndex;
     

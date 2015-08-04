@@ -20,6 +20,29 @@
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
+namespace
+{
+    QString firstResourceName(const QnAuditRecord *d1)
+    {
+        if (d1->resources.empty())
+            return QString();
+        if (QnResourcePtr res = qnResPool->getResourceById(d1->resources[0]))
+            return res->getName();
+        else
+            return QString();
+    }
+
+    QString firstResourceIp(const QnAuditRecord *d1)
+    {
+        if (d1->resources.empty())
+            return QString();
+        if (QnNetworkResourcePtr res = qnResPool->getResourceById<QnNetworkResource>(d1->resources[0]))
+            return res->getHostAddress();
+        else
+            return QString();
+    }
+}
+
 // -------------------------------------------------------------------------- //
 // QnEventLogModel::DataIndex
 // -------------------------------------------------------------------------- //
@@ -104,6 +127,16 @@ public:
         return d1->eventType < d2->eventType;
     }
 
+    static bool lessThanCameraName(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    {
+        return firstResourceName(d1) < firstResourceName(d2);
+    }
+
+    static bool lessThanCameraIp(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    {
+        return firstResourceIp(d1) < firstResourceIp(d2);
+    }
+
     void updateIndex()
     {
         LessFunc lessThan = &lessThanTimestamp;
@@ -126,6 +159,13 @@ public:
                 break;
             case EventTypeColumn:
                 lessThan = &lessThanEventType;
+                break;
+
+            case CameraNameColumn:
+                lessThan = &lessThanCameraName;
+                break;
+            case CameraIpColumn:
+                lessThan = &lessThanCameraIp;
                 break;
         }
 
@@ -458,6 +498,10 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data
         break;
     case EventTypeColumn:
         return eventTypeToString(data->eventType);
+    case CameraNameColumn:
+        return firstResourceName(data);
+    case CameraIpColumn:
+        return firstResourceIp(data);
     case DescriptionColumn:
         return eventDescriptionText(data);
     case PlayButtonColumn:
@@ -500,6 +544,8 @@ int QnAuditLogModel::minWidthForColumn(const Column &column) const
         return 128;
     case PlayButtonColumn:
         return 64;
+    case CameraNameColumn:
+        return 200;
     default:
         return 64;
     }
@@ -537,6 +583,10 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
                 return tr("Activity");
             case EventTypeColumn:
                 return tr("Activity");
+            case CameraNameColumn:
+                return tr("Camera name");
+            case CameraIpColumn:
+                return tr("IP");
             case DateColumn:
                 return tr("Date");
             case TimeColumn:

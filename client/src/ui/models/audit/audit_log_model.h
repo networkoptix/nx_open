@@ -31,6 +31,10 @@ public:
         EventTypeColumn,
         DescriptionColumn,
         PlayButtonColumn,
+        
+        CameraNameColumn,
+        CameraIpColumn,
+        
         ColumnCount
     };
 
