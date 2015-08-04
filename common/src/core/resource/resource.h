@@ -194,6 +194,7 @@ public:
     QString getProperty(const QString &key) const;
     void setProperty(const QString &key, const QString &value, bool markDirty = true, bool replaceIfExists = true);
     void setProperty(const QString &key, const QVariant& value, bool markDirty = true, bool replaceIfExists = true );
+    bool setPropertyOnce(const QString &key, const QString& value, bool allowEmpty = false);
     ec2::ApiResourceParamDataList getProperties() const;
 
     //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class

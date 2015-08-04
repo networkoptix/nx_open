@@ -733,7 +733,21 @@ void QnResource::setProperty(const QString &key, const QVariant& value, bool mar
     return setProperty(key, value.toString(), markDirty, replaceIfExists);
 }
 
-ec2::ApiResourceParamDataList QnResource::getProperties() const {
+bool QnResource::setPropertyOnce(const QString &key, const QString& value, bool allowEmpty)
+{
+    if (!allowEmpty && value.isEmpty())
+        return false;
+
+    if (getProperty(key) != value)
+    {
+        setProperty(key, value);
+        return true;
+    }
+    return false;
+}
+
+ec2::ApiResourceParamDataList QnResource::getProperties() const
+{
     return propertyDictionary->allProperties(getId());
 }
 

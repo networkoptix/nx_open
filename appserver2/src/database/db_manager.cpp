@@ -1846,7 +1846,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_client_infos values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    query.prepare("INSERT OR REPLACE INTO vms_client_infos values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     query.addBindValue(tran.params.id.toRfc4122());
 	query.addBindValue(tran.params.parentId.toRfc4122());
     query.addBindValue(tran.params.skin);
@@ -1857,6 +1857,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientI
     query.addBindValue(tran.params.openGLVersion);
     query.addBindValue(tran.params.openGLVendor);
     query.addBindValue(tran.params.openGLRenderer);
+    query.addBindValue(tran.params.fullVersion);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -3397,6 +3398,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataLi
         info.openGLVersion      = query.value(7).toString();
         info.openGLVendor       = query.value(8).toString();
         info.openGLRenderer     = query.value(9).toString();
+        info.fullVersion        = query.value(10).toString();
 
 		data.push_back(std::move(info));
     }

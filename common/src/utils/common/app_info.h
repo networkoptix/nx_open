@@ -54,9 +54,11 @@ struct QnAppInfo {
     inline
     static QString applicationFullVersion()
     {
-        return QString(QLatin1String("%1-%2%3"))
+        // TODO: static const when VS supports c++11
+        return QString(QLatin1String("%1-%2-%3%4"))
                 .arg(applicationVersion())
                 .arg(applicationRevision())
+                .arg(customizationName().replace(QLatin1Char(' '), QLatin1Char('_')))
                 .arg(QLatin1String(beta() ? "-beta" : ""));
     }
 };
