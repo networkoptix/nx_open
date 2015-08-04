@@ -951,8 +951,10 @@ angular.module('webadminApp')
                     }
                 }
                 scope.stopZoom = function(zoomIn) {
-                    zoomingNow = false;
-                    scope.zoom(zoomingIn,true,true);
+                    if(zoomingNow) {
+                        zoomingNow = false;
+                        scope.zoom(zoomingIn, true, true);
+                    }
                 };
                 scope.startZoom = function(zoomIn) {
                     zoomingNow = true;
@@ -1002,7 +1004,7 @@ angular.module('webadminApp')
 
                     //Find final levels for this zoom
                     var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);
-                    if(levelsChanged(newTargetLevels ,targetLevels )){
+                    if(levelsChanged(newTargetLevels, targetLevels)){
                         targetLevels = newTargetLevels;
 
                         if( scope.zooming == 1){ // We need to run animation again
@@ -1039,6 +1041,7 @@ angular.module('webadminApp')
                             setZoom);
                     }else{
                         setZoom(zoomTarget);
+                        scope.zoomTarget = scope.scaleManager.zoom();
                     }
                 };
 

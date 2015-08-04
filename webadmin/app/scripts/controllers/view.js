@@ -134,9 +134,9 @@ angular.module('webadminApp').controller('ViewCtrl',
             currentTime = currentTime || 0;
 
             $scope.positionProvider.setPlayingPosition(currentTime*1000);
-            if(!$scope.positionProvider.liveMode) {
+            /*if(!$scope.positionProvider.liveMode) {
                 $location.search('time', Math.round($scope.positionProvider.playedPosition));
-            }
+            }*/
         };
 
         $scope.selectCameraById = function (cameraId,position) {
