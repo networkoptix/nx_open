@@ -10,8 +10,9 @@ class QnMServerAuditManager: public QnAuditManager
 public:
     QnMServerAuditManager();
     ~QnMServerAuditManager();
-    virtual int addAuditRecord(const QnAuditRecord& record) override;
-    virtual int updateAuditRecord(int internalId, const QnAuditRecord& record) override;
+protected:
+    virtual int addAuditRecordInternal(const QnAuditRecord& record) override;
+    virtual int updateAuditRecordInternal(int internalId, const QnAuditRecord& record) override;
 private:
     void cleanupExpiredSessions();
 private:

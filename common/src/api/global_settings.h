@@ -34,6 +34,9 @@ public:
     bool isCameraSettingsOptimizationEnabled() const;
     void setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled);
 
+    bool isAuditTrailEnabled() const;
+    void setAuditTrailEnabled(bool value);
+
     bool isServerAutoDiscoveryEnabled() const;
     void setServerAutoDiscoveryEnabled(bool enabled);
 
@@ -48,6 +51,7 @@ public:
 
 signals:
     void disabledVendorsChanged();
+    void auditTrailEnableChanged();
     void cameraSettingsOptimizationChanged();
     void serverAutoDiscoveryChanged();
     void emailSettingsChanged();
@@ -58,6 +62,7 @@ private:
 
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;

@@ -1516,7 +1516,6 @@ void MediaServerProcess::run()
     soapServer.bind();
     soapServer.start();
 #endif //ENABLE_ONVIF
-    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     std::unique_ptr<QnResourcePropertyDictionary> dictionary(new QnResourcePropertyDictionary());
@@ -1528,6 +1527,7 @@ void MediaServerProcess::run()
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
 
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
+    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);

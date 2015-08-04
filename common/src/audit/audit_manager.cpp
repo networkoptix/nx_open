@@ -1,6 +1,7 @@
 #include "audit_manager.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
+#include "api/global_settings.h"
 
 static QnAuditManager* m_globalInstance = 0;
 
@@ -45,6 +46,13 @@ QnAuditManager* QnAuditManager::instance()
 
 QnAuditManager::QnAuditManager()
 {
+    m_enabled = QnGlobalSettings::instance()->isAuditTrailEnabled();
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::auditTrailEnableChanged, this,
+        [this]() {
+            setEnabled(QnGlobalSettings::instance()->isAuditTrailEnabled()); 
+        }
+    );
+
     assert( m_globalInstance == nullptr );
     m_globalInstance = this;
     connect(&m_timer, &QTimer::timeout, this, &QnAuditManager::at_timer);
@@ -64,6 +72,9 @@ QnAuditRecord QnAuditManager::prepareRecord(const QnAuthSession& authInfo, Qn::A
 
 void QnAuditManager::at_connectionOpened(const QnAuthSession& authInfo)
 {
+    if (!enabled())
+        return;
+
     AuditConnection connection;
     connection.record = prepareRecord(authInfo, Qn::AR_Login);
     connection.internalId = addAuditRecord(connection.record);
@@ -75,6 +86,9 @@ void QnAuditManager::at_connectionOpened(const QnAuthSession& authInfo)
 
 void QnAuditManager::at_connectionClosed(const QnAuthSession &data)
 {
+    if (!enabled())
+        return;
+
     QMutexLocker lock(&m_mutex);
     auto itr = m_openedConnections.find(data.sessionId);
     if (itr != m_openedConnections.end()) {
@@ -88,6 +102,9 @@ void QnAuditManager::at_connectionClosed(const QnAuthSession &data)
 
 int QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& cameraId, qint64 timestampUsec, bool isExport)
 {
+    if (!enabled())
+        return -1;
+
     CameraPlaybackInfo pbInfo;
     pbInfo.session = session;
     pbInfo.cameraId = cameraId;
@@ -103,6 +120,9 @@ int QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, const Qn
 
 void QnAuditManager::notifyPlaybackFinished(int internalId)
 {
+    if (!enabled())
+        return;
+
     QMutexLocker lock(&m_mutex);
     auto itr = m_alivePlaybackInfo.find(internalId);
     if (itr != m_alivePlaybackInfo.end())
@@ -118,6 +138,9 @@ void QnAuditManager::notifyPlaybackFinished(int internalId)
 
 void QnAuditManager::notifyPlaybackInProgress(int internalId, qint64 timestampUsec)
 {
+    if (!enabled())
+        return;
+
     qint64 timestampMs = timestampUsec / 1000;
     QMutexLocker lock(&m_mutex);
     auto itr = m_alivePlaybackInfo.find(internalId);
@@ -140,6 +163,9 @@ bool QnAuditManager::canJoinRecords(const QnAuditRecord& left, const QnAuditReco
 
 void QnAuditManager::notifySettingsChanged(const QnAuthSession& authInfo, const QString& paramName)
 {
+    if (!enabled())
+        return;
+
     ChangedSettingInfo info;
     info.paramName = paramName;
     info.session = authInfo;
@@ -192,5 +218,39 @@ void QnAuditManager::processDelayedRecords(QVector<T>& recordsToAggregate)
         }
     } while (recordProcessed);
     for (const auto& record: recordsToAdd)
-        addAuditRecord(record);
+        addAuditRecordInternal(record);
+}
+
+int QnAuditManager::addAuditRecord(const QnAuditRecord& record)
+{
+    if (!enabled())
+        return -1;
+    else
+        return addAuditRecordInternal(record);
+}
+
+int QnAuditManager::updateAuditRecord(int internalId, const QnAuditRecord& record)
+{
+    if (!enabled())
+        return -1;
+    else
+        return updateAuditRecordInternal(internalId, record);
+}
+
+bool QnAuditManager::enabled() const
+{
+    return m_enabled;
+}
+
+void QnAuditManager::setEnabled(bool value)
+{
+    QMutexLocker lock(&m_mutex);
+
+    m_enabled = value;
+    if (!m_enabled) {
+        m_openedConnections.clear();
+        m_alivePlaybackInfo.clear();
+        //m_closedPlaybackInfo.clear();
+        //m_changedSettings.clear(); // keep it to write audit record if option is turned off
+    }
 }

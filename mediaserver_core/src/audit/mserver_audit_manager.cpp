@@ -31,7 +31,7 @@ void QnMServerAuditManager::cleanupExpiredSessions()
     }
 };
 
-int QnMServerAuditManager::addAuditRecord(const QnAuditRecord& record)
+int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
 {
     QMutexLocker lock(&m_mutex);
     if (m_sessionCleanupTimer.elapsed() >> SESSION_CLEANUP_INTERVAL_MS)
@@ -62,7 +62,7 @@ int QnMServerAuditManager::addAuditRecord(const QnAuditRecord& record)
     return qnEventsDB->addAuditRecord(record);
 }
 
-int QnMServerAuditManager::updateAuditRecord(int internalId, const QnAuditRecord& record)
+int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAuditRecord& record)
 {
     QMutexLocker lock(&m_mutex);
     if (record.isLoginType() && record.rangeEndSec)

@@ -28,11 +28,17 @@ public:
     void notifySettingsChanged(const QnAuthSession& authInfo, const QString& paramName);
 
     /* return internal id of inserted record. Returns <= 0 if error */
-    virtual int addAuditRecord(const QnAuditRecord& record) = 0;
-    virtual int updateAuditRecord(int internalId, const QnAuditRecord& record) = 0;
+    int addAuditRecord(const QnAuditRecord& record);
+    int updateAuditRecord(int internalId, const QnAuditRecord& record);
+    bool enabled() const;
 public slots:
     void at_connectionOpened(const QnAuthSession &data);
     void at_connectionClosed(const QnAuthSession &data);
+private slots:
+    void setEnabled(bool value);
+protected:
+    virtual int addAuditRecordInternal(const QnAuditRecord& record) = 0;
+    virtual int updateAuditRecordInternal(int internalId, const QnAuditRecord& record) = 0;
 private slots:
     void at_timer();
 protected:
@@ -81,6 +87,7 @@ private:
 
     mutable QMutex m_mutex;
     QTimer m_timer;
+    std::atomic<bool> m_enabled;
 private:
     bool canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right);
     
