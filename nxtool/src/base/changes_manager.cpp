@@ -490,7 +490,8 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
 
                 QString timeZoneName = timeZoneNameWithOffset(QTimeZone(change.timeZoneId), QDateTime::currentDateTime());
 
-                const QString &value= convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId)).toString();
+                QDateTime timeValue = convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId));
+                const QString &value = timeValue.toString(Qt::SystemLocaleLongDate);
                 const bool dateTimeOk = addSummaryItem(*info, kDateTimeDescription
                     , value, errorReason, kDateTimeAffected, affected);
                 const bool timeZoneOk = addSummaryItem(*info, kTimeZoneDescription
