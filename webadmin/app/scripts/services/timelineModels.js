@@ -813,6 +813,8 @@ ScaleManager.prototype.bound = function (min,val,max){
     val = Math.max(val,min);
     return Math.min(val,max);
 };
+
+
 ScaleManager.prototype.updateCurrentInterval = function(){
     //Calculate visibleEnd and visibleStart
     this.msPerPixel = this.bound(this.minMsPerPixel, this.msPerPixel, this.maxMsPerPixel);

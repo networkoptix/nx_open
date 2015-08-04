@@ -20,7 +20,7 @@ angular.module('webadminApp')
                     minMsPerPixel: 1, // Minimum level for zooming:
 
                     zoomSpeed: 0.025, // Zoom speed for buttons 0 -> 1 = full zoom
-                    maxVerticalScrollForZoom: 500, // value for adjusting zoom
+                    maxVerticalScrollForZoom: 250, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
                     animationDuration: 300, // 300, // 200-400 for smooth animation
 
@@ -53,7 +53,7 @@ angular.module('webadminApp')
                             markSize:0,
                             transparency:0,
                             fontSize:0,
-                            labelPositionFix:-10
+                            labelPositionFix:-15
                         }
                     },
 
@@ -859,6 +859,9 @@ angular.module('webadminApp')
                         }else{
                             // We need to smooth zoom here
                             // Collect zoom changing in zoomTarget
+                            if(!zoomTarget) {
+                                zoomTarget = scope.scaleManager.zoom();
+                            }
                             zoomTarget -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
                         }
                         scope.zoomTo(zoomTarget, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),window.jscd.touch);
@@ -934,8 +937,7 @@ angular.module('webadminApp')
 
                 // !!! Functions for buttons on view
                 scope.zoom = function(zoomIn) {
-                    scope.zoomTarget = scope.scaleManager.zoom();
-                    var zoomTarget = scope.zoomTarget - (zoomIn ? 1 : -1) * timelineConfig.zoomSpeed;
+                    var zoomTarget = scope.scaleManager.zoom() - (zoomIn ? 1 : -1) * timelineConfig.zoomSpeed;
                     scope.zoomTo(zoomTarget);
                 };
 
@@ -962,6 +964,10 @@ angular.module('webadminApp')
                 }
                 scope.zoomTo = function(zoomTarget, zoomDate, instant){
 
+                    var maxZoom = scope.scaleManager.fullZoomOutValue();
+                    if(zoomTarget > maxZoom )
+                        zoomTarget = maxZoom;
+
                     //Find final levels for this zoom
                     var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);
                     if(levelsChanged(newTargetLevels ,targetLevels )){
@@ -982,6 +988,8 @@ angular.module('webadminApp')
 
 
                     function setZoom(value){
+                        console.log("setZoom",value);
+
                         if (zoomDate) {
                             scope.scaleManager.zoomAroundDate(
                                 value,
