@@ -84,18 +84,10 @@
             </Component>             
         </ComponentGroup>
         
-        <ComponentGroup Id="QtQuickControlsFiles" Directory="QtQuickControls">
-            <Component>
-                <File Id="qtquickcontrolsplugin$(var.suffix).dll" Name="qtquickcontrolsplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Controls\qtquickcontrolsplugin$(var.suffix).dll" DiskId="1"/>
-            </Component>  
-            <Component>
-                <File Id="qtquickcontrolsplugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Controls\qmldir" DiskId="1"/>
-            </Component>  
+            </Component>          
             <Component>
                 <File Id="qtquickcontrolsplugin_combobox.qml" Name="combobox.qml" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Controls\ComboBox.qml" DiskId="1"/>
             </Component>          
-        </ComponentGroup>      
-
         <ComponentGroup Id="QtQuickDialogsFiles" Directory="QtQuickDialogs">
             <Component>
                 <File Id="dialogplugin$(var.suffix).dll" Name="dialogplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Dialogs\dialogplugin$(var.suffix).dll" DiskId="1"/>
@@ -146,7 +138,7 @@
             <ComponentRef Id="nxtoolShortcutDesktop"/>
             <ComponentRef Id="NxtoolConfiguration" />
             <ComponentGroupRef Id="NxtoolQTLibraries" />
-            <ComponentGroupRef Id="QtQuickControlsFiles" />
+            <ComponentGroupRef Id="NxtoolQuickControlsComponent"/>
             <ComponentGroupRef Id="QtQuickDialogsFiles" />
             <ComponentGroupRef Id="QtQuickLayoutsFiles" />
             <ComponentGroupRef Id="QtQuickWindow2Files" />

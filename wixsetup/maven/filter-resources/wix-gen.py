@@ -8,7 +8,7 @@ properties_dir='${root.dir}/wixsetup/${arch}'
 #    os.makedirs(properties_dir)
 #os.system("echo ${install.type}=${finalName}.msi >> %s/installer.properties " % properties_dir)
 
-for wxs in ('dbsync', 'help', 'vox', 'bg'):
+for wxs in ('qtquickcontrols', 'dbsync', 'help', 'vox', 'bg'):
     p = subprocess.Popen('${init.python.dir}/python generate-%s-wxs.py' % wxs, shell=True, stdout=PIPE)
     out, err = p.communicate()
     print ('\n++++++++++++++++++++++Applying heat to generate-%s-wxs.py++++++++++++++++++++++' % wxs)
