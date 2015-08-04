@@ -347,3 +347,17 @@ TEST( QnCamLicenseUsageHelperTest, profileCalculateSpeed )
     ASSERT_TRUE(helper.isValid());
 }
 
+/** Basic test for single license type. */
+TEST( QnCamLicenseUsageHelperTest, checkIOLicenseType )
+{
+    QnLicensePoolScaffold licPoolScaffold;
+
+    QnResourcePoolScaffold resPoolScaffold;
+    resPoolScaffold.addCamera(Qn::LC_IO, true);
+
+    QnCamLicenseUsageHelper helper;
+    ASSERT_FALSE( helper.isValid() );
+
+    licPoolScaffold.addLicenses(Qn::LC_IO, 1);
+    ASSERT_TRUE( helper.isValid() );
+}
