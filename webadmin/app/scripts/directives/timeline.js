@@ -19,7 +19,8 @@ angular.module('webadminApp')
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
                     minMsPerPixel: 1, // Minimum level for zooming:
 
-                    zoomSpeed: 0.025, // Zoom speed for buttons 0 -> 1 = full zoom
+                    zoomSpeed: 0.025, // Zoom speed for dblclick
+                    slowZoomSpeed: 0.003, // Zoom speed for holding buttons
                     maxVerticalScrollForZoom: 250, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
                     animationDuration: 300, // 300, // 200-400 for smooth animation
@@ -276,7 +277,7 @@ angular.module('webadminApp')
                     scope.scaleManager.setStart(scope.recordsProvider ? scope.recordsProvider.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd(now);
 
-                    scope.zoomTo(scope.scaleManager.fullZoomOutValue()); // Animate full zoom out
+                    scope.zoomTo(1); // Animate full zoom out
                 }
 
                 // !!! Drawing and redrawing functions
@@ -286,6 +287,7 @@ angular.module('webadminApp')
                     }
                     scope.scaleManager.setEnd((new Date()).getTime()); // Set right border
 
+                    processZooming();
 
                     var context = clearTimeline();
                     drawTopLabels(context);
@@ -729,7 +731,7 @@ angular.module('webadminApp')
                         context.fillRect(0, top, scope.viewportWidth, timelineConfig.scrollBarHeight * scope.viewportHeight);
 
                         //2. drawOrCheckScrollBar
-                        context.fillStyle = mouseInScrollbar ? blurColor(timelineConfig.scrollBarHighlightColor, 1) : blurColor(timelineConfig.scrollBarColor, 1);
+                        context.fillStyle = (mouseInScrollbar || catchScrollBar) ? blurColor(timelineConfig.scrollBarHighlightColor, 1) : blurColor(timelineConfig.scrollBarColor, 1);
                         context.fillRect(startCoordinate, top, scrollBarWidth, timelineConfig.scrollBarHeight * scope.viewportHeight);
                     }else{
                         if(mouseInScrollbar || catchScrollBar){
@@ -936,10 +938,27 @@ angular.module('webadminApp')
 
 
                 // !!! Functions for buttons on view
-                scope.zoom = function(zoomIn) {
-                    var zoomTarget = scope.scaleManager.zoom() - (zoomIn ? 1 : -1) * timelineConfig.zoomSpeed;
+                scope.zoom = function(zoomIn,slow) {
+                    var zoomTarget = scope.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?timelineConfig.slowZoomSpeed:timelineConfig.zoomSpeed);
                     scope.zoomTo(zoomTarget);
                 };
+
+                var zoomingNow = false;
+                var zoomingIn = false;
+                function processZooming(){ // renew zooming
+                    if(zoomingNow) {
+                        scope.zoom(zoomingIn,true);
+                    }
+                }
+                scope.stopZoom = function(zoomIn) {
+                    zoomingNow = false;
+                };
+                scope.startZoom = function(zoomIn) {
+                    zoomingNow = true;
+                    zoomingIn = zoomIn;
+                    processZooming();
+                };
+
 
                 scope.zooming = 1; // init animation value
 
@@ -965,8 +984,20 @@ angular.module('webadminApp')
                 scope.zoomTo = function(zoomTarget, zoomDate, instant){
 
                     var maxZoom = scope.scaleManager.fullZoomOutValue();
-                    if(zoomTarget > maxZoom )
+                    if(zoomTarget >= maxZoom ) {
                         zoomTarget = maxZoom;
+                        scope.disableZoomOut = true;
+                    }else{
+                        scope.disableZoomOut = false;
+                    }
+
+                    var minZoom = scope.scaleManager.fullZoomInValue();
+                    if(zoomTarget <= minZoom ) {
+                        zoomTarget = minZoom;
+                        scope.disableZoomIn = true;
+                    }else{
+                        scope.disableZoomIn = false;
+                    }
 
                     //Find final levels for this zoom
                     var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);

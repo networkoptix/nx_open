@@ -885,6 +885,10 @@ ScaleManager.prototype.setAnchorDateAndPoint = function(date,point){ // Set anch
 ScaleManager.prototype.fullZoomOutValue = function(){
     return this.msToZoom(this.maxMsPerPixel);
 };
+ScaleManager.prototype.fullZoomInValue = function(){
+    return this.msToZoom(this.minMsPerPixel);
+};
+
 
 ScaleManager.prototype.calcLevels = function(msPerPixel) {
     var levels = {};
