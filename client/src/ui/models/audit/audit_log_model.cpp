@@ -755,9 +755,9 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
             return QVariant();
         if (record->isPlaybackType()) {
             if (role == Qt::DecorationRole)
-                return qnSkin->icon("slider/navigation/play.png");
+                return qnSkin->icon("audit/play.png");
             else
-                return qnSkin->icon("slider/navigation/play_hovered.png");
+                return qnSkin->icon("audit/play.png");
         }
         else if (record->eventType == Qn::AR_UserUpdate)
             return qnSkin->icon("tree/user.png");
@@ -789,6 +789,7 @@ QnAuditLogColors QnAuditLogModel::colors() const
 void QnAuditLogModel::setColors(const QnAuditLogColors &colors)
 {
     m_colors = colors;
+    emit colorsChanged();
 }
 
 void QnAuditLogModel::calcColorInterleaving()

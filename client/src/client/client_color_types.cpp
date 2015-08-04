@@ -129,19 +129,20 @@ QnRoutingManagementColors::QnRoutingManagementColors() {
 }
 
 QnAuditLogColors::QnAuditLogColors() {
-    httpLink = QColor(0xFF, 0xDE, 0xAD); // HTTP NavajoWhite
+    httpLink = QColor(0xFF, 0xFF, 0xFF); // HTTP NavajoWhite
 
-    loginAction = Qt::darkGreen;
-    unsucessLoginAction = Qt::darkRed;
-    updUsers = QColor(140, 35, 187);
-    watchingLive = QColor(98, 156, 217);
+    unsucessLoginAction = QColor(0x99, 0x99, 0x99);
+
+    loginAction = QColor(0x65, 0x99, 0x1c);
+    updUsers = QColor(0x99, 0x49, 0x98); // QColor(0x02, 0x9e, 0xb0);
+    watchingLive = QColor(0x02, 0x9e, 0xb0); //QColor(0xb1, 0x30, 0x16);
     watchingArchive = watchingLive;
-    exportVideo = QColor(210, 139, 0);
-    updCamera = QColor(165, 0, 135);
-    systemActions = QColor(178, 0, 0);
-    updServer = systemActions;
-    eventRules = Qt::black;
-    emailSettings = eventRules;
+    exportVideo = QColor(0x5d, 0x82, 0xbf);
+    updCamera = QColor(0xf3, 0x82, 0x82);
+    systemActions = QColor(0xb1, 0x30, 0x16); //QColor(0xdc, 0xb4, 0x28);
+    updServer = QColor(0xdc, 0xb4, 0x28); //QColor(0x99, 0x49, 0x98);
+    eventRules = QColor(0x9c, 0x6b, 0x50); //QColor(0x5d, 0x82, 0xbf);
+    emailSettings = QColor(0xcb, 0xcb, 0xcb); //QColor(0x9c, 0x6b, 0x50);
 }
 
 QnRecordingStatsColors::QnRecordingStatsColors()

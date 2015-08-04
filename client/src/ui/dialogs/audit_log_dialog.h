@@ -73,6 +73,7 @@ private slots:
     void at_headerCheckStateChanged(Qt::CheckState state);
     void at_updateDetailModel();
     void at_filterChanged();
+    void at_updateCheckboxes();
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     void requestFinished();

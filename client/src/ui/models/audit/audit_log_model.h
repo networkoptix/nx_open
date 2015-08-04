@@ -77,6 +77,8 @@ public:
 
     static bool hasDetail(const QnAuditRecord* record);
     static void setDetail(QnAuditRecord* record, bool showDetail);
+signals:
+    void colorsChanged();
 public slots:
     void clear();
 protected:

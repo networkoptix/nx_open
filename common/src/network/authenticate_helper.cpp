@@ -434,8 +434,12 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
 
     }
     addAuthHeader(responseHeaders, isProxy);
-    if (nonce.isEmpty() && authInProgress)
-        *authInProgress = true;
+    if (authInProgress) {
+        if (nonce.isEmpty())
+            *authInProgress = true;
+        else if (userName.isEmpty())
+            *authInProgress = true;
+    }
 
     return false;
 }
@@ -479,6 +483,8 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
 
 bool QnAuthHelper::isCookieNonceValid(const QByteArray& nonce)
 {
+    if (nonce.isEmpty())
+        return false;
     static const qint64 USEC_IN_SEC = 1000000ll;
 
     QMutexLocker lock(&m_cookieNonceCacheMutex);
