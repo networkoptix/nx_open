@@ -45,13 +45,9 @@ TextInput
     {
         if (event.key == Qt.Key_Backspace)
         {
-            if (text == "")
+            if (((impl.lastText == "") || ((cursorPosition == 0) && text.length)) && KeyNavigation.backtab)
             {
-                text = (digital ? (formatNumber("00")) : "AM");
-                if (KeyNavigation.backtab)
-                    KeyNavigation.backtab.forceActiveFocus();
-                else
-                    selectAll();
+                KeyNavigation.backtab.forceActiveFocus();
             }
         }
         else if (digital && (event.key >= Qt.Key_0) && (event.key < Qt.Key_9)
@@ -63,6 +59,8 @@ TextInput
 
     Keys.onPressed:
     {
+        impl.lastText = text;
+
         if ((digital && validator.bottom > 0) && (event.key == Qt.Key_0) && (text == "0"))
         {
             event.accepted = true;
@@ -83,6 +81,11 @@ TextInput
 
         initialText = formatNumber(initialText);
         text = formatNumber(text);
+    }
+
+    property QtObject impl : QtObject
+    {
+        property string lastText;
     }
 }
 
