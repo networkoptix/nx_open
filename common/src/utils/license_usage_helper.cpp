@@ -184,7 +184,7 @@ void QnLicenseUsageHelper::updateCache() const {
         m_cache.total[lt] = m_cache.licenses.totalLicenseByType(lt);
 
     /* Calculate used licenses with and without proposed cameras (to get proposed value as difference). */
-    calculateUsedLicenses2(basicUsedLicenses, m_cache.used);
+    calculateUsedLicenses(basicUsedLicenses, m_cache.used);
 
     /* Borrow some licenses (if available). Also repeating with and without proposed cameras. */
     for(const LicenseCompatibility& c: compatibleLicenseType) {
@@ -360,7 +360,7 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
         ;
 }
 
-void QnCamLicenseUsageHelper::calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
+void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
 {
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
@@ -430,7 +430,7 @@ QList<Qn::LicenseType> QnVideoWallLicenseUsageHelper::calculateLicenseTypes() co
 }
 
 
-void QnVideoWallLicenseUsageHelper::calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
+void QnVideoWallLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
 {
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
