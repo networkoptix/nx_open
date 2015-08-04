@@ -483,7 +483,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
             newVideoLayout = m_customVideoLayout->toString();
             QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
             if (camRes && m_role == Qn::CR_LiveVideo)
-                if (camRes->setPropertyOnce(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout))
+                if (camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout))
                     camRes->saveParams();
         }
     }
