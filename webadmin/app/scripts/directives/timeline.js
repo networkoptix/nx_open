@@ -275,7 +275,8 @@ angular.module('webadminApp')
                     var now = (new Date()).getTime();
                     scope.scaleManager.setStart(scope.recordsProvider ? scope.recordsProvider.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd(now);
-                    scope.scaleManager.fullZoomOut();
+
+                    scope.zoomTo(scope.scaleManager.fullZoomOutValue()); // Animate full zoom out
                 }
 
                 // !!! Drawing and redrawing functions
@@ -860,10 +861,7 @@ angular.module('webadminApp')
                             // Collect zoom changing in zoomTarget
                             zoomTarget -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
                         }
-
-                        // TODO: DO INSTANT?
                         scope.zoomTo(zoomTarget, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),window.jscd.touch);
-
                     } else {
                         scope.scaleManager.scrollByPixels(event.deltaX);
                     }
@@ -941,19 +939,44 @@ angular.module('webadminApp')
                     scope.zoomTo(zoomTarget);
                 };
 
-                scope.zooming = 0; // init animation value
-                scope.zoomTo = function(zoomTarget, zoomDate, instant){
-                    targetLevels = scope.scaleManager.targetLevels(zoomTarget);
+                scope.zooming = 1; // init animation value
 
-                    if(instant) { // Forca animation calculate on touch devices
-                        animateScope.process();
+                function levelsChanged(newLevels,oldLevels){
+                    if(newLevels.labels.index != oldLevels.labels.index) {
+                        return true;
                     }
 
-                    // This allows us to continue (and slowdown, mb) animation every time
-                    animateScope.animate(scope,"zooming",1).then(function(){
-                        currentLevels = scope.scaleManager.levels;
-                        scope.zooming = 0;
-                    });
+                    if(newLevels.middle.index != oldLevels.middle.index) {
+                        return true;
+                    }
+
+                    if(newLevels.small.index != oldLevels.small.index) {
+                        return true;
+                    }
+
+                    if(newLevels.marks.index != oldLevels.marks.index) {
+                        return true;
+                    }
+
+                    return false;
+                }
+                scope.zoomTo = function(zoomTarget, zoomDate, instant){
+
+                    //Find final levels for this zoom
+                    var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);
+                    if(levelsChanged(newTargetLevels ,targetLevels )){
+                        targetLevels = newTargetLevels;
+
+                        if( scope.zooming == 1){ // We need to run animation again
+                            scope.zooming = 0;
+                        }
+
+                        // This allows us to continue (and slowdown, mb) animation every time
+                        animateScope.animate(scope,"zooming",1).then(function(){
+                            currentLevels = scope.scaleManager.levels;
+                        });
+                    }
+
 
                     function setZoom(value){
                         if (zoomDate) {
@@ -967,6 +990,9 @@ angular.module('webadminApp')
                     }
 
                     if(!instant) {
+                        if(!scope.zoomTarget) {
+                            scope.zoomTarget = scope.scaleManager.zoom();
+                        }
                         animateScope.animate(scope, "zoomTarget", zoomTarget, "smooth").then(
                             function () {},
                             function () {},

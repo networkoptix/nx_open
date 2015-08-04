@@ -51,6 +51,9 @@ angular.module('webadminApp')
             }
             var delta = (Math.sin(time/duration * Math.PI - Math.PI / 2) + 1)/2;
             var result =start + (stop - start) *delta;
+            if(Number.isNaN(result)){
+               console.error("animation isNaN");
+            }
             return  result;
         };
 

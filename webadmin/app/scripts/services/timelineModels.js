@@ -879,9 +879,9 @@ ScaleManager.prototype.setAnchorDateAndPoint = function(date,point){ // Set anch
     this.updateCurrentInterval();
 };
 
-ScaleManager.prototype.fullZoomOut = function(){ // Reset zoom level to show all timeline
-    this.msPerPixel = this.maxMsPerPixel;
-    this.updateCurrentInterval();
+
+ScaleManager.prototype.fullZoomOutValue = function(){
+    return this.msToZoom(this.maxMsPerPixel);
 };
 
 ScaleManager.prototype.calcLevels = function(msPerPixel) {
@@ -1043,6 +1043,9 @@ ScaleManager.prototype.expRelative = function(zoom){
 ScaleManager.prototype.zoomToMs = function(zoom){
     // x(z) = Xmin * e^( ln(Xmax/Xmin) * z) = Xmin * (Xmax/Xmin) ^ z
     var msPerPixel = this.minMsPerPixel * Math.pow(this.absMaxMsPerPixel / this.minMsPerPixel,zoom);
+    if(Number.isNaN(msPerPixel)) {
+        console.error("msPerPixel is NaN");
+    }
     return this.bound(this.minMsPerPixel, msPerPixel, this.maxMsPerPixel);
 };
 ScaleManager.prototype.msToZoom = function(ms){
