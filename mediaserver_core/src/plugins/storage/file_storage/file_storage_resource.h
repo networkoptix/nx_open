@@ -51,6 +51,7 @@ private:
     // Translates remote url to local temporary mount folder.
     // Should have no effect on another storage types and OS's.
     QString translateUrlToLocal(const QString &url) const;
+    QString translateUrlToRemote(const QString &url) const;
 
 #ifndef _WIN32
     // mounts network (smb) folder to temporary local path
@@ -67,6 +68,7 @@ private:
     mutable QMutex  m_mutexPermission;
     mutable int     m_capabilities;
     QString         m_localPath;
+    bool            m_valid;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

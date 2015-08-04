@@ -19,9 +19,24 @@ int main(int argc, char **argv)
         QCoreApplication::translate("main", "URL")
     );
     parser.addOption(ftpUrlOption);
+
+    QCommandLineOption smbUrlOption(
+        QStringList() << "S" << "smb-storage-url",
+        QCoreApplication::translate("main", "SMB storage URL."),
+        QCoreApplication::translate("main", "URL")
+    );
+    parser.addOption(smbUrlOption);
+
     parser.process(app);
 
-    tg.prepare(parser.value(ftpUrlOption));
+    tg.prepare(
+        parser.value(
+            ftpUrlOption
+        ),
+        parser.value(
+            smbUrlOption
+        )
+    );
 
     ::testing::InitGoogleTest(&argc, argv);
     const int result = RUN_ALL_TESTS();

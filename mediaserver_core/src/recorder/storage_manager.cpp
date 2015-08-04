@@ -495,13 +495,13 @@ static const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
 static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
 {
-    QString storagePath = storage->getPath();
+    QString storageUrl = storage->getUrl();
     QString dbRefFilePath;
     
     //if (storagePath.indexOf(lit("://")) != -1)
     //    dbRefFilePath = dbRefFileName.arg(getLocalGuid());
     //else
-    dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
+    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(getLocalGuid());
 
     QByteArray dbRefGuidStr;
     //checking for file db_ref.guid existence
@@ -525,7 +525,7 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
 
     if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
     {
-        *dbDirectory = storagePath;
+        *dbDirectory = storageUrl;
         return true;
     }
     else
@@ -550,11 +550,11 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
             return false;
         dbGuidFile->close();
 
-        storagePath = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
-        if( !QDir().mkpath( storagePath ) )
+        storageUrl = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        if( !QDir().mkpath( storageUrl ) )
             return false;
     }
-    *dbDirectory = storagePath;
+    *dbDirectory = storageUrl;
     return true;
 }
 
@@ -572,6 +572,7 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
             NX_LOG( lit("Failed to file path to storage DB file. Storage is not writable?"), cl_logWARNING );
             return QnStorageDbPtr();
         }
+//        qWarning() << "DB Path: " << dbPath << "\n";
         QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
         QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
         
