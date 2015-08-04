@@ -64,7 +64,8 @@ rtu::ServerInfoManager::Impl::Impl(ServerInfoManager *parent)
 
     , m_msCounter()
     , m_lastUpdated()
-{   
+{
+    m_msCounter.start();
 }
 
 rtu::ServerInfoManager::Impl::~Impl()
@@ -81,10 +82,10 @@ void rtu::ServerInfoManager::Impl::primaryLoginToServer(const BaseServerInfo &in
         globalSuccessful(successful, id, extra, info.hostAddress);
     };
 
-    const auto &localFailed = [this, info, failed](const QString &, int)
+    const auto &localFailed = [this, info, failed](const int errorCode, const QString &, int)
     {
         if (failed)
-            failed(info.id);
+            failed(info.id, errorCode);
     };
     
     enum { kShortTimeout = 2000};
@@ -99,14 +100,21 @@ void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfo &info
     if (passwordIndex >= g_availablePasswords.size())
     {
         if (failed)
-            failed(info.id);
+            failed(info.id, kUnauthorizedError);
         return;
     }
     
     const auto &localFailed = 
-        [this, info, passwordIndex, successful, failed](const QString &,int)
+        [this, info, passwordIndex, successful, failed](const int errorCode, const QString &,int)
     {
-        loginToServer(info, passwordIndex + 1, successful, failed);
+        if (errorCode == kUnauthorizedError)
+        {
+            loginToServer(info, passwordIndex + 1, successful, failed);
+            return;
+        }
+
+        if (failed)
+            failed(info.id, kUnspecifiedError);
     };
     
     const auto &localSuccessful = [successful, info](const QUuid &id, const ExtraServerInfo &extra)
@@ -136,13 +144,13 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
         };
 
         const auto &localFailed = 
-            [this, base, successful, timestamp, failed](const QString &, int) 
+            [this, base, successful, timestamp, failed](const int, const QString &, int) 
         {
             /// on fail - try re-login
-            const auto &loginFailed = [this, timestamp, failed](const QUuid &id)
+            const auto &loginFailed = [this, timestamp, failed](const QUuid &id, int errorCode)
             {
                 if (m_lastUpdated[id] <= timestamp)
-                    failed(id);
+                    failed(id, errorCode);
             };
 
             loginToServer(base, 0, successful, loginFailed);
