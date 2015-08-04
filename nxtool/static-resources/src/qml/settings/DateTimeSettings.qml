@@ -77,7 +77,7 @@ Expandable.MaskedSettingsPanel
                         
                         if (!useCurrentTimeCheckbox.checked && !datePicker.acceptableInput)
                         {
-                            errorDialog.message = "Please enter valid time";
+                            errorDialog.message = "Please enter valid date";
                             errorDialog.show();
 
                             datePicker.forceActiveFocus();
