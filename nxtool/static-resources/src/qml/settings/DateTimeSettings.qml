@@ -94,7 +94,8 @@ Expandable.MaskedSettingsPanel
                         return true;
                     }
 
-                    property bool changed: (timeZonePicker.changed || timePicker.changed || datePicker.changed);
+                    property bool changed: (timeZonePicker.changed || timePicker.changed
+                        || datePicker.changed || useCurrentTimeCheckbox.changed);
                     enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
     
                     verticalItemAlignment: Grid.AlignVCenter;

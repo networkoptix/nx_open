@@ -96,6 +96,7 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
+                ${root.dir}/mediaserver_core/src \
                 ${libdir}/include \
                 ${environment.dir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
@@ -159,7 +160,9 @@ unix:!mac {
   } else {
     LIBS -= -lssl
     LIBS += ${linux.arm.oslibs}
+    QMAKE_CXXFLAGS += -ggdb1 -fno-omit-frame-pointer
   }
+  QMAKE_LFLAGS += -rdynamic
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX

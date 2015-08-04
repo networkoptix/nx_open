@@ -15,11 +15,6 @@
 #   include <platform/platform_abstraction.h>
 #endif
 
-#ifndef _WIN32
-#   include <platform/monitoring/global_monitor.h>
-#   include <platform/platform_abstraction.h>
-#endif
-
 #ifdef Q_OS_WIN
 #include "windows.h"
 #endif

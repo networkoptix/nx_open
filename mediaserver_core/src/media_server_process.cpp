@@ -194,6 +194,7 @@
 #include "network/universal_request_processor.h"
 #include "utils/network/nettools.h"
 #include "http/iomonitor_tcp_server.h"
+#include "rest/handlers/multiserver_chunks_rest_handler.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1398,6 +1399,7 @@ bool MediaServerProcess::initTcpListener()
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
+    QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
@@ -1528,10 +1530,15 @@ void MediaServerProcess::run()
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
+
+    //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
+    QnAuthHelper::instance()->restrictionList()->allow( lit( "?" ), AuthMethod::noAuth );
+
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );   //allowed by default for now
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/gettime"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
@@ -2133,6 +2140,8 @@ void MediaServerProcess::run()
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
+    m_crashReporter.reset(new ec2::CrashReporter);
+
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
     timer.start(QnVirtualCameraResource::issuesTimeoutMs());
@@ -2140,7 +2149,6 @@ void MediaServerProcess::run()
 
     QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
-
 
     m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
         std::bind( &MediaServerProcess::dumpSystemUsageStats, this ),
@@ -2161,6 +2169,8 @@ void MediaServerProcess::run()
     exec();
 
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
+
+    m_crashReporter.reset();
 
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;
@@ -2263,7 +2273,7 @@ void MediaServerProcess::at_appStarted()
         return;
 
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
-    m_crashReporter.scanAndReportAsync(MSSettings::runTimeSettings());
+    m_crashReporter->scanAndReportByTimer(MSSettings::runTimeSettings());
 };
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
@@ -2502,7 +2512,6 @@ int MediaServerProcess::main(int argc, char* argv[])
 #endif
 
 #ifdef __linux__
-    linux_exception::installCrashSignalHandler();
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
@@ -2511,6 +2520,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     QString rwConfigFilePath;
     bool showVersion = false;
     bool showHelp = false;
+    bool disableCrashHandler = false;
     QString engineVersion;
 
     QnCommandLineParser commandLineParser;
@@ -2540,7 +2550,18 @@ int MediaServerProcess::main(int argc, char* argv[])
         lit("This help message"), true);
     commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
         lit("Force the other engine version"), QString());
+
+    #ifdef __linux__
+        commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
+            lit("Disables crash signal handler (linux only)"), true);
+    #endif
+
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
+
+    #ifdef __linux__
+        if( !disableCrashHandler )
+            linux_exception::installCrashSignalHandler();
+    #endif
 
     if( showVersion )
     {
@@ -2578,5 +2599,7 @@ int MediaServerProcess::main(int argc, char* argv[])
 
 static void printVersion()
 {
-    std::cout << "  " << qApp->applicationName().toUtf8().data() << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
+    std::cout
+        << QN_ENGINE_VERSION << "-" << QN_APPLICATION_REVISION
+        << (strcmp(QN_BETA, "true") ? "" : "-beta") << std::endl;
 }

@@ -82,9 +82,7 @@ Base.Column
                 
                 var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
 
-                /// Always send dhcp state due to serialization issue on the server side
-                rtuContext.changesManager().addDHCPChange(name, useDHCP);
-
+                var somethingChanged = item.useDHCPControl.changed;
                 if (!useDHCP)   /// do not send address and mask if dhcp is on
                 {
                     if (item.ipAddressControl.acceptableInput)
@@ -112,6 +110,7 @@ Base.Column
                         item.subnetMaskControl.focus = true;
                         return false;
                     }
+                    somethingChanged = true;
                 }
                 
                 if (item.dnsControl.changed)
@@ -124,6 +123,7 @@ Base.Column
                         item.dnsControl.focus = true;
                         return false;
                     }
+                    somethingChanged = true;
                     rtuContext.changesManager().addDNSChange(name, item.dnsControl.text);
                 }
 
@@ -137,8 +137,17 @@ Base.Column
                         item.gatewayControl.focus = true;
                         return false;
                     }
+                    somethingChanged = true;
                     rtuContext.changesManager().addGatewayChange(name, item.gatewayControl.text);
                 }
+
+                if (somethingChanged)
+                {
+                    /// Always send dhcp state if some other parameters changed
+                    /// due to serialization issue on the server side
+                    rtuContext.changesManager().addDHCPChange(name, useDHCP);
+                }
+
             }
             return true;
         }

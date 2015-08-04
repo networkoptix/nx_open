@@ -48,7 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Passwort bestätigen</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Zusätzliche Parameter</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Dem System die Kamera-Einstellungen zu optimieren (empfohlen)</String>   
-    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">Send anonymous usage and crash statistics to software developers</String>   
+    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">Senden von anonymen Nutzungs- und Absturzstatistiken an die Software Entwickler (Empfohlen)</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">${product.name} ausprobieren</String>
@@ -56,6 +56,10 @@
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Verknüpfungen</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">Verknüpfung auf dem Desktop platzieren</String>
+
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">Verknüpfungen</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">Verknüpfung auf dem Desktop platzieren</String>
     
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Eine neuere Version von [ProductName] ist bereits installiert.</String> 
@@ -124,6 +128,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Starten Sie ${product.name} nachdem Setup beendet ist.</String>    
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">Starten Sie ${nxtool.name} nachdem Setup beendet ist.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">Dieses Paket ist ausschliesllich für 32-Bit-Betriebssystem konzipiert. Das Installationsprogramm beenden sich jetzt.</String>
 
     <!-- SelectionWarningDlg -->

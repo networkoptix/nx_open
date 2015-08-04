@@ -84,7 +84,7 @@ StreamReader::StreamReader(
     m_framesSinceTimeResync(MAX_FRAMES_BETWEEN_TIME_RESYNC),
     m_epollFD(-1),
     m_motionData(nullptr),
-    m_ptsMapper(90000, &TimeSynchronizationData::instance()->timeSyncData, encoderNum),
+    m_ptsMapper(90000, PTS_BITS, &TimeSynchronizationData::instance()->timeSyncData, encoderNum),
     m_currentGopSizeBytes( 0 )
 #ifdef DEBUG_OUTPUT
     ,m_totalFramesRead(0)

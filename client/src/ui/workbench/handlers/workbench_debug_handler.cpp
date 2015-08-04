@@ -61,34 +61,14 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() + 1);
     qDebug() << qnRuntime->debugCounter();
 
-    // TODO: #gdm WTF??
-    /*
     auto showPalette = [this] {
         QnPaletteWidget *w = new QnPaletteWidget();
         w->setPalette(qApp->palette());
         w->show();
     };
 
-    auto startMenuBlinking = [this] {
-        QTimer *timer = new QTimer(this);
-        timer->setInterval(100);
-        timer->setSingleShot(false);
-        connect(timer, &QTimer::timeout, this, [this, timer] {
-            if (qnRuntime->debugCounter() != 1) {
-                timer->stop();
-                timer->deleteLater();
-                return;
-            }
-            QMenu* m = action(Qn::MainMenuAction)->menu();
-            if (m && m->isVisible()) {
-                m->hide();
-            } else {
-                QCoreApplication::postEvent(mainWindow(), new QEvent(QnEvent::WinSystemMenu));
-            }
-        });
-        timer->start();
-    };
-    */
+    // the palette widget code maight still be required
+    Q_UNUSED(showPalette);
 }
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {

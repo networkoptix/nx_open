@@ -205,3 +205,68 @@ void TimerManager::run()
 
     NX_LOG( lit("TimerManager stopped"), cl_logDEBUG1 );
 }
+
+
+
+
+
+
+TimerManager::TimerGuard::TimerGuard()
+:
+    m_timerID( 0 )
+{
+}
+
+TimerManager::TimerGuard::TimerGuard( quint64 timerID )
+:
+    m_timerID( timerID )
+{
+}
+
+TimerManager::TimerGuard::TimerGuard( TimerGuard&& right )
+:
+    m_timerID( right.m_timerID )
+{
+    right.m_timerID = 0;
+}
+
+TimerManager::TimerGuard::~TimerGuard()
+{
+    reset();
+}
+
+TimerManager::TimerGuard& TimerManager::TimerGuard::operator=( TimerManager::TimerGuard&& right )
+{
+    if( &right == this )
+        return *this;
+
+    reset();
+
+    m_timerID = right.m_timerID;
+    right.m_timerID = 0;
+    return *this;
+}
+
+//!Cancels timer and blocks until running handler returns
+void TimerManager::TimerGuard::reset()
+{
+    if( !m_timerID )
+        return;
+    TimerManager::instance()->joinAndDeleteTimer( m_timerID );
+    m_timerID = 0;
+}
+
+TimerManager::TimerGuard::operator bool_type() const
+{
+    return m_timerID ? &TimerGuard::this_type_does_not_support_comparisons : 0;
+}
+
+bool TimerManager::TimerGuard::operator==( const TimerManager::TimerGuard& right ) const
+{
+    return m_timerID == right.m_timerID;
+}
+
+bool TimerManager::TimerGuard::operator!=( const TimerManager::TimerGuard& right ) const
+{
+    return m_timerID != right.m_timerID;
+}
