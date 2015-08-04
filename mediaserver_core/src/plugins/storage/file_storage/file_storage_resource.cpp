@@ -416,7 +416,7 @@ bool QnFileStorageResource::isAvailable() const
     if (!m_valid)
         return false;
 
-    if( !isStorageDirMounted() )
+    if(!isStorageDirMounted())
         return false;
 
     if (!updatePermissions())
