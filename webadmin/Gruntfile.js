@@ -449,11 +449,9 @@ module.exports = function (grunt) {
                             'customization/*',
                             //'bower_components/**/*',
                             //'bower_components/videogular-themes-default/videogular.css',
-                            'images/*',
-                            'images/**/*',
-                            'fonts/*',
-                            'components/*',
-                            'components/**/*'
+                            'images/**',
+                            'fonts/**',
+                            'components/**'
                         ]
                     },
                     {
@@ -632,4 +630,12 @@ module.exports = function (grunt) {
         'build',
         'scp:demo'
     ]);
+
+
+    grunt.registerTask('de', [
+        'build',
+        'scp:demo_fast'
+    ]);
+
+
 };
