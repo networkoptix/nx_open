@@ -14,7 +14,7 @@ angular.module('webadminApp')
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
-                    initialInterval: 1000*60 *60*24*365 /* *24*365*/, // no records - show small interval
+                    initialInterval: 1000*60*60*24*365 /* *24*365*/, // no records - show small interval
                     stickToLiveMs: 1000, // Value to stick viewpoert to Live - 1 second
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
                     minMsPerPixel: 1, // Minimum level for zooming:
@@ -22,7 +22,7 @@ angular.module('webadminApp')
                     zoomSpeed: 0.025, // Zoom speed for buttons 0 -> 1 = full zoom
                     maxVerticalScrollForZoom: 500, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
-                    animationDuration: 500, // 300, // 200-400 for smooth animation
+                    animationDuration: 300, // 300, // 200-400 for smooth animation
 
                     levelsSettings:{
                         labels:{
@@ -256,8 +256,8 @@ angular.module('webadminApp')
 
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
-                var timeMarker = element.find(".timeMarker.playing");
-                var pointerMarker = element.find(".timeMarker.pointer");
+                //var timeMarker = element.find(".timeMarker.playing");
+                //var pointerMarker = element.find(".timeMarker.pointer");
                 var canvas = element.find('canvas').get(0);
                 scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100, timelineConfig.stickToLiveMs); //Init boundariesProvider
 
@@ -972,8 +972,11 @@ angular.module('webadminApp')
                         }
 
                         // This allows us to continue (and slowdown, mb) animation every time
-                        animateScope.animate(scope,"zooming",1).then(function(){
+                        animateScope.animate(scope,"zooming",1,"dryResistance").then(function(){
                             currentLevels = scope.scaleManager.levels;
+                            console.log("animation finished!",scope.zooming);
+                        },function(){
+                            // ignore animation re-run
                         });
                     }
 
@@ -993,7 +996,7 @@ angular.module('webadminApp')
                         if(!scope.zoomTarget) {
                             scope.zoomTarget = scope.scaleManager.zoom();
                         }
-                        animateScope.animate(scope, "zoomTarget", zoomTarget, "smooth").then(
+                        animateScope.animate(scope, "zoomTarget", zoomTarget, "dryResistance").then(
                             function () {},
                             function () {},
                             setZoom);

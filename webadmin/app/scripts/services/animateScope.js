@@ -29,6 +29,8 @@ angular.module('webadminApp')
                     return this.smooth(start,stop,time,duration);
                 case "fading":
                     return this.fading(start,stop,time,duration);
+                case "dryResistance":
+                    return this.dryResistance(start,stop,time,duration);
                 case "linear":
                 default:
                     return this.linear(start,stop,time,duration);
@@ -53,6 +55,32 @@ angular.module('webadminApp')
             var result =start + (stop - start) *delta;
             if(Number.isNaN(result)){
                console.error("animation isNaN");
+            }
+            return  result;
+        };
+
+
+        /*
+         * Dry resistance is a physics model:
+         *
+         * x(t)=x0 + v0*t - k*t^2/2;
+         * k is a resistance koefficient, constant
+         *
+         * We have to move to stop by duration, so
+         * k = 2*(stop-start)/duration^2;
+         * v0 = 2*(stop-start)/duration
+         *
+         * x(t) = x0 + (stop-start)* (2* time/duration - (time/duration)^2)
+         */
+        Animation.prototype.dryResistance = function(start,stop,time,duration){
+            if(time > duration) {
+                time = duration;
+            }
+            var proportion = time/duration;
+            var delta = proportion * (2 - proportion);
+            var result =start + (stop - start) * delta;
+            if(Number.isNaN(result)){
+                console.error("animation isNaN");
             }
             return  result;
         };
