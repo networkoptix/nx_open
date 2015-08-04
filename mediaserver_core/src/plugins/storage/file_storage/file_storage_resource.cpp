@@ -36,6 +36,14 @@
 #include <sstream>
 #include <random>
 
+#ifndef Q_OS_WIN
+    const QString QnFileStorageResource::FROM_SEP = lit("\\");
+    const QString QnFileStorageResource::TO_SEP = lit("/");
+#else
+    const QString QnFileStorageResource::FROM_SEP = lit("/");
+    const QString QnFileStorageResource::TO_SEP = lit("\\");
+#endif
+
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
     if (!m_valid)
@@ -87,22 +95,12 @@ QString QnFileStorageResource::getPath() const
 bool QnFileStorageResource::updatePermissions() const
 {
     QMutexLocker lock(&m_mutexPermission);
+    
     if (m_durty) {
         m_durty = false;
-        QUrl storageUrl(getUrl());
-        QString path = storageUrl.path();
 #ifdef WIN32
-        if (url.startsWith("file://") && !storageUrl.userName().isEmpty())
-        {
-            NETRESOURCE netRes;
-            memset(&netRes, 0, sizeof(netRes));
-            netRes.dwType = RESOURCETYPE_DISK;
-            netRes.lpRemoteName = (LPWSTR) path.constData();
-            LPWSTR password = (LPWSTR) storageUrl.password().constData();
-            LPWSTR user = (LPWSTR) storageUrl.userName().constData();
-            if (WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0) != NO_ERROR)
-                return false;
-        }
+        if (!m_localPath.isEmpty() && !mountTmpDrive(getUrl()))
+            return false;
 #endif
     }
     return true;
@@ -145,8 +143,8 @@ bool QnFileStorageResource::checkWriteCap() const
 
 bool QnFileStorageResource::checkDBCap() const
 {
-    if (!m_valid)
-        return 0;
+    if (!m_valid || !m_localPath.isEmpty())
+        return false;
 #ifdef _WIN32
     return true;
 #else    
@@ -181,14 +179,14 @@ QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
         return url;
     else
     {
-        QString storagePath = QUrl(getUrl()).path().replace(lit("\\"), lit("/"));
-        QString tmpPath = QUrl(url).path().replace(lit("\\"), lit("/"));
+        QString storagePath = QUrl(getUrl()).path().replace(FROM_SEP, TO_SEP);
+        QString tmpPath = QUrl(url).path().replace(FROM_SEP, TO_SEP);
         if (storagePath == tmpPath)
             tmpPath.clear();
         else
             tmpPath = tmpPath.mid(storagePath.size());
-        tmpPath = m_localPath + lit("/") + tmpPath;
-        tmpPath.replace(lit("//"), lit("/"));
+        //tmpPath.replace(TO_SEP + TO_SEP, TO_SEP);
+        tmpPath = m_localPath + tmpPath;
 //        qWarning() << "translated path: " << tmpPath;
         return tmpPath;
     }
@@ -258,18 +256,50 @@ int QnFileStorageResource::mountTmpDrive(const QString &remoteUrl)
 
     return 0;
 }
+#else
+
+bool QnFileStorageResource::mountTmpDrive(const QString &url) const
+{
+    QUrl storageUrl(url);
+    if (!storageUrl.isValid())
+        return false;
+
+    QString path = 
+        lit("\\\\") + 
+        storageUrl.host() + 
+        storageUrl.path().replace(lit("/"), lit("\\"));
+
+    if (getUrl().startsWith("file://") && !storageUrl.userName().isEmpty())
+    {
+        NETRESOURCE netRes;
+        memset(&netRes, 0, sizeof(netRes));
+        netRes.dwType = RESOURCETYPE_DISK;
+        netRes.lpRemoteName = (LPWSTR) path.constData();
+        LPWSTR password = (LPWSTR) storageUrl.password().constData();
+        LPWSTR user = (LPWSTR) storageUrl.userName().constData();
+        if (WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0) != NO_ERROR)
+            return false;
+    }
+    
+    m_localPath = path;
+    return true;
+}
 #endif
 
 void QnFileStorageResource::setUrl(const QString& url)
 {
     QMutexLocker lock(&m_mutex);
-#ifndef _WIN32
+
     if (url.contains("://"))
     {
+#ifndef _WIN32
         if (mountTmpDrive(url) != 0)
             return;
-    }
+#else
+        if (!mountTmpDrive(url))
+            return;
 #endif
+    }
     QnStorageResource::setUrl(url);
     m_valid = true;
     m_durty = true;

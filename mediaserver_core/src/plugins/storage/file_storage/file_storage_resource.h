@@ -10,6 +10,9 @@
 
 class QnFileStorageResource: public QnStorageResource
 {
+private:
+    static const QString FROM_SEP;
+    static const QString TO_SEP;
 public:
     QnFileStorageResource();
     ~QnFileStorageResource();
@@ -57,6 +60,8 @@ private:
     // mounts network (smb) folder to temporary local path
     // returns not 0 if something went wrong, 0 otherwise
     int mountTmpDrive(const QString &remoteUrl);
+#else
+    bool mountTmpDrive(const QString &url) const;
 #endif
 
 private:
@@ -67,7 +72,7 @@ private:
 private:
     mutable QMutex  m_mutexPermission;
     mutable int     m_capabilities;
-    QString         m_localPath;
+    mutable QString m_localPath;
     bool            m_valid;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
