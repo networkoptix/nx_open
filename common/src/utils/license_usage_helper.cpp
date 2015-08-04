@@ -42,8 +42,11 @@ struct LicenseCompatibility
     Qn::LicenseType child;
 };
 
-/* Compatibility tree: Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder) */
-static std::array<LicenseCompatibility, 14> compatibleLicenseType =
+/* Compatibility tree: 
+ * Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder) 
+ * Trial -> IO
+ */
+static std::array<LicenseCompatibility, 15> compatibleLicenseType =
 {
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_AnalogEncoder),
@@ -61,6 +64,7 @@ static std::array<LicenseCompatibility, 14> compatibleLicenseType =
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Professional),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Analog),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_IO),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_AnalogEncoder)
 };
 
@@ -357,6 +361,7 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
         << Qn::LC_Edge
         << Qn::LC_VMAX  //only main page
         << Qn::LC_AnalogEncoder
+        << Qn::LC_IO
         ;
 }
 
