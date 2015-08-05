@@ -68,17 +68,6 @@ namespace {
     }
 
 
-struct LicenseTypeInfo
-{
-    LicenseTypeInfo(): licenseType(Qn::LC_Count), allowedForARM(0) {}
-    LicenseTypeInfo(Qn::LicenseType licenseType,  const QnLatin1Array& className, bool allowedForARM):
-        licenseType(licenseType), className(className), allowedForARM(allowedForARM) {}
-
-    Qn::LicenseType licenseType;
-    QnLatin1Array className;
-    bool allowedForARM;
-};
-
 static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
 {
     LicenseTypeInfo(Qn::LC_Trial,           "trial",         1),
@@ -90,6 +79,17 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1)
 };
 } // anonymous namespace
+
+LicenseTypeInfo::LicenseTypeInfo() : 
+    licenseType(Qn::LC_Count), 
+    allowedForARM(0) 
+{}
+
+LicenseTypeInfo::LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className, bool allowedForARM) :
+    licenseType(licenseType),
+    className(className),
+    allowedForARM(allowedForARM)
+{}
 
 
 // -------------------------------------------------------------------------- //
@@ -353,7 +353,7 @@ bool QnLicense::isValidStartLicense(ErrorCode* errCode, ValidationMode mode) con
 }
 
 bool QnLicense::isAllowedForArm() const {
-    return licenseTypeInfo[type()].allowedForARM;
+    return ::licenseTypeInfo[type()].allowedForARM;
 }
 
 
@@ -405,15 +405,15 @@ Qn::LicenseType QnLicense::type() const
     if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
         return Qn::LC_Trial;
 
-    if (xclass().toLower().toUtf8() == licenseTypeInfo[Qn::LC_VideoWall].className)
+    if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_VideoWall].className)
         return Qn::LC_VideoWall;
 
     if (!expiration().isEmpty())
         return Qn::LC_Trial;
     
     for (int i = 0; i < Qn::LC_Count; ++i) {
-        if (xclass().toLower().toUtf8() == licenseTypeInfo[i].className)
-            return licenseTypeInfo[i].licenseType;
+        if (xclass().toLower().toUtf8() == ::licenseTypeInfo[i].className)
+            return ::licenseTypeInfo[i].licenseType;
     }
 
     return Qn::LC_Professional; // default value
@@ -484,6 +484,10 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
         m_expiration = QLatin1String("");
         m_isValid1 = true;
     }
+}
+
+LicenseTypeInfo QnLicense::licenseTypeInfo(Qn::LicenseType licenseType) {
+    return ::licenseTypeInfo[licenseType];
 }
 
 // -------------------------------------------------------------------------- //

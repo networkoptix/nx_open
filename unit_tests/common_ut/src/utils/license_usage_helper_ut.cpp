@@ -457,3 +457,15 @@ TEST( QnCamLicenseUsageHelperTest, checkLicensesArmActivating )
     licPoolScaffold.addLicenses(Qn::LC_Edge, 1);
     ASSERT_TRUE( helper.isValid() );
 }
+
+/** Check if license info is filled for every license type. */
+TEST( QnLicenseInfoTest, validateLicenseInfo )
+{
+    for (int i = 0; i < Qn::LC_Count; ++i) {
+        Qn::LicenseType licenseType = static_cast<Qn::LicenseType>(i);
+
+        auto info = QnLicense::licenseTypeInfo(licenseType);
+        ASSERT_EQ(licenseType, info.licenseType);
+
+    }
+}
