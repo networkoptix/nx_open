@@ -58,11 +58,14 @@ public:
 
     QnRecordingStatsColors colors() const;
     void setColors(const QnRecordingStatsColors &colors);
+signals:
+    void colorsChanged();
 private:
     QString displayData(const QModelIndex &index) const;
     QString footerDisplayData(const QModelIndex &index) const;
     QnResourcePtr getResource(const QModelIndex &index) const;
     qreal chartData(const QModelIndex &index, bool isForecast) const;
+    QString tooltipText(Columns column) const;
     QVariant footerData(const QModelIndex &index, int role) const;
     void setModelDataInternal(const QnRecordingStatsReply& data, QnRecordingStatsReply& result);
 private:
@@ -70,6 +73,7 @@ private:
     QnRecordingStatsReply m_data;
     QnRecordingStatsReply m_forecastData;
     QnRecordingStatsColors m_colors;
+    qint64 m_bitrateSumm;
 };
 
 

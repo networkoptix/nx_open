@@ -143,6 +143,9 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayoutForecast">
+     <property name="horizontalSpacing">
+      <number>4</number>
+     </property>
      <item row="1" column="6">
       <widget class="QLabel" name="label_5">
        <property name="enabled">
@@ -184,19 +187,6 @@
         <string>Forecast for full storage(s) usage</string>
        </property>
       </widget>
-     </item>
-     <item row="0" column="11" rowspan="2">
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
      <item row="1" column="4">
       <widget class="QLabel" name="label_3">
@@ -322,6 +312,87 @@
         <double>1000.000000000000000</double>
        </property>
       </widget>
+     </item>
+     <item row="0" column="15">
+      <widget class="QLabel" name="labelForecastColor">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="13">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Current usage</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="11">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="12">
+      <widget class="QLabel" name="labelUsageColor">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="16">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>Forecast</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="14">
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>8</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>

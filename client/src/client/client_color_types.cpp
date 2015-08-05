@@ -147,8 +147,8 @@ QnAuditLogColors::QnAuditLogColors() {
 
 QnRecordingStatsColors::QnRecordingStatsColors()
 {
-    chartMainColor = QColor(7, 98, 129);
-    chartForecastColor = QColor(12, 81, 105);
+    chartMainColor = QColor(0x25, 0x92, 0xc3);
+    chartForecastColor = QColor(0x0c, 0x51, 0x69);
 }
 
 QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {

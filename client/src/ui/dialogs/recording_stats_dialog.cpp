@@ -86,6 +86,9 @@ public:
         QHeaderView::paintSection(painter, rect, logicalIndex);
         if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
         {
+            QnScopedPainterFontRollback rollback(painter);
+            painter->setFont(font());
+            painter->setPen(palette().foreground().color());
             int width = m_comboBox->minimumSizeHint().width();
             QRect r(rect);
             r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
@@ -145,6 +148,7 @@ void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionV
         painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), colors.chartMainColor);
 
         painter->setFont(opt.font);
+        painter->setPen(opt.palette.foreground().color());
         painter->drawText(opt.rect, Qt::AlignRight | Qt::AlignVCenter, index.data().toString());
 
     }
@@ -217,7 +221,27 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     connect(ui->extraSpaceSlider,   &QSlider::valueChanged,   this, &QnRecordingStatsDialog::at_forecastParamsChanged);
     connect(ui->extraSizeSpinBox,   SIGNAL(valueChanged(double)),   this, SLOT(at_forecastParamsChanged()));
 
+    connect(m_model, &QnRecordingStatsModel::colorsChanged, this, &QnRecordingStatsDialog::at_updateColors);
+    at_updateColors();
+
     ui->mainGridLayout->activate();
+}
+
+void QnRecordingStatsDialog::at_updateColors()
+{
+    auto colors = m_model->colors();
+    
+    QPalette palette = ui->labelUsageColor->palette();
+    palette.setColor(ui->labelUsageColor->backgroundRole(), colors.chartMainColor);
+    ui->labelUsageColor->setPalette(palette);
+    ui->labelUsageColor->setAutoFillBackground(true);
+    ui->labelUsageColor->update();
+
+    palette = ui->labelUsageColor->palette();
+    palette.setColor(ui->labelForecastColor->backgroundRole(), colors.chartForecastColor);
+    ui->labelForecastColor->setPalette(palette);
+    ui->labelForecastColor->setAutoFillBackground(true);
+    ui->labelForecastColor->update();
 }
 
 QnRecordingStatsDialog::~QnRecordingStatsDialog() {
