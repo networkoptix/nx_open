@@ -30,6 +30,9 @@ public:
     QByteArray getCryptSha512Hash() const;
     void setCryptSha512Hash(const QByteArray& hash);
         
+    QString getRealm() const;
+    void setRealm( const QString& realm );
+
     quint64 getPermissions() const;
     void setPermissions(quint64 permissions);
 
@@ -63,6 +66,7 @@ private:
     QByteArray m_hash;
     QByteArray m_digest;
     QByteArray m_cryptSha512Hash;
+    QString m_realm;
     quint64 m_permissions;
     bool m_isAdmin;
 	bool m_isLdap;
