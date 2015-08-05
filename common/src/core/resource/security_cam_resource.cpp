@@ -320,7 +320,10 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
     if (m_cachedLicenseType == Qn::LC_Count) 
     {
         QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
-        if (resType && resType->getManufacture() == lit("VMAX"))
+
+        if (hasCameraCapabilities(Qn::IOModuleCapability))
+            m_cachedLicenseType = Qn::LC_IO;
+        else if (resType && resType->getManufacture() == lit("VMAX"))
             m_cachedLicenseType =  Qn::LC_VMAX;
         else if (isAnalogEncoder())
             m_cachedLicenseType =  Qn::LC_AnalogEncoder; // AnalogEncoder should have priority over Analog type because of analog type is deprecated (DW-CP04 has both analog and analogEncoder params)
