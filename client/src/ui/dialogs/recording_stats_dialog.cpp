@@ -120,25 +120,29 @@ void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionV
 
         qreal realData = index.data(Qn::RecordingStatChartDataRole).toReal();
         qreal forecastData = index.data(Qn::RecordingStatForecastDataRole).toReal();
+        
 
         QColor baseColor = opt.backgroundBrush.color(); //opt.palette.color(QPalette::Normal, QPalette::Base);
-        QColor realColor(7, 98, 129);
-        QColor forecastColor(12, 81, 105);
+
+        QVariant value = index.data(Qn::RecordingStatColorsDataRole);
+        QnRecordingStatsColors colors;
+        if (value.isValid() && value.canConvert<QnRecordingStatsColors>())
+            colors = qvariant_cast<QnRecordingStatsColors>(value);
         
         if (opt.state & QStyle::State_Selected) {
             // alternate row color
             const int shift = 16;
             baseColor = shiftColor(baseColor, shift, shift, shift);
-            realColor = shiftColor(realColor, shift, shift, shift);
-            forecastColor = shiftColor(forecastColor, shift, shift, shift);
+            colors.chartMainColor = shiftColor(colors.chartMainColor, shift, shift, shift);
+            colors.chartForecastColor = shiftColor(colors.chartForecastColor, shift, shift, shift);
         }
         painter->fillRect(opt.rect, baseColor);
 
         //opt.rect.setWidth(opt.rect.width() - 4);
         opt.rect.adjust(2, 1, -2, -1);
         
-        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), forecastColor);
-        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), realColor);
+        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), colors.chartForecastColor);
+        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), colors.chartMainColor);
 
         painter->setFont(opt.font);
         painter->drawText(opt.rect, Qt::AlignRight | Qt::AlignVCenter, index.data().toString());

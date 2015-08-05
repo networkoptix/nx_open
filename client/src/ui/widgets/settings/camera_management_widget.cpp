@@ -48,6 +48,7 @@ void QnCameraManagementWidget::updateFromSettings() {
     bool discoveryFullEnabled = disabledVendors.isEmpty() && settings->isServerAutoDiscoveryEnabled();
     ui->autoDiscoveryCheckBox->setCheckState(discoveryEnabled ? (discoveryFullEnabled ? Qt::Checked : Qt::PartiallyChecked)
                                                               : Qt::Unchecked);
+    ui->auditTrailCheckBox->setChecked(settings->isAuditTrailEnabled());
 
     ui->autoSettingsCheckBox->setChecked(settings->isCameraSettingsOptimizationEnabled());
     ui->settingsWarningLabel->setVisible(false);
@@ -66,6 +67,7 @@ void QnCameraManagementWidget::submitToSettings() {
         settings->setServerAutoDiscoveryEnabled(false);
     }
 
+    settings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
     settings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
     ui->settingsWarningLabel->setVisible(false);
 
@@ -97,6 +99,9 @@ bool QnCameraManagementWidget::hasChanges() const  {
     if (ui->statisticsReportCheckBox->isChecked() != statisticsReportAllowed)
         return true;
 
+    bool auditLogAllowed = ec2::Ec2StaticticsReporter::isAllowed(servers);
+    if (ui->auditTrailCheckBox->isChecked() != settings->isAuditTrailEnabled())
+        return true;
+
     return false;
 }
-

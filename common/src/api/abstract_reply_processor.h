@@ -91,6 +91,37 @@ protected:
         emitFinished(derived, status, reply, handle, errorString);
     }
 
+    template<class T, class Derived>
+    void processUbjsonReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
+        int status = response.status;
+        QString errorString = QString::fromUtf8(response.errorString);
+
+        T reply;
+        if(status == 0) {
+            QnUbjsonRestResult result;
+            bool deserialized = false;
+            result = QnUbjson::deserialized<QnUbjsonRestResult>(response.data, QnUbjsonRestResult(), &deserialized);
+
+            if (deserialized && !result.reply().isNull())
+                reply = QnUbjson::deserialized<T>(result.reply(), T(), &deserialized);
+
+            if (!deserialized) {
+#ifdef JSON_REPLY_DEBUG
+                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+#endif
+                status = 1;
+            }
+            if (deserialized)
+                errorString = result.errorString();
+        } else {
+#ifdef JSON_REPLY_DEBUG
+            qnWarning("Error processing request: %1.", response.errorString);
+#endif
+        }
+
+        emitFinished(derived, status, reply, handle, errorString);
+    }
+
 private:
     int m_object;
     bool m_finished;

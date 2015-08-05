@@ -18,6 +18,7 @@
 #include "utils/crypt/linux_passwd_crypt.h"
 #include "utils/network/tcp_listener.h"
 #include "server/host_system_password_synchronizer.h"
+#include "audit/audit_manager.h"
 
 
 namespace {
@@ -57,8 +58,13 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     }
 
     /* reset connections if systemName is changed */
-    if (changeSystemNameResult == ResultOk && !wholeSystem)
-        resetConnections();
+    if (changeSystemNameResult == ResultOk) {
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemNameChanged);
+        qnAuditManager->addAuditRecord(auditRecord);
+        
+        if (!wholeSystem)
+            resetConnections();
+    }
 
     /* set port */
     int changePortResult = changePort(port);

@@ -35,7 +35,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
 
     if (connection) {
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
-
+        qnCommon->updateRunningInstanceGuid();
     } else if (m_connected) { // double init by null is allowed
         Q_ASSERT(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
