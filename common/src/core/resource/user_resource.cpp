@@ -59,7 +59,7 @@ void QnUserResource::generateHash() {
     hash.append("$");
     hash.append(md5.result().toHex());
 
-    QByteArray digest = QnAuthHelper::createUserPasswordDigest(getName().toLower(), password);
+    QByteArray digest = QnAuthHelper::createUserPasswordDigest(getName().toLower(), password, QnAuthHelper::REALM);
 
     setHash(hash);
     setDigest(digest);

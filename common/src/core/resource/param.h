@@ -50,13 +50,14 @@ namespace Qn
     /* Whether statistics gathering is allowed on the current server. */
     static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
 
-    // Hardware information
+    // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
     static const QString CPU_MODEL_NAME = lit("cpuModelName");
     static const QString PHISICAL_MEMORY = lit("phisicalMemory");
     static const QString BETA = lit("beta");
     static const QString PUBLIC_IP = lit("publicIp");
     static const QString NETWORK_INTERFACES = lit("networkInterfaces");
+    static const QString FULL_VERSION = lit("fullVersion");
 
     static const QString LDAP_HOST = lit("ldapHost");
     static const QString LDAP_PORT = lit("ldapPort");

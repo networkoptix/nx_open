@@ -143,6 +143,7 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addAdditionalHeader( const StringType& key, const StringType& value );
+        void addRequestHeaders(const HttpHeaders& headers);
         void removeAdditionalHeader( const StringType& key );
         template<class HttpHeadersRef>
         void setAdditionalHeaders( HttpHeadersRef&& additionalHeaders )
@@ -361,6 +362,8 @@ namespace nx_http
         bool operator<=( const AsyncHttpClientPtr& right ) const { return m_obj <= right.m_obj; }
         bool operator>( const AsyncHttpClientPtr& right ) const { return m_obj > right.m_obj; }
         bool operator>=( const AsyncHttpClientPtr& right ) const { return m_obj >= right.m_obj; }
+        bool operator==( const AsyncHttpClientPtr& right ) const { return m_obj == right.m_obj; }
+        bool operator!=( const AsyncHttpClientPtr& right ) const { return m_obj != right.m_obj; }
 
     private:
         std::shared_ptr<AsyncHttpClient> m_obj;
@@ -377,7 +380,9 @@ namespace nx_http
     */
     bool downloadFileAsync(
         const QUrl& url,
-        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler );
+        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
+        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
     //!Calls previous function and waits for completion
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,

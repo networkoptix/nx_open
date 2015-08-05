@@ -214,11 +214,12 @@ void QnResourcePoolModel::removeNode(QnResourcePoolModelNode *node) {
         return;
 
     case Qn::ResourceNode:
+    case Qn::EdgeNode:
         m_resourceNodeByResource.remove(node->resource());
         break;
     case Qn::ItemNode:
         m_itemNodeByUuid.remove(node->uuid());
-        if (node->resource())
+        if (node->resource() && m_itemNodesByResource.contains(node->resource()))
             m_itemNodesByResource[node->resource()].removeAll(node);
         break;
     case Qn::RecorderNode:
@@ -226,7 +227,7 @@ void QnResourcePoolModel::removeNode(QnResourcePoolModelNode *node) {
     case Qn::SystemNode:
         break;  //nothing special
     default:
-        assert(false); //should never come here
+        Q_ASSERT_X(false, Q_FUNC_INFO, "should never get here");
     }
 
     deleteNode(node);
@@ -553,7 +554,9 @@ Qt::DropActions QnResourcePoolModel::supportedDropActions() const {
 // QnResourcePoolModel :: handlers
 // -------------------------------------------------------------------------- //
 void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
-    assert(resource);
+    Q_ASSERT(resource);
+    if (!resource)
+        return;
 
     connect(resource,       &QnResource::parentIdChanged,                this,  &QnResourcePoolModel::at_resource_parentIdChanged);
     connect(resource,       &QnResource::nameChanged,                    this,  &QnResourcePoolModel::at_resource_resourceChanged);
@@ -628,21 +631,26 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
-    disconnect(resource, NULL, this, NULL);
-
     if (!resource)
         return;
 
-    if (!m_resourceNodeByResource.contains(resource))
-        return;
+    disconnect(resource, NULL, this, NULL);
 
-    QnResourcePoolModelNode *node = m_resourceNodeByResource.take(resource);
-    QnResourcePoolModelNode *parent = node->parent();
+    QList<QPointer<QnResourcePoolModelNode> > nodesToDelete;
+    for (QnResourcePoolModelNode* node: m_allNodes) {
+        if (node->resource() == resource)
+            nodesToDelete << QPointer<QnResourcePoolModelNode>(node);
+    }
 
-    deleteNode(node);
+    for (auto node: nodesToDelete) {
+        if (node.isNull())
+            continue;
+        removeNode(node.data());
+    }
 
-    if (parent)
-        parent->update();
+    m_itemNodesByResource.remove(resource);
+    m_recorderHashByResource.remove(resource);
+    Q_ASSERT(!m_resourceNodeByResource.contains(resource));
 }
 
 
@@ -702,8 +710,9 @@ void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resou
 
     node->update();
 
-    foreach(QnResourcePoolModelNode *node, m_itemNodesByResource[resource])
-        node->update();
+    if (m_itemNodesByResource.contains(resource))
+        foreach(QnResourcePoolModelNode *node, m_itemNodesByResource[resource])
+            node->update();
 }
 
 void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item) {

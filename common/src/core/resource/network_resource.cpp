@@ -96,12 +96,14 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
 
 void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
-    setProperty( Qn::CAMERA_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()), true);
+    setProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+                lit("%1:%2").arg(auth.user()).arg(auth.password()));
 }
 
 void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
 {
-    setProperty( Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()), true);
+    setProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
+                lit("%1:%2").arg(auth.user()).arg(auth.password()));
 }
 
 QAuthenticator QnNetworkResource::getAuth() const

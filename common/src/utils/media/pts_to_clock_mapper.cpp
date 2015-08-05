@@ -5,6 +5,8 @@
 
 #include "pts_to_clock_mapper.h"
 
+#include <limits>
+
 #include <QtCore/QMutexLocker>
 
 #include <utils/common/log.h>
@@ -12,10 +14,10 @@
 //#define DEBUG_OUTPUT
 
 
-static const int32_t MAX_PTS_DRIFT = 63000;    //700 ms
-static const int32_t DEFAULT_FRAME_DURATION = 3000;    //30 fps
-//static const int64_t MSEC_IN_SEC = 1000;
-static const int64_t USEC_IN_SEC = 1000*1000;
+static const int32_t MAX_PTS_DRIFT_MS = 1000;    //1 second
+static const int32_t DEFAULT_FRAME_DURATION_MS = 33;    //30 fps
+static const int64_t MSEC_IN_SEC = 1000;
+static const int64_t USEC_IN_SEC = 1000 * MSEC_IN_SEC;
 //static const int64_t USEC_IN_MSEC = 1000;
 
 
@@ -52,23 +54,37 @@ size_t PtsToClockMapper::TimeSynchronizationData::modificationSequence() const
 
 PtsToClockMapper::PtsToClockMapper(
     pts_type ptsFrequency,
+    size_t ptsBits,
     PtsToClockMapper::TimeSynchronizationData* timeSynchro,
     int sourceID )
 :
     m_ptsFrequency( ptsFrequency ),
+    m_ptsBits(ptsBits),
+    m_ptsMask(
+        (ptsBits >= sizeof(pts_type)*CHAR_BIT)
+            ? std::numeric_limits<pts_type>::max()
+            : ((1 << ptsBits) - 1) ),
+    m_maxPtsDrift( MAX_PTS_DRIFT_MS * ptsFrequency / MSEC_IN_SEC ),
+    m_ptsDeltaInCaseOfDiscontinuity( ptsFrequency * DEFAULT_FRAME_DURATION_MS / MSEC_IN_SEC ),
+    m_ptsOverflowCount( 0 ),
     m_timeSynchro( timeSynchro ),
     m_sourceID( sourceID == -1 ? rand() : sourceID ),
     m_prevPts( 0 ),
-    m_ptsBase( 0 ),
     m_baseClock( 0 ),
     m_baseClockOnSource( 0 ),
     m_sharedSynchroModificationSequence( 0 ),
-    m_prevPtsValid( false )
+    m_prevPtsValid( false ),
+    m_correction( 0 )
 {
+    assert( ptsBits < sizeof(pts_type)*CHAR_BIT );
 }
 
-int64_t PtsToClockMapper::getTimestamp( pts_type pts )
+PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )
 {
+    Q_ASSERT( pts <= m_ptsMask );
+
+    pts = (pts - m_correction) & m_ptsMask;
+
     if( !m_prevPtsValid )
     {
         m_prevPts = pts;
@@ -77,25 +93,50 @@ int64_t PtsToClockMapper::getTimestamp( pts_type pts )
 
     while( m_sharedSynchroModificationSequence != m_timeSynchro->modificationSequence() )
     {
-        updateTimeMapping( m_ptsBase, m_baseClockOnSource );
+        m_baseClock = m_baseClockOnSource + m_timeSynchro->localToSourceTimeShift();
         m_sharedSynchroModificationSequence = m_timeSynchro->modificationSequence();
 #ifdef DEBUG_OUTPUT
         std::cout<<"stream "<<m_sourceID<<". Updated time mapping. "<<std::endl;
 #endif
     }
 
-    if (qAbs((int32_t) (pts - m_prevPts)) > MAX_PTS_DRIFT)
+    pts_type ptsDelta = (pts - m_prevPts) & m_ptsMask;
+
+    //calculating abs diff of pts and m_prevPts
+    if( absDiff( pts, m_prevPts ) > m_maxPtsDrift )
     {
 #ifdef DEBUG_OUTPUT
         std::cout<<"stream "<<m_sourceID<<". discontinuity found"<<std::endl;
 #endif
-        //pts discontinuity
+        //pts discontinuity. Considering as if pts grows by m_ptsDeltaInCaseOfDiscontinuity
         NX_LOG( lit("Stream %1. Pts discontinuity (current %2, prev %3)").arg(m_sourceID).arg(pts).arg(m_prevPts), cl_logWARNING );
-        m_ptsBase += pts - m_prevPts - DEFAULT_FRAME_DURATION;
+        const pts_type localCorrection = (ptsDelta - m_ptsDeltaInCaseOfDiscontinuity) & m_ptsMask;
+        recalcPtsCorrection( localCorrection, &pts );
+        m_prevPts = (pts - m_ptsDeltaInCaseOfDiscontinuity) & m_ptsMask;
+        ptsDelta = (pts - m_prevPts) & m_ptsMask;
+    }
+
+    //checking for overflow
+    if( (ptsDelta < m_maxPtsDrift) && (pts < m_prevPts) )
+    {
+        //pts overflow
+        ++m_ptsOverflowCount;
+    }
+
+    if( (ptsDelta > (m_ptsMask >> 1))   //ptsDelta is negative
+        && (pts > m_prevPts) )          //overflow between pts and m_prevPts
+    {
+        //pts underflow
+        --m_ptsOverflowCount;
     }
 
     m_prevPts = pts;
-    const int64_t currentTimestamp = m_baseClock + (int64_t)(pts - m_ptsBase) * USEC_IN_SEC / m_ptsFrequency;
+    const ts_type totalPtsChange = 
+           (ts_type)(pts & m_ptsMask)                       //current pts
+           + m_ptsOverflowCount * ((ts_type)m_ptsMask+1);   //overflows
+
+    const ts_type currentTimestamp = 
+        m_baseClock + totalPtsChange * USEC_IN_SEC / m_ptsFrequency;
 
     NX_LOG( lit("pts %1, timestamp %2, %3").arg(pts).arg(currentTimestamp).arg(m_sourceID), cl_logDEBUG2 );
 #ifdef DEBUG_OUTPUT
@@ -104,15 +145,44 @@ int64_t PtsToClockMapper::getTimestamp( pts_type pts )
     return currentTimestamp;
 }
 
-void PtsToClockMapper::updateTimeMapping( pts_type pts, int64_t localTimeOnSourceUsec )
+void PtsToClockMapper::updateTimeMapping( const pts_type pts, int64_t localTimeOnSourceUsec )
 {
-    m_ptsBase = pts;
+    Q_ASSERT(pts <= m_ptsMask);
+
     m_baseClockOnSource = localTimeOnSourceUsec;
     m_baseClock = m_baseClockOnSource + m_timeSynchro->localToSourceTimeShift();
+
+    m_ptsOverflowCount = 0;
+    //we need correction so that pts always overflow around zero (pts base can be nonzero)
+    m_correction = pts;
+    m_prevPts = 0;  //(pts - m_correction) & m_ptsMask;
+    m_prevPtsValid = true;
 
 #ifdef DEBUG_OUTPUT
     std::cout<<"stream "<<m_sourceID<<". PtsToClockMapper::updateTimeMapping. "
         "ptsBase "<<pts<<", localTimeOnSourceUsec "<<localTimeOnSourceUsec<<", m_baseClock "<<m_baseClock<<
         ", m_timeSynchro->localToSourceTimeShift() "<<m_timeSynchro->localToSourceTimeShift()<<std::endl;
 #endif
+}
+
+PtsToClockMapper::pts_type PtsToClockMapper::ptsDeltaInCaseOfDiscontinuity() const
+{
+    return m_ptsDeltaInCaseOfDiscontinuity;
+}
+
+PtsToClockMapper::pts_type PtsToClockMapper::absDiff(
+    PtsToClockMapper::pts_type one,
+    PtsToClockMapper::pts_type two ) const
+{
+    return std::min<pts_type>((one - two) & m_ptsMask, (two - one) & m_ptsMask);
+}
+
+void PtsToClockMapper::recalcPtsCorrection(
+    PtsToClockMapper::pts_type ptsCorrection,
+    pts_type* const pts )
+{
+    m_prevPts = (m_prevPts - ptsCorrection) & m_ptsMask;
+    *pts = (*pts - ptsCorrection) & m_ptsMask;
+
+    m_correction = (m_correction + ptsCorrection) & m_ptsMask;
 }

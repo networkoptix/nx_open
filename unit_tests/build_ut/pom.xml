@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>unit_tests</artifactId>
+        <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
         <version>2.4-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <relativePath>../../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
@@ -15,6 +15,7 @@
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
+        <template>app</template>
     </properties>
 
 <!-- The following section is to rebuild the required artifact as lib. As soon as everything will be built as lib, this may be deleted -->

@@ -11,8 +11,8 @@
 
 class QnResourcePoolModel;
 
-class QnResourcePoolModelNode {
-    Q_DECLARE_TR_FUNCTIONS(QnResourcePoolModelNode)
+class QnResourcePoolModelNode: public QObject {
+    Q_OBJECT
 public:
     enum State {
         Normal,     /**< Normal node. */

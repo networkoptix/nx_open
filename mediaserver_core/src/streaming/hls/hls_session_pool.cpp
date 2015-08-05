@@ -86,6 +86,26 @@ namespace nx_hls
         return true;
     }
 
+    void HLSSession::setPlaylistAuthenticationQueryItem( const QPair<QString, QString>& authenticationQueryItem )
+    {
+        m_playlistAuthenticationQueryItem = authenticationQueryItem;
+    }
+
+    QPair<QString, QString> HLSSession::playlistAuthenticationQueryItem() const
+    {
+        return m_playlistAuthenticationQueryItem;
+    }
+
+    void HLSSession::setChunkAuthenticationQueryItem( const QPair<QString, QString>& authenticationQueryItem )
+    {
+        m_chunkAuthenticationQueryItem = authenticationQueryItem;
+    }
+
+    QPair<QString, QString> HLSSession::chunkAuthenticationQueryItem() const
+    {
+        return m_chunkAuthenticationQueryItem;
+    }
+
 
     ////////////////////////////////////////////////////////////
     // HLSSessionPool class

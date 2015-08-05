@@ -72,6 +72,7 @@ namespace ec2
         {
             deserialize(params, lit("info_skin"),               &data->clientInfo.skin);
             deserialize(params, lit("info_systemInfo"),         &data->clientInfo.systemInfo);
+            deserialize(params, lit("info_fullVersion"),        &data->clientInfo.fullVersion);
             deserialize(params, lit("info_cpuArchitecture"),    &data->clientInfo.cpuArchitecture);
             deserialize(params, lit("info_cpuModelName"),       &data->clientInfo.cpuModelName);
             deserialize(params, lit("info_phisicalMemory"),     &data->clientInfo.phisicalMemory);
@@ -94,6 +95,7 @@ namespace ec2
             serialize( data.clientInfo.id,              lit("info_id"),              query );
             serialize( data.clientInfo.skin,            lit("info_skin"),            query );
             serialize( data.clientInfo.systemInfo,      lit("info_systemInfo"),      query );
+            serialize( data.clientInfo.fullVersion,     lit("info_fullVersion"),     query );
             serialize( data.clientInfo.cpuArchitecture, lit("info_cpuArchitecture"), query );
             serialize( data.clientInfo.cpuModelName,    lit("info_cpuModelName"),    query );
             serialize( data.clientInfo.phisicalMemory,  lit("info_phisicalMemory"),  query );

@@ -227,11 +227,8 @@ public:
             if (fileStorage->isAvailable())
             {
                 const auto space = QString::number(fileStorage->getTotalSpace());
-                if (fileStorage->getProperty(Qn::SPACE) != space)
-                {
-                    fileStorage->setProperty(Qn::SPACE, space);
+                if (fileStorage->setProperty(Qn::SPACE, space))
                     propertyDictionary->saveParams(fileStorage->getId());
-                }
             }
         }
 
@@ -1158,6 +1155,10 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         if (catalog != 0) 
         {
             DeviceFileCatalog::Chunk deletedChunk = catalog->deleteFirstRecord();
+            QString lastDeletedDir = catalog->fileDir(deletedChunk);
+            auto fileList = qnStorageMan->storageRoot(deletedChunk.storageIndex)->getFileList(lastDeletedDir);
+            if (fileList.isEmpty())
+                qnStorageMan->storageRoot(deletedChunk.storageIndex)->removeDir(lastDeletedDir);
             clearDbByChunk(catalog, deletedChunk);
             QnServer::ChunksCatalog altQuality = catalog->getRole() == QnServer::HiQualityCatalog ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog;
             DeviceFileCatalogPtr altCatalog = getFileCatalog(catalog->cameraUniqueId(), altQuality);
@@ -1496,7 +1497,6 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 QnStorageResourcePtr QnStorageManager::getStorageByUrlExact(const QString& storageUrl)
 {
     QMutexLocker lock(&m_mutexStorages);
-    int matchLen = 0;
     for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         QString root = (*itr)->getUrl();

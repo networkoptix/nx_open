@@ -48,7 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">請確認密碼</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">附加參數</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允許系統優化攝影機設定(建議)</String>   
-    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">Send anonymous usage and crash statistics to software developers</String>   
+    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">匿名寄送使用狀況和故障狀況給軟體開發商(建議)</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">建立關聯 ${product.name}</String>
@@ -56,6 +56,10 @@
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">捷徑</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">新增捷徑至桌面</String>
+    
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">捷徑</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">新增捷徑至桌面</String>
     
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">更新的版本 [ProductName] 已經安裝</String> 
@@ -126,6 +130,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">退出安裝時執行 ${product.name} </String>    
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">退出安裝時執行 ${nxtool.name} </String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">此安裝檔為 32 位元專用. 安裝即將結束. </String>
 
     <!-- SelectionWarningDlg -->

@@ -805,6 +805,8 @@ rtu::ExtraServerInfo& rtu::ServersSelectionModel::Impl::getExtraInfo(ItemSearchI
     if (!info.hasExtraInfo())
     {
         info.setExtraInfo(ExtraServerInfo());
+        m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
+
         ++searchInfo.systemInfoIterator->loggedServers;
         m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
     }
@@ -842,9 +844,13 @@ void rtu::ServersSelectionModel::Impl::updateExtraInfoFailed(const QUuid &id)
     }
 
     searchInfo.serverInfoIterator->serverInfo.resetExtraInfo();
+    m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
+
     if (searchInfo.serverInfoIterator->selectedState == Qt::Checked)
     {
         searchInfo.serverInfoIterator->selectedState = Qt::Unchecked;
+        m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
+
         --searchInfo.systemInfoIterator->selectedServers;
         m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
 
@@ -852,7 +858,6 @@ void rtu::ServersSelectionModel::Impl::updateExtraInfoFailed(const QUuid &id)
             emit m_owner->selectionChanged();
     }
 
-    m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
 }
 
 void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(

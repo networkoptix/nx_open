@@ -50,6 +50,11 @@ namespace nx_hls
         void saveChunkAlias( MediaQuality streamQuality, const QString& alias, quint64 startTimestamp, quint64 duration );
         bool getChunkByAlias( MediaQuality streamQuality, const QString& alias, quint64* const startTimestamp, quint64* const duration ) const;
 
+        void setPlaylistAuthenticationQueryItem( const QPair<QString, QString>& authenticationQueryItem );
+        QPair<QString, QString> playlistAuthenticationQueryItem() const;
+        void setChunkAuthenticationQueryItem( const QPair<QString, QString>& authenticationQueryItem );
+        QPair<QString, QString> chunkAuthenticationQueryItem() const;
+
     private:
         const QString m_id;
         const unsigned int m_targetDurationMS;
@@ -59,6 +64,8 @@ namespace nx_hls
         std::vector<AbstractPlaylistManagerPtr> m_playlistManagers;
         //!map<pair<quality, alias>, pair<start timestamp, duration> >
         std::map<std::pair<MediaQuality, QString>, std::pair<quint64, quint64> > m_chunksByAlias;
+        QPair<QString, QString> m_playlistAuthenticationQueryItem;
+        QPair<QString, QString> m_chunkAuthenticationQueryItem;
         mutable QMutex m_mutex;
     };
 

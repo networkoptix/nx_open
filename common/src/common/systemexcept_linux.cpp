@@ -1,7 +1,5 @@
 #include "systemexcept_linux.h"
 
-#include "version.h"
-
 #include <execinfo.h>
 #include <fcntl.h>
 #include <pwd.h>
@@ -19,6 +17,7 @@
 #include <pthread.h>
 
 #include <QDebug>
+#include "utils/common/app_info.h"
 
 static const int BUFFER_SIZE = 2048;
 static const int STACK_SHIFT = 2; // signalHandler and printThreadData
@@ -30,9 +29,7 @@ static const struct timespec WAIT_FOR_MUTEX     = { 1 /* sec */, 0 /* nsec */ };
 static const struct timespec WAIT_FOR_THREADS   = { 1 /* sec */, 0 /* nsec */ };
 static const struct timespec WAIT_FOR_MAIN      = { 1 /* sec */, 500000 /* nsec */ };
 
-static const bool isBeta = strcmp(QN_BETA, "true") == 0;
-static const std::string versionId = QN_ENGINE_VERSION "-" QN_APPLICATION_REVISION;
-static const std::string fullVersionId = versionId + (isBeta ? "-beta" : "");
+static const std::string fullVersionId = QnAppInfo::applicationFullVersion().toStdString();
 
 /** Thread Keeper without heap usage */
 class ThreadKeeper
@@ -231,8 +228,6 @@ void linux_exception::setSignalHandlingDisabled(bool isDisabled)
     pthread_mutex_lock(&mutex);
     isSignalHandlingEnabled = !isDisabled;
     pthread_mutex_unlock(&mutex);
-
-    qDebug() << "linux_exception::setSignalHandlingDisabled" << isDisabled;
 }
 
 std::string linux_exception::getCrashDirectory()
