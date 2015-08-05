@@ -386,3 +386,35 @@ TEST( QnCamLicenseUsageHelperTest, checkStartLicenseType )
     licPoolScaffold.addLicenses(Qn::LC_Start, 1);
     ASSERT_TRUE( helper.isValid() );
 }
+
+/** Test for start license borrowing. */
+TEST( QnCamLicenseUsageHelperTest, borrowStartLicenses )
+{
+    QnLicensePoolScaffold licPoolScaffold;
+    QnResourcePoolScaffold resPoolScaffold;
+
+    QnCamLicenseUsageHelper helper;
+
+    resPoolScaffold.addCamera(Qn::LC_VMAX);
+    resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
+    resPoolScaffold.addCamera(Qn::LC_Analog);
+    resPoolScaffold.addCamera(Qn::LC_Professional);
+
+    ASSERT_FALSE( helper.isValid() );
+
+    /* Start licenses can be used instead of some other types. */
+    licPoolScaffold.addLicenses(Qn::LC_Start, 10);
+    ASSERT_TRUE( helper.isValid() );
+
+    /* Start licenses can't be used instead of edge licenses. */
+    resPoolScaffold.addCamera(Qn::LC_Edge);
+    ASSERT_FALSE( helper.isValid() );
+    licPoolScaffold.addLicenses(Qn::LC_Edge, 1);
+    ASSERT_TRUE( helper.isValid() );
+
+    /* Start licenses can't be used instead of io licenses. */
+    resPoolScaffold.addCamera(Qn::LC_IO);
+    ASSERT_FALSE( helper.isValid() );
+    licPoolScaffold.addLicenses(Qn::LC_IO, 1);
+    ASSERT_TRUE( helper.isValid() );
+}
