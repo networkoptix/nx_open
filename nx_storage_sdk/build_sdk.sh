@@ -5,7 +5,7 @@
 
 DOXYCHECK=`dpkg -l | grep doxygen`
 
-SDK_NAME=nx_sdk
+SDK_NAME=nx_storage_sdk
 TARGET_DIR=$SDK_NAME
 VERSION=1.6.0
 
@@ -24,58 +24,52 @@ if [ -e $TARGET_DIR ]; then
   rm -rf $TARGET_DIR
 fi
 
-mkdir -p $TARGET_DIR/include/plugins/
+mkdir -p $TARGET_DIR/include/plugins/storage/third_party
+mkdir -p $TARGET_DIR/sample/ftpstorageplugin
+
 cp -f readme.txt $TARGET_DIR
-cp -f ../common/maven/bin-resources/resources/camera_settings/camera_settings.xsd $TARGET_DIR
 
 #Copying integration headers
 cp -f ../common/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
-cp -f ../common/src/plugins/camera_plugin.h $TARGET_DIR/include/plugins/
+cp -f ../common/src/plugins/storage/third_party/third_party_storage.h $TARGET_DIR/include/plugins/storage/third_party
 
-PLUGINS=(axiscamplugin image_library_plugin rpi_cam)
+pluginName=ftpstorageplugin
 
-for (( i=0; i<${#PLUGINS[@]}; i++ ))
-do
-    pluginName="${PLUGINS[$i]}"
+#Copying plugin
+mkdir -p $TARGET_DIR/sample/$pluginName/src/impl
 
-    #Copying plugin
-    mkdir -p $TARGET_DIR/sample/$pluginName/src
-    cp -f ../plugins/$pluginName/*.pro $TARGET_DIR/sample/$pluginName/
-    cp -f ../plugins/$pluginName/src/*.h $TARGET_DIR/sample/$pluginName/src/
-    cp -f ../plugins/$pluginName/src/*.cpp $TARGET_DIR/sample/$pluginName/src/
-    cp -f ../plugins/$pluginName/Doxyfile $TARGET_DIR/sample/$pluginName/Doxyfile
+cp -f ../storage_plugins/$pluginName/src/CMakeLists.txt $TARGET_DIR/sample/$pluginName/src
 
-    if [ $? -eq 0 ]
-    then
-        echo "sources copied"
-    else
-        echo "Error occured"
-        exit 1
-    fi
+cp -f ../storage_plugins/$pluginName/src/ftp_library.h $TARGET_DIR/sample/$pluginName/src
+cp -f ../storage_plugins/$pluginName/src/ftp_library.cpp $TARGET_DIR/sample/$pluginName/src
+cp -f ../storage_plugins/$pluginName/src/impl/ftplib.cpp $TARGET_DIR/sample/$pluginName/src/impl
+cp -f ../storage_plugins/$pluginName/src/impl/ftplib.h $TARGET_DIR/sample/$pluginName/src/impl
+cp -f ../storage_plugins/$pluginName/Doxyfile $TARGET_DIR/sample/$pluginName
 
-    #Removing unnecessary source files
-    rm -rf $TARGET_DIR/sample/$pluginName/src/compatibility_info.cpp
+if [ $? -eq 0 ]
+then
+echo "sources copied"
+else
+echo "Error occured"
+exit 1
+fi
 
-    #Modifying paths in Doxyfile 
-    sed -i -e 's/common\/src/..\/include/g' ./nx_sdk/sample/$pluginName/Doxyfile
 
-    #Generating documentation
-    CUR_DIR_BAK=`pwd`
-    cd $TARGET_DIR/sample/$pluginName/
-    doxygen
+#Modifying paths in Doxyfile 
+sed -i -e 's/common\/src/..\/include/g' ./nx_sdk/sample/$pluginName/Doxyfile
 
-    if [ $? -eq 0 ]
-    then
-        echo "Doxygen run completed for $pluginName"
-    else
-        echo "Doxygen run failed for $pluginName"
-        exit 1
-    fi
+#Generating documentation
+CUR_DIR_BAK=`pwd`
+cd $TARGET_DIR/sample/$pluginName/
+doxygen
 
-    cd $CUR_DIR_BAK
-    rm -rf $TARGET_DIR/sample/$pluginName/Doxyfile
-done
+if [ $? -eq 0 ]
+then
+echo "Doxygen run completed for $pluginName"
+else
+echo "Doxygen run failed for $pluginName"
+exit 1
+fi
 
-#packing sdk
-#tar czf $SDK_NAME-$VERSION.tar.gz $TARGET_DIR
-#rm -rf $TARGET_DIR
+cd $CUR_DIR_BAK
+rm -rf $TARGET_DIR/sample/$pluginName/Doxyfile

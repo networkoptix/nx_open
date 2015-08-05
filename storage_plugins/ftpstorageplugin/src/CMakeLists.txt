@@ -27,10 +27,12 @@ add_library(
         "ftp_library.cpp" 
 )
 
-target_link_libraries(
-    ${TARGET}
+if(WIN32)
+    target_link_libraries(
+        ${TARGET}
         ws2_32
-)
+    )
+endif()
 
 if(UNIX)
     set_target_properties(
