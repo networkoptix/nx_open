@@ -189,7 +189,7 @@ private:
     bool isNonceValid(const QByteArray& nonce) const;
     bool isCookieNonceValid(const QByteArray& nonce);
     bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
-                      std::function<bool(const QByteArray&)> checkNonceFunc);
+                      std::function<bool(const QByteArray&)> checkNonceFunc, QnUserResourcePtr* const outUserResource = nullptr);
     bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
     bool doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 

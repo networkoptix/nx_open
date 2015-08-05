@@ -427,7 +427,8 @@ static QByteArray unquoteStr(const QByteArray& v)
 }
 
 bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, 
-                                bool isProxy, QnUuid* authUserId, char delimiter, std::function<bool(const QByteArray&)> checkNonceFunc)
+                                bool isProxy, QnUuid* authUserId, char delimiter, std::function<bool(const QByteArray&)> checkNonceFunc,
+                                QnUserResourcePtr* const outUserResource)
 {
     const QList<QByteArray>& authParams = smartSplit(authData, delimiter);
 
@@ -472,6 +473,9 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         {
             if (user->getName().toUtf8().toLower() == userName)
             {
+                if( outUserResource )
+                    *outUserResource = user;
+
                 userResource = user;
                 QByteArray dbHash = user->getDigest();
 
@@ -604,12 +608,16 @@ bool QnAuthHelper::isCookieNonceValid(const QByteArray& nonce)
 bool QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId)
 {
     nx_http::Response tmpHeaders;
-    bool rez = doDigestAuth(method, authData, tmpHeaders, false, authUserId, ';', std::bind(&QnAuthHelper::isCookieNonceValid, this, std::placeholders::_1));
+    QnUserResourcePtr outUserResource;
+    bool rez = doDigestAuth(
+        method, authData, tmpHeaders, false, authUserId, ';',
+        std::bind(&QnAuthHelper::isCookieNonceValid, this, std::placeholders::_1),
+        &outUserResource);
     if (!rez)
     {
         nx_http::insertHeader(
             &responseHeaders.headers,
-            nx_http::HttpHeader("Set-Cookie", lit("realm=%1; Path=/").arg(QnAppInfo::realm()).toUtf8() ));
+            nx_http::HttpHeader("Set-Cookie", lit("realm=%1; Path=/").arg(outUserResource ? outUserResource->getRealm() : QnAppInfo::realm()).toUtf8() ));
 
         QDateTime dt = qnSyncTime->currentDateTime().addSecs(COOKIE_EXPERATION_PERIOD);
         //QString nonce = lit("nonce=%1; Expires=%2; Path=/").arg(QLatin1String(getNonce())).arg(dateTimeToHTTPFormat(dt)); // Qt::RFC2822Date
