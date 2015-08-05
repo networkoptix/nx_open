@@ -163,6 +163,7 @@ QString QnLicense::displayName(Qn::LicenseType licenseType) {
     case Qn::LC_AnalogEncoder:  return tr("Analog encoder");
     case Qn::LC_VideoWall:      return tr("Video Wall");
     default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return QString();
@@ -182,6 +183,7 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     case Qn::LC_AnalogEncoder:  return tr("Analog encoder licenses");
     case Qn::LC_VideoWall:      return tr("Video Wall licenses");
     default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return QString();
@@ -313,6 +315,28 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
         }
     }
 #endif
+
+    // Only single Start license per system is allowed
+    if (type() == Qn::LC_Start)
+    {
+        for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
+            // skip other licenses and current license itself
+            if (license->type() != type() || license->key() == key())
+                continue;
+
+            // skip other licenses if they have less channels
+            if (license->cameraCount() < cameraCount())
+                continue;
+
+            if (license->cameraCount() > cameraCount())
+                return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid if it has less channels
+
+            // we found another license with the same number of channels
+            if (license->key() < key())
+                return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
+        }
+    }
+
     return gotError(errCode, NoError);
 }
 
