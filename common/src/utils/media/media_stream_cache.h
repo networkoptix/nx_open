@@ -112,7 +112,7 @@ public:
     void unblockData( int blockingID );
 
     //!Time (millis) from last usage of this object
-    size_t inactivityPeriod() const;
+    qint64 inactivityPeriod() const;
 
     struct MediaPacketContext
     {

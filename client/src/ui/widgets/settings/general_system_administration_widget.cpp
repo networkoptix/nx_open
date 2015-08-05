@@ -38,11 +38,13 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     setHelpTopic(ui->businessRulesButton,   Qn::EventsActions_Help);
     setHelpTopic(ui->cameraListButton,      Qn::Administration_General_CamerasList_Help);
+    setHelpTopic(ui->auditLogButton,      Qn::Administration_General_CamerasList_Help);
     setHelpTopic(ui->eventLogButton,        Qn::EventLog_Help);
     setHelpTopic(ui->healthMonitorButton,   Qn::Administration_General_HealthMonitoring_Help);
 
     connect(ui->businessRulesButton,    &QPushButton::clicked,  this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
     connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(Qn::CameraListAction); } );
+    connect(ui->auditLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenAuditLogAction); } );
     connect(ui->eventLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::BusinessEventsLogAction); } );
     connect(ui->healthMonitorButton,    &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); } );
 }
@@ -68,6 +70,7 @@ void QnGeneralSystemAdministrationWidget::resizeEvent(QResizeEvent *event) {
     QList<QPushButton*> buttons = QList<QPushButton*>()
         << ui->businessRulesButton
         << ui->cameraListButton
+        << ui->auditLogButton
         << ui->eventLogButton
         << ui->healthMonitorButton;
 

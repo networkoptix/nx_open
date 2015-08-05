@@ -70,6 +70,7 @@
 #include <nx_ec/data/api_reverse_connection_data.h>
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
+#include "api/model/audit/audit_record.h"
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -202,6 +203,8 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnIOPortData>();
     qRegisterMetaType<QnIOStateData>();
+    qRegisterMetaType<QnAuditRecord>();
+    qRegisterMetaType<QnAuditRecord*>();
 
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();
@@ -244,6 +247,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnUuid>( "QnUuid" );
     qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
     qRegisterMetaType<QnRecordingStatsReply>();
+    qRegisterMetaType<QnAuditRecordList>();
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

@@ -94,7 +94,7 @@ Base.Column
                         errorDialog.message = errorTemplate.arg(qsTr("ip address")).arg(name);
                         errorDialog.show();
             
-                        item.ipAddressControl.focus = true;
+                        item.ipAddressControl.forceActiveFocus();
                         return false;
                     }
 
@@ -107,7 +107,7 @@ Base.Column
                         errorDialog.message = errorTemplate.arg(qsTr("mask")).arg(name);
                         errorDialog.show();
                         
-                        item.subnetMaskControl.focus = true;
+                        item.subnetMaskControl.forceActiveFocus();
                         return false;
                     }
                     somethingChanged = true;
@@ -120,7 +120,7 @@ Base.Column
                         errorDialog.message = errorTemplate.arg(qsTr("dns")).arg(name);
                         errorDialog.show();
                         
-                        item.dnsControl.focus = true;
+                        item.dnsControl.forceActiveFocus();
                         return false;
                     }
                     somethingChanged = true;
@@ -135,7 +135,7 @@ Base.Column
                         errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(name);
                         errorDialog.show();
                         
-                        item.gatewayControl.focus = true;
+                        item.gatewayControl.forceActiveFocus();
                         return false;
                     }
                     somethingChanged = true;

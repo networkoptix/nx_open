@@ -220,7 +220,7 @@ bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
         setUrl(source->getUrl());
         mergedSomething = true;
     }
-    if (source->getMAC() != getMAC())
+    if (!source->getMAC().isNull() && source->getMAC() != getMAC())
     {
         setMAC(source->getMAC());
         mergedSomething = true;

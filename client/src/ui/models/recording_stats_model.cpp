@@ -12,6 +12,11 @@ namespace {
     const qreal SECS_PER_MONTH = SECS_PER_YEAR / 12.0;
     const qreal BYTES_IN_MB = 1000000.0;
     const int PREC = 2;
+
+    QString formatBitrateString(qint64 bitrate)
+    {
+        return QString::number(bitrate / BYTES_IN_MB * 8, 'f', PREC) + lit(" Mbps"); // *8 == value in bits
+    }
 }
 
 bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
@@ -46,7 +51,8 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
 }
 
 QnRecordingStatsModel::QnRecordingStatsModel(QObject *parent) :
-    base_type(parent)
+    base_type(parent),
+    m_bitrateSumm(0)
 {
 }
 
@@ -119,7 +125,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
         }
         case BitrateColumn:
             if (value.averageBitrate > 0)
-                return QString::number(value.averageBitrate / BYTES_IN_MB * 8, 'f', PREC) + lit(" Mbps"); // *8 == value in bits
+                return formatBitrateString(value.averageBitrate);
             else
                 return lit("-");
         default:
@@ -137,6 +143,8 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
     case DurationColumn:
         return displayData(index);
     case BitrateColumn:
+        if (m_bitrateSumm > 0)
+            return formatBitrateString(m_bitrateSumm);
         break;
     default:
         return QString();
@@ -204,6 +212,22 @@ QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) c
     return QVariant();
 }
 
+QString QnRecordingStatsModel::tooltipText(Columns column) const
+{
+    switch (column)
+    {
+        case CameraNameColumn:
+            return tr("Cameras with non empty archive");
+        case BytesColumn:
+            return tr("Storage space occupied by camera");
+        case DurationColumn:
+            return tr("Archived duration in calendar days between the first record and the current moment");
+        case BitrateColumn:
+            return tr("Average bitrate for the recorded period");
+    }
+    return QString();
+}
+
 QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const 
 {
     /* Check invalid indices. */
@@ -234,6 +258,10 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
         return chartData(index, false);
     case Qn::RecordingStatForecastDataRole:
         return chartData(index, true);
+    case Qn::RecordingStatColorsDataRole:
+        return QVariant::fromValue<QnRecordingStatsColors>(m_colors);
+    case Qt::ToolTipRole:
+        return tooltipText((Columns) index.column());
     default:
         break;
     }
@@ -280,7 +308,8 @@ void QnRecordingStatsModel::setForecastData(const QnRecordingStatsReply& data)
 QnRecordingStatsReply QnRecordingStatsModel::modelData() const
 {
     QnRecordingStatsReply result = m_data;
-    result.remove(result.size()-1); // remove footer
+    if (!result.isEmpty())
+        result.remove(result.size()-1); // remove footer
     return result;
 }
 
@@ -293,6 +322,7 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
 
     QnRecordingStatsData summ;
     QnRecordingStatsData maxValue;
+    m_bitrateSumm = 0;
 
     for(const QnCamRecordingStatsData& value: result) {
         summ += value;
@@ -300,6 +330,7 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
         maxValue.recordedSecs = qMax(maxValue.recordedSecs, value.recordedSecs);
         maxValue.archiveDurationSecs = qMax(maxValue.archiveDurationSecs, value.archiveDurationSecs);
         maxValue.averageBitrate = qMax(maxValue.averageBitrate, value.averageBitrate);
+        m_bitrateSumm = qMax(m_bitrateSumm, value.averageBitrate);
     }
     QnRecordingStatsData footer;
     footer.recordedBytes = summ.recordedBytes;
@@ -309,4 +340,15 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
     result.push_back(std::move(footer)); // add footer
 
     endResetModel();
+}
+
+QnRecordingStatsColors QnRecordingStatsModel::colors() const
+{
+    return m_colors;
+}
+
+void QnRecordingStatsModel::setColors(const QnRecordingStatsColors &colors)
+{
+    m_colors = colors;
+    emit colorsChanged();
 }

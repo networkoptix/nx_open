@@ -9,6 +9,7 @@
 
 #include <plugins/resource/archive/rtsp_client_archive_delegate.h>
 #include <plugins/resource/archive/archive_stream_reader.h>
+#include "http/custom_headers.h"
 
 QString QnClientVideoCamera::errorString(int errCode) {
     switch (errCode) {
@@ -166,6 +167,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
             QnVirtualCameraResourcePtr camera = m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false); 
+            rtspClient->setAdditionalAttribute(Qn::EC2_MEDIA_ROLE, "export");
         }
         if (role == QnStreamRecorder::Role_FileExport)
             m_exportReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files

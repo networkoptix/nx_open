@@ -86,6 +86,9 @@ public:
         QHeaderView::paintSection(painter, rect, logicalIndex);
         if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
         {
+            QnScopedPainterFontRollback rollback(painter);
+            painter->setFont(font());
+            painter->setPen(palette().foreground().color());
             int width = m_comboBox->minimumSizeHint().width();
             QRect r(rect);
             r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
@@ -120,27 +123,32 @@ void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionV
 
         qreal realData = index.data(Qn::RecordingStatChartDataRole).toReal();
         qreal forecastData = index.data(Qn::RecordingStatForecastDataRole).toReal();
+        
 
         QColor baseColor = opt.backgroundBrush.color(); //opt.palette.color(QPalette::Normal, QPalette::Base);
-        QColor realColor(7, 98, 129);
-        QColor forecastColor(12, 81, 105);
+
+        QVariant value = index.data(Qn::RecordingStatColorsDataRole);
+        QnRecordingStatsColors colors;
+        if (value.isValid() && value.canConvert<QnRecordingStatsColors>())
+            colors = qvariant_cast<QnRecordingStatsColors>(value);
         
         if (opt.state & QStyle::State_Selected) {
             // alternate row color
             const int shift = 16;
             baseColor = shiftColor(baseColor, shift, shift, shift);
-            realColor = shiftColor(realColor, shift, shift, shift);
-            forecastColor = shiftColor(forecastColor, shift, shift, shift);
+            colors.chartMainColor = shiftColor(colors.chartMainColor, shift, shift, shift);
+            colors.chartForecastColor = shiftColor(colors.chartForecastColor, shift, shift, shift);
         }
         painter->fillRect(opt.rect, baseColor);
 
         //opt.rect.setWidth(opt.rect.width() - 4);
         opt.rect.adjust(2, 1, -2, -1);
         
-        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), forecastColor);
-        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), realColor);
+        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), colors.chartForecastColor);
+        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), colors.chartMainColor);
 
         painter->setFont(opt.font);
+        painter->setPen(opt.palette.foreground().color());
         painter->drawText(opt.rect, Qt::AlignRight | Qt::AlignVCenter, index.data().toString());
 
     }
@@ -163,9 +171,9 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
     m_model = new QnRecordingStatsModel(this);
 
-    QnSortedRecordingStatsModel* sortModel = new QnSortedRecordingStatsModel(this);
-    sortModel->setSourceModel(m_model);
-    ui->gridEvents->setModel(sortModel);
+    m_sortModel = new QnSortedRecordingStatsModel(this);
+    m_sortModel->setSourceModel(m_model);
+    ui->gridEvents->setModel(m_sortModel);
     ui->gridEvents->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
     
@@ -213,7 +221,27 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     connect(ui->extraSpaceSlider,   &QSlider::valueChanged,   this, &QnRecordingStatsDialog::at_forecastParamsChanged);
     connect(ui->extraSizeSpinBox,   SIGNAL(valueChanged(double)),   this, SLOT(at_forecastParamsChanged()));
 
+    connect(m_model, &QnRecordingStatsModel::colorsChanged, this, &QnRecordingStatsDialog::at_updateColors);
+    at_updateColors();
+
     ui->mainGridLayout->activate();
+}
+
+void QnRecordingStatsDialog::at_updateColors()
+{
+    auto colors = m_model->colors();
+    
+    QPalette palette = ui->labelUsageColor->palette();
+    palette.setColor(ui->labelUsageColor->backgroundRole(), colors.chartMainColor);
+    ui->labelUsageColor->setPalette(palette);
+    ui->labelUsageColor->setAutoFillBackground(true);
+    ui->labelUsageColor->update();
+
+    palette = ui->labelUsageColor->palette();
+    palette.setColor(ui->labelForecastColor->backgroundRole(), colors.chartForecastColor);
+    ui->labelForecastColor->setPalette(palette);
+    ui->labelForecastColor->setAutoFillBackground(true);
+    ui->labelForecastColor->update();
 }
 
 QnRecordingStatsDialog::~QnRecordingStatsDialog() {
@@ -327,6 +355,7 @@ void QnRecordingStatsDialog::requestFinished()
             m_hidenCameras << camera;
     }
     m_model->setModelData(existsCameras);
+    m_sortModel->invalidate();
 
     
     ui->gridEvents->setDisabled(false);

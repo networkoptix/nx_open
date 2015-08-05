@@ -13,7 +13,10 @@ Expandable.MaskedSettingsPanel
     id: thisComponent;
     
     changed:  (maskedArea && maskedArea.changed?  true : false);
-    
+
+    extraWarned: !((NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+        || (rtuContext.selection.count === 1));
+
     function tryApplyChanges()
     {
         if (!changed)
@@ -48,6 +51,11 @@ Expandable.MaskedSettingsPanel
                 leftMargin: Common.SizeManager.spacing.base;
             }
 
+            Dialogs.ErrorDialog
+            {
+                id: errorDialog;
+            }
+
             item : Component
             {
                 id: dateTimePage;
@@ -60,21 +68,30 @@ Expandable.MaskedSettingsPanel
                     {
                         if (!timeZonePicker.model.isValidValue(timeZonePicker.currentIndex))
                         {
-                            timeZonePicker.focus = true;
-                            return false;
-                        }
-                        
-                        if (!useCurrentTimeCheckbox.checked && !timePicker.acceptableInput)
-                        {
-                            timePicker.focus = true;
+                            errorDialog.message = "Please choose time zone";
+                            errorDialog.show();
+                            timeZonePicker.forceActiveFocus();
+
                             return false;
                         }
                         
                         if (!useCurrentTimeCheckbox.checked && !datePicker.acceptableInput)
                         {
-                            datePicker.focus = true;
+                            errorDialog.message = "Please enter valid date";
+                            errorDialog.show();
+
+                            datePicker.forceActiveFocus();
                             return false;
                         }
+
+                        if (!useCurrentTimeCheckbox.checked && !timePicker.acceptableInput)
+                        {
+                            errorDialog.message = "Please enter valid time";
+                            errorDialog.show();
+
+                            timePicker.forceActiveFocus();
+                            return false;
+                        }                        
                         
                         var newDate = datePicker.date;
                         var newTime = timePicker.time;
@@ -96,7 +113,6 @@ Expandable.MaskedSettingsPanel
 
                     property bool changed: (timeZonePicker.changed || timePicker.changed
                         || datePicker.changed || useCurrentTimeCheckbox.changed);
-                    enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
     
                     verticalItemAlignment: Grid.AlignVCenter;
                     
@@ -133,21 +149,32 @@ Expandable.MaskedSettingsPanel
                     Base.TimeZonePicker
                     {
                         id: timeZonePicker;
-                        
+
+                        pseudoEnabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
+
                         model: rtuContext.timeZonesModel(this);
                         initIndex: timeZonePicker.model.initIndex;
     
                         onTimeZoneChanged:
                         {
-                            if (useCurrentTimeCheckbox.checked)
+                            if (useCurrentTimeCheckbox.checked || !timePicker.acceptableInput
+                                    || !datePicker.acceptableInput)
                                 return;
                             
                             var prevZoneId = timeZonePicker.model.timeZoneIdByIndex(from);
                             var curZoneId = timeZonePicker.model.timeZoneIdByIndex(to);
+
+                            if (!timeZonePicker.model.isValidValue(from)
+                                || !timeZonePicker.model.isValidValue(to))
+                            {
+                                console.log("Can't change timezone form " + prevZoneId + " to " + curZoneId);
+                                return;
+                            }
+
                             console.log("Chaning timezone from " + prevZoneId + " to " + curZoneId);
                             var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, prevZoneId, curZoneId);
                             datePicker.setDate(dateTime);
-                            timePicker.setTime(dateTime);
+                            timePicker.setTime(dateTime, true);
                         }
                     }
 
@@ -155,12 +182,14 @@ Expandable.MaskedSettingsPanel
                     {
                         spacing: Common.SizeManager.spacing.small;
 
-                        Base.DatePicker
+                        Base.DateEdit
                         {
                             id: datePicker;
-
                             initDate: (rtuContext.selection && rtuContext.selection !== null ?
                                 rtuContext.selection.dateTime : new Date());
+
+                            enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+                                && !useCurrentTimeCheckbox.checked;
                         }
 
                         Base.Button
@@ -168,7 +197,8 @@ Expandable.MaskedSettingsPanel
                             width: datePicker.height;
                             height: datePicker.height;
 
-                            enabled: !useCurrentTimeCheckbox.checked;
+                            enabled: !useCurrentTimeCheckbox.checked
+                                && (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
 
                             Dialogs.CalendarDialog
                             {
@@ -192,10 +222,12 @@ Expandable.MaskedSettingsPanel
                         }
                     }
 
-                    Base.TimePicker
+                    Base.TimeEdit
                     {
                         id: timePicker;
                         
+                        enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
+                            && !useCurrentTimeCheckbox.checked;
                         initTime: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
                     }
@@ -206,12 +238,20 @@ Expandable.MaskedSettingsPanel
         
                         text: qsTr("Set current date/time");
                         initialCheckedState: Qt.Unchecked;
-                        
+                        enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);
+
                         onCheckedChanged: 
                         {
                             if (checked)
                                 timeZonePicker.currentIndex = timeZonePicker.model.currentTimeZoneIndex;
-                            
+                            else
+                            {
+                                /// TODO: #ynikitenkov: investigate about wrong time recalculation when time zone changed to the initial
+                                timeZonePicker.dontSignal = true;
+                                timeZonePicker.currentIndex = timeZonePicker.initIndex;
+                                timeZonePicker.dontSignal = false;
+                            }
+
                             datePicker.showNow = checked;
                             timePicker.showNow = checked;
                         }
