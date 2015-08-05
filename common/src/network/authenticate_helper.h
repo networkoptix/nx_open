@@ -13,6 +13,9 @@
 #include "utils/network/http/httptypes.h"
 #include "utils/common/uuid.h"
 
+#include "ldap/ldap_manager.h"
+
+struct QnLdapDigestAuthContext;
 
 namespace AuthMethod
 {
@@ -94,7 +97,6 @@ public:
     virtual ~QnAuthHelper();
 
     static void initStaticInstance(QnAuthHelper* instance);
-    static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter);
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side
@@ -152,9 +154,7 @@ private:
     mutable QMutex m_cookieNonceCacheMutex;
 
     QCache<QByteArray, QElapsedTimer> m_digestNonceCache;
-    QCache<QString, QElapsedTimer> m_ldapAuthCache;
     mutable QMutex m_nonceMtx;
-    mutable QMutex m_ldapMtx;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

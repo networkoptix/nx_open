@@ -1,6 +1,3 @@
-// ldap.cpp : Defines the entry point for the console application.
-//
-
 #include "ldap_manager.h"
 
 #include <iostream>
@@ -10,6 +7,12 @@
 
 #include <Windows.h>
 #include <winldap.h>
+
+#include <QtCore/QMap>
+#include <QtCore/QBuffer>
+#include <QCryptographicHash>
+
+#include "network/authutil.h"
 
 #define QSTOCW(s) const_cast<PWCHAR>(s.toStdWString().c_str())
 
@@ -42,99 +45,160 @@ public:
     LdapUsers users;
 };
 
-/*
-std::wstring Utf8ToUtf16(const std::string &s)
-{
-    std::wstring ret;
-    int len = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.length(), NULL, 0);
-    if (len > 0) 
-    {
-      ret.resize(len);
-      MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.length(), const_cast<wchar_t*>(ret.c_str()), len);
-    }
-    return ret;
-}
-
-std::string Utf16ToUtf8(const std::wstring &s)
-{
-    QString ret;
-    int len = WideCharToMultiByte(CP_UTF8, 0, s.c_str(), s.length(), NULL, 0, NULL, NULL);
-    if (len > 0)
-    {
-      ret.resize(len);
-      WideCharToMultiByte(CP_UTF8, 0, s.c_str(), s.length(), const_cast<char*>(ret.c_str()), len, NULL, NULL);
-    }
-    return ret;
-}
-*/
-
 QnLdapManager::QnLdapManager(const QString &host, int port, const QString &bindDn, const QString &password, const QString &searchBase) 
 	: d_ptr(new QnLdapManagerPrivate(host, port, bindDn, password, searchBase)) {
+}
 
+QnLdapManager::~QnLdapManager() {
+}
+
+void QnLdapManager::fetchUsers() {
     Q_D(QnLdapManager);
 
     d->ld = ldap_init(QSTOCW(d->host), d->port);
     if (d->ld == 0)
         THROW_LDAP_EXCEPTION("LdapManager::LdapManager(): ldap_init()", LdapGetLastError());
 
-    int desired_version = LDAP_VERSION3;
-    int rc = ldap_set_option(d->ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
-    if (rc != 0)
-        THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_set_option(PROTOCOL_VERSION)", rc);
+    try {
+        int desired_version = LDAP_VERSION3;
+        int rc = ldap_set_option(d->ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
+        if (rc != 0)
+            THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_set_option(PROTOCOL_VERSION)", rc);
 
-    bind();
-}
+        rc = ldap_simple_bind_s(d->ld, QSTOCW(d->bindDn), QSTOCW(d->password));
+        if (rc != LDAP_SUCCESS)
+            THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_simple_bind_s()", rc);
 
-QnLdapManager::~QnLdapManager() {
-    Q_D(QnLdapManager);
+        LdapUsers users;
 
-    ldap_unbind(d->ld);
-}
+        LDAPMessage *result, *e;
 
-void QnLdapManager::bind() {
-    Q_D(QnLdapManager);
+        const PWSTR filter = L"(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
+	    rc = ldap_search_ext_s(d->ld, QSTOCW(d->searchBase), LDAP_SCOPE_SUBTREE, filter, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
+        if (rc != LDAP_SUCCESS)
+            THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_search_ext_s()", rc);
 
-    int rc = ldap_simple_bind_s(d->ld, QSTOCW(d->bindDn), QSTOCW(d->password));
-    if (rc != LDAP_SUCCESS)
-        THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_simple_bind_s()", rc);
-}
+        for (e = ldap_first_entry(d->ld, result); e != NULL; e = ldap_next_entry(d->ld, e)) {
+            PWSTR dn;
+            if ((dn = ldap_get_dn( d->ld, e )) != NULL) {
+                LdapUser user;
+                user.dn = QString::fromWCharArray(dn);
 
-void QnLdapManager::fetchUsers() {
-    Q_D(QnLdapManager);
-
-    LdapUsers users;
-
-    LDAPMessage *result, *e;
-
-    const PWSTR filter = L"(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
-	int rc = ldap_search_ext_s(d->ld, QSTOCW(d->searchBase), LDAP_SCOPE_SUBTREE, filter, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
-    if (rc != LDAP_SUCCESS)
-        THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_search_ext_s()", rc);
-
-    for (e = ldap_first_entry(d->ld, result); e != NULL; e = ldap_next_entry(d->ld, e)) {
-        PWSTR dn;
-        if ((dn = ldap_get_dn( d->ld, e )) != NULL) {
-            LdapUser user;
-            user.dn = QString::fromWCharArray(dn);
-
-            PWCHAR *values = ldap_get_values(d->ld, e, L"sAMAccountName");
-            ULONG nValues = ldap_count_values(values);
-            for (ULONG i = 0; i < nValues; i++) {
-                std::wstring value = values[i];
-                if (!value.empty()) {
-                    user.login = QString::fromWCharArray(values[i]);
-                    break;
+                PWCHAR *values = ldap_get_values(d->ld, e, L"sAMAccountName");
+                ULONG nValues = ldap_count_values(values);
+                for (ULONG i = 0; i < nValues; i++) {
+                    std::wstring value = values[i];
+                    if (!value.empty()) {
+                        user.login = QString::fromWCharArray(values[i]);
+                        break;
+                    }
                 }
-            }
-            ldap_value_free(values);
+                ldap_value_free(values);
 
-            users[user.login] = user;
-            ldap_memfree( dn );
+                users[user.login] = user;
+                ldap_memfree( dn );
+            }
         }
+
+        ldap_msgfree(result);
+        d->users = users;
+
+        ldap_unbind(d->ld);
+    } catch (...) {
+        ldap_unbind(d->ld);
+        throw;
+    }
+}
+
+static QByteArray md5(QByteArray data)
+{
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(data);
+    return md5.result();
+}
+
+bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &digest) {
+    Q_D(const QnLdapManager);
+
+    LDAP *ld;
+
+    ld = ldap_init(QSTOCW(d->host), LDAP_PORT);
+    int desired_version = LDAP_VERSION3;
+    int rc  = ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
+    if (rc != 0)
+        THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_set_option()", rc);
+    rc = ldap_connect(ld, NULL); // Need to connect before SASL bind!
+
+    struct berval cred;
+    cred.bv_len = 0;
+    cred.bv_val = 0;
+
+    // The servresp will contain the digest-challange after the first call.
+    berval *servresp = NULL;
+    SECURITY_STATUS res;
+    ldap_sasl_bind_s(ld, L"", L"DIGEST-MD5", &cred, NULL, NULL, &servresp);
+    ldap_get_option(ld, LDAP_OPT_ERROR_NUMBER, &res);
+    if (res != LDAP_SASL_BIND_IN_PROGRESS)
+        return false;
+    
+    QMap<QByteArray, QByteArray> responseDictionary;
+    QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
+    for (QByteArray line : smartSplit(initialResponse, ',')) {
+        line = line.trimmed();
+        int eqIndex = line.indexOf('=');
+        if (eqIndex == -1)
+            continue;
+
+        responseDictionary[line.mid(0, eqIndex)] = unquoteStr(line.mid(eqIndex + 1));
     }
 
-    ldap_msgfree(result);
-    d->users = users;
+    if (!responseDictionary.contains("realm") || !responseDictionary.contains("nonce"))
+        return false;
+
+    QByteArray realm = responseDictionary["realm"];
+    QByteArray nonce = responseDictionary["nonce"];
+
+    // TODO: Generate cnonce
+    QByteArray cnonce = "12345";
+    QByteArray nc = "00000001";
+    QByteArray qop = "auth";
+    QByteArray digestUri = QByteArray("ldap/") + realm;
+
+    QMap<QByteArray, QByteArray> authDictionary;
+    authDictionary["username"] = login.toUtf8();
+    authDictionary["realm"] = realm;
+    authDictionary["nonce"] = nonce;
+    authDictionary["digest-uri"] = digestUri;
+    authDictionary["cnonce"] = cnonce;
+    authDictionary["nc"] = nc;
+    authDictionary["qop"] = qop;
+
+    QByteArray ha1 = md5(QByteArray::fromHex(digest.toLatin1()) + ":" + nonce + ":" + cnonce).toHex();
+    QByteArray ha2 = md5(QByteArray("AUTHENTICATE:") + digestUri).toHex();
+    authDictionary["response"] = md5(ha1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2).toHex();
+
+    QByteArray authRequest;
+    for (auto i = authDictionary.cbegin(); i != authDictionary.cend(); ++i) {
+        if (i != authDictionary.cbegin()) {
+            authRequest += ", ";
+        }
+
+        authRequest += i.key();
+        authRequest += "=";
+        if (i.key() != "nc" && i.key() != "qop")
+            authRequest += "\"" + i.value() + "\"";
+        else
+            authRequest += i.value();
+    }
+
+    cred.bv_val = const_cast<char*>(authRequest.data());
+    cred.bv_len = authRequest.size();
+
+    servresp = NULL;
+    ldap_sasl_bind_s(ld, L"", L"DIGEST-MD5", &cred, NULL, NULL, &servresp);
+    ldap_get_option(ld, LDAP_OPT_ERROR_NUMBER, &res);
+
+    return res == LDAP_SUCCESS;
 }
 
 QStringList QnLdapManager::users() {
@@ -149,67 +213,3 @@ QStringList QnLdapManager::users() {
     return userLogins;
 }
 
-bool QnLdapManager::verifyCredentials(const QString &login, const QString &password) {
-    Q_D(QnLdapManager);
-
-    if (login.isEmpty() || password.isEmpty())
-        return false;
-
-    if (d->users.empty())
-        fetchUsers();
-
-    auto loginIter = d->users.find(login);
-    if (loginIter == d->users.end())
-        return false;
-
-	QString dn = loginIter->second.dn;
-    LDAP *ld2;
-    ld2 = ldap_init(QSTOCW(d->host), d->port);
-    if (ld2 == 0)
-        THROW_LDAP_EXCEPTION("LdapManager::LdapManager(): ldap_init()", LdapGetLastError());
-
-
-    int desired_version = LDAP_VERSION3;
-    int rc = ldap_set_option(ld2, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
-    if (rc != 0)
-        THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_set_option()", rc);
-
-    rc = ldap_simple_bind_s(ld2, QSTOCW(dn), QSTOCW(password));
-    if (rc != LDAP_SUCCESS)
-        return false;
-
-/*  LDAPMessage *result;
-    rc = ldap_search_ext_s(d->ld, L"dc=corp,dc=hdw,dc=mx", LDAP_SCOPE_SUBTREE, NULL, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
-    if (rc != LDAP_SUCCESS)
-        return false; */
-
-    ldap_unbind(ld2);
-    return true;
-    /* ULONG has_value = ldap_compare_s(d->ld, L"cn=Test User,cn=Users,dc=corp,dc=hdw,dc=mx", L"userPassword", L"QWEasd123"); 
-    switch ( has_value ) { 
-        case LDAP_COMPARE_TRUE: 
-            printf( "Works.\n"); 
-            break; 
-        case LDAP_COMPARE_FALSE: 
-            printf( "Failed.\n"); 
-            break; 
-        default: 
-            THROW_LDAP_EXCEPTION("LdapManager::verifyCredentials(): ldap_compare_s(): ", LdapGetLastError());
-    } */
-
-    
-/*    int rc = ldap_search_ext_s(d->ld, L"dc=corp,dc=hdw,dc=mx", LDAP_SCOPE_SUBTREE, filter, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
-    if (rc != LDAP_SUCCESS) {
-    } */
-
-//    return false;
-}
-
-/*
-try {
-    LdapManager ldapManager(NX_LDAP_HOST, NX_LDAP_PORT, LDAP_ADMIN_DN, LDAP_ADMIN_PW, LDAP_SEARCH_BASE);
-    return ldapManager.verifyCredentials(login, password);
-} catch (const LdapException& e) {
-    return false;
-}
-*/

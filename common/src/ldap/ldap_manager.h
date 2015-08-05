@@ -2,9 +2,12 @@
 #define LDAP_MANAGER_H_
 
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 #include <stdexcept>
 #include <vector>
 #include <map>
+
+#include <utils/common/singleton.h>
 
 struct LdapUser {
     QString dn;
@@ -29,19 +32,18 @@ private:
 
 class QnLdapManagerPrivate;
 
-class QnLdapManager {
+class QnLdapManager : public Singleton<QnLdapManager> {
 public:
     QnLdapManager(const QString &host, int port, const QString &bindDn, const QString &password, const QString &searchBase);
     ~QnLdapManager();
 
-    void bind();
-
     void fetchUsers();
     QStringList users();
 
-    bool verifyCredentials(const QString &login, const QString &password);
+    bool authenticateWithDigest(const QString &login, const QString &ha1);
 
 private:
+
 	Q_DECLARE_PRIVATE(QnLdapManager);
 
 	QnLdapManagerPrivate *d_ptr;

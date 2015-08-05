@@ -15,7 +15,7 @@
 #include "core/resource/media_server_resource.h"
 #include "http/custom_headers.h"
 #include "ldap/ldap_manager.h"
-
+#include "network/authutil.h"
 
 static const QString COOKIE_DIGEST_AUTH(lit("Authorization=Digest"));
 
@@ -81,7 +81,6 @@ QnAuthHelper::QnAuthHelper()
     connect(qnResPool, SIGNAL(resourceChanged(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     m_digestNonceCache.setMaxCost(100);
-    m_ldapAuthCache.setMaxCost(100);
 }
 
 QnAuthHelper::~QnAuthHelper()
@@ -158,7 +157,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
                 {
                     if( user->getName().toUtf8().toLower() == nxUserName )
                     {
-                        if( true || user->getDigest().isEmpty() )
+                        if( user->getDigest().isEmpty() )
                         {
                             //using basic authentication to allow fill user's digest
                             nx_http::insertOrReplaceHeader(
@@ -284,55 +283,12 @@ QByteArray QnAuthHelper::createHttpQueryAuthParam( const QString& userName, cons
     return authQueryItem;
 }
 
-//!Splits \a data by \a delimiter not closed within quotes
-/*!
-    E.g.: 
-    \code
-    one, two, "three, four"
-    \endcode
-
-    will be splitted to 
-    \code
-    one
-    two
-    "three, four"
-    \endcode
-*/
-QList<QByteArray> QnAuthHelper::smartSplit(const QByteArray& data, const char delimiter)
-{
-    bool quoted = false;
-    QList<QByteArray> rez;
-    if (data.isEmpty())
-        return rez;
-
-    int lastPos = 0;
-    for (int i = 0; i < data.size(); ++i)
-    {
-        if (data[i] == '\"')
-            quoted = !quoted;
-        else if (data[i] == delimiter && !quoted)
-        {
-            rez << QByteArray(data.constData() + lastPos, i - lastPos);
-            lastPos = i + 1;
-        }
-    }
-    rez << QByteArray(data.constData() + lastPos, data.size() - lastPos);
-
-    return rez;
-}
-
-static QByteArray unquoteStr(const QByteArray& v)
-{
-    QByteArray value = v.trimmed();
-    int pos1 = value.startsWith('\"') ? 1 : 0;
-    int pos2 = value.endsWith('\"') ? 1 : 0;
-    return value.mid(pos1, value.length()-pos1-pos2);
-}
-
 bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, 
                                 bool isProxy, QnUuid* authUserId, char delimiter, std::function<bool(const QByteArray&)> checkNonceFunc)
 {
-    const QList<QByteArray>& authParams = smartSplit(authData, delimiter);
+    const QMap<QByteArray, QByteArray> authParams = parseAuthData(authData, delimiter);
+    if (authParams.isEmpty())
+        return false;
 
     QByteArray userName;
     QByteArray response;
@@ -340,14 +296,10 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     QByteArray realm;
     QByteArray uri;
 
-    for (int i = 0; i < authParams.size(); ++i)
+    for (QByteArray key : authParams.keys())
     {
-        QByteArray data = authParams[i].trimmed();
-        int pos = data.indexOf('=');
-        if (pos == -1)
-            return false;
-        QByteArray key = data.left(pos);
-        QByteArray value = unquoteStr(data.mid(pos+1));
+        QByteArray value = authParams[key];
+
         if (key == "username")
             userName = value.toLower();
         else if (key == "response")
@@ -439,30 +391,10 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
 			if (user->isLdap())
 			{
 				try {
-                    QString credentials = userName + lit(":") + password;
-                    {
-                        // nonce cache will help if time just changed
-                        QMutexLocker lock(&m_ldapMtx);
-                        if (m_ldapAuthCache.contains(credentials) && m_ldapAuthCache[credentials]->elapsed() < LDAP_TIMEOUT)
-                            return true;
-                    }
-
-                    #define NX_LDAP_HOST lit("192.168.11.2")
-                    #define NX_LDAP_PORT 389
-
-                    #define LDAP_ADMIN_DN lit("Administrator@corp.hdw.mx")
-                    #define LDAP_ADMIN_PW lit("QWEasd123")
-                    #define LDAP_SEARCH_BASE lit("dc=corp,dc=hdw,dc=mx")
-
-					QnLdapManager ldapManager(NX_LDAP_HOST, NX_LDAP_PORT, LDAP_ADMIN_DN, LDAP_ADMIN_PW, LDAP_SEARCH_BASE);
-					bool authResult = ldapManager.verifyCredentials(userName, password);
-                    if (authResult) {
-                        QElapsedTimer* timeout = new QElapsedTimer();
-                        timeout->restart();
-                        QMutexLocker lock(&m_nonceMtx);
-                        m_ldapAuthCache.insert(credentials, timeout);
-                    }
-				} catch (const LdapException& e) {
+                    QnLdapManager *ldapManager = QnLdapManager::instance();
+                    bool authResult = ldapManager->authenticateWithDigest(userName, lit("") /* digest here */);
+                    return authResult;
+				} catch (const LdapException&) {
 					return false;
 				}
 			} else

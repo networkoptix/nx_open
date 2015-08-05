@@ -17,7 +17,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Outgoing Email Settings</string>
+      <string>Ldap Server Settings</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>

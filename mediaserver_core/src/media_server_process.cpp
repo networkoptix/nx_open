@@ -194,6 +194,7 @@
 #include "network/universal_request_processor.h"
 #include "utils/network/nettools.h"
 #include "http/iomonitor_tcp_server.h"
+#include "ldap/ldap_manager.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1520,6 +1521,11 @@ void MediaServerProcess::run()
     std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
+    std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager(m_mediaServer->getProperty(Qn::LDAP_HOST),
+        m_mediaServer->getProperty(Qn::LDAP_PORT).toInt(),
+        m_mediaServer->getProperty(Qn::LDAP_ADMIN_DN),
+        m_mediaServer->getProperty(Qn::LDAP_ADMIN_PASSWORD),
+        m_mediaServer->getProperty(Qn::LDAP_SEARCH_BASE)));
 
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 

@@ -59,13 +59,6 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
 {
     assert(qnResPool);
     
-/*                  #define NX_LDAP_HOST lit("192.168.11.2")
-                    #define NX_LDAP_PORT 389
-
-                    #define LDAP_ADMIN_DN lit("Administrator@corp.hdw.mx")
-                    #define LDAP_ADMIN_PW lit("QWEasd123")
-                    #define LDAP_SEARCH_BASE lit("dc=corp,dc=hdw,dc=mx") */
-
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
     m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
