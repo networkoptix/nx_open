@@ -1448,15 +1448,15 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     Q_ASSERT(!m_connections.contains(remotePeer.id));
 }
 
-bool QnTransactionMessageBus::moveConnectionToReadyForStreaming( const QnUuid& connectionGuid )
+bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& connectionGuid)
 {
-    QMutexLocker lock( &m_mutex );
+    QMutexLocker lock(&m_mutex);
 
-    for( auto connection: m_connectingConnections )
+    for(auto connection: m_connectingConnections)
     {
-        if( connection->connectionGuid() == connectionGuid )
+        if(connection->connectionGuid() == connectionGuid)
         {
-            connection->setState( QnTransactionTransport::Connected );
+            connection->setState(QnTransactionTransport::Connected);
             return true;
         }
     }
