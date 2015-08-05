@@ -257,8 +257,6 @@ angular.module('webadminApp')
 
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
-                //var timeMarker = element.find(".timeMarker.playing");
-                //var pointerMarker = element.find(".timeMarker.pointer");
                 var canvas = element.find('canvas').get(0);
                 scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100, timelineConfig.stickToLiveMs); //Init boundariesProvider
 
@@ -332,7 +330,6 @@ angular.module('webadminApp')
                     var context = canvas.getContext('2d');
                     context.fillStyle = blurColor(timelineConfig.timelineBgColor,1);
                     context.clearRect(0, 0, scope.viewportWidth, scope.viewportHeight);
-                    //context.fillRect(0, 0, scope.viewportWidth, scope.viewportHeight);
                     context.lineWidth = timelineConfig.lineWidth;
                     return context;
                 }
@@ -510,10 +507,7 @@ angular.module('webadminApp')
                     while(point <= end && counter++ < 3000){
                         var odd = bgColor!= bgOddColor || Math.round((point.getTime() / level.interval.getMilliseconds())) % 2 === 1; // add or even for zebra coloring
 
-                        var pointLevelIndex = levelIndex;
-                        //if(counter % level.contained == 0){
-                            pointLevelIndex = RulerModel.findBestLevelIndex(point, levelIndex);
-                        //}
+                        var pointLevelIndex = RulerModel.findBestLevelIndex(point, levelIndex);
 
                         var levelName = getBestLevelName(pointLevelIndex); // Here we detect best level for this particular point
 
@@ -587,7 +581,6 @@ angular.module('webadminApp')
                         var stopcoordinate = scope.scaleManager.dateToScreenCoordinate(nextDate);
                         var nextlevel = labelFixed?level:RulerModel.findBestLevel(nextDate)
                         var nextLabel = dateFormat(new Date(nextDate), nextlevel[labelFormat]);
-                        var nextWidth = context.measureText(nextLabel).width;
 
                         var bestlevel = labelFixed?level:RulerModel.findBestLevel(date);
                         var label = dateFormat(new Date(date), bestlevel[labelFormat]);
@@ -707,7 +700,7 @@ angular.module('webadminApp')
 
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
 
-                    context.fillRect(startCoordinate, top , Math.max(timelineConfig.minChunkWidth,endCoordinate - startCoordinate), timelineConfig.chunkHeight * scope.viewportHeight);
+                    context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2, top , (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, timelineConfig.chunkHeight * scope.viewportHeight);
                 }
 
                 var scrollBarWidth = 0;
@@ -780,14 +773,11 @@ angular.module('webadminApp')
                     context.lineTo(coordinate + 0.5, Math.round(scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight));
                     context.stroke();
 
-                    var side = null;
                     var startCoord = coordinate - timelineConfig.markerWidth /2;
                     if(startCoord < 0){
-                        side = "left";
                         startCoord = 0;
                     }
-                    if(startCoord + timelineConfig.markerWidth > scope.viewportWidth){
-                        side = "right";
+                    if(startCoord > scope.viewportWidth - timelineConfig.markerWidth){
                         startCoord = scope.viewportWidth - timelineConfig.markerWidth;
                     }
 

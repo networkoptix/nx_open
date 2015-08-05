@@ -2,11 +2,11 @@
 <div class="modal-header">
     <h3 class="modal-title">Login</h3>
 </div>
-<div class="modal-body" ng-if="authorized">
-    Authorization succeed
-</div>
 <form class="form" name="loginForm" novalidate ng-controller="LoginCtrl">
-    <div class="modal-body" class="col-sm-12" ng-if="!authorized">
+    <div class="modal-body" collapse="!authorized">
+        Authorization succeed
+    </div>
+    <div class="modal-body" class="col-sm-12" ng-if="!authorized" collapse="authorized">
         <div class="form-group" ng-class="{'has-error' : loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)}">
             <label for="username" class="control-label">Login</label>
             <input type="text" id="username" name="username" class="form-control" ng-model="user.username" required/>

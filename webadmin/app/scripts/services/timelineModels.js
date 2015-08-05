@@ -221,20 +221,6 @@ var RulerModel = {
     }
 };
 
-
-(function initLevels(){
-    for(var i=0; i < RulerModel.levels.length - 1; i++){
-        if(typeof(RulerModel.levels[i+1].contained) == 'undefined'){
-            RulerModel.levels[i+1].contained = Math.round(RulerModel.levels[i].interval.getMilliseconds() / RulerModel.levels[i+1].interval.getMilliseconds());
-        }
-    }
-    if(typeof(RulerModel.levels[0].contained) == 'undefined') {
-        RulerModel.levels[0].contained = 1;
-    }
-})();
-
-
-
 //Provider for records from mediaserver
 function CameraRecordsProvider(cameras,mediaserver,$q,width) {
 
@@ -982,15 +968,6 @@ ScaleManager.prototype.scrollByPixels = function(pixels){
 };
 
 
-// These two function implements logarifmic scale for zoom
-/*ScaleManager.prototype.logRelative = function(val){
-    return Math.log((Math.exp(this.zoomBase) - 1) * val + 1)/this.zoomBase;
-};
-ScaleManager.prototype.expRelative = function(val){
-    return (Math.exp(this.zoomBase * val) - 1)/(Math.exp(this.zoomBase) - 1);
-};*/
-
-
 /*
  * Details about zoom logic:
  * Main internal parameters, responsible for actual zoom is msPerPixel - number of miliseconds per one pixel on the screen, it changes from minMsPerPixel to absMaxMsPerPixel
@@ -1031,27 +1008,9 @@ ScaleManager.prototype.expRelative = function(val){
   *
  **/
 
-/*
-// These two function implements logarifmic scale for zoom
-ScaleManager.prototype.logRelative = function(relMsPerPixel){
-    relMsPerPixel = this.bound(0, relMsPerPixel, 1);
-    var zoom = Math.log( relMsPerPixel * (Math.exp(this.zoomBase) - 1) + 1 ) / this.zoomBase;
-    return zoom;
-};
-ScaleManager.prototype.expRelative = function(zoom){
-    zoom = this.bound(0, zoom, 1);
-    var relMsPerPixel = (Math.exp(this.zoomBase * zoom) - 1)/(Math.exp(this.zoomBase) - 1);
-    return relMsPerPixel;
-};
-*/
-
-
 ScaleManager.prototype.zoomToMs = function(zoom){
     // x(z) = Xmin * e^( ln(Xmax/Xmin) * z) = Xmin * (Xmax/Xmin) ^ z
     var msPerPixel = this.minMsPerPixel * Math.pow(this.absMaxMsPerPixel / this.minMsPerPixel,zoom);
-    if(Number.isNaN(msPerPixel)) {
-        console.error("msPerPixel is NaN");
-    }
     return this.bound(this.minMsPerPixel, msPerPixel, this.maxMsPerPixel);
 };
 ScaleManager.prototype.msToZoom = function(ms){
@@ -1060,10 +1019,6 @@ ScaleManager.prototype.msToZoom = function(ms){
     return zoom;
 };
 
-
-ScaleManager.prototype.availableZoomProportion = function(){
-    return (this.msToZoom(this.maxMsPerPixel) - this.msToZoom(this.minMsPerPixel)) / this.msToZoom(this.absMaxMsPerPixel);
-};
 
 ScaleManager.prototype.targetLevels = function(zoomTarget){
     var msPerPixel = this.zoomToMs(zoomTarget);
