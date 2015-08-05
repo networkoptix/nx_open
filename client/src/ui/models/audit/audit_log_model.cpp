@@ -114,12 +114,12 @@ public:
 
     static bool lessThanUserName(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return d1->userName < d2->userName;
+        return d1->authSession.userName < d2->authSession.userName;
     }
 
     static bool lessThanUserHost(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return d1->userHost < d2->userHost;
+        return d1->authSession.userHost < d2->authSession.userHost;
     }
 
     static bool lessThanEventType(const QnAuditRecord *d1, const QnAuditRecord *d2)
@@ -361,9 +361,11 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
     case Qn::AR_ServerRemove:
     case Qn::AR_BEventRemove:
     case Qn::AR_UserRemove:
+        result = QString::fromUtf8(data->extractParam("description"));
+        break;
     case Qn::AR_UnauthorizedLogin:
     case Qn::AR_Login:
-        result = QString::fromUtf8(data->extractParam("description"));
+        result = data->authSession.userAgent;
         break;
     case Qn::AR_ViewArchive:
     case Qn::AR_ViewLive:
@@ -492,9 +494,9 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data
         else
             return formatDuration(0);
     case UserNameColumn:
-        return data->userName;
+        return data->authSession.userName;
     case UserHostColumn:
-        return data->userHost;
+        return data->authSession.userHost;
         break;
     case EventTypeColumn:
         return eventTypeToString(data->eventType);
@@ -850,9 +852,9 @@ void QnAuditLogModel::calcColorInterleaving()
     for (int i = 0; i < m_index->size(); ++i)
     {
         QnAuditRecord* record = m_index->at(i);
-        if (record->sessionId != prevSessionId) {
+        if (record->authSession.id != prevSessionId) {
             colorIndex = (colorIndex + 1) % 2;
-            prevSessionId = record->sessionId;
+            prevSessionId = record->authSession.id;
         }
         m_interleaveInfo[i] = colorIndex;
     }

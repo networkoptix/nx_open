@@ -495,15 +495,15 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     QnAuthSession result;
     if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
         result.userName = userRes->getName();
-    result.sessionId = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
-    if (result.sessionId.isNull())
-        result.sessionId = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
-    if (result.sessionId.isNull()) {
+    result.id = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (result.id.isNull())
+        result.id = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (result.id.isNull()) {
         QUrlQuery query(d->request.requestLine.url.query());
-        result.sessionId = query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
+        result.id = query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
     }
-    if (result.sessionId.isNull())
-        result.sessionId = QnUuid::createUuid();
+    if (result.id.isNull())
+        result.id = QnUuid::createUuid();
 
     result.userHost = d->socket->getForeignAddress().address.toString();
     result.userAgent = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, "User-Agent"));

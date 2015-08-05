@@ -62,11 +62,9 @@ QnAuditManager::QnAuditManager()
 QnAuditRecord QnAuditManager::prepareRecord(const QnAuthSession& authInfo, Qn::AuditRecordType recordType)
 {
     QnAuditRecord result;
-    result.fillAuthInfo(authInfo);
+    result.authSession = authInfo;
     result.createdTimeSec = qnSyncTime->currentMSecsSinceEpoch() / 1000;
     result.eventType = recordType;
-    if (result.isLoginType() && !authInfo.userAgent.isEmpty())
-        result.addParam("description", authInfo.userAgent.toUtf8());
     return result;
 }
 
@@ -80,7 +78,7 @@ void QnAuditManager::at_connectionOpened(const QnAuthSession& authInfo)
     connection.internalId = addAuditRecord(connection.record);
     if (connection.internalId > 0) {
         QMutexLocker lock(&m_mutex);
-        m_openedConnections[authInfo.sessionId] = connection;
+        m_openedConnections[authInfo.id] = connection;
     }
 }
 
@@ -90,14 +88,14 @@ void QnAuditManager::at_connectionClosed(const QnAuthSession &data)
         return;
 
     QMutexLocker lock(&m_mutex);
-    auto itr = m_openedConnections.find(data.sessionId);
+    auto itr = m_openedConnections.find(data.id);
     if (itr != m_openedConnections.end()) {
         AuditConnection& connection = itr.value();
         connection.record.rangeStartSec = connection.record.createdTimeSec;
         connection.record.rangeEndSec = qnSyncTime->currentMSecsSinceEpoch() / 1000;
         updateAuditRecord(connection.internalId, connection.record);
     }
-    m_openedConnections.remove(data.sessionId);
+    m_openedConnections.remove(data.id);
 }
 
 int QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& cameraId, qint64 timestampUsec, bool isExport)
@@ -157,7 +155,7 @@ bool QnAuditManager::canJoinRecords(const QnAuditRecord& left, const QnAuditReco
     if (left.eventType != right.eventType)
         return false;
     bool peridOK = qAbs(left.rangeStartSec - right.rangeStartSec) * 1000ll < MAX_FRAME_DURATION;
-    bool sessionOK = left.sessionId == right.sessionId && left.userName == right.userName && left.userHost == right.userHost;
+    bool sessionOK = left.authSession == right.authSession;
     return peridOK && sessionOK;
 }
 

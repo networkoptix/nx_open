@@ -104,7 +104,7 @@ namespace ec2
     
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiIdData& params, const QnAuthSession& authInfo)
     {
-        Qn::AuditRecordType eventType;
+        Qn::AuditRecordType eventType = Qn::AR_NotDefined;
         QString description;
         switch(command)
         {
@@ -141,7 +141,6 @@ namespace ec2
 
         if (eventType != Qn::AR_NotDefined) {
             auto auditRecord = qnAuditManager->prepareRecord(authInfo, eventType);
-            auditRecord.addParam("description", description.toUtf8());
             qnAuditManager->addAuditRecord(auditRecord);
         }
     }

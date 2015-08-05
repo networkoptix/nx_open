@@ -6,14 +6,14 @@
 
 struct QnAuthSession
 {
-    QnUuid sessionId;
+    QnUuid id;
     QString userName;
     QString userHost;
     QString userAgent;
 };
 
-#define QnAuthSession_Fields (sessionId)(userName)(userHost)(userAgent)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnAuthSession), (eq))
+#define QnAuthSession_Fields (id)(userName)(userHost)(userAgent)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnAuthSession), (ubjson)(xml)(json)(csv_record)(eq)(sql_record))
 
 
 #endif // __QN_AUTH_SESSION_H__

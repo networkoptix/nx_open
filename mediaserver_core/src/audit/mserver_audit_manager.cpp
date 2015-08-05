@@ -9,6 +9,13 @@ namespace
     static const int SESSION_KEEP_PERIOD_MS = 1000;
 }
 
+QnAuditRecord filteredRecord(QnAuditRecord record)
+{
+    if (!record.isLoginType())
+        record.authSession.userAgent.clear(); // optimization. It used for login type only
+    return record;
+}
+
 
 QnMServerAuditManager::QnMServerAuditManager(): QnAuditManager()
 {
@@ -45,24 +52,23 @@ int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
 
     if (record.eventType == Qn::AR_Login)
     {
-        m_knownSessions.insert(record.sessionId, INT64_MAX);
+        m_knownSessions.insert(record.authSession.id, INT64_MAX);
     }
     else if (record.eventType == Qn::AR_UnauthorizedLogin) {
         ; // nothing to do
     }
-    else if (!m_knownSessions.contains(record.sessionId))
+    else if (!m_knownSessions.contains(record.authSession.id))
     {
-        m_knownSessions.insert(record.sessionId, record.createdTimeSec * 1000ll);
-        QnAuditRecord loginRecord = record;
-        loginRecord.eventType = Qn::AR_Login;
+        m_knownSessions.insert(record.authSession.id, record.createdTimeSec * 1000ll);
+        QnAuditRecord loginRecord = prepareRecord(record.authSession, Qn::AR_Login);
         loginRecord.rangeStartSec = record.createdTimeSec;
-        int insertedId = qnEventsDB->addAuditRecord(loginRecord);
+        int insertedId = qnEventsDB->addAuditRecord(filteredRecord(std::move(loginRecord)));
         if (insertedId == -1)
             return insertedId; // error occured
     }
     else 
-        m_knownSessions[record.sessionId] = record.createdTimeSec * 1000ll; // update session time if some activity
-    return qnEventsDB->addAuditRecord(record);
+        m_knownSessions[record.authSession.id] = record.createdTimeSec * 1000ll; // update session time if some activity
+    return qnEventsDB->addAuditRecord(filteredRecord(record));
 }
 
 int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAuditRecord& record)
@@ -72,7 +78,7 @@ int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAud
 
     QMutexLocker lock(&m_mutex);
     if (record.isLoginType() && record.rangeEndSec)
-        m_knownSessions.remove(record.sessionId);
+        m_knownSessions.remove(record.authSession.id);
 
-    return qnEventsDB->updateAuditRecord(internalId, record);
+    return qnEventsDB->updateAuditRecord(internalId, filteredRecord(record));
 }

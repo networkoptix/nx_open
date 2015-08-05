@@ -96,10 +96,7 @@ bool QnEventsDB::createDatabase()
             "eventType SMALLINT NOT NULL,"
             "resources BLOB,"
             "params TEXT,"
-            "sessionId BLOB(16),"
-            "userName TEXT,"
-            "userHost TEXT)"
-
+            "authSession TEXT)"
         );
         if (!ddlQuery.exec())
             return false;
@@ -108,7 +105,7 @@ bool QnEventsDB::createDatabase()
     if (!isObjectExists(lit("index"), lit("auditTimeIdx"), m_sdb)) {
         QSqlQuery ddlQuery(m_sdb);
         ddlQuery.prepare(
-            "CREATE INDEX \"auditTimeIdx\" ON \"audit_log\" (createdTimeSec, sessionId)"
+            "CREATE INDEX \"auditTimeIdx\" ON \"audit_log\" (createdTimeSec)"
             );
         if (!ddlQuery.exec())
             return false;
@@ -122,14 +119,17 @@ int QnEventsDB::addAuditRecord(const QnAuditRecord& data)
 {
     QWriteLocker lock(&m_mutex);
 
+    Q_ASSERT(data.eventType != Qn::AR_NotDefined);
+    Q_ASSERT((data.eventType & (data.eventType-1)) == 0);
+
     if (!m_sdb.isOpen())
         return false;
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO audit_log"
-        "(createdTimeSec, rangeStartSec, rangeEndSec, eventType, resources, params, sessionId, userName, userHost)"
+        "(createdTimeSec, rangeStartSec, rangeEndSec, eventType, resources, params, authSession)"
         "VALUES"
-        "(:createdTimeSec, :rangeStartSec, :rangeEndSec, :eventType, :resources, :params, :sessionId, :userName, :userHost)"
+        "(:createdTimeSec, :rangeStartSec, :rangeEndSec, :eventType, :resources, :params, :authSession)"
         );
     QnSql::bind(data, &insQuery);
 
@@ -148,11 +148,13 @@ int QnEventsDB::updateAuditRecord(int internalId, const QnAuditRecord& data)
 
     if (!m_sdb.isOpen())
         return false;
+    Q_ASSERT(data.eventType != Qn::AR_NotDefined);
+    Q_ASSERT((data.eventType & (data.eventType-1)) == 0);
 
     QSqlQuery updQuery(m_sdb);
     updQuery.prepare("UPDATE audit_log SET "
         "createdTimeSec = :createdTimeSec, rangeStartSec = :rangeStartSec, rangeEndSec = :rangeEndSec, eventType = :eventType, resources = :resources, "
-        "params = :params, sessionId = :sessionId, userName = :userName, userHost = :userHost WHERE id = :id"
+        "params = :params, authSession = :authSession WHERE id = :id"
         );
     QnSql::bind(data, &updQuery);
     updQuery.bindValue(":id", internalId);
@@ -172,7 +174,7 @@ QnAuditRecordList QnEventsDB::getAuditData(const QnTimePeriod& period, const QnU
         "FROM audit_log "
         "WHERE createdTimeSec BETWEEN ? and ? ");
     if (!sessionId.isNull())
-        request += lit("AND sessionId = ? ");
+        request += lit("AND authSession like '%1%'").arg(sessionId.toString());
     request += lit("ORDER BY createdTimeSec");
 
         
@@ -182,8 +184,6 @@ QnAuditRecordList QnEventsDB::getAuditData(const QnTimePeriod& period, const QnU
     query.prepare(request);
     query.addBindValue(period.startTimeMs / 1000);
     query.addBindValue(period.endTimeMs() == DATETIME_NOW ? INT_MAX : period.endTimeMs() / 1000);
-    if (!sessionId.isNull())
-        query.addBindValue(QnSql::serialized_field(sessionId));
     
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();

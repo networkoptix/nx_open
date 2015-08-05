@@ -12,13 +12,6 @@ struct QnAuditRecord
 {
     QnAuditRecord(): createdTimeSec(0), rangeStartSec(0), rangeEndSec(0), eventType(Qn::AR_NotDefined) {}
 
-    void fillAuthInfo(const QnAuthSession& authInfo) 
-    {
-        sessionId = authInfo.sessionId;
-        userName = authInfo.userName;
-        userHost = authInfo.userHost;
-    }
-
     bool isLoginType() const { return eventType == Qn::AR_Login || eventType == Qn::AR_UnauthorizedLogin; }
     bool isPlaybackType() const { return eventType == Qn::AR_ViewArchive || eventType == Qn::AR_ViewLive || eventType == Qn::AR_ExportVideo; }
 
@@ -34,15 +27,13 @@ struct QnAuditRecord
     std::vector<QnUuid> resources;
     QnLatin1Array params; // I didn't use map here for optimization reason
 
-    QnUuid sessionId;
-    QString userName;
-    QString userHost;
+    QnAuthSession authSession;
 };
 typedef QVector<QnAuditRecord> QnAuditRecordList;
 typedef QVector<QnAuditRecord*> QnAuditRecordRefList;
 
 
-#define QnAuditRecord_Fields (createdTimeSec)(rangeStartSec)(rangeEndSec)(eventType)(resources)(params)(sessionId)(userName)(userHost)
+#define QnAuditRecord_Fields (createdTimeSec)(rangeStartSec)(rangeEndSec)(eventType)(resources)(params)(authSession)
 Q_DECLARE_METATYPE(QnAuditRecord)
 Q_DECLARE_METATYPE(QnAuditRecord*)
 Q_DECLARE_METATYPE(QnAuditRecordList)

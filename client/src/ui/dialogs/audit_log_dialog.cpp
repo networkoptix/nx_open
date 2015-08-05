@@ -247,7 +247,7 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRe
 {
     QSet<QnUuid> selectedSessions;
     for (const QnAuditRecord* record: checkedRows) 
-        selectedSessions << record->sessionId;
+        selectedSessions << record->authSession.id;
 
     Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
     for (const QCheckBox* checkBox: m_filterCheckboxes) 
@@ -259,7 +259,7 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRe
 
     QnAuditRecordRefList result;
     auto filter = [&selectedSessions, &disabledTypes] (const QnAuditRecord* record) {
-        return selectedSessions.contains(record->sessionId) && !(disabledTypes & record->eventType);
+        return selectedSessions.contains(record->authSession.id) && !(disabledTypes & record->eventType);
     };
     std::copy_if(m_filteredData.begin(), m_filteredData.end(), std::back_inserter(result), filter);
     return result;
@@ -337,11 +337,11 @@ void QnAuditLogDialog::at_filterChanged()
     {
         QSet<QnUuid> filteredSessions;
         for (const QnAuditRecord* record: m_filteredData)
-            filteredSessions << record->sessionId;
+            filteredSessions << record->authSession.id;
     
         QnAuditRecordRefList sessions;
         for (auto& record: m_allData) {
-            if (record.isLoginType() && filteredSessions.contains(record.sessionId))
+            if (record.isLoginType() && filteredSessions.contains(record.authSession.id))
                 sessions.push_back(&record);
         }
 
