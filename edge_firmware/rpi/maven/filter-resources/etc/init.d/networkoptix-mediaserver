@@ -2,7 +2,7 @@
 ### BEGIN INIT INFO
 # Provides:          ${deb.customization.company.name}-mediaserver
 # Required-Start:    networking
-# Required-Stop:    
+# Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: ${company.name} ${product.name} Media Server
@@ -17,11 +17,34 @@ CUSTOMIZATION=${deb.customization.company.name}
 MODULE_NAME=mediaserver
 INSTALL_ROOT=/opt/$CUSTOMIZATION/$MODULE_NAME/
 BIN_PATH=$INSTALL_ROOT/bin/$MODULE_NAME
-RUN_ARGS=-e
+RUN_ARGS="-e --disable-crash-handler"
 export LD_LIBRARY_PATH=$INSTALL_ROOT/lib/
 export VMS_PLUGIN_DIR=$INSTALL_ROOT/bin/plugins/
 
 RUNNING_APP_PID="`pidof $MODULE_NAME`"
+
+function process_core_dump {
+    if [ ! $(which gdb) ]; then
+        return 0 # no gdb on the host
+    fi
+    if [ $(pidof gdb) ]; then
+        return 0 # gdb is alrady engaged
+    fi
+
+    CORE_ORIG=$(dirname $BIN_PATH)/core
+    TIME=$(date +"%s")
+    CORE=$CORE_ORIG.$TIME
+    mv $CORE_ORIG $CORE 2>/dev/null
+    if [ $? -eq 0 ]; then
+        REPORT=${MODULE_NAME}_$($BIN_PATH --version)_$TIME.gdb-bt
+
+        echo Generate crash report $REPORT...        BACKGROUND
+        gdb $BIN_PATH $CORE 2&>1 >/tmp/$REPORT <<< "t apply all bt 25" && \
+            mv /tmp/$REPORT ~/$REPORT &
+
+        ls $CORE_ORIG.* | grep -v $CORE | xargs rm 2>/dev/null
+    fi
+}
 
 case "$1" in
     start)
@@ -32,6 +55,8 @@ case "$1" in
 
         ulimit -n 3072
         ulimit -c unlimited
+        process_core_dump
+
         echo -n "Starting $APPLICATION_NAME ...         "
         $BIN_PATH $RUN_ARGS 1>/dev/null 2>&1 &
         sleep 1

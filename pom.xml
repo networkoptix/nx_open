@@ -34,7 +34,7 @@
         <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
         <mediaproxy.display.name>${company.name} Media Proxy</mediaproxy.display.name>
-        <nxtool.name>${company.name} ${product.name} Server Configuration Tool</nxtool.name>
+        <nxtool.name>${company.name} ${display.product.name} Server Configuration Tool</nxtool.name>
         <nxtool.display.name>${company.name} ${display.product.name} Server Configuration Tool</nxtool.display.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
         <traytool.name>${product.name} Tray Assistant</traytool.name>
@@ -167,7 +167,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.0</version>
+                <version>1.3</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -176,10 +176,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <doCheck>false</doCheck>
-                    <doUpdate>true</doUpdate>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -362,7 +358,6 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>
-                <module>nxtool</module>
                 <module>clientexe</module>
                 <module>wixsetup</module>
             </modules>
@@ -416,10 +411,21 @@
                 <module>plugins/nxcontrol</module>     
                 <module>plugins/acs/paxton</module>     
                 <module>plugins/acs/paxton-installer</module>     
-                <!-- Uncomment this when 2.3.1_paxton is merged -->
-                <!-- <module>plugins/acs/paxton</module>
-                <module>plugins/acs/paxton-installer</module> -->
             </modules>            
+        </profile>
+        <profile>
+            <id>nxtool</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <file>
+                    <missing>customization/${customization}/nxtool.skip</missing>
+                </file>
+            </activation>
+            <modules>
+                <module>nxtool</module>
+            </modules>    
         </profile>
 
         <profile>
@@ -603,7 +609,6 @@
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
-                <additional.defines>debug_in_release</additional.defines>
                 <modification>rpi</modification>
             </properties>
             <modules>
@@ -632,7 +637,6 @@
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
-                <additional.defines>debug_in_release</additional.defines>
                 <modification>bpi</modification>
             </properties>
             <modules>

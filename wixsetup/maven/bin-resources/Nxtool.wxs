@@ -83,7 +83,7 @@
                 <File Id="NxtoolQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\Qt5Widgets$(var.suffix).dll" DiskId="1"  />
             </Component>             
         </ComponentGroup>
-        
+       
         <ComponentGroup Id="QtQuickDialogsFiles" Directory="QtQuickDialogs">
             <Component>
                 <File Id="dialogplugin$(var.suffix).dll" Name="dialogplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Dialogs\dialogplugin$(var.suffix).dll" DiskId="1"/>

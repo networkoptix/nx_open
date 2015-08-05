@@ -362,7 +362,21 @@ void QnTransactionTransport::setStateNoLock(State state)
 QUrl QnTransactionTransport::remoteAddr() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_remoteAddr;
+    // Emulating deep copy here
+    QUrl tmpUrl(m_remoteAddr);
+    tmpUrl.setUserName(tmpUrl.userName());
+    return tmpUrl;
+}
+
+SocketAddress QnTransactionTransport::remoteSocketAddr() const
+{
+    QMutexLocker lock(&m_mutex);
+    SocketAddress addr = SocketAddress(
+        m_remoteAddr.host(),
+        m_remoteAddr.port()
+    );
+
+    return addr;
 }
 
 QnTransactionTransport::State QnTransactionTransport::getState() const
@@ -484,6 +498,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
             "true" );
 
+    QUrlQuery q;
     {
         QMutexLocker lk(&m_mutex);
         m_remoteAddr = remotePeerUrl;
@@ -492,9 +507,9 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
             m_remoteAddr.setUserName(QString());
             m_remoteAddr.setPassword(QString());
         }
+        q = QUrlQuery(m_remoteAddr.query());
     }
-
-    QUrlQuery q = QUrlQuery(remoteAddr().query());
+    
 #ifdef USE_JSON
     q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
 #endif
@@ -524,8 +539,8 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
         toString(getState()).toLatin1() );
 
     QUrl url = remoteAddr();
-    url.setPath( url.path() + lit("/") + toString( getState() ) );
-    if (!m_httpClient->doGet( url )) {
+    url.setPath(url.path() + lit("/") + toString(getState()));
+    if (!m_httpClient->doGet(url)) {
         qWarning() << Q_FUNC_INFO << "Failed to execute m_httpClient->doGet. Reconnect transaction transport";
         setState(Error);
     }
@@ -592,9 +607,10 @@ void QnTransactionTransport::repeatDoGet()
 {
     m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
     m_httpClient->addAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
+    
     QUrl url = remoteAddr();
-    url.setPath( url.path() + lit( "/" ) + toString( getState() ) );
-    if (!m_httpClient->doGet( url ))
+    url.setPath(url.path() + lit("/") + toString(getState()));
+    if (!m_httpClient->doGet(url))
         cancelConnecting();
 }
 
@@ -1033,6 +1049,15 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             m_postTranBaseUrl = m_remoteAddr;
             m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
             m_postTranBaseUrl.setQuery( QString() );
+        }
+
+        nx_http::HttpHeaders additionalHeaders;
+        addHttpChunkExtensions( &additionalHeaders );
+        for( const auto& header: additionalHeaders )
+        {
+            //removing prev header value (if any)
+            m_outgoingTranClient->removeAdditionalHeader( header.first );
+            m_outgoingTranClient->addAdditionalHeader( header.first, header.second );
         }
 
         if( !m_outgoingTranClient->doPost(
