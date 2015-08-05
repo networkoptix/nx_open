@@ -474,7 +474,7 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
 int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType) const
 {
     int result = 0;
-    return 100;
+
     for (const QnLicensePtr& license: m_licenseDict.values()) 
     {
         if (license->type() == licenseType && license->isValid())
