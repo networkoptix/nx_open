@@ -94,6 +94,10 @@ public:
     /** Id of the server this license attached to (if it is present in the current system). */
     QnUuid serverId() const;
 
+protected:
+    bool isValidEdgeLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+    bool isValidStartLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+
 private:
     void parseLicenseBlock(
         const QByteArray& licenseBlock,

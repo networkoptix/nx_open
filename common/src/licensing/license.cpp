@@ -300,41 +300,53 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     bool isArmBox = checkForARMBox(info.data.box);
     if (isArmBox && !licenseTypeInfo[type()].allowedForARM)
         return gotError(errCode, InvalidType); // strict allowed license type for ARM devices
-#if 1
-    if (isArmBox && type() == Qn::LC_Edge) 
-    {
-        for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
-            if (license->hardwareId() == hardwareId() && license->type() == type()) 
-            {
-				// Only single EDGE license per ARM device is allowed
-                if (mode != VM_Regular && license->key() != key())
-                    return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid for any of special (non regular) mode
-                else if (license->key() < key())
-                    return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
-            }
-        }
-    }
-#endif
 
-    // Only single Start license per system is allowed
+    if (isArmBox && type() == Qn::LC_Edge)
+        return isValidEdgeLicense(errCode, mode);
+
     if (type() == Qn::LC_Start)
-    {
-        for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
-            // skip other licenses and current license itself
-            if (license->type() != type() || license->key() == key())
-                continue;
+        return isValidStartLicense(errCode, mode);
 
-            // skip other licenses if they have less channels
-            if (license->cameraCount() < cameraCount())
-                continue;
+    return gotError(errCode, NoError);
+}
 
-            if (license->cameraCount() > cameraCount())
-                return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid if it has less channels
+bool QnLicense::isValidEdgeLicense(ErrorCode* errCode, ValidationMode mode) const {
+    for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
+        // skip other license types and current license itself
+        if (license->type() != type() || license->key() == key())
+            continue;
 
-            // we found another license with the same number of channels
-            if (license->key() < key())
+        // Only single EDGE license per ARM device is allowed
+        if (license->hardwareId() == hardwareId()) {
+            if (mode != VM_Regular)
+                return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid for any of special (non regular) mode
+            else if (license->key() < key())
                 return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
         }
+    }
+
+    return gotError(errCode, NoError);
+}
+
+bool QnLicense::isValidStartLicense(ErrorCode* errCode, ValidationMode mode) const {
+    Q_UNUSED(mode);
+
+    // Only single Start license per system is allowed
+    for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
+        // skip other license types and current license itself
+        if (license->type() != type() || license->key() == key())
+            continue;
+
+        // skip other licenses if they have less channels
+        if (license->cameraCount() < cameraCount())
+            continue;
+
+        if (license->cameraCount() > cameraCount())
+            return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid if it has less channels
+
+        // we found another license with the same number of channels
+        if (license->key() < key())
+            return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
     }
 
     return gotError(errCode, NoError);
