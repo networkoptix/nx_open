@@ -1519,11 +1519,6 @@ void MediaServerProcess::run()
     std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
-    std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager(m_mediaServer->getProperty(Qn::LDAP_HOST),
-        m_mediaServer->getProperty(Qn::LDAP_PORT).toInt(),
-        m_mediaServer->getProperty(Qn::LDAP_ADMIN_DN),
-        m_mediaServer->getProperty(Qn::LDAP_ADMIN_PASSWORD),
-        m_mediaServer->getProperty(Qn::LDAP_SEARCH_BASE)));
 
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
@@ -1886,6 +1881,13 @@ void MediaServerProcess::run()
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
     }
+
+    std::unique_ptr<QnLdapManager> ldapManager( new QnLdapManager(
+        m_mediaServer->getProperty( Qn::LDAP_HOST ),
+        m_mediaServer->getProperty( Qn::LDAP_PORT ).toInt(),
+        m_mediaServer->getProperty( Qn::LDAP_ADMIN_DN ),
+        m_mediaServer->getProperty( Qn::LDAP_ADMIN_PASSWORD ),
+        m_mediaServer->getProperty( Qn::LDAP_SEARCH_BASE ) ) );
 
     /* This key means that password should be forcibly changed in the database. */
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);

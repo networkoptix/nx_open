@@ -183,9 +183,25 @@ private:
         TempAuthenticationKeyCtx& operator=( const TempAuthenticationKeyCtx& );
     };
 
+    class UserDigestData
+    {
+    public:
+        nx_http::StringType ha1Digest;
+        nx_http::StringType realm;
+        nx_http::StringType cryptSha512Hash;
+        nx_http::StringType nxUserName;
+
+        void parse( const nx_http::Request& request );
+        bool empty() const;
+    };
+
+
+    /*!
+        \param userRes Can be NULL
+    */
     void addAuthHeader(
         nx_http::Response& responseHeaders,
-        const QString& realm,
+        const QnUserResourcePtr& userRes,
         bool isProxy );
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
@@ -216,6 +232,9 @@ private:
     */
     bool authenticateByUrl( const QByteArray& authRecord, const QByteArray& method ) const;
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
+    void applyClientCalculatedPasswordHashToResource(
+        const QnUserResourcePtr& userResource,
+        const UserDigestData& userDigestData );
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

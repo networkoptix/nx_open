@@ -767,14 +767,64 @@ namespace nx_http
             }
         }
 
+        namespace 
+        {
+            std::vector<QnByteArrayConstRef> splitQuotedString( const QnByteArrayConstRef& src, char sep )
+            {
+                std::vector<QnByteArrayConstRef> result;
+                QnByteArrayConstRef::size_type curTokenStart = 0;
+                bool quoted = false;
+                for( QnByteArrayConstRef::size_type
+                    pos = 0;
+                    pos < src.size();
+                    ++pos )
+                {
+                    const char ch = src[pos];
+                    if( !quoted && (ch == sep) )
+                    {
+                        result.push_back( src.mid( curTokenStart, pos - curTokenStart ) );
+                        curTokenStart = pos + 1;
+                    }
+                    else if( ch == '"' )
+                    {
+                        quoted = !quoted;
+                    }
+                }
+                result.push_back( src.mid( curTokenStart ) );
+
+                return result;
+            }
+
+
+            void parseDigestAuthParams(
+                const ConstBufferRefType& authenticateParamsStr,
+                QMap<BufferType, BufferType>* const params )
+            {
+                const std::vector<ConstBufferRefType>& paramsList = splitQuotedString( authenticateParamsStr, ',' );
+                for( const ConstBufferRefType& token : paramsList )
+                {
+                    const auto& nameAndValue = splitQuotedString( token.trimmed(), '=' );
+                    if( nameAndValue.empty() )
+                        continue;
+                    ConstBufferRefType value = nameAndValue.size() > 1 ? nameAndValue[1] : ConstBufferRefType();
+                    params->insert( nameAndValue[0].trimmed(), value.trimmed( "\"" ) );
+                }
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////
         //  Authorization
         ///////////////////////////////////////////////////////////////////
-        bool BasicCredentials::parse( const BufferType& /*str*/ )
+        bool BasicCredentials::parse( const BufferType& str )
         {
-            //TODO/IMPL
-            Q_ASSERT( false );
-            return false;
+            const auto decodedBuf = BufferType::fromBase64( str );
+            const int sepIndex = decodedBuf.indexOf( ':' );
+            if( sepIndex == -1 )
+                return false;
+            userid = decodedBuf.mid( 0, sepIndex );
+            password = decodedBuf.mid( sepIndex+1 );
+            
+            return true;
         }
 
         void BasicCredentials::serialize( BufferType* const dstBuffer ) const
@@ -786,11 +836,13 @@ namespace nx_http
             *dstBuffer += serializedCredentials.toBase64();
         }
 
-        bool DigestCredentials::parse( const BufferType& /*str*/ )
+        bool DigestCredentials::parse( const BufferType& str )
         {
-            //TODO/IMPL implementation
-            Q_ASSERT( false );
-            return false;
+            parseDigestAuthParams( str, &params );
+            auto usernameIter = params.find( "username" );
+            if( usernameIter != params.cend() )
+                userid = usernameIter.value();
+            return true;
         }
 
         void DigestCredentials::serialize( BufferType* const dstBuffer ) const
@@ -870,11 +922,27 @@ namespace nx_http
             return *this;
         }
 
-        bool Authorization::parse( const BufferType& /*str*/ )
+        bool Authorization::parse( const BufferType& str )
         {
-            //TODO/IMPL implementation
-            Q_ASSERT( false );
-            return false;
+            clear();
+
+            int authSchemeEndPos = str.indexOf( " " );
+            if( authSchemeEndPos == -1 )
+                return false;
+
+            authScheme = AuthScheme::fromString( ConstBufferRefType( str, 0, authSchemeEndPos ) );
+            const ConstBufferRefType authParamsData( str, authSchemeEndPos + 1 );
+            switch( authScheme )
+            {
+                case AuthScheme::basic:
+                    basic = new BasicCredentials();
+                    return basic->parse( authParamsData.toByteArrayWithRawData() );
+                case AuthScheme::digest:
+                    digest = new DigestCredentials();
+                    return digest->parse( authParamsData.toByteArrayWithRawData() );
+                default:
+                    return false;
+            }
         }
 
         void Authorization::serialize( BufferType* const dstBuffer ) const
@@ -914,6 +982,19 @@ namespace nx_http
             authScheme = AuthScheme::none;
         }
 
+        StringType Authorization::userid() const
+        {
+            switch( authScheme )
+            {
+                case AuthScheme::basic:
+                    return basic->userid;
+                case AuthScheme::digest:
+                    return digest->userid;
+                default:
+                    return StringType();
+            }
+        }
+
         BasicAuthorization::BasicAuthorization( const StringType& userName, const StringType& userPassword )
         :
             Authorization( AuthScheme::basic )
@@ -948,32 +1029,6 @@ namespace nx_http
         {
         }
 
-        static std::vector<QnByteArrayConstRef> splitQuotedString( const QnByteArrayConstRef& src, char sep )
-        {
-            std::vector<QnByteArrayConstRef> result;
-            QnByteArrayConstRef::size_type curTokenStart = 0;
-            bool quoted = false;
-            for( QnByteArrayConstRef::size_type
-                pos = 0;
-                pos < src.size();
-                ++pos )
-            {
-                const char ch = src[pos];
-                if( !quoted && (ch == sep) )
-                {
-                    result.push_back( src.mid(curTokenStart, pos-curTokenStart) );
-                    curTokenStart = pos+1;
-                }
-                else if( ch == '"' )
-                {
-                    quoted = !quoted;
-                }
-            }
-            result.push_back( src.mid(curTokenStart) );
-
-            return result;
-        }
-
         bool WWWAuthenticate::parse( const BufferType& str )
         {
             int authSchemeEndPos = str.indexOf( " " );
@@ -982,16 +1037,9 @@ namespace nx_http
 
             authScheme = AuthScheme::fromString( ConstBufferRefType(str, 0, authSchemeEndPos) );
 
-            const ConstBufferRefType authenticateParamsStr( str, authSchemeEndPos+1 );
-            const std::vector<ConstBufferRefType>& paramsList = splitQuotedString( authenticateParamsStr, ',' );
-            for( const ConstBufferRefType& token: paramsList )
-            {
-                const auto& nameAndValue = splitQuotedString( token.trimmed(), '=' );
-                if( nameAndValue.empty() )
-                    continue;
-                ConstBufferRefType value = nameAndValue.size() > 1 ? nameAndValue[1] : ConstBufferRefType();
-                params.insert( nameAndValue[0].trimmed(), value.trimmed("\"") );
-            }
+            parseDigestAuthParams(
+                ConstBufferRefType( str, authSchemeEndPos + 1 ),
+                &params );
 
             return true;
         }

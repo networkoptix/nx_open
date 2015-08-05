@@ -25,7 +25,7 @@ public:
     bool checkPassword(const QString &password);
 
     QByteArray getDigest() const;
-    void setDigest(const QByteArray& digest);
+    void setDigest(const QByteArray& digest, bool isValidated = false);
 
     QByteArray getCryptSha512Hash() const;
     void setCryptSha512Hash(const QByteArray& hash);
@@ -48,6 +48,15 @@ public:
     QString getEmail() const;
     void setEmail(const QString &email);
     virtual Qn::ResourceStatus getStatus() const override;
+
+    //!Millis since epoch (1970-01-01, UTC)
+    qint64 passwordExpirationTimestamp() const;
+    bool passwordExpired() const;
+    /*!
+        \return \a true if password expiration timestamp has been increased
+    */
+    bool doPasswordProlongation();
+    bool checkDigestValidity( const QByteArray& digest );
 
 signals:
     void hashChanged(const QnResourcePtr &resource);
@@ -72,6 +81,7 @@ private:
 	bool m_isLdap;
 	bool m_isEnabled;
     QString m_email;
+    qint64 m_passwordExpirationTimestamp;
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr)
