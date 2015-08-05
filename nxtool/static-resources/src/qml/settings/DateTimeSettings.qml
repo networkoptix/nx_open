@@ -163,6 +163,14 @@ Expandable.MaskedSettingsPanel
                             
                             var prevZoneId = timeZonePicker.model.timeZoneIdByIndex(from);
                             var curZoneId = timeZonePicker.model.timeZoneIdByIndex(to);
+
+                            if (!timeZonePicker.model.isValidValue(from)
+                                || !timeZonePicker.model.isValidValue(to))
+                            {
+                                console.log("Can't change timezone form " + prevZoneId + " to " + curZoneId);
+                                return;
+                            }
+
                             console.log("Chaning timezone from " + prevZoneId + " to " + curZoneId);
                             var dateTime = rtuContext.applyTimeZone(datePicker.date, timePicker.time, prevZoneId, curZoneId);
                             datePicker.setDate(dateTime);
@@ -174,10 +182,9 @@ Expandable.MaskedSettingsPanel
                     {
                         spacing: Common.SizeManager.spacing.small;
 
-                        Base.DatePicker
+                        Base.DateEdit
                         {
                             id: datePicker;
-
                             initDate: (rtuContext.selection && rtuContext.selection !== null ?
                                 rtuContext.selection.dateTime : new Date());
 
@@ -237,7 +244,14 @@ Expandable.MaskedSettingsPanel
                         {
                             if (checked)
                                 timeZonePicker.currentIndex = timeZonePicker.model.currentTimeZoneIndex;
-                            
+                            else
+                            {
+                                /// TODO: #ynikitenkov: investigate about wrong time recalculation when time zone changed to the initial
+                                timeZonePicker.dontSignal = true;
+                                timeZonePicker.currentIndex = timeZonePicker.initIndex;
+                                timeZonePicker.dontSignal = false;
+                            }
+
                             datePicker.showNow = checked;
                             timePicker.showNow = checked;
                         }
