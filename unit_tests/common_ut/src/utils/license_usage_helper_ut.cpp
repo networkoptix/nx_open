@@ -476,3 +476,17 @@ TEST( QnLicenseInfoTest, validateLicenseInfo )
 
     }
 }
+
+/** Check if license names are filled for every license type. */
+TEST( QnLicenseInfoTest, validateLicenseNames )
+{
+    for (int i = 0; i < Qn::LC_Count; ++i) {
+        Qn::LicenseType licenseType = static_cast<Qn::LicenseType>(i);
+
+        auto name = QnLicense::displayName(licenseType);
+        ASSERT_FALSE(name.isEmpty());
+
+        auto longName = QnLicense::longDisplayName(licenseType);
+        ASSERT_FALSE(longName.isEmpty());
+    }
+}
