@@ -23,7 +23,11 @@ public:
         : _msg(msg) {
     }
 
-    const char* what() const {
+    const char* what() const
+#ifdef __GNUC__
+    noexcept (true)
+#endif
+ {
         return _msg.c_str();
     }
 private:

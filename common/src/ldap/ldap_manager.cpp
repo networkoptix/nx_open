@@ -5,8 +5,31 @@
 
 #include <stdio.h>
 
+#define SEARCH_FILTER_STR "(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"
+
+#ifdef Q_OS_WIN
 #include <Windows.h>
 #include <winldap.h>
+#define QSTOCW(s) const_cast<PWCHAR>(s.toStdWString().c_str())
+#define SEARCH_FILTER L ## SEARCH_FILTER_STR
+#define FROM_WCHAR_ARRAY QString::fromWCharArray
+#define DIGEST_MD5 L"DIGEST-MD5"
+#define SM_ACCOUNT_NAME L"sAMAccountName"
+#define EMPTY_STR L""
+#else
+
+#define LDAP_DEPRECATED 1
+#include <ldap.h>
+#define QSTOCW(s) s.toUtf8().constData()
+#define LdapGetLastError() errno
+#define SEARCH_FILTER SEARCH_FILTER_STR
+#define FROM_WCHAR_ARRAY QString::fromUtf8
+#define DIGEST_MD5 "DIGEST-MD5"
+#define SM_ACCOUNT_NAME "sAMAccountName"
+#define EMPTY_STR ""
+#define PWSTR char*
+#define PWCHAR char*
+#endif
 
 #include <QtCore/QMap>
 #include <QtCore/QBuffer>
@@ -14,7 +37,6 @@
 
 #include "network/authutil.h"
 
-#define QSTOCW(s) const_cast<PWCHAR>(s.toStdWString().c_str())
 
 #define THROW_LDAP_EXCEPTION(text, rc) \
 { \
@@ -36,9 +58,9 @@ public:
 
     QString host;
     int port;
-    QString searchBase;
     QString bindDn;
     QString password;
+    QString searchBase;
 
     LDAP *ld;
 
@@ -73,7 +95,7 @@ void QnLdapManager::fetchUsers() {
 
         LDAPMessage *result, *e;
 
-        const PWSTR filter = L"(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
+        const PWSTR filter = SEARCH_FILTER;
 	    rc = ldap_search_ext_s(d->ld, QSTOCW(d->searchBase), LDAP_SCOPE_SUBTREE, filter, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
         if (rc != LDAP_SUCCESS)
             THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_search_ext_s()", rc);
@@ -82,14 +104,20 @@ void QnLdapManager::fetchUsers() {
             PWSTR dn;
             if ((dn = ldap_get_dn( d->ld, e )) != NULL) {
                 LdapUser user;
-                user.dn = QString::fromWCharArray(dn);
+                user.dn = FROM_WCHAR_ARRAY(dn);
 
-                PWCHAR *values = ldap_get_values(d->ld, e, L"sAMAccountName");
-                ULONG nValues = ldap_count_values(values);
-                for (ULONG i = 0; i < nValues; i++) {
-                    std::wstring value = values[i];
+                PWCHAR *values = ldap_get_values(d->ld, e, SM_ACCOUNT_NAME);
+                unsigned long nValues = ldap_count_values(values);
+                for (unsigned long i = 0; i < nValues; i++) {
+#ifdef Q_OS_WIN
+                    std::wstring value;
+#else
+                    std::string value;
+#endif
+                    value = values[i];
+
                     if (!value.empty()) {
-                        user.login = QString::fromWCharArray(values[i]);
+                        user.login = FROM_WCHAR_ARRAY(values[i]);
                         break;
                     }
                 }
@@ -127,16 +155,17 @@ bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &
     int rc  = ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
     if (rc != 0)
         THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_set_option()", rc);
+#ifdef Q_OS_WIN
     rc = ldap_connect(ld, NULL); // Need to connect before SASL bind!
-
+#endif
     struct berval cred;
     cred.bv_len = 0;
     cred.bv_val = 0;
 
     // The servresp will contain the digest-challange after the first call.
     berval *servresp = NULL;
-    SECURITY_STATUS res;
-    ldap_sasl_bind_s(ld, L"", L"DIGEST-MD5", &cred, NULL, NULL, &servresp);
+    long res;
+    ldap_sasl_bind_s(ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
     ldap_get_option(ld, LDAP_OPT_ERROR_NUMBER, &res);
     if (res != LDAP_SASL_BIND_IN_PROGRESS)
         return false;
@@ -178,8 +207,8 @@ bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &
     authDictionary["response"] = md5(ha1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2).toHex();
 
     QByteArray authRequest;
-    for (auto i = authDictionary.cbegin(); i != authDictionary.cend(); ++i) {
-        if (i != authDictionary.cbegin()) {
+    for (auto i = authDictionary.constBegin(); i != authDictionary.constEnd(); ++i) {
+        if (i != authDictionary.constBegin()) {
             authRequest += ", ";
         }
 
@@ -195,7 +224,7 @@ bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &
     cred.bv_len = authRequest.size();
 
     servresp = NULL;
-    ldap_sasl_bind_s(ld, L"", L"DIGEST-MD5", &cred, NULL, NULL, &servresp);
+    ldap_sasl_bind_s(ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
     ldap_get_option(ld, LDAP_OPT_ERROR_NUMBER, &res);
 
     return res == LDAP_SUCCESS;
