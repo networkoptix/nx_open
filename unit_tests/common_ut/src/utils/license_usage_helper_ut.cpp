@@ -467,5 +467,12 @@ TEST( QnLicenseInfoTest, validateLicenseInfo )
         auto info = QnLicense::licenseTypeInfo(licenseType);
         ASSERT_EQ(licenseType, info.licenseType);
 
+        /* Class name must be in lowercase. */
+        ASSERT_EQ(info.className.toLower(), info.className);
+
+        /* Make sure all class names are different. */
+        for (int j = 0; j < i; ++j)
+            ASSERT_NE(info.className, QnLicense::licenseTypeInfo(static_cast<Qn::LicenseType>(j)).className);
+
     }
 }
