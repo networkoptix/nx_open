@@ -11,20 +11,25 @@
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
 #include "core/resource/resource_fwd.h"
+#include <ui/customization/customized.h>
+#include "client/client_color_types.h"
+
 
 class QnSortedRecordingStatsModel: public QSortFilterProxyModel
 {
 public:
-    QnSortedRecordingStatsModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+    typedef QSortFilterProxyModel base_type;
+    QnSortedRecordingStatsModel(QObject *parent = 0) : base_type(parent) {}
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 };
 
-class QnRecordingStatsModel : public QAbstractItemModel
+class QnRecordingStatsModel : public Customized<QAbstractItemModel>
 {
     Q_OBJECT
+    Q_PROPERTY(QnRecordingStatsColors colors READ colors WRITE setColors)
 
-    typedef QAbstractItemModel base_type;
+    typedef Customized<QAbstractItemModel> base_type;
 public:
 
     enum Columns {
@@ -50,6 +55,9 @@ public:
     void setModelData(const QnRecordingStatsReply& data);
     QnRecordingStatsReply modelData() const;
     void setForecastData(const QnRecordingStatsReply& data);
+
+    QnRecordingStatsColors colors() const;
+    void setColors(const QnRecordingStatsColors &colors);
 private:
     QString displayData(const QModelIndex &index) const;
     QString footerDisplayData(const QModelIndex &index) const;
@@ -61,6 +69,7 @@ private:
 
     QnRecordingStatsReply m_data;
     QnRecordingStatsReply m_forecastData;
+    QnRecordingStatsColors m_colors;
 };
 
 

@@ -41,8 +41,8 @@
 #include <media_server/settings.h>
 #include <utils/common/model_functions.h>
 #include "http/custom_headers.h"
+#include "audit/audit_manager.h"
 #include "media_server/settings.h"
-
 class QnTcpListener;
 
 static const QByteArray ENDL("\r\n");
@@ -104,6 +104,7 @@ public:
     QnRtspConnectionProcessorPrivate():
         QnTCPConnectionProcessorPrivate(),
         liveMode(Mode_Live),
+        auditRecordId(0),
         dataProcessor(0),
         sessionTimeOut(0),
         useProprietaryFormat(false),
@@ -171,6 +172,7 @@ public:
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     QSharedPointer<QnThumbnailsStreamReader> thumbnailsDP;
     Mode liveMode;
+    int auditRecordId;
 
     QnRtspDataConsumer* dataProcessor;
 
@@ -212,8 +214,18 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStre
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
-    directDisconnectAll();
+    Q_D(QnRtspConnectionProcessor);
+	directDisconnectAll();
+    if (d->auditRecordId > 0)
+        qnAuditManager->notifyPlaybackFinished(d->auditRecordId);
     stop();
+}
+
+void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
+{
+    Q_D(QnRtspConnectionProcessor);
+    if (d->auditRecordId > 0)
+        qnAuditManager->notifyPlaybackInProgress(d->auditRecordId, timestampUsec);
 }
 
 void QnRtspConnectionProcessor::parseRequest()
@@ -1246,6 +1258,15 @@ int QnRtspConnectionProcessor::composePlay()
         currentDP->start();
     if (d->liveMode == Mode_Live && d->liveDpLow)
         d->liveDpLow->start();
+    
+    if (d->liveMode != Mode_ThumbNails) 
+    {
+        if (d->auditRecordId > 0)
+            qnAuditManager->notifyPlaybackFinished(d->auditRecordId);
+        qint64 startTimeUces = d->liveMode == Mode_Live ? DATETIME_NOW : d->startTime;
+        bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
+        d->auditRecordId = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUces, isExport);
+    }
 
     return CODE_OK;
 }

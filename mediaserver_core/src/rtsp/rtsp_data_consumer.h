@@ -128,5 +128,6 @@ private:
     int m_framesSinceRangeCheck;
     qint64 m_prevStartTime;
     qint64 m_prevEndTime;
+    qint64 m_lastReportTime; // media timestamp notifications to audit log
 };
 #endif // __RTSP_DATA_CONSUMER_H__

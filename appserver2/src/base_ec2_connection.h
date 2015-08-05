@@ -10,6 +10,7 @@
 
 #include "core/resource_management/resource_pool.h"
 #include "ec_connection_notification_manager.h"
+#include "ec_connection_audit_manager.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_videowall_data.h"
@@ -76,6 +77,7 @@ namespace ec2
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
         ECConnectionNotificationManager* notificationManager() { return m_notificationManager.get(); }
+        ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     protected:
@@ -95,6 +97,7 @@ namespace ec2
         std::shared_ptr<QnDiscoveryManager<QueryProcessorType>> m_discoveryManager;
         std::shared_ptr<QnTimeManager<QueryProcessorType>> m_timeManager;
         std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
+        std::unique_ptr<ECConnectionAuditManager> m_auditManager;
     };
 }
 
