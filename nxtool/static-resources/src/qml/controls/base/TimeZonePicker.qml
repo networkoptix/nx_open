@@ -13,7 +13,6 @@ ComboBox
 
     dontUseWheel: true;
 
-    property bool dontSignal: false;
     activeFocusOnTab: true;
     activeFocusOnPress: true;
 
@@ -63,7 +62,7 @@ ComboBox
         if (!model.isValidValue(currentIndex))
             return;
 
-        if (currentIndex !== lastSelectedIndex && !dontSignal)
+        if (currentIndex !== lastSelectedIndex)
             timeZoneChanged(lastSelectedIndex, currentIndex);
 
         lastSelectedIndex = currentIndex;

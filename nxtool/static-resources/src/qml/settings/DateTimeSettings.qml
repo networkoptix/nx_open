@@ -114,6 +114,7 @@ Expandable.MaskedSettingsPanel
                     property bool changed: (timeZonePicker.changed || timePicker.changed
                         || datePicker.changed || useCurrentTimeCheckbox.changed);
     
+                    property bool dontConvertTimeZone: false;
                     verticalItemAlignment: Grid.AlignVCenter;
                     
                     spacing: Common.SizeManager.spacing.base;
@@ -157,7 +158,7 @@ Expandable.MaskedSettingsPanel
     
                         onTimeZoneChanged:
                         {
-                            if (useCurrentTimeCheckbox.checked || !timePicker.acceptableInput
+                            if (dontConvertTimeZone || !timePicker.acceptableInput
                                     || !datePicker.acceptableInput)
                                 return;
                             
@@ -242,18 +243,17 @@ Expandable.MaskedSettingsPanel
 
                         onCheckedChanged: 
                         {
+                            dateTimeGrid.dontConvertTimeZone = true;
+
                             if (checked)
                                 timeZonePicker.currentIndex = timeZonePicker.model.currentTimeZoneIndex;
                             else
-                            {
-                                /// TODO: #ynikitenkov: investigate about wrong time recalculation when time zone changed to the initial
-                                timeZonePicker.dontSignal = true;
                                 timeZonePicker.currentIndex = timeZonePicker.initIndex;
-                                timeZonePicker.dontSignal = false;
-                            }
 
                             datePicker.showNow = checked;
                             timePicker.showNow = checked;
+
+                            dateTimeGrid.dontConvertTimeZone = false;
                         }
                     }
                 }
