@@ -127,7 +127,7 @@ void QnMediaResourceHelper::updateUrl() {
 
     if (protocol == lit("hls")) {
         url.setScheme(lit("http"));
-        url.setPath(lit("/hls/%1.m3u").arg(camera->getMAC().toString()));
+        url.setPath(lit("/hls/%1.m3u").arg(camera->getPhysicalId()));
 
         query.addQueryItem(m_nativeStreamIndex == 0 ? lit("hi") : lit("lo"), QString());
 
@@ -142,7 +142,7 @@ void QnMediaResourceHelper::updateUrl() {
             url.setPath(lit("/media/%1.%2").arg(camera->getMAC().toString()).arg(httpFormat));
             query.addQueryItem(lit("resolution"), m_resolution.isEmpty() ? optimalResolution() : m_resolution);
         } else {
-            url.setPath(lit("/%1").arg(camera->getMAC().toString()));
+            url.setPath(lit("/%1").arg(camera->getPhysicalId()));
             query.addQueryItem(lit("stream"), QString::number(m_nativeStreamIndex));
         }
 
