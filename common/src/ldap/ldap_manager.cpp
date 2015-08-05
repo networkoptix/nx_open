@@ -5,13 +5,11 @@
 
 #include <stdio.h>
 
-#define SEARCH_FILTER_STR "(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"
-
 #ifdef Q_OS_WIN
 #include <Windows.h>
 #include <winldap.h>
 #define QSTOCW(s) const_cast<PWCHAR>(s.toStdWString().c_str())
-#define SEARCH_FILTER L ## SEARCH_FILTER_STR
+#define SEARCH_FILTER L"(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"
 #define FROM_WCHAR_ARRAY QString::fromWCharArray
 #define DIGEST_MD5 L"DIGEST-MD5"
 #define SM_ACCOUNT_NAME L"sAMAccountName"
@@ -22,7 +20,7 @@
 #include <ldap.h>
 #define QSTOCW(s) s.toUtf8().constData()
 #define LdapGetLastError() errno
-#define SEARCH_FILTER SEARCH_FILTER_STR
+#define SEARCH_FILTER "(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"
 #define FROM_WCHAR_ARRAY QString::fromUtf8
 #define DIGEST_MD5 "DIGEST-MD5"
 #define SM_ACCOUNT_NAME "sAMAccountName"
