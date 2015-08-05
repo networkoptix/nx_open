@@ -101,7 +101,11 @@ Window
                 {
                     target: rtuContext;
                     onCurrentPageChanged: { loader.reloadPage(); }
-                    onSelectionChanged: { loader.reloadPage(); }
+                    onSelectionChanged:
+                    {
+                        if (rtuContext.currentPage !== NxRtu.Constants.ProgressPage)
+                            loader.reloadPage();
+                    }
                 }
                 
                 function reloadPage()

@@ -21,6 +21,7 @@
         <DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
         <nxtool>false</nxtool>
         <final.artifact.name>${installer.name}</final.artifact.name>
+        <NxtoolQuickControlsDir>${root.dir}\nxtool\${arch}\bin\${build.configuration}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
     </properties>
 
     <dependencies>
