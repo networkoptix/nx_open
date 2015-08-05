@@ -13,6 +13,7 @@
 #include "api/model/storage_space_reply.h"
 
 class QnRecordingStatsModel;
+class QnSortedRecordingStatsModel;
 
 namespace Ui {
     class RecordingStatsDialog;
@@ -72,6 +73,7 @@ private:
 private:
     QScopedPointer<Ui::RecordingStatsDialog> ui;
     QnRecordingStatsModel *m_model;
+    QnSortedRecordingStatsModel* m_sortModel;
 
     QMap<int, QnUuid> m_requests;
 

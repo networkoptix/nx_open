@@ -171,9 +171,9 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
     m_model = new QnRecordingStatsModel(this);
 
-    QnSortedRecordingStatsModel* sortModel = new QnSortedRecordingStatsModel(this);
-    sortModel->setSourceModel(m_model);
-    ui->gridEvents->setModel(sortModel);
+    m_sortModel = new QnSortedRecordingStatsModel(this);
+    m_sortModel->setSourceModel(m_model);
+    ui->gridEvents->setModel(m_sortModel);
     ui->gridEvents->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
     
@@ -355,6 +355,7 @@ void QnRecordingStatsDialog::requestFinished()
             m_hidenCameras << camera;
     }
     m_model->setModelData(existsCameras);
+    m_sortModel->invalidate();
 
     
     ui->gridEvents->setDisabled(false);

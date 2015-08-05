@@ -308,7 +308,8 @@ void QnRecordingStatsModel::setForecastData(const QnRecordingStatsReply& data)
 QnRecordingStatsReply QnRecordingStatsModel::modelData() const
 {
     QnRecordingStatsReply result = m_data;
-    result.remove(result.size()-1); // remove footer
+    if (!result.isEmpty())
+        result.remove(result.size()-1); // remove footer
     return result;
 }
 
