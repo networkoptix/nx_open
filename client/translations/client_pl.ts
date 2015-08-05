@@ -379,7 +379,7 @@
     </message>
     <message>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
+        <translation>Oblicz bitrate dla GOP zamiast bitrate na sekundę</translation>
     </message>
 </context>
 <context>
@@ -412,11 +412,11 @@
     </message>
     <message>
         <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wysyłaj statystyki i onformacje o błędach do producenta oprogramowania (zalecane)</translation>
     </message>
     <message>
         <source>Enable cameras and servers auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz automatyczne wykrywanie kamer i serwerów</translation>
     </message>
 </context>
 <context>
@@ -761,7 +761,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>System Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia systemu</translation>
     </message>
 </context>
 <context>
@@ -2532,7 +2532,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ask About Statistics Reporting</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapytaj o statystyki</translation>
     </message>
 </context>
 <context>
@@ -3956,7 +3956,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This could lead to client software malfunction including crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>Może to doprowadzić do nieprawidłowego działania aplikacji klienckiej.</translation>
     </message>
 </context>
 <context>
@@ -4609,7 +4609,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdź</translation>
     </message>
 </context>
 <context>
@@ -5470,11 +5470,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Odbudowa indeksu dla pamięci masowej &apos;%1&apos;  jest w toku</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Szybkie skanowanie archiwum pamięci masowej &apos;%1&apos; jet w toku</translation>
     </message>
 </context>
 <context>
@@ -5698,8 +5698,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%n servers are not responding:</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform>%n serwer nie odpowiada:</numerusform>
-            <numerusform>%n serwery nie odpowiadają:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -5866,15 +5864,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>FPS value is too high</source>
-        <translation type="unfinished">Liczba klatek (FPS) jest za duża</translation>
+        <translation>Liczba klatek (FPS) jest za duża</translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished">Aktualny liczba fps w siatce jest %1. Liczba fps została obniżona do maksymalnej liczby fps kamery %2.</translation>
+        <translation>Aktualny liczba kl/s w harmonogramie jest %1. Liczba kl/s została obniżona do maksymalnej liczby kl/s kamery %2.</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished">Dla programowej detekcji ruchu 2 fps są zarezerwowane dla drugiego strumienia. Aktualna liczba fps w siatce harmonogramu wynosi %1. Liczba fps została obniżona do %2.</translation>
+        <translation>Przy programowej detekcji ruchu 2 kl/s  są zarezerwowane dla drugiego strumienia. Aktualna liczba kl/s w siatce harmonogramu wynosi %1. Liczba kl/s została obniżona do %2.</translation>
     </message>
 </context>
 <context>
@@ -5991,7 +5989,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdź ustawienie uwierzytelniające w kamerze</translation>
     </message>
 </context>
 <context>
@@ -6734,32 +6732,33 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Some components of the system are not updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Kilka komponentów systemu nie zostało zaktualizowanych</translation>
     </message>
     <message>
         <source>Client v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Wersja klienta %1</translation>
     </message>
     <message>
         <source>Server v%1 at %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Wersja serwera %1 na %2</translation>
     </message>
     <message>
         <source>Server v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Wersja serwera %1</translation>
     </message>
     <message>
         <source>Please update all components to the latest version %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Proszę zaktualziaować kompnenty systemu do ostatniej wersji %1.</translation>
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Statystyki serwera</translation>
     </message>
     <message>
         <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
 If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>System wysyła anonimowe statystki serwerów i błędów do producenta oprogramowania.
+Jeśli chcesz wyłączyć tę funkcję zrób to w oknie Ustawienia systemowe.</translation>
     </message>
 </context>
 <context>
@@ -6813,7 +6812,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można połączyć z serwerem...</translation>
     </message>
 </context>
 <context>
@@ -7031,7 +7030,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>exported</source>
-        <translation type="unfinished"></translation>
+        <translation>wyeksportowane</translation>
     </message>
 </context>
 <context>
@@ -7481,11 +7480,11 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished">Ekran %1 </translation>
+        <translation>Ekran %1 </translation>
     </message>
     <message>
         <source>%n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%n kamer</translation>
     </message>
 </context>
 <context>
@@ -7770,7 +7769,8 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Odznaczenie spowoduje zatrzymanie nagrywania.
+Najstarsze nagrania zostaną usunięte z dysku.</translation>
     </message>
 </context>
 <context>

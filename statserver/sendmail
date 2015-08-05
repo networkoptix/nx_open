@@ -1,6 +1,0 @@
-#!/bin/bash
-
-TARGET=/tmp/sendmail.$(date +%F.%T)
-
-printf "$0 $@\n\n" > $TARGET
-cat /dev/stdin >> $TARGET

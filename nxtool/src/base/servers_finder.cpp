@@ -37,7 +37,6 @@ namespace
     enum 
     {
         kUpdateServersInfoInterval = 2000
-        , kHostLifeTimeMs = kUpdateServersInfoInterval * 2
         , kUnknownHostTimeout = 60 * 1000
         , kServerAliveTimeout = 12 * 1000
     };
@@ -64,6 +63,17 @@ namespace
         return (setsockopt( handle, IPPROTO_IP, IP_ADD_MEMBERSHIP
             , reinterpret_cast<const char*>(&request), sizeof(request)) == kNoError);
     }
+
+    
+    bool isDifferentFlags(const rtu::BaseServerInfo &first
+        , const rtu::BaseServerInfo &second
+        , rtu::Constants::ServerFlags excludeFlags)
+    {
+        const rtu::Constants::ServerFlags firstFlags = (first.flags & ~excludeFlags);
+        const rtu::Constants::ServerFlags secondFlags = (second.flags & ~excludeFlags);
+        return (firstFlags != secondFlags);
+    }
+
 }
 
 namespace
@@ -251,7 +261,7 @@ void rtu::ServersFinder::Impl::updateServers()
 {
     checkOutdatedServers();
     
-    checkOutdatedHosts(m_knownHosts, kHostLifeTimeMs);
+    checkOutdatedHosts(m_knownHosts, kServerAliveTimeout);
     const QStringList removedUnknownHosts =
         checkOutdatedHosts(m_unknownHosts, kUnknownHostTimeout);
     for (const QString &address: removedUnknownHosts)
@@ -424,6 +434,8 @@ bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl
     info.hostAddress = host;
 
     onEntityDiscovered(host, m_knownHosts);
+    if (m_unknownHosts.remove(host))
+        emit m_owner->unknownRemoved(host);
 
     emit m_owner->serverDiscovered(info);
 
@@ -446,14 +458,15 @@ bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl
         {
             it->visibleAddressTimestamp = timestamp;
         }
-        else if ((timestamp - it->visibleAddressTimestamp) > kHostLifeTimeMs)
+        else if ((timestamp - it->visibleAddressTimestamp) > kServerAliveTimeout)
         {
             it->visibleAddressTimestamp = timestamp;
             info.displayAddress = host;
             displayAddressOutdated = true;
         }
 
-        if ((info != it->info) || displayAddressOutdated)
+        if ((info != it->info) || displayAddressOutdated
+            || isDifferentFlags(info, it->info, Constants::IsFactoryFlag))
         {
             oldInfo.name = info.name;
             oldInfo.systemName = info.systemName;

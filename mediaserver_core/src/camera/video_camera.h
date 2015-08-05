@@ -92,7 +92,8 @@ private:
     //!index - is a \a MediaQuality element
     std::vector<nx_hls::HLSLivePlaylistManagerPtr> m_hlsLivePlaylistManager;
     
-    const size_t m_hlsInactivityPeriodMS;
+    const qint64 m_loStreamHlsInactivityPeriodMS;
+    const qint64 m_hiStreamHlsInactivityPeriodMS;
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog);
     bool ensureLiveCacheStarted(

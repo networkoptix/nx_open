@@ -24,7 +24,7 @@ extern "C"
 #include "qmath.h"
 #include "camera/get_image_helper.h"
 #include <http/custom_headers.h>
-
+#include "utils/common/util.h"
 
 int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time)
 {

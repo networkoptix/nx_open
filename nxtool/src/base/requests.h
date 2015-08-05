@@ -71,7 +71,8 @@ namespace rtu
 
     typedef QVector<ItfUpdateInfo> ItfUpdateInfoContainer;
     
-    typedef std::function<void (const QString &errorReason
+    typedef std::function<void (const int errorCode
+        , const QString &errorReason
         , AffectedEntities affectedEntities)> OperationCallback; 
     
     typedef std::function<void (const QUuid &serverId
@@ -79,7 +80,13 @@ namespace rtu
         , const QTimeZone &timeZone
         , const QDateTime &timestamp)> DateTimeCallbackType;
     
-    enum { kNoErrorReponse = 0 };
+    enum 
+    {
+        kNoErrorReponse = 0 
+        , kUnspecifiedError = -1
+
+        , kUnauthorizedError = 401
+    };
     
     typedef std::function<void (const QUuid &id
         , const rtu::ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
@@ -91,6 +98,15 @@ namespace rtu
         , const OperationCallback &failed
         , int timeout = HttpClient::kUseDefaultTimeout);
 
+    void getIfList(HttpClient *client
+        , const BaseServerInfo &baseInfo
+        , const QString &password
+        , const ExtraServerInfoSuccessCallback &successful
+        , const OperationCallback &failed
+        , int timeout = HttpClient::kUseDefaultTimeout);
+
+    /// Sends getTime and getIfList consequentially. 
+    /// If getTime is successful, calls successfull callback anyway
     void getServerExtraInfo(HttpClient *client
         , const BaseServerInfo &baseInfo
         , const QString &password

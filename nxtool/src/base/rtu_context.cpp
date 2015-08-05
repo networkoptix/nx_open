@@ -180,7 +180,7 @@ QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     if (date.isNull() || time.isNull() || !prevTimeZone.isValid()
         || !nextTimeZone.isValid() || !date.isValid() || !time.isValid())
     {
-        return QDateTime();
+        return QDateTime(date, time);
     }
     
     return convertDateTime(date, time, prevTimeZone, nextTimeZone).toLocalTime();
@@ -203,7 +203,7 @@ QString rtu::RtuContext::toolDisplayName() const
 
 bool rtu::RtuContext::isBeta() const
 {
-    return (QN_BETA == "true");
+    return (QStringLiteral("true") == QStringLiteral(QN_BETA));
 }
 
 QString rtu::RtuContext::toolVersion() const

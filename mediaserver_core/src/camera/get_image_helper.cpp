@@ -163,6 +163,18 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(const QnVirtualC
         dstSize.setHeight(360); //on edge instead of full-size image we return 360p
 #endif
 
+    //if requested size is less than 128 in any dimension then upscaling to 128
+    if( dstSize.height() < 128 && dstSize.height() > 0 )
+    {
+        dstSize.setWidth( dstSize.width() * 128 / dstSize.height() );
+        dstSize.setHeight( 128 );
+    }
+    if( dstSize.width() < 128 && dstSize.width() > 0 )
+    {
+        dstSize.setWidth( 128 );
+        dstSize.setHeight( dstSize.height() * 128 / dstSize.width() );
+    }
+
     bool useHQ = true;
     if ((dstSize.width() > 0 && dstSize.width() <= 480) || (dstSize.height() > 0 && dstSize.height() <= 316))
         useHQ = false;

@@ -22,7 +22,7 @@ commands = [\
 ]
 if '${nxtool}' == 'true':
     commands += [\
-    'candle -dinstalltype="client-only" -dDbSync22SourceDir="${DbSync22Dir}" -dClientHelpSourceDir="${ClientHelpSourceDir}" -dClientVoxSourceDir="${ClientVoxSourceDir}" -dClientBgSourceDir="${ClientBgSourceDir}" -arch ${arch} -out obj\\${build.configuration}-nxtool\\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -ext wixext\WixSystemToolsExtension.dll MyExitDialog.wxs UpgradeDlg.wxs NxtoolDlg.wxs SelectionWarning.wxs Product-nxtool.wxs Nxtool.wxs',\
+    'candle -dinstalltype="client-only" -dNxtoolQuickControlsDir="${NxtoolQuickControlsDir}" -dClientHelpSourceDir="${ClientHelpSourceDir}" -dClientVoxSourceDir="${ClientVoxSourceDir}" -dClientBgSourceDir="${ClientBgSourceDir}" -arch ${arch} -out obj\\${build.configuration}-nxtool\\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -ext wixext\WixSystemToolsExtension.dll MyExitDialog.wxs UpgradeDlg.wxs NxtoolDlg.wxs SelectionWarning.wxs Product-nxtool.wxs Nxtool.wxs NxtoolQuickControls.wxs',\
     'light -cultures:${installer.language} -cc ${project.build.directory} -reusecab -loc CustomStrings_${installer.language}.wxl -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -ext wixext\WixSystemToolsExtension.dll -out %s/%s -pdbout bin\\${build.configuration}\\EVEMediaPlayerSetup.wixpdb obj\\${build.configuration}-nxtool\\*.wixobj' % (nxtool_msi_folder, nxtool_msi_name),\
     'cscript FixExitDialog.js %s/%s' % (nxtool_msi_folder, nxtool_msi_name)
     ]

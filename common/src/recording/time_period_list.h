@@ -9,9 +9,11 @@
 #include <QtCore/QVector>
 #endif
 
+#include <api/api_fwd.h>
 #include "time_period.h"
-
+#include "utils/common/uuid.h"
 class QnTimePeriodListTimeIterator;
+
 
 /**
  * A sorted list of time periods that basically is an implementation of 
@@ -231,6 +233,17 @@ inline QnTimePeriodListTimeIterator QnTimePeriodList::timeEnd() const {
     return QnTimePeriodListTimeIterator(end(), 0);
 }
 
+struct MultiServerPeriodData
+{
+    /** Guid of the server, owning this periods. */
+    QnUuid guid;
+    QnTimePeriodList periods;
+};
+
+QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData, (json)(metatype)(ubjson)(xml)(csv_record)(compressed_time)(eq));
+
+
 Q_DECLARE_METATYPE(QnTimePeriodList);
+Q_DECLARE_METATYPE(MultiServerPeriodDataList);
 
 #endif // QN_TIME_PERIOD_LIST_H

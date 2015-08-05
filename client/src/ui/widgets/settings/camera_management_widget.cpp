@@ -95,7 +95,7 @@ bool QnCameraManagementWidget::hasChanges() const  {
     const auto servers = qnResPool->getResources<QnMediaServerResource>();
     bool statisticsReportAllowed = ec2::Ec2StaticticsReporter::isAllowed(servers);
     if (ui->statisticsReportCheckBox->isChecked() != statisticsReportAllowed)
-        return false;
+        return true;
 
     return false;
 }
