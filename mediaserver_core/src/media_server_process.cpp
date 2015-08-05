@@ -652,7 +652,7 @@ void MediaServerProcess::dumpSystemUsageStats()
                                                      .arg(iface.bytesPerSecMax));
 
     const auto networkIfInfo = networkIfList.join(lit(", "));
-    if (m_mediaServer->setPropertyOnce(Qn::NETWORK_INTERFACES, networkIfInfo))
+    if (m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo))
         propertyDictionary->saveParams(m_mediaServer->getId());
 
     QMutexLocker lk( &m_mutex );
@@ -1236,7 +1236,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
             ec2Connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         }
 
-        if (server->setPropertyOnce(Qn::PUBLIC_IP, m_publicAddress.toString()))
+        if (server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString(), QnResource::NO_ALLOW_EMPTY))
             propertyDictionary->saveParams(server->getId());
     }
 }
@@ -1859,20 +1859,18 @@ void MediaServerProcess::run()
             m_mediaServer = server;
 
         const auto hwInfo = HardwareInformation::instance();
-        server->setPropertyOnce(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
-        server->setPropertyOnce(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
-        server->setPropertyOnce(Qn::PHISICAL_MEMORY, QString::number(hwInfo.phisicalMemory));
+        server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+        server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
+        server->setProperty(Qn::PHISICAL_MEMORY, QString::number(hwInfo.phisicalMemory));
 
-        server->setPropertyOnce(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
-        server->setPropertyOnce(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
-        server->setPropertyOnce(Qn::PUBLIC_IP, m_publicAddress.toString());
+        server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
+        server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
+        server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
 
         const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
         if (!confStats.isNull()) // if present
         {
-            server->setPropertyOnce(Qn::STATISTICS_REPORT_ALLOWED,
-                                    QnLexical::serialized(confStats.toBool()));
-
+            server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(confStats.toBool()));
             MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
             MSSettings::roSettings()->sync();
         }

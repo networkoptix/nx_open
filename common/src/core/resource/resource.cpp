@@ -700,15 +700,23 @@ QString QnResource::getProperty(const QString &key) const {
     return value;
 }
 
-void QnResource::setProperty(const QString &key, const QString &value, bool markDirty, bool replaceIfExists) 
+bool QnResource::setProperty(const QString &key, const QString &value, PropertyOptions options)
 {
+    const bool markDirty        = !(options & NO_MARK_DIRTY);
+    const bool replaceIfExists  = !(options & NO_REPLACE_IF_EXIST);
+
+    if ((options & NO_ALLOW_EMPTY) && value.isEmpty() )
+        return false;
+
     {
         QMutexLocker lk( &m_mutex );
         if( m_id.isNull() )
         {
             //saving property to some internal dictionary. Will apply to global dictionary when id is known
             m_locallySavedProperties[key] = LocalPropertyValue( value, markDirty, replaceIfExists );
-            return;
+
+            //calling propertyDictionary->saveParams(...) does not make any sense
+            return false;
         }
     }
 
@@ -716,6 +724,13 @@ void QnResource::setProperty(const QString &key, const QString &value, bool mark
     bool isModified = propertyDictionary->setValue(getId(), key, value, markDirty, replaceIfExists);
     if (isModified)
         emitPropertyChanged(key);
+
+    return isModified;
+}
+
+bool QnResource::setProperty(const QString &key, const QVariant& value, PropertyOptions options)
+{
+    return setProperty(key, value.toString(), options);
 }
 
 void QnResource::emitPropertyChanged(const QString& key)
@@ -726,24 +741,6 @@ void QnResource::emitPropertyChanged(const QString& key)
         emit videoLayoutChanged(::toSharedPointer(this));
 
     emit propertyChanged(toSharedPointer(this), key);
-}
-
-void QnResource::setProperty(const QString &key, const QVariant& value, bool markDirty, bool replaceIfExists)
-{
-    return setProperty(key, value.toString(), markDirty, replaceIfExists);
-}
-
-bool QnResource::setPropertyOnce(const QString &key, const QString& value, bool allowEmpty)
-{
-    if (!allowEmpty && value.isEmpty())
-        return false;
-
-    if (getProperty(key) != value)
-    {
-        setProperty(key, value);
-        return true;
-    }
-    return false;
 }
 
 ec2::ApiResourceParamDataList QnResource::getProperties() const

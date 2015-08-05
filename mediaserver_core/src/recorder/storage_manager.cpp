@@ -227,7 +227,7 @@ public:
             if (fileStorage->isAvailable())
             {
                 const auto space = QString::number(fileStorage->getTotalSpace());
-                if (fileStorage->setPropertyOnce(Qn::SPACE, space))
+                if (fileStorage->setProperty(Qn::SPACE, space))
                     propertyDictionary->saveParams(fileStorage->getId());
             }
         }

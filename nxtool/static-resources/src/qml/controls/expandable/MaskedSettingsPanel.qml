@@ -14,8 +14,9 @@ GenericSettingsPanel
     property var maskedArea: area.item;
     
     //TODO: #ynikitenkov  (rtuContext.selection !== null) should not be required  here
+    property bool extraWarned: false;
     property bool warned: (rtuContext.selection && (rtuContext.selection !== null)
-        && (rtuContext.selection.count === 1) ? true : false);
+        && (rtuContext.selection.count === 1) ? true : false) || extraWarned;
 
     Component
     {

@@ -71,7 +71,8 @@ namespace rtu
 
     typedef QVector<ItfUpdateInfo> ItfUpdateInfoContainer;
     
-    typedef std::function<void (const QString &errorReason
+    typedef std::function<void (const int errorCode
+        , const QString &errorReason
         , AffectedEntities affectedEntities)> OperationCallback; 
     
     typedef std::function<void (const QUuid &serverId
@@ -79,7 +80,13 @@ namespace rtu
         , const QTimeZone &timeZone
         , const QDateTime &timestamp)> DateTimeCallbackType;
     
-    enum { kNoErrorReponse = 0 };
+    enum 
+    {
+        kNoErrorReponse = 0 
+        , kUnspecifiedError = -1
+
+        , kUnauthorizedError = 401
+    };
     
     typedef std::function<void (const QUuid &id
         , const rtu::ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
