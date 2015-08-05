@@ -76,7 +76,9 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_Edge,            "edge",          1),
     LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0),
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
-    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1)
+    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
+    LicenseTypeInfo(Qn::LC_IO,              "io",            0),
+    LicenseTypeInfo(Qn::LC_Start,           "start",         0)
 };
 } // anonymous namespace
 
