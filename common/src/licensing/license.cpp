@@ -164,8 +164,9 @@ QString QnLicense::displayName(Qn::LicenseType licenseType) {
     case Qn::LC_VMAX:           return tr("Vmax");
     case Qn::LC_AnalogEncoder:  return tr("Analog encoder");
     case Qn::LC_VideoWall:      return tr("Video Wall");
+    case Qn::LC_IO:             return tr("I/O Module");
+    case Qn::LC_Start:          return tr("Start");
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return QString();
@@ -184,8 +185,9 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     case Qn::LC_VMAX:           return tr("Vmax licenses");
     case Qn::LC_AnalogEncoder:  return tr("Analog encoder licenses");
     case Qn::LC_VideoWall:      return tr("Video Wall licenses");
+    case Qn::LC_IO:             return tr("I/O Module licenses");
+    case Qn::LC_Start:          return tr("Start licenses");
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return QString();
