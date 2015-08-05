@@ -248,7 +248,7 @@ Expandable.MaskedSettingsPanel
                             if (checked)
                                 timeZonePicker.currentIndex = timeZonePicker.model.currentTimeZoneIndex;
                             else
-                                timeZonePicker.currentIndex = timeZonePicker.initIndex;
+                                timeZonePicker.currentIndex = timeZonePicker.lastSelectedIndex;
 
                             datePicker.showNow = checked;
                             timePicker.showNow = checked;
