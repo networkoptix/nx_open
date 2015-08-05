@@ -273,6 +273,28 @@ CameraRecordsProvider.prototype.cacheRequestedInterval = function (start,end,lev
         }
     }
 };
+CameraRecordsProvider.prototype.getBlindSpotsInCache = function(start,end,level){
+    if(typeof(this.requestedCache[level])=='undefined'){
+        return [{start:start,end:end}]; // One large blind spot
+    }
+    var result = [];
+
+    var levelCache = this.requestedCache[level];
+    for(var i = 0;i < levelCache.length;i++) {
+
+        if(start < levelCache[i].start){
+            result.push ({start:start,end:levelCache[i].start});
+        }
+
+        start = Math.max(start,levelCache[i].end);//Move start
+
+        if(end < levelCache[i].end){
+            break;
+        }
+    }
+    return result;
+};
+
 CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start,end,level) {
     if(typeof(this.requestedCache[level])=='undefined'){
         return false;
@@ -348,11 +370,11 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
 
     if(start instanceof Date)
     {
-        start=start.getTime();
+        start = start.getTime();
     }
     if(end instanceof Date)
     {
-        end=end.getTime();
+        end = end.getTime();
     }
 
     // Splice existing intervals and check, if we need an update from server
@@ -370,8 +392,8 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
     }*/
 
 
-    var noNeedUpdate = this.checkRequestedIntervalCache(start,end,level);
-    if(!noNeedUpdate){ // Request update
+    var needUpdate = !this.checkRequestedIntervalCache(start,end,level);
+    if(needUpdate){ // Request update
         this.requestInterval(start, end, level);
     }
 
@@ -518,39 +540,38 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
 CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent){
     parent = parent || this.chunksTree;
 
-    var addedRecords = 0;
     if(!parent){
-        return false;
+        return;
     }
 
-    if (parent.children.length > 0) {
-        for (var i = 0; i < parent.children.length; i++) {
-            var currentChunk = parent.children[i];
-            if(currentChunk.end < start){ //skip this branch
-                continue;
-            }
-            if(currentChunk.start > end){ //do not go further
-                break;
-            }
+    if(parent.end <= start || parent.start >= end ){ // Not intresected
+        return;
+    }
 
-            if (currentChunk.level === level) { //Exactly required level
-                addedRecords++ ;
-                result.push(currentChunk);
-                //currentChunk.expand = false;
-            } else { //Need to go deeper
+    if(parent.level == level){
+        result.push(parent); // Good chunk!
+        return;
+    }
 
-                addedRecords += this.selectRecords(result, start, end, level, currentChunk);
-                //currentChunk.expand = true;
-            }
+    if(parent.children.length == 0){
+        result.push(parent); // Bad chunk, but no choice
+        return;
+    }
+
+    // Iterate children:
+    for (var i = 0; i < parent.children.length; i++) {
+        this.selectRecords(result, start, end, level, parent.children[i]);
+    }
+
+    // iterate blind spots:
+    var blindSpots = this.getBlindSpotsInCache(parent.start,parent.end,parent.level+1);
+    for (i = 0; i < blindSpots.length; i++) {
+        var spot = blindSpots[i];
+        if( spot.start >= start || spot.end <= end ){
+            result.push(spot);
         }
     }
-    if(addedRecords === 0){
-        addedRecords ++;
-        result.push(parent);
-    }
-    return addedRecords;
 };
-
 
 
 /**
@@ -651,6 +672,7 @@ ShortCache.prototype.update = function(requestPosition,position){
             }
         });
 };
+
 // Check playing date - return videoposition if possible
 ShortCache.prototype.checkPlayingDate = function(positionDate){
     if(positionDate < this.start){ //Check left boundaries

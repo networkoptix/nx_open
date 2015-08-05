@@ -68,7 +68,8 @@ angular.module('webadminApp')
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
-                    loadingChunkColor: [58,145,30],
+                    loadingChunkColor: [58,145,30,0.5],
+                    blindChunkColor:  [255,128,128,0.5],
 
                     scrollBarSpeed: 0.1, // By default - scroll by 10%
                     scrollBarHeight: 20/110, // %
@@ -671,7 +672,7 @@ angular.module('webadminApp')
                         return;
                     }
 
-                    context.fillStyle =   blurColor(timelineConfig.chunksBgColor,1);
+                    context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
 
                     context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
 
@@ -695,8 +696,13 @@ angular.module('webadminApp')
                     var endCoordinate = scope.scaleManager.dateToScreenCoordinate(chunk.end);
 
                     var exactChunk = levelIndex == chunk.level;
+                    var blur = 1;//chunk.level/(RulerModel.levels.length - 1);
 
-                    context.fillStyle = exactChunk? blurColor(timelineConfig.exactChunkColor,1):blurColor(timelineConfig.loadingChunkColor,1);
+                    context.fillStyle = exactChunk? blurColor(timelineConfig.exactChunkColor,blur):blurColor(timelineConfig.loadingChunkColor,blur);
+
+                    /*if(!chunk.level){ //blind spot!
+                        context.fillStyle = blurColor(timelineConfig.blindChunkColor,blur);
+                    }*/
 
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
 
