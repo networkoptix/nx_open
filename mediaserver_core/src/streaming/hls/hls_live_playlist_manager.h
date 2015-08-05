@@ -46,7 +46,7 @@ namespace nx_hls
 
         void clear();
         //!Time (millis) from last usage of this object
-        size_t inactivityPeriod() const;
+        qint64 inactivityPeriod() const;
 
     private:
         MediaStreamCache* const m_mediaStreamCache;

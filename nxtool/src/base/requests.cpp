@@ -148,7 +148,7 @@ namespace /// Parsers stuff
             }
             else if (failed)
             {
-                failed(kErrorDesc, affected);
+                failed(rtu::kUnspecifiedError, kErrorDesc, affected);
             }
         };
 
@@ -167,11 +167,11 @@ namespace /// Parsers stuff
             const QJsonObject &object = doc.object();
             if (isErrorReply(object))
             {
-                callback(getErrorDescription(object), affected);
+                callback(rtu::kUnspecifiedError, getErrorDescription(object), affected);
             }
             else
             {
-                callback(QString(), affected);
+                callback(rtu::kNoErrorReponse, QString(), affected);
             }
         };
         
@@ -183,12 +183,12 @@ namespace /// Parsers stuff
     rtu::HttpClient::ErrorCallback makeErrorCallback(const rtu::OperationCallback &callback
         , rtu::AffectedEntities affected)
     {
-        const auto result = [callback, affected](const QString &reason, int)
+        const auto result = [callback, affected](const QString &reason, int code)
         {
             if (!callback)
                 return;
             
-            callback(reason, affected);
+            callback(code, reason, affected);
         };
         
         return result;
@@ -334,7 +334,7 @@ void rtu::getTime(HttpClient *client
     if (!client)
     {
         if (failed)
-            failed(kInvalidRequest, affected);
+            failed(rtu::kUnspecifiedError, kInvalidRequest, affected);
         return;
     }
 
@@ -372,7 +372,7 @@ void rtu::getIfList(HttpClient *client
     if (!client)
     {
         if (failed)
-            failed(kInvalidRequest, affected);
+            failed(kUnspecifiedError, kInvalidRequest, affected);
         return;
     }
 
@@ -403,21 +403,22 @@ void rtu::getServerExtraInfo(HttpClient *client
     if (!client)
     {
         if (failed)
-            failed(kInvalidRequest, affected);
+            failed(kUnspecifiedError, kInvalidRequest, affected);
         return;
     }
 
-    const auto &getTimeFailed = [failed](const QString &reason, AffectedEntities affected)
+    const auto &getTimeFailed = [failed](const int errorCode 
+        , const QString &reason, AffectedEntities affected)
     {
         if (failed)
-            failed(reason, affected);
+            failed(errorCode, reason, affected);
     };
 
     const auto &getTimeSuccessfull = [client, baseInfo, password, successful, timeout]
         (const QUuid &id, const rtu::ExtraServerInfo &extraInfo) 
     {
         /// getTime command is successfully executed up to now
-        const auto &ifListFailed = [successful, id, extraInfo](const QString &, AffectedEntities)
+        const auto &ifListFailed = [successful, id, extraInfo](const int, const QString &, AffectedEntities)
         {
             if (successful)
                 successful(id, extraInfo);
@@ -450,7 +451,7 @@ void rtu::sendIfListRequest(HttpClient *client
     if (!client || !(info.flags & Constants::AllowIfConfigFlag))
     {
         if (failed)
-            failed(kInvalidRequest, kAllEntitiesAffected);
+            failed(kUnspecifiedError, kInvalidRequest, kAllEntitiesAffected);
         return;
     }
     
@@ -467,7 +468,7 @@ void rtu::sendIfListRequest(HttpClient *client
         if (!parseIfListCmd(object, extraInfo))
         {
             if (failed)
-                failed(kErrorDesc, kAllAddressFlagsAffected);
+                failed(kUnspecifiedError, kErrorDesc, kAllAddressFlagsAffected);
         }
         else if (successful)
         {
@@ -491,7 +492,7 @@ void rtu::sendSetTimeRequest(HttpClient *client
         || !QTimeZone(timeZoneId).isValid() || !client)
     {
         if (callback)
-            callback(kInvalidRequest, kDateTimeAffected | kTimeZoneAffected);
+            callback(kUnspecifiedError, kInvalidRequest, kDateTimeAffected | kTimeZoneAffected);
         return;
     }
     
@@ -521,7 +522,7 @@ void rtu::sendSetSystemNameRequest(HttpClient *client
     if (!client || !info.hasExtraInfo() || systemName.isEmpty())
     {
         if (callback)
-            callback(kInvalidRequest, kSystemNameAffected);
+            callback(kUnspecifiedError, kInvalidRequest, kSystemNameAffected);
         return;
     }
 
@@ -550,7 +551,7 @@ void rtu::sendSetPasswordRequest(HttpClient *client
     if (!client || !info.hasExtraInfo() || password.isEmpty())
     {
         if (callback)
-            callback(kInvalidRequest, kPasswordAffected);
+            callback(kUnspecifiedError, kInvalidRequest, kPasswordAffected);
 
         return;
     }
@@ -580,7 +581,7 @@ void rtu::sendSetPortRequest(HttpClient *client
     if (!client || !info.hasExtraInfo() || !port)
     {
         if (callback)
-            callback(kInvalidRequest, kPortAffected);
+            callback(kUnspecifiedError, kInvalidRequest, kPortAffected);
        return;
     }
 
@@ -655,7 +656,7 @@ void rtu::sendChangeItfRequest(HttpClient *client
     if (!client || !info.hasExtraInfo())
     {
         if (callback)
-            callback(kInvalidRequest, affected);
+            callback(kUnspecifiedError, kInvalidRequest, affected);
         return;
     }
 
