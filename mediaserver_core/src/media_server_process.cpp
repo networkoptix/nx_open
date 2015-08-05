@@ -2042,36 +2042,35 @@ void MediaServerProcess::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
-    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-    if (adminUser) {
+    if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
+    {
         qnCommon->bindModuleinformation(adminUser);
         qnCommon->updateModuleInformation();
 
         hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
-    }
 
-    typedef ec2::Ec2StaticticsReporter stats;
-    bool adminParamsChanged = false;
+        typedef ec2::Ec2StaticticsReporter stats;
+        bool adminParamsChanged = false;
 
-    // TODO: fix, when VS supports init lists:
-    //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
-    const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
-    for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
-    {
-        const QString& param = **it;
-        const QString val = MSSettings::roSettings()->value(param, lit("")).toString();
-        if (!val.isEmpty() && val != adminUser->getProperty(param))
+        // TODO: fix, when VS supports init lists:
+        //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
+        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
+        for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
         {
-            adminUser->setProperty(param, val);
-            MSSettings::roSettings()->remove(param);
-            adminParamsChanged = true;
+            const QString& param = **it;
+            const QString val = MSSettings::roSettings()->value(param, lit("")).toString();
+            if (adminUser->setProperty(param, val, QnResource::NO_ALLOW_EMPTY))
+            {
+                MSSettings::roSettings()->remove(param);
+                adminParamsChanged = true;
+            }
         }
-    }
 
-    if (adminParamsChanged)
-    {
-        propertyDictionary->saveParams(adminUser->getId());
-        MSSettings::roSettings()->sync();
+        if (adminParamsChanged)
+        {
+            propertyDictionary->saveParams(adminUser->getId());
+            MSSettings::roSettings()->sync();
+        }
     }
 
     QnStorageResourceList storages = m_mediaServer->getStorages();
