@@ -40,7 +40,10 @@ start() {
     fi
 
     echo -n "Starting $BIN_NAME..... "
-    $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --msg-log-level=$HTTP_LOG_LEVEL 2>/dev/null 1>&2&
+    $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf \
+        --runtime-conf-file=$PREFIX/etc/running_time.conf \
+        --msg-log-level=$HTTP_LOG_LEVEL 2>/dev/null 1>&2&
+
     if [ `/bin/pidof $BIN_NAME` ]
     then
         echo "OK"
@@ -77,7 +80,7 @@ stop_watchdog() {
         echo "$CUSTOMIZATION-mediaserver watchdog is not running"
         return 0
     fi
-    
+
     echo -n "Stopping $CUSTOMIZATION-mediaserver watchdog..... "
     kill $WATCHDOG_PID
     sleep 1
@@ -186,7 +189,7 @@ case "$1" in
     run_watchdog)
         run_watchdog
         ;;
-        
+
     stop_watchdog)
         stop_watchdog
         ;;

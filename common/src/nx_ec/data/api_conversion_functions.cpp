@@ -311,7 +311,7 @@ void fromApiToResource(const ApiCameraDataEx& src, QnVirtualCameraResourcePtr& d
     fromApiToResource( static_cast<const ApiCameraAttributesData&>(src), *userAttributesLock );
 
     for(const ApiResourceParamData &srcParam: src.addParams)
-        dst->setProperty(srcParam.name, srcParam.value, false);
+        dst->setProperty(srcParam.name, srcParam.value, QnResource::NO_MARK_DIRTY);
 }
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraDataEx& dst)

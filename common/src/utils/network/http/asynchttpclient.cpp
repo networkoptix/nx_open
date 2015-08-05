@@ -775,6 +775,12 @@ namespace nx_http
         m_additionalHeaders.erase( key );
     }
 
+    void AsyncHttpClient::addRequestHeaders(const HttpHeaders& headers)
+    {
+        for (HttpHeaders::const_iterator itr = headers.begin(); itr != headers.end(); ++itr)
+            m_additionalHeaders.emplace( itr->first, itr->second);
+    }
+
     void AsyncHttpClient::serializeRequest()
     {
         m_requestBuffer.clear();
@@ -1078,9 +1084,14 @@ namespace nx_http
 
     bool downloadFileAsync(
         const QUrl& url,
-        std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler )
+        std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders,
+        AsyncHttpClient::AuthType authType )
     {
         nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
+        httpClientCaptured->addRequestHeaders(extraHeaders);
+        httpClientCaptured->setAuthType(authType);
+
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
             ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {
