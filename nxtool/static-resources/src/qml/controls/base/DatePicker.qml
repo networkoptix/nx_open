@@ -27,8 +27,6 @@ QtControls.TextField
     
     text: impl.stringFromDate(initDate);
     inputMask: impl.mask;
-    
-    enabled: !showNow;
 
     onShowNowChanged:
     {

@@ -45,7 +45,7 @@ typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
 class QnRtspConnectionProcessorPrivate;
 
-class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
+class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
 {
     Q_OBJECT
 public:
@@ -73,8 +73,8 @@ protected:
     virtual void run();
     void addResponseRangeHeader();
 private slots:
-    void at_camera_parentIdChanged();
-    void at_camera_resourceChanged();
+    void at_camera_parentIdChanged(const QnResourcePtr & /*resource*/);
+    void at_camera_resourceChanged(const QnResourcePtr & /*resource*/);
 
 private:
     void checkQuality();

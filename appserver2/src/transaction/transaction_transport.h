@@ -163,6 +163,7 @@ public:
     void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
 
     QUrl remoteAddr() const;
+    SocketAddress remoteSocketAddr() const;
 
     ApiPeerData remotePeer() const { return m_remotePeer; }
 

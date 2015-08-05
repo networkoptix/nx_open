@@ -1,5 +1,5 @@
-import QtQuick 2.0;
-import QtQuick.Window 2.0;
+import QtQuick 2.3;
+import QtQuick.Window 2.1;
 import QtQuick.Controls 1.2;
 
 import "../common" as Common;
@@ -24,7 +24,7 @@ Window
     modality: Qt.WindowModal;
 
     height: loader.height + buttonsPanel.height;
-    width: Math.max(buttonsPanel.width, loader.width );
+    width: Math.max(buttonsPanel.width, loader.width);
 
     Loader
     {
@@ -41,7 +41,7 @@ Window
         styled: thisComponent.styledButtons;
 
         y: thisComponent.height - height;
-        anchors.right: parent.right;
+        x: thisComponent.width - width;
 
         onButtonClicked:
         {

@@ -36,10 +36,44 @@ class TimerManagerImpl;
 */
 class TimerManager
 :
-    public QThread
-    , public Singleton<TimerManager>
+    public QThread,
+    public Singleton<TimerManager>
 {
 public:
+    //!This class is to simplify timer id usage
+    /*!
+        \note Not thread-safe
+    */
+    class TimerGuard
+    {
+        typedef void (TimerGuard::*bool_type)() const;
+        void this_type_does_not_support_comparisons() const {}
+
+    public:
+        TimerGuard();
+        TimerGuard( quint64 timerID );
+        TimerGuard( TimerGuard&& right );
+        /*!
+            Calls \a TimerGuard::reset()
+        */
+        ~TimerGuard();
+
+        TimerGuard& operator=( TimerGuard&& right );
+
+        //!Cancels timer and blocks until running handler returns
+        void reset();
+
+        operator bool_type() const;
+        bool operator==( const TimerGuard& right ) const;
+        bool operator!=( const TimerGuard& right ) const;
+
+    private:
+        quint64 m_timerID;
+
+        TimerGuard( const TimerGuard& right );
+        TimerGuard& operator=( const TimerGuard& right );
+    };
+
     /*!
         Launches internal thread
     */
@@ -76,6 +110,7 @@ public:
     void joinAndDeleteTimer( const quint64& timerID );
 
     void stop();
+
 protected:
     virtual void run();
 

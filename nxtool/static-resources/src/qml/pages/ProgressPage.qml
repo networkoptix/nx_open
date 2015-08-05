@@ -7,7 +7,7 @@ import "../common" as Common;
 Base.Column
 {
     id: thisComponent;
-    
+
     anchors
     {
         left: (parent ? parent.left : undefined);
@@ -24,7 +24,7 @@ Base.Column
     property string caption;
     property int changesCount;
     property int currentCount;
-    
+
     Base.Text
     {
         id: caption;
@@ -47,20 +47,31 @@ Base.Column
         color: "#e4e4e4";
     }
 
-    ProgressBar
+    Rectangle
     {
-        id: changesProgressBar;
-
         height: Common.SizeManager.clickableSizes.base;
+
         anchors
         {
             left: parent.left;
             right: parent.right;
         }
 
-        minimumValue: 0;
-        maximumValue: thisComponent.changesCount;
-        value: currentCount;
-    }
+        border.color: "grey";
 
+        ProgressBar
+        {
+            id: changesProgressBar;
+
+            indeterminate: true;
+            height: parent.height;
+
+            minimumValue: 0;
+            maximumValue: 1;
+            value: currentCount;
+
+            width: parent.width * (currentCount + 1) / (changesCount + 1);
+        }
+
+    }
 }

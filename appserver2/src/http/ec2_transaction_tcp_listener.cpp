@@ -239,6 +239,9 @@ void QnTransactionTcpProcessor::run()
             ttFinishCallback
             );
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
+
+        QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid );
+
         d->socket.clear();
     }
 }

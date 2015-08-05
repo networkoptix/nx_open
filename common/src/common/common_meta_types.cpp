@@ -150,6 +150,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::TimePeriodContent>();
     qRegisterMetaType<QnTimePeriodList>();
+    qRegisterMetaType<MultiServerPeriodDataList>();
 
     qRegisterMetaType<QnSoftwareVersion>();
     qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();

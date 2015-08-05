@@ -21,7 +21,7 @@ namespace
     enum 
     {
         kIfListRequestsPeriod = 2 * 1000
-        , kWaitTriesCount = 60
+        , kWaitTriesCount = 90
 
         /// Accepted wait time is 120 seconds due to restart on network interface parameters change
         , kTotalIfConfigTimeout = kIfListRequestsPeriod * kWaitTriesCount   
@@ -400,8 +400,9 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
                 , baseInfo.hostAddress, newInterfaces);
         }
         
-        onChangesetApplied(request.changesCount);
+        const int changesCount = request.changesCount;
         m_itfChanges.erase(it);
+        onChangesetApplied(changesCount);
     };
     
     const auto &successful =
@@ -411,7 +412,7 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
     };
 
     const auto &failed = 
-        [processCallback, baseInfo](const QString &, int)
+        [processCallback, baseInfo](const int, const QString &, int)
     {
         processCallback(false, baseInfo.id, ExtraServerInfo());
     };
@@ -445,6 +446,10 @@ void rtu::ChangesManager::Impl::onChangesetApplied(int changesCount)
     }
     
     m_changeset.reset();
+    m_itfChanges.clear();
+    m_targetServers.clear();
+    m_serverValues.clear();
+    m_requests.clear();
     m_context->setCurrentPage(Constants::SummaryPage);
 }
 
@@ -477,7 +482,7 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
         const auto request = [this, info, change, timestampMs]()
         {
             const auto &callback = 
-                [this, info, change, timestampMs](const QString &errorReason, AffectedEntities affected)
+                [this, info, change, timestampMs](const int, const QString &errorReason, AffectedEntities affected)
             {
                 static const QString kDateTimeDescription = "date / time";
                 static const QString kTimeZoneDescription = "time zone";
@@ -485,7 +490,8 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
 
                 QString timeZoneName = timeZoneNameWithOffset(QTimeZone(change.timeZoneId), QDateTime::currentDateTime());
 
-                const QString &value= convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId)).toString();
+                QDateTime timeValue = convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId));
+                const QString &value = timeValue.toString(Qt::SystemLocaleLongDate);
                 const bool dateTimeOk = addSummaryItem(*info, kDateTimeDescription
                     , value, errorReason, kDateTimeAffected, affected);
                 const bool timeZoneOk = addSummaryItem(*info, kTimeZoneDescription
@@ -525,7 +531,7 @@ void rtu::ChangesManager::Impl::addSystemNameChangeRequests()
         const auto request = [this, info, systemName]()
         {
             const auto &callback = 
-                [this, info, systemName](const QString &errorReason, AffectedEntities affected)
+                [this, info, systemName](const int, const QString &errorReason, AffectedEntities affected)
             {
                 static const QString &kSystemNameDescription = "system name";
 
@@ -559,7 +565,7 @@ void rtu::ChangesManager::Impl::addPortChangeRequests()
         const auto request = [this, info, port]()
         {
             const auto &callback = 
-                [this, info, port](const QString &errorReason, AffectedEntities affected)
+                [this, info, port](const int, const QString &errorReason, AffectedEntities affected)
             {
                 static const QString kPortDescription = "port";
                 
@@ -596,7 +602,7 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
             [this, info, changes, changeRequest]()
         {
             const auto &failedCallback = 
-                [this, info, changes](const QString &errorReason, AffectedEntities affected)
+                [this, info, changes](const int, const QString &errorReason, AffectedEntities affected)
             {
                 const auto &it = m_itfChanges.find(info->baseInfo().id);
                 if (it == m_itfChanges.end())
@@ -605,17 +611,17 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
                 for (const auto &change: changes)
                     addUpdateInfoSummaryItem(*info, errorReason, change, affected);
 
-                onChangesetApplied(it.value().changesCount);
+                const int changesCount = it.value().changesCount;
                 m_itfChanges.erase(it);
-
+                onChangesetApplied(changesCount);
             };
 
             const auto &callback = 
-                [this, failedCallback](const QString &errorReason, AffectedEntities affected)
+                [this, failedCallback](const int errorCode, const QString &errorReason, AffectedEntities affected)
             {
                 if (!errorReason.isEmpty())
                 {
-                    failedCallback(errorReason, affected);
+                    failedCallback(errorCode, errorReason, affected);
                 }
                 else
                 {
@@ -623,7 +629,7 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
                     QTimer::singleShot(kTotalIfConfigTimeout
                         , [this, failedCallback, affected]() 
                     {
-                        failedCallback(tr("Request timeout"), affected);
+                        failedCallback(kUnspecifiedError, ("Request timeout"), affected);
                     });
                 }
                 
@@ -678,7 +684,7 @@ void rtu::ChangesManager::Impl::addPasswordChangeRequests()
         const auto request = [this, info, password]()
         {
             const auto finalCallback = 
-                [this, info, password](const QString &errorReason, AffectedEntities affected)
+                [this, info, password](const int, const QString &errorReason, AffectedEntities affected)
             {
                 static const QString kPasswordDescription = "password";
 
@@ -693,11 +699,12 @@ void rtu::ChangesManager::Impl::addPasswordChangeRequests()
             };
             
             const auto &callback = 
-                [this, info, password, finalCallback](const QString &errorReason, AffectedEntities affected)
+                [this, info, password, finalCallback](const int errorCode
+                    , const QString &errorReason, AffectedEntities affected)
             {
                 if (errorReason.isEmpty())
                 {
-                    finalCallback(errorReason, affected);
+                    finalCallback(errorCode, errorReason, affected);
                 }
                 else
                 {

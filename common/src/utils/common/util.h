@@ -118,5 +118,6 @@ QString debugTime(qint64 timeMSec, const QString &fmt = QString());
  */
 QByteArray dateTimeToHTTPFormat(const QDateTime& value);
 
+qint64 parseDateTime(const QString &dateTime);
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

@@ -648,6 +648,7 @@ public:
         BnsFormat           = 2,
         CsvFormat           = 3,
         XmlFormat           = 4,
+        CompressedPeriodsFormat = 5, // used for chunks data only
 
         UnsupportedFormat   = -1
     };

@@ -424,6 +424,8 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             d->protocol = d->request.requestLine.version.protocol;
             d->requestBody = d->httpStreamReader.fetchMessageBody();
 
+            nx_http::HttpModManager::instance()->apply( &d->request );
+
             //TODO #ak logging
             //NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
             //    arg(d->socket->getForeignAddress().toString()).

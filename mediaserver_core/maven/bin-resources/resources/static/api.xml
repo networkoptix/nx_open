@@ -960,16 +960,14 @@
                         <param>
                             <name>height</name>
                             <description>Required image height. By default image have same size as
-                                source video stream.</description>
+                                source video stream. If only height is specified width is auto detected</description>
                             <optional>true</optional>
                             <values/>
                         </param>
                         <param>
                             <name>width</name>
                             <description>Required image width. By default image have same size as
-                                source video stream. If only width or height is specified other
-                                parameter is auto detected. Video aspect ratio is not
-                                changed.</description>
+                                source video stream. width cannot be specified without specifying height</description>
                             <optional>true</optional>
                             <values/>
                         </param>
@@ -1339,7 +1337,7 @@
                 </function>
                 <function>
                     <name>gettime</name>
-                    <description>Returns server UTC time and time zone</description>
+                    <description>Returns server UTC time, time zone and authentication realm (realm is added for convenience)</description>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1770,6 +1768,52 @@
                     <result>
                         <caption>Return result of the target api request.</caption>
                     </result>
+                </function>
+            </functions>
+        </group>
+        <group>
+            <groupName>Authentication</groupName>
+            <groupDescription>Request authentication methods supported by server</groupDescription>
+            <functions>
+                <function>
+                    <name>HTTP Basic / Digest Authentication</name>
+                    <description>
+                        Server is fully conformant with authentication defined in rfc2617 (https://tools.ietf.org/html/rfc2617)
+                    </description>
+                </function>
+                <function>
+                    <name>Cookie-based Authentication</name>
+                    <description>
+                        Cookie authorisation scheme allows to avoid standard login/password dialog in web-applications. 
+                        It provides you a way to replace it with your own. 
+                        It works mostly like sessions, but a bit more secure because it doesn't send user's password over HTTP.
+                        <ul>
+                            <li>In the first request to server you must send cookie Authorization=Digest (path: '/')
+                                You can request any anonymous request like '/api/moduleInformation'</li>
+                            <li>In response you'll get cookies 'realm' and 'nonce' (nonce is a session key for this user)</li>
+                            <li>Calculate digest signature:
+                                (login must be in lower case)
+                                digest = MD5(login + ':' + realm + ':' + password)
+                                method = MD5("GET:")
+                                auth = MD5(digest + ':' + nonce + ':' + method);</li>
+                            <li>Set cookies: response=auth and username=login (path: '/')
+                                Every following request to server must contain cookies: username, nonce, response, Authorization</li>
+                        </ul>
+                    </description>
+                </function>
+                <function>
+                    <name>Providing Authentication Hash In Request Url</name>
+                    <description>
+                        You can add "auth" field to url query section. E.g., http://127.0.0.1:7001/ec2/getMediaServersEx?auth=auth_digest
+                        "auth_digest" is calculated in a following way:
+                        auth_digest    = base64(username:nonce:simplified_ha2)
+                        simplified_ha2 = MD5(ha1:nonce:MD5(method:))
+                        ha1            = MD5(usename:realm:password)
+
+                        Current server time MUST be used as a nonce value.
+                        So, to get realm and nonce call /gettime.
+                        Such nonce value is valid for 5 minutes.
+                    </description>
                 </function>
             </functions>
         </group>

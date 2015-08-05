@@ -195,6 +195,7 @@
 #include "network/universal_request_processor.h"
 #include "utils/network/nettools.h"
 #include "http/iomonitor_tcp_server.h"
+#include "rest/handlers/multiserver_chunks_rest_handler.h"
 #include "audit/mserver_audit_manager.h"
 
 // This constant is used while checking for compatibility.
@@ -653,12 +654,8 @@ void MediaServerProcess::dumpSystemUsageStats()
                                                      .arg(iface.bytesPerSecMax));
 
     const auto networkIfInfo = networkIfList.join(lit(", "));
-    if (!networkIfInfo.isEmpty() &&
-        m_mediaServer->getProperty(Qn::NETWORK_INTERFACES) != networkIfInfo)
-    {
-        m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo);
+    if (m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo))
         propertyDictionary->saveParams(m_mediaServer->getId());
-    }
 
     QMutexLocker lk( &m_mutex );
     if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
@@ -1241,11 +1238,8 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
             ec2Connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         }
 
-        const auto publicIp = m_publicAddress.toString();
-        if (server->getProperty(Qn::PUBLIC_IP) != publicIp) {
-            server->setProperty(Qn::PUBLIC_IP, publicIp);
+        if (server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString(), QnResource::NO_ALLOW_EMPTY))
             propertyDictionary->saveParams(server->getId());
-        }
     }
 }
 
@@ -1401,6 +1395,7 @@ bool MediaServerProcess::initTcpListener()
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
+    QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
@@ -1539,6 +1534,7 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );   //allowed by default for now
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/gettime"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
@@ -1866,35 +1862,18 @@ void MediaServerProcess::run()
             m_mediaServer = server;
 
         const auto hwInfo = HardwareInformation::instance();
-        if (server->getProperty(Qn::CPU_ARCHITECTURE) != hwInfo.cpuArchitecture)
-            server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+        server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+        server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
+        server->setProperty(Qn::PHISICAL_MEMORY, QString::number(hwInfo.phisicalMemory));
 
-        if (server->getProperty(Qn::CPU_MODEL_NAME) != hwInfo.cpuModelName)
-            server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
-
-        const auto phisicalMemory = QString::number(hwInfo.phisicalMemory);
-        if (server->getProperty(Qn::PHISICAL_MEMORY) != phisicalMemory)
-            server->setProperty(Qn::PHISICAL_MEMORY, QVariant(hwInfo.phisicalMemory));
-
-        const auto isBeta = QString::number(QnAppInfo::beta() ? 1 : 0);
-        if (server->getProperty(Qn::BETA) != isBeta)
-            server->setProperty(Qn::BETA, isBeta);
-
-        if (!m_publicAddress.isNull())
-        {
-            const auto publicIp = m_publicAddress.toString();
-            if (server->getProperty(Qn::PUBLIC_IP) != publicIp)
-                server->setProperty(Qn::PUBLIC_IP, publicIp);
-        }
+        server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
+        server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
+        server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
 
         const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
         if (!confStats.isNull()) // if present
         {
-            const auto normStats = QnLexical::serialized(confStats.toBool());
-            const auto msStats = server->getProperty(Qn::STATISTICS_REPORT_ALLOWED);
-            if (normStats != msStats)
-                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, normStats);
-
+            server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(confStats.toBool()));
             MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
             MSSettings::roSettings()->sync();
         }
@@ -2483,8 +2462,6 @@ bool changePort(quint16 port)
 }
 */
 
-static void printVersion();
-
 #ifdef __linux__
 void SIGUSR1_handler(int)
 {
@@ -2565,7 +2542,7 @@ int MediaServerProcess::main(int argc, char* argv[])
 
     if( showVersion )
     {
-        printVersion();
+        std::cout << QnAppInfo::applicationFullVersion().toStdString() << std::endl;
         return 0;
     }
 
@@ -2595,11 +2572,4 @@ int MediaServerProcess::main(int argc, char* argv[])
     if (restartFlag && res == 0)
         return 1;
     return 0;
-}
-
-static void printVersion()
-{
-    std::cout
-        << QN_ENGINE_VERSION << "-" << QN_APPLICATION_REVISION
-        << (strcmp(QN_BETA, "true") ? "" : "-beta") << std::endl;
 }

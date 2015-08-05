@@ -1793,21 +1793,17 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
         return errCode;
 
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO vms_scheduletask(camera_attrs_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES (?,?,?,?,?,?,?,?,?,?)");
+    insQuery.prepare("INSERT INTO vms_scheduletask ("
+        "camera_attrs_id, start_time, end_time, do_record_audio, record_type,"
+        "day_of_week, before_threshold, after_threshold, stream_quality, fps"
+    ") VALUES ("
+        ":internalId, :startTime, :endTime, :recordAudio, :recordingType,"
+        ":dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps"
+    ")");
 
-    insQuery.bindValue(0, internalId);
-    for(const ApiScheduleTaskData& task: scheduleTasks) 
-    {
-        insQuery.bindValue(1, QnSql::serialized_field(task.startTime));
-        insQuery.bindValue(2, QnSql::serialized_field(task.endTime));
-        insQuery.bindValue(3, QnSql::serialized_field(task.recordAudio));
-        insQuery.bindValue(4, QnSql::serialized_field(task.recordingType));
-        insQuery.bindValue(5, QnSql::serialized_field(task.dayOfWeek));
-        insQuery.bindValue(6, QnSql::serialized_field(task.beforeThreshold));
-        insQuery.bindValue(7, QnSql::serialized_field(task.afterThreshold));
-        insQuery.bindValue(8, QnSql::serialized_field(task.streamQuality));
-        insQuery.bindValue(9, QnSql::serialized_field(task.fps));
-
+    insQuery.bindValue(":internalId", internalId);
+    for(const ApiScheduleTaskData& task: scheduleTasks) {
+        QnSql::bind(task, &insQuery);
         if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
             return ErrorCode::dbError;
@@ -1846,17 +1842,11 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_client_infos values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    query.addBindValue(tran.params.id.toRfc4122());
-	query.addBindValue(tran.params.parentId.toRfc4122());
-    query.addBindValue(tran.params.skin);
-    query.addBindValue(tran.params.systemInfo);
-    query.addBindValue(tran.params.cpuArchitecture);
-    query.addBindValue(tran.params.cpuModelName);
-    query.addBindValue(tran.params.phisicalMemory);
-    query.addBindValue(tran.params.openGLVersion);
-    query.addBindValue(tran.params.openGLVendor);
-    query.addBindValue(tran.params.openGLRenderer);
+    query.prepare("INSERT OR REPLACE INTO vms_client_infos VALUES ("
+        ":id, :parentId, :skin, :systemInfo, :cpuArchitecture, :cpuModelName,"
+        ":phisicalMemory, :openGLVersion, :openGLVendor, :openGLRenderer, :fullVersion)");
+
+    QnSql::bind(tran.params, &query);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -3397,6 +3387,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataLi
         info.openGLVersion      = query.value(7).toString();
         info.openGLVendor       = query.value(8).toString();
         info.openGLRenderer     = query.value(9).toString();
+        info.fullVersion        = query.value(10).toString();
 
 		data.push_back(std::move(info));
     }

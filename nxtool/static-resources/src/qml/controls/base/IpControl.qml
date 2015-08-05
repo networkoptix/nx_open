@@ -1,34 +1,121 @@
-import QtQuick 2.1;
+import QtQuick 2.0
 
-import "../base" as Base;
+import "." as Base;
+import "../../common" as Common;
 
-
-Base.TextField
+FocusScope
 {
     id: thisComponent;
 
-    property bool changed: changedBase && enabled;
-    property string defaultEmptyValue: "0.0.0.0";
-    
-    validator: RegExpValidator
+    property real fontSize: Common.SizeManager.fontSizes.base;
+    property bool changed: (firstOctet.changed || secondOctet.changed
+        || thirdOctet.changed || fourthOctet.changed);
+    property string text: ("%1.%2.%3.%4").arg(firstOctet.text)
+        .arg(secondOctet.text).arg(thirdOctet.text).arg(fourthOctet.text);
+    property bool isEmptyAddress:
+        (!firstOctet.text.trim().length
+        && !secondOctet.text.trim().length
+        && !thirdOctet.text.trim().length
+        && !fourthOctet.text.trim().length)
+
+    property bool acceptableInput: firstOctet.acceptableInput
+        && secondOctet.acceptableInput && thirdOctet.acceptableInput
+        && fourthOctet.acceptableInput;
+
+    property string initialText;
+
+    onInitialTextChanged:
     {
-        regExp: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        /// fills octets with initial values
+        var arr = initialText.split(".");
+        if (arr.length != 4)    /// should be 4 octets
+            return;
+
+        firstOctet.initialText = arr[0];
+        secondOctet.initialText = arr[1];
+        thirdOctet.initialText = arr[2];
+        fourthOctet.initialText = arr[3];
     }
 
-    text: initialText;
-
-    onTextChanged: 
+    Rectangle
     {
-        //maximum value of the first two digits is 25, otherwise appending dot
-        var maximumOctetIntermediateValue = 25;
+        anchors.fill: parent
+        anchors.bottomMargin: -1
+        color: "#44ffffff"
+        radius: baserect.radius
+    }
 
-        var octet = text.substring(text.lastIndexOf('.') + 1, text.length);       
-        // check if we can append any symbol - or already have valid ip
-        if (octet.length < 2 || acceptableInput)
-            return;
-        
-        if (parseInt(octet) > maximumOctetIntermediateValue)
-            text = text + '.';
+    Rectangle
+    {
+        id: baserect
+        gradient: Gradient {
+            GradientStop {color: "#e0e0e0" ; position: 0}
+            GradientStop {color: "#fff" ; position: 0.1}
+            GradientStop {color: "#fff" ; position: 1}
+        }
+        radius: firstOctet.contentHeight * 0.16
+        anchors.fill: parent
+        border.color: thisComponent.activeFocus ? "#47b" : "#999"
+    }
+
+    width: row.width * 1.1;
+    height: Common.SizeManager.clickableSizes.medium;
+
+    MouseArea
+    {
+        anchors.fill: parent;
+        acceptedButtons: Qt.NoButton; // pass all clicks to parent
+        cursorShape: Qt.IBeamCursor;
+    }
+
+    Row
+    {
+        id: row;
+
+        spacing: 3;
+        anchors.centerIn: parent;
+
+        IpOctet
+        {
+            id: firstOctet;
+            nextOctet: secondOctet;
+        }
+
+        IpDot
+        {
+            parentOctet: firstOctet;
+        }
+
+        IpOctet
+        {
+            id: secondOctet;
+            nextOctet: thirdOctet;
+            prevOctet: firstOctet;
+        }
+
+        IpDot
+        {
+            parentOctet: secondOctet;
+        }
+
+        IpOctet
+        {
+            id: thirdOctet;
+            nextOctet: fourthOctet;
+            prevOctet: secondOctet;
+        }
+
+        IpDot
+        {
+            parentOctet: thirdOctet;
+        }
+
+        IpOctet
+        {
+            id: fourthOctet;
+            prevOctet: thirdOctet;
+        }
     }
 }
+
 
