@@ -240,7 +240,7 @@ FocusScope
     onShowNowChanged:
     {
         if (showNow)
-            time = initTime;
+            thisComponent.setDate(initDate);
     }
 
     onActiveFocusChanged:
