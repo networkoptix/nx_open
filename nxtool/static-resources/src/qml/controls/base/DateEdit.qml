@@ -17,6 +17,7 @@ FocusScope
     property var initDate;
     property bool showNow: false;
 
+    opacity: (enabled ? 1 : 0.5);
     height: Common.SizeManager.clickableSizes.medium;
     width: height * 3;
 
