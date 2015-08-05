@@ -45,7 +45,7 @@ Expandable.MaskedSettingsPanel
                         errorDialog.message = errorTemplate.arg(qsTr("system name"));
                         errorDialog.show();
                         
-                        systemName.focus = true;
+                        systemName.forceActiveFocus();
                         return false;
                     }
 
@@ -58,7 +58,7 @@ Expandable.MaskedSettingsPanel
                         errorDialog.message = errorTemplate.arg(qsTr("password"));
                         errorDialog.show();
                         
-                        password.focus = true;
+                        password.forceActiveFocus();
                         return false;
                     }
 
@@ -92,7 +92,8 @@ Expandable.MaskedSettingsPanel
 
                     implicitWidth: implicitHeight * 6;
 
-                    clearOnInitValue: (rtuContext.selection.systemName.length === 0);
+                    clearOnInitValue: ((rtuContext.selection.systemName.length === 0)
+                        && rtuContext.selection.count !== 1);
                     initialText: (clearOnInitValue ?
                         kDifferentSystems : rtuContext.selection.systemName);
                 }

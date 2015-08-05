@@ -22,6 +22,12 @@ ListView
 
     model: rtuContext.selectionModel();
 
+    Connections
+    {
+        target: model;
+        onLayoutChanged: { forceLayout(); }
+    }
+
     header: Rtu.SelectionHeader 
     {
         selectAllCheckedState: impl.selectAllCheckedState;

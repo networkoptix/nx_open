@@ -53,6 +53,7 @@ namespace ec2
             qint64 remoteSystemIdentityTime,
             const nx_http::Request& request,
             const QByteArray& contentEncoding );
+        bool moveConnectionToReadyForStreaming( const QnUuid& connectionGuid );
         //!Report socket to receive transactions from
         /*!
             \param requestBuf Contains serialized \a request and (possibly) partial (or full) message body
