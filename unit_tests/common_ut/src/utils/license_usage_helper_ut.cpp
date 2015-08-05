@@ -326,17 +326,27 @@ TEST( QnCamLicenseUsageHelperTest, profileCalculateSpeed )
 
     QnCamLicenseUsageHelper helper;
 
+    /* All types of licenses that can be directly required by cameras. */
+    auto checkedTypes = QList<Qn::LicenseType>()
+        << Qn::LC_Analog
+        << Qn::LC_Professional
+        << Qn::LC_Edge
+        << Qn::LC_VMAX
+        << Qn::LC_AnalogEncoder
+        << Qn::LC_IO
+        ;
+
     QnVirtualCameraResourceList halfOfCameras;
     
-    for (int i = 0; i < Qn::LC_Count; ++i) {
-        resPoolScaffold.addCameras(static_cast<Qn::LicenseType>(i), camerasCountPerType / 2, true);
+    for (auto t: checkedTypes) {
+        resPoolScaffold.addCameras(t, camerasCountPerType / 2, true);
         halfOfCameras.append(
-            resPoolScaffold.addCameras(static_cast<Qn::LicenseType>(i), camerasCountPerType / 2, false)
+            resPoolScaffold.addCameras(t, camerasCountPerType / 2, false)
         );
     }
   
-    for (int i = 0; i < Qn::LC_Count; ++i) {
-        licPoolScaffold.addLicenses(static_cast<Qn::LicenseType>(i), camerasCountPerType - borrowedCount);
+    for (auto t: checkedTypes) {
+        licPoolScaffold.addLicenses(t, camerasCountPerType - borrowedCount);
     }
 
     ASSERT_TRUE(helper.isValid());
