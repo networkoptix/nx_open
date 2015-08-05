@@ -45,9 +45,9 @@ struct LicenseCompatibility
 /* Compatibility tree: 
  * Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder) 
  * Trial -> IO
- * Start -> Professional
+ * Start -> Professional -> Analog -> (VMAX, AnalogEncoder)
  */
-static std::array<LicenseCompatibility, 16> compatibleLicenseType =
+static std::array<LicenseCompatibility, 19> compatibleLicenseType =
 {
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_AnalogEncoder),
@@ -62,6 +62,9 @@ static std::array<LicenseCompatibility, 16> compatibleLicenseType =
     LicenseCompatibility(Qn::LC_Edge,           Qn::LC_AnalogEncoder),
 
     LicenseCompatibility(Qn::LC_Start,          Qn::LC_Professional),
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_AnalogEncoder),
 
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Edge),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Professional),
