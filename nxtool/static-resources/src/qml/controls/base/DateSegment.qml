@@ -27,7 +27,7 @@ TextInput
 
         function testDigit(key)
         {
-            return ((key >= Qt.Key_0) && (key < Qt.Key_9));
+            return ((key >= Qt.Key_0) && (key <= Qt.Key_9));
         }
     }
 

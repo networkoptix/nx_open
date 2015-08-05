@@ -230,9 +230,9 @@ FocusScope
 
     onInitDateChanged:
     {
-        var planeDate = impl.plainDate(initDate);
-        if (impl.toMSeconds(planeDate) !== impl.toMSeconds(initDate))
-            initDate = planeDate;
+        var plainDate = impl.plainDate(initDate);
+        if (impl.toMSeconds(plainDate) !== impl.toMSeconds(initDate))
+            initDate = plainDate;
         thisComponent.setDate(initDate);
     }
 
@@ -247,8 +247,10 @@ FocusScope
         if (activeFocus)
             return;
 
-        var accaptable = yearInput.text.length && yearInput.acceptableInput
+        var acceptable = yearInput.text.length && yearInput.acceptableInput
             && monthInput.text.length && monthInput.acceptableInput;
+        if (!acceptable)
+            return;
         var maxDays = impl.daysInMonth(yearInput.text, monthInput.text - 1);
         if (parseInt(dayInput.text) > maxDays)
             dayInput.text = maxDays;
