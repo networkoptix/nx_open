@@ -242,3 +242,8 @@ QStringList QnLdapManager::users() {
     return userLogins;
 }
 
+QString QnLdapManager::realm() const
+{
+    //TODO return Active Directory realm
+    return QString();
+}

@@ -44,6 +44,8 @@ public:
     void fetchUsers();
     QStringList users();
 
+    QString realm() const;
+
     bool authenticateWithDigest(const QString &login, const QString &ha1);
 
 private:
