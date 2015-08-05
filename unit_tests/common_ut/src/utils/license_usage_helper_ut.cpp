@@ -419,7 +419,7 @@ TEST( QnCamLicenseUsageHelperTest, borrowStartLicenses )
     ASSERT_TRUE( helper.isValid() );
 }
 
-/** Basic test for start license type. */
+/** Test for several start licenses in the same system. */
 TEST( QnCamLicenseUsageHelperTest, checkStartLicenseOverlapping )
 {
     QnLicensePoolScaffold licPoolScaffold;
@@ -437,5 +437,23 @@ TEST( QnCamLicenseUsageHelperTest, checkStartLicenseOverlapping )
 
     /* One licenses with 8 channels. */
     licPoolScaffold.addLicenses(Qn::LC_Start, 8);
+    ASSERT_TRUE( helper.isValid() );
+}
+
+/** Test for start licenses on the arm servers. */
+TEST( QnCamLicenseUsageHelperTest, checkLicensesArmActivating )
+{
+    /* Nor professional nor starter licenses should not be active on arm server. */
+    QnLicensePoolScaffold licPoolScaffold(true);
+    licPoolScaffold.addLicenses(Qn::LC_Start, 8);
+    licPoolScaffold.addLicenses(Qn::LC_Professional, 8);
+
+    QnResourcePoolScaffold resPoolScaffold;
+    resPoolScaffold.addCameras(Qn::LC_Professional, 1, true);
+
+    QnCamLicenseUsageHelper helper;
+    ASSERT_FALSE( helper.isValid() );
+
+    licPoolScaffold.addLicenses(Qn::LC_Edge, 1);
     ASSERT_TRUE( helper.isValid() );
 }

@@ -298,7 +298,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
         return gotError(errCode, Expired);
     
     bool isArmBox = checkForARMBox(info.data.box);
-    if (isArmBox && !licenseTypeInfo[type()].allowedForARM)
+    if (isArmBox && !isAllowedForArm())
         return gotError(errCode, InvalidType); // strict allowed license type for ARM devices
 
     if (isArmBox && type() == Qn::LC_Edge)
@@ -351,6 +351,11 @@ bool QnLicense::isValidStartLicense(ErrorCode* errCode, ValidationMode mode) con
 
     return gotError(errCode, NoError);
 }
+
+bool QnLicense::isAllowedForArm() const {
+    return licenseTypeInfo[type()].allowedForARM;
+}
+
 
 QByteArray QnLicense::toString() const
 {

@@ -4,7 +4,8 @@ static QUuid initialKey = QUuid::createUuid();
 
 
 QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
-    m_type(licenseType)
+    m_type(licenseType),
+    m_armServer(false)
 {
     ++initialKey.data1;
     setKey(initialKey.toByteArray());
@@ -13,6 +14,10 @@ QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
 
 bool QnLicenseStub::isValid(ErrorCode* /*errCode = 0 */,
                             ValidationMode /*mode = VM_Regular */) const {
+
+    if (isArmServer() && !isAllowedForArm())
+        return false;
+
     // Only single Start license per system is allowed
     if (type() == Qn::LC_Start)
         return isValidStartLicense();
@@ -22,4 +27,12 @@ bool QnLicenseStub::isValid(ErrorCode* /*errCode = 0 */,
 
 Qn::LicenseType QnLicenseStub::type() const  {
     return m_type;
+}
+
+bool QnLicenseStub::isArmServer() const {
+    return m_armServer;
+}
+
+void QnLicenseStub::setArmServer(bool value) {
+    m_armServer = value;
 }

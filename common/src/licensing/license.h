@@ -97,6 +97,8 @@ public:
 protected:
     bool isValidEdgeLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
     bool isValidStartLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+    bool isAllowedForArm() const;
+
 
 private:
     void parseLicenseBlock(
