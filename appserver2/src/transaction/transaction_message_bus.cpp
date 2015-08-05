@@ -1447,10 +1447,10 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     QMutexLocker lock(&m_mutex);
     transport->moveToThread(thread());
     m_connectingConnections << transport;
-    Q_ASSERT( !m_connections.contains( remotePeer.id ) );
+    Q_ASSERT(!m_connections.contains(remotePeer.id));
 }
 
-void QnTransactionMessageBus::moveConnectionToReadyForStreaming( const QnUuid& connectionGuid )
+bool QnTransactionMessageBus::moveConnectionToReadyForStreaming( const QnUuid& connectionGuid )
 {
     QMutexLocker lock( &m_mutex );
 
@@ -1459,9 +1459,11 @@ void QnTransactionMessageBus::moveConnectionToReadyForStreaming( const QnUuid& c
         if( connection->connectionGuid() == connectionGuid )
         {
             connection->setState( QnTransactionTransport::Connected );
-            return;
+            return true;
         }
     }
+
+    return false;
 }
 
 void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
