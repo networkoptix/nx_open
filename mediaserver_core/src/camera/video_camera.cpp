@@ -637,9 +637,6 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     const QnLiveStreamProviderPtr& primaryReader,
     qint64 targetDurationUSec )
 {
-    if( streamQuality != MEDIA_Quality_Low )
-        int x = 0;
-
     primaryReader->startIfNotRunning();
 
     m_cameraUsers.insert(this);
