@@ -13,11 +13,11 @@ ComboBox
 
     dontUseWheel: true;
 
-    property bool dontSignal: false;
     activeFocusOnTab: true;
     activeFocusOnPress: true;
 
     property bool pseudoEnabled: true;
+    property int lastSelectedIndex;
 
     onHoveredChanged:
     {
@@ -38,7 +38,7 @@ ComboBox
     property bool changed: (currentIndex !== initIndex);
 
     property int initIndex: init;
-    property int lastSelectedIndex;
+    property int innerLastSelectedIndex;
     property int fontSize: Common.SizeManager.fontSizes.base;
 
     height: Common.SizeManager.clickableSizes.medium;
@@ -57,16 +57,18 @@ ComboBox
         if ((currentIndex == initIndex) && firstTimeChange)
         {
             firstTimeChange = false;
+            innerLastSelectedIndex = currentIndex;
             lastSelectedIndex = currentIndex;
         }
 
         if (!model.isValidValue(currentIndex))
             return;
 
-        if (currentIndex !== lastSelectedIndex && !dontSignal)
-            timeZoneChanged(lastSelectedIndex, currentIndex);
+        if (currentIndex !== innerLastSelectedIndex)
+            timeZoneChanged(innerLastSelectedIndex, currentIndex);
 
-        lastSelectedIndex = currentIndex;
+        lastSelectedIndex = innerLastSelectedIndex;
+        innerLastSelectedIndex = currentIndex;
     }
 
     style: ComboBoxStyle
