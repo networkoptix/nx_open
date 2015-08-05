@@ -37,7 +37,6 @@ namespace
     enum 
     {
         kUpdateServersInfoInterval = 2000
-        , kHostLifeTimeMs = kUpdateServersInfoInterval * 2
         , kUnknownHostTimeout = 60 * 1000
         , kServerAliveTimeout = 12 * 1000
     };
@@ -262,7 +261,7 @@ void rtu::ServersFinder::Impl::updateServers()
 {
     checkOutdatedServers();
     
-    checkOutdatedHosts(m_knownHosts, kHostLifeTimeMs);
+    checkOutdatedHosts(m_knownHosts, kServerAliveTimeout);
     const QStringList removedUnknownHosts =
         checkOutdatedHosts(m_unknownHosts, kUnknownHostTimeout);
     for (const QString &address: removedUnknownHosts)
@@ -435,6 +434,8 @@ bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl
     info.hostAddress = host;
 
     onEntityDiscovered(host, m_knownHosts);
+    if (m_unknownHosts.remove(host))
+        emit m_owner->unknownRemoved(host);
 
     emit m_owner->serverDiscovered(info);
 
@@ -457,7 +458,7 @@ bool rtu::ServersFinder::Impl::readResponsePacket(const rtu::ServersFinder::Impl
         {
             it->visibleAddressTimestamp = timestamp;
         }
-        else if ((timestamp - it->visibleAddressTimestamp) > kHostLifeTimeMs)
+        else if ((timestamp - it->visibleAddressTimestamp) > kServerAliveTimeout)
         {
             it->visibleAddressTimestamp = timestamp;
             info.displayAddress = host;

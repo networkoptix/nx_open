@@ -12,6 +12,12 @@ FocusScope
         || thirdOctet.changed || fourthOctet.changed);
     property string text: ("%1.%2.%3.%4").arg(firstOctet.text)
         .arg(secondOctet.text).arg(thirdOctet.text).arg(fourthOctet.text);
+    property bool isEmptyAddress:
+        (!firstOctet.text.trim().length
+        && !secondOctet.text.trim().length
+        && !thirdOctet.text.trim().length
+        && !fourthOctet.text.trim().length)
+
     property bool acceptableInput: firstOctet.acceptableInput
         && secondOctet.acceptableInput && thirdOctet.acceptableInput
         && fourthOctet.acceptableInput;
