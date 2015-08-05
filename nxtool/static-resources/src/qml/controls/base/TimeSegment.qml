@@ -15,7 +15,7 @@ TextInput
     text: initialText;
     selectByMouse: true;
 
-    width: implicitHeight * 1;
+    width: implicitHeight;
     renderType: Text.NativeRendering;
     font.pixelSize: Common.SizeManager.fontSizes.base;
 
