@@ -245,8 +245,13 @@ Expandable.MaskedSettingsPanel
                             if (checked)
                                 timeZonePicker.currentIndex = timeZonePicker.model.currentTimeZoneIndex;
                             else
+                            {
+                                /// TODO: #ynikitenkov: investigate about wrong time recalculation when time zone changed to the initial
+                                timeZonePicker.dontSignal = true;
                                 timeZonePicker.currentIndex = timeZonePicker.initIndex;
-                            
+                                timeZonePicker.dontSignal = false;
+                            }
+
                             datePicker.showNow = checked;
                             timePicker.showNow = checked;
                         }
