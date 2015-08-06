@@ -209,13 +209,6 @@ table.webclient-window>tbody>tr>td{
   color:silver;
 }
 
-.webclient-window .tree li>a{
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  padding-right: 10px;
-}
-
 .webclient-window .tree li>.collapse-group{
   padding:10px;
 }
@@ -262,6 +255,10 @@ table.webclient-window>tbody>tr>td{
   height:40px !important;
   margin-right: 10px;
   background-color: black;
+
+
+  position:absolute;
+  margin-left:-80px;
 }
 
 
@@ -288,12 +285,23 @@ table.webclient-window>tbody>tr>td{
   text-decoration: none;
   background-color: rgba(53,70,79,0.2);
 }
+
+.dark-theme .nav > li > a{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-right: 10px;
+  padding-left:95px;
+}
+
 .dark-theme .nav > li.active > a{
   text-decoration: none;
   background-color: rgba(53,70,79,0.4);
   border-left: 3px solid lightblue;
-  padding-left:12px;
+  padding-left:92px;
 }
+
+
 
 .camera-node small{
   color: rgb(105,135,150);

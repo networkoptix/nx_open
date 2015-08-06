@@ -250,6 +250,10 @@ angular.module('webadminApp').controller('ViewCtrl',
                     return camera.name + '__' + num;
                 }
 
+                /*
+
+                // This is for encoders (group cameras):
+
                 //1. split cameras with groupId and without
                 var cams = _.partition(cameras, function (cam) {
                     return cam.groupId === '';
@@ -282,7 +286,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                 //6 union cameras back
                 cameras = _.union(cams[0], cams[1]);
-
+                */
                 //7 sort again
                 cameras = _.sortBy(cameras, cameraSorter);
 

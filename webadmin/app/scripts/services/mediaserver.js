@@ -90,11 +90,11 @@ angular.module('webadminApp')
                 return proxy + '/api/showLog' + (params||'');
             },
             authForMedia:function(){
-                return ipCookie('authKey'); // TODO: REMOVE
+                //return ipCookie('authKey'); // TODO: REMOVE
                 return ipCookie('auth');
             },
             authForRtsp:function(){
-                return ipCookie('authKey'); // TODO: REMOVE
+                //return ipCookie('authKey'); // TODO: REMOVE
                 return ipCookie('auth_rtsp');
             },
 

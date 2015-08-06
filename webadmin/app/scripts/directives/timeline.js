@@ -99,7 +99,6 @@ angular.module('webadminApp')
                     end: 0
                 };
 
-
                 scope.timelineConfig = timelineConfig;
 
                 var rulerPreset = {
@@ -273,7 +272,7 @@ angular.module('webadminApp')
                 }
                 function initTimeline(){
                     var now = (new Date()).getTime();
-                    scope.scaleManager.setStart(scope.recordsProvider ? scope.recordsProvider.start : (now - timelineConfig.initialInterval));
+                    scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd(now);
 
                     scope.zoomTo(1); // Animate full zoom out

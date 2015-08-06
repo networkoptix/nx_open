@@ -24,8 +24,8 @@
         </div>
     </div>
 
-    <div class="modal-footer" ng-if="!authorized">
-        <button class="btn btn-primary pull-left" name="button" type="submit"
+    <div class="modal-footer" >
+        <button class="btn btn-primary pull-left" name="button" type="submit" ng-if="!authorized"
                 ng-disabled="loginForm.$invalid || authorizing" ng-click="login()">Log in</button>
     </div>
 </form>

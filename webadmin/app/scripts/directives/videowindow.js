@@ -49,6 +49,8 @@ angular.module('webadminApp')
                 }
 
                 function detectBestFormat(){
+                    return "native-hls";
+
                     //This function gets available sources for camera and chooses the best player for this browser
 
                     //return "rtsp"; // To debug some format - force it to work

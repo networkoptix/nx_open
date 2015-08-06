@@ -2,13 +2,10 @@
     <div class="pull-left camera-preview">
         <img ng-src="{{camera.preview}}" >
     </div>
-
     <span ng-if="camera.status!='Recording' && camera.scheduleEnabled" class="camera-status danger">&#x25E6;</span>
     <span ng-if="camera.status=='Recording' " class="camera-status danger">&#x25CF;</span>
     <span ng-if="camera.status!='Recording' && !camera.scheduleEnabled" class="camera-status">&nbsp;</span>
-
     {{camera.name}}<br/>
-
     <span class="camera-status">&nbsp;</span>
     <small>{{camera.url}}</small>
 </a>

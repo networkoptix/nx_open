@@ -243,7 +243,7 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width) {
     });
 
     //2. getCameraHistory
-};
+}
 
 CameraRecordsProvider.prototype.now = function(){
     return (new Date()).getTime();
