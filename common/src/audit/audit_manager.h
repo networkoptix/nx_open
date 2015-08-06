@@ -1,8 +1,10 @@
 #ifndef __AUDIT_MANAGER_H__
 #define __AUDIT_MANAGER_H__
 
+#include <QMutex>
 #include <QTimer>
 #include <QElapsedTimer>
+
 #include "api/model/audit/audit_record.h"
 #include "api/model/audit/auth_session.h"
 #include "recording/time_period.h"
@@ -88,6 +90,7 @@ private:
     mutable QMutex m_mutex;
     QTimer m_timer;
     std::atomic<bool> m_enabled;
+
 private:
     bool canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right);
     

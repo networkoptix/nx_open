@@ -5,8 +5,8 @@
 
 namespace
 {
-    static const int SESSION_CLEANUP_INTERVAL_MS = 1000;
-    static const int SESSION_KEEP_PERIOD_MS = 1000;
+    static const qint64 SESSION_CLEANUP_INTERVAL_MS = 1000;
+    static const qint64 SESSION_KEEP_PERIOD_MS      = 1000;
 }
 
 QnAuditRecord filteredRecord(QnAuditRecord record)
@@ -44,7 +44,7 @@ int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
         Q_ASSERT(record.resources.empty());
 
     QMutexLocker lock(&m_mutex);
-    if (m_sessionCleanupTimer.elapsed() >> SESSION_CLEANUP_INTERVAL_MS)
+    if (m_sessionCleanupTimer.elapsed() > SESSION_CLEANUP_INTERVAL_MS)
     {
         m_sessionCleanupTimer.restart();
         cleanupExpiredSessions();

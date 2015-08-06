@@ -20,10 +20,10 @@
 
 #include "server_query_processor.h"
 #include "rest/server/json_rest_result.h"
+#include "rest/server/rest_connection_processor.h"
 #include "audit/audit_manager.h"
 #include "api/model/audit/auth_session.h"
 #include "audit/audit_manager.h"
-
 
 namespace ec2
 {

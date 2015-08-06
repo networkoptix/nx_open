@@ -137,6 +137,11 @@ namespace ec2
                 }
                 break;
             }
+            default:
+            {
+                // do not audit these commands
+                break;
+            }
         }
 
         if (eventType != Qn::AR_NotDefined) {
