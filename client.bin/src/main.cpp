@@ -57,6 +57,7 @@ extern "C"
 
 #include <utils/common/log.h>
 #include <utils/common/command_line_parser.h>
+#include <utils/network/http/http_mod_manager.h>
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
@@ -336,6 +337,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
 
     ec2::DummyHandler dummyEc2RequestHandler;
+
+    nx_http::HttpModManager httpModManager;
 
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
