@@ -561,30 +561,25 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     {
         if (user->getName().toLower() == userName)
         {
-			if (authUserId)
-				*authUserId = user->getId();
+            if (authUserId)
+                *authUserId = user->getId();
 
-			if (!user->isEnabled())
-				continue;
+            if (!user->isEnabled())
+                continue;
 
-			if (user->isLdap())
-			{
-				try {
-                    QnLdapManager *ldapManager = QnLdapManager::instance();
-                    bool authResult = ldapManager->authenticateWithDigest(userName, lit("") /* digest here */);
-                    return authResult;
-				} catch (const LdapException&) {
-					return false;
-				}
-			} else
-			{
-				if (user->checkPassword(password))
-				{
-					if (user->getDigest().isEmpty())
-						emit emptyDigestDetected(user, userName, password);
-					return true;
-				}
-			}
+            if( user->passwordExpired() )
+            {
+                //user password has expired, validating password
+                if( !user->doPasswordProlongation() )
+                    return false;
+            }
+
+            if (user->checkPassword(password))
+            {
+                if (user->getDigest().isEmpty())
+                    emit emptyDigestDetected(user, userName, password);
+                return true;
+            }
         }
     }
 
@@ -674,7 +669,7 @@ void QnAuthHelper::addAuthHeader(
 
     const QString auth(lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5"));
     //QString auth(lit("Digest realm=\"%1\",nonce=\"%2\",algorithm=MD5,qop=\"auth\""));
-	const QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
+    const QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
     nx_http::insertOrReplaceHeader( &response.headers, nx_http::HttpHeader(
         headerName,
         auth.arg(realm).arg(QLatin1String(getNonce())).toLatin1() ) );
