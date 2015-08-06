@@ -11,6 +11,7 @@
 #include "common/common_module.h"
 #include "http/custom_headers.h"
 #include "utils/network/flash_socket/types.h"
+#include "audit/audit_manager.h"
 
 
 static const int AUTH_TIMEOUT = 60 * 1000;
@@ -71,8 +72,12 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         const bool isProxy = false;
         QElapsedTimer t;
         t.restart();
-        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId))
+        bool authInProgress = false;
+        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &authInProgress))
         {
+            if (!authInProgress)
+                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authSession(), Qn::AR_UnauthorizedLogin));
+
             if( !d->socket->isConnected() )
                 return false;   //connection has been closed
 

@@ -1574,8 +1574,8 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     }
 
     QSqlQuery insQuery2(m_sdb);
-    insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, crypt_sha512_hash, rights) "
-                      "VALUES (:internalId, :internalId, :digest, :cryptSha512Hash, :permissions)");
+    insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights) "
+                      "VALUES (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions)");
     QnSql::bind(data, &insQuery2);
     if (data.digest.isEmpty())
     {
@@ -3309,7 +3309,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& userId, ApiUserDataList& user
     query.setForwardOnly(true);
     query.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        u.is_superuser as isAdmin, u.email, p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, u.password as hash, p.rights as permissions \
+        u.is_superuser as isAdmin, u.email, p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions \
         FROM vms_resource r \
         JOIN auth_user u  on u.id = r.id\
         JOIN vms_userprofile p on p.user_id = u.id\

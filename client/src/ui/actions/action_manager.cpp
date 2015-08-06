@@ -820,6 +820,11 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::PreferencesRole).
         autoRepeat(false);
 
+    factory(Qn::OpenAuditLogAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Audit trail..."));
+
     factory().
         flags(Qn::Main).
         separator();

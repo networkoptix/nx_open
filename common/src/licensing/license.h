@@ -22,6 +22,16 @@
 #undef verify
 #endif
 
+struct LicenseTypeInfo
+{
+    LicenseTypeInfo();
+    LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className, bool allowedForARM);
+
+    Qn::LicenseType licenseType;
+    QnLatin1Array className;
+    bool allowedForARM;
+};
+
 class QnLicense {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
@@ -93,6 +103,14 @@ public:
 
     /** Id of the server this license attached to (if it is present in the current system). */
     QnUuid serverId() const;
+
+    static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
+
+protected:
+    bool isValidEdgeLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+    bool isValidStartLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+    bool isAllowedForArm() const;
+
 
 private:
     void parseLicenseBlock(

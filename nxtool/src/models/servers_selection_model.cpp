@@ -873,7 +873,7 @@ void rtu::ServersSelectionModel::Impl::updateExtraInfoFailed(const QUuid &id
         updateSystemRow = true;
     }
 
-    if ((currentLoggedState == kDifferentNetwork) && (newLoggedState == kServerUnauthorized))
+    if ((currentLoggedState != kServerUnauthorized) && (newLoggedState == kServerUnauthorized))
     {
         ++searchInfo.systemInfoIterator->unauthorizedServers;
         updateSystemRow = true;

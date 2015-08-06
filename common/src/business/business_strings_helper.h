@@ -56,6 +56,10 @@ public:
 
     //TODO: #vasilenko isPublic field is not used, why?
     static QString motionUrl(const QnBusinessEventParameters &params, bool isPublic);
+
+    static QString toggleStateToString(QnBusiness::EventState state);
+    static QString eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType);
+    static QString bruleDescriptionText(const QnBusinessEventRulePtr& bRule);
 private:
     /** Details of event: aggregation info, date and time, other info */
     static QString aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,

@@ -89,6 +89,8 @@ public:
     QnTransactionTransport( const ApiPeerData& localPeer );
     ~QnTransactionTransport();
 
+    void setBeforeDestroyCallback(std::function<void ()> ttFinishCallback);
+
 signals:
     void gotTransaction(
         Qn::SerializationFormat tranFormat,
@@ -298,7 +300,7 @@ private:
     //!Number of threads waiting on \a QnTransactionTransport::waitForNewTransactionsReady
     int m_waiterCount;
     QWaitCondition m_cond;
-
+    std::function<void ()> m_ttFinishCallback;
 private:
     void default_initializer();
     void sendHttpKeepAlive( quint64 taskID );

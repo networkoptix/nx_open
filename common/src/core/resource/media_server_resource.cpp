@@ -509,5 +509,5 @@ void QnMediaServerResource::setAuthKey(const QString& authKey)
 
 QString QnMediaServerResource::realm() const
 {
-    return QnAuthHelper::REALM;
+    return QnAppInfo::realm();
 }

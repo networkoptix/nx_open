@@ -106,6 +106,7 @@
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
+#include <rest/handlers/audit_log_rest_handler.h>
 #include <rest/handlers/recording_stats_rest_handler.h>
 #include <rest/handlers/ping_system_rest_handler.h>
 #include <rest/handlers/ptz_rest_handler.h>
@@ -195,6 +196,7 @@
 #include "utils/network/nettools.h"
 #include "http/iomonitor_tcp_server.h"
 #include "rest/handlers/multiserver_chunks_rest_handler.h"
+#include "audit/mserver_audit_manager.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1373,6 +1375,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
@@ -1513,7 +1516,6 @@ void MediaServerProcess::run()
     soapServer.bind();
     soapServer.start();
 #endif //ENABLE_ONVIF
-
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     std::unique_ptr<QnResourcePropertyDictionary> dictionary(new QnResourcePropertyDictionary());
@@ -1525,6 +1527,7 @@ void MediaServerProcess::run()
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
 
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
+    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
@@ -2046,36 +2049,35 @@ void MediaServerProcess::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
-    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-    if (adminUser) {
+    if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
+    {
         qnCommon->bindModuleinformation(adminUser);
         qnCommon->updateModuleInformation();
 
         hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
-    }
 
-    typedef ec2::Ec2StaticticsReporter stats;
-    bool adminParamsChanged = false;
+        typedef ec2::Ec2StaticticsReporter stats;
+        bool adminParamsChanged = false;
 
-    // TODO: fix, when VS supports init lists:
-    //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
-    const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
-    for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
-    {
-        const QString& param = **it;
-        const QString val = MSSettings::roSettings()->value(param, lit("")).toString();
-        if (!val.isEmpty() && val != adminUser->getProperty(param))
+        // TODO: fix, when VS supports init lists:
+        //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
+        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
+        for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
         {
-            adminUser->setProperty(param, val);
-            MSSettings::roSettings()->remove(param);
-            adminParamsChanged = true;
+            const QString& param = **it;
+            const QString val = MSSettings::roSettings()->value(param, lit("")).toString();
+            if (adminUser->setProperty(param, val, QnResource::NO_ALLOW_EMPTY))
+            {
+                MSSettings::roSettings()->remove(param);
+                adminParamsChanged = true;
+            }
         }
-    }
 
-    if (adminParamsChanged)
-    {
-        propertyDictionary->saveParams(adminUser->getId());
-        MSSettings::roSettings()->sync();
+        if (adminParamsChanged)
+        {
+            propertyDictionary->saveParams(adminUser->getId());
+            MSSettings::roSettings()->sync();
+        }
     }
 
     QnStorageResourceList storages = m_mediaServer->getStorages();

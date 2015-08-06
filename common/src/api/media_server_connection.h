@@ -215,6 +215,7 @@ public:
 
     int pingSystemAsync(const QUrl &url, const QString &user, const QString &password, QObject *target, const char *slot);
     int getRecordingStatisticsAsync(qint64 bitrateAnalizePeriodMs, QObject *target, const char *slot);
+    int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject *target, const char *slot);
     int mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot);
 
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);

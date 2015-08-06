@@ -5,6 +5,7 @@
 #include <QtCore/QSet>
 
 #include <network/authenticate_helper.h>
+#include <utils/common/app_info.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 #include <utils/common/id.h>
@@ -28,7 +29,7 @@ struct QnModuleInformation {
     QString realm;
 
     QnModuleInformation()
-        : port(0), sslAllowed(false), protoVersion(0), flags(0), realm(QnAuthHelper::REALM)
+        : port(0), sslAllowed(false), protoVersion(0), flags(0), realm(QnAppInfo::realm())
     {}
 
     bool isCompatibleToCurrentSystem() const;

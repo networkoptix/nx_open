@@ -778,6 +778,7 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
     dst->setPermissions(src.permissions);
     dst->setDigest(src.digest);
     dst->setCryptSha512Hash(src.cryptSha512Hash);
+    dst->setRealm(src.realm);
 }
 
 void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
@@ -788,6 +789,7 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     dst.permissions = src->getPermissions();
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();
+    dst.realm = src->getRealm();
 }
 
 template<class List>
