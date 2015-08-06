@@ -191,9 +191,6 @@ angular.module('webadminApp')
                     periodsType = 0;
                 }
 
-                if(typeof(limit)=='undefined'){
-                    limit = Number.MAX_VALUE;
-                }
                 if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
                     serverUrl = '/proxy/'+ serverUrl + '/';
                 }
@@ -201,13 +198,14 @@ angular.module('webadminApp')
                     serverUrl = proxy + '/';
                 }
                 //RecordedTimePeriods
-                return  wrapRequest($http.get(serverUrl + 'api/RecordedTimePeriods' +
+                return  wrapRequest($http.get(serverUrl + 'ec2/recordedTimePeriods' +
                     '?physicalId=' + physicalId +
                     '&startTime=' + startTime +
                     '&endTime=' + endTime +
                     '&detail=' + detail +
                     '&periodsType=' + periodsType +
-                    '&limit=' + limit));
+                    (limit?'&limit=' + limit:'') +
+                    '&flat'));
             }
         };
     });

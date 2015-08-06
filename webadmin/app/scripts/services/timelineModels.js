@@ -333,17 +333,17 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                 self.cacheRequestedInterval(start,end,level);
 
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
-
-                if(data.data.length == 0){
+                var chunks = data.data.reply;
+                if(chunks.length == 0){
                     console.log("no chunks for this camera");
                 }
 
-                for (var i = 0; i < data.data.length; i++) {
-                    var endChunk = data.data[i][0] + data.data[i][1];
-                    if (data.data[i][1] < 0) {
+                for (var i = 0; i < chunks.length; i++) {
+                    var endChunk = parseInt(chunks[i].startTimeMs) + parseInt(chunks[i].durationMs);
+                    if (chunks[i].durationMs < 0) {
                         endChunk = (new Date()).getTime() + 100000;// some date in future
                     }
-                    var addchunk = new Chunk(null, data.data[i][0], endChunk, level);
+                    var addchunk = new Chunk(null, parseInt(chunks[i].startTimeMs), endChunk, level);
                     self.addChunk(addchunk,null);
                 }
 
@@ -648,22 +648,27 @@ ShortCache.prototype.update = function(requestPosition,position){
             this.limitChunks).
         then(function(data){
             self.updating = false;
-            if(data.data.length == 0){
+
+
+            var chunks = data.data.reply;
+
+            if(chunks.length == 0){
                 console.log("no chunks for this camera and interval");
             }
-            if(data.data.length > 0 && parseInt(data.data[0][0]) < requestPosition){ // Crop first chunk.
-                data.data[0][1] -= requestPosition - parseInt(data.data[0][0]);
-                data.data[0][0] = requestPosition;
+
+            if(chunks.length > 0 && parseInt(chunks[0].startTimeMs) < requestPosition){ // Crop first chunk.
+                chunks[0].durationMs -= requestPosition - parseInt(chunks[0].startTimeMs);
+                chunks[0].startTimeMs = requestPosition;
             }
-            self.currentDetailization = data.data;
+            self.currentDetailization = chunks;
 
             var lastCheckPointDate = self.lastRequestDate;
             var lastCheckPointPosition = self.lastRequestPosition;
             var lastSavedCheckpoint = 0; // First chunk will be forced to save
 
             for(var i=0; i<self.currentDetailization.length; i++){
-                lastCheckPointPosition += self.currentDetailization[i][1];// Duration of chunks count
-                lastCheckPointDate = self.currentDetailization[i][0] + self.currentDetailization[i][1];
+                lastCheckPointPosition += self.currentDetailization[i].durationMs;// Duration of chunks count
+                lastCheckPointDate = self.currentDetailization[i].startTimeMs + self.currentDetailization[i].durationMs;
 
                 if( lastCheckPointDate - lastSavedCheckpoint > self.checkpointsFrequency) {
                     lastSavedCheckpoint = lastCheckPointDate;
@@ -731,8 +736,8 @@ ShortCache.prototype.setPlayingPosition = function(position){
     this.playedPosition = this.lastRequestDate + intervalToEat;
 
     for(var i=0; i<this.currentDetailization.length; i++){
-        intervalToEat -= this.currentDetailization[i][1];// Duration of chunks count
-        this.playedPosition = this.currentDetailization[i][0] + this.currentDetailization[i][1] + intervalToEat;
+        intervalToEat -= this.currentDetailization[i].durationMs;// Duration of chunks count
+        this.playedPosition = this.currentDetailization[i].startTimeMs + this.currentDetailization[i].durationMs + intervalToEat;
         if(intervalToEat <= 0){
             break;
         }
@@ -745,8 +750,8 @@ ShortCache.prototype.setPlayingPosition = function(position){
     }
 
     if(!this.liveMode && this.currentDetailization.length>0
-        && (this.currentDetailization[this.currentDetailization.length - 1][1]
-            + this.currentDetailization[this.currentDetailization.length - 1][0]
+        && (this.currentDetailization[this.currentDetailization.length - 1].durationMs
+            + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs
             < this.playedPosition + this.updateInterval)) { // It's time to update
         this.update();
     }

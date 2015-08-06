@@ -7,8 +7,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.cameras = {};
         $scope.activeCamera = null;
 
-        $scope.hasMobileApp = window.jscd.mobile;
-        if($scope.hasMobileApp) {
+        if(window.jscd.mobile) {
             $scope.mobileStore = window.jscd.os == "iOS"?"appstore":"googleplay";
             var found = _.find(Config.helpLinks, function (links) {
                 if (!links.urls) {
@@ -23,10 +22,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.mobileAppLink = url.url;
                 return true;
             });
-
-            if (!found) {
-                $scope.hasMobileApp = false;
-            }
+            $scope.hasMobileApp = !!found;
         }
 
         $scope.activeResolution = 'Auto';
