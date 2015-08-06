@@ -10,17 +10,17 @@ namespace cdb {
 
 
 void AccountManager::addAccount(
-    const AuthorizationInfo& authInfo,
+    const AuthorizationInfo& authzInfo,
     const data::AccountData& accountData,
-    std::function<void(ResultCode)> completionHandler )
+    std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler )
 {
     //TODO #ak
 
-    completionHandler( ResultCode::ok );
+    completionHandler( ResultCode::ok, data::EmailVerificationCode() );
 }
 
 void AccountManager::verifyAccountEmailAddress(
-    const AuthenticationInfo& authInfo,
+    const AuthorizationInfo& authzInfo,
     const std::basic_string<uint8_t>& emailVerificationCode,
     std::function<void(ResultCode)> completionHandler )
 {
@@ -28,7 +28,7 @@ void AccountManager::verifyAccountEmailAddress(
 }
 
 void AccountManager::getAccountByLogin(
-    const AuthenticationInfo& authInfo,
+    const AuthorizationInfo& authzInfo,
     const std::string& userName,
     std::function<void(ResultCode, data::AccountData)> completionHandler )
 {

@@ -6,10 +6,11 @@
 #ifndef cloud_db_authorization_manager_h
 #define cloud_db_authorization_manager_h
 
+#include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <utils/common/singleton.h>
 
-#include "types.h"
 #include "managers/types.h"
+#include "types.h"
 
 
 namespace cdb {
@@ -25,15 +26,15 @@ class AuthorizationManager
 {
 public:
     /*!
-        \param authzInfo Authorization information can contain data filter to restrict access to data
+        \param dataToAuthorize Authorization information can contain data filter to restrict access to data
         \return \a true if authorized, \a false otherwise
         \note This method cannot block
     */
     bool authorize(
-        const AuthenticationInfo& authInfo,
+        const stree::AbstractResourceReader& dataToAuthorize,
         EntityType requestedEntity,
         DataActionType requestedAction,
-        AuthorizationInfo* const authzInfo ) const;
+        stree::AbstractResourceWriter* const authzInfo ) const;
 };
 
 }   //cdb

@@ -42,10 +42,15 @@ namespace nx_http
         //    authentication manager should be able to return some custom data
         //    which will be forwarded to the request handler.
         //    Should this data be template parameter?
+        stree::ResourceContainer authInfo;
         if( const auto auth = nx_http::ServerManagers::instance()->authenticationManager() )
         {
             header::WWWAuthenticate wwwAuthenticate;
-            if( !auth->authenticate( *this, *request.request, &wwwAuthenticate ) )
+            if( !auth->authenticate(
+                    *this,
+                    *request.request,
+                    &wwwAuthenticate,
+                    &authInfo ) )
             {
                 nx_http::Message response( nx_http::MessageType::response );
                 response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
@@ -70,6 +75,7 @@ namespace nx_http
             !dispatcher->dispatchRequest(
                 *this,
                 std::move(request),
+                std::move(authInfo),
                 std::move(sendResponseFunc) ) )
         {
             //creating and sending error response

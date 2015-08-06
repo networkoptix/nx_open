@@ -28,16 +28,16 @@ public:
     void addAccount(
         const AuthorizationInfo& authzInfo,
         const data::AccountData& accountData,
-        std::function<void(ResultCode)> completionHandler );
+        std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler );
     //!On success, account moved to "activated" state
     void verifyAccountEmailAddress(
-        const AuthenticationInfo& authInfo,
+        const AuthorizationInfo& authzInfo,
         const std::basic_string<uint8_t>& emailVerificationCode,
         std::function<void(ResultCode)> completionHandler );
     
     //void getAccounts(/*TODO*/);
     void getAccountByLogin(
-        const AuthenticationInfo& authInfo,
+        const AuthorizationInfo& authzInfo,
         const std::string& userName,
         std::function<void(ResultCode, data::AccountData)> completionHandler );
 };

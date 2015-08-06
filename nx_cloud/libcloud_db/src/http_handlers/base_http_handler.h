@@ -11,7 +11,9 @@
 #include <utils/network/http/server/abstract_http_request_handler.h>
 #include <utils/network/http/server/http_server_connection.h>
 
+#include "access_control/authorization_manager.h"
 #include "access_control/types.h"
+#include "managers/types.h"
 
 
 namespace cdb
@@ -23,29 +25,52 @@ namespace cdb
         public nx_http::AbstractHttpRequestHandler
     {
     public:
+        AbstractFiniteMsgBodyHttpHandler(
+            EntityType entityType,
+            DataActionType actionType )
+        :
+            m_entityType( entityType ),
+            m_actionType( actionType )
+        {
+        }
+
         virtual ~AbstractFiniteMsgBodyHttpHandler()
         {
-            int x = 0;
         }
 
         //!Implementation of AbstractHttpRequestHandler::processRequest
+        /*!
+            \warning this object is allowed to be removed from within \a completionHandler call!
+        */
         virtual void processRequest(
             const nx_http::HttpServerConnection& /*connection*/,
+            stree::ResourceContainer&& authInfo,
             const nx_http::Request& /*request*/,
             nx_http::Response* const response,
             std::function<void(
                 const nx_http::StatusCode::Value statusCode,
                 std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) override
         {
-            //TODO #ak performing authorization and invoking specific handler
-            AuthorizationInfo authzInfo;
-            //stree::ResourceContainer res;
+            m_completionHandler = std::move( completionHandler );
+
             InputData inputData;
             //TODO #ak deserializing inputData
 
-            m_completionHandler = std::move(completionHandler);
+            //TODO #ak performing authorization
+            //  authorization is performed here since it can depend on input data which 
+            //  needs to be deserialized depending on request type
+            if( !AuthorizationManager::instance()->authorize(
+                    stree::MultiSourceResourceReader( authInfo, inputData ),
+                    m_entityType,
+                    m_actionType,
+                    &authInfo ) )   //using same object since we can move it
+            {
+                requestCompleted( nx_http::StatusCode::unauthorized, OutputData() );
+                return;
+            }
+
             processRequest(
-                authzInfo,
+                AuthorizationInfo( std::move(authInfo) ),
                 std::move(inputData),
                 response,
                 std::bind(
@@ -58,7 +83,7 @@ namespace cdb
     protected:
         //!Implement request-specific logic in this function
         virtual void processRequest(
-            const AuthorizationInfo& authzInfo,
+            AuthorizationInfo&& authzInfo,
             const InputData& inputData,
             //const stree::AbstractResourceReader& inputParams,
             nx_http::Response* const response,
@@ -67,13 +92,20 @@ namespace cdb
                 const OutputData& outputData )>&& completionHandler ) = 0;
 
     private:
+        const EntityType m_entityType;
+        const DataActionType m_actionType;
+        std::function<void(
+            const nx_http::StatusCode::Value statusCode,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> m_completionHandler;
+
         void requestCompleted(
             const nx_http::StatusCode::Value statusCode,
             const OutputData& /*outputData*/ )
         {
-            //TODO #ak serializing response into message body buffer
+            //TODO #ak serializing outputData into message body buffer using proper format
 
-            m_completionHandler(
+            auto completionHandler = std::move(m_completionHandler);
+            completionHandler(
                 statusCode,
                 std::make_unique<nx_http::BufferSource>(
                     "text/html",
@@ -82,10 +114,6 @@ namespace cdb
                         "<body>Hello from base cloud_db add_account handler</body>"
                     "</html>\n" ) );
         }
-
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> m_completionHandler;
     };
 }
 

@@ -67,11 +67,7 @@ int CloudDBProcess::executeApplication()
     AuthenticationManager authenticationManager;
     httpServerManagers.setAuthenticationManager( &authenticationManager );
 
-    //TODO #ak registering HTTP handlers
-    //cdb::AddAccountHttpHandler addAccountHandler;
-    //httpMessageDispatcher.registerRequestProcessor(
-    //    cdb::AddAccountHttpHandler::HANDLER_PATH,
-    //    &addAccountHandler );
+    //registering HTTP handlers
     httpMessageDispatcher.registerRequestProcessor<cdb::AddAccountHttpHandler>(
         cdb::AddAccountHttpHandler::HANDLER_PATH );
 

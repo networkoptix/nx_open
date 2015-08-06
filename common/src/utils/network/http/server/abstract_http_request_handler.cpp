@@ -24,6 +24,7 @@ namespace nx_http
     bool AbstractHttpRequestHandler::processRequest(
         const nx_http::HttpServerConnection& connection,
         nx_http::Message&& requestMsg,
+        stree::ResourceContainer&& authInfo,
         std::function<
             void(
                 nx_http::Message&&,
@@ -65,6 +66,7 @@ namespace nx_http
 
         processRequest(
             connection,
+            std::move( authInfo ),
             request,
             response,
             sendResponseFunc );

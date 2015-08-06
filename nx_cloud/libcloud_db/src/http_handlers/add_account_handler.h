@@ -26,24 +26,27 @@ class AddAccountHttpHandler
 public:
     static const QString HANDLER_PATH;
 
-protected:
+    AddAccountHttpHandler();
     virtual ~AddAccountHttpHandler();
 
+protected:
+    //!Implementation of \a AbstractFiniteMsgBodyHttpHandler::processRequest
     virtual void processRequest(
-        const AuthorizationInfo& authzInfo,
+        AuthorizationInfo&& authzInfo,
         const data::AccountData& accountData,
-        //const stree::AbstractResourceReader& inputParams,
         nx_http::Response* const response,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,
             const data::EmailVerificationCode& output )>&& completionHandler ) override;
 
 private:
+    std::function<void(
+        const nx_http::StatusCode::Value statusCode,
+        const data::EmailVerificationCode& output )> m_completionHandler;
+
     void addAccountDone(
         ResultCode resultCode,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            const data::EmailVerificationCode& output )> completionHandler );
+        data::EmailVerificationCode outData );
 };
 
 }

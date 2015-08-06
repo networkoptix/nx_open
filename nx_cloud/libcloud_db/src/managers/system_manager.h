@@ -50,13 +50,13 @@ class SystemManager
 public:
     //!Binds system to account, associated with \a authInfo
     void bindSystemToAccount(
-        const AuthenticationInfo& authInfo,
+        const AuthorizationInfo& authzInfo,
         const QnUuid& accountID,
         const QnUuid& systemID,
         const std::string& systemName,
         std::function<void(ResultCode, SystemData)> completionHandler );
     void unbindSystem(
-        const AuthenticationInfo& authInfo,
+        const AuthorizationInfo& authzInfo,
         const QnUuid& systemID,
         std::function<void(ResultCode)> completionHandler );
     /*!
@@ -66,12 +66,12 @@ public:
         \note if request can be completed immediately (e.g., data is present in internal cache) \a completionHandler will be invoked within this call
      */
     void getSystems(
-        const AuthenticationInfo& authInfo,
+        const AuthorizationInfo& authzInfo,
         const DataFilter& filter,
         std::function<void(ResultCode, TransactionSequence, std::vector<SystemData>)> completionHandler,
         std::function<void(DataChangeEvent)> eventReceiver = std::function<void(DataChangeEvent)>());
     void addSubscription(
-        const AuthenticationInfo& authInfo,
+        const AuthorizationInfo& authzInfo,
         const QnUuid& systemID,
         const QnUuid& productID,
         std::function<void(ResultCode)> completionHandler );
@@ -79,7 +79,7 @@ public:
         \note if request can be completed immediately (e.g., data is present in internal cache) \a completionHandler will be invoked within this call
      */
     void getActiveSubscriptions(
-        const AuthenticationInfo& authInfo,
+        const AuthorizationInfo& authzInfo,
         const QnUuid& systemID,
         std::function<void(ResultCode, std::vector<SubscriptionData>)> completionHandler );
     
@@ -88,7 +88,7 @@ public:
          \return receiver ID
      */
     int registerNotificationReceiver(
-        const AuthenticationInfo& authInfo,
+        const AuthorizationInfo& authzInfo,
         const DataFilter& filter,
         TransactionSequence lastKnownTranSeq,
         std::function<void(const std::unique_ptr<SystemChangeEvent>&)> eventReceiver );

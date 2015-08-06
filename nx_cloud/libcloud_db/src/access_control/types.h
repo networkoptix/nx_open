@@ -9,6 +9,8 @@
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 
 
+namespace cdb {
+
 enum class AccessRole
 {
     //!anyone
@@ -35,9 +37,19 @@ public:
 };
 
 class AuthorizationInfo
+:
+    public stree::AbstractResourceReader
 {
 public:
-    bool accessAllowedToOwnDataOnly;
+    AuthorizationInfo();
+    AuthorizationInfo( stree::ResourceContainer&& rc );
+
+    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
+    virtual bool getAsVariant( int resID, QVariant* const value ) const override;
+
+    bool accessAllowedToOwnDataOnly() const;
 };
+
+}   //cdb
 
 #endif

@@ -28,16 +28,17 @@ public:
     virtual bool authenticate(
         const nx_http::HttpServerConnection& connection,
         const nx_http::Request& request,
-        nx_http::header::WWWAuthenticate* const wwwAuthenticate ) override;
+        nx_http::header::WWWAuthenticate* const wwwAuthenticate,
+        stree::AbstractResourceWriter* authProperties ) override;
 
 private:
-    /*!
-        \param inputParams It can be HTTP request and originating peer network info
-        \note \a completionHandler is allowed to be called from within this method
-    */
-    bool authenticate(
-        const stree::AbstractResourceReader& inputParams,
-        std::function<void(AuthenticationInfo)> completionHandler ) const;
+    ///*!
+    //    \param inputParams It can be HTTP request and originating peer network info
+    //    \note \a completionHandler is allowed to be called from within this method
+    //*/
+    //bool authenticate(
+    //    const stree::AbstractResourceReader& inputParams,
+    //    std::function<void(AuthenticationInfo)> completionHandler ) const;
 };
 
 #endif

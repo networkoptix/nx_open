@@ -9,6 +9,8 @@
 #include <string>
 #include <stdint.h>
 
+#include <plugins/videodecoder/stree/resourcecontainer.h>
+
 
 namespace cdb {
 namespace data {
@@ -16,6 +18,8 @@ namespace data {
 //TODO #ak bring in fusion
 
 class AccountData
+:
+    public stree::AbstractResourceReader
 {
 public:
     std::string email;
@@ -23,6 +27,8 @@ public:
     std::basic_string<uint8_t> passwordHA1;
     std::basic_string<uint8_t> emailVerificationCode;
     //TODO
+
+    virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
 class EmailVerificationCode

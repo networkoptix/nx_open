@@ -10,6 +10,8 @@
 #include <memory>
 #include <mutex>
 
+#include <plugins/videodecoder/stree/resourcecontainer.h>
+
 #include "http_server_connection.h"
 #include "../abstract_msg_body_source.h"
 
@@ -35,6 +37,7 @@ namespace nx_http
         bool processRequest(
             const nx_http::HttpServerConnection& connection,
             nx_http::Message&& request,
+            stree::ResourceContainer&& authInfo,
             std::function<void(
                 nx_http::Message&&,
                 std::unique_ptr<nx_http::AbstractMsgBodySource>)> completionHandler );
@@ -47,6 +50,7 @@ namespace nx_http
         */
         virtual void processRequest(
             const nx_http::HttpServerConnection& connection,
+            stree::ResourceContainer&& authInfo,
             const nx_http::Request& request,
             nx_http::Response* const response,
             std::function<void(

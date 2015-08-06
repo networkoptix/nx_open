@@ -59,6 +59,7 @@ namespace nx_http
         bool dispatchRequest(
             const HttpServerConnection& conn,
             nx_http::Message&& message,
+            stree::ResourceContainer&& authInfo,
             CompletionFuncRefType&& completionFunc )
         {
             assert( message.type == nx_http::MessageType::request );
@@ -80,6 +81,7 @@ namespace nx_http
             return requestProcessor->processRequest(
                 conn,
                 std::move( message ),
+                std::move( authInfo ),
                 [completionFunc, requestProcessor](
                     nx_http::Message&& responseMsg,
                     std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )

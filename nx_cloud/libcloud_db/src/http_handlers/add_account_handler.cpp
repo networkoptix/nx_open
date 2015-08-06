@@ -16,21 +16,27 @@ namespace cdb
 {
     const QString AddAccountHttpHandler::HANDLER_PATH = QLatin1String("/add_account");
 
+    AddAccountHttpHandler::AddAccountHttpHandler()
+    :
+        AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::EmailVerificationCode>(
+            EntityType::account,
+            DataActionType::insert )
+    {
+    }
+
     AddAccountHttpHandler::~AddAccountHttpHandler()
     {
-        int x = 0;
     }
 
     void AddAccountHttpHandler::processRequest(
-        const AuthorizationInfo& authzInfo,
+        AuthorizationInfo&& authzInfo,
         const data::AccountData& accountData,
-        //const stree::AbstractResourceReader& inputParams,
         nx_http::Response* const /*response*/,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,
             const data::EmailVerificationCode& output )>&& completionHandler )
     {
-        //TODO filling data from inputParams?
+        m_completionHandler = std::move( completionHandler );
         AccountManager::instance()->addAccount(
             authzInfo,
             accountData,
@@ -38,21 +44,18 @@ namespace cdb
                 &AddAccountHttpHandler::addAccountDone,
                 this,
                 std::placeholders::_1,
-                std::move( completionHandler ) ) );
-        //TODO #ak
+                std::placeholders::_2 ) );
     }
 
     void AddAccountHttpHandler::addAccountDone(
         ResultCode resultCode,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            const data::EmailVerificationCode& output )> completionHandler )
+        data::EmailVerificationCode outData )
     {
-        //TODO #ak
+        auto completionHandler = std::move(m_completionHandler);
         completionHandler(
             resultCode == ResultCode::ok
                 ? nx_http::StatusCode::ok
                 : nx_http::StatusCode::forbidden,
-            data::EmailVerificationCode() );
+            std::move( outData ) );
     }
 }
