@@ -116,19 +116,21 @@ int MediatorProcess::executeApplication()
     //TODO opening database
     RegisteredDomainsDataManager registeredDomainsDataManager;
 
+    // no need for http interface so far
+    /*
     nx_http::ServerManagers httpServerManagers;
 
     nx_http::MessageDispatcher httpMessageDispatcher;
     httpServerManagers.setDispatcher( &httpMessageDispatcher );
 
-    //TODO #ak authentication
-    //AuthenticationManager authenticationManager;
-    //httpServerManagers.setAuthenticationManager( &authenticationManager );
+    AuthenticationManager authenticationManager;
+    httpServerManagers.setAuthenticationManager( &authenticationManager );
 
     RegisterSystemHttpHandler registerHttpHandler;
     httpMessageDispatcher.registerRequestProcessor(
         RegisterSystemHttpHandler::HANDLER_PATH,
         &registerHttpHandler );
+    */
 
     using namespace std::placeholders;
 
