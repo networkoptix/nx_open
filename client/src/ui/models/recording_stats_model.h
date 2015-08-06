@@ -73,7 +73,7 @@ private:
     QnRecordingStatsReply m_data;
     QnRecordingStatsReply m_forecastData;
     QnRecordingStatsColors m_colors;
-    qint64 m_bitrateSumm;
+    qint64 m_bitrateSum;
 };
 
 
