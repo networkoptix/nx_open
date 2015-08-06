@@ -319,3 +319,16 @@ table.webclient-window>tbody>tr>td{
     max-height: 30px !important;
   }
 }
+
+.mobile-alert{
+  background-color: black;
+  margin:0;
+  padding: 10px 20px;
+}
+
+
+.mobile-alert .btn{
+  border: 1px solid silver;
+  border-radius: 5px;
+  margin:0;
+}

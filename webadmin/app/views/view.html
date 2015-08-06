@@ -1,9 +1,8 @@
 <div class="container-fluid dark-theme row">
-
    <table style="width:100%" class="webclient-window">
         <tbody>
             <tr>
-                <td>
+                <td class="hidden-xs">
                     <div class="view-wrapper">
                         <div class="cameras-panel">
                             <ul class="tree nav" >
@@ -35,7 +34,20 @@
                     <div class="view-wrapper">
                         <div class="view-panel videogular-container">
                             <div class="stick-to-top">
-                                <div class="webclient-panel webclient-bottom-border">
+                                <div class="webclient-panel mobile-alert" ng-if="hasMobileApp" collapse="mobileAppNotified">
+                                    <div class="pull-right" >
+                                        <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
+                                            Install
+                                        </a>
+                                        <span class="webclient-button caption-row" ng-click="mobileAppNotified=true"><span class="glyphicon glyphicon-remove"></span></span>
+                                    </div>
+                                    <div>
+                                        <span class="caption-row ">
+                                            Please, use mobile application to view video
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="webclient-panel webclient-bottom-border hidden-xs">
                                     <div class="pull-right" >
                                         <div class="webclient-panel-border"></div>
                                         <div class="webclient-button caption-row btn-group" ng-click="formatCollapsed = !formatCollapsed">
@@ -69,26 +81,24 @@
                                         </span>
                                     </div>
                                     <div>
-                                            <span class="caption-row ">
-
-                                                <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger camera-status">&#x25E6;</span>
-                                                <span ng-if="activeCamera.status=='Recording' " class="danger camera-status">&#x25CF;</span>
-                                                <span ng-if="activeCamera.status!='Recording' && !activeCamera.scheduleEnabled" class="camera-status">&nbsp;</span>
-
-                                                  {{activeCamera.name}}
-                                            </span>
+                                        <span class="caption-row ">
+                                            <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger camera-status">&#x25E6;</span>
+                                            <span ng-if="activeCamera.status=='Recording' " class="danger camera-status">&#x25CF;</span>
+                                            <span ng-if="activeCamera.status!='Recording' && !activeCamera.scheduleEnabled" class="camera-status">&nbsp;</span>
+                                            {{activeCamera.name}}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="float-size">
+                            <div class="float-size hidden-xs">
                                 <videowindow vg-update-time="updateTime($currentTime, $duration)"
                                              vg-player-ready="playerReady($API)"
                                              vg-src="acitveVideoSource">
                                 </videowindow>
                             </div>
 
-                            <div class="stick-to-bottom">
+                            <div class="stick-to-bottom hidden-xs">
                                 <timeline records-provider="activeVideoRecords"
                                       position-handler="switchPosition"
                                       play-handler="switchPlaying"

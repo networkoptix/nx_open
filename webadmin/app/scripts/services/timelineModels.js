@@ -16,7 +16,7 @@ function Chunk(boundaries,start,end,level,title,extension){
     this.children = [];
 
     _.extend(this, extension);
-}
+};
 
 Chunk.prototype.debug = function(){
     console.log(new Array(this.level + 1).join(" "), this.title, this.level,  this.children.length);
@@ -31,12 +31,12 @@ function Interval (ms,seconds,minutes,hours,days,months,years){
     this.months = months;
     this.years = years;
     this.milliseconds = ms
-}
+};
 if(!Number.isInteger) {
     Number.isInteger = function (num) {
         return (typeof num === 'number') && (Math.round(num) === num);
     };
-}
+};
 function isDate(val){
     return val instanceof Date;
 }
@@ -243,7 +243,7 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width) {
     });
 
     //2. getCameraHistory
-}
+};
 
 CameraRecordsProvider.prototype.now = function(){
     return (new Date()).getTime();
@@ -790,7 +790,7 @@ function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initial
     this.anchorPoint = 1;
     this.anchorDate = this.end;
     this.updateCurrentInterval();
-}
+};
 
 ScaleManager.prototype.updateTotalInterval = function(){
     //Calculate maxmxPerPixel

@@ -7,6 +7,27 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.cameras = {};
         $scope.activeCamera = null;
 
+        $scope.hasMobileApp = window.jscd.mobile; //TODO: remove true here
+        $scope.mobileStore = window.jscd.os == "iOS"?"appstore":"googleplay"; // TODO: Remove hardcode here
+
+        var found = _.find(Config.helpLinks,function(links){
+            if(!links.urls){
+               return false;
+            }
+            var url = _.find(links.urls,function(url){
+                return url.class == $scope.mobileStore;
+            });
+            if(!url){
+                return false;
+            }
+            $scope.mobileAppLink = url.url;
+            return true;
+        });
+
+        if(!found){
+            $scope.hasMobileApp = false;
+        }
+
         $scope.activeResolution = 'Auto';
         // detect max resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
@@ -347,7 +368,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                 $camerasPanel.css("height",viewportHeight );
                 $viewPanel.css("height",viewportHeight );
-
             };
             updateHeights();
             $window.resize(updateHeights);

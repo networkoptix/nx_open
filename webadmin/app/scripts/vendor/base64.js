@@ -140,4 +140,4 @@ var Base64 = {
         return string;
     }
 
-}
+};
