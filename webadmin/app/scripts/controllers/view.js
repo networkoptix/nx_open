@@ -7,25 +7,26 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.cameras = {};
         $scope.activeCamera = null;
 
-        $scope.hasMobileApp = window.jscd.mobile; //TODO: remove true here
-        $scope.mobileStore = window.jscd.os == "iOS"?"appstore":"googleplay"; // TODO: Remove hardcode here
-
-        var found = _.find(Config.helpLinks,function(links){
-            if(!links.urls){
-               return false;
-            }
-            var url = _.find(links.urls,function(url){
-                return url.class == $scope.mobileStore;
+        $scope.hasMobileApp = window.jscd.mobile;
+        if($scope.hasMobileApp) {
+            $scope.mobileStore = window.jscd.os == "iOS"?"appstore":"googleplay";
+            var found = _.find(Config.helpLinks, function (links) {
+                if (!links.urls) {
+                    return false;
+                }
+                var url = _.find(links.urls, function (url) {
+                    return url.class == $scope.mobileStore;
+                });
+                if (!url) {
+                    return false;
+                }
+                $scope.mobileAppLink = url.url;
+                return true;
             });
-            if(!url){
-                return false;
-            }
-            $scope.mobileAppLink = url.url;
-            return true;
-        });
 
-        if(!found){
-            $scope.hasMobileApp = false;
+            if (!found) {
+                $scope.hasMobileApp = false;
+            }
         }
 
         $scope.activeResolution = 'Auto';
