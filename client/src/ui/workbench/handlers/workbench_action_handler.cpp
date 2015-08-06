@@ -815,7 +815,7 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
 void QnWorkbenchActionHandler::at_openIOMonitorAction_triggered() 
 {
     foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
-        QnServerCameraPtr cameraResource = resource.dynamicCast<QnServerCamera>();
+        QnVirtualCameraResourcePtr cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
         if(cameraResource) {
             QnIOStateDisplayWidget* ioStateDisplay = new QnIOStateDisplayWidget(mainWindow());
             ioStateDisplay->setCamera(cameraResource);
