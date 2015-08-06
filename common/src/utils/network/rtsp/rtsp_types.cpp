@@ -39,7 +39,7 @@ namespace nx_rtsp
         if (rangeType[0] == "clock")
         {
             const auto values = rangeType[1].split('-');
-            if( values.isEmpty() || values.sise() > 2 )
+            if( values.isEmpty() || values.size() > 2 )
                 return false;
         
             extractNptTime(values[0], startTime);
