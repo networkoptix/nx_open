@@ -6,6 +6,7 @@
 struct QnAppInfo {
     static QString organizationName();
     static QString linuxOrganizationName();
+    static QString realm();
 
     static QString applicationVersion();
     static QString applicationRevision();

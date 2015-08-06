@@ -134,7 +134,7 @@ void QnCommonModule::updateModuleInformation() {
     QnUserResourcePtr admin = qnResPool->getAdministrator();
     if (admin) {
         QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(admin->getHash());
+        md5.addData(admin->getDigest());
         md5.addData(moduleInformationCopy.systemName.toUtf8());
         moduleInformationCopy.authHash = md5.result();
     }

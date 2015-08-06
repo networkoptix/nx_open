@@ -1,0 +1,1 @@
+ALTER TABLE vms_userprofile ADD COLUMN realm varchar(128) NOT NULL DEFAULT 'NetworkOptix';
