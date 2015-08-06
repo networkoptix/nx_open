@@ -55,11 +55,46 @@ void QnAuditItemDelegate::setDefaultSectionHeight(int value)
     m_defaultSectionHeight = value;
 }
 
+QSize QnAuditItemDelegate::sizeHintForText(const QStyleOptionViewItem & option, const QString& textData) const
+{
+    int width = 0;
+    auto itr = m_sizeHintHash.find(textData);
+    if (itr != m_sizeHintHash.end())
+        width = itr.value();
+    else {
+        QFontMetrics fm(option.font);
+        width = fm.width(textData);
+        m_sizeHintHash.insert(textData, width);
+    }
+    return QSize(width + 4, m_defaultSectionHeight);
+}
+
+QSize QnAuditItemDelegate::defaultSizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
+{
+    QString textData = index.data().toString();
+    int width = 0;
+    auto itr = m_sizeHintHash.find(textData);
+    if (itr != m_sizeHintHash.end())
+        width = itr.value();
+    else {
+        width = base_type::sizeHint(option, index).width();
+        m_sizeHintHash.insert(textData, width);
+    }
+    return QSize(width + 4, m_defaultSectionHeight);
+}
+
 QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
+    static const QDateTime dateTimePattern = QDateTime::fromString(lit("2015-12-12T23:59:59"), Qt::ISODate);
+    static const QString dateTimeStr = dateTimePattern.toString(Qt::DefaultLocaleShortDate);
+    static const QString timeStr = dateTimePattern.time().toString(Qt::DefaultLocaleShortDate);
+    static const QString dateStr = dateTimePattern.date().toString(Qt::DefaultLocaleShortDate);
+
     QSize result;
     QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
-    if (column == QnAuditLogModel::DescriptionColumn)
+    switch(column)
+    {
+    case QnAuditLogModel::DescriptionColumn:
     {
         QVariant data = index.data(Qn::AuditRecordDataRole);
         if (!data.canConvert<QnAuditRecord*>())
@@ -73,27 +108,50 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
                 txtDocument.setHtml(index.data(Qn::DisplayHtmlRole).toString());
                 result = txtDocument.size().toSize();
                 if (m_widthHint == -1)
-                    m_widthHint = result.width() - base_type::sizeHint(option, index).width(); // extra width because of partially bold data
+                    m_widthHint = result.width() - defaultSizeHint(option, index).width(); // extra width because of partially bold data
             }
             else {
-                result = base_type::sizeHint(option, index);
-                result.setWidth(result.width() + m_widthHint);
+                result = defaultSizeHint(option, index);
             }
             if (!showDetail)
                 result.setHeight(m_defaultSectionHeight);
         }
         else {
-            result = base_type::sizeHint(option, index);
-            result.setHeight(m_defaultSectionHeight);
+            result = defaultSizeHint(option, index);
         }
         result.setWidth(qMin(result.width(), MAX_DESCR_COL_LEN));
+        break;
     }
-    else if (column == QnAuditLogModel::PlayButtonColumn) 
+    case QnAuditLogModel::TimestampColumn:
+        result = sizeHintForText(option, dateTimeStr);
+        break;
+    case QnAuditLogModel::TimeColumn:
+        result = sizeHintForText(option, timeStr);
+        break;
+    case QnAuditLogModel::DateColumn:
+        result = sizeHintForText(option, dateStr);
+        break;
+    case QnAuditLogModel::EndTimestampColumn:
     {
-        return QSize(m_playBottonSize.width() + COLUMN_SPACING*2, m_defaultSectionHeight);
+        QSize size1 = sizeHintForText(option, dateTimeStr);
+        QSize size2 = sizeHintForText(option, QnAuditLogModel::eventTypeToString(Qn::AR_UnauthorizedLogin));
+        result = QSize(qMax(size1.width(), size2.width()), size1.height());
+        break;
     }
-    else {
-        result = base_type::sizeHint(option, index);
+    case QnAuditLogModel::PlayButtonColumn:
+        result = QSize(m_playBottonSize.width() + COLUMN_SPACING*2, m_defaultSectionHeight);
+        break;
+    case QnAuditLogModel::UserActivityColumn:
+    {
+        QVariant value = index.data(Qt::SizeHintRole);
+        if (value.isValid())
+            result = qvariant_cast<QSize>(value);
+        else 
+            result = defaultSizeHint(option, index);
+        break;
+    }
+    default:
+        result = defaultSizeHint(option, index);
     }
 
     int extraSpaceForColumns[QnAuditLogModel::ColumnCount] = 
@@ -211,6 +269,27 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
         button.rect.setTopLeft(option.rect.topLeft() + QPoint(4, 4));
         button.rect.setSize(m_playBottonSize);
         QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);
+        break;
+    }
+    case QnAuditLogModel::UserActivityColumn:
+    {
+        // draw chart manually
+        qreal chartData = index.data(Qn::AuditLogChartDataRole).toReal();
+        QColor chartColor = index.data(Qt::BackgroundColorRole).value<QColor>();
+
+        const int shift = 16;
+        if (option.state & QStyle::State_Selected)
+            chartColor = shiftColor(chartColor, shift, shift, shift); // alternate row color
+
+        option.rect.adjust(2, 1, -2, -1);
+        painter->fillRect(QRect(option.rect.left() , option.rect.top(), option.rect.width() * chartData, option.rect.height()), chartColor);
+        if (option.state & QStyle::State_MouseOver) {
+            QnScopedPainterFontRollback rollback(painter);
+            QnScopedPainterPenRollback rollback2(painter);
+            painter->setFont(option.font);
+            painter->setPen(option.backgroundBrush.color());
+            painter->drawText(option.rect, Qt::AlignLeft | Qt::AlignVCenter, index.data().toString());
+        }
         break;
     }
     default:
@@ -338,17 +417,17 @@ void QnAuditLogDialog::at_filterChanged()
 
     if (ui->tabWidget->currentIndex() == SessionTab)
     {
-        QSet<QnUuid> filteredSessions;
+        QSet<QnUuid> filteredIdList;
         for (const QnAuditRecord* record: m_filteredData)
-            filteredSessions << record->authSession.id;
+            filteredIdList << record->authSession.id;
     
-        QnAuditRecordRefList sessions;
-        for (auto& record: m_allData) {
-            if (record.isLoginType() && filteredSessions.contains(record.authSession.id))
-                sessions.push_back(&record);
+        QnAuditRecordRefList filteredSessions;
+        for (auto& record: m_sessionData) {
+            if (filteredIdList.contains(record.authSession.id))
+                filteredSessions.push_back(&record);
         }
 
-        m_sessionModel->setData(sessions);
+        m_sessionModel->setData(filteredSessions);
     }
     else {
         QSet<QnUuid> filteredCameras;
@@ -472,9 +551,10 @@ void QnAuditLogDialog::setupSessionsGrid()
         QnAuditLogModel::EndTimestampColumn <<
         QnAuditLogModel::DurationColumn <<
         QnAuditLogModel::UserNameColumn <<
-        QnAuditLogModel::UserHostColumn;
+        QnAuditLogModel::UserHostColumn <<
+        QnAuditLogModel::UserActivityColumn;
 
-    m_sessionModel = new QnAuditLogSessionModel(this);
+    m_sessionModel = new QnAuditLogMasterModel(this);
     m_sessionModel->setColumns(columns);
     ui->gridMaster->setModel(m_sessionModel);
 
@@ -518,9 +598,10 @@ void QnAuditLogDialog::setupCamerasGrid()
     columns << 
         QnAuditLogModel::SelectRowColumn <<
         QnAuditLogModel::CameraNameColumn <<
-        QnAuditLogModel::CameraIpColumn;
+        QnAuditLogModel::CameraIpColumn <<
+        QnAuditLogModel::UserActivityColumn;
 
-    m_camerasModel = new QnAuditLogModel(this);
+    m_camerasModel = new QnAuditLogMasterModel(this);
     m_camerasModel->setColumns(columns);
     ui->gridCameras->setModel(m_camerasModel);
 
@@ -617,6 +698,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_filterChanged);
+    /*
     connect(ui->tabWidget, &QTabWidget::currentChanged, 
         this, [this](int index) {
             if (index == SessionTab)
@@ -626,6 +709,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
             at_filterChanged();
         }
     );
+    */
     
 }
 
@@ -814,7 +898,10 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     m_camerasModel->clearData();
     m_detailModel->clearData();
     m_requests.clear();
+    
     m_allData.clear();
+    m_sessionData.clear();
+    m_cameraData.clear();
     m_filteredData.clear();
 
 
@@ -842,24 +929,37 @@ void QnAuditLogDialog::at_gotdata(int httpStatus, const QnAuditRecordList& recor
     }
 }
 
+void QnAuditLogDialog::makeSessionData()
+{
+    m_sessionData.clear();
+    QMap<QnUuid, int> activityPerSession;
+    for (const QnAuditRecord& record: m_allData)
+    {
+        if (record.isLoginType())
+            m_sessionData << record;
+        activityPerSession[record.authSession.id]++;
+    }
+
+    for (QnAuditRecord& record: m_sessionData)
+        record.addParam("childCnt", QByteArray::number(activityPerSession.value(record.authSession.id)));
+}
+
 void QnAuditLogDialog::makeCameraData()
 {
     m_cameraData.clear();
-    QSet<QnUuid> processedCameras;
+    QMap<QnUuid, int> activityPerCamera;
     for (const QnAuditRecord& record: m_allData)
     {
-        if (record.isPlaybackType() || record.eventType == Qn::AR_CameraUpdate)
-        {
+        if (record.isPlaybackType() || record.eventType == Qn::AR_CameraUpdate) {
             for (const QnUuid& cameraId: record.resources)
-            {
-                if (!record.resources.empty() && !processedCameras.contains(cameraId)) {
-                    processedCameras << cameraId;
-                    QnAuditRecord cameraRecord;
-                    cameraRecord.resources.push_back(cameraId);
-                    m_cameraData.push_back(cameraRecord);
-                }
-            }
+                activityPerCamera[cameraId]++;
         }
+    }
+    for (auto itr = activityPerCamera.begin(); itr != activityPerCamera.end(); ++itr) {
+        QnAuditRecord cameraRecord;
+        cameraRecord.resources.push_back(itr.key());
+        cameraRecord.addParam("childCnt", QByteArray::number(itr.value())); // used for "user activity" column
+        m_cameraData.push_back(cameraRecord);
     }
 }
 
@@ -867,13 +967,14 @@ void QnAuditLogDialog::requestFinished()
 {
     setGridGeneralCheckState(ui->gridMaster, Qt::Unchecked);
     setGridGeneralCheckState(ui->gridCameras, Qt::Unchecked);
+    makeSessionData();
     makeCameraData();
     at_filterChanged();
 
     ui->gridMaster->setDisabled(false);
     ui->gridCameras->setDisabled(false);
     setCursor(Qt::ArrowCursor);
-    //updateHeaderWidth();
+    /*
     if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
         ui->statusLabel->setText(tr("Audit trail for period from %1 to %2 - %n session(s) found", "", m_sessionModel->rowCount())
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
@@ -881,6 +982,7 @@ void QnAuditLogDialog::requestFinished()
     else
         ui->statusLabel->setText(tr("Audit trail for %1 - %n session(s) found", "", m_sessionModel->rowCount())
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
+    */
     ui->loadingProgressBar->hide();
 }
 
