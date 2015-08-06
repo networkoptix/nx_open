@@ -542,6 +542,7 @@ namespace nx_http
         if (cookieIter == headers.end())
             return BufferType();
 
+        //TODO #ak optimize string operations here
         for(const BufferType& value: cookieIter->second.split(';'))
         {
             QList<BufferType> params = value.split('=');

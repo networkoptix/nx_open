@@ -53,8 +53,14 @@ TestConnection::TestConnection(
 
 TestConnection::~TestConnection()
 {
-    if( m_socket )
-        m_socket->terminateAsyncIO( true );
+    std::unique_ptr<AbstractStreamSocket> _socket;
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        m_terminated = true;
+        _socket = std::move(m_socket);
+    }
+    if( _socket )
+        _socket->terminateAsyncIO( true );
 }
 
 void TestConnection::pleaseStop()
@@ -86,21 +92,29 @@ size_t TestConnection::totalBytesReceived() const
 
 void TestConnection::onConnected( SystemError::ErrorCode errorCode )
 {
+    std::unique_lock<std::mutex> lk( m_mutex );
+
     if( errorCode != SystemError::noError )
     {
-        m_socket->cancelAsyncIO();
-        return m_handler( this, errorCode );
+        auto handler = std::move( m_handler );
+        m_socket.reset();
+        lk.unlock();
+        return handler( this, errorCode );
     }
 
     if( !startIO() )
-        m_handler( this, errorCode );
+    {
+        auto handler = std::move( m_handler );
+        m_socket.reset();
+        lk.unlock();
+        return handler( this, SystemError::getLastOSErrorCode() );
+    }
 }
 
 bool TestConnection::startIO()
 {
     using namespace std::placeholders;
 
-    std::unique_lock<std::mutex> lk( m_mutex );
     //TODO #ak we need mutex here because async socket API lacks way to start async read and write atomically.
         //Should note that aio::AIOService provides such functionality
 
@@ -115,8 +129,6 @@ bool TestConnection::startIO()
             m_outData,
             std::bind(&TestConnection::onDataSent, this, _1, _2) ) )
     {
-        m_terminated = true;
-        m_socket->cancelAsyncIO();
         return false;
     }
 
@@ -125,16 +137,17 @@ bool TestConnection::startIO()
 
 void TestConnection::onDataReceived( SystemError::ErrorCode errorCode, size_t bytesRead )
 {
-    {
-        std::unique_lock<std::mutex> lk( m_mutex );
-        if( m_terminated )
-            return;
-    }
+    std::unique_lock<std::mutex> lk( m_mutex );
+    if( m_terminated )
+        return;
 
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
         m_socket->cancelAsyncIO();
-        return m_handler( this, errorCode );
+        auto handler = std::move(m_handler);
+        m_socket.reset();
+        lk.unlock();
+        return handler( this, errorCode );
     }
 
     m_totalBytesReceived += bytesRead;
@@ -147,29 +160,36 @@ void TestConnection::onDataReceived( SystemError::ErrorCode errorCode, size_t by
             std::bind(&TestConnection::onDataReceived, this, _1, _2) ) )
     {
         m_socket->cancelAsyncIO();
-        m_handler( this, SystemError::getLastOSErrorCode() );
+        auto handler = std::move( m_handler );
+        m_socket.reset();
+        lk.unlock();
+        handler( this, SystemError::getLastOSErrorCode() );
     }
 }
 
 void TestConnection::onDataSent( SystemError::ErrorCode errorCode, size_t bytesWritten )
 {
-    {
-        std::unique_lock<std::mutex> lk( m_mutex );
-        if( m_terminated )
-            return;
-    }
+    std::unique_lock<std::mutex> lk( m_mutex );
+    if( m_terminated )
+        return;
 
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
         m_socket->cancelAsyncIO();
-        return m_handler( this, errorCode );
+        auto handler = std::move( m_handler );
+        m_socket.reset();
+        lk.unlock();
+        return handler( this, errorCode );
     }
 
     m_totalBytesSent += bytesWritten;
     if( m_totalBytesSent >= m_bytesToSendThrough )
     {
         m_socket->cancelAsyncIO();
-        m_handler( this, SystemError::getLastOSErrorCode() );
+        auto handler = std::move( m_handler );
+        m_socket.reset();
+        lk.unlock();
+        handler( this, SystemError::getLastOSErrorCode() );
         return;
     }
 
@@ -179,7 +199,10 @@ void TestConnection::onDataSent( SystemError::ErrorCode errorCode, size_t bytesW
             std::bind(&TestConnection::onDataSent, this, _1, _2) ) )
     {
         m_socket->cancelAsyncIO();
-        m_handler( this, SystemError::getLastOSErrorCode() );
+        auto handler = std::move( m_handler );
+        m_socket.reset();
+        lk.unlock();
+        handler( this, SystemError::getLastOSErrorCode() );
     }
 }
 

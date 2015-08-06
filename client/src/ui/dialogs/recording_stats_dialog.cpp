@@ -87,6 +87,7 @@ public:
         if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
         {
             QnScopedPainterFontRollback rollback(painter);
+            QnScopedPainterPenRollback rollback2(painter);
             painter->setFont(font());
             painter->setPen(palette().foreground().color());
             int width = m_comboBox->minimumSizeHint().width();
@@ -161,19 +162,28 @@ void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionV
 QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::RecordingStatsDialog),
+    m_model(new QnRecordingStatsModel(this)),
+    m_requests(),
     m_updateDisabled(false),
     m_dirty(false),
-    m_lastMouseButton(Qt::NoButton)
+    m_selectAllAction(NULL),
+    m_exportAction(NULL),
+    m_clipboardAction(NULL),
+    m_lastMouseButton(Qt::NoButton),
+    m_allData(),
+    m_hidenCameras(),
+    m_availStorages(),
+    m_mserver()
 {
     ui->setupUi(this);
     setWarningStyle(ui->warningLabel);
 
     //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
-    m_model = new QnRecordingStatsModel(this);
+    
 
-    m_sortModel = new QnSortedRecordingStatsModel(this);
-    m_sortModel->setSourceModel(m_model);
-    ui->gridEvents->setModel(m_sortModel);
+    auto sortModel = new QnSortedRecordingStatsModel(this);
+    sortModel->setSourceModel(m_model);
+    ui->gridEvents->setModel(sortModel);
     ui->gridEvents->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
     
@@ -355,9 +365,7 @@ void QnRecordingStatsDialog::requestFinished()
             m_hidenCameras << camera;
     }
     m_model->setModelData(existsCameras);
-    m_sortModel->invalidate();
-
-    
+       
     ui->gridEvents->setDisabled(false);
     setCursor(Qt::ArrowCursor);
     ui->loadingProgressBar->hide();

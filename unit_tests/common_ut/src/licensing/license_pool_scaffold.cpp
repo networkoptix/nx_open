@@ -2,7 +2,9 @@
 
 #include <licensing/license_stub.h>
 
-QnLicensePoolScaffold::QnLicensePoolScaffold() {
+QnLicensePoolScaffold::QnLicensePoolScaffold(bool isArm /* = false */):
+    m_arm(isArm)
+{
     qnLicensePool;
 }
 
@@ -11,7 +13,9 @@ QnLicensePoolScaffold::~QnLicensePoolScaffold() {
 }
 
 void QnLicensePoolScaffold::addLicenses(Qn::LicenseType licenseType, int count) {
-    qnLicensePool->addLicense(QnLicensePtr(new QnLicenseStub(licenseType, count)));
+    auto stub = new QnLicenseStub(licenseType, count);
+    stub->setArmServer(m_arm);
+    qnLicensePool->addLicense(QnLicensePtr(stub));
 }
 
 void QnLicensePoolScaffold::addLicense(Qn::LicenseType licenseType) {

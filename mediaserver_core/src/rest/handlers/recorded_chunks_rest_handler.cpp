@@ -6,8 +6,9 @@
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
+#include <http/custom_headers.h>
 
-#include "utils/common/util.h"
+#include <utils/common/util.h>
 #include <utils/fs/file.h>
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
@@ -105,7 +106,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first == "physicalId" || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
+        if (params[i].first == Qn::CAMERA_UNIQUE_ID_HEADER_NAME || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
         {
             urlFound = true;
             physicalId = params[i].second.trimmed();

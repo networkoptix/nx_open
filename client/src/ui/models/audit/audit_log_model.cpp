@@ -53,14 +53,13 @@ public:
     {
     }
 
-    void setSort(int column, Qt::SortOrder order)
+    void setSort(Column column, Qt::SortOrder order)
     { 
         if ((Column) column == m_sortCol) {
             m_sortOrder = order;
             return;
         }
-
-        m_sortCol = (Column) column;
+        m_sortCol = column;
         m_sortOrder = order;
 
         updateIndex();
@@ -137,6 +136,11 @@ public:
         return firstResourceIp(d1) < firstResourceIp(d2);
     }
 
+    static bool lessThanActivity(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    {
+        return d1->extractParam("childCnt").toUInt() < d2->extractParam("childCnt").toUInt();
+    }
+
     void updateIndex()
     {
         LessFunc lessThan = &lessThanTimestamp;
@@ -166,6 +170,10 @@ public:
                 break;
             case CameraIpColumn:
                 lessThan = &lessThanCameraIp;
+                break;
+
+            case UserActivityColumn:
+                lessThan = &lessThanActivity;
                 break;
         }
 
@@ -508,6 +516,8 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data
         return eventDescriptionText(data);
     case PlayButtonColumn:
         return buttonNameForEvent(data->eventType);
+    case UserActivityColumn:
+        return tr("%n action(s)", "", data->extractParam("childCnt").toUInt());
     }
 
     return QString();
@@ -515,7 +525,7 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data
 
 void QnAuditLogModel::sort(int column, Qt::SortOrder order) {
     beginResetModel();
-    m_index->setSort(column, order);
+    m_index->setSort(m_columns[column], order);
     endResetModel();
 }
 
@@ -532,7 +542,7 @@ int QnAuditLogModel::minWidthForColumn(const Column &column) const
     case TimestampColumn:
     case EndTimestampColumn:
     case DurationColumn:
-        return 64;
+        return 80;
     case UserNameColumn:
     case UserHostColumn:
         return 48;

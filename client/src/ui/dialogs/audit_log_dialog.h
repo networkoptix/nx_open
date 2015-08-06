@@ -11,7 +11,7 @@
 #include "api/model/audit/audit_record.h"
 #include "ui/actions/actions.h"
 
-class QnAuditLogSessionModel;
+class QnAuditLogMasterModel;
 class QnAuditLogDetailModel;
 class QnCheckBoxedHeaderView;
 class QnAuditItemDelegate;
@@ -36,10 +36,13 @@ public:
     void setDefaultSectionHeight(int value);
 private:
     void paintRichDateTime(QPainter * painter, const QStyleOptionViewItem & option, int dateTimeSecs) const;
+    QSize defaultSizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const;
+    QSize sizeHintForText(const QStyleOptionViewItem & option, const QString& textData) const;
 private:
     int m_defaultSectionHeight;
     QSize m_playBottonSize;
     mutable int m_widthHint;
+    mutable QHash<QString, int> m_sizeHintHash;
 };
 
 
@@ -98,17 +101,19 @@ private:
     void setupSessionsGrid();
     void setupCamerasGrid();
     void setupMasterGridCommon(QnTableView* gridMaster);
+    void makeSessionData();
     void makeCameraData();
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 
-    QnAuditLogSessionModel *m_sessionModel;
+    QnAuditLogMasterModel *m_sessionModel;
     QnAuditLogModel *m_camerasModel;
     QnAuditLogDetailModel *m_detailModel;
     QSet<int> m_requests;
 
     QnAuditRecordList m_allData;
     QnAuditRecordList m_cameraData;
+    QnAuditRecordList m_sessionData;
     QnAuditRecordRefList m_filteredData;
     bool m_updateDisabled;
     bool m_dirty;

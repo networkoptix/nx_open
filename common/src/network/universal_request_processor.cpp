@@ -68,7 +68,8 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
     if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
-        const bool isProxy = d->owner->isProxy(d->request);
+        //not asking Proxy authentication because we proxy requests in a custom way
+        const bool isProxy = false;
         QElapsedTimer t;
         t.restart();
         bool authInProgress = false;
