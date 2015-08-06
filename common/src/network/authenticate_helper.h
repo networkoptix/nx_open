@@ -91,7 +91,6 @@ class QnAuthHelper: public QObject
     Q_OBJECT
 
 public:
-    static const QString REALM;
     static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
 
     QnAuthHelper();
@@ -182,12 +181,15 @@ private:
         TempAuthenticationKeyCtx& operator=( const TempAuthenticationKeyCtx& );
     };
 
-    void addAuthHeader(nx_http::Response& responseHeaders, bool isProxy);
+    void addAuthHeader(
+        nx_http::Response& responseHeaders,
+        const QString& realm,
+        bool isProxy );
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
     bool isCookieNonceValid(const QByteArray& nonce);
     bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, bool* authInProgress, char delimiter, 
-                      std::function<bool(const QByteArray&)> checkNonceFunc);
+                      std::function<bool(const QByteArray&)> checkNonceFunc, QnUserResourcePtr* const outUserResource = nullptr);
     bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
     bool doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId, bool* authInProgress);
 
@@ -211,6 +213,7 @@ private:
         \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
     */
     bool authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId ) const;
+    QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

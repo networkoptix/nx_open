@@ -13,6 +13,7 @@
 #include <network/universal_tcp_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/concurrent.h>
+#include <utils/network/http/auth_tools.h>
 #include <utils/network/simple_http_client.h>
 
 #include <rest/active_connections_rest_handler.h>
@@ -353,8 +354,8 @@ namespace ec2
 
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
-        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest(
-            loginInfo.login, addr.password(), QnAuthHelper::REALM );
+        loginInfo.passwordHash = nx_http::calcHa1(
+            loginInfo.login, QnAppInfo::realm(), addr.password() );
         loginInfo.clientInfo = clientInfo;
 
         {
@@ -589,8 +590,8 @@ namespace ec2
 
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
-        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest(
-            loginInfo.login, addr.password(), QnAuthHelper::REALM );
+        loginInfo.passwordHash = nx_http::calcHa1(
+            loginInfo.login, QnAppInfo::realm(), addr.password() );
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
         m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(
