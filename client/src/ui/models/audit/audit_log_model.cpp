@@ -11,7 +11,6 @@
 #include "ui/style/resource_icon_cache.h"
 #include "client/client_globals.h"
 #include <utils/math/math.h>
-#include <plugins/resource/server_camera/server_camera.h>
 #include "client/client_settings.h"
 #include <ui/common/ui_resource_name.h>
 #include "ui/style/skin.h"

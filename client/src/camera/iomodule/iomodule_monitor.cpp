@@ -33,8 +33,8 @@ private:
     QnIOModuleMonitor* m_owner;
 };
 
-QnIOModuleMonitor::QnIOModuleMonitor(const QnSecurityCamResourcePtr camera):
-        m_camera(camera)
+QnIOModuleMonitor::QnIOModuleMonitor(const QnSecurityCamResourcePtr &camera):
+    m_camera(camera)
 {
 }
 

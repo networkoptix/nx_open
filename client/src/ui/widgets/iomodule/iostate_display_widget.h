@@ -2,19 +2,20 @@
 #define QN_CALENDAR_WIDGET_H
 
 #include <QElapsedTimer>
-#include "plugins/resource/server_camera/server_camera.h"
 #include "api/model/api_ioport_data.h"
 #include <ui/workbench/workbench_context_aware.h>
 #include "ui_iostate_display_widget.h"
 
-class QnIOStateDisplayWidget: public QDialog, public QnWorkbenchContextAware
+#include <utils/common/connective.h>
+
+class QnIOStateDisplayWidget: public Connective<QDialog>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef QDialog base_type;
+    typedef Connective<QDialog> base_type;
 
 public: 
     QnIOStateDisplayWidget(QWidget *parent = NULL);
-    void setCamera(const QnServerCameraPtr& camera);
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
 signals:
 private slots:
     void at_connectionOpened();
@@ -31,7 +32,7 @@ private:
 private:
     QScopedPointer<Ui::IOStateDisplayWidget> ui;
 
-    QnServerCameraPtr m_camera;
+    QnVirtualCameraResourcePtr m_camera;
     QnIOModuleMonitorPtr m_monitor;
     
     struct ModelData

@@ -10,7 +10,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <client/client_globals.h>
 #include <client/client_settings.h>
-#include <plugins/resource/server_camera/server_camera.h>
 #include <ui/common/grid_widget_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

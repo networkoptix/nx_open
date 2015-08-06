@@ -13,7 +13,6 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
-#include <plugins/resource/server_camera/server_camera.h>
 #include <ui/actions/action_manager.h>
 
 #include <ui/common/grid_widget_helper.h>

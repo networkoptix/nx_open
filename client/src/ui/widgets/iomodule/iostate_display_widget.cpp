@@ -22,7 +22,7 @@ QnIOStateDisplayWidget::QnIOStateDisplayWidget(QWidget *parent):
     setEnabled(false);
 }
 
-void QnIOStateDisplayWidget::setCamera(const QnServerCameraPtr& camera)
+void QnIOStateDisplayWidget::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
     m_camera = camera;
     if (!camera) {
@@ -32,14 +32,14 @@ void QnIOStateDisplayWidget::setCamera(const QnServerCameraPtr& camera)
         return;
     }
 
-    m_monitor = camera->createIOModuleMonitor();
-    connect(m_monitor.data(), &QnIOModuleMonitor::connectionOpened, this, &QnIOStateDisplayWidget::at_connectionOpened );
-    connect(m_monitor.data(), &QnIOModuleMonitor::connectionClosed, this, &QnIOStateDisplayWidget::at_connectionClosed );
-    connect(m_monitor.data(), &QnIOModuleMonitor::ioStateChanged, this, &QnIOStateDisplayWidget::at_ioStateChanged );
+    m_monitor.reset(new QnIOModuleMonitor(camera));
+    connect(m_monitor, &QnIOModuleMonitor::connectionOpened, this, &QnIOStateDisplayWidget::at_connectionOpened );
+    connect(m_monitor, &QnIOModuleMonitor::connectionClosed, this, &QnIOStateDisplayWidget::at_connectionClosed );
+    connect(m_monitor, &QnIOModuleMonitor::ioStateChanged, this, &QnIOStateDisplayWidget::at_ioStateChanged );
 
-    connect(camera.data(), &QnResource::propertyChanged, this, &QnIOStateDisplayWidget::at_cameraPropertyChanged );
-    connect(camera.data(), &QnResource::statusChanged, this, &QnIOStateDisplayWidget::at_cameraStatusChanged );
-    connect(camera.data(), &QnResource::nameChanged, this, [this]() {setWindowTitle(m_camera->getName());} );
+    connect(camera, &QnResource::propertyChanged, this, &QnIOStateDisplayWidget::at_cameraPropertyChanged );
+    connect(camera, &QnResource::statusChanged, this, &QnIOStateDisplayWidget::at_cameraStatusChanged );
+    connect(camera, &QnResource::nameChanged, this, [this]() {setWindowTitle(m_camera->getName());} );
 
     connect (&m_timer, &QTimer::timeout, this, &QnIOStateDisplayWidget::at_timer);
     m_timer.start(1000);
