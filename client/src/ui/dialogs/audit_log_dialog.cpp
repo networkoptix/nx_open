@@ -41,8 +41,11 @@ namespace {
     const int BTN_ICON_SIZE = 16;
     static const int COLUMN_SPACING = 4;
     static const int MAX_DESCR_COL_LEN = 300;
-    static const int SESSIONS_TAB = 0;
-    static const int CAMERAS_TAB = 1;
+    
+    enum MasterGridTabIndex {
+        SessionTab,
+        CameraTab
+    };
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
@@ -333,7 +336,7 @@ void QnAuditLogDialog::at_filterChanged()
 {
     m_filteredData = filterDataByText();
 
-    if (ui->tabWidget->currentIndex() == SESSIONS_TAB)
+    if (ui->tabWidget->currentIndex() == SessionTab)
     {
         QSet<QnUuid> filteredSessions;
         for (const QnAuditRecord* record: m_filteredData)
@@ -365,7 +368,7 @@ void QnAuditLogDialog::at_filterChanged()
 
 void QnAuditLogDialog::at_updateDetailModel()
 {
-    if (ui->tabWidget->currentIndex() == SESSIONS_TAB) 
+    if (ui->tabWidget->currentIndex() == SessionTab)
     {
         QnAuditRecordRefList checkedRows = m_sessionModel->checkedRows();
         auto data = filterChildDataBySessions(checkedRows);
@@ -616,8 +619,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
     connect(ui->tabWidget, &QTabWidget::currentChanged, 
         this, [this](int index) {
-            if (index == SESSION_ABORTED)
-                ui->gridDetails->adjustSize();
+            if (index == SessionTab)
+                ui->gridMaster->adjustSize();
             else
                 ui->gridCameras->adjustSize();
             at_filterChanged();

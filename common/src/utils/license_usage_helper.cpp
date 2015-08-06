@@ -42,8 +42,12 @@ struct LicenseCompatibility
     Qn::LicenseType child;
 };
 
-/* Compatibility tree: Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder) */
-static std::array<LicenseCompatibility, 14> compatibleLicenseType =
+/* Compatibility tree: 
+ * Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder) 
+ * Trial -> IO
+ * Start -> Professional -> Analog -> (VMAX, AnalogEncoder)
+ */
+static std::array<LicenseCompatibility, 19> compatibleLicenseType =
 {
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_AnalogEncoder),
@@ -57,10 +61,16 @@ static std::array<LicenseCompatibility, 14> compatibleLicenseType =
     LicenseCompatibility(Qn::LC_Edge,           Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Edge,           Qn::LC_AnalogEncoder),
 
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_Professional),
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_AnalogEncoder),
+
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Edge),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Professional),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Analog),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_IO),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_AnalogEncoder)
 };
 
@@ -184,7 +194,7 @@ void QnLicenseUsageHelper::updateCache() const {
         m_cache.total[lt] = m_cache.licenses.totalLicenseByType(lt);
 
     /* Calculate used licenses with and without proposed cameras (to get proposed value as difference). */
-    calculateUsedLicenses2(basicUsedLicenses, m_cache.used);
+    calculateUsedLicenses(basicUsedLicenses, m_cache.used);
 
     /* Borrow some licenses (if available). Also repeating with and without proposed cameras. */
     for(const LicenseCompatibility& c: compatibleLicenseType) {
@@ -357,10 +367,12 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
         << Qn::LC_Edge
         << Qn::LC_VMAX  //only main page
         << Qn::LC_AnalogEncoder
+        << Qn::LC_IO
+        << Qn::LC_Start
         ;
 }
 
-void QnCamLicenseUsageHelper::calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
+void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
 {
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
@@ -430,7 +442,7 @@ QList<Qn::LicenseType> QnVideoWallLicenseUsageHelper::calculateLicenseTypes() co
 }
 
 
-void QnVideoWallLicenseUsageHelper::calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
+void QnVideoWallLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
 {
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);

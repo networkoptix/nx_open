@@ -87,6 +87,7 @@ public:
         if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
         {
             QnScopedPainterFontRollback rollback(painter);
+            QnScopedPainterPenRollback rollback2(painter);
             painter->setFont(font());
             painter->setPen(palette().foreground().color());
             int width = m_comboBox->minimumSizeHint().width();

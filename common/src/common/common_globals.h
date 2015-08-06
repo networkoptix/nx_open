@@ -676,6 +676,20 @@ public:
         LC_AnalogEncoder,
         LC_VideoWall,
 
+        /** 
+         * I/O Modules license.
+         * Needs to be activated to enable I/O module features. One license channel per one module.
+         */
+        LC_IO,                  
+
+        /**
+         * Like a professional license.
+         * Could not be activated on ARM devices.
+         * Only one license key per system (not server). If systems are merged and each of them had some start licenses originally, 
+         * new merged system will only take one start license( the one with bigger channels). Other start licenses will become invalid. 
+         */
+        LC_Start,
+
         LC_Count
     };
 

@@ -128,7 +128,7 @@
 
     "QnRecordingStatsModel": {
         "colors": {
-			"_": "Recording statistics.",
+            "_": "Recording statistics.",
 		
             "chartMainColor": "#39b2ef",
             "chartForecastColor": "#89d7ff"

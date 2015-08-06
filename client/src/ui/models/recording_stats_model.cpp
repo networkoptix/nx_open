@@ -52,7 +52,7 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
 
 QnRecordingStatsModel::QnRecordingStatsModel(QObject *parent) :
     base_type(parent),
-    m_bitrateSumm(0)
+    m_bitrateSum(0)
 {
 }
 
@@ -143,8 +143,8 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
     case DurationColumn:
         return displayData(index);
     case BitrateColumn:
-        if (m_bitrateSumm > 0)
-            return formatBitrateString(m_bitrateSumm);
+        if (m_bitrateSum > 0)
+            return formatBitrateString(m_bitrateSum);
         break;
     default:
         return QString();
@@ -224,6 +224,8 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
             return tr("Archived duration in calendar days between the first record and the current moment");
         case BitrateColumn:
             return tr("Average bitrate for the recorded period");
+        default:
+            break;
     }
     return QString();
 }
@@ -322,7 +324,7 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
 
     QnRecordingStatsData summ;
     QnRecordingStatsData maxValue;
-    m_bitrateSumm = 0;
+    m_bitrateSum = 0;
 
     for(const QnCamRecordingStatsData& value: result) {
         summ += value;
@@ -330,7 +332,7 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
         maxValue.recordedSecs = qMax(maxValue.recordedSecs, value.recordedSecs);
         maxValue.archiveDurationSecs = qMax(maxValue.archiveDurationSecs, value.archiveDurationSecs);
         maxValue.averageBitrate = qMax(maxValue.averageBitrate, value.averageBitrate);
-        m_bitrateSumm = qMax(m_bitrateSumm, value.averageBitrate);
+        m_bitrateSum = qMax(m_bitrateSum, value.averageBitrate);
     }
     QnRecordingStatsData footer;
     footer.recordedBytes = summ.recordedBytes;
