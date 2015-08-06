@@ -51,6 +51,14 @@
             <type>zip</type>
             <classifier>archive</classifier>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_storage_sdk</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>archive</classifier>
+        </dependency>
+
 
         <dependency>
             <groupId>${project.groupId}</groupId>

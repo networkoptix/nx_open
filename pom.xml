@@ -324,6 +324,7 @@
             <modules>
                 <!--<module>plugins/axiscamplugin</module>-->
                 <module>nx_sdk</module>
+                <module>nx_storage_sdk</module>
                 <module>plugins/genericrtspplugin</module>
                 <module>storage_plugins/ftpstorageplugin</module>
                 <module>plugins/image_library_plugin</module>
