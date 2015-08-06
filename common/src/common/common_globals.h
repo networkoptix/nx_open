@@ -33,7 +33,7 @@ namespace Qn
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            ServerFlag CameraStatusFlag IOPortType IODefaultState)
+            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
@@ -360,6 +360,33 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(IOPortTypes)
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IOPortType)
 
+    enum AuditRecordType
+    {
+        AR_NotDefined        = 0x0000,
+        AR_UnauthorizedLogin = 0x0001,
+        AR_Login             = 0x0002,
+        AR_UserUpdate        = 0x0004,
+        AR_ViewLive          = 0x0008,
+        AR_ViewArchive       = 0x0010,
+        AR_ExportVideo       = 0x0020,
+        AR_CameraUpdate      = 0x0040,
+        AR_SystemNameChanged = 0x0080,
+        AR_SystemmMerge      = 0x0100,
+        AR_SettingsChange    = 0x0200,
+        AR_ServerUpdate      = 0x0400,
+        AR_BEventUpdate      = 0x0800,
+        AR_EmailSettings     = 0x1000,
+        AR_CameraRemove      = 0x2000,
+        AR_ServerRemove      = 0x4000,
+        AR_BEventRemove      = 0x8000,
+        AR_UserRemove        = 0x10000,
+        AR_BEventReset       = 0x20000,
+        AR_DatabaseRestore   = 0x40000
+    };
+
+    Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(AuditRecordTypes)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuditRecordType)
     
     enum IODefaultState {
         IO_OpenCircuit,
@@ -500,6 +527,7 @@ public:
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
         DisplayHtmlRole,                            /**< Same as Display role, but use HTML format. */
+        DisplayHtmlHoveredRole,                     /**< Same as DisplayHtmlRole role, but used if mouse over a element */
 
         ModifiedRole,                               /**< Role for modified state. Value of type bool. */
         DisabledRole,                               /**< Role for disabled state. Value of type bool. */
@@ -522,6 +550,12 @@ public:
         RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
         RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
         RecordingStatForecastDataRole,              /**< Return qreal for chart. Forecast value. Used in QnRecordingStatsModel */
+        RecordingStatColorsDataRole,                /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
+        
+        AuditRecordDataRole,                        /**< Return QnAuditRecord object */
+        ColumnDataRole,                             /**< convert index col count to column enumerator */
+        DecorationHoveredRole,                      /**< Same as Qt::DecorationRole but for hovered item */
+        AlternateColorRole,                         /**< Use alternate color in painting */
 
         LastItemDataRole
     };
@@ -642,6 +676,20 @@ public:
         LC_AnalogEncoder,
         LC_VideoWall,
 
+        /** 
+         * I/O Modules license.
+         * Needs to be activated to enable I/O module features. One license channel per one module.
+         */
+        LC_IO,                  
+
+        /**
+         * Like a professional license.
+         * Could not be activated on ARM devices.
+         * Only one license key per system (not server). If systems are merged and each of them had some start licenses originally, 
+         * new merged system will only take one start license( the one with bigger channels). Other start licenses will become invalid. 
+         */
+        LC_Start,
+
         LC_Count
     };
 
@@ -694,7 +742,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
-        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState),
+        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType),
     (metatype)(lexical)
 )
 
@@ -716,6 +764,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::IOPortTypes),
     (metatype)(numeric)(lexical)
+
 )
 
 #endif // QN_COMMON_GLOBALS_H

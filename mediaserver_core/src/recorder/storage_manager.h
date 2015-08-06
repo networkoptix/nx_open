@@ -94,6 +94,7 @@ public:
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
     bool isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs);
+    bool isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period);
     void stopAsyncTasks();
 
     QnStorageScanData rebuildCatalogAsync();

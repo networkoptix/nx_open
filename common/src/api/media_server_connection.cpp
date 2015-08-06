@@ -38,6 +38,7 @@
 #include "model/upload_update_reply.h"
 #include "http/custom_headers.h"
 #include "model/recording_stats_reply.h"
+#include "common/common_module.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -87,6 +88,7 @@ namespace {
         (ConfigureObject,          "configure")
         (PingSystemObject,         "pingSystem")
         (RecordingStatsObject,     "recStats")
+        (AuditLogObject,           "auditLog")
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
         (TestLdapSettingsObject,   "testLdapSettings")
@@ -291,6 +293,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case RecordingStatsObject:
         processJsonReply<QnRecordingStatsReply>(this, response, handle);
         break;
+    case AuditLogObject:
+        processUbjsonReply<QnAuditRecordList>(this, response, handle);
+        break;
     case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
         break;
@@ -326,6 +331,7 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
 
     if (!videowallGuid.isNull())
         extraHeaders.insert(QString::fromLatin1(Qn::VIDEOWALL_GUID_HEADER_NAME), videowallGuid.toString());
+    extraHeaders.insert(QString::fromLatin1(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
     setExtraHeaders(extraHeaders);
 }
 
@@ -853,6 +859,14 @@ int QnMediaServerConnection::getRecordingStatisticsAsync(qint64 bitrateAnalizePe
     QnRequestParamList params;
     params << QnRequestParam("bitrateAnalizePeriodMs", bitrateAnalizePeriodMs);
     return sendAsyncGetRequest(RecordingStatsObject, params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
+}
+
+int QnMediaServerConnection::getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("startTimeMs", startTimeMs);
+    params << QnRequestParam("endTimeMs", endTimeMs);
+    params << QnRequestParam("format", "ubjson");
+    return sendAsyncGetRequest(AuditLogObject, params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
 
 int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {

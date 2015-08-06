@@ -34,7 +34,7 @@ QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(QWidget *parent):
     base_type(Qt::Horizontal, parent),
     m_checkState(Qt::Unchecked)
 {
-    connect(this, SIGNAL(sectionClicked(int)), this, SLOT(at_sectionClicked(int)));
+    connect(this, &QnCheckBoxedHeaderView::sectionClicked, this, &QnCheckBoxedHeaderView::at_sectionClicked);
 }
 
 Qt::CheckState QnCheckBoxedHeaderView::checkState() const {
@@ -46,10 +46,6 @@ void QnCheckBoxedHeaderView::setCheckState(Qt::CheckState state) {
         return;
     m_checkState = state;
     emit checkStateChanged(state);
-}
-
-void QnCheckBoxedHeaderView::paintEvent(QPaintEvent *e) {
-    base_type::paintEvent(e);
 }
 
 void QnCheckBoxedHeaderView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const {

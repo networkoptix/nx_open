@@ -177,6 +177,33 @@ struct QnRoutingManagementColors {
 };
 #define QnRoutingManagementColors_Fields (readOnly)
 
+struct QnAuditLogColors {
+    QnAuditLogColors();
+
+    QColor httpLink;
+    
+    QColor loginAction;
+    QColor unsucessLoginAction;
+    QColor updUsers;
+    QColor watchingLive;
+    QColor watchingArchive;
+    QColor exportVideo;
+    QColor updCamera;
+    QColor systemActions;
+    QColor updServer;
+    QColor eventRules;
+    QColor emailSettings;
+};
+#define QnAuditLogColors_Fields (httpLink)(loginAction)(unsucessLoginAction)(updUsers)(watchingLive)(watchingArchive)(exportVideo)(updCamera)(systemActions)(updServer)(eventRules)(emailSettings)
+
+struct QnRecordingStatsColors {
+    QnRecordingStatsColors();
+
+    QColor chartMainColor;
+    QColor chartForecastColor;
+};
+#define QnRecordingStatsColors_Fields (chartMainColor)(chartForecastColor)
+
 struct QnServerUpdatesColors {
     QnServerUpdatesColors();
 
@@ -190,7 +217,7 @@ struct QnServerUpdatesColors {
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
-    (QnRoutingManagementColors)(QnVideowallManageWidgetColors) \
+    (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
     (QnServerUpdatesColors)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

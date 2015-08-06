@@ -92,6 +92,7 @@ public:
     Chunk chunkAt(int index) const;
     bool isLastChunk(qint64 startTimeMs) const;
     bool containTime(qint64 timeMs, qint64 eps = 5 * 1000) const;
+    bool containTime(const QnTimePeriod& period) const;
 
     qint64 minTime() const;
     qint64 maxTime() const;

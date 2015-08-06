@@ -138,8 +138,6 @@ private:
     QString getAggregationText() const;
 
     static QString toggleStateToModelString(QnBusiness::EventState value);
-    static QString toggleStateToString(QnBusiness::EventState state);
-    static QString eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType);
 private:
     QnUuid m_id;
     bool m_modified;

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>443</width>
+    <width>446</width>
     <height>300</height>
    </rect>
   </property>
@@ -35,6 +35,13 @@
     <widget class="QCheckBox" name="autoSettingsCheckBox">
      <property name="text">
       <string>Allow system to optimize camera settings (Recommended)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="auditTrailCheckBox">
+     <property name="text">
+      <string>Enable audit trail</string>
      </property>
     </widget>
    </item>

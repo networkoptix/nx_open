@@ -757,6 +757,15 @@ bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, qint64
     return catalog && catalog->containTime(timeMs);
 }
 
+bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period)
+{
+    DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, QnServer::HiQualityCatalog);
+    if (catalog && catalog->containTime(period))
+        return true;
+
+    catalog = getFileCatalog(cameraUniqueId, QnServer::LowQualityCatalog);
+    return catalog && catalog->containTime(period);
+}
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, 
                                                       const QList<QnServer::ChunksCatalog> &catalogs, int limit) 
@@ -811,11 +820,11 @@ QnRecordingStatsData QnStorageManager::getChunkStatisticsByCamera(qint64 bitrate
     auto catalogHi = m_devFileCatalog[QnServer::HiQualityCatalog].value(uniqueId);
     auto catalogLow = m_devFileCatalog[QnServer::LowQualityCatalog].value(uniqueId);
 
-    if (catalogHi && catalogLow)
+    if (catalogHi && !catalogHi->isEmpty() && catalogLow && !catalogLow->isEmpty())
         return mergeStatsFromCatalogs(bitrateAnalizePeriodMs, catalogHi, catalogLow);
-    else if (catalogHi)
+    else if (catalogHi && !catalogHi->isEmpty())
         return catalogHi->getStatistics(bitrateAnalizePeriodMs);
-    else if (catalogLow)
+    else if (catalogLow && !catalogLow->isEmpty())
         return catalogLow->getStatistics(bitrateAnalizePeriodMs);
     else
         return QnRecordingStatsData();

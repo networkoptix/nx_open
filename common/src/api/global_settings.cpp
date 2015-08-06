@@ -34,6 +34,7 @@ namespace {
 
     const QString nameDisabledVendors(lit("disabledVendors"));
     const QString nameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
+    const QString nameAuditTrailEnabled(lit("auditTrailEnabled"));
     const QString nameHost(lit("smtpHost"));
     const QString namePort(lit("smtpPort"));
     const QString nameUser(lit("smtpUser"));
@@ -61,6 +62,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
+    m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameAuditTrailEnabled, true, this);
     m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, false, this);
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
@@ -109,9 +111,11 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << m_updateNotificationsEnabledAdaptor
         << emailAdaptors
         << ldapAdaptors
+        << m_auditTrailEnabledAdaptor
         ;
 
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
+    connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
     connect(m_serverAutoDiscoveryEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::serverAutoDiscoveryChanged,          Qt::QueuedConnection);
 
@@ -151,6 +155,16 @@ bool QnGlobalSettings::isCameraSettingsOptimizationEnabled() const {
 
 void QnGlobalSettings::setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled) {
     m_cameraSettingsOptimizationAdaptor->setValue(cameraSettingsOptimizationEnabled);
+}
+
+bool QnGlobalSettings::isAuditTrailEnabled() const
+{
+    return m_auditTrailEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setAuditTrailEnabled(bool value)
+{
+    m_auditTrailEnabledAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::isServerAutoDiscoveryEnabled() const {
