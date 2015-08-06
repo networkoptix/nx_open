@@ -535,9 +535,6 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
 }
 
 bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const {
-    if (capabilities == Qn::IOModuleCapability)
-        return true;
-
     return getCameraCapabilities() & capabilities;
 }
 
