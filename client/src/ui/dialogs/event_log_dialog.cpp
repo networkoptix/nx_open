@@ -8,6 +8,7 @@
 
 #include <utils/common/event_processors.h>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 

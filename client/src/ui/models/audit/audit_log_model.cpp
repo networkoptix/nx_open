@@ -4,9 +4,9 @@
 
 #include <QtGui/QPalette>
 
-#include <utils/common/warnings.h>
-#include <utils/common/synctime.h>
-#include "core/resource/resource.h"
+#include <core/resource/resource.h>
+#include <core/resource/network_resource.h>
+
 #include "core/resource_management/resource_pool.h"
 #include "ui/style/resource_icon_cache.h"
 #include "client/client_globals.h"
@@ -16,6 +16,9 @@
 #include "ui/style/skin.h"
 #include "api/common_message_processor.h"
 #include "business/business_strings_helper.h"
+
+#include <utils/common/warnings.h>
+#include <utils/common/synctime.h>
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 

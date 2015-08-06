@@ -2,11 +2,17 @@
 #define QN_CALENDAR_WIDGET_H
 
 #include <QElapsedTimer>
+
+#include <core/resource/resource_fwd.h>
+
 #include "api/model/api_ioport_data.h"
 #include <ui/workbench/workbench_context_aware.h>
 #include "ui_iostate_display_widget.h"
 
 #include <utils/common/connective.h>
+
+class QnIOModuleMonitor;
+typedef QSharedPointer<QnIOModuleMonitor> QnIOModuleMonitorPtr;
 
 class QnIOStateDisplayWidget: public Connective<QDialog>, public QnWorkbenchContextAware
 {

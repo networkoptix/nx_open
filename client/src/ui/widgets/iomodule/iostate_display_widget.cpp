@@ -1,4 +1,7 @@
 #include "iostate_display_widget.h"
+
+#include <core/resource/camera_resource.h>
+
 #include "camera/iomodule/iomodule_monitor.h"
 #include "ui/style/skin.h"
 #include "business/business_event_parameters.h"
