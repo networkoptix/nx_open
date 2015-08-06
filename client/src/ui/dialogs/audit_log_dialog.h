@@ -70,6 +70,7 @@ private slots:
     void at_sessionsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
+    void at_selectAllAction_triggered();
     void at_masterItemPressed(const QModelIndex& index);
     void at_ItemPressed(const QModelIndex& index);
     void at_ItemEntered(const QModelIndex& index);
@@ -103,6 +104,8 @@ private:
     void setupMasterGridCommon(QnTableView* gridMaster);
     void makeSessionData();
     void makeCameraData();
+    void setupContextMenu(QTableView* gridMaster);
+    QTableView* currentGridView() const;
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 

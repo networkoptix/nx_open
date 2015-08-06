@@ -577,19 +577,22 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
     gridMaster->setMouseTracking(true);
     model->setheaderHeight(calcHeaderHeight(gridMaster->horizontalHeader()));
 
-    gridMaster->addAction(m_clipboardAction);
-    gridMaster->addAction(m_exportAction);
-
     connect(model, &QAbstractItemModel::dataChanged, this, &QnAuditLogDialog::at_updateDetailModel);
     connect(model, &QAbstractItemModel::modelReset, this, &QnAuditLogDialog::at_updateDetailModel);
-
     connect (headers,           &QnCheckBoxedHeaderView::checkStateChanged, this, &QnAuditLogDialog::at_headerCheckStateChanged);
-
     connect(gridMaster->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QnAuditLogDialog::at_masterGridSelectionChanged);
     connect(gridMaster,         &QTableView::pressed, this, &QnAuditLogDialog::at_masterItemPressed); // put selection changed before item pressed
     connect(gridMaster,         &QTableView::clicked,               this,   &QnAuditLogDialog::at_sessionsGrid_clicked);
+
+    setupContextMenu(gridMaster);
+}
+
+void QnAuditLogDialog::setupContextMenu(QTableView* gridMaster)
+{
+    gridMaster->addAction(m_clipboardAction);
+    gridMaster->addAction(m_exportAction);
     connect(gridMaster,         &QTableView::customContextMenuRequested, this, &QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested);
-    connect(m_selectAllAction,  &QAction::triggered,                gridMaster, &QTableView::selectAll);
+    connect(m_selectAllAction,  &QAction::triggered,  this, &QnAuditLogDialog::at_selectAllAction_triggered);
 }
 
 void QnAuditLogDialog::setupCamerasGrid()
@@ -672,6 +675,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
                 ui->gridDetails->adjustSize();
         }, Qt::QueuedConnection
     );
+    setupContextMenu(ui->gridDetails);
 
     QDate dt = QDateTime::currentDateTime().date();
     ui->dateEditFrom->setDate(dt);
@@ -1032,14 +1036,32 @@ void QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested(const QPoint&)
     menu->deleteLater();
 }
 
+QTableView* QnAuditLogDialog::currentGridView() const
+{
+    if (ui->gridDetails->hasFocus())
+        return ui->gridDetails;
+    else if (ui->tabWidget->currentIndex() == SessionTab)
+        return ui->gridMaster;
+    else
+        return ui->gridCameras;
+}
+
 void QnAuditLogDialog::at_exportAction_triggered()
 {
-    QnGridWidgetHelper::exportToFile(ui->gridMaster, this, tr("Export selected records to a file"));
+    if (currentGridView())
+        QnGridWidgetHelper::exportToFile(currentGridView(), this, tr("Export selected records to a file"));
+}
+
+void QnAuditLogDialog::at_selectAllAction_triggered()
+{
+    if (currentGridView())
+        currentGridView()->selectAll();
 }
 
 void QnAuditLogDialog::at_clipboardAction_triggered()
 {
-    QnGridWidgetHelper::copyToClipboard(ui->gridMaster);
+    if (currentGridView())
+        QnGridWidgetHelper::copyToClipboard(currentGridView());
 }
 
 void QnAuditLogDialog::disableUpdateData()
