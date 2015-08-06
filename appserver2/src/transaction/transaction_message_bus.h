@@ -52,8 +52,9 @@ namespace ec2
             const ApiPeerData& remotePeer,
             qint64 remoteSystemIdentityTime,
             const nx_http::Request& request,
-            const QByteArray& contentEncoding );
-        bool moveConnectionToReadyForStreaming( const QnUuid& connectionGuid );
+            const QByteArray& contentEncoding,
+			std::function<void ()> ttFinishCallback);
+		bool moveConnectionToReadyForStreaming( const QnUuid& connectionGuid );
         //!Report socket to receive transactions from
         /*!
             \param requestBuf Contains serialized \a request and (possibly) partial (or full) message body
@@ -64,7 +65,7 @@ namespace ec2
             const ApiPeerData &remotePeer,
             qint64 remoteSystemIdentityTime,
             const nx_http::Request& request,
-            const QByteArray& requestBuf );
+            const QByteArray& requestBuf);
         //!Process transaction received via standard HTTP server interface
         bool gotTransactionFromRemotePeer(
             const QnUuid& connectionGuid,

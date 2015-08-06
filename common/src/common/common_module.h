@@ -39,7 +39,8 @@ public:
     void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
     QnUuid moduleGUID() const{ return m_uuid; }
 
-    QnUuid runningInstanceGUID() const{ return m_runUuid; }
+    QnUuid runningInstanceGUID() const;
+    void updateRunningInstanceGuid();
 
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }

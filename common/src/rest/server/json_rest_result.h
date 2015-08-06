@@ -6,6 +6,7 @@
 
 #include <utils/common/model_functions.h>
 
+
 // TODO: #MSAPI rename to QnRestResult.
 // 
 // Add format field (Qn::SerializationFormat) that will be set in QnJsonRestHandler (to be renamed).

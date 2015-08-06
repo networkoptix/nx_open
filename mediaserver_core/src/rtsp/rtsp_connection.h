@@ -106,6 +106,7 @@ private:
     void processBinaryRequest();
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
     QSharedPointer<QnArchiveStreamReader> getArchiveDP();
+    void notifyMediaRangeUsed(qint64 timestampUsec);
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

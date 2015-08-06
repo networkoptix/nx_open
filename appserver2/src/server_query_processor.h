@@ -19,6 +19,7 @@
 #include "transaction/transaction_log.h"
 #include "transaction/transaction_message_bus.h"
 #include <transaction/binary_transaction_serializer.h>
+#include "api/model/audit/auth_session.h"
 
 
 namespace ec2
