@@ -292,9 +292,8 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
 }
 
 void QnRecordingStatsModel::clear() {
-    beginResetModel();
+    QN_SCOPED_MODEL_RESET(this);
     m_data.clear();
-    endResetModel();
 }
 
 void QnRecordingStatsModel::setModelData(const QnRecordingStatsReply& data)
@@ -317,7 +316,7 @@ QnRecordingStatsReply QnRecordingStatsModel::modelData() const
 
 void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& data, QnRecordingStatsReply& result)
 {
-    beginResetModel();
+    QN_SCOPED_MODEL_RESET(this);
     result = data;
     if (result.isEmpty())
         return;
@@ -340,8 +339,6 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
     footer.archiveDurationSecs = summ.archiveDurationSecs;
     footer.averageBitrate = maxValue.averageBitrate;
     result.push_back(std::move(footer)); // add footer
-
-    endResetModel();
 }
 
 QnRecordingStatsColors QnRecordingStatsModel::colors() const
