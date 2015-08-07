@@ -218,7 +218,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="5">
+     <item row="0" column="7">
       <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -230,6 +230,48 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item row="0" column="6">
+      <widget class="QCheckBox" name="selectAllCheckBox">
+       <property name="text">
+        <string>Select all</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="Line" name="line_2">
+       <property name="minimumSize">
+        <size>
+         <width>6</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="lineWidth">
+        <number>1</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="Line" name="line_3">
+       <property name="minimumSize">
+        <size>
+         <width>6</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

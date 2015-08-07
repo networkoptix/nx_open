@@ -77,7 +77,9 @@ private slots:
     void at_eventsGrid_clicked(const QModelIndex& idx);
     void at_headerCheckStateChanged(Qt::CheckState state);
     void at_updateDetailModel();
+    void at_typeCheckboxChanged();
     void at_filterChanged();
+    void at_selectAllCheckboxChanged();
     void at_updateCheckboxes();
     void at_masterGridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 private:

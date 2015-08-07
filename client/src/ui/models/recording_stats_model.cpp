@@ -279,7 +279,7 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
         switch(section) {
         case CameraNameColumn: return tr("Camera");
         case BytesColumn:      return tr("Space");
-        case DurationColumn:   return tr("Days");
+        case DurationColumn:   return tr("Calendar Days");
         case BitrateColumn:    return QVariant(); //return tr("Bitrate");
         default:
             break;
