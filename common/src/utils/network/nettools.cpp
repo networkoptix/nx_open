@@ -665,15 +665,6 @@ int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 
 #elif defined(__linux__)
 
-int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
-{
-    int result = getMacFromEth0(MAC_str, host);
-    if (result != 0 || MAC_str[0] == 0)
-        return getFirstMacAddress(MAC_str, host);
-    else
-        return result;
-}
-
 int getMacFromEth0(char MAC_str[MAC_ADDR_LEN], char** host)
 {
     memset(MAC_str, 0, MAC_ADDR_LEN);
@@ -703,6 +694,15 @@ int getMacFromEth0(char MAC_str[MAC_ADDR_LEN], char** host)
     *host = inet_ntoa(ip->sin_addr);
 
     return 0;
+}
+
+int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
+{
+    int result = getMacFromEth0(MAC_str, host);
+    if (result != 0 || MAC_str[0] == 0)
+        return getFirstMacAddress(MAC_str, host);
+    else
+        return result;
 }
 
 #else	//mac, bsd
