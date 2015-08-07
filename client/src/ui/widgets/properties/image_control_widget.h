@@ -21,6 +21,12 @@ public:
     void submitToResources(const QnVirtualCameraResourceList &cameras);
 
     bool isFisheye() const;
+
+private:
+    void updateAspectRatioFromResources(const QnVirtualCameraResourceList &cameras);
+    void updateRotationFromResources(const QnVirtualCameraResourceList &cameras);
+    void updateFisheyeFromResources(const QnVirtualCameraResourceList &cameras);
+
 signals:
     void changed();
     void fisheyeChanged();

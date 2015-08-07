@@ -10,6 +10,14 @@
 
 #include <utils/aspect_ratio.h>
 
+namespace {
+    /** We are allowing to set fixed rotation to any value with this step. */
+    const int rotationDegreesStep = 90;
+
+    /** Maximum rotation value. */
+    const int rotationDegreesMax = 359;
+}
+
 QnImageControlWidget::QnImageControlWidget(QWidget* parent /*= 0*/):
     QWidget(parent),
     ui(new Ui::ImageControlWidget)
@@ -28,11 +36,8 @@ QnImageControlWidget::QnImageControlWidget(QWidget* parent /*= 0*/):
     ui->forceArComboBox->setCurrentIndex(0);
 
     connect(ui->forceRotationCheckBox, &QCheckBox::stateChanged, this, [this](int state){ ui->forceRotationComboBox->setEnabled(state == Qt::Checked);} );
-
-    ui->forceRotationComboBox->addItem(tr("0 degrees"),      0);
-    ui->forceRotationComboBox->addItem(tr("90 degrees"),    90);
-    ui->forceRotationComboBox->addItem(tr("180 degrees"),   180);
-    ui->forceRotationComboBox->addItem(tr("270 degrees"),   270);
+    for (int degrees = 0; degrees < rotationDegreesMax; degrees += rotationDegreesStep)
+        ui->forceRotationComboBox->addItem(tr("%1 degrees").arg(degrees), degrees);
     ui->forceRotationComboBox->setCurrentIndex(0);
 
     connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   &QnImageControlWidget::changed);
@@ -57,90 +62,14 @@ QnImageControlWidget::~QnImageControlWidget()
 }
 
 void QnImageControlWidget::updateFromResources(const QnVirtualCameraResourceList &cameras) {
-    bool hasVideo = std::any_of(cameras.cbegin(), cameras.cend(), [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0); });
+    bool hasVideo = std::any_of(cameras.cbegin(), cameras.cend(), [](const QnVirtualCameraResourcePtr &camera) {
+        return camera->hasVideo(0); 
+    });
     setEnabled(hasVideo);
 
-    ui->fisheyeCheckBox->setCheckState(Qt::Unchecked);
-
-    /* Update checkbox state based on camera value. */
-    auto setupCheckbox = [](QCheckBox* checkBox, bool firstCamera, bool value){
-        Qt::CheckState state = value ? Qt::Checked : Qt::Unchecked;
-        if (firstCamera) {
-            checkBox->setTristate(false);
-            checkBox->setCheckState(state);
-        }
-        else if (state != checkBox->checkState()) {
-            checkBox->setTristate(true);
-            checkBox->setCheckState(Qt::PartiallyChecked);
-        }
-    };
-
-    bool firstCamera = true; 
-
-    bool sameArOverride = true;
-    qreal arOverride = 0;
-    QString rotFirst;
-    bool sameRotation = true;
-
-    for (const QnVirtualCameraResourcePtr &camera: cameras) {
-        setupCheckbox(ui->fisheyeCheckBox, firstCamera, camera->getDewarpingParams().enabled);
-
-        qreal changedAr = camera->customAspectRatio();
-        if (firstCamera) {
-            arOverride = changedAr;
-        } else {
-            sameArOverride &= qFuzzyEquals(changedAr, arOverride);
-        }
-
-        QString rotation = camera->getProperty(QnMediaResource::rotationKey());
-        if(firstCamera) {
-            rotFirst = rotation;
-        } else {
-            sameRotation &= rotFirst == rotation;
-        }
-
-        firstCamera = false;
-
-    }
-
-    ui->forceArCheckBox->setTristate(!sameArOverride);
-    if (sameArOverride) {
-        ui->forceArCheckBox->setChecked(!qFuzzyIsNull(arOverride));
-
-        /* Float is important here. */
-        float ar = QnAspectRatio::closestStandardRatio(arOverride).toFloat();
-        int idx = -1;
-        for (int i = 0; i < ui->forceArComboBox->count(); ++i) {
-            if (qFuzzyEquals(ar, ui->forceArComboBox->itemData(i).toFloat())) {
-                idx = i;
-                break;
-            }
-        }
-        ui->forceArComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
-    } else {
-        ui->forceArComboBox->setCurrentIndex(0);
-        ui->forceArCheckBox->setCheckState(Qt::PartiallyChecked);
-    }
-
-    ui->forceRotationCheckBox->setTristate(!sameRotation);
-    if(sameRotation) {
-        ui->forceRotationCheckBox->setChecked(!rotFirst.isEmpty());
-
-        int degree = rotFirst.toInt();
-        ui->forceRotationComboBox->setCurrentIndex(degree/90);
-        int idx = -1;
-        for (int i = 0; i < ui->forceRotationComboBox->count(); ++i) {
-            if (ui->forceRotationComboBox->itemData(i).toInt() == degree) {
-                idx = i;
-                break;
-            }
-        }
-        ui->forceRotationComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
-    } else {
-        ui->forceRotationComboBox->setCurrentIndex(0);
-        ui->forceRotationCheckBox->setCheckState(Qt::PartiallyChecked);
-    }
-
+    updateAspectRatioFromResources(cameras);
+    updateRotationFromResources(cameras);
+    updateFisheyeFromResources(cameras);
 }
 
 void QnImageControlWidget::submitToResources(const QnVirtualCameraResourceList &cameras) {
@@ -172,4 +101,61 @@ void QnImageControlWidget::submitToResources(const QnVirtualCameraResourceList &
 
 bool QnImageControlWidget::isFisheye() const {
     return ui->fisheyeCheckBox->isChecked();
+}
+
+void QnImageControlWidget::updateAspectRatioFromResources(const QnVirtualCameraResourceList &cameras) {
+    qreal arOverride = cameras.empty() ? 0 : cameras.front()->customAspectRatio();
+    bool sameArOverride = std::all_of(cameras.cbegin(), cameras.cend(), [arOverride](const QnVirtualCameraResourcePtr &camera) {
+        return qFuzzyEquals(camera->customAspectRatio(), arOverride);
+    });
+
+    ui->forceArCheckBox->setTristate(!sameArOverride);
+    if (sameArOverride) {
+        ui->forceArCheckBox->setChecked(!qFuzzyIsNull(arOverride));
+
+        /* Float is important here. */
+        float ar = QnAspectRatio::closestStandardRatio(arOverride).toFloat();
+        int idx = -1;
+        for (int i = 0; i < ui->forceArComboBox->count(); ++i) {
+            if (qFuzzyEquals(ar, ui->forceArComboBox->itemData(i).toFloat())) {
+                idx = i;
+                break;
+            }
+        }
+        ui->forceArComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+    } else {
+        ui->forceArComboBox->setCurrentIndex(0);
+        ui->forceArCheckBox->setCheckState(Qt::PartiallyChecked);
+    }
+}
+
+void QnImageControlWidget::updateRotationFromResources(const QnVirtualCameraResourceList &cameras) {
+    QString rotationOverride = cameras.empty() ? QString() : cameras.front()->getProperty(QnMediaResource::rotationKey());
+    bool sameRotation = std::all_of(cameras.cbegin(), cameras.cend(), [rotationOverride](const QnVirtualCameraResourcePtr &camera) {
+        return rotationOverride == camera->getProperty(QnMediaResource::rotationKey());
+    });
+
+    ui->forceRotationCheckBox->setTristate(!sameRotation);
+    if(sameRotation) {
+        ui->forceRotationCheckBox->setChecked(!rotationOverride.isEmpty());
+        int idx = qBound(0, rotationOverride.toInt(), rotationDegreesMax) / rotationDegreesStep;
+        ui->forceRotationComboBox->setCurrentIndex(idx);
+    } else {
+        ui->forceRotationComboBox->setCurrentIndex(0);
+        ui->forceRotationCheckBox->setCheckState(Qt::PartiallyChecked);
+    }
+}
+
+void QnImageControlWidget::updateFisheyeFromResources(const QnVirtualCameraResourceList &cameras) {
+    bool fisheye = cameras.empty() ? false : cameras.front()->getDewarpingParams().enabled;   
+    bool sameFisheye = std::all_of(cameras.cbegin(), cameras.cend(), [fisheye](const QnVirtualCameraResourcePtr &camera) {
+        return fisheye == camera->getDewarpingParams().enabled;
+    });
+
+    ui->fisheyeCheckBox->setTristate(!sameFisheye);
+    ui->fisheyeCheckBox->setCheckState(sameFisheye 
+        ? fisheye
+        ? Qt::Checked
+        : Qt::Unchecked
+        : Qt::PartiallyChecked);
 }
