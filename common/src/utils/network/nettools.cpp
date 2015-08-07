@@ -631,32 +631,37 @@ bool isNewDiscoveryAddressBetter(
     return eq1 > eq2;
 }
 
+
+int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
+{
+    memset(MAC_str, 0, sizeof(MAC_str));
+    *host = 0;
+    for (const auto& iface: QNetworkInterface::allInterfaces())
+    {
+        QByteArray addr = iface.hardwareAddress().toLocal8Bit().replace( ':', '-' );
+        if (addr.isEmpty() || addr == QByteArray("00-00-00-00-00-00"))
+            continue;
+
+        memcpy(MAC_str, addr.constData(), qMin(addr.length(), MAC_ADDR_LEN));
+        MAC_str[MAC_ADDR_LEN-1] = 0;
+        return 0;
+    }
+
+    return -1;
+}
+
+
 #ifdef _WIN32
 
 //TODO #ak refactor of function api is required
 int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
-    // for test purpose only. This function used for EDGE so far
-    memset(MAC_str, 0, sizeof(MAC_str));
-    *host = 0;
-    QList<QNetworkInterface> ifList = QNetworkInterface::allInterfaces();
-    if (ifList.size() > 0) {
-        QByteArray addr = ifList[0].hardwareAddress().toLocal8Bit();
-        memcpy(MAC_str, addr.constData(), qMin(addr.length(), MAC_ADDR_LEN));
-        for (int i = 0; i < MAC_ADDR_LEN; ++i)
-        {
-            if (MAC_str[i] == ':')
-                MAC_str[i] = '-';
-        }
-        MAC_str[MAC_ADDR_LEN-1] = 0;
-    }
-
-    return 0;
+    return getFirstMacAddress(MAC_str, host);
 }
 
 #elif defined(__linux__)
 
-int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
+int getMacFromEth0(char MAC_str[MAC_ADDR_LEN], char** host)
 {
     memset(MAC_str, 0, MAC_ADDR_LEN);
 #define HWADDR_len 6
@@ -685,6 +690,15 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
     *host = inet_ntoa(ip->sin_addr);
 
     return 0;
+}
+
+int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
+{
+    int result = getMacFromEth0(MAC_str, host);
+    if (result != 0 || MAC_str[0] == 0 || strcmp(MAC_str, "00-00-00-00-00-00") == 0)
+        return getFirstMacAddress(MAC_str, host);
+    else
+        return result;
 }
 
 #else	//mac, bsd
