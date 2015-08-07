@@ -331,7 +331,7 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
         maxValue.recordedSecs = qMax(maxValue.recordedSecs, value.recordedSecs);
         maxValue.archiveDurationSecs = qMax(maxValue.archiveDurationSecs, value.archiveDurationSecs);
         maxValue.averageBitrate = qMax(maxValue.averageBitrate, value.averageBitrate);
-        m_bitrateSum = qMax(m_bitrateSum, value.averageBitrate);
+        m_bitrateSum += value.averageBitrate;
     }
     QnRecordingStatsData footer;
     footer.recordedBytes = summ.recordedBytes;
