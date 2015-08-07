@@ -33,6 +33,7 @@
     (QnTimeReply)\
     (QnStorageScanData)\
     (QnTestEmailSettingsReply)\
+    (QnTestLdapSettingsReply)\
     (QnCompatibilityItem)\
     (QnPingReply)\
     (QnCameraListReply)\
