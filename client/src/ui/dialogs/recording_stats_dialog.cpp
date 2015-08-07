@@ -96,7 +96,7 @@ public:
             int width = m_comboBox->minimumSizeHint().width();
             QRect r(rect);
             r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
-            painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last:"));
+            painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last recorded:"));
         }
     }
     QComboBox* comboBox() const { return m_comboBox; }
