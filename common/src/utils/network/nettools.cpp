@@ -639,7 +639,7 @@ int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
     for (const auto& iface: QNetworkInterface::allInterfaces())
     {
         QByteArray addr = iface.hardwareAddress().toLocal8Bit();
-        if (addr.isEmpty())
+        if (addr.isEmpty() || addr == QByteArray("00-00-00-00-00-00"))
             continue;
         memcpy(MAC_str, addr.constData(), qMin(addr.length(), MAC_ADDR_LEN));
         for (int i = 0; i < MAC_ADDR_LEN; ++i)
@@ -699,7 +699,7 @@ int getMacFromEth0(char MAC_str[MAC_ADDR_LEN], char** host)
 int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
 {
     int result = getMacFromEth0(MAC_str, host);
-    if (result != 0 || MAC_str[0] == 0)
+    if (result != 0 || MAC_str[0] == 0 || strcmp(MAC_str, "00-00-00-00-00-00") == 0)
         return getFirstMacAddress(MAC_str, host);
     else
         return result;
