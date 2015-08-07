@@ -185,9 +185,7 @@ QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
             tmpPath.clear();
         else
             tmpPath = tmpPath.mid(storagePath.size());
-        //tmpPath.replace(TO_SEP + TO_SEP, TO_SEP);
         tmpPath = m_localPath + tmpPath;
-//        qWarning() << "translated path: " << tmpPath;
         return tmpPath;
     }
 }
