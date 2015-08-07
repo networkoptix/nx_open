@@ -5,14 +5,20 @@
 
 #include <stdio.h>
 
+namespace {
+    static const QString SM_ACCOUNT_NAME(lit("sAMAccountName"));
+    static const QString MAIL(lit("mail"));
+    static const QString SEARCH_FILTER(lit("(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"));
+}
+
 #ifdef Q_OS_WIN
 #include <Windows.h>
 #include <winldap.h>
-#define QSTOCW(s) const_cast<PWCHAR>(s.toStdWString().c_str())
-#define SEARCH_FILTER L"(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"
+
+#define QSTOCW(s) (const PWCHAR)(s.utf16())
+
 #define FROM_WCHAR_ARRAY QString::fromWCharArray
 #define DIGEST_MD5 L"DIGEST-MD5"
-#define SM_ACCOUNT_NAME L"sAMAccountName"
 #define EMPTY_STR L""
 #else
 
@@ -20,10 +26,8 @@
 #include <ldap.h>
 #define QSTOCW(s) s.toUtf8().constData()
 #define LdapGetLastError() errno
-#define SEARCH_FILTER "(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"
 #define FROM_WCHAR_ARRAY QString::fromUtf8
 #define DIGEST_MD5 "DIGEST-MD5"
-#define SM_ACCOUNT_NAME "sAMAccountName"
 #define EMPTY_STR ""
 #define PWSTR char*
 #define PWCHAR char*
@@ -35,12 +39,36 @@
 
 #include "network/authutil.h"
 
+namespace {
+    QString GetFirstValue(LDAP *ld, LDAPMessage *e, const QString& name) {
+        QString result;
+
+        PWCHAR *values = ldap_get_values(ld, e, QSTOCW(name));
+        unsigned long nValues = ldap_count_values(values);
+        for (unsigned long i = 0; i < nValues; i++) {
+#ifdef Q_OS_WIN
+            std::wstring value;
+#else
+            std::string value;
+#endif
+            value = values[i];
+
+            if (!value.empty()) {
+                result = FROM_WCHAR_ARRAY(values[i]);
+                break;
+            }
+        }
+        ldap_value_free(values);
+
+        return result;
+    }
+}
 
 #define THROW_LDAP_EXCEPTION(text, rc) \
 { \
         std::ostringstream os; \
         os << text << ": " << ldap_err2string(rc); \
-        throw LdapException(os.str().c_str()); \
+        throw QnLdapException(os.str().c_str()); \
 }
 
 class QnLdapManagerPrivate {
@@ -62,17 +90,21 @@ public:
 
     LDAP *ld;
 
-    LdapUsers users;
+    QnLdapUsers users;
 };
 
 QnLdapManager::QnLdapManager(const QString &host, int port, const QString &bindDn, const QString &password, const QString &searchBase) 
 	: d_ptr(new QnLdapManagerPrivate(host, port, bindDn, password, searchBase)) {
 }
 
+QnLdapManager::QnLdapManager(const QnLdapSettings& settings)
+    : d_ptr(new QnLdapManagerPrivate(settings.host, settings.port, settings.adminDn, settings.adminPassword, settings.searchBase)) {
+}
+
 QnLdapManager::~QnLdapManager() {
 }
 
-void QnLdapManager::fetchUsers() {
+QnLdapUsers QnLdapManager::fetchUsers() {
     Q_D(QnLdapManager);
 
     d->ld = ldap_init(QSTOCW(d->host), d->port);
@@ -89,11 +121,11 @@ void QnLdapManager::fetchUsers() {
         if (rc != LDAP_SUCCESS)
             THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_simple_bind_s()", rc);
 
-        LdapUsers users;
+        QnLdapUsers users;
 
         LDAPMessage *result, *e;
 
-        const PWSTR filter = SEARCH_FILTER;
+        const PWSTR filter = QSTOCW(SEARCH_FILTER);
 	    rc = ldap_search_ext_s(d->ld, QSTOCW(d->searchBase), LDAP_SCOPE_SUBTREE, filter, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
         if (rc != LDAP_SUCCESS)
             THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_search_ext_s()", rc);
@@ -101,27 +133,13 @@ void QnLdapManager::fetchUsers() {
         for (e = ldap_first_entry(d->ld, result); e != NULL; e = ldap_next_entry(d->ld, e)) {
             PWSTR dn;
             if ((dn = ldap_get_dn( d->ld, e )) != NULL) {
-                LdapUser user;
+                QnLdapUser user;
                 user.dn = FROM_WCHAR_ARRAY(dn);
 
-                PWCHAR *values = ldap_get_values(d->ld, e, SM_ACCOUNT_NAME);
-                unsigned long nValues = ldap_count_values(values);
-                for (unsigned long i = 0; i < nValues; i++) {
-#ifdef Q_OS_WIN
-                    std::wstring value;
-#else
-                    std::string value;
-#endif
-                    value = values[i];
+                user.login = GetFirstValue(d->ld, e, SM_ACCOUNT_NAME);
+                user.email = GetFirstValue(d->ld, e, MAIL);
 
-                    if (!value.empty()) {
-                        user.login = FROM_WCHAR_ARRAY(values[i]);
-                        break;
-                    }
-                }
-                ldap_value_free(values);
-
-                users[user.login] = user;
+                users.append(user);
                 ldap_memfree( dn );
             }
         }
@@ -134,6 +152,8 @@ void QnLdapManager::fetchUsers() {
         ldap_unbind(d->ld);
         throw;
     }
+
+    return d->users;
 }
 
 static QByteArray md5(QByteArray data)
@@ -148,7 +168,7 @@ bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &
 
     LDAP *ld;
 
-    ld = ldap_init(QSTOCW(d->host), LDAP_PORT);
+    ld = ldap_init(QSTOCW(d->host), d->port);
     int desired_version = LDAP_VERSION3;
     int rc  = ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
     if (rc != 0)
@@ -189,7 +209,7 @@ bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &
     QByteArray cnonce = "12345";
     QByteArray nc = "00000001";
     QByteArray qop = "auth";
-    QByteArray digestUri = QByteArray("ldap/") + realm;
+    QByteArray digestUri = QByteArray("ldap/ad2.corp.hdw.mx"); //QByteArray("ldap/") + realm;
 
     QMap<QByteArray, QByteArray> authDictionary;
     authDictionary["username"] = login.toUtf8();
@@ -228,20 +248,57 @@ bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &
     return res == LDAP_SUCCESS;
 }
 
-QStringList QnLdapManager::users() {
+QnLdapUsers QnLdapManager::users() {
     Q_D(const QnLdapManager);
 
-    QStringList userLogins;
-
-    for (auto key : d->users) {
-        userLogins.push_back(key.first);
-    }
-
-    return userLogins;
+    return d->users;
 }
 
 QString QnLdapManager::realm() const
 {
-    //TODO return Active Directory realm
-    return QString();
+    Q_D(const QnLdapManager);
+
+    QString result;
+
+    LDAP *ld;
+
+    ld = ldap_init(QSTOCW(d->host), d->port);
+    int desired_version = LDAP_VERSION3;
+    int rc  = ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
+    if (rc != 0)
+        return result;
+
+#ifdef Q_OS_WIN
+    rc = ldap_connect(ld, NULL); // Need to connect before SASL bind!
+#endif
+
+    struct berval cred;
+    cred.bv_len = 0;
+    cred.bv_val = 0;
+
+    // The servresp will contain the digest-challange after the first call.
+    berval *servresp = NULL;
+    long res;
+    ldap_sasl_bind_s(ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
+    ldap_get_option(ld, LDAP_OPT_ERROR_NUMBER, &res);
+    if (res != LDAP_SASL_BIND_IN_PROGRESS)
+        return result;
+    
+    QMap<QByteArray, QByteArray> responseDictionary;
+    QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
+    for (QByteArray line : smartSplit(initialResponse, ',')) {
+        line = line.trimmed();
+        int eqIndex = line.indexOf('=');
+        if (eqIndex == -1)
+            continue;
+
+        if (line.mid(0, eqIndex) == "realm") {
+            result = QString::fromLatin1(unquoteStr(line.mid(eqIndex + 1)));
+            break;
+        }
+    }
+
+    ldap_unbind(d->ld);
+
+    return result;
 }

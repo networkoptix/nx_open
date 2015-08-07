@@ -17,6 +17,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
 #include <utils/common/uuid.h>
+#include <utils/common/ldap.h>
 #include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
@@ -197,6 +198,7 @@
 #include "http/iomonitor_tcp_server.h"
 #include "ldap/ldap_manager.h"
 #include "rest/handlers/multiserver_chunks_rest_handler.h"
+#include "rest/handlers/merge_ldap_users_rest_handler.h"
 #include "audit/mserver_audit_manager.h"
 
 // This constant is used while checking for compatibility.
@@ -1397,6 +1399,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
     QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
+    QnRestProcessorPool::instance()->registerHandler("ec2/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
@@ -1885,12 +1888,21 @@ void MediaServerProcess::run()
             QnSleep::msleep(1000);
     }
 
-    std::unique_ptr<QnLdapManager> ldapManager( new QnLdapManager(
-        m_mediaServer->getProperty( Qn::LDAP_HOST ),
+    QnLdapSettings ldapSettings = globalSettings->ldapSettings();
+    QnLdapSettings ls;
+    ls.host = "192.168.11.2";
+    ls.port = 389;
+    ls.adminDn = "Administrator@corp.hdw.mx";
+    ls.adminPassword = "QWEasd123";
+    ls.searchBase = "dc=corp,dc=hdw,dc=mx";
+    globalSettings->setLdapSettings(ls);
+
+    std::unique_ptr<QnLdapManager> ldapManager( new QnLdapManager(ls) );
+/*        m_mediaServer->getProperty( Qn::LDAP_HOST ),
         m_mediaServer->getProperty( Qn::LDAP_PORT ).toInt(),
         m_mediaServer->getProperty( Qn::LDAP_ADMIN_DN ),
         m_mediaServer->getProperty( Qn::LDAP_ADMIN_PASSWORD ),
-        m_mediaServer->getProperty( Qn::LDAP_SEARCH_BASE ) ) );
+        m_mediaServer->getProperty( Qn::LDAP_SEARCH_BASE ) ) ); */
 
     /* This key means that password should be forcibly changed in the database. */
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);

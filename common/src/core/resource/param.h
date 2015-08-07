@@ -59,11 +59,11 @@ namespace Qn
     static const QString NETWORK_INTERFACES = lit("networkInterfaces");
     static const QString FULL_VERSION = lit("fullVersion");
 
-    static const QString LDAP_HOST = lit("ldapHost");
+/*    static const QString LDAP_HOST = lit("ldapHost");
     static const QString LDAP_PORT = lit("ldapPort");
     static const QString LDAP_ADMIN_DN = lit("ldapAdminDn");
     static const QString LDAP_ADMIN_PASSWORD = lit("ldapAdminPassword");
-    static const QString LDAP_SEARCH_BASE = lit("ldapSearchBase");
+    static const QString LDAP_SEARCH_BASE = lit("ldapSearchBase"); */
 
     // Storage
     static const QString SPACE = lit("space");

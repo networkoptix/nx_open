@@ -8,18 +8,20 @@
 #include <map>
 
 #include <utils/common/singleton.h>
+#include <utils/common/ldap.h>
 
-struct LdapUser {
+struct QnLdapUser {
     QString dn;
     QString login;
     QString fullName;
+    QString email;
 };
 
-typedef std::map<QString, LdapUser> LdapUsers;
+typedef QList<QnLdapUser> QnLdapUsers;
 
-class LdapException : std::exception {
+class QnLdapException : std::exception {
 public:
-    LdapException(const char *msg)
+    QnLdapException(const char *msg)
         : _msg(msg) {
     }
 
@@ -39,17 +41,17 @@ class QnLdapManagerPrivate;
 class QnLdapManager : public Singleton<QnLdapManager> {
 public:
     QnLdapManager(const QString &host, int port, const QString &bindDn, const QString &password, const QString &searchBase);
+    QnLdapManager(const QnLdapSettings& settings);
     ~QnLdapManager();
 
-    void fetchUsers();
-    QStringList users();
+    QnLdapUsers fetchUsers();
+    QnLdapUsers users();
 
     QString realm() const;
 
     bool authenticateWithDigest(const QString &login, const QString &ha1);
 
 private:
-
 	Q_DECLARE_PRIVATE(QnLdapManager);
 
 	QnLdapManagerPrivate *d_ptr;
