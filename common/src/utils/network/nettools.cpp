@@ -631,12 +631,9 @@ bool isNewDiscoveryAddressBetter(
     return eq1 > eq2;
 }
 
-#ifdef _WIN32
 
-//TODO #ak refactor of function api is required
-int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
+int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
-    // for test purpose only. This function used for EDGE so far
     memset(MAC_str, 0, sizeof(MAC_str));
     *host = 0;
     QList<QNetworkInterface> ifList = QNetworkInterface::allInterfaces();
@@ -654,9 +651,27 @@ int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
     return 0;
 }
 
+
+#ifdef _WIN32
+
+//TODO #ak refactor of function api is required
+int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
+{
+    return getFirstMacAddress(MAC_str, host);
+}
+
 #elif defined(__linux__)
 
 int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
+{
+    int result = getMacFromEth0(MAC_str, host);
+    if (result != 0 || MAC_str[0] == 0)
+        return getFirstMacAddress(MAC_str, host);
+    else
+        return result;
+}
+
+int getMacFromEth0(char MAC_str[MAC_ADDR_LEN], char** host)
 {
     memset(MAC_str, 0, MAC_ADDR_LEN);
 #define HWADDR_len 6
