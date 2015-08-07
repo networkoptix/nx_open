@@ -219,7 +219,8 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
     QnSoftwareVersion latestVersion = QnSoftwareVersion(releasesMap.value(currentRelease).toString());
     QString updatesPrefix = map.value(lit("updates_prefix")).toString();
     if (latestVersion.isNull() || updatesPrefix.isEmpty()) {
-        finishTask(QnCheckForUpdateResult::NoNewerVersion);
+        if (!tryNextServer())
+            finishTask(QnCheckForUpdateResult::NoSuchBuild);
         return;
     }
 
