@@ -122,6 +122,14 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr &user)
 }
 
 bool QnUserListModelPrivate::isUnique(const QnUserResourcePtr &user) const {
+    QString userName = user->getName();
+    for (const QnUserResourcePtr &user1 : userList) {
+        if (user1 == user)
+            continue;
+
+        if (user1->getName().compare(userName, Qt::CaseInsensitive) == 0)
+            return false;
+    }
     return true;
 }
 
@@ -159,8 +167,6 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
             if (user->isLdap()) {
                 if (!user->isEnabled())
                     return tr("Disabled").toUpper();
-            } else {
-                return tr("No").toUpper();
             }
             break;
         default:
@@ -168,12 +174,14 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
         } // switch (column)
         break;
     case Qt::DecorationRole:
-        if (index.column() == EditIconColumn)
+        switch (index.column()) {
+        case EditIconColumn:
             return qnSkin->icon("/edit.png");
-        break;
-    case Qt::CheckStateRole:
-        if (user->isEnabled() && user->isLdap() && index.column() == LdapColumn)
-            return Qt::Checked;
+        case LdapColumn:
+            if (user->isLdap() && user->isEnabled())
+                return qnSkin->icon("/done.png");
+            break;
+        }
         break;
     case Qt::ForegroundRole:
         if (user->isLdap()) {
@@ -185,6 +193,10 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
         break;
     case Qn::UserResourceRole:
         return QVariant::fromValue(user);
+    case Qt::TextAlignmentRole:
+        if (index.column() == LdapColumn)
+            return Qt::AlignCenter;
+        break;
     default:
         break;
     } // switch (role)
@@ -222,9 +234,6 @@ Qt::ItemFlags QnUserListModel::flags(const QModelIndex &index) const {
         return flags;
 
     flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-
-    if (user->isLdap() && user->isEnabled())
-        flags |= Qt::ItemIsUserCheckable;
 
     return flags;
 }
