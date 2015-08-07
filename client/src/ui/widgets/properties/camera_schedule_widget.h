@@ -1,24 +1,23 @@
-#ifndef QN_CAMERA_SCHEDULE_WIDGET_H
-#define QN_CAMERA_SCHEDULE_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
 #include <core/misc/schedule_task.h>
 
-class QnWorkbenchContext;
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
     class CameraScheduleWidget;
 }
 
-class QnCameraScheduleWidget: public QWidget
+class QnCameraScheduleWidget: public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QList<QnScheduleTask::Data> scheduleTasks READ scheduleTasks WRITE setScheduleTasks NOTIFY scheduleTasksChanged USER true DESIGNABLE false)
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
 public:
-    QnCameraScheduleWidget(QWidget *parent = 0);
+    explicit QnCameraScheduleWidget(QWidget *parent = 0);
     virtual ~QnCameraScheduleWidget();
 
     virtual bool hasHeightForWidth() const override;
@@ -76,10 +75,6 @@ public:
     /** Returns true if there is at least one "record-motion-plus-LQ-always" square on the grid */
     bool hasDualStreamingMotionOnGrid() const;
 
-    // TODO
-    QnWorkbenchContext *context() const { return m_context; }
-    void setContext(QnWorkbenchContext *context);
-
     void setExportScheduleButtonEnabled(bool enabled);
     int maxRecordedDays() const;
     int minRecordedDays() const;
@@ -90,7 +85,6 @@ signals:
     void scheduleTasksChanged();
     void recordingSettingsChanged();
     void scheduleEnabledChanged(int);
-    void moreLicensesRequested();
     void gridParamsChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
     void controlsChangesApplied();
@@ -126,7 +120,6 @@ private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 
     QScopedPointer<Ui::CameraScheduleWidget> ui;
-    QnWorkbenchContext *m_context;
 
     QnVirtualCameraResourceList m_cameras;
     bool m_disableUpdateGridParams;
@@ -150,6 +143,3 @@ private:
      */
     int m_inUpdate;
 };
-
-
-#endif // QN_CAMERA_SCHEDULE_WIDGET_H

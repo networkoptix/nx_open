@@ -57,6 +57,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QnWorkbenchContextAware(parent),
     d_ptr(new QnCameraSettingsWidgetPrivate()),
     ui(new Ui::SingleCameraSettingsWidget),
+    m_cameraScheduleWidget(new QnCameraScheduleWidget(this)),
     m_cameraSupportsMotion(false),
     m_hasDbChanges(false),
     m_scheduleEnabledChanged(false),
@@ -69,15 +70,18 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_inUpdateMaxFps(false)
 {
     ui->setupUi(this);
+    ui->recordingLayout->addWidget(m_cameraScheduleWidget);
 
     m_motionLayout = new QVBoxLayout(ui->motionWidget);
     m_motionLayout->setContentsMargins(0, 0, 0, 0);
 
-    ui->cameraScheduleWidget->setContext(context());
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnSingleCameraSettingsWidget::updateLicensesButtonVisible);
 
     QnCamLicenseUsageHelper helper;
     ui->licensesUsageWidget->init(&helper);
+
+
+    
 
     /* Set up context help. */
     setHelpTopic(this,                                                      Qn::CameraSettings_Help);
@@ -103,17 +107,16 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
 
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(recordingSettingsChanged()),     this,   SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(controlsChangesApplied()),       this,   SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged()));
+    connect(m_cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
+    connect(m_cameraScheduleWidget,   SIGNAL(recordingSettingsChanged()),     this,   SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
+    connect(m_cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
+    connect(m_cameraScheduleWidget,   SIGNAL(controlsChangesApplied()),       this,   SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
+    connect(m_cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged()));
 
-    connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_dbDataChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(archiveRangeChanged()),          this,   SLOT(at_dbDataChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
+    connect(m_cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
+    connect(m_cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_dbDataChanged()));
+    connect(m_cameraScheduleWidget,   SIGNAL(archiveRangeChanged()),          this,   SLOT(at_dbDataChanged()));
+    connect(m_cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
     connect(ui->motionWebPageLabel,     SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
 
@@ -122,7 +125,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton,   &QPushButton::clicked,              this,   &QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked);
     connect(ui->pingButton,                 &QPushButton::clicked,              this,   [this]{menu()->trigger(Qn::PingAction, QnActionParameters(m_camera));});
-    connect(ui->moreLicensesButton,         &QPushButton::clicked,              this,   &QnSingleCameraSettingsWidget::moreLicensesRequested);
+    connect(ui->moreLicensesButton,         &QPushButton::clicked,              this,   [this]{menu()->trigger(Qn::PreferencesLicensesTabAction);});
 
     connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
     connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()));
@@ -241,11 +244,11 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
 }
 
 void QnSingleCameraSettingsWidget::setScheduleEnabled(bool enabled) {
-    ui->cameraScheduleWidget->setScheduleEnabled(enabled);
+    m_cameraScheduleWidget->setScheduleEnabled(enabled);
 }
 
 bool QnSingleCameraSettingsWidget::isScheduleEnabled() const {
-    return ui->cameraScheduleWidget->isScheduleEnabled();
+    return m_cameraScheduleWidget->isScheduleEnabled();
 }
 
 void QnSingleCameraSettingsWidget::submitToResource() {
@@ -271,19 +274,19 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         if (m_camera->isDtsBased()) {
             m_camera->setScheduleDisabled(!ui->analogViewCheckBox->isChecked());
         } else {
-            m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
+            m_camera->setScheduleDisabled(!m_cameraScheduleWidget->isScheduleEnabled());
         }
 
-        int maxDays = ui->cameraScheduleWidget->maxRecordedDays();
+        int maxDays = m_cameraScheduleWidget->maxRecordedDays();
         if (maxDays != QnCameraScheduleWidget::RecordedDaysDontChange) {
             m_camera->setMaxDays(maxDays);
-            m_camera->setMinDays(ui->cameraScheduleWidget->minRecordedDays());
+            m_camera->setMinDays(m_cameraScheduleWidget->minRecordedDays());
         }
 
         if (!m_camera->isDtsBased()) {
             if (m_hasScheduleChanges) {
                 QnScheduleTaskList scheduleTasks;
-                foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks())
+                foreach (const QnScheduleTask::Data& scheduleTaskData, m_cameraScheduleWidget->scheduleTasks())
                     scheduleTasks.append(QnScheduleTask(scheduleTaskData));
                 m_camera->setScheduleTasks(scheduleTasks);
             }
@@ -333,10 +336,10 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->loginEdit->clear();
         ui->passwordEdit->clear();
 
-        ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
-        ui->cameraScheduleWidget->setScheduleEnabled(false);
-        ui->cameraScheduleWidget->setChangesDisabled(false); /* Do not block editing by default if schedule task list is empty. */
-        ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
+        m_cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
+        m_cameraScheduleWidget->setScheduleEnabled(false);
+        m_cameraScheduleWidget->setChangesDisabled(false); /* Do not block editing by default if schedule task list is empty. */
+        m_cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
 
         ui->softwareMotionButton->setEnabled(false);
         ui->cameraMotionButton->setText(QString());
@@ -385,21 +388,21 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
             QnVirtualCameraResourceList cameras;
             cameras.push_back(m_camera);
 
-            ui->cameraScheduleWidget->beginUpdate();
-            ui->cameraScheduleWidget->setCameras(cameras);
+            m_cameraScheduleWidget->beginUpdate();
+            m_cameraScheduleWidget->setCameras(cameras);
 
             QList<QnScheduleTask::Data> scheduleTasks;
             foreach (const QnScheduleTask& scheduleTaskData, m_camera->getScheduleTasks())
                 scheduleTasks.append(scheduleTaskData.getData());
-            ui->cameraScheduleWidget->setScheduleTasks(scheduleTasks);
+            m_cameraScheduleWidget->setScheduleTasks(scheduleTasks);
 
-            ui->cameraScheduleWidget->setScheduleEnabled(!m_camera->isScheduleDisabled());
+            m_cameraScheduleWidget->setScheduleEnabled(!m_camera->isScheduleDisabled());
 
-            int currentCameraFps = ui->cameraScheduleWidget->getGridMaxFps();
+            int currentCameraFps = m_cameraScheduleWidget->getGridMaxFps();
             if (currentCameraFps > 0)
-                ui->cameraScheduleWidget->setFps(currentCameraFps);
+                m_cameraScheduleWidget->setFps(currentCameraFps);
             else
-                ui->cameraScheduleWidget->setFps(m_camera->getMaxFps()/2);
+                m_cameraScheduleWidget->setFps(m_camera->getMaxFps()/2);
 
 
             // TODO #Elric: wrong, need to get camera-specific web page
@@ -408,7 +411,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
 
             updateMotionCapabilities();
 
-            ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
+            m_cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
             
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
@@ -497,7 +500,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     setReadOnly(ui->enableAudioCheckBox, readOnly);
     setReadOnly(ui->loginEdit, readOnly);
     setReadOnly(ui->passwordEdit, readOnly);
-    setReadOnly(ui->cameraScheduleWidget, readOnly);
+    setReadOnly(m_cameraScheduleWidget, readOnly);
     setReadOnly(ui->resetMotionRegionsButton, readOnly);
     setReadOnly(ui->sensitivitySlider, readOnly);
     setReadOnly(ui->softwareMotionButton, readOnly);
@@ -597,7 +600,7 @@ void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
     if (!m_camera)
         return;
     
-    ui->cameraScheduleWidget->setRecordingParamsAvailability(m_camera->hasVideo(0) && !m_camera->hasParam(lit("noRecordingParams")));
+    m_cameraScheduleWidget->setRecordingParamsAvailability(m_camera->hasVideo(0) && !m_camera->hasParam(lit("noRecordingParams")));
 }
 
 void QnSingleCameraSettingsWidget::updateMotionCapabilities() {
@@ -614,7 +617,7 @@ void QnSingleCameraSettingsWidget::updateMotionAvailability() {
     if(ui->cameraMotionButton->isChecked())
         motionAvailable = m_camera && (m_camera->getCameraBasedMotionType() != Qn::MT_NoMotion);
 
-    ui->cameraScheduleWidget->setMotionAvailable(motionAvailable);
+    m_cameraScheduleWidget->setMotionAvailable(motionAvailable);
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity() {
@@ -639,7 +642,7 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream() {
 
     QList<QnScheduleTask::Data> filteredTasks;
     bool usesSecondStream = false;
-    foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks()) {
+    foreach (const QnScheduleTask::Data& scheduleTaskData, m_cameraScheduleWidget->scheduleTasks()) {
         QnScheduleTask::Data data(scheduleTaskData);
         if (data.m_recordType == Qn::RT_MotionAndLowQuality) {
             usesSecondStream = true;
@@ -663,7 +666,7 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream() {
         QMessageBox::Yes);
     switch (button) {
     case QMessageBox::Yes:
-        ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
+        m_cameraScheduleWidget->setScheduleTasks(filteredTasks);
         return true;
     case QMessageBox::No:
         ui->expertSettingsWidget->setSecondStreamEnabled();
@@ -676,7 +679,7 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream() {
 
 
 void QnSingleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
-    ui->cameraScheduleWidget->setExportScheduleButtonEnabled(enabled);
+    m_cameraScheduleWidget->setExportScheduleButtonEnabled(enabled);
 }
 
 // -------------------------------------------------------------------------- //
@@ -713,7 +716,7 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
 }
 
 void QnSingleCameraSettingsWidget::at_analogViewCheckBox_clicked() {
-    ui->cameraScheduleWidget->setScheduleEnabled(ui->analogViewCheckBox->isChecked());
+    m_cameraScheduleWidget->setScheduleEnabled(ui->analogViewCheckBox->isChecked());
 }
 
 void QnSingleCameraSettingsWidget::updateLicensesButtonVisible() {
@@ -750,7 +753,7 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
 
     d->calculateMaxFps(&maxFps, &maxDualStreamingFps, motionType);
 
-    ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
+    m_cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
 }
 
@@ -888,7 +891,7 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplie
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
-    ui->analogViewCheckBox->setChecked(ui->cameraScheduleWidget->isScheduleEnabled());
+    ui->analogViewCheckBox->setChecked(m_cameraScheduleWidget->isScheduleEnabled());
     m_scheduleEnabledChanged = true;
 }
 

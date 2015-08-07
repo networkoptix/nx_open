@@ -12,6 +12,7 @@ namespace Ui {
 }
 
 class QnCameraSettingsWidgetPrivate;
+class QnCameraScheduleWidget;
 
 class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -59,16 +60,12 @@ public:
     void setExportScheduleButtonEnabled(bool enabled);
 signals:
     void hasChangesChanged();
-    void moreLicensesRequested();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
-    void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
-    void at_cameraScheduleWidget_gridParamsChanged();
-    void at_cameraScheduleWidget_controlsChangesApplied();
 
     void at_enableAudioCheckBox_clicked();
     void at_analogViewCheckBox_clicked();
@@ -87,6 +84,8 @@ private:
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
+    QnCameraScheduleWidget* m_cameraScheduleWidget;
+
     QnVirtualCameraResourceList m_cameras;
     bool m_hasDbChanges;
     bool m_hasScheduleChanges;

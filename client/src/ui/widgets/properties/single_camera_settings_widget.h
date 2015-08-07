@@ -21,6 +21,7 @@ class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
 class CameraAdvancedSettingsWebPage;
+class QnCameraScheduleWidget;
 
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -84,7 +85,6 @@ public:
 
 signals:
     void hasChangesChanged();
-    void moreLicensesRequested();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
@@ -135,6 +135,7 @@ private:
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
+    QnCameraScheduleWidget* m_cameraScheduleWidget;
   
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;

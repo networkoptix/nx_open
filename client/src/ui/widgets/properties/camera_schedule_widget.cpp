@@ -12,6 +12,7 @@
 
 #include <licensing/license.h>
 
+#include <ui/actions/action_manager.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/help/help_topic_accessor.h>
@@ -142,6 +143,7 @@ namespace {
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::CameraScheduleWidget),
     m_disableUpdateGridParams(false),
     m_motionAvailable(true),
@@ -236,6 +238,12 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
     connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,  updateLicensesIfNeeded);
+
+    connect(context()->instance<QnWorkbenchPanicWatcher>(), &QnWorkbenchPanicWatcher::panicModeChanged, this, &QnCameraScheduleWidget::updatePanicLabelText);
+    connect(context(), &QnWorkbenchContext::userChanged, this, &QnCameraScheduleWidget::updateLicensesButtonVisible);
+    updatePanicLabelText();
+    updateLicensesButtonVisible();
+
 }
 
 QnCameraScheduleWidget::~QnCameraScheduleWidget() {
@@ -386,16 +394,6 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     updateLicensesLabelText();
 }
 
-void QnCameraScheduleWidget::setContext(QnWorkbenchContext *context) {
-    m_context = context;
-
-    if(context) {
-        connect(context->instance<QnWorkbenchPanicWatcher>(), SIGNAL(panicModeChanged()), this, SLOT(updatePanicLabelText()));
-        connect(context, SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(updateLicensesButtonVisible()));
-        updatePanicLabelText();
-        updateLicensesButtonVisible();
-    }
-}
 
 void QnCameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled) {
     ui->exportScheduleButton->setEnabled(enabled);
@@ -832,7 +830,7 @@ void QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
 
 void QnCameraScheduleWidget::at_licensesButton_clicked()
 {
-    emit moreLicensesRequested();
+    menu()->trigger(Qn::PreferencesLicensesTabAction);
 }
 
 void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {

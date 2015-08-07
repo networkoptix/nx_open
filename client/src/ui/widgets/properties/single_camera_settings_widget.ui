@@ -275,7 +275,7 @@
       <attribute name="title">
        <string>Recording</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="recordingLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -288,9 +288,6 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="QnCameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="ioSettingsTab">
@@ -572,27 +569,27 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnCameraScheduleWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/camera_schedule_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QnCameraExpertSettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/expert_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnIOPortSettingsWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/ioport_settings_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QnLicensesUsageWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/licenses_usage_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnImageControlWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/image_control_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnIOPortSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/ioport_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -610,12 +607,6 @@
    <class>QnCameraAdvancedSettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/camera_advanced_settings_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnImageControlWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/properties/image_control_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
