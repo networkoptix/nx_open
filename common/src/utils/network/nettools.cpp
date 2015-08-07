@@ -638,15 +638,11 @@ int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
     *host = 0;
     for (const auto& iface: QNetworkInterface::allInterfaces())
     {
-        QByteArray addr = iface.hardwareAddress().toLocal8Bit();
+        QByteArray addr = iface.hardwareAddress().toLocal8Bit().replace( ':', '-' );
         if (addr.isEmpty() || addr == QByteArray("00-00-00-00-00-00"))
             continue;
+
         memcpy(MAC_str, addr.constData(), qMin(addr.length(), MAC_ADDR_LEN));
-        for (int i = 0; i < MAC_ADDR_LEN; ++i)
-        {
-            if (MAC_str[i] == ':')
-                MAC_str[i] = '-';
-        }
         MAC_str[MAC_ADDR_LEN-1] = 0;
         return 0;
     }
