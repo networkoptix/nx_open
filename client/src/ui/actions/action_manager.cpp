@@ -813,6 +813,12 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("System Update...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission);
 
+    factory(Qn::UserManagementAction).
+        flags(Qn::Main | Qn::Tree).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
+        text(tr("User management...")).
+        condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this));
+
     factory(Qn::PreferencesGeneralTabAction).
         flags(Qn::Main).
         text(tr("Local Settings...")).

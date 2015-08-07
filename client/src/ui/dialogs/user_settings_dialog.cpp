@@ -224,6 +224,13 @@ void QnUserSettingsDialog::updateFromResource() {
     updateLogin();
     updatePassword();
 
+    if (m_user->isLdap()) {
+        ui->enabledCheckBox->setChecked(m_user->isEnabled());
+    } else {
+        ui->enabledLabel->hide();
+        ui->enabledCheckBox->hide();
+    }
+
     setHasChanges(false);
 }
 

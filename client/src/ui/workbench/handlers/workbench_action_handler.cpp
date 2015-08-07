@@ -239,6 +239,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
     connect(action(Qn::SystemAdministrationAction),             SIGNAL(triggered()),    this,   SLOT(at_systemAdministrationAction_triggered()));
     connect(action(Qn::SystemUpdateAction),                     SIGNAL(triggered()),    this,   SLOT(at_systemUpdateAction_triggered()));
+    connect(action(Qn::UserManagementAction),                   SIGNAL(triggered()),    this,   SLOT(at_userManagementAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -1186,6 +1187,11 @@ void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
 void QnWorkbenchActionHandler::at_systemUpdateAction_triggered() {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UpdatesPage);
+}
+
+void QnWorkbenchActionHandler::at_userManagementAction_triggered() {
+    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UserManagement);
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
