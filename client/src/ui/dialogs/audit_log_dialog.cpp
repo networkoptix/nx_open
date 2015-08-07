@@ -13,7 +13,6 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
-#include <plugins/resource/server_camera/server_camera.h>
 #include <ui/actions/action_manager.h>
 
 #include <ui/common/grid_widget_helper.h>
@@ -178,6 +177,8 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
 
 void QnAuditItemDelegate::paintRichDateTime(QPainter * painter, const QStyleOptionViewItem & option, int dateTimeSecs) const
 {
+    if (dateTimeSecs == 0)
+        return;
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(dateTimeSecs * 1000ll);
     QString dateStr = dateTime.date().toString(Qt::DefaultLocaleShortDate) + QString(lit(" "));
     QString timeStr = dateTime.time().toString(Qt::DefaultLocaleShortDate);

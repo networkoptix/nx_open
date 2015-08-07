@@ -204,82 +204,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="imageControlGroupBox">
-         <property name="title">
-          <string>Image Control</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="forceArCheckBox">
-            <property name="text">
-             <string>Force aspect ratio to:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <widget class="QComboBox" name="forceArComboBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="forceRotationCheckBox">
-            <property name="text">
-             <string>Default rotation:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
-            <item>
-             <widget class="QComboBox" name="forceRotationComboBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="fisheyeCheckBox">
-            <property name="text">
-             <string>This is a fish-eye lens camera</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+        <widget class="QnImageControlWidget" name="imageControlWidget" native="true"/>
        </item>
        <item>
         <widget class="QGroupBox" name="analogGroupBox">
@@ -649,19 +574,19 @@
   <customwidget>
    <class>QnCameraScheduleWidget</class>
    <extends>QWidget</extends>
-   <header>ui/widgets/properties/camera_schedule_widget.h</header>
+   <header location="global">ui/widgets/properties/camera_schedule_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnCameraExpertSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>ui/widgets/properties/expert_settings_widget.h</header>
+   <header location="global">ui/widgets/properties/expert_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnIOPortSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>ui/widgets/properties/ioport_settings_widget.h</header>
+   <header location="global">ui/widgets/properties/ioport_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -678,13 +603,19 @@
   <customwidget>
    <class>QnFisheyeSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>ui/widgets/properties/fisheye_settings_widget.h</header>
+   <header location="global">ui/widgets/properties/fisheye_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnCameraAdvancedSettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/camera_advanced_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnImageControlWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/image_control_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
