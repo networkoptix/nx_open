@@ -409,8 +409,50 @@ void QnAuditLogDialog::setupFilterCheckbox(QCheckBox* checkbox, const QColor& co
     checkbox->setPalette(palette);
     checkbox->setProperty("filter", (int) filteredTypes);
     m_filterCheckboxes << checkbox;
-    connect(checkbox, &QCheckBox::stateChanged, this, &QnAuditLogDialog::at_updateDetailModel);
+    checkbox->disconnect(this);
+    connect(checkbox, &QCheckBox::stateChanged, this, &QnAuditLogDialog::at_typeCheckboxChanged);
 }
+
+void QnAuditLogDialog::at_typeCheckboxChanged()
+{
+    bool hasChecked = false;
+    bool hasUnchecked = false;
+    for (const auto& checkbox: m_filterCheckboxes)
+    {
+        if (checkbox->isChecked())
+            hasChecked = true;
+        else
+            hasUnchecked = true;
+    }
+    Qt::CheckState checkState = Qt::Unchecked;
+    if (hasChecked && hasUnchecked)
+        checkState = Qt::PartiallyChecked;
+    else if(hasChecked)
+        checkState = Qt::Checked;
+
+    ui->selectAllCheckBox->blockSignals(true);
+    ui->selectAllCheckBox->setCheckState(checkState);
+    ui->selectAllCheckBox->blockSignals(false);
+
+    at_updateDetailModel();
+};
+
+void QnAuditLogDialog::at_selectAllCheckboxChanged()
+{
+    Qt::CheckState state = ui->selectAllCheckBox->checkState();
+    if (state == Qt::PartiallyChecked) {
+        ui->selectAllCheckBox->setChecked(true);
+        return;
+    }
+
+    for (const auto& checkbox: m_filterCheckboxes)
+    {
+        checkbox->blockSignals(true);
+        checkbox->setChecked(state == Qt::Checked);
+        checkbox->blockSignals(false);
+    }
+    at_updateDetailModel();
+};
 
 void QnAuditLogDialog::at_filterChanged()
 {
@@ -640,6 +682,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     setupCamerasGrid();
     connect(m_sessionModel, &QnAuditLogModel::colorsChanged, this, &QnAuditLogDialog::at_updateCheckboxes);
     at_updateCheckboxes();
+    connect(ui->selectAllCheckBox, &QCheckBox::stateChanged, this, &QnAuditLogDialog::at_selectAllCheckboxChanged);
 
     // setup detail grid
 
