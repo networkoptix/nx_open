@@ -54,10 +54,6 @@ echo "Error occured"
 exit 1
 fi
 
-
-#Modifying paths in Doxyfile 
-sed -i -e 's/common\/src/..\/include/g' ./nx_sdk/sample/$pluginName/Doxyfile
-
 #Generating documentation
 CUR_DIR_BAK=`pwd`
 cd $TARGET_DIR/sample/$pluginName/
