@@ -11,5 +11,8 @@ bool QnLdapSettings::equals(const QnLdapSettings &other) const {
 }
 
 bool QnLdapSettings::isValid() const {
-    return true;
+    return  !host.isEmpty()
+            && !adminDn.isEmpty()
+            && !adminPassword.isEmpty()
+            && port != -1;
 }

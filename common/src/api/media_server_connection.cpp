@@ -195,6 +195,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case TestEmailSettingsObject:
         processJsonReply<QnTestEmailSettingsReply>(this, response, handle);
         break;
+    case TestLdapSettingsObject:
+        processJsonReply<QnTestLdapSettingsReply>(this, response, handle);
+        break;
     case CameraAddObject:
         emitFinished(this, response.status, handle);
         break;
