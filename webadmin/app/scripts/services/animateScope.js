@@ -79,10 +79,7 @@ angular.module('webadminApp')
             var proportion = time/duration;
             var delta = proportion * (2 - proportion);
             var result =start + (stop - start) * delta;
-            if(Number.isNaN(result)){
-                console.error("animation isNaN");
-            }
-            return  result;
+            return result;
         };
 
         Animation.prototype.fading = function(start,stop,time,duration){

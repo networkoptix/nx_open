@@ -43,13 +43,11 @@ angular.module('webadminApp')
 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
-                    console.log("playing source",src?src.src:null);
-
                     return src?src.src:null;
                 }
 
                 function detectBestFormat(){
-                    return "native-hls";
+                    // return "flashls";
 
                     //This function gets available sources for camera and chooses the best player for this browser
 
@@ -108,9 +106,13 @@ angular.module('webadminApp')
                                 scope.ieNoWebm = true;
                             }
 
-                            if(window.jscd.browserMajorVersion>=10 && weHaveHls){
-                                return "jshls";
+                            if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
+                                return "flashls";
                             }
+
+                            /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
+                                return "jshls";
+                            }*/
 
                             return false; // IE9 - No other supported formats
 
@@ -183,17 +185,27 @@ angular.module('webadminApp')
 
                 function initFlashls() {
                     scope.videogular = false;
-                    flashlsAPI.init("videowindow", function (api) {
-                        scope.vgApi = api;
-                        
-                        if (scope.vgSrc) {
-                            scope.vgApi.load(getFormatSrc('hls'));
-                        }
+                    scope.flashls = true;
+                    scope.flashSource = "components/flashlsChromeless.swf";
+                    scope.flashParam = flashlsAPI.flashParams();
 
-                        scope.vgPlayerReady({$API:api});
-                    }, function (api) {
-                        console.alert("some error");
-                    });
+                    if(!flashlsAPI.ready()) {
+                        flashlsAPI.init("videowindow", function (api) {
+                            scope.vgApi = api;
+
+                            if (scope.vgSrc) {
+                                scope.vgApi.load(getFormatSrc('hls'));
+                            }
+
+                            scope.vgPlayerReady({$API: api});
+                        }, function (api) {
+                            console.alert("some error");
+                        }, function (position, duration) {
+                            scope.vgUpdateTime({$currentTime: position, $duration: duration});
+                        });
+                    }else{
+                        flashlsAPI.load(getFormatSrc('hls'));
+                    }
                 }
 
                 function initJsHls(){

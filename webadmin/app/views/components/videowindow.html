@@ -13,6 +13,14 @@
         </videogular>
     </div>
 
-    <div id="videowindow"></div>
+    <div id="videowindow" ng-if="flashls">
+        <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+                width="100%" height="100%"
+                id="flashvideo"
+                ng-name="'flashvideoembed'"
+                ng-source="flashSource"
+                ng-param="flashParam">
+        </object>
+    </div>
 
 </div>

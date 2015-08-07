@@ -51,13 +51,18 @@ angular.module('webadminApp').controller('ViewCtrl',
             var res = false;
             var v = document.createElement('video');
             if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
-                res = true; // we have webm codec!
+                return true;//Native support
             }
-            return res;
+
+            if(type=='hls'){
+                return window.jscd.flashVersion != '-'; // flash hls support
+            }
+
+            return false;
         }
 
         function formatSupported(type){
-            return cameraSupports('webm') && browserSupports("webm");
+            return cameraSupports(type) && browserSupports(type);
         }
         function updateAvailableResolutions() {
             if(!$scope.activeCamera){
