@@ -212,6 +212,7 @@ void QnUserResource::setEnabled(bool isEnabled)
     if (m_isEnabled == isEnabled)
         return;
     m_isEnabled = isEnabled;
+    emit enabledChanged(::toSharedPointer(this));
 }
 
 QString QnUserResource::getEmail() const
