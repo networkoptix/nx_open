@@ -108,6 +108,12 @@
         <resource name = "AXISP5414" public = "AXISM3004"/> 
         <resource name = "AXISP5415" public = "AXISM3004"/>    
         <resource name = "AXISQ1765" public = "AXISQ1755"/>       
+        <resource name = "AXISP1357" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value = "30"/>
+            </params>
+        </resource>        
         <resource name = "AXISP3904" public = "AXIS_COMMON">
         <params>
             <param name = "MaxFPS"
