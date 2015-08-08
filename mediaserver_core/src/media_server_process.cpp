@@ -120,6 +120,7 @@
 #include <rest/handlers/time_rest_handler.h>
 #include <rest/handlers/activate_license_rest_handler.h>
 #include <rest/handlers/test_email_rest_handler.h>
+#include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
@@ -1372,6 +1373,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
@@ -1888,22 +1890,6 @@ void MediaServerProcess::run()
             QnSleep::msleep(1000);
     }
 
-    QnLdapSettings ldapSettings = globalSettings->ldapSettings();
-    QnLdapSettings ls;
-    ls.host = "192.168.11.2";
-    ls.port = 389;
-    ls.adminDn = "Administrator@corp.hdw.mx";
-    ls.adminPassword = "QWEasd123";
-    ls.searchBase = "dc=corp,dc=hdw,dc=mx";
-    globalSettings->setLdapSettings(ls);
-
-    std::unique_ptr<QnLdapManager> ldapManager( new QnLdapManager(ls) );
-/*        m_mediaServer->getProperty( Qn::LDAP_HOST ),
-        m_mediaServer->getProperty( Qn::LDAP_PORT ).toInt(),
-        m_mediaServer->getProperty( Qn::LDAP_ADMIN_DN ),
-        m_mediaServer->getProperty( Qn::LDAP_ADMIN_PASSWORD ),
-        m_mediaServer->getProperty( Qn::LDAP_SEARCH_BASE ) ) ); */
-
     /* This key means that password should be forcibly changed in the database. */
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
     MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
@@ -2106,6 +2092,8 @@ void MediaServerProcess::run()
     updateAllowCameraCHangesIfNeed();
     //QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
 #endif
+
+    std::unique_ptr<QnLdapManager> ldapManager( new QnLdapManager(globalSettings->ldapSettings()) );
 
     //QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
 

@@ -1,12 +1,15 @@
 #include "user_management_widget.h"
 #include "ui_user_management_widget.h"
 
+#include <api/app_server_connection.h>
+
 #include <core/resource/user_resource.h>
 #include <api/global_settings.h>
 #include <utils/common/ldap.h>
 #include <ui/models/user_list_model.h>
 #include <ui/actions/action_manager.h>
 #include <client/client_meta_types.h>
+#include <utils/network/http/asynchttpclient.h>
 
 #include <ui/dialogs/ldap_settings_dialog.h>
 
@@ -48,7 +51,7 @@ void QnUserManagementWidgetPrivate::at_refreshButton_clicked() {
         return;
     }
 
-    // TODO: Implement fetching
+    QnAppServerConnectionFactory::getConnection2()->getUserManager()->mergeLdapUsers();
 }
 
 void QnUserManagementWidgetPrivate::openLdapSettings() {

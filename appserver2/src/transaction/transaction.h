@@ -88,6 +88,7 @@ namespace ec2
             getUsers                    = 500,  /*< ApiUserDataList */
             saveUser                    = 501,  /*< ApiUserData */
             removeUser                  = 502,  /*< ApiIdData */
+            mergeLdapUsers              = 503,  /*< */
 
             /* Layout resource */
             getLayouts                  = 600,  /*< ApiLayoutDataList */

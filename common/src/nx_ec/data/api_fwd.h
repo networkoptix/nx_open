@@ -96,6 +96,8 @@ namespace ec2 {
     struct ApiDatabaseDumpData;
     struct ApiLicenseOverflowData;
 
+    struct ApiMergeLdapUsersData;
+
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
     typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
@@ -146,6 +148,7 @@ namespace ec2 {
     (ApiEmailData)\
     (ApiEmailSettingsData)\
     (ApiLdapSettingsData)\
+    (ApiMergeLdapUsersData)\
     (ApiFullInfoData)\
     (ApiIdData)\
     (ApiSyncMarkerRecord)\

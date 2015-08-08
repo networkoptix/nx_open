@@ -51,6 +51,8 @@ public:
 
     bool authenticateWithDigest(const QString &login, const QString &ha1);
 
+    static bool testSettings(const QnLdapSettings& settings);
+
 private:
 	Q_DECLARE_PRIVATE(QnLdapManager);
 

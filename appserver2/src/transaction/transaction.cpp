@@ -151,7 +151,9 @@ namespace ec2
             REGISTER_COMMAND(getStatisticsReport),
             REGISTER_COMMAND(triggerStatisticsReport),
 
-            REGISTER_COMMAND(getTransactionLog)
+            REGISTER_COMMAND(getTransactionLog),
+
+            REGISTER_COMMAND(mergeLdapUsers)
         };
 
         QString toString(Value val) 

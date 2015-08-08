@@ -163,6 +163,42 @@ static QByteArray md5(QByteArray data)
     return md5.result();
 }
 
+bool QnLdapManager::testSettings(const QnLdapSettings& settings) {
+    LDAP *ld = ldap_init(QSTOCW(settings.host), settings.port);
+    if (ld == 0)
+        return false;
+
+    try {
+        int desired_version = LDAP_VERSION3;
+        int rc = ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
+        if (rc != 0)
+            THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_set_option(PROTOCOL_VERSION)", rc);
+
+        rc = ldap_simple_bind_s(ld, QSTOCW(settings.adminDn), QSTOCW(settings.adminPassword));
+        if (rc != LDAP_SUCCESS)
+            THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_simple_bind_s()", rc);
+
+        QnLdapUsers users;
+
+        LDAPMessage *result;
+
+        const PWSTR filter = QSTOCW(SEARCH_FILTER);
+        rc = ldap_search_ext_s(ld, QSTOCW(settings.searchBase), LDAP_SCOPE_SUBTREE, filter, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
+        if (rc != LDAP_SUCCESS)
+            THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_search_ext_s()", rc);
+
+        ldap_msgfree(result);
+
+        ldap_unbind(ld);
+
+        return true;
+    } catch (...) {
+        ldap_unbind(ld);
+    }
+
+    return false;
+}
+
 bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &digest) {
     Q_D(const QnLdapManager);
 

@@ -698,6 +698,11 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        ErrorCode mergeLdapUsers() {
+            int(AbstractUserManager::*fn)(impl::SimpleHandlerPtr) = &AbstractUserManager::mergeLdapUsers;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, std::placeholders::_1));
+        }
+
     signals:
         void addedOrUpdated( QnUserResourcePtr camera );
         void removed( QnUuid id );
@@ -706,6 +711,7 @@ namespace ec2
         virtual int getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler ) = 0;
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int mergeLdapUsers( impl::SimpleHandlerPtr handler ) = 0;
     };
 
 

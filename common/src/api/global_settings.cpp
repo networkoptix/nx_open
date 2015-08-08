@@ -97,12 +97,13 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         ;
 
     QList<QnAbstractResourcePropertyAdaptor*> ldapAdaptors;
-    ldapAdaptors << 
-        m_ldapHostAdaptor,
-        m_ldapPortAdaptor,
-        m_ldapAdminDnAdaptor,
-        m_ldapAdminPasswordAdaptor,
-        m_ldapSearchBaseAdaptor;
+    ldapAdaptors
+        << m_ldapHostAdaptor
+        << m_ldapPortAdaptor
+        << m_ldapAdminDnAdaptor
+        << m_ldapAdminPasswordAdaptor
+        << m_ldapSearchBaseAdaptor
+        ;
 
     m_allAdaptors 
         << m_disabledVendorsAdaptor
