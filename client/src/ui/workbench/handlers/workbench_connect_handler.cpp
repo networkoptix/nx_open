@@ -276,6 +276,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
         clientData.fullVersion = QnAppInfo::applicationFullVersion();
         clientData.systemInfo = QnSystemInformation::currentSystemInformation().toString();
+        clientData.systemRuntime = QnSystemInformation::currentSystemRuntime();
 
         const auto& hw = HardwareInformation::instance();
         clientData.phisicalMemory = hw.phisicalMemory;
