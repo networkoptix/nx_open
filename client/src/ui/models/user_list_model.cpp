@@ -7,14 +7,15 @@
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-class QnUserListModelPrivate : public QObject {
+class QnUserListModelPrivate : public Connective<QObject> {
+    typedef Connective<QObject> base_type;
 public:
     QnUserListModel *model;
 
     QnUserResourceList userList;
 
     QnUserListModelPrivate(QnUserListModel *parent)
-        : QObject(parent)
+        : base_type(parent)
         , model(parent)
     {
         userList = qnResPool->getResources<QnUserResource>();
@@ -43,6 +44,10 @@ void QnUserListModelPrivate::at_resourcePool_resourceAdded(const QnResourcePtr &
     if (userIndex(user->getId()) != -1)
         return;
 
+    connect(user,   &QnUserResource::nameChanged,           this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user,   &QnUserResource::permissionsChanged,    this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user,   &QnUserResource::enabledChanged,        this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+
     int row = userList.size();
     model->beginInsertRows(QModelIndex(), row, row);
     userList.append(user);
@@ -57,6 +62,8 @@ void QnUserListModelPrivate::at_resourcePool_resourceRemoved(const QnResourcePtr
     int row = userIndex(user->getId());
     if (row == -1)
         return;
+
+    disconnect(user, nullptr, this, nullptr);
 
     model->beginRemoveRows(QModelIndex(), row, row);
     userList.removeAt(row);
