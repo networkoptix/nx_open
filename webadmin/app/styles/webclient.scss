@@ -127,7 +127,6 @@ table.webclient-window>tbody>tr>td{
 
   position: relative;
   top: 50%;
-  -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
   margin-left: auto;
   margin-right: auto;
@@ -279,6 +278,27 @@ table.webclient-window>tbody>tr>td{
   visibility:hidden;
   max-width:72px !important;
   max-height:40px !important;
+}
+
+
+.camera-view-informer{
+  text-align: center;
+
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.camera-view-informer .camera-view-message-icon{
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.camera-view-informer .camera-view-message{
+  font-weight: 300;
+  color: #3F545F;
+  font-size: 40px;
+  display: inline-block;
 }
 
 .dark-theme .nav > li > a{

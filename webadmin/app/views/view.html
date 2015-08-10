@@ -92,7 +92,19 @@
                             </div>
 
                             <div class="float-size hidden-xs">
-                                <videowindow vg-update-time="updateTime($currentTime, $duration)"
+                                <div class="camera-view-informer" ng-if="activeCamera.status == 'Offline'">
+                                    <div class="camera-view-offline camera-view-message-icon"></div>
+                                    <br/>
+                                    <div class="camera-view-message">OFFLINE</div>
+                                </div>
+                                <div class="camera-view-informer" ng-if="activeCamera.status == 'Unauthorized'" >
+                                    <div class="camera-view-unauthorized camera-view-message-icon"></div>
+                                    <br/>
+                                    <div class="camera-view-message">UNAUTHORIZED</div>
+                                </div>
+
+                                <videowindow ng-hide="activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized'"
+                                             vg-update-time="updateTime($currentTime, $duration)"
                                              vg-player-ready="playerReady($API)"
                                              vg-src="acitveVideoSource">
                                 </videowindow>

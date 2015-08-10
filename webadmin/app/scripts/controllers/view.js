@@ -231,9 +231,6 @@ angular.module('webadminApp').controller('ViewCtrl',
                     return param.name == "mediaStreams";
                 };
                 function cameraSorter(camera) {
-                    if(camera.status!='Online') {
-                        console.log(camera.url, camera.status, camera);
-                    }
                     camera.url = extractDomain(camera.url);
                     camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
 
