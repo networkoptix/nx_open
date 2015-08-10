@@ -12,7 +12,6 @@ angular.module('webadminApp')
             link: function (scope, element, attrs) {
                 var $_current = element;
 
-                console.log("link",attrs,scope);
                 //scope.$watch('[' + attrs.ngData + ',' + attrs.ngParam + ']', function (newVal) {
                     var $_clone = element.clone().attr('data', scope.ngSource),
                         content = '';

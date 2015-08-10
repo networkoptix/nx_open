@@ -45,7 +45,7 @@ Interval.prototype.addToDate = function(date, count){
         date = new Date(date);
     }
     if(!isDate(date)){
-        console.error("non date " + (typeof date) + ": " + date , Number.isInteger(date) , ((date ^ 0) === date) , (date ^ 0));
+        console.error("non date " + (typeof date) + ": " + date );
         return date;
     }
     if(typeof(count)==='undefined') {
@@ -60,7 +60,7 @@ Interval.prototype.addToDate = function(date, count){
                 date.getSeconds() + count * this.seconds,
                 date.getMilliseconds() + count * this.milliseconds);
     }catch(error){
-        console.log(date);
+        console.error("date problem" , date);
         throw error;
     }
 };
@@ -335,7 +335,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
                 var chunks = data.data.reply;
                 if(chunks.length == 0){
-                    console.log("no chunks for this camera");
+                    //console.log("no chunks for this camera");
                 }
 
                 for (var i = 0; i < chunks.length; i++) {
@@ -629,7 +629,6 @@ ShortCache.prototype.update = function(requestPosition,position){
     if(this.updating && !requestPosition){ //Do not send request twice
         return;
     }
-    // console.log("update detailization",this.updating, requestPosition);
 
     requestPosition = requestPosition || this.playedPosition;
 
@@ -637,8 +636,6 @@ ShortCache.prototype.update = function(requestPosition,position){
     var self = this;
     this.lastRequestDate = requestPosition;
     this.lastRequestPosition = position || this.played;
-
-    // console.log("lastRequestPosition ",position, this.played, new Date(this.lastRequestDate));
 
     this.mediaserver.getRecords('/',
             this.cameras[0],
@@ -649,11 +646,10 @@ ShortCache.prototype.update = function(requestPosition,position){
         then(function(data){
             self.updating = false;
 
-
             var chunks = data.data.reply;
 
             if(chunks.length == 0){
-                console.log("no chunks for this camera and interval");
+                //console.log("no chunks for this camera and interval");
             }
 
             if(chunks.length > 0 && parseInt(chunks[0].startTimeMs) < requestPosition){ // Crop first chunk.
@@ -681,12 +677,12 @@ ShortCache.prototype.update = function(requestPosition,position){
 // Check playing date - return videoposition if possible
 ShortCache.prototype.checkPlayingDate = function(positionDate){
     if(positionDate < this.start){ //Check left boundaries
-        console.log("too left!",new Date(positionDate), new Date(this.start), positionDate - this.start);
+        //console.log("too left!",new Date(positionDate), new Date(this.start), positionDate - this.start);
         return false; // Return negative value - outer code should request new videocache
     }
 
     if(positionDate > this.lastPlayedDate ){
-        console.log("too right!",new Date(positionDate), new Date(this.lastPlayedDate), positionDate - this.lastPlayedDate);
+        //console.log("too right!",new Date(positionDate), new Date(this.lastPlayedDate), positionDate - this.lastPlayedDate);
         return false;
     }
 
@@ -701,7 +697,7 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
     }
 
     if(typeof(lastPosition)=='undefined'){// No checkpoints - go to live
-        console.log("no checkpoints found - use the start point!");
+        //console.log("no checkpoints found - use the start point!");
         return positionDate - this.start;
     }
 
@@ -726,7 +722,6 @@ ShortCache.prototype.setPlayingPosition = function(position){
         // Estimate current playing position
         this.playedPosition = lastPosition + position - this.checkPoints[lastPosition];
 
-        console.log("back on timeline");
 
         this.update(this.checkPoints[lastPosition], lastPosition);// Request detailization from that position and to the future - restore track
     }

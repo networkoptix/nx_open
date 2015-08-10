@@ -56,7 +56,7 @@ angular.module('webadminApp')
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
                 getSettings(true).catch(function (error) {
-                    console.warn ("remove hack here!!!");
+                    //TODO: remove hack here!!!;
                     return;
 
                     $log.error(error);// if server can't handle moduleInformation - it's offline - show dialog alike restart

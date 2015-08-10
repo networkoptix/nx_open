@@ -179,7 +179,7 @@ angular.module('webadminApp')
 
                         scope.vgPlayerReady({$API:scope.vgApi});
                     }, function (api) {
-                        console.alert("some error");
+                        console.error("some error");
                     });
                 }
 
@@ -199,7 +199,7 @@ angular.module('webadminApp')
 
                             scope.vgPlayerReady({$API: api});
                         }, function (api) {
-                            console.alert("some error");
+                            console.error("some error");
                         }, function (position, duration) {
                             scope.vgUpdateTime({$currentTime: position, $duration: duration});
                         });
@@ -220,7 +220,7 @@ angular.module('webadminApp')
 
                         scope.vgPlayerReady({$API:api});
                     }, function (api) {
-                        console.alert("some error");
+                        console.error("some error");
                     });
 
                 }
@@ -241,16 +241,16 @@ angular.module('webadminApp')
 
                         /* Start listening for streamStarted event */
                         locomote.on('streamStarted', function() {
-                            console.log('stream has started');
+                            //console.log('stream has started');
                         });
 
                         /* If any error occurs, we should take action */
                         locomote.on('error', function(err) {
-                            console.log(err);
+                            console.error(err);
                         });
 
                         if (scope.vgSrc) {
-                            console.log('play',scope.vgSrc[2].src);
+                            //console.log('play',scope.vgSrc[2].src);
                             scope.vgApi.play(scope.vgSrc[2].src);
                         }
 
