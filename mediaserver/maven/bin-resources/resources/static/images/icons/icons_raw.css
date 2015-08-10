@@ -1,0 +1,170 @@
+body { 
+background-color: #1C2327; 
+}
+
+div {
+border:1px solid #263137;
+margin: 10px;
+float: left;
+}
+
+span {
+width:100%;
+float: left;
+display:block;}
+
+.s100 {
+width:100px;
+height:100PX;
+}
+
+.s50 {
+width: 50px;
+height: 50px;
+}
+
+.s40 {
+width: 40px;
+height: 40px;
+}
+
+.s30 {
+width: 30px;
+height: 30px;
+}
+
+.s20 {
+width: 20px;
+height: 20px;
+}
+
+.s10 {
+width: 10px;
+height: 10px;
+}
+
+.play {
+background: url(icons_sprite.png) 0px 0px;
+}
+
+.pause {
+background: url(icons_sprite.png) -20px 0px;
+}
+
+.minus {
+background: url(icons_sprite.png) -40px 0px;
+}
+
+.plus {
+background: url(icons_sprite.png) -60px 0px;
+}
+
+.fullscreen {
+background: url(icons_sprite.png) -80px 0px;
+}
+
+.exit-fullscreen {
+background: url(icons_sprite.png) -100px 0px;
+}
+
+.info-sign {
+background: url(icons_sprite.png) -120px 0px;
+}
+
+.menu-up{
+background: url(icons_sprite.png) -140px 0px;
+}
+
+.menu-down {
+background: url(icons_sprite.png) -160px 0px;
+}
+
+.menu-left {
+background: url(icons_sprite.png) -180px 0px;
+}
+
+.menu-right {
+background: url(icons_sprite.png) -200px 0px;
+}
+
+.camera-recorded {
+background: url(icons_sprite.png) -220px 00px;
+}
+
+.camera-not-recorded {
+background: url(icons_sprite.png) -240px 0px;
+}
+
+.collapse-up {
+background: url(icons_sprite.png) -260px 0px;
+}
+
+.collapse-down {
+background: url(icons_sprite.png) -280px 0px;
+}
+
+.small-camera-recorded {
+background: url(icons_sprite.png) 0px -50px;
+}
+
+.small-camera-not-recorded {
+background: url(icons_sprite.png) -10px -50px;
+}
+
+.small-camera-offline {
+background: url(icons_sprite.png) -20px -50px;
+}
+
+.server {
+background: url(icons_sprite.png) 0px -20px;
+}
+
+.server-current {
+background: url(icons_sprite.png) -30px -20px;
+}
+
+.server-offline {
+background: url(icons_sprite.png) -60px -20px;
+}
+
+
+.cap-unauthorized{
+background: url(icons_sprite.png) -90px -20px;
+}
+
+.cap-offline {
+background: url(icons_sprite.png) -120px -20px;
+}
+
+.camera-vew-preloader {
+background: url(camera_view_preloader.gif) 0px 0px;
+}
+
+.camera-vew-unauthorized {
+background: url(icons_sprite.png) 0px -60px;
+}
+
+.camera-vew-offline {
+background: url(icons_sprite.png) -100px -60px;
+}
+
+.camera-vew-error {
+background: url(icons_sprite.png) -200px -60px;
+}
+
+
+@media 
+only screen and (-webkit-min-device-pixel-ratio: 1.5),
+only screen and (min--moz-device-pixel-ratio: 1.5),
+only screen and (min-resolution: 240dpi) {
+.play, .pause, .minus, .plus, .fullscreen, .exit-fullscreen, .info-sign, .menu-up, .menu-down, .menu-left, .menu-right, .camera-recorded, .camera-not-recorded, .collapse-up, .collapse-down, .small-camera-recorded, .small-camera-not-recorded, .small-camera-offline, .server, .server-current, .server-offline, .cap-unauthorized, .cap-offline, .camera-vew-unauthorized, .camera-vew-offline, .camera-vew-error {
+    background-image: url(icons_sprite@2x.png);
+	background-size: 300px 160px; 
+}
+
+.camera-vew-preloader {
+	background-image: url(camera_view_preloader@2x.gif);
+	background-size: 100px 100px; 
+}
+
+}

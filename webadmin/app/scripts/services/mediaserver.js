@@ -6,6 +6,7 @@ angular.module('webadminApp')
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
 
+
         var proxy = '';
         if(location.search.indexOf('proxy=')>0){
             var params = location.search.replace('?','').split('&');
@@ -13,6 +14,10 @@ angular.module('webadminApp')
                 var pair = params[i].split("=");
                 if(pair[0] === 'proxy'){
                     proxy = '/proxy/' + pair[1];
+                    if(pair[1] == 'demo'){
+                        proxy = Config.demo;
+                    }
+
                     break;
                 }
             }
@@ -51,6 +56,9 @@ angular.module('webadminApp')
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
                 getSettings(true).catch(function (error) {
+                    console.warn ("remove hack here!!!");
+                    return;
+
                     $log.error(error);// if server can't handle moduleInformation - it's offline - show dialog alike restart
                     offlineDialog = $modal.open({
                         templateUrl: 'offline_modal',
@@ -69,11 +77,37 @@ angular.module('webadminApp')
             return request;
         }
         return {
+            url:function(){
+                return proxy;
+            },
+            mediaDemo:function(){
+                if(proxy == Config.demo){
+                    return Config.demoMedia;
+                }
+                return false;
+            },
             logUrl:function(params){
                 return proxy + '/api/showLog' + (params||'');
             },
+            authForMedia:function(){
+                //return ipCookie('authKey'); // TODO: REMOVE
+                return ipCookie('auth');
+            },
+            authForRtsp:function(){
+                //return ipCookie('authKey'); // TODO: REMOVE
+                return ipCookie('auth_rtsp');
+            },
+
+            previewUrl:function(cameraPhysicalId,time,width,height){
+                return proxy + '/api/image' +
+                    '?physicalId=' + cameraPhysicalId +
+                    (width? '&width=' + width:'') +
+                    (height? '&height=' + height:'') +
+                    ('&time=' + (time || 'LATEST')); // mb LATEST?
+
+            },
             hasProxy:function(){
-              return proxy !=='';
+                return proxy !=='';
             },
             checkAdmin:function(){
                 var deferred = $q.defer();
@@ -139,7 +173,9 @@ angular.module('webadminApp')
                 }
                 return cacheCurrentUser;
             },
-            getRecords:function(serverUrl,physicalId,startTime,endTime,detail,periodsType){
+            getRecords:function(serverUrl,physicalId,startTime,endTime,detail,limit,periodsType){
+
+                //console.log("getRecords",serverUrl,physicalId,startTime,endTime,detail,periodsType);
                 var d = new Date();
                 if(typeof(startTime)==='undefined'){
                     startTime = d.getTime() - 30*24*60*60*1000;
@@ -158,13 +194,18 @@ angular.module('webadminApp')
                 if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
                     serverUrl = '/proxy/'+ serverUrl + '/';
                 }
+                if( proxy == Config.demo){
+                    serverUrl = proxy + '/';
+                }
                 //RecordedTimePeriods
-                return wrapRequest($http.get(serverUrl + 'api/RecordedTimePeriods' +
+                return  wrapRequest($http.get(serverUrl + 'ec2/recordedTimePeriods' +
                     '?physicalId=' + physicalId +
                     '&startTime=' + startTime +
                     '&endTime=' + endTime +
                     '&detail=' + detail +
-                    '&periodsType=' + periodsType));
+                    '&periodsType=' + periodsType +
+                    (limit?'&limit=' + limit:'') +
+                    '&flat'));
             }
         };
     });

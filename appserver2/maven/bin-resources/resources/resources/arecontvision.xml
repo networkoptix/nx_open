@@ -26,18 +26,46 @@
         </resource>
         <resource name = "1225" public ="ArecontVision_Abstract">
             <params>
-                <param name = "MaxSensorWidth" default_value ="1280"/>
-                <param name = "MaxSensorHeight" default_value ="960"/>
-                <param name = "MaxFPS" default_value ="37"/>
+                <param name = "MaxSensorWidth" default_value = "1280"/>
+                <param name = "MaxSensorHeight" default_value = "960"/>
+                <param name = "MaxFPS" default_value = "37"/>
             </params>
         </resource>
         <resource name = "1245" public ="ArecontVision_Abstract">
             <params>
-                <param name = "MaxSensorWidth" default_value ="1280"/>
-                <param name = "MaxSensorHeight" default_value ="1024"/>
+                <param name = "MaxSensorWidth" default_value = "1280"/>
+                <param name = "MaxSensorHeight" default_value = "1024"/>
                 <param name = "MaxFPS" default_value ="42"/>
             </params>
         </resource>
-
+        <resource name = "10215" public = "10005"/>
+        <resource name = "5585" public = "8365">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "1280"/>
+                <param name = "MaxSensorHeight" default_value = "960"/>
+                <param name = "MaxFPS" default_value = "12"/>
+            </params>
+        </resource>
+        <resource name = "1555" public = "ArecontVision_Abstract">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "1280"/>
+                <param name = "MaxSensorHeight" default_value = "960"/>
+                <param name = "MaxFPS" default_value = "42"/>
+            </params>
+        </resource>        
+        <resource name = "12586" public = "12176"/>
+        <resource name = "12585" public = "12176"/>        
+        <resource name = "20585" public = "20185"/>
+        <resource name = "3215" public = "3226"/>
+        <resource name = "3216" public = "3226"/>        
+        <resource name = "1215" public = "1115">
+            <params>
+                <param name = "MaxFPS" default_value = "37"/>
+            </params>
+        </resource>
+        <resource name = "2215" public = "2115"/>
+        <resource name = "2216" public = "2215"/>
+        <resource name = "5215" public = "5115"/>
+        
     </oem>
 </resources>

@@ -400,7 +400,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &li
     QnRequestParamList params;
 
     for(const QnNetworkResourcePtr& netResource: list)
-        params << QnRequestParam("physicalId", netResource->getPhysicalId());
+        params << QnRequestParam(QLatin1String(Qn::CAMERA_UNIQUE_ID_HEADER_NAME), netResource->getPhysicalId());
     params << QnRequestParam("startTime", QString::number(startTimeMs));
     params << QnRequestParam("endTime", QString::number(endTimeMs));
     params << QnRequestParam("detail", QString::number(detail));

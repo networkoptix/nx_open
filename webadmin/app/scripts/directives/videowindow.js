@@ -1,0 +1,297 @@
+'use strict';
+
+'use strict';
+/**
+ * This is smart video-plugin.
+ * 1. It gets list of possible video-sources in different formats (each requires mime-type)
+ * (Outer code decides, if some video-format is supported by exact server)
+ * 2. Detects browser and operating system
+ * 3. Chooses best possible video-source for this browser
+ * 4. If there is now such format - he tries to detect possible plugin for rtsp and use it
+ *
+ * This plugin hides details from outer code either.
+ *
+ * API:
+ * update playing time handler
+ * change source
+ * play/pause
+ * seekPosition - later
+ * playingSpeed - later
+ *
+ */
+angular.module('webadminApp')
+    .directive('videowindow', ['$interval','$timeout','animateScope', function ($interval,$timeout,animateScope) {
+        return {
+            restrict: 'E',
+            scope: {
+                vgUpdateTime:"&",
+                vgPlayerReady:"&",
+                vgSrc:"="
+            },
+            templateUrl: 'views/components/videowindow.html',// ???
+
+            link: function (scope, element/*, attrs*/) {
+
+
+                var mimeTypes = {
+                    'hls': 'application/x-mpegURL',
+                    'webm': 'video/webm',
+                    'rtsp': 'application/x-rtsp',
+                    'flv': 'video/x-flv',
+                    'mp4': 'video/mp4'
+                };
+
+                function getFormatSrc(mediaformat) {
+                    var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
+                    return src?src.src:null;
+                }
+
+                function detectBestFormat(){
+                    // return "flashls";
+
+                    //This function gets available sources for camera and chooses the best player for this browser
+
+                    //return "rtsp"; // To debug some format - force it to work
+
+                    //We have options:
+                    // webm - for good desktop browsers
+                    // webm-codec - for IE. Detect
+                    // native-hls - for mobile browsers
+                    // flv - for desktop browsers - not supported yet
+                    // rtsp - for desktop browsers
+                    // activex-rtsp - for some browsers - not supported yet
+                    // flashls - for desktop browsers
+                    // jshls - for desktop browsers - not supported yet
+
+                    function canPlayNatively(type){
+                        var res = false;
+                        var v = document.createElement('video');
+                        if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
+                            res = true; // we have webm codec!
+                        }
+                        return res;
+                    }
+                    var weHaveWebm = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['webm'];});
+                    var weHaveHls = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['hls'];});
+                    var weHaveRtsp = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['rtsp'];});
+
+                    // Test native support. Native is always better choice
+                    if(weHaveWebm && canPlayNatively("webm")){ // webm is our best format for now
+                        return "webm";
+                    }
+
+                    if(weHaveHls && canPlayNatively("hls")){ // webm is our best format for now
+                        return "native-hls";
+                    }
+
+                    // Hardcode native support
+                    if(window.jscd.os == "Android" && weHaveWebm){
+                        console.warn("hardcoded support for webm on android");
+                        return "webm"; // TODO: Try removing this line.
+                    }
+
+                    if(window.jscd.mobile && weHaveHls){
+                        console.warn("hardcoded support for hls on mobile");
+                        return "native-hls"; // Only one choice on mobile.
+                        // TODO: Try removing this line.
+                    }
+
+                    // No native support
+                    //Presume we are on desktop:
+                    switch(window.jscd.browser){
+                        case 'Microsoft Internet Explorer':
+                            // Check version here
+                            if(weHaveWebm )
+                            {
+                                scope.ieNoWebm = true;
+                            }
+
+                            if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
+                                return "flashls";
+                            }
+
+                            /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
+                                return "jshls";
+                            }*/
+
+                            return false; // IE9 - No other supported formats
+
+
+                        case "Safari": // TODO: Try removing this line.
+                            if(weHaveHls) {
+                                return "native-hls";
+                            }
+
+                        case "Chrome":
+                        case "Firefox":
+                        case "Opera":
+                        case "Webkit":
+                        default:
+                            if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
+                                return "flashls";
+                            }
+                            if(weHaveHls) {
+                                return "jshls";// We are hoping that we have some good browser
+                            }
+                            if(weHaveRtsp){
+                                return "rtsp";
+                            }
+                            return false; // IE9 - No supported formats
+                    }
+
+                    return false; // No supported formats
+                }
+
+
+                //TODO: remove ID, generate it dynamically
+
+                var activePlayer = null;
+                function recyclePlayer(player){
+                    if(activePlayer != player) {
+                        element.find("#videowindow").html("");
+                        scope.vgPlayerReady({$API: null});
+                    }
+                    activePlayer = player;
+
+                }
+
+                function initVideogular() {
+                    scope.videogular = true;
+                }
+
+                // TODO: Create common interface for each player, html5 compatible or something
+                // TODO: move supported info to config
+                // TODO: Support new players
+
+                function initNativePlayer(format){
+                    scope.videogular = false;
+                    nativePlayer.init(element.find("#videowindow"), function (api) {
+                        scope.vgApi = api;
+
+                        if (scope.vgSrc) {
+                            scope.vgApi.load(getFormatSrc(format),mimeTypes[format]);
+
+                            scope.vgApi.addEventListener("timeupdate",function(event,arg2,arg3){
+                                //console.log("timeupdate",event,arg2,arg3,scope.vgApi, scope.vgApi.currentTime);
+                                scope.vgUpdateTime({$currentTime:event.srcElement.currentTime, $duration: event.srcElement.duration});
+                            });
+                        }
+
+                        scope.vgPlayerReady({$API:scope.vgApi});
+                    }, function (api) {
+                        console.alert("some error");
+                    });
+                }
+
+                function initFlashls() {
+                    scope.videogular = false;
+                    scope.flashls = true;
+                    scope.flashSource = "components/flashlsChromeless.swf";
+                    scope.flashParam = flashlsAPI.flashParams();
+
+                    if(!flashlsAPI.ready()) {
+                        flashlsAPI.init("videowindow", function (api) {
+                            scope.vgApi = api;
+
+                            if (scope.vgSrc) {
+                                scope.vgApi.load(getFormatSrc('hls'));
+                            }
+
+                            scope.vgPlayerReady({$API: api});
+                        }, function (api) {
+                            console.alert("some error");
+                        }, function (position, duration) {
+                            scope.vgUpdateTime({$currentTime: position, $duration: duration});
+                        });
+                    }else{
+                        flashlsAPI.load(getFormatSrc('hls'));
+                    }
+                }
+
+                function initJsHls(){
+                    scope.videogular = false;
+
+                    jshlsAPI.init( element.find("#videowindow"), function (api) {
+                        scope.vgApi = api;
+
+                        if (scope.vgSrc) {
+                            scope.vgApi.load(getFormatSrc('hls'));
+                        }
+
+                        scope.vgPlayerReady({$API:api});
+                    }, function (api) {
+                        console.alert("some error");
+                    });
+
+                }
+
+                function initRtsp(){
+                    scope.videogular = false;
+                    var locomote = new Locomote('videowindow', /*'bower_components/locomote/dist/Player.swf'/**/'components/Player.swf'/**/);
+                    locomote.on('apiReady', function() {
+                        scope.vgApi = locomote;
+
+                        /* Tell Locomote to play the specified media */
+                        if(!scope.vgApi.load ) {
+                            scope.vgApi.load = scope.vgApi.play;
+                            scope.vgApi.play = function(){
+                                scope.vgApi.load(getFormatSrc('rtsp'));
+                            }
+                        }
+
+                        /* Start listening for streamStarted event */
+                        locomote.on('streamStarted', function() {
+                            console.log('stream has started');
+                        });
+
+                        /* If any error occurs, we should take action */
+                        locomote.on('error', function(err) {
+                            console.log(err);
+                        });
+
+                        if (scope.vgSrc) {
+                            console.log('play',scope.vgSrc[2].src);
+                            scope.vgApi.play(scope.vgSrc[2].src);
+                        }
+
+                        scope.vgPlayerReady({$API:api});
+                    });
+                }
+
+
+
+                scope.$watch("vgSrc",function(){
+                    if(/*!scope.vgApi && */scope.vgSrc ) {
+                        var format = detectBestFormat();
+                        recyclePlayer(format);// Remove old player. TODO: recycle it later
+
+                        switch(format){
+                            case "flashls":
+                                initFlashls();
+                                break;
+
+                            case "jshls":
+                                initJsHls();
+                                break;
+
+                            case "rtsp":
+                                initRtsp();
+                                break;
+
+                            case "native-hls":
+                                initNativePlayer("hls");
+                                break;
+
+                            case "webm":
+                            default:
+                                initNativePlayer(format);
+                                break;
+                        }
+                    }
+                    //if(scope.vgApi && scope.vgSrc ) {
+                    //    scope.vgApi.load(scope.vgSrc[0].src);
+                    //}
+                });
+            }
+        }
+    }]);

@@ -46,7 +46,7 @@ void deserialize_field(const QVariant &value, QnAuthSession *target)
     QnByteArrayConstRef ref(tmp);
     QList<QnByteArrayConstRef> params = ref.split(DELIMITER);
     if (params.size() > 0)
-        target->id = QnUuid::fromRfc4122(params[0]);
+        target->id = QnUuid(params[0]);
     if (params.size() > 1)
         target->userName = QString::fromUtf8(params[1]);
     if (params.size() > 2)
