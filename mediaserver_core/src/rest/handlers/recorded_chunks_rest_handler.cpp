@@ -88,6 +88,8 @@ namespace {
 
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
+    static const qint64 USEC_PER_MS = 1000;
+
     Q_UNUSED(path)
     qint64 startTime = -1;
     qint64 endTime = -1;
@@ -118,10 +120,10 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         }
         else if (params[i].first == "startTime") 
         {
-            startTime = parseDateTime(params[i].second.toUtf8());
+            startTime = parseDateTime(params[i].second.toUtf8()) / USEC_PER_MS;
         }
         else if (params[i].first == "endTime") {
-            endTime = parseDateTime(params[i].second.toUtf8());
+            endTime = parseDateTime(params[i].second.toUtf8()) / USEC_PER_MS;
         }
         else if (params[i].first == "detail")
             detailLevel = params[i].second.toLongLong();
