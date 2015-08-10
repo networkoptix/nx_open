@@ -21,7 +21,7 @@
 namespace cdb {
 
 typedef DataChangeEvent SystemChangeEvent;
-typedef DataInsertUpdateEvent<SystemData> SystemInsertUpdateEvent;
+typedef DataInsertUpdateEvent<data::SystemData> SystemInsertUpdateEvent;
 
 
 
@@ -51,7 +51,7 @@ public:
     //!Binds system to an account associated with \a authzInfo
     void bindSystemToAccount(
         const AuthorizationInfo& authzInfo,
-        const data::SystemData& systemData,
+        data::SystemData&& systemData,
         std::function<void(ResultCode)> completionHandler );
     void unbindSystem(
         const AuthorizationInfo& authzInfo,
@@ -66,7 +66,7 @@ public:
     void getSystems(
         const AuthorizationInfo& authzInfo,
         const DataFilter& filter,
-        std::function<void(ResultCode, TransactionSequence, std::vector<SystemData>)> completionHandler,
+        std::function<void(ResultCode, TransactionSequence, std::vector<data::SystemData>)> completionHandler,
         std::function<void(DataChangeEvent)> eventReceiver = std::function<void(DataChangeEvent)>());
     void addSubscription(
         const AuthorizationInfo& authzInfo,
@@ -79,7 +79,7 @@ public:
     void getActiveSubscriptions(
         const AuthorizationInfo& authzInfo,
         const QnUuid& systemID,
-        std::function<void(ResultCode, std::vector<SubscriptionData>)> completionHandler );
+        std::function<void(ResultCode, std::vector<data::SubscriptionData>)> completionHandler );
     
     /*!
          Only notifications that match \a filter are returned
@@ -95,11 +95,11 @@ public:
 private:
     db::DBResult insertSystemToDB(
         db::DBTransaction& tran,
-        const SystemData& newSystem );
+        const data::SystemData& newSystem );
     void systemAdded(
         db::DBResult resultCode,
-        SystemData&& systemData,
-        std::function<void(ResultCode)> completionHandler )
+        data::SystemData systemData,
+        std::function<void(ResultCode)> completionHandler );
 };
 
 }   //cdb

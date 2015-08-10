@@ -14,7 +14,7 @@ namespace cdb {
 
 void SystemManager::bindSystemToAccount(
     const AuthorizationInfo& authzInfo,
-    const data::SystemData& systemData,
+    data::SystemData&& systemData,
     std::function<void(ResultCode)> completionHandler )
 {
     QnUuid accountID;
@@ -25,7 +25,7 @@ void SystemManager::bindSystemToAccount(
     }
 
     using namespace std::placeholders;
-    db::DBManager::instance()->executeUpdate(
+    db::DBManager::instance()->executeUpdate<data::SystemData>(
         std::bind(&SystemManager::insertSystemToDB, this, _1, _2),
         std::move(systemData),
         std::bind(&SystemManager::systemAdded, this, _1, _2, std::move(completionHandler)) );
@@ -34,7 +34,7 @@ void SystemManager::bindSystemToAccount(
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
     const DataFilter& filter,
-    std::function<void(ResultCode, TransactionSequence, std::vector<SystemData>)> completionHandler,
+    std::function<void(ResultCode, TransactionSequence, std::vector<data::SystemData>)> completionHandler,
     std::function<void(DataChangeEvent)> eventReceiver )
 {
     if( authzInfo.accessAllowedToOwnDataOnly() )
@@ -44,7 +44,10 @@ void SystemManager::getSystems(
         //TODO authInfo or authzInfo? Get rid of this question at compile time
         if( !authzInfo.get(cdb::param::accountID, &accountID) )
         {
-            completionHandler( ResultCode::notAuthorized, INVALID_TRANSACTION, std::vector<SystemData>() );
+            completionHandler(
+                ResultCode::notAuthorized,
+                INVALID_TRANSACTION,
+                std::vector<data::SystemData>() );
             return;
         }
     }
@@ -62,7 +65,7 @@ void SystemManager::getSystems(
 
 db::DBResult SystemManager::insertSystemToDB(
     db::DBTransaction& tran,
-    const SystemData& newSystem )
+    const data::SystemData& newSystem )
 {
     //sql: inserting (/updating?) record
     //sql: fetching newly created (/existing?) record (if needed)
@@ -74,8 +77,8 @@ db::DBResult SystemManager::insertSystemToDB(
 }
 
 void SystemManager::systemAdded(
-    db::DBResult resultCode,
-    SystemData&& systemData,
+    db::DBResult dbResult,
+    data::SystemData systemData,
     std::function<void(ResultCode)> completionHandler )
 {
     if( dbResult == db::DBResult::ok )
@@ -87,18 +90,3 @@ void SystemManager::systemAdded(
 }
 
 }   //cdb
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

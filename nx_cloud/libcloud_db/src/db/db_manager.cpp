@@ -17,16 +17,5 @@ DBResult DBTransaction::commit()
 }
 
 
-void DBManager::executeUpdate( std::function<DBResult(DBTransaction&)> dbUpdateFunc )
-{
-    //TODO #ak
-}
-
-void DBManager::executeSelect( std::function<DBResult()> dbSelectFunc )
-{
-    //TODO #ak
-}
-
-
 }   //db
 }   //cdb

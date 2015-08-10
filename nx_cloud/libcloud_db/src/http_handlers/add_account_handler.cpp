@@ -30,7 +30,7 @@ namespace cdb
 
     void AddAccountHttpHandler::processRequest(
         AuthorizationInfo&& authzInfo,
-        const data::AccountData& accountData,
+        data::AccountData&& accountData,
         nx_http::Response* const /*response*/,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,
@@ -39,7 +39,7 @@ namespace cdb
         m_completionHandler = std::move( completionHandler );
         AccountManager::instance()->addAccount(
             authzInfo,
-            accountData,
+            std::move(accountData),
             std::bind(
                 &AddAccountHttpHandler::addAccountDone,
                 this,

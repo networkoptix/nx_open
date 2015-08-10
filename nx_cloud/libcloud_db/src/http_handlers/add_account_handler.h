@@ -33,7 +33,7 @@ protected:
     //!Implementation of \a AbstractFiniteMsgBodyHttpHandler::processRequest
     virtual void processRequest(
         AuthorizationInfo&& authzInfo,
-        const data::AccountData& accountData,
+        data::AccountData&& accountData,
         nx_http::Response* const response,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,

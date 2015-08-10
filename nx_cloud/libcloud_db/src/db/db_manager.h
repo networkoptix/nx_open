@@ -47,15 +47,24 @@ public:
     void executeUpdate(
         std::function<DBResult(DBTransaction&, const InputData&, OutputData* const)> dbUpdateFunc,
         InputData&& input,
-        std::function<void(DBResult, InputData&&, OutputData&&)> completionHandler );
+        std::function<void(DBResult, InputData, OutputData&&)> completionHandler ) 
+    {
+        //TODO #ak
+    }
     //!Overload for updates with no output data
     template<typename InputData>
     void executeUpdate(
         std::function<DBResult(DBTransaction&, const InputData&)> dbUpdateFunc,
         InputData&& input,
-        std::function<void(DBResult, InputData&&)> completionHandler );
+        std::function<void(DBResult, InputData)> completionHandler )
+    {
+        //TODO #ak
+    }
     template<typename OutputData>
-    void executeSelect( std::function<DBResult(OutputData* const)> dbSelectFunc );
+    void executeSelect( std::function<DBResult(OutputData* const)> dbSelectFunc )
+    {
+        //TODO #ak
+    }
 };
 
 

@@ -84,7 +84,7 @@ namespace cdb
         //!Implement request-specific logic in this function
         virtual void processRequest(
             AuthorizationInfo&& authzInfo,
-            const InputData& inputData,
+            InputData&& inputData,
             //const stree::AbstractResourceReader& inputParams,
             nx_http::Response* const response,
             std::function<void(

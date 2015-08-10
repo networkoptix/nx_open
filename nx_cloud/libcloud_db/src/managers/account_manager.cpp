@@ -7,20 +7,18 @@
 
 #include <functional>
 
-#include "db/db_manager.h"
-
 
 namespace cdb {
 
 void AccountManager::addAccount(
     const AuthorizationInfo& authzInfo,
-    const data::AccountData& accountData,
+    data::AccountData&& accountData,
     std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler )
 {
     //TODO #ak
     
     using namespace std::placeholders;
-    db::DBManager::instance()->executeUpdate(
+    db::DBManager::instance()->executeUpdate<data::AccountData, data::EmailVerificationCode>(
         std::bind(&AccountManager::insertAccount, this, _1, _2, _3),
         std::move(accountData),
         std::bind(&AccountManager::accountAdded, this, _1, _2, _3, std::move(completionHandler)) );
@@ -50,13 +48,13 @@ db::DBResult AccountManager::insertAccount(
     //TODO #ak executing sql query
     
     
-    return DBResult::ok;
+    return db::DBResult::ok;
 }
 
 void AccountManager::accountAdded(
     db::DBResult resultCode,
-    data::AccountData&& accountData,
-    data::EmailVerificationCode&& resultData,
+    data::AccountData accountData,
+    data::EmailVerificationCode resultData,
     std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler )
 {
     //TODO #ak
@@ -70,25 +68,7 @@ void AccountManager::accountAdded(
     
     completionHandler(
         resultCode == db::DBResult::ok ? ResultCode::ok : ResultCode::dbError,
-        std:move( resultData ) );
+        std::move( resultData ) );
 }
 
 }   //cdb
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

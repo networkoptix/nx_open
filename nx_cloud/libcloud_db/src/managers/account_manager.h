@@ -14,6 +14,7 @@
 
 #include "access_control/types.h"
 #include "data/account_data.h"
+#include "db/db_manager.h"
 #include "types.h"
 
 
@@ -30,7 +31,7 @@ public:
     //!Adds account in "not activated" state and sends verification email to the address provided
     void addAccount(
         const AuthorizationInfo& authzInfo,
-        const data::AccountData& accountData,
+        data::AccountData&& accountData,
         std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler );
     //!On success, account moved to "activated" state
     void verifyAccountEmailAddress(
@@ -51,9 +52,10 @@ private:
         data::EmailVerificationCode* const resultData );
     void accountAdded(
         db::DBResult resultCode,
-        data::AccountData&& accountData,
-        data::EmailVerificationCode&& resultData,
+        data::AccountData accountData,
+        data::EmailVerificationCode resultData,
         std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler );
+};
 
 }   //cdb
 
