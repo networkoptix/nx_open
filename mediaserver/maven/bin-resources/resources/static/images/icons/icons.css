@@ -1,0 +1,112 @@
+
+.glyphicon.glyphicon-play {
+    background: url(icons_sprite.png) -18px -16px;
+    width: 18px;
+    height: 18px;
+}
+
+.glyphicon.glyphicon-pause {
+    background: url(icons_sprite.png) -67px -17px;
+    width: 16px;
+    height: 16px;
+}
+
+.glyphicon.glyphicon-minus {
+    background: url(icons_sprite.png) -12px -62px;
+    width: 16px;
+    height: 16px;
+}
+
+.glyphicon.glyphicon-plus {
+    background: url(icons_sprite.png) -52px -62px;
+    width: 16px;
+    height: 16px;
+}
+
+.glyphicon.glyphicon-fullscreen {
+    background: url(icons_sprite.png) -92px -62px;
+    width: 16px;
+    height: 16px;
+}
+
+.exit-fullscreen {
+background: url(icons_sprite.png) -120px -50px;
+}
+
+.info {
+background: url(icons_sprite.png) -160px -50px;
+}
+
+
+.arrow-left {
+background: url(icons_sprite.png) -280px -50px;
+}
+
+.arrow-right {
+background: url(icons_sprite.png) -320px -50px;
+}
+
+.camera-recorded {
+background: url(icons_sprite.png) -0px -90px;
+}
+
+.camera-not-recorded {
+background: url(icons_sprite.png) -30px -90px;
+}
+
+
+.arrow-up {
+    background: url(icons_sprite.png) -60px -90px;
+}
+
+.arrow-down {
+    background: url(icons_sprite.png) -90px -90px;
+}
+
+.glyphicon.glyphicon-chevron-up {
+    background: url(icons_sprite.png) -212px -62px;
+    width: 16px;
+    height: 16px;
+}
+
+.glyphicon.glyphicon-chevron-down {
+    background: url(icons_sprite.png) -252px -62px;
+    width: 16px;
+    height: 16px;
+}
+
+.small-camera-recorded {
+background: url(icons_sprite.png) 0px -120px;
+}
+
+.small-camera-not-recorded {
+background: url(icons_sprite.png) -10px -120px;
+}
+
+.small-camera-offline {
+background: url(icons_sprite.png) -20px -120px;
+}
+
+@media 
+only screen and (-webkit-min-device-pixel-ratio: 1.5),
+only screen and (min--moz-device-pixel-ratio: 1.5),
+only screen and (min-resolution: 240dpi) {
+    .glyphicon.glyphicon-play, .glyphicon.glyphicon-pause, .glyphicon.glyphicon-minus, .glyphicon.glyphicon-plus, .glyphicon.glyphicon-fullscreen, .exit-fullscreen, .info, .arrow-up, .arrow-down, .arrow-left, .arrow-right, .camera-recorded, .camera-not-recorded, .glyphicon.glyphicon-chevron-up, .glyphicon.glyphicon-chevron-down, .small-camera-recorded, .small-camera-not-recorded, .small-camera-offline {
+        background-image: url(icons_sprite@2x.png);
+        background-size: 360px 130px;
+    }
+}
+
+.glyphicon.glyphicon-play:before,
+.glyphicon.glyphicon-pause:before,
+.glyphicon.glyphicon-minus:before,
+.glyphicon.glyphicon-plus:before,
+.glyphicon.glyphicon-fullscreen:before,
+/*.exit-fullscreen, .info, .arrow-up, .arrow-down, .arrow-left, .arrow-right, .camera-recorded, .camera-not-recorded,*/
+.glyphicon.glyphicon-chevron-up:before,
+.glyphicon.glyphicon-chevron-down:before,
+/*.small-camera-recorded, .small-camera-not-recorded, .small-camera-offline*/
+.glyphicon.glyphicon-chevron-up:before,
+.glyphicon.glyphicon-chevron-down:before{
+    display:none;
+}
