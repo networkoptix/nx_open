@@ -142,8 +142,6 @@ angular.module('webadminApp')
                             scope.flashRequired = true;
                             return false; // IE9 - No supported formats
                     }
-
-                    return false; // No supported formats
                 }
 
 
