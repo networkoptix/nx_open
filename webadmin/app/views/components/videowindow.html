@@ -4,14 +4,6 @@
         We recommend using Chrome browser<br>
         <a href="https://tools.google.com/dlpage/webmmf/">Or you can install special codec for IE to get better user experience.</a>
     </div>
-    <div ng-if="videogular">
-        <videogular
-                vg-player-ready="vgPlayerReady({$API: $API})"
-                vg-update-time="vgUpdateTime({$currentTime:$currentTime, $duration:$duration})">
-            <vg-media vg-src="vgSrc"></vg-media>
-            <vg-buffering></vg-buffering>
-        </videogular>
-    </div>
 
     <div id="videowindow" ng-if="flashls">
         <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"

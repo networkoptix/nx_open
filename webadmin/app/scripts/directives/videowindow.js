@@ -155,16 +155,11 @@ angular.module('webadminApp')
 
                 }
 
-                function initVideogular() {
-                    scope.videogular = true;
-                }
-
                 // TODO: Create common interface for each player, html5 compatible or something
                 // TODO: move supported info to config
                 // TODO: Support new players
 
                 function initNativePlayer(format){
-                    scope.videogular = false;
                     nativePlayer.init(element.find("#videowindow"), function (api) {
                         scope.vgApi = api;
 
@@ -184,7 +179,6 @@ angular.module('webadminApp')
                 }
 
                 function initFlashls() {
-                    scope.videogular = false;
                     scope.flashls = true;
                     scope.flashSource = "components/flashlsChromeless.swf";
                     scope.flashParam = flashlsAPI.flashParams();
@@ -209,8 +203,6 @@ angular.module('webadminApp')
                 }
 
                 function initJsHls(){
-                    scope.videogular = false;
-
                     jshlsAPI.init( element.find("#videowindow"), function (api) {
                         scope.vgApi = api;
 
@@ -226,7 +218,6 @@ angular.module('webadminApp')
                 }
 
                 function initRtsp(){
-                    scope.videogular = false;
                     var locomote = new Locomote('videowindow', /*'bower_components/locomote/dist/Player.swf'/**/'components/Player.swf'/**/);
                     locomote.on('apiReady', function() {
                         scope.vgApi = locomote;
