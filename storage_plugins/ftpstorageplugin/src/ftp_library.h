@@ -23,7 +23,12 @@
     \section usage Usage
     You should have NX Mediaserver installed. Put built plugin library in mediaserver/plugin folder and restart mediaserver.
     Connect to the server with client. In external storage selection dialog you should be able to see new storage type (FTP). 
-    Enter valid ftp url and credentials and press Ok.
+    Enter valid ftp url and credentials and press Ok. For example, 
+	\code
+	Url:		ftp://10.2.3.87/path/to/storage
+	Login:		user1
+	Password:	12345678
+	\endcode
 */
 
 namespace nx_spl 
