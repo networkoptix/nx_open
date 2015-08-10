@@ -87,6 +87,49 @@ background: url(icons_sprite.png) -10px -120px;
 background: url(icons_sprite.png) -20px -120px;
 }
 
+
+
+.camera-node.Unauthorized .camera-preview-image{
+    background: url(icons_sprite.png) -90px -20px !important;
+    width:30px;
+    height: 30px;
+}
+.camera-node.Offline .camera-preview-image{
+    background: url(icons_sprite.png) -120px -20px !important;
+    width:30px;
+    height: 30px;
+}
+
+
+
+
+.camera-view-preloader {
+    background: url(camera_view_preloader.gif) 0px 0px;
+    width: 100px;
+    height: 100px;
+}
+
+.camera-view-unauthorized {
+    background: url(icons_sprite.png) 0px -60px;
+    width: 100px;
+    height: 100px;
+}
+
+.camera-view-offline {
+    background: url(icons_sprite.png) -100px -60px;
+    width: 100px;
+    height: 100px;
+}
+
+.camera-view-error {
+    background: url(icons_sprite.png) -200px -60px;
+    width: 100px;
+    height: 100px;
+}
+
+
+
+
 @media 
 only screen and (-webkit-min-device-pixel-ratio: 1.5),
 only screen and (min--moz-device-pixel-ratio: 1.5),

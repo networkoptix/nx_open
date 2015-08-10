@@ -251,7 +251,7 @@ table.webclient-window>tbody>tr>td{
 }
 
 .camera-preview{
-  width:70px !important;
+  width:72px !important;
   height:40px !important;
   margin-right: 10px;
   background-color: black;
@@ -261,19 +261,24 @@ table.webclient-window>tbody>tr>td{
   margin-left:-80px;
 }
 
-
-.camera-preview>img{
-  max-width:70px !important;
-  max-height:40px !important;
-
+.camera-node.Unauthorized .camera-preview,
+.camera-node.Offline .camera-preview{
+  background-color: #212A2F;
+  border: 1px solid #171C1F;
+}
+.camera-preview>.camera-preview-image {
   display:block;
-
   position: relative;
   top: 50%;
   transform: translateY(-50%);
 
   margin-left: auto;
   margin-right: auto;
+}
+.camera-preview>.camera-preview-image>img{
+  visibility:hidden;
+  max-width:72px !important;
+  max-height:40px !important;
 }
 
 .dark-theme .nav > li > a{
