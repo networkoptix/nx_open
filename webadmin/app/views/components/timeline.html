@@ -71,93 +71,12 @@
 
 <div style="position:fixed; left: 10px; bottom: 10px;">
     <div class="btn-group">
-        <button ng-click="isConfigureCollapsed = !isConfigureCollapsed" class="btn btn-sm btn-default">
+        <span class="btn btn-sm btn-default">
             Preset:
-        </button>
+        </span>
         <button type="button" class="btn btn-sm "
                 ng-class="{'btn-primary':preset == activePreset, 'btn-default':preset != activePreset}"
                 ng-repeat="preset in presets"
                 ng-click="selectPreset(preset)">{{$index}}</button>
     </div>
-
-    <div collapse="!isConfigureCollapsed" class="well well-lg" style="position:absolute;width: 800px;  margin-top:-700px; color:black; z-index:1000;">
-
-        <label>Поля <input type="number" ng-model="timelineConfig.labelPadding"></label>
-        <br>
-
-        <b>Верхний уровень:</b>
-        <div>
-            Выравнивание:
-            <label>
-                <input type="radio" ng-model="timelineConfig.topLabelAlign" value="center"> center
-            </label>
-            <label>
-                <input type="radio" ng-model="timelineConfig.topLabelAlign" value="left"> left
-            </label>
-            <label>
-                <input type="radio" ng-model="timelineConfig.topLabelAlign" value="above"> above
-            </label>
-        </div>
-        <label>
-            Вертикальная корректировка: <input type="number" ng-model="timelineConfig.topLabelPositionFix">
-        </label><br/>
-        <label>
-            Шрифт: <input type="number" ng-model="timelineConfig.topLabelFont.size">
-        </label>
-        <label>
-            Толщина: <input type="number" ng-model="timelineConfig.topLabelFont.weight"> (шаг 100)
-        </label>
-
-        <div>
-            Цвет текста:
-            <label>R: <input type="number" ng-model="timelineConfig.topLabelFont.color[0]"></label>
-            <label>G: <input type="number" ng-model="timelineConfig.topLabelFont.color[1]"></label>
-            <label>B: <input type="number" ng-model="timelineConfig.topLabelFont.color[2]"></label>
-        </div>
-
-
-        <div>
-            Цвет маркера:
-            <label>R: <input type="number" ng-model="timelineConfig.topLabelMarkerColor[0]"></label>
-            <label>G: <input type="number" ng-model="timelineConfig.topLabelMarkerColor[1]"></label>
-            <label>B: <input type="number" ng-model="timelineConfig.topLabelMarkerColor[2]"></label>
-        </div>
-        <br>
-        <b>Нижний уровень:</b>
-        <div>
-            Выравнивание:
-            <label><input type="radio" ng-model="timelineConfig.labelAlign" value="center">center</label>
-            <label><input type="radio" ng-model="timelineConfig.labelAlign" value="left">left</label>
-            <label><input type="radio" ng-model="timelineConfig.labelAlign" value="above">above</label>
-        </div>
-        <label>
-            Вертикальная корректировка: <input type="number" ng-model="timelineConfig.labelPositionFix">
-        </label><br/>
-        <label>
-            Высота отметки: <input type="number" ng-model="timelineConfig.labelMarkerHeight">
-        </label><br/>
-        <label>
-            Шрифт: <input type="number" ng-model="timelineConfig.labelFont.size">
-        </label>
-
-        <label>
-            Толщина: <input type="number" ng-model="timelineConfig.labelFont.weight">
-        </label>
-
-        <div>
-            Цвет текста:
-            <label>R: <input type="number" ng-model="timelineConfig.labelFont.color[0]"></label>
-            <label>G: <input type="number" ng-model="timelineConfig.labelFont.color[1]"></label>
-            <label>B: <input type="number" ng-model="timelineConfig.labelFont.color[2]"></label>
-        </div>
-
-
-        <div>
-            Цвет маркера:
-            <label>R: <input type="number" ng-model="timelineConfig.labelMarkerColor[0]"></label>
-            <label>G: <input type="number" ng-model="timelineConfig.labelMarkerColor[1]"></label>
-            <label>B: <input type="number" ng-model="timelineConfig.labelMarkerColor[2]"></label>
-        </div>
-    </div>
-
 </div>

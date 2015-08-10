@@ -153,7 +153,7 @@ angular.module('webadminApp')
                 var activePlayer = null;
                 function recyclePlayer(player){
                     if(activePlayer != player) {
-                        element.find("#videowindow").html("");
+                        element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
                     }
                     activePlayer = player;
@@ -165,7 +165,7 @@ angular.module('webadminApp')
                 // TODO: Support new players
 
                 function initNativePlayer(format){
-                    nativePlayer.init(element.find("#videowindow"), function (api) {
+                    nativePlayer.init(element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
@@ -214,7 +214,7 @@ angular.module('webadminApp')
                 }
 
                 function initJsHls(){
-                    jshlsAPI.init( element.find("#videowindow"), function (api) {
+                    jshlsAPI.init( element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {

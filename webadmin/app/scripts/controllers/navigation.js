@@ -29,6 +29,9 @@ angular.module('webadminApp')
             ipCookie.remove('username',{ path: '/' });
             window.location.reload();
         };
+
+        $scope.webclientEnabled = Config.webclientEnabled;
+
         $scope.alertVisible = true;
         $scope.closeAlert = function(){
             $scope.alertVisible = false;
