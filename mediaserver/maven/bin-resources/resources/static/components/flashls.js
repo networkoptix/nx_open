@@ -2,7 +2,6 @@
 var JSLoaderFragment = {
 
     requestFragment : function(instanceId,url, resourceLoadedFlashCallback, resourceFailureFlashCallback) {
-        //console.log("JSURLStream.onRequestResource");
         if(!this.flashObject) {
             this.flashObject = getFlashMovieObject(instanceId);
         }
@@ -10,7 +9,6 @@ var JSLoaderFragment = {
     },
     abortFragment : function(instanceId) {
         if(this.xhr &&this.xhr.readyState !== 4) {
-            console.log("JSLoaderFragment:abort XHR");
             this.xhr.abort();
         }
     },
@@ -34,18 +32,17 @@ var JSLoaderFragment = {
         }
     },
     xhrReadBytes : function(event) {
-        //console.log("fragment loaded");
         var len = event.currentTarget.response.byteLength;
         var t0 = new Date();
         var res = base64ArrayBuffer(event.currentTarget.response);
         var t1 = new Date();
         this.binding.flashObject[this.resourceLoadedFlashCallback](res,len);
         var t2 = new Date();
-        console.log('encoding/toFlash:' + (t1-t0) + '/' + (t2-t1));
-        console.log('encoding speed/toFlash:' + Math.round(len/(t1-t0)) + 'kB/s/' + Math.round(res.length/(t2-t1)) + 'kB/s');
+        //console.log('encoding/toFlash:' + (t1-t0) + '/' + (t2-t1));
+        //console.log('encoding speed/toFlash:' + Math.round(len/(t1-t0)) + 'kB/s/' + Math.round(res.length/(t2-t1)) + 'kB/s');
     },
     xhrTransferFailed : function(oEvent) {
-        console.log("An error occurred while transferring the file :" + oEvent.target.status);
+        //console.log("An error occurred while transferring the file :" + oEvent.target.status);
         this.binding.flashObject[this.resourceFailureFlashCallback](res);
     }
 };
@@ -61,7 +58,6 @@ var JSLoaderPlaylist = {
     },
     abortPlaylist : function(instanceId) {
         if(this.xhr &&this.xhr.readyState !== 4) {
-            console.log("JSLoaderPlaylist:abort XHR");
             this.xhr.abort();
         }
     },
@@ -86,7 +82,7 @@ var JSLoaderPlaylist = {
         this.binding.flashObject[this.resourceLoadedFlashCallback](event.currentTarget.responseText);
     },
     xhrTransferFailed : function(oEvent) {
-        console.log("An error occurred while transferring the file :" + oEvent.target.status);
+        //console.log("An error occurred while transferring the file :" + oEvent.target.status);
         this.binding.flashObject[this.resourceFailureFlashCallback](res);
     }
 };
@@ -98,7 +94,8 @@ var flashlsAPI = new (function(){
     //We use swfobject to embed player. see https://code.google.com/p/swfobject/wiki/documentation
     var flashParameters = {
         player:"components/flashlsChromeless.swf",
-        id:"flashlsPlayer",
+        id:"flashvideo",
+        name:"flashvideoembed",
         width:"100%",
         height:"100%",
         version: "9.0.0",
@@ -110,14 +107,16 @@ var flashlsAPI = new (function(){
             //movie:"components/flashlsChromeless.swf",
             quality:"high",
             swliveconnect:true,
-            allowScriptAccess:"sameDomain",
-            bgcolor:"#0",
+            allowScriptAccess:"always",
+            bgcolor:"#1C2327",
             allowFullScreen:true,
-            wmode:"window"
-            //FlashVars:"callback=flashlsCallback"
+            wmode:"window",
+            FlashVars:"callback=flashlsCallback"
         },
         attributes:{ // https://code.google.com/p/swfobject/wiki/documentation - see section "How can you configure your Flash content?
-            id:"flashvideowindow"/*,
+            id:"flashvideowindow",
+            name: "flashvideoembed"
+            /*,
             align:"",
             name:"",
             styleclass:"",
@@ -125,15 +124,22 @@ var flashlsAPI = new (function(){
         }
     };
 
+    this.ready = function(){
+        return !!this.flashObject;
+    };
+
+    this.flashParams = function(){
+        return flashParameters.params;
+    };
+
     this.getFlashMovieObject = function (){
-        var movieName = flashParameters.attributes.id || this.element;
+        var movieName = flashParameters.name || this.element;
         if (window.document[movieName])
         {
             return window.document[movieName];
         }
         if (navigator.appName.indexOf("Microsoft Internet")==-1)
         {
-            console.log(document.embeds);
             if (document.embeds && document.embeds[movieName])
                 return document.embeds[movieName];
         }
@@ -142,28 +148,23 @@ var flashlsAPI = new (function(){
             return document.getElementById(movieName);
         }
     };
+    this.embedHandler = function (e){
 
-    this.init = function(element,readyHandler,errorHandler) {
+        if(!this.flashObject) {
+            this.flashObject = this.getFlashMovieObject(); //e.ref is a pointer to the <object>
+            this.readyHandler(this);
+        }
+    };
+
+    this.init = function(element,readyHandler,errorHandler, positionHandler) {
         this.element = element;
         var self = this;
-        var embedHandler = function (e){
-            if(e.success) {
-                self.flashObject = self.getFlashMovieObject(); //e.ref is a pointer to the <object>
 
-                console.log("embedHandler", self.flashObject);
-                //do something with mySWF
-                readyHandler(self);
-            }else{
-                if(errorHandler) {
-                    errorHandler(self);
-                }
-            }
-        };
         this.readyHandler = readyHandler;
         this.errorHandler = errorHandler;
-        flashParameters.flashvars.callback = "flashlsCallback";
+        this.positionHandler = positionHandler;
 
-        swfobject.embedSWF(
+        /*swfobject.embedSWF(
             flashParameters.player,
             element,
             flashParameters.width,
@@ -173,14 +174,19 @@ var flashlsAPI = new (function(){
             flashParameters.flashvars,
             flashParameters.params,
             flashParameters.attributes,
-            embedHandler);
+            function(){
+                console.log("swf ready");
+            });*/
+
     };
 
     
     this.load = function(url) {
-        console.log("load", url);
+        if(!url){
+            return;
+        }
+        //console.log("load video",url);
         this.flashObject.playerLoad(url);
-        this.play();
     };
 
     this.play = function(offset) {
@@ -340,7 +346,7 @@ var flashlsAPI = new (function(){
     };
 
 })();
-
+var timer = 0;
 flashlsAPI.flashlsEvents = {
     ready: function(flashTime) {
         //flashPingDate = flashTime;
@@ -352,7 +358,7 @@ flashlsAPI.flashlsEvents = {
         //this.flashObject = this.getFlashMovieObject();
         //this.readyHandler(this);
 
-        console.log("ready",this);
+        //console.log("ready",this);
         //api = new flashlsAPI(getFlashMovieObject());
     },
     videoSize: function(width, height) {
@@ -452,31 +458,29 @@ flashlsAPI.flashlsEvents = {
         updateLevelInfo();
     },
     position: function(timemetrics) {
-        document.getElementById('mediaInfo').rows[Y_POSITION].cells[X_POSITION].innerHTML =  timemetrics.position.toFixed(2);
-        document.getElementById('mediaInfo').rows[Y_DURATION].cells[X_DURATION].innerHTML =  timemetrics.duration.toFixed(2);
-        document.getElementById('mediaInfo').rows[Y_BUFFER].cells[X_BUFFER].innerHTML =  timemetrics.buffer.toFixed(2);
-        document.getElementById('mediaInfo').rows[Y_BACK_BUFFER].cells[X_BACK_BUFFER].innerHTML =  timemetrics.backbuffer.toFixed(2);
-        document.getElementById('mediaInfo').rows[Y_PLAYLIST_SLIDING].cells[X_PLAYLIST_SLIDING].innerHTML =  timemetrics.live_sliding_main.toFixed(2);
 
-        var event = { time : new Date() - jsLoadDate, buffer : Math.round(1000*timemetrics.buffer), pos: Math.round(1000*timemetrics.position)};
-        var bufEvents = events.buffer, bufEventLen = bufEvents.length;
-        if(bufEventLen > 1) {
-            var event0 = bufEvents[bufEventLen-2],event1 = bufEvents[bufEventLen-1];
-            var slopeBuf0 = (event0.buffer - event1.buffer)/(event0.time-event1.time);
-            var slopeBuf1 = (event1.buffer - event.buffer)/(event1.time-event.time);
 
-            var slopePos0 = (event0.pos - event1.pos)/(event0.time-event1.time);
-            var slopePos1 = (event1.pos - event.pos)/(event1.time-event.time);
-            // compute slopes. if less than 30% difference, remove event1
-            if((slopeBuf0 === slopeBuf1 || Math.abs(slopeBuf0/slopeBuf1 -1) <= 0.3) &&
-                (slopePos0 === slopePos1 || Math.abs(slopePos0/slopePos1 -1) <= 0.3))
-            {
-                bufEvents.pop();
-            }
+        var backbuffer = timemetrics.backbuffer;
+        // TODO: what if video stopped? (buffer goes 0);
+        flashlsAPI.positionHandler(Math.round(backbuffer * 1000))
+
+        if(!timer){
+            timer = (new Date()).getTime();
         }
-        events.buffer.push(event);
-        updateBufferCanvas(timemetrics.position,timemetrics.duration,timemetrics.buffer, timemetrics.backbuffer);
-        refreshCanvas();
+        /*var position = timemetrics.position;
+        var duration = timemetrics.duration;
+        var sliding = timemetrics.live_sliding_main;
+        var buffer = timemetrics.buffer;
+
+        console.log("position changed",
+            (((new Date()).getTime() - timer) / 1000 ).toFixed(2),
+            backbuffer.toFixed(2),
+            position.toFixed(2),
+            "bb:",backbuffer.toFixed(2),
+            (backbuffer - position).toFixed(2),
+            (backbuffer + position).toFixed(2),
+            (buffer + backbuffer).toFixed(2)
+        );*/
     },
     state: function(newState) {
         var event = {time : new Date() - jsLoadDate, type : newState.toLowerCase(), name : ''};
@@ -526,5 +530,6 @@ flashlsAPI.flashlsEvents = {
 
 
 window.flashlsCallback = function(eventName, args) {
+    flashlsAPI.embedHandler();
     flashlsAPI.flashlsEvents[eventName].apply(null, args);
 };
