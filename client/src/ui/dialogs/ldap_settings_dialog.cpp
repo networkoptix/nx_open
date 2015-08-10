@@ -30,7 +30,6 @@ public:
     QPushButton *testButton;
 
     void testSettings();
-    void cancel();
     void showTestResult(const QString &text);
     void stopTesting(const QString &text = QString());
     QnLdapSettings settings() const;
@@ -52,10 +51,9 @@ QnLdapSettingsDialogPrivate::QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *p
 
 void QnLdapSettingsDialogPrivate::testSettings() {
     QnLdapSettings settings = this->settings();
-    // result.timeout = testLdapTimeoutMSec / 1000;
 
     if (!settings.isValid()) {
-        showTestResult(tr("The provided settings are not valid.") + lit("\n") + tr("Could not perform a test."));
+        stopTesting(tr("The provided settings are not valid.") + lit("\n") + tr("Could not perform a test."));
         return;
     }
 
@@ -72,7 +70,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     }
 
     if (!serverConnection) {
-        showTestResult(tr("None of your servers is connected to the Internet.") + lit("\n") + tr("Could not perform a test."));
+        stopTesting(tr("None of your servers is connected to the Internet.") + lit("\n") + tr("Could not perform a test."));
         return;
     }
 
@@ -89,10 +87,6 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     testHandle = serverConnection->testLdapSettingsAsync(settings, dialog, SLOT(at_testLdapSettingsFinished(int, const QnTestLdapSettingsReply&, int)));
 }
 
-void QnLdapSettingsDialogPrivate::cancel() {
-    stopTesting(QString());
-}
-
 void QnLdapSettingsDialogPrivate::showTestResult(const QString &text) {
     dialog->ui->testResultLabel->setText(text);
     dialog->ui->testStackWidget->setCurrentWidget(dialog->ui->testResultPage);
@@ -105,11 +99,9 @@ void QnLdapSettingsDialogPrivate::stopTesting(const QString &text) {
     timeoutTimer->stop();
     testHandle = -1;
 
-    showTestResult(text);
     dialog->ui->buttonBox->button(QDialogButtonBox::Ok)->show();
     testButton->setEnabled(true);
     dialog->ui->fieldsWidget->setEnabled(true);
-
     showTestResult(text);
 }
 
@@ -175,10 +167,7 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
     ui->setupUi(this);
 
     d->testButton = ui->buttonBox->addButton(lit("Test"), QDialogButtonBox::ActionRole);
-    QPushButton *cancelButton = ui->buttonBox->button(QDialogButtonBox::Cancel);
-
     connect(d->testButton, &QPushButton::clicked, d, &QnLdapSettingsDialogPrivate::testSettings);
-    connect(cancelButton, &QPushButton::clicked, d, &QnLdapSettingsDialogPrivate::cancel);
 
     /* Mark some fields as mandatory, so field label will turn red if the field is empty. */
     auto declareMandatoryField = [this](QLabel* label, QLineEdit* lineEdit) {
@@ -208,7 +197,7 @@ void QnLdapSettingsDialog::at_testLdapSettingsFinished(int status, const QnTestL
     if (handle != d->testHandle)
         return;
 
-    d->showTestResult(status != 0 || reply.errorCode != 0 ? tr("Failed") : tr("Success"));
+    d->stopTesting(status != 0 || reply.errorCode != 0 ? tr("Failed") : tr("Success"));
 }
 
 void QnLdapSettingsDialog::accept() {
@@ -226,6 +215,8 @@ void QnLdapSettingsDialog::accept() {
 }
 
 void QnLdapSettingsDialog::reject() {
-    d->stopTesting();
-    base_type::reject();
+    if (d->testHandle != -1)
+        d->stopTesting();
+    else
+        base_type::reject();
 }
