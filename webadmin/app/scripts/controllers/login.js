@@ -56,7 +56,7 @@ angular.module('webadminApp')
                 $scope.authorizing = true;
                 mediaserver.getCurrentUser(true).then(reload).catch(function(error){
                     $scope.authorizing = false;
-                    alert("not authorized ");
+                    alert("Login or password is incorrect");
                 });
             }
         };
