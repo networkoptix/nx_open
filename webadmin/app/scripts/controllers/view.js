@@ -29,7 +29,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.ieNoWebm = true;
         }
 
-
         $scope.activeResolution = 'Auto';
         // detect max resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
