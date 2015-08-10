@@ -2247,7 +2247,8 @@ void MediaServerProcess::run()
 
     fileDeletor.reset();
     storageManager.reset();
-
+    if (m_mediaServer)
+        m_mediaServer->beforeDestroy();
     m_mediaServer.clear();
 }
 
