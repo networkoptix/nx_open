@@ -72,13 +72,21 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         const bool isProxy = false;
         QElapsedTimer t;
         t.restart();
-        bool authInProgress = false;
-        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &authInProgress))
+        AuthMethod::Value usedMethod = AuthMethod::noAuth;
+        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &usedMethod))
         {
-            if (!authInProgress) {
-                auto session = authSession();
-                session.id = QnUuid::createUuid();
-                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
+            // report error for digest for second try only, for any other used type report immediately
+            if (usedMethod != AuthMethod::noAuth) 
+            {   // noAuth with fail result possible if no digest in database yet, we need one more request to fill it.
+                int retryThreshold = (usedMethod == AuthMethod::httpDigest ? 0 : -1);
+                if (d->authenticatedOnce)
+                    ++retryThreshold;
+                if (retryCount > retryThreshold)
+                {
+                    auto session = authSession();
+                    session.id = QnUuid::createUuid();
+                    qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
+                }
             }
 
             if( !d->socket->isConnected() )
@@ -129,6 +137,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if (t.elapsed() >= AUTH_TIMEOUT)
                 return false; // close connection
         }
+        d->authenticatedOnce = true;
     }
 
     return true;
