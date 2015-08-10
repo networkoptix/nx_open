@@ -365,3 +365,21 @@ table.webclient-window>tbody>tr>td{
   border-radius: 5px;
   margin:0;
 }
+.server-link{
+  position:relative;
+  height:60px;
+  padding: 10px;
+  border-top: 1px solid #0D0E0F;
+}
+.server-link:before{
+  position:absolute;
+  z-index: -1;
+  top:1px;
+  border-top: 1px solid #1C2327;
+}
+.server-link>*{
+  vertical-align: middle;
+}
+.server-link .glyphicon{
+  top:8px;
+}

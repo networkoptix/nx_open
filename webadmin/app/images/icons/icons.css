@@ -54,6 +54,30 @@ background: url(icons_sprite.png) -20px -120px;
 }
 
 
+.glyphicon-server-ok {
+    background: url(icons_sprite.png) 0px -20px;
+    width: 30px !important;
+    height: 30px;
+}
+
+.glyphicon-server-current {
+    background: url(icons_sprite.png) -30px -20px;
+    width: 30px !important;
+    height: 30px;
+}
+
+.glyphicon-server-offline {
+    background: url(icons_sprite.png) -60px -20px;
+    width: 30px !important;
+    height: 30px;
+}
+.glyphicon-server-unauthorized {
+    background: url(icons_sprite.png) -60px -20px;
+    width: 30px !important;
+    height: 30px;
+}
+
+
 
 .camera-node.Unauthorized .camera-preview-image{
     background: url(icons_sprite.png) -90px -20px !important;
