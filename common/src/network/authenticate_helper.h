@@ -23,18 +23,21 @@ namespace AuthMethod
     {
         noAuth          = 0x01,
         //!authentication method described in rfc2617
-        http            = 0x02,
+        httpBasic       = 0x02,
+        httpDigest      = 0x04,
+        http            = httpBasic | httpDigest,
         //!base on \a authinfo cookie
-        cookie          = 0x04,
+        cookie          = 0x08,
         //!authentication by X-NetworkOptix-VideoWall header
         //TODO #ak remove this value from here
-        videowall       = 0x08,
+        videowall       = 0x10,
         //!Authentication by url query parameters \a auth and \a proxy_auth
         /*!
             params has following format: BASE64-URL( UTF8(username) ":" MD5( LATIN1(username) ":NetworkOptix:" LATIN1(password) ) )
             TODO #ak this method is too poor, have to introduce some salt
         */
-        urlQueryParam   = 0x10
+        urlQueryParam   = 0x20,
+        tempUrlQueryParam   = 0x40
     };
 }
 
@@ -101,7 +104,7 @@ public:
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side
-    bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, bool* authInProgress = 0);
+    bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
     //!Authenticates request on client side
     /*!
         Usage:\n
@@ -188,10 +191,10 @@ private:
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
     bool isCookieNonceValid(const QByteArray& nonce);
-    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, bool* authInProgress, char delimiter, 
+    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
                       std::function<bool(const QByteArray&)> checkNonceFunc, QnUserResourcePtr* const outUserResource = nullptr);
     bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
-    bool doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId, bool* authInProgress);
+    bool doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
     mutable QMutex m_mutex;
     static QnAuthHelper* m_instance;
