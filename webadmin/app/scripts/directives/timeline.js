@@ -911,8 +911,8 @@ angular.module('webadminApp')
                 scope.mouseUp = function(event){
                     updateMouseCoordinate(event);
                     catchScrollBar = false;
-                    console.log("set timer for dblclick here");
-                    console.log("move playing position");
+                    //TODO: "set timer for dblclick here";
+                    //TODO: "move playing position";
                 };
                 scope.mouseLeave = function(event){
                     updateMouseCoordinate(null);

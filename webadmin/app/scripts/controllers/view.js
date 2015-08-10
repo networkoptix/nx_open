@@ -25,6 +25,11 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.hasMobileApp = !!found;
         }
 
+        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm')){
+            $scope.ieNoWebm = true;
+        }
+
+
         $scope.activeResolution = 'Auto';
         // detect max resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];

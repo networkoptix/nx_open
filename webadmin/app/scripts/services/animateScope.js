@@ -43,7 +43,7 @@ angular.module('webadminApp')
             }
             var result = start + (stop-start)*time/duration;
             if(isNaN(result)){
-                console.log('linear-error',result,start,stop,time,duration);
+                console.error('linear-error',result,start,stop,time,duration);
             }
             return  result;
         };

@@ -20,7 +20,6 @@ angular.module('webadminApp')
             $scope.authorized = true;
             $scope.authorizing = false;
             setTimeout(function(){
-                console.log("reload on login");
                 window.location.reload();
             },20);
             return false;

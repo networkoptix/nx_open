@@ -32,7 +32,6 @@ angular.module('webadminApp')
 
             link: function (scope, element/*, attrs*/) {
 
-
                 var mimeTypes = {
                     'hls': 'application/x-mpegURL',
                     'webm': 'video/webm',
@@ -85,13 +84,17 @@ angular.module('webadminApp')
                     }
 
                     // Hardcode native support
-                    if(window.jscd.os == "Android" && weHaveWebm){
-                        console.warn("hardcoded support for webm on android");
-                        return "webm"; // TODO: Try removing this line.
+                    if(window.jscd.os == "Android" ){
+                        if(weHaveWebm){
+                            return "webm";
+                            // TODO: Try removing this line.
+                        }else {
+                            scope.noArmSupport = true;
+                            return false;
+                        }
                     }
 
                     if(window.jscd.mobile && weHaveHls){
-                        console.warn("hardcoded support for hls on mobile");
                         return "native-hls"; // Only one choice on mobile.
                         // TODO: Try removing this line.
                     }
@@ -113,7 +116,7 @@ angular.module('webadminApp')
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
-
+                            scope.flashRequired = true;
                             return false; // IE9 - No other supported formats
 
 
@@ -130,16 +133,15 @@ angular.module('webadminApp')
                             if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
                                 return "flashls";
                             }
-                            if(weHaveHls) {
+                            /*if(weHaveHls) {
                                 return "jshls";// We are hoping that we have some good browser
-                            }
-                            if(weHaveRtsp){
+                            }*/
+                            if(weHaveRtsp && window.jscd.flashVersion != '-'){
                                 return "rtsp";
                             }
+                            scope.flashRequired = true;
                             return false; // IE9 - No supported formats
                     }
-
-                    return false; // No supported formats
                 }
 
 
@@ -155,16 +157,11 @@ angular.module('webadminApp')
 
                 }
 
-                function initVideogular() {
-                    scope.videogular = true;
-                }
-
                 // TODO: Create common interface for each player, html5 compatible or something
                 // TODO: move supported info to config
                 // TODO: Support new players
 
                 function initNativePlayer(format){
-                    scope.videogular = false;
                     nativePlayer.init(element.find("#videowindow"), function (api) {
                         scope.vgApi = api;
 
@@ -179,12 +176,11 @@ angular.module('webadminApp')
 
                         scope.vgPlayerReady({$API:scope.vgApi});
                     }, function (api) {
-                        console.alert("some error");
+                        console.error("some error");
                     });
                 }
 
                 function initFlashls() {
-                    scope.videogular = false;
                     scope.flashls = true;
                     scope.flashSource = "components/flashlsChromeless.swf";
                     scope.flashParam = flashlsAPI.flashParams();
@@ -199,7 +195,7 @@ angular.module('webadminApp')
 
                             scope.vgPlayerReady({$API: api});
                         }, function (api) {
-                            console.alert("some error");
+                            console.error("some error");
                         }, function (position, duration) {
                             scope.vgUpdateTime({$currentTime: position, $duration: duration});
                         });
@@ -209,8 +205,6 @@ angular.module('webadminApp')
                 }
 
                 function initJsHls(){
-                    scope.videogular = false;
-
                     jshlsAPI.init( element.find("#videowindow"), function (api) {
                         scope.vgApi = api;
 
@@ -220,13 +214,12 @@ angular.module('webadminApp')
 
                         scope.vgPlayerReady({$API:api});
                     }, function (api) {
-                        console.alert("some error");
+                        console.error("some error");
                     });
 
                 }
 
                 function initRtsp(){
-                    scope.videogular = false;
                     var locomote = new Locomote('videowindow', /*'bower_components/locomote/dist/Player.swf'/**/'components/Player.swf'/**/);
                     locomote.on('apiReady', function() {
                         scope.vgApi = locomote;
@@ -241,16 +234,16 @@ angular.module('webadminApp')
 
                         /* Start listening for streamStarted event */
                         locomote.on('streamStarted', function() {
-                            console.log('stream has started');
+                            //console.log('stream has started');
                         });
 
                         /* If any error occurs, we should take action */
                         locomote.on('error', function(err) {
-                            console.log(err);
+                            console.error(err);
                         });
 
                         if (scope.vgSrc) {
-                            console.log('play',scope.vgSrc[2].src);
+                            //console.log('play',scope.vgSrc[2].src);
                             scope.vgApi.play(scope.vgSrc[2].src);
                         }
 

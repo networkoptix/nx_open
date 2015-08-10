@@ -25,9 +25,6 @@
 .videowindow{
   background-color: #1C2327;
 }
-.dark-theme videogular{
-  background-color: #1C2327;
-}
 
 .dark-theme .caret{
   border-top-color:white;
@@ -127,7 +124,6 @@ table.webclient-window>tbody>tr>td{
 
   position: relative;
   top: 50%;
-  -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
   margin-left: auto;
   margin-right: auto;
@@ -251,7 +247,7 @@ table.webclient-window>tbody>tr>td{
 }
 
 .camera-preview{
-  width:70px !important;
+  width:72px !important;
   height:40px !important;
   margin-right: 10px;
   background-color: black;
@@ -261,19 +257,59 @@ table.webclient-window>tbody>tr>td{
   margin-left:-80px;
 }
 
-
-.camera-preview>img{
-  max-width:70px !important;
-  max-height:40px !important;
-
+.camera-node.Unauthorized .camera-preview,
+.camera-node.Offline .camera-preview{
+  background-color: #212A2F;
+  border: 1px solid #171C1F;
+}
+.camera-preview>.camera-preview-image {
   display:block;
-
   position: relative;
   top: 50%;
   transform: translateY(-50%);
 
   margin-left: auto;
   margin-right: auto;
+}
+.camera-preview>.camera-preview-image>img{
+  visibility:hidden;
+  max-width:72px !important;
+  max-height:40px !important;
+}
+
+
+.camera-view-informer{
+  text-align: center;
+
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+
+  font-weight: 400;
+  font-size:18px;
+  line-height:30px;
+  color:#53707F;
+}
+
+.camera-view-informer a{
+  color: #91A7B2;
+  text-decoration: underline;
+}
+.camera-view-informer a:hover,
+.camera-view-informer a:active{
+  color: #ffffff;
+}
+
+.camera-view-informer .camera-view-message-icon{
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.camera-view-informer .camera-view-message{
+  font-weight: 300;
+  color: #3F545F;
+  font-size: 40px;
+  display: inline-block;
 }
 
 .dark-theme .nav > li > a{
@@ -332,11 +368,37 @@ table.webclient-window>tbody>tr>td{
   background-color: black;
   margin:0;
   padding: 10px 20px;
+  font-weight: 300;
+  font-size:18px;
+  color:#FFFFFF;
 }
 
 
 .mobile-alert .btn{
-  border: 1px solid silver;
+  border: 1px solid #263137;
   border-radius: 5px;
   margin:0;
+  color:#FFFFFF;
+}
+
+.mobile-alert .btn:hover{
+ background-color: rgba(198,234,255,0.15);
+}
+.server-link{
+  position:relative;
+  height:60px;
+  padding: 10px;
+  border-top: 1px solid #0D0E0F;
+}
+.server-link:before{
+  position:absolute;
+  z-index: -1;
+  top:1px;
+  border-top: 1px solid #1C2327;
+}
+.server-link>*{
+  vertical-align: middle;
+}
+.server-link .glyphicon{
+  top:8px;
 }
