@@ -985,7 +985,8 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePerio
             }
         }
     }
-    result.recordedSecs /= 1000;
+    result.recordedSecs /= 1000;       // msec to sec
+    bitrateStats.recordedSecs /= 1000; // msec to sec
     if (bitrateStats.recordedBytes > 0 && bitrateStats.recordedSecs > 0)
         result.averageBitrate = bitrateStats.recordedBytes / (qreal) bitrateStats.recordedSecs;
     Q_ASSERT(result.averageBitrate >= 0);
