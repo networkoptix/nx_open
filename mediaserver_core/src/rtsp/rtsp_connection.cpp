@@ -256,7 +256,7 @@ void QnRtspConnectionProcessor::parseRequest()
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
 
-    if (nx_http::getHeaderValue(d->request.headers, "User-Agent").toLower().contains("network optix"))
+    if (!nx_http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
         d->useProprietaryFormat = true;
     else {
         d->sessionTimeOut = DEFAULT_RTSP_TIMEOUT;

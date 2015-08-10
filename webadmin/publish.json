@@ -1,0 +1,33 @@
+{
+    "options": {
+
+    },
+    "demo": {
+        "options": {
+            "host": "enk.me",
+            "username": "ebalashov",
+            "password": "e8Lp9jTsbgjk"
+        },
+        "files": [
+            {
+                "cwd": "dist",
+                "src": ["**"],
+                "dest": "/home/ebalashov/public_html/webclient"
+            }
+        ]
+    },
+    "demo_fast": {
+        "options": {
+            "host": "enk.me",
+            "username": "ebalashov",
+            "password": "e8Lp9jTsbgjk"
+        },
+        "files": [
+            {
+                "cwd": "dist",
+                "src": ["**/*.html","**/*.css","**/*.js"],
+                "dest": "/home/ebalashov/public_html/webclient"
+            }
+        ]
+    }
+}

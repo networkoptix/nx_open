@@ -52,13 +52,20 @@ QnStorageSpaceData QnStorageUrlDialog::storage() const {
 
 QString QnStorageUrlDialog::normalizePath(QString path) {
     QString separator = lit("/");
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->item(m_server->getId()).data;
-    if (data.platform.toLower() == lit("windows"))
-        separator = lit("\\");
+    //ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->item(m_server->getId()).data;
+    //if (data.platform.toLower() == lit("windows"))
+    //    separator = lit("\\");
     QString result = path.replace(L'/', separator);
     result = path.replace(L'\\', separator);
     if (result.endsWith(separator))
         result.chop(1);
+    if (separator == lit("/"))
+    {
+        int i = 0;
+        while (result[i] == separator[0])
+            ++i;
+        return result.mid(i);
+    }
     return result;
 }
 
@@ -105,15 +112,14 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
         }
     }
     
-    if (login.isEmpty()) {
-        return normalizePath(path);
-    }
-    else {
-        QUrl url = QString(lit("file:///%1")).arg(normalizePath(path));
+    QString urlString = normalizePath(path);
+    urlString = lit("file://%1").arg(urlString);
+    QUrl url(urlString);
+    if (!login.isEmpty())
         url.setUserName(login);
+    if (!password.isEmpty())
         url.setPassword(password);
-        return url.toString();
-    }
+    return url.toString();
 }
 
 void QnStorageUrlDialog::accept() 

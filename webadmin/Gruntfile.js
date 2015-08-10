@@ -80,51 +80,61 @@ module.exports = function (grunt) {
                 livereload: 35729
             },
             proxies: [
+                /*{
+                    context: '/ec2/',
+                    host: '10.0.2.229',
+                    port: 7039,
+                    headers: { //admin:123
+                        'Authorization': 'Basic YWRtaW46MTIz'
+                    }
+                 },
+                 {
+                     context: '/',
+                     host: 'mono',
+                     port: 41000,
+                 }
+                 */
+
+                //'Authorization': 'Basic YWRtaW46MTIz' //admin:123
+                //'Authorization': 'Basic dXNlcjoxMjM='//user:123
+
                 //Total proxy
-                //{context: '/',host: '192.168.56.101',port: 9000},
-
-
-                //Demoaserver
-                {context: '/api/',      host: 'demo.networkoptix.com', port: 7001},
-                 {context: '/ec2/',      host: 'demo.networkoptix.com', port: 7001},
-                 {context: '/hls/',      host: 'demo.networkoptix.com',port: 7001},
-                 {context: '/media/',    host: 'demo.networkoptix.com', port: 7001},
-                 {context: '/proxy/',    host: 'demo.networkoptix.com',port: 7001}/**/
+                //{context: '/',host: '192.168.56.101',port: 7002},
 
                 //Cube
-                /*{context: '/api/',      host: '192.168.0.25', port: 7001},
-                {context: '/ec2/',      host: '192.168.0.25', port: 7001},
-                {context: '/hls/',      host: '192.168.0.25',port: 7001},
-                {context: '/media/',    host: '192.168.0.25', port: 7001},
-                {context: '/proxy/',    host: '192.168.0.25',port: 7001}*/
+                /*{context: '/api/',   host: '192.168.0.25', port: 7001},
+                {context: '/ec2/',   host: '192.168.0.25', port: 7001},
+                {context: '/hls/',   host: '192.168.0.25', port: 7001},
+                {context: '/media/', host: '192.168.0.25', port: 7001},
+                {context: '/proxy/', host: '192.168.0.25', port: 7001}/**/
+
+                //demo.networkoptix.com
+                /*{context: '/api/', host: 'demo.networkoptix.com', port: 7001},
+                {context: '/ec2/', host: 'demo.networkoptix.com', port: 7001},
+                {context: '/hls/', host: 'demo.networkoptix.com',port: 7001},
+                {context: '/media/', host: 'demo.networkoptix.com', port: 7001},
+                {context: '/proxy/', host: 'demo.networkoptix.com',port: 7001}/**/
 
                 //Evgeniy
-                /*{context: '/api/',      host: '192.168.56.101', port: 9000},
-                {context: '/ec2/',      host: '192.168.56.101', port: 9000},
-                {context: '/hls/',      host: '192.168.56.101',port: 9000},
-                {context: '/media/',    host: '192.168.56.101', port: 9000},
-                {context: '/proxy/',    host: '192.168.56.101',port: 9000}*/
+/*                {context: '/api/', host: '192.168.56.101', port: 9000},
+                {context: '/ec2/', host: '192.168.56.101', port: 9000},
+                {context: '/hls/', host: '192.168.56.101',port: 9000},
+                {context: '/media/', host: '192.168.56.101', port: 9000},
+                {context: '/proxy/', host: '192.168.56.101',port: 9000}/**/
 
-/*                //Sergey Yuldashev
-                {context: '/api/',      host: '10.0.2.203', port: 8901},
-                {context: '/ec2/',      host: '10.0.2.203', port: 8901},
-                {context: '/hls/',      host: '10.0.2.203', port: 8901},
-                {context: '/media/',    host: '10.0.2.203', port: 8901},
-                {context: '/proxy/',    host: '10.0.2.203', port: 8901}/**/
+                // Masha
+                {context: '/api/',      host: '10.0.2.186', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.186', port: 7001},
+                {context: '/hls/',      host: '10.0.2.186', port: 7001},
+                {context: '/media/',    host: '10.0.2.186', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.186', port: 7001}/**/
 
-                // Sasha
-                /*{context: '/api/',      host: '10.0.2.119', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.119', port: 7001},
-                {context: '/hls/',      host: '10.0.2.119', port: 7001},
-                {context: '/media/',    host: '10.0.2.119', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.119', port: 7001}/**/
-
-/*                //Roman Vasilenko  port: 7003,7004,7005,2006
-                {context: '/api/', host: '10.0.2.244', port: 7005},
+                //Roman Vasilenko  port: 7003,7004,7005,2006
+                /*{context: '/api/', host: '10.0.2.244', port: 7005},
                 {context: '/ec2/', host: '10.0.2.244', port: 7005},
                 {context: '/hls/', host: '10.0.2.244', port: 7005},
                 {context: '/media/', host: '10.0.2.244', port: 7005},
-                {context: '/proxy/', host: '10.0.2.244', port: 7005}/**/
+                {context: '/proxy/', host: '10.0.2.244', port: 7005}*/
 
             ],
             livereload: {
@@ -333,7 +343,7 @@ module.exports = function (grunt) {
         // concat, minify and revision files. Creates configurations in memory so
         // additional tasks can operate on them
         useminPrepare: {
-            html: ['<%= yeoman.app %>/index.html', '<%= yeoman.app %>/login.html', '<%= yeoman.app %>/api.xsl'],
+            html: ['<%= yeoman.app %>/login.html','<%= yeoman.app %>/index.html', '<%= yeoman.app %>/api.xsl'],
             options: {
                 dest: '<%= yeoman.dist %>'
             }
@@ -439,8 +449,9 @@ module.exports = function (grunt) {
                             'customization/*',
                             //'bower_components/**/*',
                             //'bower_components/videogular-themes-default/videogular.css',
-                            'images/{,*/}*.{webp}',
-                            'fonts/*'
+                            'images/**',
+                            'fonts/**',
+                            'components/**'
                         ]
                     },
                     {
@@ -455,6 +466,17 @@ module.exports = function (grunt) {
                         flatten: true,
                         dest: '<%= yeoman.dist %>/fonts',
                         src: ['bower_components/sass-bootstrap/fonts/*']
+                    }
+                    ,
+                    {
+                        expand: true,
+                        cwd: '<%= yeoman.app %>',
+                        flatten: true,
+                        dest: '<%= yeoman.dist %>/components',
+                        src: ['bower_components/mediaelement/build/silverlightmediaelement.xap',
+                            'bower_components/mediaelement/build/flashmediaelement.swf',
+                            'bower_components/locomote/dist/Player.swf']
+
                     }
                 ]
             },
@@ -487,32 +509,6 @@ module.exports = function (grunt) {
                 'svgmin'
             ]
         },
-
-        // By default, your `index.html`'s <!-- Usemin block --> will take care of
-        // minification. These next options are pre-configured if you do not wish
-        // to use the Usemin blocks.
-        //cssmin: {
-        //   dist: {
-        //     files: {
-        //       '<%= yeoman.dist %>/styles/main.css': [
-        //         '.tmp/styles/{,*/}*.css',
-        //         '<%= yeoman.app %>/styles/{,*/}*.css'
-        //       ]
-        //     }
-        //   }
-        //},
-        // uglify: {
-        //   dist: {
-        //     files: {
-        //       '<%= yeoman.dist %>/scripts/scripts.js': [
-        //         '<%= yeoman.dist %>/scripts/scripts.js'
-        //       ]
-        //     }
-        //   }
-        // },
-        // concat: {
-        //   dist: {}
-        // },
 
         // Test settings
         karma: {
@@ -547,7 +543,9 @@ module.exports = function (grunt) {
             default:{
 
             }
-        }
+        },
+
+        scp: grunt.file.readJSON('publish.json')
     });
 
 
@@ -557,7 +555,8 @@ module.exports = function (grunt) {
                 'build',
                 'configureProxies:server',
                 //'connect:livereload',
-                'connect:dist:keepalive']);
+                'connect:dist:keepalive'
+            ]);
         }
 
         grunt.task.run([
@@ -626,4 +625,17 @@ module.exports = function (grunt) {
     grunt.registerTask('pub', [
         'publish'
     ]);
+
+    grunt.registerTask('demo', [
+        'build',
+        'scp:demo'
+    ]);
+
+
+    grunt.registerTask('de', [
+        'build',
+        'scp:demo_fast'
+    ]);
+
+
 };

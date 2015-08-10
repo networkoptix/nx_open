@@ -8,20 +8,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title></title>
     <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <!-- build:css styles/vendor.css -->
+
+
+    <link rel="stylesheet" href="fonts/roboto/roboto_bold/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_light/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
+
+    <!-- build:css styles/vendor-index.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="bower_components/videogular-themes-default/videogular.css" />
+    <link rel="stylesheet" href="bower_components/mediaelement/build/mediaelementplayer.css" />
     <!-- endbower -->
     <!-- endbuild -->
-    <!-- build:css({.tmp,app}) styles/main.css -->
+    <!-- build:css({.tmp,app}) styles/index.css -->
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/webclient.css">
+    <link rel="stylesheet" href="styles/timeline.css">
     <!-- endbuild -->
 
+    <link rel="stylesheet" href="images/icons/icons.css">
+
     <link rel="stylesheet" href="customization/styles.css">
+
 </head>
 <body ng-app="webadminApp">
 <!--[if lt IE 7]>
@@ -31,7 +47,18 @@
 <navbar></navbar>
 
 <!-- Add your site or application content here -->
-<div class="container" ng-view=""></div>
+<div ng-view=""></div>
+
+<!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+<!-- <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-XXXXX-X');
+  ga('send', 'pageview');
+</script> -->
 
 <!--[if lt IE 9]>
 <script src="bower_components/es5-shim/es5-shim.js"></script>
@@ -51,20 +78,26 @@
 <script src="bower_components/underscore/underscore.js"></script>
 <script src="bower_components/Chart.js/Chart.js"></script>
 <script src="bower_components/tc-angular-chartjs/dist/tc-angular-chartjs.min.js"></script>
-<script src="bower_components/videogular/videogular.js"></script>
-<script src="bower_components/videogular-buffering/vg-buffering.js"></script>
-<script src="bower_components/videogular-dash/vg-dash.js"></script>
-<script src="bower_components/videogular-controls/vg-controls.js"></script>
-<script src="bower_components/videogular-poster/vg-poster.js"></script>
+<script src="bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
 <script src="bower_components/angular-cookie/angular-cookie.js"></script>
+<script src="bower_components/mediaelement/build/mediaelement-and-player.js"></script>
+<script src="bower_components/screenfull/dist/screenfull.js"></script>
 <!-- endbower -->
 
 <script src="scripts/vendor/jquery-file-upload/jquery.ui.widget.js"></script>
 <script src="scripts/vendor/jquery-file-upload/jquery.iframe-transport.js"></script>
 <script src="scripts/vendor/jquery-file-upload/jquery.fileupload.js"></script>
 <script src="scripts/vendor/jquery-file-upload/jquery.fileupload-process.js"></script>
+<script src="scripts/vendor/date.js"></script>
+<script src="scripts/vendor/client-detection.js"></script>
+<script src="scripts/vendor/swfobject.js"></script>
 
 <script src="scripts/vendor/md5.js"></script>
+<script src="scripts/vendor/base64.js"></script>
+
+<script src="components/flashls.js"></script>
+<script src="components/jshls.js"></script>
+<script src="components/nativeplayer.js"></script>
 
 <!-- endbuild -->
 
@@ -74,49 +107,54 @@
 <script src="scripts/app.js"></script>
 
 <script src="scripts/services/mediaserver.js"></script>
+<script src="scripts/services/timelineModels.js"></script>
+<script src="scripts/services/cameraRecords.js"></script>
 <script src="scripts/services/auth.js"></script>
+<script src="scripts/services/animateScope.js"></script>
 
 <script src="scripts/directives/navbar.js"></script>
 <script src="scripts/directives/pwcheck.js"></script>
 <script src="scripts/directives/icon.js"></script>
 <script src="scripts/directives/fileupload.js"></script>
-<script src="scripts/directives/vg-quality.js"></script>
 <script src="scripts/directives/inplace-edit.js"></script>
+<script src="scripts/directives/timeline.js"></script>
+<script src="scripts/directives/object.js"></script>
+<script src="scripts/directives/videowindow.js"></script>
+
 
 <script src="scripts/controllers/main.js"></script>
 <script src="scripts/controllers/navigation.js"></script>
 <script src="scripts/controllers/settings.js"></script>
 <script src="scripts/controllers/join.js"></script>
-<script src="scripts/controllers/offline.js"></script>
 <script src="scripts/controllers/login.js"></script>
 <script src="scripts/controllers/advanced.js"></script>
 <script src="scripts/controllers/info.js"></script>
 <script src="scripts/controllers/restart.js"></script>
 <script src="scripts/controllers/sdkeula.js"></script>
+<script src="scripts/controllers/offline.js"></script>
 <script src="scripts/controllers/webclient.js"></script>
 <script src="scripts/controllers/view.js"></script>
 <script src="scripts/controllers/health.js"></script>
-
-<script src="scripts/controllers/log.js"></script>
 <!-- endbuild -->
+
 
 <script src="customization/config.js"></script>
 
 <script type="text/ng-template" id="offline_modal">
     <div class="modal-header">
-            <h3 class="modal-title">Server is offline</h3>
+        <h3 class="modal-title">Server is offline</h3>
     </div>
 
     <form class="form" role="form" id="restartDialog">
-            <div class="modal-body" class="col-sm-12">
+        <div class="modal-body" class="col-sm-12">
             <p>Server can't handle requests now. Trying to reach it again.</p>
-    <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
-    <p>If nothing happens for a while - you could check server condition manually</p>
-    </div>
+            <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
+            <p>If nothing happens for a while - you could check server condition manually</p>
+        </div>
 
-    <div class="modal-footer">
+        <div class="modal-footer">
             <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Refresh page</button>
-    </div>
+        </div>
     </form>
 </script>
 

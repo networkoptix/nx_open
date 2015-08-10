@@ -121,6 +121,8 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
                     result += DELIM;
                 result += tr("%n hours", "", hours);
             }
+            if (result.isEmpty())
+                result = tr("less than an hour");
             return result;
         }
         case BitrateColumn:

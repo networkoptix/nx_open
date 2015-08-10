@@ -23,13 +23,15 @@ angular.module('webadminApp')
         };
 
         $scope.logout = function(){
-
             ipCookie.remove('response',{ path: '/' });
             ipCookie.remove('nonce',{ path: '/' });
             ipCookie.remove('realm',{ path: '/' });
             ipCookie.remove('username',{ path: '/' });
             window.location.reload();
         };
+
+        $scope.webclientEnabled = Config.webclientEnabled;
+
         $scope.alertVisible = true;
         $scope.closeAlert = function(){
             $scope.alertVisible = false;

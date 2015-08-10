@@ -109,6 +109,7 @@ public:
     * Return pair of handles of saving requests. first: handle for saving storages, second: handle for remove storages
     */
     QPair<int, int> saveUpdatedStorages();
+    void beforeDestroy();
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);

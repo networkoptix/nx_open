@@ -6,7 +6,7 @@
 namespace
 {
     static const qint64 SESSION_CLEANUP_INTERVAL_MS = 1000;
-    static const qint64 SESSION_KEEP_PERIOD_MS      = 1000;
+    static const qint64 SESSION_KEEP_PERIOD_MS      = 1000 * 3600ll * 24;
 }
 
 QnAuditRecord filteredRecord(QnAuditRecord record)
@@ -52,7 +52,7 @@ int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
 
     if (record.eventType == Qn::AR_Login)
     {
-        m_knownSessions.insert(record.authSession.id, INT64_MAX);
+        m_knownSessions.insert(record.authSession.id, UINT_MAX * 1000ll);
     }
     else if (record.eventType == Qn::AR_UnauthorizedLogin) {
         ; // nothing to do

@@ -31,15 +31,15 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
             storage->setUrl(storageUrl);
             storage->setSpaceLimit(nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE);
 
-            const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
-            const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
-            const auto it = std::find_if(partitions.begin(), partitions.end(),
-                                         [&](const QnPlatformMonitor::PartitionSpace& part)
-                { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
+            //const auto storagePath = QnStorageResource::toNativeDirPath(storage->getUrl());
+            //const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+            //const auto it = std::find_if(partitions.begin(), partitions.end(),
+            //                             [&](const QnPlatformMonitor::PartitionSpace& part)
+            //    { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
     
-            const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
-            if (storage->getStorageType().isEmpty())
-                storage->setStorageType(QnLexical::serialized(storageType));
+            //const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+            //if (storage->getStorageType().isEmpty())
+            //    storage->setStorageType(QnLexical::serialized(storageType));
         }
         else
             return CODE_INVALID_PARAMETER;

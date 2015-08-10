@@ -10,6 +10,9 @@
 
 class QnFileStorageResource: public QnStorageResource
 {
+private:
+    static const QString FROM_SEP;
+    static const QString TO_SEP;
 public:
     QnFileStorageResource();
     ~QnFileStorageResource();
@@ -37,6 +40,8 @@ public:
 
     virtual void setUrl(const QString& url) override;
 
+    QString getLocalPath() const {return m_localPath;}
+
 private:
     virtual QString getPath() const override;
     QString removeProtocolPrefix(const QString& url);
@@ -45,6 +50,20 @@ private:
     bool isStorageDirMounted() const;
     bool checkDBCap() const;
 
+    // It is for smb mount points with linux server .
+    // Translates remote url to local temporary mount folder.
+    // Should have no effect on another storage types and OS's.
+    QString translateUrlToLocal(const QString &url) const;
+    QString translateUrlToRemote(const QString &url) const;
+
+#ifndef _WIN32
+    // mounts network (smb) folder to temporary local path
+    // returns not 0 if something went wrong, 0 otherwise
+    int mountTmpDrive(const QString &remoteUrl);
+#else
+    bool mountTmpDrive(const QString &url) const;
+#endif
+
 private:
     // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
     float m_storageBitrateCoeff;
@@ -52,7 +71,9 @@ private:
 
 private:
     mutable QMutex  m_mutexPermission;
-    int             m_capabilities;
+    mutable int     m_capabilities;
+    mutable QString m_localPath;
+    bool            m_valid;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

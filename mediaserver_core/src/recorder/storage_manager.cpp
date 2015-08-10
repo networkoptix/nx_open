@@ -33,11 +33,13 @@
 #include "media_server/settings.h"
 #include "utils/serialization/lexical_enum.h"
 
+#include <memory>
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
 static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
 static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
+static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
 class ArchiveScanPosition
@@ -269,6 +271,7 @@ QnStorageManager::QnStorageManager():
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
     m_clearMotionTimer.restart();
+    m_removeEmtyDirTimer.restart();
 }
 
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -489,13 +492,13 @@ static const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
 static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
 {
-    QString storagePath = storage->getPath();
+    QString storageUrl = storage->getUrl();
     QString dbRefFilePath;
     
     //if (storagePath.indexOf(lit("://")) != -1)
     //    dbRefFilePath = dbRefFileName.arg(getLocalGuid());
     //else
-    dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
+    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(getLocalGuid());
 
     QByteArray dbRefGuidStr;
     //checking for file db_ref.guid existence
@@ -519,7 +522,7 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
 
     if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
     {
-        *dbDirectory = storagePath;
+        *dbDirectory = storageUrl;
         return true;
     }
     else
@@ -544,11 +547,11 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
             return false;
         dbGuidFile->close();
 
-        storagePath = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
-        if( !QDir().mkpath( storagePath ) )
+        storageUrl = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        if( !QDir().mkpath( storageUrl ) )
             return false;
     }
-    *dbDirectory = storagePath;
+    *dbDirectory = storageUrl;
     return true;
 }
 
@@ -566,6 +569,7 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
             NX_LOG( lit("Failed to file path to storage DB file. Storage is not writable?"), cl_logWARNING );
             return QnStorageDbPtr();
         }
+//        qWarning() << "DB Path: " << dbPath << "\n";
         QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
         QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
         
@@ -935,6 +939,45 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     return result;
 }
 
+
+void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
+{
+    std::function<bool (const QnAbstractStorageResource::FileInfoList &)> recursiveRemover =
+        [&](const QnAbstractStorageResource::FileInfoList &fl)
+    {
+        for (const auto& entry : fl)
+        {
+            if (entry.isDir())
+            {
+                QnAbstractStorageResource::FileInfoList dirFileList =
+                    storage->getFileList(
+                        entry.absoluteFilePath()
+                    );
+                if (!dirFileList.isEmpty() && !recursiveRemover(dirFileList))
+                    return false;
+                // ignore error here, trying to clean as much as we can
+                storage->removeDir(entry.absoluteFilePath());
+            }
+            else // we've met file. solid reason to stop
+                return false;
+        }
+        return true;
+    }; 
+
+    auto qualityFileList = storage->getFileList(storage->getUrl());
+    for (const auto &qualityEntry : qualityFileList)
+    {
+        if (qualityEntry.isDir()) // quality 
+        {
+            auto cameraFileList = storage->getFileList(qualityEntry.absoluteFilePath());
+            for (const auto &cameraEntry : cameraFileList)
+            {   // for every year folder
+                recursiveRemover(storage->getFileList(cameraEntry.absoluteFilePath()));
+            }
+        }
+    }
+}
+
 void QnStorageManager::clearSpace()
 {
     testOfflineStorages();
@@ -956,6 +999,15 @@ void QnStorageManager::clearSpace()
     for(const QnStorageResourcePtr& storage: storages)
         clearOldestSpace(storage, false);
 
+    // 3. Remove empty dirs
+    if (m_removeEmtyDirTimer.elapsed() > EMPTY_DIRS_CLEANUP_INTERVAL)
+    {
+        m_removeEmtyDirTimer.restart();
+        for (const QnStorageResourcePtr &storage : storages)
+            removeEmptyDirs(storage);
+    }
+
+    // 4. DB cleanup
     {
         QMutexLocker lock(&m_sdbMutex);
         for(const QnStorageDbPtr& sdb: m_chunksDB) {
@@ -1164,10 +1216,6 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         if (catalog != 0) 
         {
             DeviceFileCatalog::Chunk deletedChunk = catalog->deleteFirstRecord();
-            QString lastDeletedDir = catalog->fileDir(deletedChunk);
-            auto fileList = qnStorageMan->storageRoot(deletedChunk.storageIndex)->getFileList(lastDeletedDir);
-            if (fileList.isEmpty())
-                qnStorageMan->storageRoot(deletedChunk.storageIndex)->removeDir(lastDeletedDir);
             clearDbByChunk(catalog, deletedChunk);
             QnServer::ChunksCatalog altQuality = catalog->getRole() == QnServer::HiQualityCatalog ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog;
             DeviceFileCatalogPtr altCatalog = getFileCatalog(catalog->cameraUniqueId(), altQuality);
