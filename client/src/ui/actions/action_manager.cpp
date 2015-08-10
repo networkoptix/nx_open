@@ -1413,7 +1413,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::RecordingStatisticsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Recording statistics...")).
+        text(tr("Recording Statistics...")).
         condition(new QnConjunctionActionCondition(
         new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
         new QnEdgeServerCondition(false, this),

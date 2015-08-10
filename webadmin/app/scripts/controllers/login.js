@@ -9,10 +9,12 @@ angular.module('webadminApp')
 
         $scope.authorized = false;
         $scope.authorizing = false;
-        $scope.user = {
-            password: "",
-            username: ""
-        };
+        if(!$scope.user){
+            $scope.user = {
+                username:"",
+                password:""
+            }
+        }
 
         function reload(){
             $scope.authorized = true;
@@ -24,7 +26,6 @@ angular.module('webadminApp')
         }
 
         $scope.login = function () {
-            console.log($scope);
             if ($scope.loginForm.$valid) {
 
                 var lowercaseLogin = $scope.user.username.toLowerCase();
@@ -32,21 +33,29 @@ angular.module('webadminApp')
                 var realm = ipCookie('realm');
                 var nonce = ipCookie('nonce');
 
-                var hash1 = md5(lowercaseLogin + ':' + realm + ':' + $scope.user.password);
-                var cnonce = md5("GET:");
-                var response = md5(hash1 + ':' + nonce + ':' + cnonce);
+                var digest = md5(lowercaseLogin + ':' + realm + ':' + $scope.user.password);
+                var method = md5("GET:");
+                var auth_digest = md5(digest + ':' + nonce + ':' + method);
+                var auth = Base64.encode(lowercaseLogin + ':' + nonce + ':' + auth_digest);
+                ipCookie('auth',auth, { path: '/' });
 
-                //console.log("hash1 md5(", $scope.user.username + ':' + realm + ':' + $scope.user.password,')=', hash1);
-                //console.log("response  md5(", hash1 + ':' + nonce + ':'+ cnonce,')=', response);
+                var rtspmethod = md5("PLAY:");
+                var rtsp_digest = md5(digest + ':' + nonce + ':' + rtspmethod);
+                var auth_rtsp = Base64.encode(lowercaseLogin + ':' + nonce + ':' + rtsp_digest);
+                ipCookie('auth_rtsp',auth_rtsp, { path: '/' });
 
-                ipCookie('response',response, { path: '/' });
-                ipCookie('username',lowercaseLogin, { path: '/' });
+
+                //Old cookies:
+                ipCookie('response',auth_digest, { path: '/' }); // TODO: REMOVE
+                ipCookie('username',lowercaseLogin, { path: '/' }); // TODO: REMOVE
+                //var authKey = Base64.encode(lowercaseLogin + ':0:' + digest); // TODO: REMOVE
+                //ipCookie('authKey',authKey, { path: '/' }); // TODO: REMOVE
 
                 // Check auth again
                 $scope.authorizing = true;
                 mediaserver.getCurrentUser(true).then(reload).catch(function(error){
                     $scope.authorizing = false;
-                    alert("not authorized ");
+                    alert("Login or password is incorrect");
                 });
             }
         };

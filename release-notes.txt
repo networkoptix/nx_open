@@ -1,3 +1,49 @@
+-----------------------------------------------2.4.0.xxxx-----------------------------------------
+
+Features:
+#6052 - Audit monitor
+#5965 - Storage using information
+#5832 - ACTI encoder support 
+#5820, VMS-276 - IO module
+Ldap
+Storage SDK
+Web-client
+
+Improvements:
+#6025 - Add compatibility for paxton plugin with server 2.3.1, 2.3.2 and 2.4.
+#5900,VMS-277 - multiple server writing to same NAS ( server side  issue ) 
+#5767 - Autoupdates: multiple servers support
+VMS-289 - Client Login: When you start qulu the keyboard focus is not on the login box
+VMS-306 - Buffer secondary stream for better HLS performance
+VMS-307 - camera name stays permanently
+
+Bug fixes:
+#6024 - Support: It's impossible to take videostreams and different information with client from remote server
+#6015 - Server api: Bug in generating images
+#5970 - Couldn't do anything with storages while fast archive scan
+#5796 - Large CPU usage on Jaguar
+
+#6051 - AbstractStorageResource interface tests
+#6047 - Add helper class for safe direct signal/slot connection
+
+NXtool improvements:
+NXTOOL-1 - Add an ability to update servers via NxTool 
+NXTOOL-10 - Add date\time validation and error dialogs 
+NXTOOL-14 - Change DNS server and default gateway for several servers 
+NXTOOL-20 - NxTool. Edit all button shouldn't be shown if it's nothing to edit.
+NXTOOL-26 - Display detailed server info
+NXTOOL-29 - Make "Enter password" button blink if user tries to do something
+NXTOOL-31 - NxTool. Don't show Update message for several servers, if user doesn't edit partition
+NXTOOL-35 - Save NxTool position between runs
+
+Gathering statistics (improvements):
+#5996 - Need to introduce a way to check if there's a real audio track from camera
+5912 - Storage size is not spaceLimit
+5908 - while reporting stats, server should report actual OS (not just win64 or linux)
+5312 - statistics: network interfaces info (number and bandwidth)
+VMS-323 - Include customization into statistics and crash reports
+
+
 ----------------------------------------------2.3.2.xxxx------------------------------------------
 
 Features:

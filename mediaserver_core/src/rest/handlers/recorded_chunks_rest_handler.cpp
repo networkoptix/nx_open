@@ -6,8 +6,9 @@
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
+#include <http/custom_headers.h>
 
-#include "utils/common/util.h"
+#include <utils/common/util.h>
 #include <utils/fs/file.h>
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
@@ -87,6 +88,8 @@ namespace {
 
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
+    static const qint64 USEC_PER_MS = 1000;
+
     Q_UNUSED(path)
     qint64 startTime = -1;
     qint64 endTime = -1;
@@ -105,7 +108,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first == "physicalId" || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
+        if (params[i].first == Qn::CAMERA_UNIQUE_ID_HEADER_NAME || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
         {
             urlFound = true;
             physicalId = params[i].second.trimmed();
@@ -117,10 +120,10 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         }
         else if (params[i].first == "startTime") 
         {
-            startTime = parseDateTime(params[i].second.toUtf8());
+            startTime = parseDateTime(params[i].second.toUtf8()) / USEC_PER_MS;
         }
         else if (params[i].first == "endTime") {
-            endTime = parseDateTime(params[i].second.toUtf8());
+            endTime = parseDateTime(params[i].second.toUtf8()) / USEC_PER_MS;
         }
         else if (params[i].first == "detail")
             detailLevel = params[i].second.toLongLong();

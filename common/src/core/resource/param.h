@@ -58,6 +58,7 @@ namespace Qn
     static const QString PUBLIC_IP = lit("publicIp");
     static const QString NETWORK_INTERFACES = lit("networkInterfaces");
     static const QString FULL_VERSION = lit("fullVersion");
+    static const QString SYSTEM_RUNTIME = lit("systemRuntime");
 
 /*    static const QString LDAP_HOST = lit("ldapHost");
     static const QString LDAP_PORT = lit("ldapPort");

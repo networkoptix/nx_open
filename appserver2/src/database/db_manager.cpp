@@ -1844,7 +1844,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientI
     QSqlQuery query(m_sdb);
     query.prepare("INSERT OR REPLACE INTO vms_client_infos VALUES ("
         ":id, :parentId, :skin, :systemInfo, :cpuArchitecture, :cpuModelName,"
-        ":phisicalMemory, :openGLVersion, :openGLVendor, :openGLRenderer, :fullVersion)");
+        ":phisicalMemory, :openGLVersion, :openGLVendor, :openGLRenderer,"
+        ":fullVersion, :systemRuntime)");
 
     QnSql::bind(tran.params, &query);
     if (!query.exec()) {
@@ -3369,30 +3370,18 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataLi
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(lit("SELECT * FROM vms_client_infos %1 ORDER BY guid").arg(filterStr));
+    query.prepare(QString(
+        "SELECT guid as id, parent_guid as parentId, skin, systemInfo, "
+            "cpuArchitecture, cpuModelName, cpuModelName, openGLVersion,"
+            "openGLVendor, openGLRenderer, full_version as fullVersion, systemRuntime "
+        "FROM vms_client_infos %1 ORDER BY guid").arg(filterStr));
+
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
     }
-    
-    while (query.next()) {
-        ApiClientInfoData info;
 
-        info.id                 = QnSql::deserialized_field<QnUuid>(query.value(0));
-        info.parentId           = QnSql::deserialized_field<QnUuid>(query.value(1));
-        info.skin               = query.value(2).toString();
-        info.systemInfo         = query.value(3).toString();
-        info.cpuArchitecture    = query.value(4).toString();
-        info.cpuModelName       = query.value(5).toString();
-        info.phisicalMemory     = query.value(6).toLongLong();
-        info.openGLVersion      = query.value(7).toString();
-        info.openGLVendor       = query.value(8).toString();
-        info.openGLRenderer     = query.value(9).toString();
-        info.fullVersion        = query.value(10).toString();
-
-		data.push_back(std::move(info));
-    }
-
+    QnSql::fetch_many(query, &data);
     return ErrorCode::ok;
 }
 

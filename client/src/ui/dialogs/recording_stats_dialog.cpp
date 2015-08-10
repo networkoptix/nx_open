@@ -7,10 +7,13 @@
 #include <QtGui/QMouseEvent>
 #include <QShowEvent>
 
-#include <core/resource_management/resource_pool.h>
 #include <client/client_globals.h>
 #include <client/client_settings.h>
-#include <plugins/resource/server_camera/server_camera.h>
+
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+
 #include <ui/common/grid_widget_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -24,7 +27,7 @@
 #include "ui/models/recording_stats_model.h"
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
-#include <core/resource/media_server_resource.h>
+
 #include "utils/common/event_processors.h"
 #include <utils/common/scoped_painter_rollback.h>
 #include "utils/math/color_transformations.h"
@@ -93,7 +96,7 @@ public:
             int width = m_comboBox->minimumSizeHint().width();
             QRect r(rect);
             r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
-            painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last:"));
+            painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last recorded:"));
         }
     }
     QComboBox* comboBox() const { return m_comboBox; }

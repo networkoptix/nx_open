@@ -129,6 +129,8 @@ class RTPSession: public QObject
 {
     Q_OBJECT;
 public:
+    static const char USER_AGENT_STR[];
+
     // TODO: #Elric #enum
     enum DefaultAuthScheme {
         authNone,

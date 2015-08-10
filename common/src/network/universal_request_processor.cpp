@@ -68,14 +68,18 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
     if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
-        const bool isProxy = d->owner->isProxy(d->request);
+        //not asking Proxy authentication because we proxy requests in a custom way
+        const bool isProxy = false;
         QElapsedTimer t;
         t.restart();
         bool authInProgress = false;
         while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &authInProgress))
         {
-            if (!authInProgress)
-                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authSession(), Qn::AR_UnauthorizedLogin));
+            if (!authInProgress) {
+                auto session = authSession();
+                session.id = QnUuid::createUuid();
+                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
+            }
 
             if( !d->socket->isConnected() )
                 return false;   //connection has been closed

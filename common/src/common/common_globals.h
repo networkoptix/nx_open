@@ -556,6 +556,7 @@ public:
         ColumnDataRole,                             /**< convert index col count to column enumerator */
         DecorationHoveredRole,                      /**< Same as Qt::DecorationRole but for hovered item */
         AlternateColorRole,                         /**< Use alternate color in painting */
+        AuditLogChartDataRole,                      /**< Return qreal in range [0..1] for chart. Used in QnAuditLogModel */
 
         LastItemDataRole
     };

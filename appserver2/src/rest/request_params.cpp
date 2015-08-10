@@ -72,6 +72,7 @@ namespace ec2
         {
             deserialize(params, lit("info_skin"),               &data->clientInfo.skin);
             deserialize(params, lit("info_systemInfo"),         &data->clientInfo.systemInfo);
+            deserialize(params, lit("info_systemRuntime"),      &data->clientInfo.systemRuntime);
             deserialize(params, lit("info_fullVersion"),        &data->clientInfo.fullVersion);
             deserialize(params, lit("info_cpuArchitecture"),    &data->clientInfo.cpuArchitecture);
             deserialize(params, lit("info_cpuModelName"),       &data->clientInfo.cpuModelName);
@@ -92,16 +93,17 @@ namespace ec2
         serialize(data.passwordHash, lit("digest"), query);
         if( data.clientInfo.id != QnUuid())
         {
-            serialize( data.clientInfo.id,              lit("info_id"),              query );
-            serialize( data.clientInfo.skin,            lit("info_skin"),            query );
-            serialize( data.clientInfo.systemInfo,      lit("info_systemInfo"),      query );
-            serialize( data.clientInfo.fullVersion,     lit("info_fullVersion"),     query );
-            serialize( data.clientInfo.cpuArchitecture, lit("info_cpuArchitecture"), query );
-            serialize( data.clientInfo.cpuModelName,    lit("info_cpuModelName"),    query );
-            serialize( data.clientInfo.phisicalMemory,  lit("info_phisicalMemory"),  query );
-            serialize( data.clientInfo.openGLVersion,   lit("info_openGLVersion"),   query );
-            serialize( data.clientInfo.openGLVendor,    lit("info_openGLVendor"),    query );
-            serialize( data.clientInfo.openGLRenderer,  lit("info_openGLRenderer"),  query );
+            serialize(data.clientInfo.id,              lit("info_id"),              query);
+            serialize(data.clientInfo.skin,            lit("info_skin"),            query);
+            serialize(data.clientInfo.systemInfo,      lit("info_systemInfo"),      query);
+            serialize(data.clientInfo.systemRuntime,   lit("info_systemRuntime"),   query);
+            serialize(data.clientInfo.fullVersion,     lit("info_fullVersion"),     query);
+            serialize(data.clientInfo.cpuArchitecture, lit("info_cpuArchitecture"), query);
+            serialize(data.clientInfo.cpuModelName,    lit("info_cpuModelName"),    query);
+            serialize(data.clientInfo.phisicalMemory,  lit("info_phisicalMemory"),  query);
+            serialize(data.clientInfo.openGLVersion,   lit("info_openGLVersion"),   query);
+            serialize(data.clientInfo.openGLVendor,    lit("info_openGLVendor"),    query);
+            serialize(data.clientInfo.openGLRenderer,  lit("info_openGLRenderer"),  query);
         }
     }
 

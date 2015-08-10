@@ -12,7 +12,7 @@ namespace nx_ms_conf
 
     static const QLatin1String MIN_STORAGE_SPACE( "minStorageSpace" );
 #ifdef __arm__
-    static const qint64 DEFAULT_MIN_STORAGE_SPACE =    100*1024*1024; // 100MB
+    static const qint64 DEFAULT_MIN_STORAGE_SPACE = 100*1024*1024; // 100MB
 #else
     static const qint64 DEFAULT_MIN_STORAGE_SPACE = 5*1024*1024*1024ll; // 5gb
 #endif

@@ -82,7 +82,3 @@ void QnServerCamera::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
     QnVirtualCameraResource::updateInner(other, modifiedFields);
 }
 
-QnIOModuleMonitorPtr QnServerCamera::createIOModuleMonitor()
-{
-    return QnIOModuleMonitorPtr(new QnIOModuleMonitor(toSharedPointer().dynamicCast<QnSecurityCamResource>()));
-}

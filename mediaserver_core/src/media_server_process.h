@@ -11,6 +11,7 @@
 #include <core/resource/resource_fwd.h>
 #include <crash_reporter.h>
 
+#include "http/auto_request_forwarder.h"
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
 #include "platform/monitoring/global_monitor.h"
@@ -84,6 +85,7 @@ private:
     qint64 m_firstRunningTime;
 
     QnModuleFinder* m_moduleFinder;
+    std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;

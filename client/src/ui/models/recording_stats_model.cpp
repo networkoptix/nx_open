@@ -121,6 +121,8 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
                     result += DELIM;
                 result += tr("%n hours", "", hours);
             }
+            if (result.isEmpty())
+                result = tr("less than an hour");
             return result;
         }
         case BitrateColumn:
@@ -279,7 +281,7 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
         switch(section) {
         case CameraNameColumn: return tr("Camera");
         case BytesColumn:      return tr("Space");
-        case DurationColumn:   return tr("Days");
+        case DurationColumn:   return tr("Calendar Days");
         case BitrateColumn:    return QVariant(); //return tr("Bitrate");
         default:
             break;
@@ -331,7 +333,7 @@ void QnRecordingStatsModel::setModelDataInternal(const QnRecordingStatsReply& da
         maxValue.recordedSecs = qMax(maxValue.recordedSecs, value.recordedSecs);
         maxValue.archiveDurationSecs = qMax(maxValue.archiveDurationSecs, value.archiveDurationSecs);
         maxValue.averageBitrate = qMax(maxValue.averageBitrate, value.averageBitrate);
-        m_bitrateSum = qMax(m_bitrateSum, value.averageBitrate);
+        m_bitrateSum += value.averageBitrate;
     }
     QnRecordingStatsData footer;
     footer.recordedBytes = summ.recordedBytes;

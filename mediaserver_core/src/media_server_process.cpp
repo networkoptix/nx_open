@@ -1357,6 +1357,11 @@ bool MediaServerProcess::initTcpListener()
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
     m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
+    m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
+    m_httpModManager->addCustomRequestMod( std::bind(
+        &QnAutoRequestForwarder::processRequest,
+        m_autoRequestForwarder.get(),
+        std::placeholders::_1 ) );
 
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
@@ -1542,6 +1547,8 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/gettime"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
+    //by following delegating hls authentication to target server
+    QnAuthHelper::instance()->restrictionList()->allow( lit("/proxy/*/hls/*"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
     QnEventsDB::init();
@@ -1875,6 +1882,7 @@ void MediaServerProcess::run()
         server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
         server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
         server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
+        server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
         const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
         if (!confStats.isNull()) // if present
@@ -2248,7 +2256,8 @@ void MediaServerProcess::run()
 
     fileDeletor.reset();
     storageManager.reset();
-
+    if (m_mediaServer)
+        m_mediaServer->beforeDestroy();
     m_mediaServer.clear();
 }
 

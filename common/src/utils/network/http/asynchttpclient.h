@@ -143,7 +143,6 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addAdditionalHeader( const StringType& key, const StringType& value );
-        void addRequestHeaders(const HttpHeaders& headers);
         void removeAdditionalHeader( const StringType& key );
         template<class HttpHeadersRef>
         void setAdditionalHeaders( HttpHeadersRef&& additionalHeaders )

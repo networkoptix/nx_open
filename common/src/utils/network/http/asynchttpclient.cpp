@@ -776,12 +776,6 @@ namespace nx_http
         m_additionalHeaders.erase( key );
     }
 
-    void AsyncHttpClient::addRequestHeaders(const HttpHeaders& headers)
-    {
-        for (HttpHeaders::const_iterator itr = headers.begin(); itr != headers.end(); ++itr)
-            m_additionalHeaders.emplace( itr->first, itr->second);
-    }
-
     void AsyncHttpClient::serializeRequest()
     {
         m_requestBuffer.clear();
@@ -1122,7 +1116,7 @@ namespace nx_http
         AsyncHttpClient::AuthType authType )
     {
         nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
-        httpClientCaptured->addRequestHeaders(extraHeaders);
+        httpClientCaptured->setAdditionalHeaders(extraHeaders);
         httpClientCaptured->setAuthType(authType);
 
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
