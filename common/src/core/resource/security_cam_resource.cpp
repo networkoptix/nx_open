@@ -697,6 +697,39 @@ bool QnSecurityCamResource::isScheduleDisabled() const {
     return (*userAttributesLock)->scheduleDisabled;
 }
 
+void QnSecurityCamResource::setLicenseUsed(bool value) {
+    switch (licenseType()) {
+    case Qn::LC_IO:
+        {
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+            if ((*userAttributesLock)->licenseUsed == value)
+                return;
+            (*userAttributesLock)->licenseUsed = value;
+        }
+    default:
+        break;
+    }
+
+    setScheduleDisabled(!value);  
+    emit licenseUsedChanged(::toSharedPointer(this));
+}
+
+
+bool QnSecurityCamResource::isLicenseUsed() const {
+    switch (licenseType()) {
+    case Qn::LC_IO:
+        {
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+            return (*userAttributesLock)->licenseUsed;
+        }
+    default:
+        break;
+    }
+
+    /* By default camera requires license when recording is enabled. */
+    return !isScheduleDisabled();
+}
+
 void QnSecurityCamResource::setAudioEnabled(bool enabled) {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     (*userAttributesLock)->audioEnabled = enabled;

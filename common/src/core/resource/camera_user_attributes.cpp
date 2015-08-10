@@ -36,6 +36,8 @@ void QnCameraUserAttributes::assign( const QnCameraUserAttributes& right, QSet<Q
         *modifiedFields << "scheduleTasksChanged";
     if( motionRegions != right.motionRegions )
         *modifiedFields << "motionRegionChanged";
+    if (licenseUsed != right.licenseUsed)
+        *modifiedFields << "licenseUsedChanged";
 
     *this = right;
 }
