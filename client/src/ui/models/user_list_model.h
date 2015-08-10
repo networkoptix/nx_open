@@ -13,6 +13,7 @@ public:
         NameColumn,
         PermissionsColumn,
         LdapColumn,
+        EnabledColumn,
         EditIconColumn,
 
         ColumnCount

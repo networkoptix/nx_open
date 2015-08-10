@@ -163,12 +163,6 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
             return user->getName();
         case PermissionsColumn:
             return d->permissionsString(user);
-        case LdapColumn:
-            if (user->isLdap()) {
-                if (!user->isEnabled())
-                    return tr("Disabled").toUpper();
-            }
-            break;
         default:
             break;
         } // switch (column)
@@ -178,18 +172,22 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
         case EditIconColumn:
             return qnSkin->icon("/edit.png");
         case LdapColumn:
-            if (user->isLdap() && user->isEnabled())
+            if (user->isLdap())
                 return qnSkin->icon("/done.png");
+            break;
+        case EnabledColumn:
+            if (user->isEnabled())
+                return qnSkin->icon("/done.png");
+            break;
+        default:
             break;
         }
         break;
     case Qt::ForegroundRole:
-        if (user->isLdap()) {
-            if (!user->isEnabled())
-                return qApp->palette().color(QPalette::Disabled, QPalette::Text);
-            if (!d->isUnique(user))
-                return qnGlobals->errorTextColor();
-        }
+        if (!user->isEnabled())
+            return qApp->palette().color(QPalette::Disabled, QPalette::Text);
+        if (user->isLdap() && !d->isUnique(user))
+            return qnGlobals->errorTextColor();
         break;
     case Qn::UserResourceRole:
         return QVariant::fromValue(user);
@@ -221,6 +219,8 @@ QVariant QnUserListModel::headerData(int section, Qt::Orientation orientation, i
         return tr("Permissions");
     case LdapColumn:
         return tr("LDAP");
+    case EnabledColumn:
+        return tr("Enabled");
     default:
         return QString();
     }
