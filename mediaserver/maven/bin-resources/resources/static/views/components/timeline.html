@@ -19,4 +19,16 @@
              ng-class="{hidden:disableScrollRight}">
             <span class="glyphicon glyphicon-chevron-right"></span>
         </div>
---></div><div style="position:fixed; left: 10px; bottom: 10px"><div class="btn-group"><span class="btn btn-sm btn-default">Preset:</span> <button type="button" class="btn btn-sm" ng-class="{'btn-primary':preset == activePreset, 'btn-default':preset != activePreset}" ng-repeat="preset in presets" ng-click="selectPreset(preset)">{{$index}}</button></div></div>
+--></div><!--
+<div style="position:fixed; left: 10px; bottom: 10px;">
+    <div class="btn-group">
+        <span class="btn btn-sm btn-default">
+            Preset:
+        </span>
+        <button type="button" class="btn btn-sm "
+                ng-class="{'btn-primary':preset == activePreset, 'btn-default':preset != activePreset}"
+                ng-repeat="preset in presets"
+                ng-click="selectPreset(preset)">{{$index}}</button>
+    </div>
+</div>
+-->
