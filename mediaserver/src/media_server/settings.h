@@ -79,6 +79,10 @@ namespace nx_ms_conf
 
     static const QLatin1String HTTP_MSG_LOG_LEVEL( "http-log-level" );
     static const QLatin1String DEFAULT_HTTP_MSG_LOG_LEVEL( "none" );
+
+    //!If set to \a true, EC DB is opened in read-only mode. So, any data modification operation except license activation will fail
+    static const QLatin1String EC_DB_READ_ONLY( "ecDbReadOnly" );
+    static const QLatin1String DEFAULT_EC_DB_READ_ONLY( "false" );
 }
 
 /*!

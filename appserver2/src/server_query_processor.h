@@ -322,6 +322,7 @@ namespace ec2
             errorCode = processMultiUpdateSync(
                 ApiCommand::removeResource,
                 tran.isLocal,
+                tran.deliveryInfo,
                 dbManager->getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
                 transactionsToSend );
             if( errorCode != ErrorCode::ok )
@@ -338,6 +339,7 @@ namespace ec2
             ErrorCode errorCode = processMultiUpdateSync(
                 ApiCommand::removeBusinessRule,
                 tran.isLocal,
+                tran.deliveryInfo,
                 dbManager->getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
                 transactionsToSend );
             if( errorCode != ErrorCode::ok )
@@ -346,6 +348,7 @@ namespace ec2
             return processMultiUpdateSync(
                 ApiCommand::saveBusinessRule,
                 tran.isLocal,
+                tran.deliveryInfo,
                 tran.params.defaultRules,
                 transactionsToSend );
         }
@@ -420,6 +423,7 @@ namespace ec2
         ErrorCode processMultiUpdateSync(
             ApiCommand::Value command,
             bool isLocal,
+            const QnTranDeliveryInformation& tranDeliverInfo,
             const std::vector<SubDataType>& nestedList,
             std::list<std::function<void()>>* const transactionsToSend )
         {
@@ -427,6 +431,7 @@ namespace ec2
             {
                 QnTransaction<SubDataType> subTran(command, data);
                 subTran.isLocal = isLocal;
+                subTran.deliveryInfo = tranDeliverInfo;
                 ErrorCode errorCode = processUpdateSync( subTran, transactionsToSend );
                 if (errorCode != ErrorCode::ok)
                     return errorCode;
@@ -446,7 +451,7 @@ namespace ec2
                 multiTran,
                 handler,
                 [this, subCommand]( QnTransaction<QueryDataType>& multiTran, std::list<std::function<void()>>* const transactionsToSend ) -> ErrorCode {
-                    return processMultiUpdateSync( subCommand, multiTran.isLocal, multiTran.params, transactionsToSend );
+                    return processMultiUpdateSync( subCommand, multiTran.isLocal, multiTran.deliveryInfo, multiTran.params, transactionsToSend );
                 } );
         }
 
