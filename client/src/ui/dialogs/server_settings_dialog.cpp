@@ -240,7 +240,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
 
     QUrl url(item.url);
     if (item.storageType == lit("file"))
-        pathItem->setData(Qt::DisplayRole, url.path().mid(1));
+        pathItem->setData(Qt::DisplayRole, url.host() + url.path());
     else if (item.storageType == lit("local"))
         pathItem->setData(Qt::DisplayRole, item.url);
     else 

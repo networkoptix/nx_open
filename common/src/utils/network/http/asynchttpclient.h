@@ -143,7 +143,6 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addAdditionalHeader( const StringType& key, const StringType& value );
-        void addRequestHeaders(const HttpHeaders& headers);
         void removeAdditionalHeader( const StringType& key );
         template<class HttpHeadersRef>
         void setAdditionalHeaders( HttpHeadersRef&& additionalHeaders )
@@ -261,6 +260,9 @@ namespace nx_http
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
         bool resendRequestWithAuthorization( const nx_http::Response& response );
+        void doSomeCustomLogic(
+            const nx_http::Response& response,
+            Request* const request );
 
         AsyncHttpClient( const AsyncHttpClient& );
         AsyncHttpClient& operator=( const AsyncHttpClient& );

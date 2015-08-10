@@ -53,6 +53,7 @@ private slots:
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
     void at_forecastParamsChanged();
+    void at_updateColors();
 private:
     void requestFinished();
     QList<QnMediaServerResourcePtr> getServerList() const;

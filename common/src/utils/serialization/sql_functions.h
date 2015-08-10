@@ -124,10 +124,10 @@ inline void deserialize_field(const QVariant &value, QFlags<T> *target) {
     *target = static_cast<QFlags<T> >(tmp); 
 }
 
-class QnAuthSession;
+struct QnAuthSession;
 void serialize_field(const std::vector<QnUuid>&value, QVariant *target);
 void deserialize_field(const QVariant &value, std::vector<QnUuid> *target);
-void serialize_field(const QnAuthSession&authData, QVariant *target);
+void serialize_field(const QnAuthSession &authData, QVariant *target);
 void deserialize_field(const QVariant &value, QnAuthSession *target);
 
 #endif // QN_SERIALIZATION_SQL_FUNCTIONS_H

@@ -4,19 +4,21 @@
 
 #include <QtGui/QPalette>
 
-#include <utils/common/warnings.h>
-#include <utils/common/synctime.h>
-#include "core/resource/resource.h"
+#include <core/resource/resource.h>
+#include <core/resource/network_resource.h>
+
 #include "core/resource_management/resource_pool.h"
 #include "ui/style/resource_icon_cache.h"
 #include "client/client_globals.h"
 #include <utils/math/math.h>
-#include <plugins/resource/server_camera/server_camera.h>
 #include "client/client_settings.h"
 #include <ui/common/ui_resource_name.h>
 #include "ui/style/skin.h"
 #include "api/common_message_processor.h"
 #include "business/business_strings_helper.h"
+
+#include <utils/common/warnings.h>
+#include <utils/common/synctime.h>
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
@@ -53,14 +55,13 @@ public:
     {
     }
 
-    void setSort(int column, Qt::SortOrder order)
+    void setSort(Column column, Qt::SortOrder order)
     { 
         if ((Column) column == m_sortCol) {
             m_sortOrder = order;
             return;
         }
-
-        m_sortCol = (Column) column;
+        m_sortCol = column;
         m_sortOrder = order;
 
         updateIndex();
@@ -137,6 +138,11 @@ public:
         return firstResourceIp(d1) < firstResourceIp(d2);
     }
 
+    static bool lessThanActivity(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    {
+        return d1->extractParam("childCnt").toUInt() < d2->extractParam("childCnt").toUInt();
+    }
+
     void updateIndex()
     {
         LessFunc lessThan = &lessThanTimestamp;
@@ -166,6 +172,10 @@ public:
                 break;
             case CameraIpColumn:
                 lessThan = &lessThanCameraIp;
+                break;
+
+            case UserActivityColumn:
+                lessThan = &lessThanActivity;
                 break;
         }
 
@@ -508,6 +518,8 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data
         return eventDescriptionText(data);
     case PlayButtonColumn:
         return buttonNameForEvent(data->eventType);
+    case UserActivityColumn:
+        return tr("%n action(s)", "", data->extractParam("childCnt").toUInt());
     }
 
     return QString();
@@ -515,7 +527,7 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data
 
 void QnAuditLogModel::sort(int column, Qt::SortOrder order) {
     beginResetModel();
-    m_index->setSort(column, order);
+    m_index->setSort(m_columns[column], order);
     endResetModel();
 }
 
@@ -532,7 +544,7 @@ int QnAuditLogModel::minWidthForColumn(const Column &column) const
     case TimestampColumn:
     case EndTimestampColumn:
     case DurationColumn:
-        return 64;
+        return 80;
     case UserNameColumn:
     case UserHostColumn:
         return 48;

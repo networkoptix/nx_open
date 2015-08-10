@@ -143,12 +143,14 @@ QnAuditLogColors::QnAuditLogColors() {
     updServer = QColor(0xdc, 0xb4, 0x28); //QColor(0x99, 0x49, 0x98);
     eventRules = QColor(0x9c, 0x6b, 0x50); //QColor(0x5d, 0x82, 0xbf);
     emailSettings = QColor(0xcb, 0xcb, 0xcb); //QColor(0x9c, 0x6b, 0x50);
+    
+    chartColor = QColor(0x25, 0x92, 0xc3);
 }
 
 QnRecordingStatsColors::QnRecordingStatsColors()
 {
-    chartMainColor = QColor(7, 98, 129);
-    chartForecastColor = QColor(12, 81, 105);
+    chartMainColor = QColor(0x25, 0x92, 0xc3);
+    chartForecastColor = QColor(0x0c, 0x51, 0x69);
 }
 
 QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {

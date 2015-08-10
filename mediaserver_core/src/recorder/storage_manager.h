@@ -83,6 +83,7 @@ public:
     QnStorageResourceList getStoragesInLexicalOrder() const;
 
     void clearSpace();
+    void removeEmptyDirs(const QnStorageResourcePtr &storage);
     
     void clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
     void clearMaxDaysData();
@@ -197,6 +198,7 @@ private:
     mutable QMutex m_csvMigrationMutex;
     bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
+    QElapsedTimer m_removeEmtyDirTimer;
 };
 
 #define qnStorageMan QnStorageManager::instance()

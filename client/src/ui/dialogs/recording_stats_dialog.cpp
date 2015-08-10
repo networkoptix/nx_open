@@ -7,10 +7,13 @@
 #include <QtGui/QMouseEvent>
 #include <QShowEvent>
 
-#include <core/resource_management/resource_pool.h>
 #include <client/client_globals.h>
 #include <client/client_settings.h>
-#include <plugins/resource/server_camera/server_camera.h>
+
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+
 #include <ui/common/grid_widget_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -24,7 +27,7 @@
 #include "ui/models/recording_stats_model.h"
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
-#include <core/resource/media_server_resource.h>
+
 #include "utils/common/event_processors.h"
 #include <utils/common/scoped_painter_rollback.h>
 #include "utils/math/color_transformations.h"
@@ -86,10 +89,14 @@ public:
         QHeaderView::paintSection(painter, rect, logicalIndex);
         if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
         {
+            QnScopedPainterFontRollback rollback(painter);
+            QnScopedPainterPenRollback rollback2(painter);
+            painter->setFont(font());
+            painter->setPen(palette().foreground().color());
             int width = m_comboBox->minimumSizeHint().width();
             QRect r(rect);
             r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
-            painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last:"));
+            painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last recorded:"));
         }
     }
     QComboBox* comboBox() const { return m_comboBox; }
@@ -145,6 +152,7 @@ void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionV
         painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), colors.chartMainColor);
 
         painter->setFont(opt.font);
+        painter->setPen(opt.palette.foreground().color());
         painter->drawText(opt.rect, Qt::AlignRight | Qt::AlignVCenter, index.data().toString());
 
     }
@@ -157,17 +165,26 @@ void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionV
 QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::RecordingStatsDialog),
+    m_model(new QnRecordingStatsModel(this)),
+    m_requests(),
     m_updateDisabled(false),
     m_dirty(false),
-    m_lastMouseButton(Qt::NoButton)
+    m_selectAllAction(NULL),
+    m_exportAction(NULL),
+    m_clipboardAction(NULL),
+    m_lastMouseButton(Qt::NoButton),
+    m_allData(),
+    m_hidenCameras(),
+    m_availStorages(),
+    m_mserver()
 {
     ui->setupUi(this);
     setWarningStyle(ui->warningLabel);
 
     //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
-    m_model = new QnRecordingStatsModel(this);
+    
 
-    QnSortedRecordingStatsModel* sortModel = new QnSortedRecordingStatsModel(this);
+    auto sortModel = new QnSortedRecordingStatsModel(this);
     sortModel->setSourceModel(m_model);
     ui->gridEvents->setModel(sortModel);
     ui->gridEvents->setItemDelegate(new QnRecordingStatsItemDelegate(this));
@@ -217,7 +234,27 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     connect(ui->extraSpaceSlider,   &QSlider::valueChanged,   this, &QnRecordingStatsDialog::at_forecastParamsChanged);
     connect(ui->extraSizeSpinBox,   SIGNAL(valueChanged(double)),   this, SLOT(at_forecastParamsChanged()));
 
+    connect(m_model, &QnRecordingStatsModel::colorsChanged, this, &QnRecordingStatsDialog::at_updateColors);
+    at_updateColors();
+
     ui->mainGridLayout->activate();
+}
+
+void QnRecordingStatsDialog::at_updateColors()
+{
+    auto colors = m_model->colors();
+    
+    QPalette palette = ui->labelUsageColor->palette();
+    palette.setColor(ui->labelUsageColor->backgroundRole(), colors.chartMainColor);
+    ui->labelUsageColor->setPalette(palette);
+    ui->labelUsageColor->setAutoFillBackground(true);
+    ui->labelUsageColor->update();
+
+    palette = ui->labelUsageColor->palette();
+    palette.setColor(ui->labelForecastColor->backgroundRole(), colors.chartForecastColor);
+    ui->labelForecastColor->setPalette(palette);
+    ui->labelForecastColor->setAutoFillBackground(true);
+    ui->labelForecastColor->update();
 }
 
 QnRecordingStatsDialog::~QnRecordingStatsDialog() {
@@ -331,8 +368,7 @@ void QnRecordingStatsDialog::requestFinished()
             m_hidenCameras << camera;
     }
     m_model->setModelData(existsCameras);
-
-    
+       
     ui->gridEvents->setDisabled(false);
     setCursor(Qt::ArrowCursor);
     ui->loadingProgressBar->hide();

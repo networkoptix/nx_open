@@ -286,6 +286,9 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             nx_http::HttpHeader( "Via", (viaHeaderStr.isEmpty() ? nx_http::StringType() : ", ") + via.toString() ) );
     }
 
+    //NOTE next hop should accept Authorization header already present
+    //  in request since we use current time as nonce value
+
     d->clientRequest.clear();
     d->request.serialize(&d->clientRequest);
 

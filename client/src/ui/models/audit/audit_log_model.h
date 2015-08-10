@@ -27,7 +27,7 @@ public:
         UserHostColumn,
         DateColumn,
         TimeColumn,
-        UserActivityColumn, // not implemented yet
+        UserActivityColumn,
         EventTypeColumn,
         DescriptionColumn,
         PlayButtonColumn,
@@ -44,7 +44,7 @@ public:
     /*
     * Model uses reference to the data. Data MUST be alive till model clear call
     */
-    void setData(const QnAuditRecordRefList &data);
+    virtual void setData(const QnAuditRecordRefList &data);
     
     /*
     * Interleave colors for grouping records from a same session
@@ -81,6 +81,7 @@ public:
 
     static bool hasDetail(const QnAuditRecord* record);
     static void setDetail(QnAuditRecord* record, bool showDetail);
+    static QString eventTypeToString(Qn::AuditRecordType recordType);
 signals:
     void colorsChanged();
 public slots:
@@ -94,7 +95,6 @@ private:
     QString htmlData(const Column& column,const QnAuditRecord* data, int row, bool hovered) const;
     static QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true);
     static QString formatDuration(int durationSecs);
-    static QString eventTypeToString(Qn::AuditRecordType recordType);
     static QString eventDescriptionText(const QnAuditRecord* data);
     QVariant colorForType(Qn::AuditRecordType actionType) const;
     static QString buttonNameForEvent(Qn::AuditRecordType eventType);

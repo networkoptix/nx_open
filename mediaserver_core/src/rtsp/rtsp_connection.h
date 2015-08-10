@@ -89,11 +89,9 @@ private:
     int composeSetup();
     int composePlay();
     int composePause();
-    void parseRangeHeader(const QString& rangeStr, qint64* startTime, qint64* endTime);
     int extractTrackId(const QString& path);
     int composeTeardown();
     void processRangeHeader();
-    void extractNptTime(const QString& strValue, qint64* dst);
     int composeSetParameter();
     int composeGetParameter();
     void createDataProvider();
@@ -107,6 +105,7 @@ private:
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
     QSharedPointer<QnArchiveStreamReader> getArchiveDP();
     void notifyMediaRangeUsed(qint64 timestampUsec);
+
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

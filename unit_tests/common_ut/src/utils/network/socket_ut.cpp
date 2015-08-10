@@ -200,7 +200,6 @@ TEST_F( HostNameResolveTest, HostNameResolve2 )
     std::unique_lock<std::mutex> lk( m_mutex );
     while( (m_completedConnectionsCount + cancelledConnectionsCount) < TOTAL_CONNECTIONS )
     {
-        size_t currentConnectionsCount = 0;
         std::unique_ptr<AbstractStreamSocket> connectionToCancel;
         if( m_connections.size() > 1 && (canCancelIndex < m_startedConnectionsCount) )
         {
@@ -210,7 +209,6 @@ TEST_F( HostNameResolveTest, HostNameResolve2 )
             connectionToCancel = std::move(*connectionToCancelIter);
             m_connections.erase( connectionToCancelIter );
             canCancelIndex += /*index +*/ 1;
-            currentConnectionsCount = m_connections.size();
         }
         lk.unlock();
         if( connectionToCancel )

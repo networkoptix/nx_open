@@ -14,6 +14,8 @@
 #include <ui/customization/customized.h>
 #include "client/client_color_types.h"
 
+#include <ui/models/abstract_item_model.h>
+
 
 class QnSortedRecordingStatsModel: public QSortFilterProxyModel
 {
@@ -24,12 +26,12 @@ protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 };
 
-class QnRecordingStatsModel : public Customized<QAbstractItemModel>
+class QnRecordingStatsModel : public Customized<QnAbstractItemModel>
 {
     Q_OBJECT
     Q_PROPERTY(QnRecordingStatsColors colors READ colors WRITE setColors)
 
-    typedef Customized<QAbstractItemModel> base_type;
+    typedef Customized<QnAbstractItemModel> base_type;
 public:
 
     enum Columns {
@@ -58,11 +60,14 @@ public:
 
     QnRecordingStatsColors colors() const;
     void setColors(const QnRecordingStatsColors &colors);
+signals:
+    void colorsChanged();
 private:
     QString displayData(const QModelIndex &index) const;
     QString footerDisplayData(const QModelIndex &index) const;
     QnResourcePtr getResource(const QModelIndex &index) const;
     qreal chartData(const QModelIndex &index, bool isForecast) const;
+    QString tooltipText(Columns column) const;
     QVariant footerData(const QModelIndex &index, int role) const;
     void setModelDataInternal(const QnRecordingStatsReply& data, QnRecordingStatsReply& result);
 private:
@@ -70,6 +75,7 @@ private:
     QnRecordingStatsReply m_data;
     QnRecordingStatsReply m_forecastData;
     QnRecordingStatsColors m_colors;
+    qint64 m_bitrateSum;
 };
 
 

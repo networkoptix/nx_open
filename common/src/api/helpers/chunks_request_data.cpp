@@ -8,6 +8,7 @@
 
 #include <utils/serialization/lexical.h>
 #include <utils/common/util.h>
+#include <utils/common/string.h>
 
 namespace {
     const QString startTimeKey(lit("startTime"));
