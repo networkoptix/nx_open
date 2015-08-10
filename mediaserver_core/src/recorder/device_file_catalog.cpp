@@ -381,6 +381,7 @@ bool DeviceFileCatalog::needRebuildPause()
 
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
+//    qDebug() << "folder being scanned: " << folder;
     QnAbstractStorageResource::FileInfoList files;
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
     {
