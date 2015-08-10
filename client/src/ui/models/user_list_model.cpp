@@ -174,6 +174,22 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
             break;
         } // switch (column)
         break;
+    case Qt::ToolTipRole:
+        switch (index.column()) {
+        case NameColumn:
+            return user->getName();
+        case PermissionsColumn:
+            return d->permissionsString(user);
+        case LdapColumn:
+            return user->isLdap() ? tr("LDAP user") : tr("Normal user");
+        case EnabledColumn:
+            return user->isEnabled() ? tr("Enabled") : tr("Disabled");
+        case EditIconColumn:
+            return tr("Edit user");
+        default:
+            break;
+        } // switch (column)
+        break;
     case Qt::DecorationRole:
         switch (index.column()) {
         case EditIconColumn:
