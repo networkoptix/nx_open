@@ -37,6 +37,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     m_user(0),
     m_hasChanges(false),
     m_inUpdateDependensies(false),
+    m_enabledModified(false),
     m_userNameModified(false),
     m_passwordModified(false),
     m_emailModified(false),
@@ -60,12 +61,14 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
     connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
     connect(ui->emailEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateEmail()));
+    connect(ui->enabledCheckBox,        SIGNAL(clicked(bool)),                  this,   SLOT(updateEnabled()));
     connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(updateAccessRights()));
 
     connect(ui->loginEdit,              &QLineEdit::textChanged, this,   [this](){ setHasChanges(); m_userNameModified = true; } );
     connect(ui->passwordEdit,           &QLineEdit::textChanged, this,   [this](){ setHasChanges(); m_passwordModified = true; } );
     connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged, this,   [this](){ setHasChanges(); } );
     connect(ui->emailEdit,              &QLineEdit::textChanged, this,   [this](){ setHasChanges(); m_emailModified = true; } );
+    connect(ui->enabledCheckBox,        &QCheckBox::clicked,     this,   [this](){ setHasChanges(); m_enabledModified = true; } );
     connect(ui->accessRightsComboBox,   static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this,   [this](){ setHasChanges(); m_accessRightsModified = true; } );
 
@@ -92,6 +95,7 @@ void QnUserSettingsDialog::setHasChanges(bool hasChanges) {
         m_userNameModified = false;
         m_passwordModified = false;
         m_emailModified = false;
+        m_enabledModified = false;
         m_accessRightsModified = false;
     }
 
@@ -262,7 +266,8 @@ void QnUserSettingsDialog::submitToResource() {
     if( m_emailModified )
         m_user->setEmail(ui->emailEdit->text());
 
-    m_user->setEnabled(ui->enabledCheckBox->isChecked());
+    if (m_enabledModified)
+        m_user->setEnabled(ui->enabledCheckBox->isChecked());
 
     setHasChanges(false);
 }
@@ -389,6 +394,8 @@ void QnUserSettingsDialog::updateElement(Element element) {
             valid = false;
         }
         break;
+    case Enabled:
+        break;
     default:
         break;
     }
@@ -408,6 +415,7 @@ void QnUserSettingsDialog::loadAccessRightsToUi(quint64 rights) {
 }
 
 void QnUserSettingsDialog::updateAll() {
+    updateElement(Enabled);
     updateElement(Email);
     updateElement(AccessRights);
     updateElement(Password);
