@@ -24,6 +24,7 @@
 #include <utils/common/request_param.h>
 #include <utils/common/model_functions.h>
 
+#include <api/app_server_connection.h>
 #include <api/serializer/serializer.h>
 #include <event_log/events_serializer.h>
 
@@ -335,6 +336,7 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     if (!videowallGuid.isNull())
         extraHeaders.insert(QString::fromLatin1(Qn::VIDEOWALL_GUID_HEADER_NAME), videowallGuid.toString());
     extraHeaders.insert(QString::fromLatin1(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
+    extraHeaders.insert(QString::fromLatin1(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
     setExtraHeaders(extraHeaders);
 }
 

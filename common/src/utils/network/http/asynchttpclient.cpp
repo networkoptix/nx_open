@@ -41,6 +41,7 @@ namespace nx_http
         m_connectionClosed( false ),
         m_requestBytesSent( 0 ),
         m_authorizationTried( false ),
+        m_ha1RecalcTried( false ),
         m_terminated( false ),
         m_totalBytesRead( 0 ),
         m_contentEncodingUsed( true ),
@@ -442,6 +443,14 @@ namespace nx_http
                 const Response* response = m_httpStreamReader.message().response;
                 if( response->statusLine.statusCode == StatusCode::unauthorized )
                 {
+                    //TODO #ak following block should be moved somewhere
+                    if( !m_ha1RecalcTried &&
+                        response->headers.find( Qn::REALM_HEADER_NAME ) != response->headers.cend() )
+                    {
+                        m_authorizationTried = false;
+                        m_ha1RecalcTried = true;
+                    }
+
                     if( !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
                     {
                         //trying authorization
@@ -572,6 +581,7 @@ namespace nx_http
         }
 
         m_authorizationTried = false;
+        m_ha1RecalcTried = false;
         m_request = nx_http::Request();
     }
 
