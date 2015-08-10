@@ -1,6 +1,8 @@
 #include "user_management_widget.h"
 #include "ui_user_management_widget.h"
 
+#include <QtCore/QSortFilterProxyModel>
+
 #include <api/app_server_connection.h>
 
 #include <core/resource/user_resource.h>
@@ -18,12 +20,15 @@ public:
     QnUserManagementWidget *widget;
 
     QnUserListModel *usersModel;
+    QnSortedUserListModel *sortModel;
 
     QnUserManagementWidgetPrivate(QnUserManagementWidget *parent)
         : QObject(parent)
         , widget(parent)
         , usersModel(new QnUserListModel(parent))
+        , sortModel(new QnSortedUserListModel(parent))
     {
+        sortModel->setSourceModel(usersModel);
     }
 
     void at_usersTable_activated(const QModelIndex &index);
@@ -69,9 +74,10 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->usersTable->setModel(d->usersModel);
+    ui->usersTable->setModel(d->sortModel);
     ui->usersTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->usersTable->horizontalHeader()->setSectionResizeMode(QnUserListModel::PermissionsColumn, QHeaderView::Stretch);
+    ui->usersTable->sortByColumn(QnUserListModel::NameColumn, Qt::AscendingOrder);
 
     connect(ui->usersTable,             &QTableView::activated,     d,      &QnUserManagementWidgetPrivate::at_usersTable_activated);
     connect(ui->usersTable,             &QTableView::clicked,       d,      &QnUserManagementWidgetPrivate::at_usersTable_clicked);

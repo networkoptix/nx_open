@@ -6,6 +6,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <utils/common/string.h>
 
 class QnUserListModelPrivate : public Connective<QObject> {
     typedef Connective<QObject> base_type;
@@ -150,10 +151,12 @@ QnUserListModel::QnUserListModel(QObject *parent)
 QnUserListModel::~QnUserListModel() {}
 
 int QnUserListModel::rowCount(const QModelIndex &parent) const {
+    Q_UNUSED(parent)
     return d->userList.size();
 }
 
 int QnUserListModel::columnCount(const QModelIndex &parent) const {
+    Q_UNUSED(parent)
     return ColumnCount;
 }
 
@@ -259,4 +262,52 @@ Qt::ItemFlags QnUserListModel::flags(const QModelIndex &index) const {
     flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
     return flags;
+}
+
+
+QnSortedUserListModel::QnSortedUserListModel(QObject *parent)
+    : base_type(parent)
+    , QnWorkbenchContextAware(parent)
+{
+}
+
+bool QnSortedUserListModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
+    QnUserResourcePtr leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+    QnUserResourcePtr rightUser = right.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+
+    Q_ASSERT(leftUser);
+    Q_ASSERT(rightUser);
+
+    if (!rightUser)
+        return true;
+    if (!leftUser)
+        return false;
+
+    switch (sortColumn()) {
+    case QnUserListModel::PermissionsColumn: {
+        qint64 leftPermissions = accessController()->globalPermissions(leftUser);
+        qint64 rightPermissions = accessController()->globalPermissions(rightUser);
+        if (leftPermissions == rightPermissions)
+            break;
+        return leftPermissions > rightPermissions; // Use ">" to make the owner higher than others
+    }
+    case QnUserListModel::EnabledColumn: {
+        bool leftEnabled = leftUser->isEnabled();
+        bool rightEnabled = rightUser->isEnabled();
+        if (leftEnabled == rightEnabled)
+            break;
+        return leftEnabled;
+    }
+    case QnUserListModel::LdapColumn: {
+        bool leftLdap = leftUser->isLdap();
+        bool rightLdap = rightUser->isLdap();
+        if (leftLdap == rightLdap)
+            break;
+        return leftLdap;
+    }
+    default:
+        break;
+    }
+
+    return naturalStringLess(leftUser->getName(), rightUser->getName());
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/QAbstractListModel>
+#include <QtCore/QSortFilterProxyModel>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnUserListModelPrivate;
@@ -31,4 +31,15 @@ public:
 private:
     QnUserListModelPrivate *d;
     friend class QnUserListModelPrivate;
+};
+
+
+class QnSortedUserListModel : public QSortFilterProxyModel, public QnWorkbenchContextAware {
+    typedef QSortFilterProxyModel base_type;
+
+public:
+    QnSortedUserListModel(QObject *parent);
+
+protected:
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
 };
