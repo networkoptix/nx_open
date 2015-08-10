@@ -75,8 +75,11 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         bool authInProgress = false;
         while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &authInProgress))
         {
-            if (!authInProgress)
-                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authSession(), Qn::AR_UnauthorizedLogin));
+            if (!authInProgress) {
+                auto session = authSession();
+                session.id = QnUuid::createUuid();
+                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
+            }
 
             if( !d->socket->isConnected() )
                 return false;   //connection has been closed
