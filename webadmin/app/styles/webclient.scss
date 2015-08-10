@@ -284,6 +284,20 @@ table.webclient-window>tbody>tr>td{
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+
+  font-weight: 400;
+  font-size:18px;
+  line-height:30px;
+  color:#53707F;
+}
+
+.camera-view-informer a{
+  color: #91A7B2;
+  text-decoration: underline;
+}
+.camera-view-informer a:hover,
+.camera-view-informer a:active{
+  color: #ffffff;
 }
 
 .camera-view-informer .camera-view-message-icon{
@@ -354,13 +368,21 @@ table.webclient-window>tbody>tr>td{
   background-color: black;
   margin:0;
   padding: 10px 20px;
+  font-weight: 300;
+  font-size:18px;
+  color:#FFFFFF;
 }
 
 
 .mobile-alert .btn{
-  border: 1px solid silver;
+  border: 1px solid #263137;
   border-radius: 5px;
   margin:0;
+  color:#FFFFFF;
+}
+
+.mobile-alert .btn:hover{
+ background-color: rgba(198,234,255,0.15);
 }
 .server-link{
   position:relative;

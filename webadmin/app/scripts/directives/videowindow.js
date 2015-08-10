@@ -32,7 +32,6 @@ angular.module('webadminApp')
 
             link: function (scope, element/*, attrs*/) {
 
-
                 var mimeTypes = {
                     'hls': 'application/x-mpegURL',
                     'webm': 'video/webm',
@@ -85,13 +84,17 @@ angular.module('webadminApp')
                     }
 
                     // Hardcode native support
-                    if(window.jscd.os == "Android" && weHaveWebm){
-                        console.warn("hardcoded support for webm on android");
-                        return "webm"; // TODO: Try removing this line.
+                    if(window.jscd.os == "Android" ){
+                        if(weHaveWebm){
+                            return "webm";
+                            // TODO: Try removing this line.
+                        }else {
+                            scope.noArmSupport = true;
+                            return false;
+                        }
                     }
 
                     if(window.jscd.mobile && weHaveHls){
-                        console.warn("hardcoded support for hls on mobile");
                         return "native-hls"; // Only one choice on mobile.
                         // TODO: Try removing this line.
                     }
@@ -113,7 +116,7 @@ angular.module('webadminApp')
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
-
+                            scope.flashRequired = true;
                             return false; // IE9 - No other supported formats
 
 
@@ -130,12 +133,13 @@ angular.module('webadminApp')
                             if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
                                 return "flashls";
                             }
-                            if(weHaveHls) {
+                            /*if(weHaveHls) {
                                 return "jshls";// We are hoping that we have some good browser
-                            }
-                            if(weHaveRtsp){
+                            }*/
+                            if(weHaveRtsp && window.jscd.flashVersion != '-'){
                                 return "rtsp";
                             }
+                            scope.flashRequired = true;
                             return false; // IE9 - No supported formats
                     }
 
