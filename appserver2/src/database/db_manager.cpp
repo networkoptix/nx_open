@@ -3369,7 +3369,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataLi
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(lit(
+    query.prepare(QString(
         "SELECT guid as id, parent_guid as parentId, skin, systemInfo, "
             "cpuArchitecture, cpuModelName, cpuModelName, openGLVersion,"
             "openGLVendor, openGLRenderer, full_version as fullVersion, systemRuntime "
