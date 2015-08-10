@@ -9,6 +9,10 @@
 #include <utils/common/singleton.h>
 
 
+namespace cdb {
+namespace db {
+
+
 enum class DBResult
 {
     ok,
@@ -16,14 +20,14 @@ enum class DBResult
 };
 
 
-//!
+//!Transaction
 class DBTransaction
 {
 public:
     DBResult commit();
 };
 
-
+//!Executes DB request
 /*!
     Scales DB operations on multiple threads
  */
@@ -32,13 +36,30 @@ class DBManager
     public Singleton<DBManager>
 {
 public:
-    //!Executes \a dbUpdateFunc within proper thread and passes transaction to it
+    //!Executes data modification request that spawns some output data
     /*!
-        \param dbUpdateFunc This function has to commit changes. If commit does not happen, rollback will be called
-        \param completionHandler Result returned by \a dbUpdateFunc is passed here
+        Hold multiple threads inside. \a dbUpdateFunc is executed within random thread.
+        \param dbUpdateFunc This function may executed SQL commands and fill output data
+        \param completionHandler DB operation result is passed here
+        \note DB operation may fail even if \a dbUpdateFunc finished successfully (e.g., transaction commit fails)
     */
-    void executeUpdate( std::function<DBResult(DBTransaction&)> dbUpdateFunc );
-    void executeSelect( std::function<DBResult()> dbSelectFunc );
+    template<typename InputData, typename OutputData>
+    void executeUpdate(
+        std::function<DBResult(DBTransaction&, const InputData&, OutputData* const)> dbUpdateFunc,
+        InputData&& input,
+        std::function<void(DBResult, InputData&&, OutputData&&)> completionHandler );
+    //!Overload for updates with no output data
+    template<typename InputData>
+    void executeUpdate(
+        std::function<DBResult(DBTransaction&, const InputData&)> dbUpdateFunc,
+        InputData&& input,
+        std::function<void(DBResult, InputData&&)> completionHandler );
+    template<typename OutputData>
+    void executeSelect( std::function<DBResult(OutputData* const)> dbSelectFunc );
 };
+
+
+}   //db
+}   //cdb
 
 #endif

@@ -19,12 +19,15 @@
 
 namespace cdb {
 
+/*!
+    \note Methods of this class are re-enterable
+*/
 class AccountManager
 :
     public Singleton<AccountManager>
 {
 public:
-    //!Adds account in "not activated" state and sends verification email to the provided address
+    //!Adds account in "not activated" state and sends verification email to the address provided
     void addAccount(
         const AuthorizationInfo& authzInfo,
         const data::AccountData& accountData,
@@ -40,7 +43,17 @@ public:
         const AuthorizationInfo& authzInfo,
         const std::string& userName,
         std::function<void(ResultCode, data::AccountData)> completionHandler );
-};
+    
+private:
+    db::DBResult insertAccount(
+        db::DBTransaction& tran,
+        const data::AccountData& accountData,
+        data::EmailVerificationCode* const resultData );
+    void accountAdded(
+        db::DBResult resultCode,
+        data::AccountData&& accountData,
+        data::EmailVerificationCode&& resultData,
+        std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler );
 
 }   //cdb
 

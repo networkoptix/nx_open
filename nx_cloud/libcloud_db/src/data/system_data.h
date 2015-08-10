@@ -11,6 +11,9 @@
 #include <utils/common/uuid.h>
 
 
+namespace cdb {
+namespace data {
+
 class SubscriptionData
 {
 public:
@@ -26,5 +29,8 @@ public:
     bool cloudConnectionSubscriptionStatus;
     //TODO
 };
+
+}   //data
+}   //cdb
 
 #endif //CLOUD_DB_SYSTEM_DATA_H

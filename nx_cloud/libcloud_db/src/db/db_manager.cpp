@@ -6,6 +6,10 @@
 #include "db_manager.h"
 
 
+namespace cdb {
+namespace db {
+
+
 DBResult DBTransaction::commit()
 {
     //TODO #ak
@@ -22,3 +26,7 @@ void DBManager::executeSelect( std::function<DBResult()> dbSelectFunc )
 {
     //TODO #ak
 }
+
+
+}   //db
+}   //cdb

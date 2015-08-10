@@ -5,9 +5,12 @@
 
 #include "account_manager.h"
 
+#include <functional>
+
+#include "db/db_manager.h"
+
 
 namespace cdb {
-
 
 void AccountManager::addAccount(
     const AuthorizationInfo& authzInfo,
@@ -15,8 +18,12 @@ void AccountManager::addAccount(
     std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler )
 {
     //TODO #ak
-
-    completionHandler( ResultCode::ok, data::EmailVerificationCode() );
+    
+    using namespace std::placeholders;
+    db::DBManager::instance()->executeUpdate(
+        std::bind(&AccountManager::insertAccount, this, _1, _2, _3),
+        std::move(accountData),
+        std::bind(&AccountManager::accountAdded, this, _1, _2, _3, std::move(completionHandler)) );
 }
 
 void AccountManager::verifyAccountEmailAddress(
@@ -35,4 +42,53 @@ void AccountManager::getAccountByLogin(
     //TODO #ak
 }
 
+db::DBResult AccountManager::insertAccount(
+    db::DBTransaction& tran,
+    const data::AccountData& accountData,
+    data::EmailVerificationCode* const resultData )
+{
+    //TODO #ak executing sql query
+    
+    
+    return DBResult::ok;
+}
+
+void AccountManager::accountAdded(
+    db::DBResult resultCode,
+    data::AccountData&& accountData,
+    data::EmailVerificationCode&& resultData,
+    std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler )
+{
+    //TODO #ak
+    if( resultCode == db::DBResult::ok )
+    {
+        //TODO updating cache
+        //m_cache.add( accountData.id, std::move(accountData) );
+        //TODO sending email
+        //EmailManager::instance()->send( accountData.email, ... );
+    }
+    
+    completionHandler(
+        resultCode == db::DBResult::ok ? ResultCode::ok : ResultCode::dbError,
+        std:move( resultData ) );
+}
+
 }   //cdb
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

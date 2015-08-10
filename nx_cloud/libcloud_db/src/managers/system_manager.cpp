@@ -14,32 +14,21 @@ namespace cdb {
 
 void SystemManager::bindSystemToAccount(
     const AuthorizationInfo& authzInfo,
-    const QnUuid& accountID,
-    const QnUuid& systemID,
-    const std::string& systemName,
-    std::function<void(ResultCode, SystemData)> completionHandler )
+    const data::SystemData& systemData,
+    std::function<void(ResultCode)> completionHandler )
 {
-    if( authzInfo.accessAllowedToOwnDataOnly() )
+    QnUuid accountID;
+    if( authzInfo.get(cdb::param::accountID, &accountID) )
     {
-        //comparing accountID and authenticated account id
-        QnUuid authAccountID;
-        if( !authzInfo.get(cdb::param::accountID, &authAccountID) ||
-            authAccountID != accountID)
-        {
-            completionHandler( ResultCode::notAuthorized, SystemData() );
-            return;
-        }
+        completionHandler( ResultCode::notAuthorized );
+        return;
     }
 
-    SystemData newSystem;
-    //TODO filling newSystem
-
-    DBManager::instance()->executeUpdate(
-        std::bind(
-            &SystemManager::insertSystemToDB,
-            this, std::placeholders::_1,
-            std::move(newSystem),
-            std::move(completionHandler)) );
+    using namespace std::placeholders;
+    db::DBManager::instance()->executeUpdate(
+        std::bind(&SystemManager::insertSystemToDB, this, _1, _2),
+        std::move(systemData),
+        std::bind(&SystemManager::systemAdded, this, _1, _2, std::move(completionHandler)) );
 }
 
 void SystemManager::getSystems(
@@ -71,10 +60,9 @@ void SystemManager::getSystems(
     }
 }
 
-DBResult SystemManager::insertSystemToDB(
-    DBTransaction& tran,
-    const SystemData& newSystem,
-    std::function<void(ResultCode, SystemData)> completionHandler )
+db::DBResult SystemManager::insertSystemToDB(
+    db::DBTransaction& tran,
+    const SystemData& newSystem )
 {
     //sql: inserting (/updating?) record
     //sql: fetching newly created (/existing?) record (if needed)
@@ -82,16 +70,35 @@ DBResult SystemManager::insertSystemToDB(
     //TODO #ak sql: fetching transaction id
     TransactionSequence transactionID = 0;
 
-    const DBResult dbResult = tran.commit();
-    if( dbResult == DBResult::ok )
+    return db::DBResult::ok;
+}
+
+void SystemManager::systemAdded(
+    db::DBResult resultCode,
+    SystemData&& systemData,
+    std::function<void(ResultCode)> completionHandler )
+{
+    if( dbResult == db::DBResult::ok )
     {
         //TODO #ak updating account cache
         //m_cache.recordModified( transactionID, newSystem.id, newSystem );
     }
-    completionHandler(
-        dbResult == DBResult::ok ? ResultCode::ok : ResultCode::dbError,
-        newSystem );
-    return dbResult;
+    completionHandler( dbResult == db::DBResult::ok ? ResultCode::ok : ResultCode::dbError );
 }
 
 }   //cdb
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

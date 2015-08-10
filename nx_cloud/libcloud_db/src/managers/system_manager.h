@@ -48,13 +48,11 @@ typedef DataInsertUpdateEvent<SystemData> SystemInsertUpdateEvent;
 class SystemManager
 {
 public:
-    //!Binds system to account, associated with \a authInfo
+    //!Binds system to an account associated with \a authzInfo
     void bindSystemToAccount(
         const AuthorizationInfo& authzInfo,
-        const QnUuid& accountID,
-        const QnUuid& systemID,
-        const std::string& systemName,
-        std::function<void(ResultCode, SystemData)> completionHandler );
+        const data::SystemData& systemData,
+        std::function<void(ResultCode)> completionHandler );
     void unbindSystem(
         const AuthorizationInfo& authzInfo,
         const QnUuid& systemID,
@@ -95,10 +93,13 @@ public:
     void unregisterNotificationReceiver( int receiverID );
 
 private:
-    DBResult insertSystemToDB(
-        DBTransaction& tran,
-        const SystemData& newSystem,
-        std::function<void(ResultCode, SystemData)> completionHandler );
+    db::DBResult insertSystemToDB(
+        db::DBTransaction& tran,
+        const SystemData& newSystem );
+    void systemAdded(
+        db::DBResult resultCode,
+        SystemData&& systemData,
+        std::function<void(ResultCode)> completionHandler )
 };
 
 }   //cdb
