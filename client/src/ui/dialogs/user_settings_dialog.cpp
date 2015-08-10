@@ -224,12 +224,16 @@ void QnUserSettingsDialog::updateFromResource() {
     updateLogin();
     updatePassword();
 
-    if (m_user->isLdap()) {
-        ui->enabledCheckBox->setChecked(m_user->isEnabled());
-    } else {
-        ui->enabledLabel->hide();
-        ui->enabledCheckBox->hide();
-    }
+    ui->enabledCheckBox->setChecked(m_user->isEnabled());
+
+    bool ldap = m_user->isLdap();
+
+    ui->loginEdit->setReadOnly(ldap);
+    ui->emailEdit->setReadOnly(ldap);
+    ui->passwordEdit->setVisible(!ldap);
+    ui->passwordLabel->setVisible(!ldap);
+    ui->confirmPasswordEdit->setVisible(!ldap);
+    ui->confirmPasswordLabel->setVisible(!ldap);
 
     setHasChanges(false);
 }
@@ -257,6 +261,8 @@ void QnUserSettingsDialog::submitToResource() {
     }
     if( m_emailModified )
         m_user->setEmail(ui->emailEdit->text());
+
+    m_user->setEnabled(ui->enabledCheckBox->isChecked());
 
     setHasChanges(false);
 }
