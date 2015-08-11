@@ -16,12 +16,12 @@ Expandable.MaskedSettingsPanel
 
     propertiesGroupName: qsTr("Configure Device Network Settings");
 
-    function tryApplyChanges()
+    function tryApplyChanges(warnings)
     {
         if (!changed)
             return true;
         
-        return maskedArea.tryApplyChanges();
+        return maskedArea.tryApplyChanges(warnings);
     }
 
     propertiesDelegate: Component
@@ -30,7 +30,7 @@ Expandable.MaskedSettingsPanel
 
         Row
         {
-            function tryApplyChanges()
+            function tryApplyChanges(warnings)
             {
                 if (portNumber.changed)
                     rtuContext.changesManager().addPortChange(Number(portNumber.text));
@@ -44,7 +44,7 @@ Expandable.MaskedSettingsPanel
                     return true;
                 }
 
-                return (flagged.currentItem.item.tryApplyChanges());
+                return (flagged.currentItem.item.tryApplyChanges(warnings));
             }
 
             property bool changed: portNumber.changed || flagged.changed;
