@@ -385,7 +385,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         break;
     }
     case ServerTerminatedReason: {
-        result = tr("Server terminated.");
+        result = tr("Connection to server is lost.");
         break;
     }
     case ServerStartedReason: {
