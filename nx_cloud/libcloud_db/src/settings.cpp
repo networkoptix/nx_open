@@ -5,10 +5,11 @@
 
 #include "settings.h"
 
-#include <QLatin1String>
-#include <QString>
+#include <thread>
 
+#include <QtCore/QLatin1String>
 #include <QtCore/QStandardPaths>
+#include <QtCore/QString>
 
 #include "version.h"
 
@@ -21,18 +22,42 @@ namespace
 #else
     static const QLatin1String DEFAULT_LOG_LEVEL( "INFO" );
 #endif
+    static const QLatin1String LOG_DIR( "logDir" );
 
     static const QLatin1String ENDPOINTS_TO_LISTEN( "listenOn" );
     static const QLatin1String DEFAULT_ENDPOINTS_TO_LISTEN( ":3346" );
 
     static const QLatin1String DATA_DIR( "dataDir" );
-    
-    static const QLatin1String LOG_DIR( "logDir" );
+
+    //DB options
+    static const QLatin1String DB_DRIVER_NAME( "db/driverName" );
+    static const QLatin1String DEFAULT_DB_DRIVER_NAME( "QMYSQL" );
+
+    static const QLatin1String DB_HOST_NAME( "db/hostName" );
+    static const QLatin1String DEFAULT_DB_HOST_NAME( "127.0.0.1" );
+
+    static const QLatin1String DB_PORT( "db/port" );
+    static const int DEFAULT_DB_PORT = 3306;
+
+    static const QLatin1String DB_DB_NAME( "db/dbName" );
+    static const QLatin1String DEFAULT_DB_DB_NAME( "nx_cloud" );
+
+    static const QLatin1String DB_USER_NAME( "db/userName" );
+    static const QLatin1String DEFAULT_DB_USER_NAME( "root" );
+
+    static const QLatin1String DB_PASSWORD( "db/password" );
+    static const QLatin1String DEFAULT_DB_PASSWORD( "" );
+
+    static const QLatin1String DB_CONNECT_OPTIONS( "db/connectOptions" );
+    static const QLatin1String DEFAULT_DB_CONNECT_OPTIONS( "" );
+
+    static const QLatin1String DB_MAX_CONNECTIONS( "db/maxConnections" );
+    static const QLatin1String DEFAULT_DB_MAX_CONNECTIONS( "1" );
 }
 
 
-namespace cdb
-{
+namespace cdb {
+namespace conf {
 
 
 Settings::Settings()
@@ -56,11 +81,14 @@ bool Settings::showHelp() const
     return m_showHelp;
 }
 
-QString Settings::logLevel() const
+Logging Settings::logging() const
 {
-    if( !m_logLevel.isEmpty() )
-        return m_logLevel;
-    return m_settings.value( LOG_LEVEL, DEFAULT_LOG_LEVEL ).toString();
+    return m_logging;
+}
+
+db::ConnectionOptions Settings::dbConnectionOptions() const
+{
+    return m_dbConnectionOptions;
 }
 
 std::list<SocketAddress> Settings::endpointsToListen() const
@@ -94,16 +122,10 @@ QString Settings::dataDir() const
 #endif
 }
 
-QString Settings::logDir() const
-{
-    return m_settings.value(
-        LOG_DIR,
-        dataDir() + lit( "/log/" ) ).toString();
-}
-
-void Settings::parseArgs( int argc, char **argv )
+void Settings::load( int argc, char **argv )
 {
     m_commandLineParser.parse( argc, argv, stderr );
+    loadConfiguration();
 }
 
 void Settings::printCmdLineArgsHelp()
@@ -121,5 +143,26 @@ void Settings::fillSupportedCmdParameters()
         DEFAULT_LOG_LEVEL );
 }
 
+void Settings::loadConfiguration()
+{
+    //log
+    m_logging.logLevel = !m_logLevel.isEmpty()
+        ? m_logLevel
+        : m_settings.value( LOG_LEVEL, DEFAULT_LOG_LEVEL ).toString();
+    m_logging.logDir = m_settings.value( LOG_DIR, dataDir() + lit( "/log/" ) ).toString();
 
+    //DB
+    m_dbConnectionOptions.driverName = m_settings.value( DB_DRIVER_NAME, DEFAULT_DB_DRIVER_NAME ).toString();
+    m_dbConnectionOptions.hostName = m_settings.value( DB_HOST_NAME, DEFAULT_DB_HOST_NAME ).toString();
+    m_dbConnectionOptions.port = m_settings.value( DB_PORT, DEFAULT_DB_PORT ).toInt();
+    m_dbConnectionOptions.dbName = m_settings.value( DB_DB_NAME, DEFAULT_DB_DB_NAME ).toString();
+    m_dbConnectionOptions.userName = m_settings.value( DB_USER_NAME, DEFAULT_DB_USER_NAME ).toString();
+    m_dbConnectionOptions.password = m_settings.value( DB_PASSWORD, DEFAULT_DB_PASSWORD ).toString();
+    m_dbConnectionOptions.connectOptions = m_settings.value( DB_CONNECT_OPTIONS, DEFAULT_DB_CONNECT_OPTIONS ).toString();
+    m_dbConnectionOptions.maxConnectionCount = m_settings.value( DB_MAX_CONNECTIONS, DEFAULT_DB_MAX_CONNECTIONS ).toUInt();
+    if( m_dbConnectionOptions.maxConnectionCount == 0 )
+        m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
+}
+
+}   //conf
 }   //cdb

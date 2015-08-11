@@ -20,6 +20,13 @@
 
 class QnCommandLineParser;
 
+namespace nx_http
+{
+    class MessageDispatcher;
+}
+
+namespace cdb {
+
 class CloudDBProcess
 :
     public QtService<QtSingleCoreApplication>,
@@ -41,7 +48,10 @@ private:
     char** m_argv;
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
 
-    void initializeLogging( const cdb::Settings& settings );
+    void initializeLogging( const conf::Settings& settings );
+    void registerApiHandlers( nx_http::MessageDispatcher* const msgDispatcher );
 };
+
+}   //cdb
 
 #endif  //HOLE_PUNCHER_SERVICE_H

@@ -13,10 +13,22 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/network/socket_common.h>
 
+#include "db/types.h"
 
-namespace cdb
+
+namespace cdb {
+namespace conf {
+
+class Logging
 {
+public:
+    QString logLevel;
+    QString logDir;
+};
 
+/*!
+    \note Values specified via command-line have priority over conf file (or win32 registry) values
+*/
 class Settings
 {
 public:
@@ -24,13 +36,15 @@ public:
 
     bool showHelp() const;
 
-    QString logLevel() const;
     //!list of local endpoints to bind to. By default, 0.0.0.0:3346
     std::list<SocketAddress> endpointsToListen() const;
     QString dataDir() const;
-    QString logDir() const;
+    
+    Logging logging() const;
+    db::ConnectionOptions dbConnectionOptions() const;
 
-    void parseArgs( int argc, char **argv );
+    //!Loads settings from both command line and conf file (or win32 registry)
+    void load( int argc, char **argv );
     //!Prints to std out
     void printCmdLineArgsHelp();
 
@@ -40,9 +54,14 @@ private:
     bool m_showHelp;
     QString m_logLevel;
 
+    Logging m_logging;
+    db::ConnectionOptions m_dbConnectionOptions;
+
     void fillSupportedCmdParameters();
+    void loadConfiguration();
 };
 
+}   //conf
 }   //cdb
 
 #endif  //NX_CLOUD_DB_SETTING_H

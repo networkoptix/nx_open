@@ -94,7 +94,7 @@ public:
 
 private:
     db::DBResult insertSystemToDB(
-        db::DBTransaction& tran,
+        QSqlDatabase* const tran,
         const data::SystemData& newSystem );
     void systemAdded(
         db::DBResult resultCode,

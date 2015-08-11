@@ -47,7 +47,7 @@ public:
     
 private:
     db::DBResult insertAccount(
-        db::DBTransaction& tran,
+        QSqlDatabase* const tran,
         const data::AccountData& accountData,
         data::EmailVerificationCode* const resultData );
     void accountAdded(

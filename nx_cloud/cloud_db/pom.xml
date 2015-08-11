@@ -24,7 +24,7 @@
     <properties>
         <product.title>${company.name} cloud_db</product.title>
         <!--Global libs-->
-        <qt.libs>core network concurrent</qt.libs>
+        <qt.libs>core network concurrent sql</qt.libs>
         <global.libs>-lcommon -ludt -lcloud_db</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>

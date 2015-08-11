@@ -64,7 +64,7 @@ void SystemManager::getSystems(
 }
 
 db::DBResult SystemManager::insertSystemToDB(
-    db::DBTransaction& tran,
+    QSqlDatabase* const tran,
     const data::SystemData& newSystem )
 {
     //sql: inserting (/updating?) record

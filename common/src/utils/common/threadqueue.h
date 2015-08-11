@@ -49,7 +49,8 @@ public:
         return false;
     }
 
-    bool push(const T& val) 
+    template<typename ValueRef>
+    bool push(ValueRef&& val)
     { 
         QnMutexLocker mutex( &m_cs );
 
@@ -63,7 +64,7 @@ public:
 
         //m_queue.enqueue(val); 
         int index = (m_headIndex + m_bufferLen) % m_buffer.size();
-        m_buffer[index] = val;
+        m_buffer[index] = std::forward<ValueRef>(val);
         m_bufferLen++;
 
         m_sem.release(); 
@@ -212,10 +213,10 @@ private:
             int delta = newSize-oldSize;
 
             for (int i = 0; i < delta && i < tailIndex; ++i)
-                m_buffer[oldSize + i] = m_buffer[i];
+                m_buffer[oldSize + i] = std::move(m_buffer[i]);
             int i = 0;
             for (;i < tailIndex - delta; ++i)
-                m_buffer[i] = m_buffer[i+delta];
+                m_buffer[i] = std::move(m_buffer[i+delta]);
             for (;i < tailIndex; ++i)
                 m_buffer[i] = T();
         }

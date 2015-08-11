@@ -5,15 +5,64 @@
 
 #include "db_manager.h"
 
+#include <utils/common/log.h>
+
+#include <thread>
+
 
 namespace cdb {
 namespace db {
 
 
-DBResult DBTransaction::commit()
+static const int WAITING_TASKS_COEFF = 5;
+
+DBManager::DBManager( const ConnectionOptions& connectionOptions )
+:
+    m_connectionOptions( connectionOptions ),
+    m_connectionsBeingAdded( 0 )
 {
-    //TODO #ak
-    return DBResult::ioError;
+}
+
+DBManager::~DBManager()
+{
+}
+
+bool DBManager::init()
+{
+    return openOneMoreConnectionIfNeeded();
+}
+
+bool DBManager::openOneMoreConnectionIfNeeded()
+{
+    {
+        QnMutexLocker lk( &m_mutex );   
+
+        const auto effectiveDBConnectionCount = m_dbThreadPool.size() + m_connectionsBeingAdded;
+        if( m_requestQueue.size() < effectiveDBConnectionCount * WAITING_TASKS_COEFF ||  //task number is not too high
+            effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount )    //pool size is already at maximum
+        {
+            return true;
+        }
+        ++m_connectionsBeingAdded;
+    }
+
+    //adding another connection
+    auto executorThread = std::make_unique<DbRequestExecutionThread>(
+        m_connectionOptions,
+        &m_requestQueue );
+    //avoiding locking mutex for connecting phase
+    if( !executorThread->open() )
+    {
+        NX_LOG( lit("Failed to initialize connection to DB"), cl_logWARNING );
+        QnMutexLocker lk( &m_mutex );
+        --m_connectionsBeingAdded;
+        return false;
+    }
+
+    QnMutexLocker lk( &m_mutex );
+    m_dbThreadPool.push_back( std::move( executorThread ) );
+    --m_connectionsBeingAdded;
+    return true;
 }
 
 

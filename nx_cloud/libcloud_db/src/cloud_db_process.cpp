@@ -6,8 +6,10 @@
 #include "cloud_db_process.h"
 
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <list>
+#include <thread>
 
 #include <QtCore/QDir>
 
@@ -18,10 +20,13 @@
 #include <utils/network/http/server/server_managers.h>
 
 #include "access_control/authentication_manager.h"
+#include "db/db_manager.h"
 #include "http_handlers/add_account_handler.h"
 
 #include "version.h"
 
+
+namespace cdb {
 
 CloudDBProcess::CloudDBProcess( int argc, char **argv )
 : 
@@ -40,9 +45,9 @@ void CloudDBProcess::pleaseStop()
 int CloudDBProcess::executeApplication()
 {
     //reading settings
-    cdb::Settings settings;
+    conf::Settings settings;
     //parsing command line arguments
-    settings.parseArgs( m_argc, m_argv );
+    settings.load( m_argc, m_argv );
     if( settings.showHelp() )
     {
         settings.printCmdLineArgsHelp();
@@ -58,6 +63,15 @@ int CloudDBProcess::executeApplication()
         return 1;
     }
 
+    db::DBManager dbManager( settings.dbConnectionOptions() );
+    for( ;; )
+    {
+        if( dbManager.init() )
+            break;
+        NX_LOG( lit("Cannot start application due to DB connect error"), cl_logALWAYS );
+        std::this_thread::sleep_for( std::chrono::seconds( 5 ) );
+    }
+
     //contains singletones common for http server
     nx_http::ServerManagers httpServerManagers;
 
@@ -68,8 +82,7 @@ int CloudDBProcess::executeApplication()
     httpServerManagers.setAuthenticationManager( &authenticationManager );
 
     //registering HTTP handlers
-    httpMessageDispatcher.registerRequestProcessor<cdb::AddAccountHttpHandler>(
-        cdb::AddAccountHttpHandler::HANDLER_PATH );
+    registerApiHandlers( &httpMessageDispatcher );
 
     using namespace std::placeholders;
 
@@ -85,6 +98,8 @@ int CloudDBProcess::executeApplication()
 
     if( !m_multiAddressHttpServer->listen() )
         return 5;
+
+    NX_LOG( lit( "%1 has been started" ).arg(QN_APPLICATION_NAME), cl_logALWAYS );
 
     //TODO #ak remove qt event loop
     //application's main loop
@@ -113,17 +128,17 @@ void CloudDBProcess::stop()
     application()->quit();
 }
 
-void CloudDBProcess::initializeLogging( const cdb::Settings& settings )
+void CloudDBProcess::initializeLogging( const conf::Settings& settings )
 {
     //logging
-    if( settings.logLevel() != QString::fromLatin1("none") )
+    if( settings.logging().logLevel != QString::fromLatin1("none") )
     {
-        const QString& logDir = settings.logDir();
+        const QString& logDir = settings.logging().logDir;
             
         QDir().mkpath(logDir);
         const QString& logFileName = logDir + lit("/log_file");
         if( cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1) )
-            QnLog::initLog( settings.logLevel() );
+            QnLog::initLog( settings.logging().logLevel );
         else
             std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
         NX_LOG(lit("================================================================================="), cl_logALWAYS);
@@ -132,3 +147,11 @@ void CloudDBProcess::initializeLogging( const cdb::Settings& settings )
         NX_LOG(lit("Software revision: %1").arg(QN_APPLICATION_REVISION), cl_logALWAYS);
     }
 }
+
+void CloudDBProcess::registerApiHandlers( nx_http::MessageDispatcher* const msgDispatcher )
+{
+    msgDispatcher->registerRequestProcessor<cdb::AddAccountHttpHandler>(
+        cdb::AddAccountHttpHandler::HANDLER_PATH );
+}
+
+}   //cdb
