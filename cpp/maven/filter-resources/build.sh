@@ -38,7 +38,7 @@ case `uname -s` in
         ;;
 esac
 if [ '${box}' == 'isd' ] || [ '${box}' == 'isd_s2' ]; then
-    if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'mediaserver_core' ]  || [ '${project.artifactId}' == 'appserver2' ] || [ '${project.artifactId}' == 'isd_native_plugin' ]; then
+    if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'appserver2' ] || [ '${project.artifactId}' == 'isd_native_plugin' ]; then
         DEBUG=ext_debug
     fi
 fi
