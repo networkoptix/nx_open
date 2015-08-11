@@ -13,6 +13,7 @@
 #include "types.h"
 
 
+namespace nx {
 namespace cdb {
 
 //!Performs request authorization based on authentication info, requested entity and requested action type
@@ -38,5 +39,6 @@ public:
 };
 
 }   //cdb
+}   //nx
 
 #endif

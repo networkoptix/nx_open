@@ -9,6 +9,9 @@
 #include <stdint.h>
 
 
+namespace nx {
+namespace cdb {
+
 typedef uint64_t TransactionSequence;
 static const TransactionSequence INVALID_TRANSACTION = (uint64_t)-1;
 
@@ -45,5 +48,8 @@ class DataDeleteEvent
 {
 public:
 };
+
+}   //cdb
+}   //nx
 
 #endif

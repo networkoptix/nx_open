@@ -12,6 +12,9 @@
 #include "types.h"
 
 
+namespace nx {
+namespace cdb {
+
 //!Performs authentication based on various parameters
 /*!
     Typically, username/digest is used to authenticate, but IP address/network interface and other data can be used also.
@@ -40,5 +43,8 @@ private:
     //    const stree::AbstractResourceReader& inputParams,
     //    std::function<void(AuthenticationInfo)> completionHandler ) const;
 };
+
+}   //cdb
+}   //nx
 
 #endif

@@ -16,6 +16,7 @@
 #include "db/types.h"
 
 
+namespace nx {
 namespace cdb {
 namespace conf {
 
@@ -63,5 +64,6 @@ private:
 
 }   //conf
 }   //cdb
+}   //nx
 
 #endif  //NX_CLOUD_DB_SETTING_H

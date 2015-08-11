@@ -18,6 +18,7 @@
 #include "types.h"
 
 
+namespace nx {
 namespace cdb {
 
 typedef DataChangeEvent SystemChangeEvent;
@@ -103,5 +104,6 @@ private:
 };
 
 }   //cdb
+}   //nx
 
 #endif

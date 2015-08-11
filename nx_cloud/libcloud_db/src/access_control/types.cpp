@@ -6,7 +6,9 @@
 #include "types.h"
 
 
+namespace nx {
 namespace cdb {
+
 
 AuthorizationInfo::AuthorizationInfo()
 {
@@ -28,4 +30,6 @@ bool AuthorizationInfo::accessAllowedToOwnDataOnly() const
     return false;
 }
 
+
 }   //cdb
+}   //nx

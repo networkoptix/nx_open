@@ -14,9 +14,9 @@
 #include "request_executor.h"
 
 
+namespace nx {
 namespace cdb {
 namespace db {
-
 
 
 class DbRequestExecutionThread
@@ -49,5 +49,6 @@ private:
 
 }   //db
 }   //cdb
+}   //nx
 
 #endif  //NX_CLOUD_DB_REQUEST_EXECUTION_THREAD_H

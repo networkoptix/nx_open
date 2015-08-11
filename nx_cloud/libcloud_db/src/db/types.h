@@ -9,6 +9,7 @@
 #include <QtCore/QString>
 
 
+namespace nx {
 namespace cdb {
 namespace db {
 
@@ -44,5 +45,6 @@ public:
 
 }   //db
 }   //cdb
+}   //nx
 
 #endif  //NX_CLOUD_DB_DB_TYPES_H

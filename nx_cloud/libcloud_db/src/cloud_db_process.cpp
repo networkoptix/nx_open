@@ -26,6 +26,7 @@
 #include "version.h"
 
 
+namespace nx {
 namespace cdb {
 
 static const int DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC = 5;
@@ -157,3 +158,4 @@ void CloudDBProcess::registerApiHandlers( nx_http::MessageDispatcher* const msgD
 }
 
 }   //cdb
+}   //nx

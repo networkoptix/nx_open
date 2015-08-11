@@ -16,6 +16,7 @@
 
 class QSqlDatabase;
 
+namespace nx {
 namespace cdb {
 namespace db {
 
@@ -42,5 +43,6 @@ private:
 
 }   //db
 }   //cdb
+}   //nx
 
 #endif  //DB_STRUCTURE_UPDATER_H

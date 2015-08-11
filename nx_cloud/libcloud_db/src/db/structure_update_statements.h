@@ -7,8 +7,10 @@
 #define NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H
 
 
+namespace nx {
 namespace cdb {
 namespace db {
+
 
 static const char createDbVersionTables[] = 
 "\
@@ -17,7 +19,9 @@ CREATE TABLE internal_data (                        \
 );                                                  \
 ";
 
+
 }   //db
 }   //cdb
+}   //nx
 
 #endif  //NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H

@@ -4,10 +4,13 @@
 ***********************************************************/
 
 
-namespace cdb
+namespace nx {
+namespace cdb {
+
+enum param
 {
-    enum param
-    {
-        accountID
-    };
-}
+    accountID
+};
+
+}   //cdb
+}   //nx

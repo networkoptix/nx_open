@@ -16,6 +16,7 @@
 #include "structure_update_statements.h"
 
 
+namespace nx {
 namespace cdb {
 namespace db {
 
@@ -78,3 +79,4 @@ DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection 
 
 }   //db
 }   //cdb
+}   //nx

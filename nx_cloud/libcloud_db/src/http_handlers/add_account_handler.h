@@ -16,8 +16,8 @@
 #include "managers/types.h"
 
 
-namespace cdb
-{
+namespace nx {
+namespace cdb {
 
 class AddAccountHttpHandler
 :
@@ -49,6 +49,7 @@ private:
         data::EmailVerificationCode outData );
 };
 
-}
+}   //cdb
+}   //nx
 
 #endif  //cloud_db_add_account_handler_h

@@ -11,8 +11,10 @@
 #include <utils/common/uuid.h>
 
 
+namespace nx {
 namespace cdb {
 namespace data {
+
 
 class SubscriptionData
 {
@@ -30,7 +32,9 @@ public:
     //TODO
 };
 
+
 }   //data
 }   //cdb
+}   //nx
 
 #endif //CLOUD_DB_SYSTEM_DATA_H

@@ -18,6 +18,7 @@
 #include "types.h"
 
 
+namespace nx {
 namespace cdb {
 
 /*!
@@ -58,5 +59,6 @@ private:
 };
 
 }   //cdb
+}   //nx
 
 #endif

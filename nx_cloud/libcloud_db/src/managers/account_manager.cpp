@@ -8,6 +8,7 @@
 #include <functional>
 
 
+namespace nx {
 namespace cdb {
 
 void AccountManager::addAccount(
@@ -72,3 +73,4 @@ void AccountManager::accountAdded(
 }
 
 }   //cdb
+}   //nx

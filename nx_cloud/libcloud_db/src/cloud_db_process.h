@@ -25,6 +25,7 @@ namespace nx_http
     class MessageDispatcher;
 }
 
+namespace nx {
 namespace cdb {
 
 class CloudDBProcess
@@ -53,5 +54,6 @@ private:
 };
 
 }   //cdb
+}   //nx
 
 #endif  //HOLE_PUNCHER_SERVICE_H

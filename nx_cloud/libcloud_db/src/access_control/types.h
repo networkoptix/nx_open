@@ -9,6 +9,7 @@
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 
 
+namespace nx {
 namespace cdb {
 
 enum class AccessRole
@@ -51,5 +52,6 @@ public:
 };
 
 }   //cdb
+}   //nx
 
 #endif

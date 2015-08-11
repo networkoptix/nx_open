@@ -6,8 +6,10 @@
 #include "account_data.h"
 
 
+namespace nx {
 namespace cdb {
 namespace data {
+
 
 bool AccountData::getAsVariant( int resID, QVariant* const value ) const
 {
@@ -15,5 +17,7 @@ bool AccountData::getAsVariant( int resID, QVariant* const value ) const
     return false;
 }
 
+
 }   //data
 }   //cdb
+}   //nx

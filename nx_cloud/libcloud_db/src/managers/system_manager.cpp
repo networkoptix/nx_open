@@ -10,6 +10,7 @@
 #include "db/db_manager.h"
 
 
+namespace nx {
 namespace cdb {
 
 void SystemManager::bindSystemToAccount(
@@ -90,3 +91,4 @@ void SystemManager::systemAdded(
 }
 
 }   //cdb
+}   //nx

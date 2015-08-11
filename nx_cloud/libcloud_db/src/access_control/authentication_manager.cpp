@@ -6,6 +6,9 @@
 #include "authentication_manager.h"
 
 
+namespace nx {
+namespace cdb {
+
 bool AuthenticationManager::authenticate(
     const nx_http::HttpServerConnection& connection,
     const nx_http::Request& request,
@@ -25,3 +28,6 @@ bool AuthenticationManager::authenticate(
 //    //TODO #ak authenticating with stree (to identify nx_cloud module)
 //    return false;
 //}
+
+}   //cdb
+}   //nx

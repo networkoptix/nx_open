@@ -12,6 +12,7 @@
 #include "db_structure_updater.h"
 
 
+namespace nx {
 namespace cdb {
 namespace db {
 
@@ -76,3 +77,4 @@ bool DBManager::openOneMoreConnectionIfNeeded()
 
 }   //db
 }   //cdb
+}   //nx

@@ -6,7 +6,9 @@
 #include "authorization_manager.h"
 
 
+namespace nx {
 namespace cdb {
+
 
 bool AuthorizationManager::authorize(
     const stree::AbstractResourceReader& dataToAuthorize,
@@ -18,4 +20,6 @@ bool AuthorizationManager::authorize(
     return true;
 }
 
+
 }   //cdb
+}   //nx

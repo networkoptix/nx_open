@@ -13,7 +13,7 @@
 #endif
 
 
-static cdb::CloudDBProcess* serviceInstance = NULL;
+static nx::cdb::CloudDBProcess* serviceInstance = NULL;
 
 void stopServer( int /*signal*/ )
 {
@@ -39,7 +39,7 @@ int libCloudDBMain(int argc, char* argv[])
     signal(SIGTERM, stopServer);
 #endif
 
-    cdb::CloudDBProcess service(argc, argv);
+    nx::cdb::CloudDBProcess service(argc, argv);
     serviceInstance = &service;
     const int result = service.exec();
 

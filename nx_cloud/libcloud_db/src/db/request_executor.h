@@ -13,6 +13,7 @@
 #include "types.h"
 
 
+namespace nx {
 namespace cdb {
 namespace db {
 
@@ -210,5 +211,6 @@ private:
 
 }   //db
 }   //cdb
+}   //nx
 
 #endif  //NX_CLOUD_DB_REQUEST_EXECUTOR_H

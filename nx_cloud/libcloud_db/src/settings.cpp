@@ -56,6 +56,7 @@ namespace
 }
 
 
+namespace nx {
 namespace cdb {
 namespace conf {
 
@@ -166,3 +167,4 @@ void Settings::loadConfiguration()
 
 }   //conf
 }   //cdb
+}   //nx

@@ -12,6 +12,7 @@
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 
 
+namespace nx {
 namespace cdb {
 namespace data {
 
@@ -39,5 +40,6 @@ public:
 
 }   //data
 }   //cdb
+}   //nx
 
 #endif  //CDB_ACCOUNT_DATA_H
