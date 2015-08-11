@@ -5,9 +5,11 @@
 
 #include "db_manager.h"
 
+#include <thread>
+
 #include <utils/common/log.h>
 
-#include <thread>
+#include "db_structure_updater.h"
 
 
 namespace cdb {
@@ -29,7 +31,12 @@ DBManager::~DBManager()
 
 bool DBManager::init()
 {
-    return openOneMoreConnectionIfNeeded();
+    if( !openOneMoreConnectionIfNeeded() )
+        return false;
+
+    //updating DB structure to actual state
+    DBStructureUpdater dbStructureUpdater( this );
+    return dbStructureUpdater.updateStructSync();
 }
 
 bool DBManager::openOneMoreConnectionIfNeeded()
@@ -58,6 +65,7 @@ bool DBManager::openOneMoreConnectionIfNeeded()
         --m_connectionsBeingAdded;
         return false;
     }
+    executorThread->start();
 
     QnMutexLocker lk( &m_mutex );
     m_dbThreadPool.push_back( std::move( executorThread ) );
