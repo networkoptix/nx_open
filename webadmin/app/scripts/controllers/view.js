@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$sce) {
+    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q) {
 
         $scope.playerApi = false;
         $scope.cameras = {};
@@ -33,6 +33,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         // detect max resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
         var nativeResolutions = ['Auto', 'hi', 'lo'];
+        var reloadInterval = 30*1000;//30 seconds
+        var quickReloadInterval = 3*1000;// 3 seconds if something was wrong
         var mimeTypes = {
             'hls': 'application/x-mpegURL',
             'webm': 'video/webm',
@@ -64,7 +66,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             return false;
         }
-
         function formatSupported(type){
             return cameraSupports(type) && browserSupports(type);
         }
@@ -103,9 +104,12 @@ angular.module('webadminApp').controller('ViewCtrl',
             };
         });
 
-        function getCamerasServer(camera) {
+        function getServer(id) {
+            if(!$scope.mediaServers) {
+                return null;
+            }
             return _.find($scope.mediaServers, function (server) {
-                return server.id === camera.parentId;
+                return server.id === id;
             });
         }
 
@@ -166,7 +170,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }*/
         };
 
-        $scope.selectCameraById = function (cameraId,position) {
+        $scope.selectCameraById = function (cameraId, position, silent) {
 
             $scope.cameraId = cameraId || $scope.cameraId;
             if(position){
@@ -177,7 +181,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return camera.id === $scope.cameraId;
             });
 
-            if ($scope.activeCamera) {
+            if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
 
@@ -190,10 +194,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             $location.path('/view/' + activeCamera.id, false);
             $scope.selectCameraById(activeCamera.id,false);
         };
-
-        $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {
-            $scope.selectCameraById(next.params.cameraId, $location.search().time || false);
-        });
 
         $scope.switchPlaying = function(play){
             if($scope.playerAPI) {
@@ -221,106 +221,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             }*/
         };
 
-        function extractDomain(url) {
-            url = url.split('/')[2] || url.split('/')[0];
-            return url.split(':')[0].split('?')[0];
-        }
-
-        function getCameras() {
-            mediaserver.getCameras().then(function (data) {
-                var cameras = data.data;
-
-
-                var findMediaStream = function(param){
-                    return param.name == "mediaStreams";
-                };
-                function cameraSorter(camera) {
-                    camera.url = extractDomain(camera.url);
-                    camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
-                    camera.server = getCamerasServer(camera);
-                    if(camera.server.status == 'Offline'){
-                        camera.status = 'Offline';
-                    }
-
-                    var mediaStreams = _.find(camera.addParams,findMediaStream);
-                    camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
-
-
-                    var num = 0;
-                    var addrArray = camera.url.split('.');
-                    for (var i = 0; i < addrArray.length; i++) {
-                        var power = 3 - i;
-                        num += ((parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
-                    }
-                    if (isNaN(num)) {
-                        num = camera.url;
-                    }else {
-                        num = num.toString(16);
-                        if (num.length < 8) {
-                            num = '0' + num;
-                        }
-                    }
-                    return camera.name + '__' + num;
-                }
-
-                /*
-
-                // This is for encoders (group cameras):
-
-                //1. split cameras with groupId and without
-                var cams = _.partition(cameras, function (cam) {
-                    return cam.groupId === '';
-                });
-
-                //2. sort groupedCameras
-                cams[1] = _.sortBy(cams[1], cameraSorter);
-
-                //3. group groupedCameras by groups ^_^
-                cams[1] = _.groupBy(cams[1], function (cam) {
-                    return cam.groupId;
-                });
-
-                //4. Translate into array
-                cams[1] = _.values(cams[1]);
-
-                //5. Emulate cameras by groups
-                cams[1] = _.map(cams[1], function (group) {
-                    return {
-                        isGroup: true,
-                        collapsed: false,
-                        parentId: group[0].parentId,
-                        name: group[0].groupName,
-                        id: group[0].groupId,
-                        url: group[0].url,
-                        status: 'Online',
-                        cameras: group
-                    };
-                });
-
-                //6 union cameras back
-                cameras = _.union(cams[0], cams[1]);
-                */
-                //7 sort again
-                cameras = _.sortBy(cameras, cameraSorter);
-
-                //8. Group by servers
-                $scope.cameras = _.groupBy(cameras, function (camera) {
-                    return camera.parentId;
-                });
-
-                $scope.allcameras = cameras;
-            }, function () {
-
-
-                /*if(camera.id === $scope.cameraId){
-                 $scope.selectCamera(camera);
-                 }*/
-
-
-                console.error('network problem');
-            });
-        }
-
         $scope.selectFormat = function(format){
             $scope.activeFormat = format;
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
@@ -344,27 +244,163 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         };
 
-        $scope.$watch('allcameras', function () {
-            $scope.selectCameraById($scope.cameraId,$location.search().time || false);
+
+
+
+
+        function extractDomain(url) {
+            url = url.split('/')[2] || url.split('/')[0];
+            return url.split(':')[0].split('?')[0];
+        }
+
+        function getCameras() {
+
+            var deferred = $q.defer();
+
+            mediaserver.getCameras().then(function (data) {
+                var cameras = data.data;
+
+
+                var findMediaStream = function(param){
+                    return param.name == "mediaStreams";
+                };
+                function cameraSorter(camera) {
+                    camera.url = extractDomain(camera.url);
+                    camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
+                    camera.server = getServer(camera.parentId);
+                    if(camera.server.status == 'Offline'){
+                        camera.status = 'Offline';
+                    }
+
+                    var mediaStreams = _.find(camera.addParams,findMediaStream);
+                    camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
+
+                    var num = 0;
+                    var addrArray = camera.url.split('.');
+                    for (var i = 0; i < addrArray.length; i++) {
+                        var power = 3 - i;
+                        num += ((parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
+                    }
+                    if (isNaN(num)) {
+                        num = camera.url;
+                    }else {
+                        num = num.toString(16);
+                        if (num.length < 8) {
+                            num = '0' + num;
+                        }
+                    }
+                    return camera.name + '__' + num;
+                }
+
+                /*
+
+                 // This is for encoders (group cameras):
+
+                 //1. split cameras with groupId and without
+                 var cams = _.partition(cameras, function (cam) {
+                 return cam.groupId === '';
+                 });
+
+                 //2. sort groupedCameras
+                 cams[1] = _.sortBy(cams[1], cameraSorter);
+
+                 //3. group groupedCameras by groups ^_^
+                 cams[1] = _.groupBy(cams[1], function (cam) {
+                 return cam.groupId;
+                 });
+
+                 //4. Translate into array
+                 cams[1] = _.values(cams[1]);
+
+                 //5. Emulate cameras by groups
+                 cams[1] = _.map(cams[1], function (group) {
+                 return {
+                 isGroup: true,
+                 collapsed: false,
+                 parentId: group[0].parentId,
+                 name: group[0].groupName,
+                 id: group[0].groupId,
+                 url: group[0].url,
+                 status: 'Online',
+                 cameras: group
+                 };
+                 });
+
+                 //6 union cameras back
+                 cameras = _.union(cams[0], cams[1]);
+                 */
+                //7 sort again
+                cameras = _.sortBy(cameras, cameraSorter);
+
+                //8. Group by servers
+                $scope.cameras = _.groupBy(cameras, function (camera) {
+                    return camera.parentId;
+                });
+
+                $scope.allcameras = cameras;
+
+                deferred.resolve(cameras);
+            }, function (error) {
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        }
+
+        function reloadTree(){
+
+            var deferred = $q.defer();
+
+            console.log("reloadTree");
+            mediaserver.getMediaServers().then(function (data) {
+                _.each(data.data, function (server) {
+                    server.url = extractDomain(server.url);
+                    var oldserver = getServer(server.id);
+                    server.collapsed = oldserver? oldserver.collapsed : server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
+                });
+                $scope.mediaServers = data.data;
+
+                getCameras().then(function(data){
+                        deferred.resolve(data);
+                    },
+                    function(error){
+                        deferred.reject(error);
+                    });
+
+            }, function (error) {
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        }
+
+        var firstTime = true;
+        var timer = false;
+        function reloader(){
+            reloadTree().then(function(){
+                $scope.selectCameraById($scope.cameraId,$location.search().time || false,firstTime);
+                firstTime = false;
+                timer = $timeout(reloader, reloadInterval);
+            },function(error){
+                console.error(error);
+                timer = $timeout(reloader, quickReloadInterval);
+            });
+        }
+
+        reloader();
+
+        $scope.$on(
+            '$destroy',
+            function( ) {
+                $timeout.cancel(timer);
+            }
+        );
+
+
+        $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {
+            $scope.selectCameraById(next.params.cameraId, $location.search().time || false);
         });
 
-        mediaserver.getMediaServers().then(function (data) {
-            _.each(data.data, function (server) {
-                server.url = extractDomain(server.url);
-                server.collapsed = server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
-            });
-            $scope.mediaServers = data.data;
-
-            _.forEach( $scope.mediaServers,function(server){
-                server.collapsed =  $scope.settings.id.replace('{','').replace('}','') != server.id.replace('{','').replace('}','');
-            });
-
-            getCameras();
-
-            $scope.selectCameraById($routeParams.cameraId,$location.search().time || false);
-        }, function () {
-            console.error('network problem');
-        });
 
         (function (){
             // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
