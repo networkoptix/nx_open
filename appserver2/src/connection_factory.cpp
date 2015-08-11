@@ -316,6 +316,11 @@ namespace ec2
         m_resCtx = resCtx;
     }
 
+    void Ec2DirectConnectionFactory::setConfParams( std::map<QString, QVariant> confParams )
+    {
+        m_settingsInstance.loadParams( std::move( confParams ) );
+    }
+
     int Ec2DirectConnectionFactory::establishDirectConnection( const QUrl& url, impl::ConnectHandlerPtr handler )
     {
         const int reqID = generateRequestID();
@@ -533,6 +538,7 @@ namespace ec2
 #endif
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+        connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
         
 		if (!loginInfo.clientInfo.id.isNull())
         {
