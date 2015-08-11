@@ -8,6 +8,7 @@ static QnAuditManager* m_globalInstance = 0;
 namespace
 {
     const int MIN_PLAYBACK_TIME_TO_LOG = 1000 * 5;
+    const qint64 GROUP_TIME_THRESHOLD = 1000ll * 30;
 }
 
 QnAuditRecord QnAuditManager::CameraPlaybackInfo::toAuditRecord() const
@@ -154,7 +155,7 @@ bool QnAuditManager::canJoinRecords(const QnAuditRecord& left, const QnAuditReco
 {
     if (left.eventType != right.eventType)
         return false;
-    bool peridOK = qAbs(left.rangeStartSec - right.rangeStartSec) * 1000ll < MAX_FRAME_DURATION;
+    bool peridOK = qAbs(left.rangeStartSec - right.rangeStartSec) * 1000ll < GROUP_TIME_THRESHOLD;
     bool sessionOK = left.authSession == right.authSession;
     return peridOK && sessionOK;
 }
