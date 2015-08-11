@@ -25,9 +25,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.hasMobileApp = !!found;
         }
 
-        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm')){
-            $scope.ieNoWebm = true;
-        }
 
         $scope.activeResolution = 'Auto';
         // detect max resolution here?
@@ -44,17 +41,12 @@ angular.module('webadminApp').controller('ViewCtrl',
             'mjpeg':'video/x-motion-jpeg'
         };
 
-        function cameraSupports(type){
-            if(!$scope.activeCamera){
-                return null;
-            }
-            return _.find($scope.activeCamera.mediaStreams,function(stream){
-                return stream.transports.indexOf(type)>0;
-            });
-        }
-        function browserSupports(type){
 
-            var res = false;
+        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm')){
+            $scope.ieNoWebm = true;
+        }
+
+        function browserSupports(type){
             var v = document.createElement('video');
             if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
                 return true;//Native support
@@ -66,6 +58,15 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             return false;
         }
+        function cameraSupports(type){
+            if(!$scope.activeCamera){
+                return null;
+            }
+            return _.find($scope.activeCamera.mediaStreams,function(stream){
+                return stream.transports.indexOf(type)>0;
+            });
+        }
+
         function formatSupported(type){
             return cameraSupports(type) && browserSupports(type);
         }
@@ -351,7 +352,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             var deferred = $q.defer();
 
-            console.log("reloadTree");
             mediaserver.getMediaServers().then(function (data) {
                 _.each(data.data, function (server) {
                     server.url = extractDomain(server.url);

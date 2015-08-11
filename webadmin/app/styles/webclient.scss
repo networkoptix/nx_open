@@ -44,6 +44,10 @@ table.webclient-window>tbody>tr>td{
   vertical-align: top;
   padding:0;
 }
+
+table.webclient-window>tbody>tr>td.alert{
+  height:auto;
+}
 .cameras-panel{
   overflow-y: auto;
   overflow-x: hidden;
