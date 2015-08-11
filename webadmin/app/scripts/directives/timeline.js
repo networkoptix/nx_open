@@ -919,8 +919,8 @@ angular.module('webadminApp')
                     //updateMouseCoordinate(null);
                 };
                 scope.mouseMove = function(event){
-                    /*&updateMouseCoordinate(event);
-                    if(catchScrollBar){
+                    updateMouseCoordinate(event);
+                    /*if(catchScrollBar){
                         var moveScroll = mouseInScrollbar - catchScrollBar;
                         scope.scaleManager.scroll( scope.scaleManager.scroll() + moveScroll / scope.viewportWidth );
                     }*/
