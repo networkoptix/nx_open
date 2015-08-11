@@ -17,6 +17,7 @@
 #include "media_server/settings.h"
 
 #include <utils/common/app_info.h>
+#include <utils/common/util.h>
 
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
     m_monitor(qnPlatform->monitor()) 
@@ -79,7 +80,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
     for(const QnPlatformMonitor::PartitionSpace &partition: partitions) {
         bool hasStorage = false;
         for(const QString &storagePath: storagePaths) {
-            if(storagePath.startsWith(partition.path)) {
+            if(closeDirPath(storagePath).startsWith(partition.path)) {
                 hasStorage = true;
                 break;
             }
