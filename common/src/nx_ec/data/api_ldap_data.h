@@ -12,13 +12,12 @@ namespace ec2
     {
         ApiLdapSettingsData() {}
 
-        QString host;
-        int port;
+        QString uri;
         QString adminDn;
         QString adminPassword;
         QString searchBase;
     };
-#define ApiLdapSettingsData_Fields (host)(port)(adminDn)(adminPassword)(searchBase)
+#define ApiLdapSettingsData_Fields (uri)(adminDn)(adminPassword)(searchBase)
 } // namespace ec2
 
 #endif // QN_API_LDAP_DATA_H

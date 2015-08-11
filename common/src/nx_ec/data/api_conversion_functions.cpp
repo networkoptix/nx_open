@@ -402,16 +402,14 @@ void fromApiToResource(const ApiEmailSettingsData &src, QnEmailSettings &dst) {
 }
 
 void fromResourceToApi(const QnLdapSettings &src, ApiLdapSettingsData &dst) {
-    dst.host = src.host;
-    dst.port = src.port;
+    dst.uri = src.uri.toString();
     dst.adminDn = src.adminDn;
     dst.adminPassword = src.adminPassword;
     dst.searchBase = src.searchBase;
 }
 
 void fromApiToResource(const ApiLdapSettingsData &src, QnLdapSettings &dst) {
-    dst.host = src.host;
-    dst.port = src.port;
+    dst.uri = src.uri;
     dst.adminDn = src.adminDn;
     dst.adminPassword = src.adminPassword;
     dst.searchBase = src.searchBase;

@@ -40,7 +40,6 @@ class QnLdapManagerPrivate;
 
 class QnLdapManager : public Singleton<QnLdapManager> {
 public:
-    QnLdapManager(const QString &host, int port, const QString &bindDn, const QString &password, const QString &searchBase);
     QnLdapManager(const QnLdapSettings& settings);
     ~QnLdapManager();
 

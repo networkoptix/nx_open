@@ -6,6 +6,7 @@
 #include "merge_ldap_users_rest_handler.h"
 
 #include <common/common_module.h>
+#include "common/user_permissions.h"
 #include <utils/network/http/httptypes.h>
 
 #include <core/resource/user_resource.h>
@@ -40,20 +41,21 @@ int QnMergeLdapUsersRestHandler::executePost(const QString& /*path*/, const QnRe
 
     auto findUser = [dbUsers](const QString& name) { for(QnUserResourcePtr user : dbUsers ) {if (name == user->getName()) return user; } return QnUserResourcePtr(); };
     for(QnLdapUser ldapUser : ldapUsers) {
-        QnUserResourcePtr dbUser = findUser(ldapUser.login);
+        QString login = ldapUser.login.toLower();
+        QnUserResourcePtr dbUser = findUser(login);
         if (!dbUser) {
             dbUser.reset(new QnUserResource());
 
             dbUser->setId(QnUuid::createUuid());
             dbUser->setTypeByName(lit("User"));
 
-            dbUser->setName(ldapUser.login);
+            dbUser->setName(login);
 
             // Without hash DbManager wont'd do anything
             dbUser->setHash(lit("-").toLatin1());
             dbUser->setEmail(ldapUser.email);
             dbUser->setAdmin(false);
-            dbUser->setPermissions(0);
+            dbUser->setPermissions(Qn::GlobalLiveViewerPermissions);
 
             dbUser->setLdap(true);
             dbUser->setEnabled(false);
@@ -61,6 +63,10 @@ int QnMergeLdapUsersRestHandler::executePost(const QString& /*path*/, const QnRe
             QnUserResourceList newUsers;
             userManager->saveSync(dbUser, &newUsers);
         } else {
+            // If regular user with same name already exists -> skip it
+            if (!dbUser->isLdap())
+                continue;
+
             if (dbUser->getEmail() != ldapUser.email) {
                 dbUser->setEmail(ldapUser.email);
 

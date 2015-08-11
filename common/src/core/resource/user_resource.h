@@ -68,6 +68,7 @@ signals:
     void adminChanged(const QnResourcePtr &resource);
     void emailChanged(const QnResourcePtr &user);
     void enabledChanged(const QnResourcePtr &user);
+    void ldapChanged(const QnResourcePtr &user);
 
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;

@@ -230,6 +230,8 @@ void QnUserSettingsDialog::updateFromResource() {
 
     ui->enabledCheckBox->setChecked(m_user->isEnabled());
 
+    ui->enabledCheckBox->setEnabled(m_user->getName() != lit("admin"));
+
     bool ldap = m_user->isLdap();
 
     ui->loginEdit->setReadOnly(ldap);

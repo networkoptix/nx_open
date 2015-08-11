@@ -48,6 +48,7 @@ void QnUserListModelPrivate::at_resourcePool_resourceAdded(const QnResourcePtr &
     connect(user,   &QnUserResource::nameChanged,           this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
     connect(user,   &QnUserResource::permissionsChanged,    this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
     connect(user,   &QnUserResource::enabledChanged,        this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+    connect(user,   &QnUserResource::ldapChanged,           this,   &QnUserListModelPrivate::at_resourcePool_resourceChanged);
 
     int row = userList.size();
     model->beginInsertRows(QModelIndex(), row, row);

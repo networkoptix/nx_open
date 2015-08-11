@@ -233,6 +233,9 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
 
         if( userResource )
         {
+            if (!userResource->isEnabled())
+                return false;
+
             if( userResource->isLdap() && !userDigestData.empty() )
             {
                 //this block is supposed to be executed after changing password on LDAP server

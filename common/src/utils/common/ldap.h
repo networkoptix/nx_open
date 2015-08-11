@@ -4,8 +4,7 @@
 struct QnLdapSettings {
     QnLdapSettings() {}
 
-    QString host;
-    int port;
+    QUrl uri;
     QString adminDn;
     QString adminPassword;
     QString searchBase;

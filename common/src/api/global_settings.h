@@ -86,8 +86,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;   //TODO: #GDM #Common think where else we can store it
 
     // set of ldap settings adaptors
-    QnResourcePropertyAdaptor<QString> *m_ldapHostAdaptor;
-    QnResourcePropertyAdaptor<int> *m_ldapPortAdaptor;
+    QnResourcePropertyAdaptor<QUrl> *m_ldapUriAdaptor;
     QnResourcePropertyAdaptor<QString> *m_ldapAdminDnAdaptor;
     QnResourcePropertyAdaptor<QString> *m_ldapAdminPasswordAdaptor;
     QnResourcePropertyAdaptor<QString> *m_ldapSearchBaseAdaptor;

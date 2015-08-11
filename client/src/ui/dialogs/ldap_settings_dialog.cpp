@@ -18,6 +18,7 @@
 namespace {
     const int testLdapTimeoutMSec = 20 * 1000;
     const int defaultPort = 389;
+    const int defaultPortSsl = 636;
 }
 
 class QnLdapSettingsDialogPrivate: public QObject {
@@ -112,8 +113,11 @@ QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
     if (!url.isValid())
         return result;
 
-    result.host = url.host();
-    result.port = url.port() == -1 ? defaultPort : url.port();
+    if (url.port() == -1) {
+        url.setPort(url.scheme() == lit("ldaps") ? defaultPortSsl : defaultPort);
+    }
+
+    result.uri = url;
     result.adminDn = dialog->ui->adminDnLineEdit->text();
     result.adminPassword = dialog->ui->passwordLineEdit->text();
     result.searchBase = dialog->ui->searchBaseLineEdit->text();
@@ -125,11 +129,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
 
     const QnLdapSettings &settings = QnGlobalSettings::instance()->ldapSettings();
 
-    QUrl url;
-    url.setScheme(lit("ldap"));
-    url.setHost(settings.host);
-    if (settings.port != defaultPort)
-        url.setPort(settings.port);
+    QUrl url = settings.uri;
     dialog->ui->serverLineEdit->setText(url.toString());
     dialog->ui->adminDnLineEdit->setText(settings.adminDn);
     dialog->ui->passwordLineEdit->setText(settings.adminPassword);
@@ -153,7 +153,9 @@ void QnLdapSettingsDialogPrivate::at_serverLineEdit_editingFinished() {
     if (!url.isValid())
         return;
 
-    url.setScheme(lit("ldap"));
+    if (url.scheme() != lit("ldap") && url.scheme() != lit("ldaps"))
+        url.setScheme(lit("ldap"));
+
     url.setPath(QString());
     dialog->ui->serverLineEdit->setText(url.toString());
 }

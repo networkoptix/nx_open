@@ -1,5 +1,7 @@
 #include "ldap_manager.h"
 
+#include "api/global_settings.h"
+
 #include <iostream>
 #include <sstream>
 
@@ -73,32 +75,13 @@ namespace {
 
 class QnLdapManagerPrivate {
 public:
-	QnLdapManagerPrivate(const QString &host, int port, const QString &bindDn, const QString &password, const QString &searchBase) 
-	: host(host),
-	  port(port),
-	  bindDn(bindDn),
-	  password(password),
-	  searchBase(searchBase) {
-	}
-
-
-    QString host;
-    int port;
-    QString bindDn;
-    QString password;
-    QString searchBase;
-
     LDAP *ld;
 
     QnLdapUsers users;
 };
 
-QnLdapManager::QnLdapManager(const QString &host, int port, const QString &bindDn, const QString &password, const QString &searchBase) 
-	: d_ptr(new QnLdapManagerPrivate(host, port, bindDn, password, searchBase)) {
-}
-
 QnLdapManager::QnLdapManager(const QnLdapSettings& settings)
-    : d_ptr(new QnLdapManagerPrivate(settings.host, settings.port, settings.adminDn, settings.adminPassword, settings.searchBase)) {
+    : d_ptr(new QnLdapManagerPrivate()) {
 }
 
 QnLdapManager::~QnLdapManager() {
@@ -107,7 +90,14 @@ QnLdapManager::~QnLdapManager() {
 QnLdapUsers QnLdapManager::fetchUsers() {
     Q_D(QnLdapManager);
 
-    d->ld = ldap_init(QSTOCW(d->host), d->port);
+    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+
+    QUrl uri = settings.uri;
+    if (uri.scheme() == lit("ldaps"))
+        d->ld = ldap_sslinit(QSTOCW(uri.host()), uri.port(), 1);
+    else
+        d->ld = ldap_init(QSTOCW(uri.host()), uri.port());
+
     if (d->ld == 0)
         THROW_LDAP_EXCEPTION("LdapManager::LdapManager(): ldap_init()", LdapGetLastError());
 
@@ -117,7 +107,7 @@ QnLdapUsers QnLdapManager::fetchUsers() {
         if (rc != 0)
             THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_set_option(PROTOCOL_VERSION)", rc);
 
-        rc = ldap_simple_bind_s(d->ld, QSTOCW(d->bindDn), QSTOCW(d->password));
+        rc = ldap_simple_bind_s(d->ld, QSTOCW(settings.adminDn), QSTOCW(settings.adminPassword));
         if (rc != LDAP_SUCCESS)
             THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_simple_bind_s()", rc);
 
@@ -126,7 +116,7 @@ QnLdapUsers QnLdapManager::fetchUsers() {
         LDAPMessage *result, *e;
 
         const PWSTR filter = QSTOCW(SEARCH_FILTER);
-	    rc = ldap_search_ext_s(d->ld, QSTOCW(d->searchBase), LDAP_SCOPE_SUBTREE, filter, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
+        rc = ldap_search_ext_s(d->ld, QSTOCW(settings.searchBase), LDAP_SCOPE_SUBTREE, filter, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
         if (rc != LDAP_SUCCESS)
             THROW_LDAP_EXCEPTION("LdapManager::bind(): ldap_search_ext_s()", rc);
 
@@ -164,7 +154,9 @@ static QByteArray md5(QByteArray data)
 }
 
 bool QnLdapManager::testSettings(const QnLdapSettings& settings) {
-    LDAP *ld = ldap_init(QSTOCW(settings.host), settings.port);
+    QUrl uri = settings.uri;
+
+    LDAP *ld = ldap_init(QSTOCW(uri.host()), uri.port());
     if (ld == 0)
         return false;
 
@@ -202,9 +194,12 @@ bool QnLdapManager::testSettings(const QnLdapSettings& settings) {
 bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &digest) {
     Q_D(const QnLdapManager);
 
+    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+
     LDAP *ld;
 
-    ld = ldap_init(QSTOCW(d->host), d->port);
+    QUrl uri = settings.uri;
+    ld = ldap_init(QSTOCW(uri.host()), uri.port());
     int desired_version = LDAP_VERSION3;
     int rc  = ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
     if (rc != 0)
@@ -298,7 +293,10 @@ QString QnLdapManager::realm() const
 
     LDAP *ld;
 
-    ld = ldap_init(QSTOCW(d->host), d->port);
+    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+
+    QUrl uri = settings.uri;
+    ld = ldap_init(QSTOCW(uri.host()), uri.port());
     int desired_version = LDAP_VERSION3;
     int rc  = ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
     if (rc != 0)

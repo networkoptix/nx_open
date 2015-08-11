@@ -48,8 +48,7 @@ namespace {
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
 
-    const QString ldapHost(lit("ldapHost"));
-    const QString ldapPort(lit("ldapPort"));
+    const QString ldapUri(lit("ldapUri"));
     const QString ldapAdminDn(lit("ldapAdminDn"));
     const QString ldapAdminPassword(lit("ldapAdminPassword"));
     const QString ldapSearchBase(lit("ldapSearchBase"));
@@ -76,8 +75,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmailSettings::defaultTimeoutSec(), this);
     m_simpleAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameSimple, true, this);
 
-    m_ldapHostAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapHost, QString(), this);
-    m_ldapPortAdaptor = new QnLexicalResourcePropertyAdaptor<int>(ldapPort, 389, this);
+    m_ldapUriAdaptor = new QnLexicalResourcePropertyAdaptor<QUrl>(ldapUri, QUrl(), this);
     m_ldapAdminDnAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapAdminDn, QString(), this);
     m_ldapAdminPasswordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapAdminPassword, QString(), this);
     m_ldapSearchBaseAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapSearchBase, QString(), this);
@@ -98,8 +96,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
 
     QList<QnAbstractResourcePropertyAdaptor*> ldapAdaptors;
     ldapAdaptors
-        << m_ldapHostAdaptor
-        << m_ldapPortAdaptor
+        << m_ldapUriAdaptor
         << m_ldapAdminDnAdaptor
         << m_ldapAdminPasswordAdaptor
         << m_ldapSearchBaseAdaptor
@@ -214,8 +211,7 @@ ec2::ApiResourceParamDataList QnGlobalSettings::allSettings() const {
 
 QnLdapSettings QnGlobalSettings::ldapSettings() const {
     QnLdapSettings result;
-    result.host = m_ldapHostAdaptor->value();
-    result.port = m_ldapPortAdaptor->value();
+    result.uri = m_ldapUriAdaptor->value();
     result.adminDn = m_ldapAdminDnAdaptor->value();
     result.adminPassword = m_ldapAdminPasswordAdaptor->value();
     result.searchBase = m_ldapSearchBaseAdaptor->value();
@@ -223,8 +219,7 @@ QnLdapSettings QnGlobalSettings::ldapSettings() const {
 }
 
 void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings) {
-    m_ldapHostAdaptor->setValue(settings.host);
-    m_ldapPortAdaptor->setValue(settings.port);
+    m_ldapUriAdaptor->setValue(settings.uri);
     m_ldapAdminDnAdaptor->setValue(settings.adminDn);
     m_ldapAdminPasswordAdaptor->setValue(settings.adminPassword);
     m_ldapSearchBaseAdaptor->setValue(settings.searchBase);

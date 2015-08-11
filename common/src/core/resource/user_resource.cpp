@@ -198,6 +198,8 @@ void QnUserResource::setLdap(bool isLdap)
     if (m_isLdap == isLdap)
         return;
     m_isLdap = isLdap;
+
+    emit ldapChanged(::toSharedPointer(this));
 }
 
 bool QnUserResource::isEnabled() const
@@ -271,6 +273,16 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
         if (m_email != localOther->m_email) {
             m_email = localOther->m_email;
             modifiedFields << "emailChanged";
+        }
+
+        if (m_isEnabled != localOther->m_isEnabled) {
+            m_isEnabled = localOther->m_isEnabled;
+            modifiedFields << "enabledChanged";
+        }
+
+        if (m_isLdap != localOther->m_isLdap) {
+            m_isLdap = localOther->m_isLdap;
+            modifiedFields << "ldapChanged";
         }
     }
 }
