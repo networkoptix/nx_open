@@ -3,6 +3,9 @@
 
 #include <limits>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+#include <boost/algorithm/cxx11/all_of.hpp>
+
 #include <QtWidgets/QMessageBox>
 
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
@@ -305,53 +308,68 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         } else {
             /* Aggregate camera parameters first. */
             m_cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
-            ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
-            ui->analogGroupBox->setVisible(false);
 
-            
+            using boost::algorithm::any_of;
+            using boost::algorithm::all_of;
 
-            /* Update checkbox state based on camera value. */
-            auto setupCheckbox = [](QCheckBox* checkBox, bool firstCamera, bool value){
-                Qt::CheckState state = value ? Qt::Checked : Qt::Unchecked;
-                if (firstCamera) {
-                    checkBox->setTristate(false);
-                    checkBox->setCheckState(state);
-                }
-                else if (state != checkBox->checkState()) {
-                    checkBox->setTristate(true);
-                    checkBox->setCheckState(Qt::PartiallyChecked);
-                }
-            };
+            const bool isDtsBased        = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->isDtsBased(); });
+            const bool hasVideo          = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->hasVideo(0); });
+            const bool audioSupported    = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->isAudioSupported(); });
+            const bool audioForced       = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->isAudioForced(); });
+            const bool isMotionAvailable = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->hasMotion(); });
 
-            bool firstCamera = true; 
-            QSet<QString> logins, passwords;
-            bool audioSupported = false;
-            bool audioForced = false;
-
-
-            bool hasVideo = true;
-            bool isDtsBased = false;
-            for (const QnVirtualCameraResourcePtr &camera: m_cameras) 
-            {
-                hasVideo &= camera->hasVideo(0);
-                logins.insert(camera->getAuth().user());
-                passwords.insert(camera->getAuth().password());
-
-                audioSupported |= camera->isAudioSupported();
-                audioForced |= camera->isAudioForced();
-
-                if (camera->isDtsBased())
-                    isDtsBased = true;
-
-                setupCheckbox(ui->analogViewCheckBox,   firstCamera, !camera->isScheduleDisabled());
-                setupCheckbox(ui->enableAudioCheckBox,  firstCamera, camera->isAudioEnabled());
-
-                firstCamera = false;
-            }
+            m_cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
             ui->analogGroupBox->setVisible(isDtsBased);
+            ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);            
+            ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !isDtsBased);
+            ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
+            ui->expertTab->setEnabled(!isDtsBased && hasVideo);
 
-            ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);
-           
+            {           
+                /* Update checkbox state based on camera value. */
+                auto setupCheckbox = [](QCheckBox* checkBox, bool firstCamera, bool value){
+                    Qt::CheckState state = value ? Qt::Checked : Qt::Unchecked;
+                    if (firstCamera) {
+                        checkBox->setTristate(false);
+                        checkBox->setCheckState(state);
+                    }
+                    else if (state != checkBox->checkState()) {
+                        checkBox->setTristate(true);
+                        checkBox->setCheckState(Qt::PartiallyChecked);
+                    }
+                };
+            
+                bool firstCamera = true; 
+                QSet<QString> logins, passwords;
+
+                for (const QnVirtualCameraResourcePtr &camera: m_cameras) {
+                    logins.insert(camera->getAuth().user());
+                    passwords.insert(camera->getAuth().password());
+
+                    setupCheckbox(ui->analogViewCheckBox,   firstCamera, !camera->isScheduleDisabled());
+                    setupCheckbox(ui->enableAudioCheckBox,  firstCamera, camera->isAudioEnabled());
+
+                    firstCamera = false;
+                }          
+
+                if (logins.size() == 1) {
+                    ui->loginEdit->setText(*logins.begin());
+                    ui->loginEdit->setPlaceholderText(QString());
+                } else {
+                    ui->loginEdit->setText(QString());
+                    ui->loginEdit->setPlaceholderText(tr("<multiple values>", "LoginEdit"));
+                }
+                m_loginWasEmpty = ui->loginEdit->text().isEmpty();
+
+                if (passwords.size() == 1) {
+                    ui->passwordEdit->setText(*passwords.begin());
+                    ui->passwordEdit->setPlaceholderText(QString());
+                } else {
+                    ui->passwordEdit->setText(QString());
+                    ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
+                }
+                m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
+            }
 
             ui->expertSettingsWidget->updateFromResources(m_cameras);
 
@@ -407,34 +425,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             updateMaxFPS();
 
-            bool isMotionAvailable = true;
-            for (const QnVirtualCameraResourcePtr &camera: m_cameras) 
-                isMotionAvailable &= camera->hasMotion();
-            m_cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
-
-            /* Write camera parameters out. */
-
-            if (logins.size() == 1) {
-                ui->loginEdit->setText(*logins.begin());
-                ui->loginEdit->setPlaceholderText(QString());
-            } else {
-                ui->loginEdit->setText(QString());
-                ui->loginEdit->setPlaceholderText(tr("<multiple values>", "LoginEdit"));
-            }
-            m_loginWasEmpty = ui->loginEdit->text().isEmpty();
-
-            if (passwords.size() == 1) {
-                ui->passwordEdit->setText(*passwords.begin());
-                ui->passwordEdit->setPlaceholderText(QString());
-            } else {
-                ui->passwordEdit->setText(QString());
-                ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
-            }
-            m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
-            
-            ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !isDtsBased);
-            ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
-            ui->expertTab->setEnabled(!isDtsBased && hasVideo);
         }
 
         m_cameraScheduleWidget->setCameras(m_cameras);
