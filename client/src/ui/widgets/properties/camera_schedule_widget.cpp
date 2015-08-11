@@ -14,6 +14,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/read_only.h>
+#include <ui/common/checkbox_utils.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -172,6 +173,10 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QnCamLicenseUsageHelper helper;
     ui->licensesUsageWidget->init(&helper);
 
+    QnCheckbox::autoCleanTristate(ui->enableRecordingCheckBox);
+    QnCheckbox::autoCleanTristate(ui->checkBoxMinArchive);
+    QnCheckbox::autoCleanTristate(ui->checkBoxMaxArchive);
+
     connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->recordMotionButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
@@ -187,18 +192,16 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->licensesButton,         SIGNAL(clicked()),                  this,   SLOT(at_licensesButton_clicked()));
     connect(ui->displayQualityCheckBox, SIGNAL(stateChanged(int)),          this,   SLOT(at_displayQualiteCheckBox_stateChanged(int)));
     connect(ui->displayFpsCheckBox,     SIGNAL(stateChanged(int)),          this,   SLOT(at_displayFpsCheckBox_stateChanged(int)));
-    connect(ui->enableRecordingCheckBox,SIGNAL(clicked()),                  this,   SLOT(at_enableRecordingCheckBox_clicked()));
     connect(ui->enableRecordingCheckBox, SIGNAL(stateChanged(int)),          this,   SLOT(updateGridEnabledState()));
     connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SIGNAL(scheduleEnabledChanged(int)));
     connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateLicensesLabelText()));
 
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
 
-    connect(ui->checkBoxMinArchive,      &QCheckBox::clicked,               this,   &QnCameraScheduleWidget::at_checkBoxArchive_clicked);
+
     connect(ui->checkBoxMinArchive,      &QCheckBox::stateChanged,          this,   &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
     connect(ui->checkBoxMinArchive,      &QCheckBox::stateChanged,          this,   &QnCameraScheduleWidget::archiveRangeChanged);
 
-    connect(ui->checkBoxMaxArchive,      &QCheckBox::clicked,               this,   &QnCameraScheduleWidget::at_checkBoxArchive_clicked);
     connect(ui->checkBoxMaxArchive,      &QCheckBox::stateChanged,          this,   &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
     connect(ui->checkBoxMaxArchive,      &QCheckBox::stateChanged,          this,   &QnCameraScheduleWidget::archiveRangeChanged);
 
@@ -797,25 +800,6 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
     }
     m_disableUpdateGridParams = false;
     updateGridParams(true);
-}
-
-void QnCameraScheduleWidget::at_enableRecordingCheckBox_clicked()
-{
-    Qt::CheckState state = ui->enableRecordingCheckBox->checkState();
-
-    ui->enableRecordingCheckBox->setTristate(false);
-    if (state == Qt::PartiallyChecked)
-        ui->enableRecordingCheckBox->setCheckState(Qt::Checked);
-}
-
-void QnCameraScheduleWidget::at_checkBoxArchive_clicked()
-{
-    QCheckBox* checkBox = (QCheckBox*) sender();
-    Qt::CheckState state = checkBox->checkState();
-
-    checkBox->setTristate(false);
-    if (state == Qt::PartiallyChecked)
-        checkBox->setCheckState(Qt::Checked);
 }
 
 void QnCameraScheduleWidget::at_displayQualiteCheckBox_stateChanged(int state)

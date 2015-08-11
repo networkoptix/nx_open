@@ -67,7 +67,6 @@ private slots:
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
 
-    void at_enableAudioCheckBox_clicked();
     void at_analogViewCheckBox_clicked();
 
     void updateMaxFPS();

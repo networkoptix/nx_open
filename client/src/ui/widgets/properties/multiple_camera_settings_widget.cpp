@@ -13,6 +13,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/read_only.h>
+#include <ui/common/checkbox_utils.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -63,11 +64,13 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     QnCamLicenseUsageHelper helper;
     ui->licensesUsageWidget->init(&helper);
 
+    QnCheckbox::autoCleanTristate(ui->enableAudioCheckBox);
+    QnCheckbox::autoCleanTristate(ui->analogViewCheckBox);
+
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnMultipleCameraSettingsWidget::updateLicensesButtonVisible);
 
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->enableAudioCheckBox,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->enableAudioCheckBox,    SIGNAL(clicked()),                      this,   SLOT(at_enableAudioCheckBox_clicked()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
 
     connect(m_cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
@@ -504,20 +507,7 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChan
     m_hasScheduleEnabledChanges = true;
 }
 
-void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked() {
-    Qt::CheckState state = ui->enableAudioCheckBox->checkState();
-
-    ui->enableAudioCheckBox->setTristate(false);
-    if (state == Qt::PartiallyChecked)
-        ui->enableAudioCheckBox->setCheckState(Qt::Checked);
-}
-
 void QnMultipleCameraSettingsWidget::at_analogViewCheckBox_clicked() {
-    Qt::CheckState state = ui->analogViewCheckBox->checkState();
-
-    ui->analogViewCheckBox->setTristate(false);
-    if (state == Qt::PartiallyChecked)
-        ui->analogViewCheckBox->setCheckState(Qt::Checked);
     m_cameraScheduleWidget->setScheduleEnabled(ui->analogViewCheckBox->isChecked());
 }
 

@@ -3,6 +3,7 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <ui/common/checkbox_utils.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -45,12 +46,7 @@ QnImageControlWidget::QnImageControlWidget(QWidget* parent /*= 0*/):
     connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   &QnImageControlWidget::changed);
     connect(ui->forceRotationComboBox,  QnComboboxCurrentIndexChanged,          this,   &QnImageControlWidget::changed);
 
-    connect(ui->fisheyeCheckBox,        &QCheckBox::clicked,                    this,   [this]() {
-        Qt::CheckState state = ui->fisheyeCheckBox->checkState();
-        ui->fisheyeCheckBox->setTristate(false);
-        if (state == Qt::PartiallyChecked)
-            ui->fisheyeCheckBox->setCheckState(Qt::Checked);
-    });
+    QnCheckbox::autoCleanTristate(ui->fisheyeCheckBox);
 
     connect(ui->fisheyeCheckBox,        &QCheckBox::stateChanged,               this,   &QnImageControlWidget::changed);
     connect(ui->fisheyeCheckBox,        &QCheckBox::stateChanged,               this,   &QnImageControlWidget::fisheyeChanged);
