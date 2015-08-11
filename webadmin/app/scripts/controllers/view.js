@@ -266,6 +266,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                     return param.name == "mediaStreams";
                 };
                 function cameraSorter(camera) {
+                    console.log(camera.name,camera);
                     camera.url = extractDomain(camera.url);
                     camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
                     camera.server = getServer(camera.parentId);
