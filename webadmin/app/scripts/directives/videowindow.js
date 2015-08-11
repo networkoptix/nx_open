@@ -46,6 +46,9 @@ angular.module('webadminApp')
                 }
 
                 function detectBestFormat(){
+
+                    scope.flashRequired = false;
+                    scope.noArmSupport = false;
                     // return "flashls";
 
                     //This function gets available sources for camera and chooses the best player for this browser
@@ -85,7 +88,7 @@ angular.module('webadminApp')
 
                     // Hardcode native support
                     if(window.jscd.os == "Android" ){
-                        if(weHaveWebm){
+                        if(weHaveWebm){hjg
                             return "webm";
                             // TODO: Try removing this line.
                         }else {
@@ -150,7 +153,7 @@ angular.module('webadminApp')
                 var activePlayer = null;
                 function recyclePlayer(player){
                     if(activePlayer != player) {
-                        element.find("#videowindow").html("");
+                        element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
                     }
                     activePlayer = player;
@@ -162,7 +165,7 @@ angular.module('webadminApp')
                 // TODO: Support new players
 
                 function initNativePlayer(format){
-                    nativePlayer.init(element.find("#videowindow"), function (api) {
+                    nativePlayer.init(element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
@@ -171,6 +174,10 @@ angular.module('webadminApp')
                             scope.vgApi.addEventListener("timeupdate",function(event,arg2,arg3){
                                 //console.log("timeupdate",event,arg2,arg3,scope.vgApi, scope.vgApi.currentTime);
                                 scope.vgUpdateTime({$currentTime:event.srcElement.currentTime, $duration: event.srcElement.duration});
+                                if(scope.loading) {
+                                    scope.loading = false;
+                                    scope.$digest();
+                                }
                             });
                         }
 
@@ -197,6 +204,8 @@ angular.module('webadminApp')
                         }, function (api) {
                             console.error("some error");
                         }, function (position, duration) {
+
+                            scope.loading = false;
                             scope.vgUpdateTime({$currentTime: position, $duration: duration});
                         });
                     }else{
@@ -205,7 +214,7 @@ angular.module('webadminApp')
                 }
 
                 function initJsHls(){
-                    jshlsAPI.init( element.find("#videowindow"), function (api) {
+                    jshlsAPI.init( element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
@@ -256,6 +265,7 @@ angular.module('webadminApp')
                 scope.$watch("vgSrc",function(){
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         var format = detectBestFormat();
+                        scope.loading = !!format;
                         recyclePlayer(format);// Remove old player. TODO: recycle it later
 
                         switch(format){

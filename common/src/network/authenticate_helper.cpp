@@ -120,12 +120,12 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy, QnUuid* authUserId, bool* authInProgress)
+bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy, QnUuid* authUserId, AuthMethod::Value* usedAuthMethod)
 {
     if (authUserId)
         *authUserId = QnUuid();
-    if (authInProgress)
-        *authInProgress = false;
+    if (usedAuthMethod)
+        *usedAuthMethod = AuthMethod::noAuth;
 
     const QUrlQuery urlQuery( request.requestLine.url.query() );
 
@@ -144,6 +144,8 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
             if( it != m_authenticatedPaths.end() &&
                 it->second.path == request.requestLine.url.path() )
             {
+                if (usedAuthMethod)
+                    *usedAuthMethod = AuthMethod::tempUrlQueryParam;
                 return true;
             }
         }
@@ -152,8 +154,11 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     if( allowedAuthMethods & AuthMethod::videowall )
     {
         const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue( request.headers, Qn::VIDEOWALL_GUID_HEADER_NAME );
-        if (!videoWall_auth.isEmpty())
+        if (!videoWall_auth.isEmpty()) {
+            if (usedAuthMethod)
+                *usedAuthMethod = AuthMethod::videowall;
             return (!qnResPool->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull());
+        }
     }
 
     if( allowedAuthMethods & AuthMethod::urlQueryParam )
@@ -162,6 +167,8 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         if( !authQueryParam.isEmpty() )
         {
             if( authenticateByUrl( authQueryParam, request.requestLine.method, authUserId ) )
+                if (usedAuthMethod)
+                    *usedAuthMethod = AuthMethod::urlQueryParam;
                 return true;
         }
     }
@@ -170,8 +177,11 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     {
         const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
         int customAuthInfoPos = cookie.indexOf(COOKIE_DIGEST_AUTH);
-        if (customAuthInfoPos >= 0)
-            return doCookieAuthorization("GET", cookie.toUtf8(), response, authUserId, authInProgress);
+        if (customAuthInfoPos >= 0) {
+            if (usedAuthMethod)
+                *usedAuthMethod = AuthMethod::cookie;
+            return doCookieAuthorization("GET", cookie.toUtf8(), response, authUserId);
+        }
     }
 
     if( allowedAuthMethods & AuthMethod::http )
@@ -210,8 +220,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
                     }
                 }
             }
-            if (authInProgress)
-                *authInProgress = true;
+
             addAuthHeader(
                 response,
                 userResource,
@@ -262,14 +271,25 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         }
 
         bool authResult = false;
-        if (authType == "digest")
+        if (authType == "digest") 
+        {
+            if (usedAuthMethod)
+                *usedAuthMethod = AuthMethod::httpDigest;
+
             authResult = doDigestAuth(
-                request.requestLine.method, authData, response, isProxy, authUserId, authInProgress, ',',
+                request.requestLine.method, authData, response, isProxy, authUserId, ',',
                 std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1));
-        else if (authType == "basic")
+        }
+        else if (authType == "basic") {
+            if (usedAuthMethod)
+                *usedAuthMethod = AuthMethod::httpBasic;
             authResult = doBasicAuth(authData, response, authUserId);
-        else
+        }
+        else {
+            if (usedAuthMethod)
+                *usedAuthMethod = AuthMethod::httpBasic;
             authResult = false;
+        }
         if( authResult )
         {
             //checking whether client re-calculated ha1 digest
@@ -437,7 +457,7 @@ QByteArray QnAuthHelper::createHttpQueryAuthParam(
 }
 
 bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, 
-                                bool isProxy, QnUuid* authUserId, bool* authInProgress, char delimiter, std::function<bool(const QByteArray&)> checkNonceFunc,
+                                bool isProxy, QnUuid* authUserId, char delimiter, std::function<bool(const QByteArray&)> checkNonceFunc,
                                 QnUserResourcePtr* const outUserResource)
 {
     const QMap<QByteArray, QByteArray> authParams = parseAuthData(authData, delimiter);
@@ -542,12 +562,6 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         responseHeaders,
         userResource,
         isProxy );
-    if (authInProgress) {
-        if (nonce.isEmpty())
-            *authInProgress = true;
-        else if (userName.isEmpty())
-            *authInProgress = true;
-    }
 
     return false;
 }
@@ -636,12 +650,12 @@ bool QnAuthHelper::isCookieNonceValid(const QByteArray& nonce)
     return rez;
 }
 
-bool QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId, bool* authInProgress)
+bool QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId)
 {
     nx_http::Response tmpHeaders;
     QnUserResourcePtr outUserResource;
     bool rez = doDigestAuth(
-        method, authData, tmpHeaders, false, authUserId, authInProgress, ';',
+        method, authData, tmpHeaders, false, authUserId, ';',
         std::bind(&QnAuthHelper::isCookieNonceValid, this, std::placeholders::_1),
         &outUserResource);
     if (!rez)

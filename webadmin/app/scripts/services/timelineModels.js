@@ -338,13 +338,18 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                     //console.log("no chunks for this camera");
                 }
 
+                _.forEach(chunks,function(chunk){
+                    chunk.durationMs = parseInt(chunk.durationMs);
+                    chunk.startTimeMs = parseInt(chunk.startTimeMs);
+                });
+
                 for (var i = 0; i < chunks.length; i++) {
-                    var endChunk = parseInt(chunks[i].startTimeMs) + parseInt(chunks[i].durationMs);
+                    var endChunk = chunks[i].startTimeMs + chunks[i].durationMs;
                     if (chunks[i].durationMs < 0) {
                         endChunk = (new Date()).getTime() + 100000;// some date in future
                     }
-                    var addchunk = new Chunk(null, parseInt(chunks[i].startTimeMs), endChunk, level);
-                    self.addChunk(addchunk,null);
+                    var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
+                    self.addChunk(addchunk, null);
                 }
 
                 deferred.resolve(self.chunksTree);
@@ -598,7 +603,7 @@ function ShortCache(cameras,mediaserver,$q){
     this.requestInterval = 90 * 1000;//90 seconds to request
     this.updateInterval = 60 * 1000;//every 60 seconds update
     this.requestDetailization = 1;//the deepest detailization possible
-    this.limitChunks = 10; // limit for number of chunks
+    this.limitChunks = 100; // limit for number of chunks
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
 }
 ShortCache.prototype.init = function(start){
@@ -630,13 +635,14 @@ ShortCache.prototype.update = function(requestPosition,position){
         return;
     }
 
-    requestPosition = requestPosition || this.playedPosition;
+    requestPosition = Math.round(requestPosition) || Math.round(this.playedPosition);
 
     this.updating = true;
     var self = this;
     this.lastRequestDate = requestPosition;
     this.lastRequestPosition = position || this.played;
 
+    // Get next {{limitChunks}} chunks
     this.mediaserver.getRecords('/',
             this.cameras[0],
             requestPosition,
@@ -648,12 +654,17 @@ ShortCache.prototype.update = function(requestPosition,position){
 
             var chunks = data.data.reply;
 
+            _.forEach(chunks,function(chunk){
+                chunk.durationMs = parseInt(chunk.durationMs);
+                chunk.startTimeMs = parseInt(chunk.startTimeMs);
+            });
+
             if(chunks.length == 0){
                 //console.log("no chunks for this camera and interval");
             }
 
-            if(chunks.length > 0 && parseInt(chunks[0].startTimeMs) < requestPosition){ // Crop first chunk.
-                chunks[0].durationMs -= requestPosition - parseInt(chunks[0].startTimeMs);
+            if(chunks.length > 0 && chunks[0].startTimeMs < requestPosition){ // Crop first chunk.
+                chunks[0].durationMs += chunks[0].startTimeMs - requestPosition ;
                 chunks[0].startTimeMs = requestPosition;
             }
             self.currentDetailization = chunks;
@@ -722,7 +733,6 @@ ShortCache.prototype.setPlayingPosition = function(position){
         // Estimate current playing position
         this.playedPosition = lastPosition + position - this.checkPoints[lastPosition];
 
-
         this.update(this.checkPoints[lastPosition], lastPosition);// Request detailization from that position and to the future - restore track
     }
 
@@ -747,11 +757,13 @@ ShortCache.prototype.setPlayingPosition = function(position){
     if(!this.liveMode && this.currentDetailization.length>0
         && (this.currentDetailization[this.currentDetailization.length - 1].durationMs
             + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs
-            < this.playedPosition + this.updateInterval)) { // It's time to update
+            < Math.round(this.playedPosition) + this.updateInterval)) { // It's time to update
+        console.log("it's time to update" , this.currentDetailization[this.currentDetailization.length - 1].durationMs
+            + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs ,
+                this.playedPosition + this.updateInterval
+        );
         this.update();
     }
-
-    //console.log("new played position",new Date(this.playedPosition),i,this.currentDetailization.length);
 
     if(position > this.lastPlayedPosition){
         this.lastPlayedPosition = position; // Save the boundaries of uploaded cache

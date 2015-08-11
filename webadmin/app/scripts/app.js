@@ -5,6 +5,7 @@ angular.module('webadminApp', [
     'ngResource',
     'ngSanitize',
     'ngRoute',
+    //'ngTouch',
     'ui.bootstrap',
     'tc.chartjs'
 ]).config(function ($routeProvider) {
