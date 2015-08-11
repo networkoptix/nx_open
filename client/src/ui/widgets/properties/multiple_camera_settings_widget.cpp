@@ -273,7 +273,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
     {
         QnScopedUpdateRollback rollback(ui->cameraScheduleWidget);
         ui->imageControlWidget->updateFromResources(m_cameras);
-
+        ui->licensingWidget->setCameras(m_cameras);
 
         if(m_cameras.empty()) {
             ui->loginEdit->setText(QString());
@@ -286,7 +286,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
             ui->cameraScheduleWidget->setChangesDisabled(true);
             ui->cameraScheduleWidget->setMotionAvailable(false);
-            ui->licensingWidget->setVisible(false);
         } else {
             /* Aggregate camera parameters first. */
             ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
@@ -306,7 +305,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             });
 
             ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
-            ui->licensingWidget->setVisible(isDtsBased);
             ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);            
             ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !isDtsBased);
             ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
@@ -397,7 +395,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         }
 
         ui->cameraScheduleWidget->setCameras(m_cameras);
-        ui->licensingWidget->setCameras(m_cameras);
+        
     }
 
     setHasDbChanges(false);

@@ -153,7 +153,10 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     }
 
     m_camera = camera;
-    d->setCameras(QnVirtualCameraResourceList() << camera);
+    QnVirtualCameraResourceList cameras;
+    if (m_camera)
+        cameras << m_camera;
+    d->setCameras(cameras);
     ui->advancedSettingsWidget->setCamera(camera);
 
     if(m_camera) {
@@ -309,6 +312,11 @@ bool QnSingleCameraSettingsWidget::licensedParametersModified() const {
 void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
+    QnVirtualCameraResourceList cameras;
+    if (m_camera)
+        cameras << m_camera;
+    ui->licensingWidget->setCameras(cameras);
+
     if(!m_camera) {
         ui->nameEdit->clear();
         ui->modelEdit->clear();
@@ -332,7 +340,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
-        ui->licensingWidget->setVisible(false);
 
         ui->imageControlWidget->updateFromResources(QnVirtualCameraResourceList());
     } else {
@@ -356,10 +363,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->getCameraCapabilities() & Qn::IOModuleCapability);
 
-        ui->licensingWidget->setVisible(m_camera->isDtsBased());
-        ui->licensingWidget->setCameras(QnVirtualCameraResourceList() << m_camera);
-
-        ui->imageControlWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
+        ui->imageControlWidget->updateFromResources(cameras);
 
         if (!dtsBased) {
             ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);
@@ -397,7 +401,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
             
-            ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
+            ui->expertSettingsWidget->updateFromResources(cameras);
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
                 m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::JpgFormat, this);

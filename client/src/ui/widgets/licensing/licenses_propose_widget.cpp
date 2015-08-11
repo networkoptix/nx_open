@@ -2,6 +2,7 @@
 #include "ui_licenses_propose_widget.h"
 
 #include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <core/resource/camera_resource.h>
 
@@ -75,7 +76,12 @@ QnVirtualCameraResourceList QnLicensesProposeWidget::cameras() const {
 void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &cameras) {
     m_cameras = cameras;
 
-    bool licenseUsed = cameras.isEmpty() ? false : cameras.front()->isLicenseUsed();
+    updateVisibility();
+
+    if (m_cameras.isEmpty())
+        return;
+
+    bool licenseUsed = cameras.front()->isLicenseUsed();
 
     bool sameValue = boost::algorithm::all_of(cameras, [licenseUsed](const QnVirtualCameraResourcePtr &camera) { 
         return camera->isLicenseUsed() == licenseUsed; 
@@ -98,4 +104,13 @@ void QnLicensesProposeWidget::setState(Qt::CheckState value) {
         ui->analogViewCheckBox->setChecked(value == Qt::Checked);
     }
     updateLicenseText();
+}
+
+void QnLicensesProposeWidget::updateVisibility() {
+    bool visible = boost::algorithm::any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {
+        return camera->isDtsBased()
+            || camera->hasCameraCapabilities(Qn::IOModuleCapability);
+    });
+
+    setVisible(visible);
 }

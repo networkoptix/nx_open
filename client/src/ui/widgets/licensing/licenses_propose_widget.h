@@ -30,6 +30,7 @@ protected:
     void afterContextInitialized() override;
 
 private:
+    void updateVisibility();
     void updateLicenseText();
     void updateLicensesButtonVisible();
 
