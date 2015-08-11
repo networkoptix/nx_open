@@ -323,9 +323,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.selectResolution = function(resolution){
-            if(resolution == "auto" || resolution == "Auto" || resolution == "AUTO"){
+            /*if(resolution == "auto" || resolution == "Auto" || resolution == "AUTO"){
                 resolution = "320p";
-            }
+            }*/
 
             if($scope.activeResolution == resolution){
                 return;
