@@ -265,8 +265,15 @@ angular.module('webadminApp').controller('ViewCtrl',
                 var findMediaStream = function(param){
                     return param.name == "mediaStreams";
                 };
+
+
+                function cameraFilter(camera){
+                    // Filter desktop cameras here
+                    return true;
+                }
+
                 function cameraSorter(camera) {
-                    console.log(camera.name,camera);
+
                     camera.url = extractDomain(camera.url);
                     camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
                     camera.server = getServer(camera.parentId);
@@ -331,6 +338,9 @@ angular.module('webadminApp').controller('ViewCtrl',
                  //6 union cameras back
                  cameras = _.union(cams[0], cams[1]);
                  */
+
+
+                cameras = _.filter(cameras, cameraFilter);
                 //7 sort again
                 cameras = _.sortBy(cameras, cameraSorter);
 

@@ -17,11 +17,12 @@
 .dark-theme{
   color:white;
   background-color: #1C2327;
-  position:absolute;
+  /*position:absolute;
   top:0px;
+  padding-top:50px;*/
   height:100%;
   width:100%;
-  padding-top:50px;
+  margin-top: -20px !important;
 }
 
 .dark-theme .caret{
