@@ -79,6 +79,7 @@ private slots:
     void at_updateDetailModel();
     void at_typeCheckboxChanged();
     void at_filterChanged();
+    void at_currentTabChanged();
     void at_selectAllCheckboxChanged();
     void at_updateCheckboxes();
     void at_masterGridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);

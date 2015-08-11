@@ -296,7 +296,7 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
             QnScopedPainterFontRollback rollback(painter);
             QnScopedPainterPenRollback rollback2(painter);
             painter->setFont(option.font);
-            painter->setPen(option.backgroundBrush.color());
+            painter->setPen(option.palette.foreground().color());
             painter->drawText(option.rect, Qt::AlignLeft | Qt::AlignVCenter, index.data().toString());
         }
         break;
@@ -454,6 +454,18 @@ void QnAuditLogDialog::at_selectAllCheckboxChanged()
     }
     at_filterChanged();
 };
+
+void QnAuditLogDialog::at_currentTabChanged()
+{
+    bool allEnabled = (ui->tabWidget->currentIndex() == SessionTab);
+    const Qn::AuditRecordTypes camerasTypes = Qn::AR_ViewLive | Qn::AR_ViewArchive | Qn::AR_ExportVideo | Qn::AR_CameraUpdate | Qn::AR_CameraRemove;
+
+    for(QCheckBox* checkBox: m_filterCheckboxes) {
+        Qn::AuditRecordTypes eventTypes = (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
+        checkBox->setEnabled(allEnabled || (camerasTypes & eventTypes));
+    }
+    at_filterChanged();
+}
 
 void QnAuditLogDialog::at_filterChanged()
 {
@@ -747,7 +759,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
-    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_currentTabChanged);
     /*
     connect(ui->tabWidget, &QTabWidget::currentChanged, 
         this, [this](int index) {
