@@ -102,13 +102,13 @@ angular.module('webadminApp').controller('ViewCtrl',
                 id: r.data.reply.id
             };
         });
-/*
+
         function getCamerasServer(camera) {
             return _.find($scope.mediaServers, function (server) {
                 return server.id === camera.parentId;
             });
         }
-*/
+
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
             $scope.switchPlaying(true);
@@ -237,6 +237,10 @@ angular.module('webadminApp').controller('ViewCtrl',
                 function cameraSorter(camera) {
                     camera.url = extractDomain(camera.url);
                     camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
+                    camera.server = getCamerasServer(camera);
+                    if(camera.server.status == 'Offline'){
+                        camera.status = 'Offline';
+                    }
 
                     var mediaStreams = _.find(camera.addParams,findMediaStream);
                     camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
