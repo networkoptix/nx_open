@@ -46,9 +46,9 @@ angular.module('webadminApp')
                 }
 
                 function detectBestFormat(){
-
                     scope.flashRequired = false;
                     scope.noArmSupport = false;
+                    scope.noFormat = false;
                     // return "flashls";
 
                     //This function gets available sources for camera and chooses the best player for this browser
@@ -88,7 +88,7 @@ angular.module('webadminApp')
 
                     // Hardcode native support
                     if(window.jscd.os == "Android" ){
-                        if(weHaveWebm){hjg
+                        if(weHaveWebm){
                             return "webm";
                             // TODO: Try removing this line.
                         }else {
@@ -119,7 +119,11 @@ angular.module('webadminApp')
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
-                            scope.flashRequired = true;
+                            if(weHaveHls) {
+                                scope.flashRequired = true;
+                                return false;
+                            }
+                            scope.noFormat = true;
                             return false; // IE9 - No other supported formats
 
 
@@ -142,7 +146,12 @@ angular.module('webadminApp')
                             if(weHaveRtsp && window.jscd.flashVersion != '-'){
                                 return "rtsp";
                             }
-                            scope.flashRequired = true;
+                            if(weHaveHls) {
+                                scope.flashRequired = true;
+                                return false;
+                            }
+
+                            scope.noFormat = true;
                             return false; // IE9 - No supported formats
                     }
                 }
