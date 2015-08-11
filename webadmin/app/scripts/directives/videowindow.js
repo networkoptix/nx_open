@@ -269,6 +269,7 @@ angular.module('webadminApp')
                     });
                 }
 
+                element.bind('contextmenu',function() { return false; }); // Kill context menu
 
 
                 scope.$watch("vgSrc",function(){
