@@ -1650,7 +1650,7 @@ void MediaServerProcess::run()
         QnResourceDiscoveryManager::instance(),
         qnResPool,
         qnResTypePool );
-    //TODO #ak passing settings
+    //passing settings
     std::map<QString, QVariant> confParams;
     for( const auto& paramName: MSSettings::roSettings()->allKeys() )
     {
