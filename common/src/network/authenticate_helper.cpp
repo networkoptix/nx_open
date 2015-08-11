@@ -146,9 +146,11 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         if( !authQueryParam.isEmpty() )
         {
             if( authenticateByUrl( authQueryParam, request.requestLine.method, authUserId ) )
+            {
                 if (usedAuthMethod)
                     *usedAuthMethod = AuthMethod::urlQueryParam;
                 return true;
+            }
         }
     }
 
@@ -634,11 +636,28 @@ bool QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteAr
 {
     nx_http::Response tmpHeaders;
     QnUserResourcePtr outUserResource;
-    bool rez = doDigestAuth(
-        method, authData, tmpHeaders, false, authUserId, ';',
-        std::bind(&QnAuthHelper::isCookieNonceValid, this, std::placeholders::_1),
-        &outUserResource);
-    if (!rez)
+
+    nx_http::header::DigestCredentials digestCredentials;
+    if( !digestCredentials.parse( authData ) )
+        return false;
+    bool authResult = false;
+    if( digestCredentials.params.contains( "auth" ) )
+    {
+        //authenticating
+        QnUuid userID;
+        authResult = authenticateByUrl( digestCredentials.params.value("auth"), method, &userID );
+        outUserResource = m_users.value( userID );
+        if( authUserId )
+            *authUserId = userID;
+    }
+    else
+    {
+        authResult = doDigestAuth(
+            method, authData, tmpHeaders, false, authUserId, ';',
+            std::bind(&QnAuthHelper::isCookieNonceValid, this, std::placeholders::_1),
+            &outUserResource);
+    }
+    if( !authResult )
     {
         nx_http::insertHeader(
             &responseHeaders.headers,
@@ -651,7 +670,7 @@ bool QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteAr
         QString clientGuid = lit("%1=%2").arg(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME)).arg(QnUuid::createUuid().toString());
         nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", clientGuid.toUtf8()));
     }
-    return rez;
+    return authResult;
 }
 
 void QnAuthHelper::addAuthHeader(
