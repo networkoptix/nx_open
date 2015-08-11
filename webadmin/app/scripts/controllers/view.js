@@ -413,6 +413,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
 
+
         (function (){
             // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
             // But I kept it for all browsers to avoid future possible bugs in different browsers
