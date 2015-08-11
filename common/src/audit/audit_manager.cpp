@@ -7,7 +7,6 @@ static QnAuditManager* m_globalInstance = 0;
 
 namespace
 {
-    const int MIN_PLAYBACK_TIME_TO_LOG = 1000 * 5;
     const qint64 GROUP_TIME_THRESHOLD = 1000ll * 30;
 }
 
