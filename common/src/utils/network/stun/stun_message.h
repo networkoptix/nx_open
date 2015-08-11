@@ -271,7 +271,7 @@ const T* Message::getAttribute( int aType, size_t index ) const
             return nullptr;
     }
 
-    return static_cast<T*>( it->second.get() );
+    return static_cast< const T* >( it->second.get() );
 }
 
 } // namespase stun

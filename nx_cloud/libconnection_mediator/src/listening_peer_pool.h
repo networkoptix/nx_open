@@ -13,6 +13,7 @@ namespace nx {
 namespace hpm {
 
 class STUNMessageDispatcher;
+class MediaserverApiIf;
 
 //!This class instance keeps information about all currently listening peers, processes STUN requests \a bind, \a connect and sends \a connection_requested indication
 /*!
@@ -22,20 +23,18 @@ class STUNMessageDispatcher;
 class ListeningPeerPool
 {
 public:
-    ListeningPeerPool();
-    virtual ~ListeningPeerPool();
-
-    bool registerRequestProcessors( STUNMessageDispatcher& dispatcher );
+    ListeningPeerPool( STUNMessageDispatcher* dispatcher,
+                       MediaserverApiIf* mediaserverApi );
 
     bool ping( StunServerConnection* connection, stun::Message&& message );
     bool listen( StunServerConnection* connection, stun::Message&& message );
     bool connect( StunServerConnection* connection, stun::Message&& message );
 
-    static ListeningPeerPool* instance();
-
 private:
     bool errorResponse( StunServerConnection* connection,
                         stun::Message& request, int code, String reason );
+
+    MediaserverApiIf* m_mediaserverApi;
 };
 
 } // namespace hpm

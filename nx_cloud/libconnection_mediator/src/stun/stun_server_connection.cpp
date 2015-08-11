@@ -73,55 +73,5 @@ void StunServerConnection::processMessage( stun::Message&& message )
     }
 }
 
-/*
-void StunServerConnection::processBindingRequest( stun::Message&& request )
-{
-    const auto tid = std::move( request.header.transactionId );
-
-    const auto systemAttr = request.getAttribute< attrs::SystemId >();
-    if( !systemAttr ) {
-        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::BAD_REQUEST,
-                        "Attribute systemId is required" );
-        return;
-    }
-
-    const auto systemId = systemAttr->get();
-    if( !verifySystemName( systemId ) ) {
-        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::BAD_REQUEST,
-                        String( "Wrong systemId: " ) + systemId.toByteArray() );
-        return;
-    }
-
-    const auto serverAttr = request.getAttribute< attrs::ServerId >();
-    if( !serverAttr ) {
-        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::BAD_REQUEST,
-                        "Attribute serverId is required" );
-        return;
-    }
-
-    const auto serverId = serverAttr->get();
-    if( !verifyServerId( serverId ) ) {
-        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::BAD_REQUEST,
-                        String( "Wrong serverId: " ) + serverId.toByteArray() );
-        return;
-    }
-
-    const auto authAttr = request.getAttribute< attrs::Authorization >();
-    if( !authAttr ) {
-        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::UNAUTHTORIZED,
-                        "Attribute authorization is required" );
-        return;
-    }
-    if( !verifyAuthroization( authAttr->value ) ) {
-        sendErrorReply( stun::BINDING, std::move( tid ), stun::error::UNAUTHTORIZED,
-                        String( "Authroization did not pass" ) );
-        return;
-
-    }
-
-
-}
-    */
-
 } // namespace hpm
 } // namespace nx

@@ -1,38 +1,25 @@
-
 #include "listening_peer_pool.h"
 
 #include "stun/custom_stun.h"
 #include "stun/stun_message_dispatcher.h"
-
-#include <atomic>
+#include "mediaserver_api.h"
 
 namespace nx {
 namespace hpm {
 
-static std::atomic<ListeningPeerPool*> ListeningPeerPool_instance;
-
-ListeningPeerPool::ListeningPeerPool()
-{
-    assert( ListeningPeerPool_instance.load() == nullptr );
-    ListeningPeerPool_instance.store( this, std::memory_order_relaxed );
-}
-
-ListeningPeerPool::~ListeningPeerPool()
-{
-    assert( ListeningPeerPool_instance.load() == this );
-    ListeningPeerPool_instance.store( nullptr, std::memory_order_relaxed );
-}
-
-bool ListeningPeerPool::registerRequestProcessors( STUNMessageDispatcher& dispatcher )
+ListeningPeerPool::ListeningPeerPool( STUNMessageDispatcher* dispatcher,
+                                      MediaserverApiIf* mediaserverApi )
+    : m_mediaserverApi( mediaserverApi )
 {
     using namespace std::placeholders;
-    return
-        dispatcher.registerRequestProcessor(
+    Q_ASSERT(
+        dispatcher->registerRequestProcessor(
             methods::PING, std::bind( &ListeningPeerPool::ping, this, _1, _2 ) ) &&
-        dispatcher.registerRequestProcessor(
+        dispatcher->registerRequestProcessor(
             methods::LISTEN, std::bind( &ListeningPeerPool::listen, this, _1, _2 ) ) &&
-        dispatcher.registerRequestProcessor(
-            methods::CONNECT, std::bind( &ListeningPeerPool::connect, this, _1, _2 ) );
+        dispatcher->registerRequestProcessor(
+            methods::CONNECT, std::bind( &ListeningPeerPool::connect, this, _1, _2 ) )
+    );
 }
 
 bool ListeningPeerPool::ping( StunServerConnection* connection, stun::Message&& message )
@@ -59,8 +46,11 @@ bool ListeningPeerPool::ping( StunServerConnection* connection, stun::Message&& 
         return errorResponse( connection, message, stun::error::BAD_REQUEST,
                               "Attribute PublicEndpointList is required" );
 
-    // TODO: ping endpoints and remove unaccesible
     std::list< SocketAddress > endpoints = endpointsAttr->get();
+    endpoints.remove_if( [ & ]( const SocketAddress& addr )
+    {
+        return !m_mediaserverApi->ping( addr, serverAttr->get() );
+    } );
 
     stun::Message response( stun::Header(
         stun::MessageClass::successResponse, message.header.method,
@@ -104,11 +94,6 @@ bool ListeningPeerPool::connect( StunServerConnection* /*connection*/, stun::Mes
     //sending success response with selected server address
 
     return false;
-}
-
-ListeningPeerPool* ListeningPeerPool::instance()
-{
-    return ListeningPeerPool_instance.load( std::memory_order_relaxed );
 }
 
 bool ListeningPeerPool::errorResponse(

@@ -4,6 +4,7 @@ CONFIG += console
 INCLUDEPATH += ${root.dir}/nx_cloud/libconnection_mediator/src
 
 include( ${libdir}/gtest.pri )
+include( ${libdir}/gmock.pri )
 
 !win32 {
   ext_debug2.target  = $(TARGET).debug

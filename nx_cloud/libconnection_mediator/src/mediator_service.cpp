@@ -23,6 +23,7 @@
 #include "http/register_http_handler.h"
 #include "stun/stun_message_dispatcher.h"
 #include "listening_peer_pool.h"
+#include "mediaserver_api.h"
 #include "version.h"
 
 namespace nx {
@@ -135,9 +136,9 @@ int MediatorProcess::executeApplication()
     using namespace std::placeholders;
 
     //STUN handlers
-    ListeningPeerPool listeningPeerPool;
     STUNMessageDispatcher stunMessageDispatcher;
-    listeningPeerPool.registerRequestProcessors( stunMessageDispatcher );
+    MediaserverApi mediaserverApi;
+    ListeningPeerPool listeningPeerPool( &stunMessageDispatcher, &mediaserverApi );
 
     //accepting STUN requests by both tcp and udt
     m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>( stunAddrToListenList, true, SocketFactory::nttAuto ) );
