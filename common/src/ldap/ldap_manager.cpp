@@ -93,6 +93,7 @@ QnLdapUsers QnLdapManager::fetchUsers() {
     QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
 
     QUrl uri = settings.uri;
+#if defined Q_OS_WINDOWS
     if (uri.scheme() == lit("ldaps"))
         d->ld = ldap_sslinit(QSTOCW(uri.host()), uri.port(), 1);
     else
@@ -100,6 +101,11 @@ QnLdapUsers QnLdapManager::fetchUsers() {
 
     if (d->ld == 0)
         THROW_LDAP_EXCEPTION("LdapManager::LdapManager(): ldap_init()", LdapGetLastError());
+#elif defined(Q_OS_LINUX)
+    if (ldap_initialize(&d->ld, QSTOCW(uri.toString())) != LDAP_SUCCESS)
+        THROW_LDAP_EXCEPTION("LdapManager::LdapManager(): ldap_initialize()", LdapGetLastError());
+#endif
+
 
     try {
         int desired_version = LDAP_VERSION3;
