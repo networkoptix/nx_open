@@ -94,6 +94,8 @@ namespace ec2
         serverError,
         unsupported,
         unauthorized,
+        //!Requested operation is currently forbidden (e.g., read-only mode is enabled)
+        forbidden,
         //!Response parse error
         badResponse,
         //!Error executing DB request

@@ -215,6 +215,7 @@ bool handleTransaction(
     if( tranFormat == Qn::UbjsonFormat )
     {
         QnAbstractTransaction transaction;
+        transaction.deliveryInfo.originatorType = QnTranDeliveryInformation::remoteServer;
         QnUbjsonReader<QByteArray> stream(&serializedTransaction);
         if (!QnUbjson::deserialize(&stream, &transaction)) {
             qnWarning("Ignore bad transaction data. size=%1.", serializedTransaction.size());
@@ -231,11 +232,12 @@ bool handleTransaction(
     else if( tranFormat == Qn::JsonFormat )
     {
         QnAbstractTransaction transaction;
+        transaction.deliveryInfo.originatorType = QnTranDeliveryInformation::remoteServer;
         QJsonObject tranObject;
         //TODO #ak take tranObject from cache
         if( !QJson::deserialize(serializedTransaction, &tranObject) )
             return false;
-        if( !QJson::deserialize( tranObject["tran"], &transaction ) )
+        if( !QJson::deserialize(tranObject["tran"], &transaction) )
             return false;
 
         return handleTransaction2(

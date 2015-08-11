@@ -458,7 +458,7 @@ TEST( HttpRequestTest, Request_parse )
 
 
 //////////////////////////////////////////////
-//   Via header tests
+//   WWWAuthenticate header tests
 //////////////////////////////////////////////
 
 TEST( HttpHeaderTest, WWWAuthenticate_parse )
@@ -496,4 +496,56 @@ TEST( HttpHeaderTest, WWWAuthenticate_parse )
     //    nx_http::header::WWWAuthenticate auth;
     //    ASSERT_FALSE( auth.parse( QByteArray::fromRawData(testData, sizeof(testData)-1) ) );
     //}
+}
+
+TEST( HttpHeaderTest, Authorization_parse )
+{
+    {
+        static const char testData[] =
+            "Digest username=\"Mufasa\","
+                "realm=\"testrealm@host.com\","
+                "nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\","
+                "uri=\"/dir/index.html\","
+                "qop=auth,"
+                "nc=00000001,"
+                "cnonce=\"0a4f113b\","
+                "response=\"6629fae49393a05397450978507c4ef1\","
+                "opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"";
+        nx_http::header::Authorization auth;
+        ASSERT_TRUE( auth.parse( QByteArray::fromRawData( testData, sizeof( testData ) - 1 ) ) );
+        ASSERT_EQ( auth.authScheme, nx_http::header::AuthScheme::digest );
+        ASSERT_EQ( auth.userid(), "Mufasa" );
+        ASSERT_EQ( auth.digest->params["username"], "Mufasa" );
+        ASSERT_EQ( auth.digest->params["realm"], "testrealm@host.com" );
+        ASSERT_EQ( auth.digest->params["nonce"], "dcd98b7102dd2f0e8b11d0f600bfb0c093" );
+        ASSERT_EQ( auth.digest->params["uri"], "/dir/index.html" );
+        ASSERT_EQ( auth.digest->params["qop"], "auth" );
+        ASSERT_EQ( auth.digest->params["nc"], "00000001" );
+        ASSERT_EQ( auth.digest->params["cnonce"], "0a4f113b" );
+        ASSERT_EQ( auth.digest->params["response"], "6629fae49393a05397450978507c4ef1" );
+        ASSERT_EQ( auth.digest->params["opaque"], "5ccc069c403ebaf9f0171e9517f40e41" );
+    }
+
+    {
+        static const char testData[] = "Digest realm=AXIS_ACCC8E338EDF, nonce=\"p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad\", algorithm=MD5, qop=auth";
+
+        nx_http::header::Authorization auth;
+        ASSERT_TRUE( auth.parse( QByteArray::fromRawData( testData, sizeof( testData ) - 1 ) ) );
+        ASSERT_EQ( auth.authScheme, nx_http::header::AuthScheme::digest );
+        ASSERT_EQ( auth.digest->params.size(), 4 );
+        ASSERT_EQ( auth.digest->params["realm"], "AXIS_ACCC8E338EDF" );
+        ASSERT_EQ( auth.digest->params["algorithm"], "MD5" );
+        ASSERT_EQ( auth.digest->params["qop"], "auth" );
+        ASSERT_EQ( auth.digest->params["nonce"], "p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad" );
+    }
+
+    {
+        static const char testData[] = "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==";
+
+        nx_http::header::Authorization auth;
+        ASSERT_TRUE( auth.parse( QByteArray::fromRawData( testData, sizeof( testData ) - 1 ) ) );
+        ASSERT_EQ( auth.authScheme, nx_http::header::AuthScheme::basic );
+        ASSERT_EQ( auth.basic->userid, "Aladdin" );
+        ASSERT_EQ( auth.basic->password, "open sesame" );
+    }
 }

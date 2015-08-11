@@ -19,6 +19,7 @@
 #include "server_query_processor.h"
 #include "ec2_connection.h"
 #include "managers/time_manager.h"
+#include "settings.h"
 
 
 namespace ec2
@@ -46,12 +47,14 @@ namespace ec2
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
         virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) override;
         virtual void setContext( const ResourceContext& resCtx ) override;
+        virtual void setConfParams( std::map<QString, QVariant> confParams ) override;
 
     private:
         ServerQueryProcessor m_serverQueryProcessor;
         ClientQueryProcessor m_remoteQueryProcessor;
         QMutex m_mutex;
         ResourceContext m_resCtx;
+        Settings m_settingsInstance;
         std::unique_ptr<QnDbManager> m_dbManager;
         std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
         std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;

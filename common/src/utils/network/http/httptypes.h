@@ -435,6 +435,8 @@ namespace nx_http
             StringType toString() const;
             void clear();
 
+            StringType userid() const;
+
         private:
             Authorization( const Authorization& );
             const Authorization& operator=( const Authorization& );
