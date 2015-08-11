@@ -293,6 +293,8 @@ void QnFileStorageResource::setUrl(const QString& url)
 #ifndef _WIN32
         if (mountTmpDrive(url) != 0)
             return;
+        if (!m_localPath.isEmpty() && m_storageManager)
+            m_storageManager->addLocalPathInUse(m_localPath);
 #else
         if (!mountTmpDrive(url))
             return;
@@ -301,13 +303,15 @@ void QnFileStorageResource::setUrl(const QString& url)
     QnStorageResource::setUrl(url);
     m_valid = true;
     m_durty = true;
+
 }
 
-QnFileStorageResource::QnFileStorageResource():
+QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
     m_storageBitrateCoeff(1.0),
     m_durty(false),
     m_capabilities(0),
-    m_valid(false)
+    m_valid(false),
+    m_storageManager(storageManager)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -322,6 +326,9 @@ QnFileStorageResource::~QnFileStorageResource()
         umount(m_localPath.toLatin1().constData());
         rmdir(m_localPath.toLatin1().constData());
     }
+
+    if (!m_localPath.isEmpty() && m_storageManager)
+        m_storageManager->removeFromLocalPathInUse(m_localPath);
 #endif
 }
 
@@ -485,7 +492,8 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 
 QnStorageResource* QnFileStorageResource::instance(const QString&)
 {
-    QnStorageResource* storage = new QnFileStorageResource();
+    assert(QnStorageManager::instance());
+    QnStorageResource* storage = new QnFileStorageResource(QnStorageManager::instance());
     storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
     return storage;
 }

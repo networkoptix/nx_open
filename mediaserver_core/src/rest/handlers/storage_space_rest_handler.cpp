@@ -71,8 +71,10 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
             data.freeSpace = -1;
 
         reply.storages.push_back(data);
-        storagePaths.push_back(path);
+        storagePaths.push_back(path);        
     }
+
+    qnStorageMan->getCurrentlyUsedLocalPathes(&storagePaths);
 
     for(const QnPlatformMonitor::PartitionSpace &partition: partitions) {
         bool hasStorage = false;
