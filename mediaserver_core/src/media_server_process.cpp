@@ -2101,7 +2101,7 @@ void MediaServerProcess::run()
     //QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
 #endif
 
-    std::unique_ptr<QnLdapManager> ldapManager( new QnLdapManager(globalSettings->ldapSettings()) );
+    std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager());
 
     //QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
 

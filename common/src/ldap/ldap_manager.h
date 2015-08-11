@@ -40,7 +40,7 @@ class QnLdapManagerPrivate;
 
 class QnLdapManager : public Singleton<QnLdapManager> {
 public:
-    QnLdapManager(const QnLdapSettings& settings);
+    QnLdapManager();
     ~QnLdapManager();
 
     QnLdapUsers fetchUsers();

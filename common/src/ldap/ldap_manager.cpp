@@ -80,7 +80,7 @@ public:
     QnLdapUsers users;
 };
 
-QnLdapManager::QnLdapManager(const QnLdapSettings& settings)
+QnLdapManager::QnLdapManager()
     : d_ptr(new QnLdapManagerPrivate()) {
 }
 
@@ -240,7 +240,7 @@ bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &
     QByteArray cnonce = "12345";
     QByteArray nc = "00000001";
     QByteArray qop = "auth";
-    QByteArray digestUri = QByteArray("ldap/ad2.corp.hdw.mx"); //QByteArray("ldap/") + realm;
+    QByteArray digestUri = QByteArray("ldap/") + settings.uri.host().toLatin1();
 
     QMap<QByteArray, QByteArray> authDictionary;
     authDictionary["username"] = login.toUtf8();
