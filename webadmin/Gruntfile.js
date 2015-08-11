@@ -12,11 +12,14 @@ module.exports = function (grunt) {
     // Load grunt tasks automatically
     require('load-grunt-tasks')(grunt);
 
+
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
 
     grunt.loadNpmTasks('grunt-protractor-webdriver');
     grunt.loadNpmTasks('grunt-protractor-runner');
+    grunt.loadNpmTasks('grunt-wiredep');
+
 
     // Define the configuration for all the tasks
     grunt.initConfig({
@@ -140,6 +143,7 @@ module.exports = function (grunt) {
             livereload: {
                 options: {
                     middleware: function (connect, options) {
+                        var serveStatic = require('serve-static');
                         if (!Array.isArray(options.base)) {
                             options.base = [options.base];
                         }
@@ -149,12 +153,12 @@ module.exports = function (grunt) {
 
                         // Serve static files.
                         options.base.forEach(function (base) {
-                            middlewares.push(connect.static(base));
+                            middlewares.push(serveStatic(base));
                         });
 
                         // Make directory browse-able.
-                        var directory = options.directory || options.base[options.base.length - 1];
-                        middlewares.push(connect.directory(directory));
+                        //var directory = options.directory || options.base[options.base.length - 1];
+                        //middlewares.push(connect.directory(directory));
 
                         return middlewares;
                     },
@@ -288,14 +292,7 @@ module.exports = function (grunt) {
         },
 
         // Automatically inject Bower components into the app
-        'bower-install': {
-            app: {
-                html: '<%= yeoman.app %>/index.html',
-                ignorePath: '<%= yeoman.app %>/'
-            }
-        },
-
-
+       
         // Compiles Sass to CSS and generates necessary files if requested
         compass: {
             options: {
@@ -562,7 +559,6 @@ module.exports = function (grunt) {
         grunt.task.run([
             'clean:server',
             'wiredep',
-            'bower-install',
             'concurrent:server',
             'autoprefixer',
             'configureProxies:server',
@@ -593,7 +589,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', [
         'clean:dist',
-        'bower-install',
+        'wiredep',
         'useminPrepare',
         'concurrent:dist',
         'autoprefixer',
