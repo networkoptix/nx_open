@@ -17,8 +17,10 @@
 
 namespace {
     const int testLdapTimeoutMSec = 20 * 1000;
-    const int defaultPort = 389;
-    const int defaultPortSsl = 636;
+
+    int defaultLdapPort(bool ssl = false) {
+        return ssl ? 636 : 389;
+    }
 }
 
 class QnLdapSettingsDialogPrivate: public QObject {
@@ -113,9 +115,8 @@ QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
     if (!url.isValid())
         return result;
 
-    if (url.port() == -1) {
-        url.setPort(url.scheme() == lit("ldaps") ? defaultPortSsl : defaultPort);
-    }
+    if (url.port() == -1)
+        url.setPort(defaultLdapPort(url.scheme() == lit("ldaps")));
 
     result.uri = url;
     result.adminDn = dialog->ui->adminDnLineEdit->text();
@@ -130,6 +131,8 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
     const QnLdapSettings &settings = QnGlobalSettings::instance()->ldapSettings();
 
     QUrl url = settings.uri;
+    if (url.port() == defaultLdapPort(url.scheme() == lit("ldaps")))
+        url.setPort(-1);
     dialog->ui->serverLineEdit->setText(url.toString());
     dialog->ui->adminDnLineEdit->setText(settings.adminDn);
     dialog->ui->passwordLineEdit->setText(settings.adminPassword);

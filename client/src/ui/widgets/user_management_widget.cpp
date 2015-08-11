@@ -34,7 +34,7 @@ public:
     void at_usersTable_activated(const QModelIndex &index);
     void at_usersTable_clicked(const QModelIndex &index);
     void at_refreshButton_clicked();
-    void openLdapSettings();
+    bool openLdapSettings();
 };
 
 void QnUserManagementWidgetPrivate::at_usersTable_activated(const QModelIndex &index) {
@@ -52,17 +52,17 @@ void QnUserManagementWidgetPrivate::at_usersTable_clicked(const QModelIndex &ind
 
 void QnUserManagementWidgetPrivate::at_refreshButton_clicked() {
     if (!QnGlobalSettings::instance()->ldapSettings().isValid()) {
-        openLdapSettings();
-        return;
+        if (!openLdapSettings())
+            return;
     }
 
     QnAppServerConnectionFactory::getConnection2()->getUserManager()->mergeLdapUsers();
 }
 
-void QnUserManagementWidgetPrivate::openLdapSettings() {
+bool QnUserManagementWidgetPrivate::openLdapSettings() {
     QScopedPointer<QnLdapSettingsDialog> dialog(new QnLdapSettingsDialog(widget));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    return dialog->exec() == QDialogButtonBox::Ok;
 }
 
 
