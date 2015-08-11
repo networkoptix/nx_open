@@ -28,6 +28,8 @@
 
 namespace cdb {
 
+static const int DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC = 5;
+
 CloudDBProcess::CloudDBProcess( int argc, char **argv )
 : 
     QtService<QtSingleCoreApplication>(argc, argv, QN_APPLICATION_NAME),
@@ -69,7 +71,7 @@ int CloudDBProcess::executeApplication()
         if( dbManager.init() )
             break;
         NX_LOG( lit("Cannot start application due to DB connect error"), cl_logALWAYS );
-        std::this_thread::sleep_for( std::chrono::seconds( 5 ) );
+        std::this_thread::sleep_for( std::chrono::seconds( DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC ) );
     }
 
     //contains singletones common for http server
