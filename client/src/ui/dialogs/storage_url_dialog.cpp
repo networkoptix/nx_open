@@ -77,7 +77,7 @@ QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(
 
     if(protocol == lit("smb")) {
         result.protocol = protocol;
-        result.name = tr("Windows Network Shared Resource");
+        result.name = tr("Network Shared Resource");
         result.urlTemplate = tr("\\\\<Computer Name>\\<Folder>");
         result.urlPattern = lit("\\\\\\\\%1\\\\.+").arg(validHostnamePattern);
     } 
