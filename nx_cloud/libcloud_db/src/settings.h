@@ -11,7 +11,6 @@
 #include <QtCore/QSettings>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/common/singleton.h>
 #include <utils/network/socket_common.h>
 
 
@@ -19,8 +18,6 @@ namespace cdb
 {
 
 class Settings
-:
-    public Singleton<Settings>
 {
 public:
     Settings();
