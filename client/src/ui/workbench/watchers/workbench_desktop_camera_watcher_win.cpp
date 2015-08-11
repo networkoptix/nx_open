@@ -40,7 +40,7 @@ void QnWorkbenchDesktopCameraWatcher::deinitialize() {
 }
 
 void QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    if (m_desktop || qnRuntime->isVideoWallMode())
+    if (m_desktop || qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
     if (QnDesktopResourcePtr desktop = resource.dynamicCast<QnDesktopResource>()) {
         m_desktop = desktop;

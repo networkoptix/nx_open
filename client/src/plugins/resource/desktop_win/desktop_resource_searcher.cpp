@@ -53,7 +53,7 @@ QString QnDesktopResourceSearcher::manufacture() const {
 }
 
 QnResourceList QnDesktopResourceSearcher::findResources() {
-    if (qnRuntime->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return QnResourceList();
 
 #ifdef Q_OS_WIN
