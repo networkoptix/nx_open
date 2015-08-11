@@ -21,6 +21,7 @@
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
+class QnIoModuleOverlayWidget;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -34,6 +35,7 @@ public:
     static const Button ZoomWindowButton    = static_cast<Button>(0x080);
     static const Button EnhancementButton   = static_cast<Button>(0x100);
     static const Button DbgScreenshotButton = static_cast<Button>(0x200);
+    static const Button IoModuleButton      = static_cast<Button>(0x400);
 #define ScreenshotButton ScreenshotButton
 #define MotionSearchButton MotionSearchButton
 #define PtzButton PtzButton
@@ -41,6 +43,7 @@ public:
 #define ZoomWindowButton ZoomWindowButton
 #define EnhancementButton EnhancementButton
 #define DbgScreenshotButton DbgScreenshotButton
+#define IoModuleButton IoModuleButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
@@ -176,6 +179,7 @@ private slots:
     void at_fishEyeButton_toggled(bool checked);
     void at_zoomWindowButton_toggled(bool checked);
     void at_histogramButton_toggled(bool checked);
+    void at_ioModuleButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
     void at_statusOverlayWidget_diagnosticsRequested();
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
@@ -237,6 +241,8 @@ private:
     QnFisheyeHomePtzController *m_homePtzController;
 
     QnMediaDewarpingParams m_dewarpingParams;
+
+    QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

@@ -55,6 +55,7 @@
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
+#include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <utils/aspect_ratio.h>
 
 #include "resource_widget_renderer.h"
@@ -115,7 +116,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_renderer(NULL),
     m_motionSensitivityValid(false),
     m_binaryMotionMaskValid(false),
-    m_homePtzController(NULL)
+    m_homePtzController(NULL),
+    m_ioModuleOverlayWidget(nullptr)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource)
@@ -177,6 +179,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     /* Set up info updates. */
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
     updateInfoText();
+
+    /* Set up overlays */
+    if (m_camera->flags() & Qn::io_module) {
+        m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget(this);
+        addOverlayWidget(m_ioModuleOverlayWidget, Invisible, false, true, false, true);
+    }
 
     /* Set up buttons. */
 
@@ -246,6 +254,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
         connect(enhancementButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_histogramButton_toggled);
         buttonBar()->addButton(EnhancementButton, enhancementButton);
+    }
+
+    {
+        QnImageButtonWidget *ioModuleButton = new QnImageButtonWidget();
+        ioModuleButton->setIcon(qnSkin->icon("item/io.png"));
+        ioModuleButton->setCheckable(true);
+        ioModuleButton->setProperty(Qn::NoBlockMotionSelection, true);
+        ioModuleButton->setToolTip(tr("IO Module"));
+        connect(ioModuleButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ioModuleButton_toggled);
+        buttonBar()->addButton(IoModuleButton, ioModuleButton);
     }
 
     if (qnRuntime->isDevMode()) {
@@ -1032,6 +1050,9 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result &= ~PtzButton;
     }
 
+    if (resource()->toResource()->flags() & Qn::io_module)
+        result |= IoModuleButton;
+
     if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo) {
         if(item()
                 && item()->layout()
@@ -1212,6 +1233,11 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
 
     params.enabled = checked;
     setImageEnhancement(params);
+}
+
+void QnMediaResourceWidget::at_ioModuleButton_toggled(bool checked) {
+    if (m_ioModuleOverlayWidget)
+        setOverlayWidgetVisibility(m_ioModuleOverlayWidget, checked ? Visible : Invisible);
 }
 
 void QnMediaResourceWidget::at_renderWatcher_widgetChanged(QnResourceWidget *widget) {
