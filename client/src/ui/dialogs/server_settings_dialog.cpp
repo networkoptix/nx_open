@@ -63,7 +63,6 @@ namespace {
         PathColumn,
         CapacityColumn,
         LoginColumn,
-        PasswordColumn,
         ArchiveSpaceColumn,
         ColumnCount
     };
@@ -125,7 +124,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(PathColumn, QHeaderView::Stretch);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(LoginColumn, QHeaderView::ResizeToContents);
-    ui->storagesTable->horizontalHeader()->setSectionResizeMode(PasswordColumn, QHeaderView::ResizeToContents);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
@@ -257,10 +255,6 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     loginItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     loginItem->setData(Qt::DisplayRole, url.userName());
 
-    QTableWidgetItem *passwordItem = new QTableWidgetItem();
-    passwordItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    passwordItem->setData(Qt::DisplayRole, url.password());
-
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     QTableWidgetItem *archiveSpaceItem = new QTableWidgetItem();
     archiveSpaceItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
@@ -276,7 +270,6 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     ui->storagesTable->setItem(row, PathColumn, pathItem);
     ui->storagesTable->setItem(row, CapacityColumn, capacityItem);
     ui->storagesTable->setItem(row, LoginColumn, loginItem);
-    ui->storagesTable->setItem(row, PasswordColumn, passwordItem);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     ui->storagesTable->setItem(row, ArchiveSpaceColumn, archiveSpaceItem);
     ui->storagesTable->openPersistentEditor(archiveSpaceItem);
@@ -315,8 +308,6 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
     result.storageId = checkBoxItem->data(StorageIdRole).value<QnUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
-    QString login = ui->storagesTable->item(row, LoginColumn)->text();
-    QString password = ui->storagesTable->item(row, PasswordColumn)->text();
     result.url = qvariant_cast<QString>(pathItem->data(Qn::StorageUrlRole));
 
     result.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();
