@@ -370,6 +370,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
     case Qn::AR_CameraRemove:
     case Qn::AR_ServerRemove:
     case Qn::AR_BEventRemove:
+    case Qn::AR_BEventUpdate:
     case Qn::AR_UserRemove:
         result = QString::fromUtf8(data->extractParam("description"));
         break;
@@ -383,13 +384,6 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
         result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
     case Qn::AR_CameraUpdate:
         result +=  tr("%n cameras", "", data->resources.size());
-        break;
-    case Qn::AR_BEventUpdate:
-        if (!data->resources.empty()) {
-            QnBusinessEventRulePtr bRule = QnCommonMessageProcessor::instance()->businessRules().value(data->resources[0]);
-            if (bRule) 
-                result = QnBusinessStringsHelper::bruleDescriptionText(bRule);
-        }
         break;
     default:
         result = getResourcesString(data->resources);
