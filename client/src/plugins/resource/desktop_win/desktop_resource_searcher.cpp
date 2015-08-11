@@ -12,6 +12,7 @@
 #   include <d3d9.h>
 #   include <d3dx9.h>
 #endif
+#include "client/client_runtime_settings.h"
 
 #define ONLY_PRIMARY_DESKTOP
 
@@ -52,6 +53,9 @@ QString QnDesktopResourceSearcher::manufacture() const {
 }
 
 QnResourceList QnDesktopResourceSearcher::findResources() {
+    if (qnRuntime->isVideoWallMode())
+        return QnResourceList();
+
 #ifdef Q_OS_WIN
     QnResourceList result;
     if (m_pD3D == 0)
