@@ -21,7 +21,6 @@ class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
 class CameraAdvancedSettingsWebPage;
-class QnCameraScheduleWidget;
 
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -105,13 +104,10 @@ private slots:
     void at_motionTypeChanged();
     void at_resetMotionRegionsButton_clicked();
     void at_motionRegionListChanged();
-    void at_analogViewCheckBox_clicked();
     void at_fisheyeSettingsChanged();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
-    void updateLicensesButtonVisible();
-    void updateLicenseText();
     void updateIpAddressText();
     void updateWebPageText();
 
@@ -135,7 +131,6 @@ private:
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
-    QnCameraScheduleWidget* m_cameraScheduleWidget;
   
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;

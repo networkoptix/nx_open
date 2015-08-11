@@ -207,47 +207,7 @@
         <widget class="QnImageControlWidget" name="imageControlWidget" native="true"/>
        </item>
        <item>
-        <widget class="QGroupBox" name="analogGroupBox">
-         <property name="title">
-          <string>Licensing</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_11">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QCheckBox" name="analogViewCheckBox">
-              <property name="text">
-               <string>Use an analog license to view this camera</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="moreLicensesButton">
-              <property name="text">
-               <string>Get More Licenses...</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QnLicensesUsageWidget" name="licensesUsageWidget" native="true"/>
-          </item>
-         </layout>
-        </widget>
+        <widget class="QnLicensesProposeWidget" name="licensingWidget" native="true"/>
        </item>
        <item>
         <widget class="QCheckBox" name="enableAudioCheckBox">
@@ -288,6 +248,9 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <item>
+        <widget class="QnCameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="ioSettingsTab">
@@ -575,12 +538,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnLicensesUsageWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/licensing/licenses_usage_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QnImageControlWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/image_control_widget.h</header>
@@ -607,6 +564,18 @@
    <class>QnCameraAdvancedSettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/camera_advanced_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnLicensesProposeWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/licensing/licenses_propose_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnCameraScheduleWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/camera_schedule_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

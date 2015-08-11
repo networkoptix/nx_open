@@ -144,7 +144,7 @@ namespace {
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent),
-    QnWorkbenchContextAware(parent),
+    QnWorkbenchContextAware(parent, true),
     ui(new Ui::CameraScheduleWidget),
     m_disableUpdateGridParams(false),
     m_motionAvailable(true),
@@ -241,17 +241,19 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
     connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,  updateLicensesIfNeeded);
-
-    connect(context()->instance<QnWorkbenchPanicWatcher>(), &QnWorkbenchPanicWatcher::panicModeChanged, this, &QnCameraScheduleWidget::updatePanicLabelText);
-    connect(context(), &QnWorkbenchContext::userChanged, this, &QnCameraScheduleWidget::updateLicensesButtonVisible);
-    updatePanicLabelText();
-    updateLicensesButtonVisible();
-
 }
 
 QnCameraScheduleWidget::~QnCameraScheduleWidget() {
     return;
 }
+
+void QnCameraScheduleWidget::afterContextInitialized() {
+    connect(context()->instance<QnWorkbenchPanicWatcher>(), &QnWorkbenchPanicWatcher::panicModeChanged, this, &QnCameraScheduleWidget::updatePanicLabelText);
+    connect(context(), &QnWorkbenchContext::userChanged, this, &QnCameraScheduleWidget::updateLicensesButtonVisible);
+    updatePanicLabelText();
+    updateLicensesButtonVisible();
+}
+
 
 bool QnCameraScheduleWidget::hasHeightForWidth() const {
     return false;   //TODO: #GDM temporary fix to handle string freeze
@@ -367,26 +369,15 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
             maxDays = qMax(qAbs(camera->maxDays()), qAbs(maxDays));
     }
 
-    if(enabledCount > 0 && disabledCount > 0)
-        ui->enableRecordingCheckBox->setCheckState(Qt::PartiallyChecked);
-    else 
-        ui->enableRecordingCheckBox->setCheckState(enabledCount > 0 ? Qt::Checked : Qt::Unchecked);
+    QnCheckbox::setupTristateCheckbox(ui->enableRecordingCheckBox, enabledCount == 0 || disabledCount == 0, enabledCount > 0);
+    QnCheckbox::setupTristateCheckbox(ui->checkBoxMinArchive, mixedMinDays, minDays <= 0);
+    QnCheckbox::setupTristateCheckbox(ui->checkBoxMaxArchive, mixedMaxDays, maxDays <= 0);
 
-    ui->checkBoxMinArchive->setCheckState(mixedMinDays
-        ? Qt::PartiallyChecked
-        : minDays <= 0
-        ? Qt::Checked
-        : Qt::Unchecked);
     if (minDays != 0)
         ui->spinBoxMinDays->setValue(qAbs(minDays));
     else 
         ui->spinBoxMinDays->setValue(defaultMinArchiveDays);
 
-    ui->checkBoxMaxArchive->setCheckState(mixedMaxDays
-        ? Qt::PartiallyChecked
-        : maxDays <= 0
-        ? Qt::Checked
-        : Qt::Unchecked);
     if (maxDays != 0)
         ui->spinBoxMaxDays->setValue(qAbs(maxDays));
     else

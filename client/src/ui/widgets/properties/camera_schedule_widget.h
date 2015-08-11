@@ -89,6 +89,9 @@ signals:
     void scheduleExported(const QnVirtualCameraResourceList &);
     void controlsChangesApplied();
 
+protected:
+    virtual void afterContextInitialized() override;
+
 private slots:
     void updateGridParams(bool fromUserInput = false);
     void updateGridEnabledState();

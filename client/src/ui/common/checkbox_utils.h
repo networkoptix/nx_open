@@ -10,6 +10,8 @@ public:
 
     static void autoCleanTristate(QCheckBox* checkbox);
 
+    static void setupTristateCheckbox(QCheckBox* checkbox, bool sameValue, bool checked);
+
 private:
     void cleanTristate();
 };

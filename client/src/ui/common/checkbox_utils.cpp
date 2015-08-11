@@ -29,3 +29,11 @@ void QnCheckbox::cleanTristate() {
     if (state == Qt::PartiallyChecked)
         checkbox->setCheckState(Qt::Checked);
 }
+
+void QnCheckbox::setupTristateCheckbox(QCheckBox* checkbox, bool sameValue, bool checked) {
+    checkbox->setTristate(!sameValue);
+    if (!sameValue)
+        checkbox->setCheckState(Qt::PartiallyChecked);
+    else
+        checkbox->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
+}

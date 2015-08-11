@@ -12,7 +12,6 @@ namespace Ui {
 }
 
 class QnCameraSettingsWidgetPrivate;
-class QnCameraScheduleWidget;
 
 class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -67,11 +66,8 @@ private slots:
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
 
-    void at_analogViewCheckBox_clicked();
-
     void updateMaxFPS();
-    void updateLicenseText();
-    void updateLicensesButtonVisible();
+
 protected:
     QnCameraSettingsWidgetPrivate* d_ptr;
 
@@ -83,7 +79,6 @@ private:
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
-    QnCameraScheduleWidget* m_cameraScheduleWidget;
 
     QnVirtualCameraResourceList m_cameras;
     bool m_hasDbChanges;
