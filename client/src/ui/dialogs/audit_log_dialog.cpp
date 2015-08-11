@@ -34,6 +34,14 @@
 #include <ui/models/audit/audit_log_session_model.h>
 #include <ui/models/audit/audit_log_detail_model.h>
 #include <QMouseEvent>
+#include "core/resource/layout_resource.h"
+#include "ui/common/geometry.h"
+#include "ui/style/globals.h"
+#include "ui/workbench/workbench_context_aware.h"
+#include <ui/workbench/workbench_display.h>
+#include "ui/workbench/extensions/workbench_stream_synchronizer.h"
+#include <core/resource/user_resource.h>
+#include "core/resource/media_resource.h"
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -852,7 +860,64 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     if (period.durationMs > 0)
         params.setArgument(Qn::TimePeriodRole, period);
     
-    context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+
+    /* Construct and add a new layout. */
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    //layout->addFlags(Qn::local);
+    layout->setId(QnUuid::createUuid());
+    layout->setName(tr("Audit log replay"));
+    if(context()->user())
+        layout->setParentId(context()->user()->getId());
+
+    /* Calculate size of the resulting matrix. */
+    qreal desiredItemAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+
+    /* Calculate best size for layout cells. */
+    qreal desiredCellAspectRatio = desiredItemAspectRatio;
+
+    /* Aspect ratio of the screen free space. */
+    QRectF viewportGeometry = display()->boundedViewportGeometry();
+
+    qreal displayAspectRatio = viewportGeometry.isNull()
+        ? desiredItemAspectRatio
+        : QnGeometry::aspectRatio(viewportGeometry);
+
+    if (resList.size() == 1) {
+        if (QnMediaResourcePtr mediaRes = resList[0].dynamicCast<QnMediaResource>()) {
+            qreal customAspectRatio = mediaRes->customAspectRatio();
+            if (!qFuzzyIsNull(customAspectRatio))
+                desiredCellAspectRatio = customAspectRatio;
+        }
+    }
+
+    const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * resList.size() / desiredCellAspectRatio)));
+
+    for(int i = 0; i < resList.size(); i++) 
+    {
+        QnLayoutItemData item;
+        item.uuid = QnUuid::createUuid();
+        item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
+        item.resource.id = resList[i]->getId();
+        item.resource.path = resList[i]->getUniqueId();
+        item.dataByRole[Qn::ItemTimeRole] = period.startTimeMs;
+
+        QString forcedRotation = resList[i]->getProperty(QnMediaResource::rotationKey());
+        if (!forcedRotation.isEmpty()) 
+            item.rotation = forcedRotation.toInt();
+        
+        layout->addItem(item);
+    }
+
+    layout->setData(Qn::LayoutTimeLabelsRole, true);
+    //layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
+    layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
+    layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
+    layout->setCellAspectRatio(desiredCellAspectRatio);
+    layout->setLocalRange(period);
+
+    resourcePool()->addResource(layout);
+    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+
 }
 
 void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId, const QString& objectName)
