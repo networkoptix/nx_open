@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$sce) {
+    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q) {
 
         $scope.playerApi = false;
         $scope.cameras = {};
@@ -25,14 +25,13 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.hasMobileApp = !!found;
         }
 
-        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm')){
-            $scope.ieNoWebm = true;
-        }
 
         $scope.activeResolution = 'Auto';
         // detect max resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
         var nativeResolutions = ['Auto', 'hi', 'lo'];
+        var reloadInterval = 30*1000;//30 seconds
+        var quickReloadInterval = 3*1000;// 3 seconds if something was wrong
         var mimeTypes = {
             'hls': 'application/x-mpegURL',
             'webm': 'video/webm',
@@ -42,17 +41,12 @@ angular.module('webadminApp').controller('ViewCtrl',
             'mjpeg':'video/x-motion-jpeg'
         };
 
-        function cameraSupports(type){
-            if(!$scope.activeCamera){
-                return null;
-            }
-            return _.find($scope.activeCamera.mediaStreams,function(stream){
-                return stream.transports.indexOf(type)>0;
-            });
-        }
-        function browserSupports(type){
 
-            var res = false;
+        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm')){
+            $scope.ieNoWebm = true;
+        }
+
+        function browserSupports(type){
             var v = document.createElement('video');
             if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
                 return true;//Native support
@@ -63,6 +57,14 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             return false;
+        }
+        function cameraSupports(type){
+            if(!$scope.activeCamera){
+                return null;
+            }
+            return _.find($scope.activeCamera.mediaStreams,function(stream){
+                return stream.transports.indexOf(type)>0;
+            });
         }
 
         function formatSupported(type){
@@ -102,13 +104,16 @@ angular.module('webadminApp').controller('ViewCtrl',
                 id: r.data.reply.id
             };
         });
-/*
-        function getCamerasServer(camera) {
+
+        function getServer(id) {
+            if(!$scope.mediaServers) {
+                return null;
+            }
             return _.find($scope.mediaServers, function (server) {
-                return server.id === camera.parentId;
+                return server.id === id;
             });
         }
-*/
+
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
             $scope.switchPlaying(true);
@@ -166,7 +171,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }*/
         };
 
-        $scope.selectCameraById = function (cameraId,position) {
+        $scope.selectCameraById = function (cameraId, position, silent) {
 
             $scope.cameraId = cameraId || $scope.cameraId;
             if(position){
@@ -177,7 +182,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return camera.id === $scope.cameraId;
             });
 
-            if ($scope.activeCamera) {
+            if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
 
@@ -190,10 +195,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             $location.path('/view/' + activeCamera.id, false);
             $scope.selectCameraById(activeCamera.id,false);
         };
-
-        $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {
-            $scope.selectCameraById(next.params.cameraId, $location.search().time || false);
-        });
 
         $scope.switchPlaying = function(play){
             if($scope.playerAPI) {
@@ -221,12 +222,42 @@ angular.module('webadminApp').controller('ViewCtrl',
             }*/
         };
 
+        $scope.selectFormat = function(format){
+            $scope.activeFormat = format;
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+        };
+
+        $scope.selectResolution = function(resolution){
+            /*if(resolution == "auto" || resolution == "Auto" || resolution == "AUTO"){
+                resolution = "320p";
+            }*/
+
+            if($scope.activeResolution == resolution){
+                return;
+            }
+            $scope.activeResolution = resolution;
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+        };
+
+        $scope.fullScreen = function(){
+            if (screenfull.enabled) {
+                screenfull.request($(".videowindow").get(0));
+            }
+        };
+
+
+
+
+
         function extractDomain(url) {
             url = url.split('/')[2] || url.split('/')[0];
             return url.split(':')[0].split('?')[0];
         }
 
         function getCameras() {
+
+            var deferred = $q.defer();
+
             mediaserver.getCameras().then(function (data) {
                 var cameras = data.data;
 
@@ -234,13 +265,24 @@ angular.module('webadminApp').controller('ViewCtrl',
                 var findMediaStream = function(param){
                     return param.name == "mediaStreams";
                 };
+
+
+                function cameraFilter(camera){
+                    // Filter desktop cameras here
+                    return true;
+                }
+
                 function cameraSorter(camera) {
+
                     camera.url = extractDomain(camera.url);
                     camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
+                    camera.server = getServer(camera.parentId);
+                    if(camera.server.status == 'Offline'){
+                        camera.status = 'Offline';
+                    }
 
                     var mediaStreams = _.find(camera.addParams,findMediaStream);
                     camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
-
 
                     var num = 0;
                     var addrArray = camera.url.split('.');
@@ -261,41 +303,44 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                 /*
 
-                // This is for encoders (group cameras):
+                 // This is for encoders (group cameras):
 
-                //1. split cameras with groupId and without
-                var cams = _.partition(cameras, function (cam) {
-                    return cam.groupId === '';
-                });
+                 //1. split cameras with groupId and without
+                 var cams = _.partition(cameras, function (cam) {
+                 return cam.groupId === '';
+                 });
 
-                //2. sort groupedCameras
-                cams[1] = _.sortBy(cams[1], cameraSorter);
+                 //2. sort groupedCameras
+                 cams[1] = _.sortBy(cams[1], cameraSorter);
 
-                //3. group groupedCameras by groups ^_^
-                cams[1] = _.groupBy(cams[1], function (cam) {
-                    return cam.groupId;
-                });
+                 //3. group groupedCameras by groups ^_^
+                 cams[1] = _.groupBy(cams[1], function (cam) {
+                 return cam.groupId;
+                 });
 
-                //4. Translate into array
-                cams[1] = _.values(cams[1]);
+                 //4. Translate into array
+                 cams[1] = _.values(cams[1]);
 
-                //5. Emulate cameras by groups
-                cams[1] = _.map(cams[1], function (group) {
-                    return {
-                        isGroup: true,
-                        collapsed: false,
-                        parentId: group[0].parentId,
-                        name: group[0].groupName,
-                        id: group[0].groupId,
-                        url: group[0].url,
-                        status: 'Online',
-                        cameras: group
-                    };
-                });
+                 //5. Emulate cameras by groups
+                 cams[1] = _.map(cams[1], function (group) {
+                 return {
+                 isGroup: true,
+                 collapsed: false,
+                 parentId: group[0].parentId,
+                 name: group[0].groupName,
+                 id: group[0].groupId,
+                 url: group[0].url,
+                 status: 'Online',
+                 cameras: group
+                 };
+                 });
 
-                //6 union cameras back
-                cameras = _.union(cams[0], cams[1]);
-                */
+                 //6 union cameras back
+                 cameras = _.union(cams[0], cams[1]);
+                 */
+
+
+                cameras = _.filter(cameras, cameraFilter);
                 //7 sort again
                 cameras = _.sortBy(cameras, cameraSorter);
 
@@ -305,62 +350,69 @@ angular.module('webadminApp').controller('ViewCtrl',
                 });
 
                 $scope.allcameras = cameras;
-            }, function () {
 
+                deferred.resolve(cameras);
+            }, function (error) {
+                deferred.reject(error);
+            });
 
-                /*if(camera.id === $scope.cameraId){
-                 $scope.selectCamera(camera);
-                 }*/
+            return deferred.promise;
+        }
 
+        function reloadTree(){
 
-                console.error('network problem');
+            var deferred = $q.defer();
+
+            mediaserver.getMediaServers().then(function (data) {
+                _.each(data.data, function (server) {
+                    server.url = extractDomain(server.url);
+                    var oldserver = getServer(server.id);
+                    server.collapsed = oldserver? oldserver.collapsed : server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
+                });
+                $scope.mediaServers = data.data;
+
+                getCameras().then(function(data){
+                        deferred.resolve(data);
+                    },
+                    function(error){
+                        deferred.reject(error);
+                    });
+
+            }, function (error) {
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        }
+
+        var firstTime = true;
+        var timer = false;
+        function reloader(){
+            reloadTree().then(function(){
+                $scope.selectCameraById($scope.cameraId,$location.search().time || false,firstTime);
+                firstTime = false;
+                timer = $timeout(reloader, reloadInterval);
+            },function(error){
+                console.error(error);
+                timer = $timeout(reloader, quickReloadInterval);
             });
         }
 
-        $scope.selectFormat = function(format){
-            $scope.activeFormat = format;
-            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
-        };
+        reloader();
 
-        $scope.selectResolution = function(resolution){
-            if(resolution == "auto" || resolution == "Auto" || resolution == "AUTO"){
-                resolution = "320p";
+        $scope.$on(
+            '$destroy',
+            function( ) {
+                $timeout.cancel(timer);
             }
+        );
 
-            if($scope.activeResolution == resolution){
-                return;
-            }
-            $scope.activeResolution = resolution;
-            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
-        };
 
-        $scope.fullScreen = function(){
-            if (screenfull.enabled) {
-                screenfull.request($(".videowindow").get(0));
-            }
-        };
-
-        $scope.$watch('allcameras', function () {
-            $scope.selectCameraById($scope.cameraId,$location.search().time || false);
+        $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {
+            $scope.selectCameraById(next.params.cameraId, $location.search().time || false);
         });
 
-        mediaserver.getMediaServers().then(function (data) {
-            _.each(data.data, function (server) {
-                server.url = extractDomain(server.url);
-                server.collapsed = server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
-            });
-            $scope.mediaServers = data.data;
 
-            _.forEach( $scope.mediaServers,function(server){
-                server.collapsed =  $scope.settings.id.replace('{','').replace('}','') != server.id.replace('{','').replace('}','');
-            });
-
-            getCameras();
-
-            $scope.selectCameraById($routeParams.cameraId,$location.search().time || false);
-        }, function () {
-            console.error('network problem');
-        });
 
         (function (){
             // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%

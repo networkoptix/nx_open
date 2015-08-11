@@ -370,6 +370,10 @@ namespace ec2
             ++m_runningRequests;
         }
 
+        const auto info = QString::fromUtf8( QJson::serialized( clientInfo )  );
+        NX_LOG( lit("%1 to %2 with %3").arg( Q_FUNC_INFO ).arg( addr.toString() ).arg( info ),
+                cl_logDEBUG1 );
+
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
@@ -550,7 +554,7 @@ namespace ec2
 			if (result != ErrorCode::ok)
 				return result;
 
-			if (infos.size() && clientInfo == infos.front())
+            if (infos.size() && QJson::serialized(clientInfo) == QJson::serialized(infos.front()))
 			{
 				NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
 					cl_logDEBUG2);

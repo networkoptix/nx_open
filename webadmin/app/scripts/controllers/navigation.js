@@ -32,7 +32,8 @@ angular.module('webadminApp')
 
         $scope.webclientEnabled = Config.webclientEnabled;
 
-        $scope.alertVisible = true;
+        $scope.alertVisible = !$scope.isActive("/view");
+
         $scope.closeAlert = function(){
             $scope.alertVisible = false;
         }

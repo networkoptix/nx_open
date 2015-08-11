@@ -17,13 +17,12 @@
 .dark-theme{
   color:white;
   background-color: #1C2327;
-  position:absolute;
+  /*position:absolute;
   top:0px;
+  padding-top:50px;*/
   height:100%;
-  padding-top:50px;
-}
-.videowindow{
-  background-color: #1C2327;
+  width:100%;
+  margin-top: -20px !important;
 }
 
 .dark-theme .caret{
@@ -45,6 +44,10 @@ table.webclient-window>tbody>tr>td{
   height:100%;
   vertical-align: top;
   padding:0;
+}
+
+table.webclient-window>tbody>tr>td.alert{
+  height:auto;
 }
 .cameras-panel{
   overflow-y: auto;
@@ -261,6 +264,12 @@ table.webclient-window>tbody>tr>td{
   background-color: #212A2F;
   border: 1px solid #171C1F;
 }
+
+.camera-node.Unauthorized .camera-preview img,
+.camera-node.Offline .camera-preview img{
+  display:none;
+}
+
 .camera-preview>.camera-preview-image {
   display:block;
   position: relative;

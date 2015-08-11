@@ -198,15 +198,30 @@ void QnServerSettingsDialog::accept() {
     setEnabled(false);
     setCursor(Qt::WaitCursor);
 
-    bool valid = true;//m_hasStorageChanges ? validateStorages(tableStorages()) : true;
-    if (valid) {
+    if (hasChanges()) {
         submitToResources();
 
         base_type::accept();
     }
+    else
+        base_type::reject();
 
     unsetCursor();
     setEnabled(true);
+}
+
+bool QnServerSettingsDialog::hasChanges() const
+{
+    if (m_hasStorageChanges)
+        return true;
+    if (m_server->getName() != ui->nameLineEdit->text())
+        return true;
+    if (m_server->getMaxCameras() != ui->maxCamerasSpinBox->value())
+        return true;
+    if (m_server->isRedundancy() != ui->failoverCheckBox->isChecked())
+        return true;
+
+    return false;
 }
 
 void QnServerSettingsDialog::reject() {

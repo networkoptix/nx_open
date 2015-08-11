@@ -109,6 +109,7 @@ public:
         QnTCPConnectionProcessorPrivate(),
         liveMode(Mode_Live),
         auditRecordId(0),
+        auditRecordMode(Mode_Live),
         dataProcessor(0),
         sessionTimeOut(0),
         useProprietaryFormat(false),
@@ -177,6 +178,8 @@ public:
     QSharedPointer<QnThumbnailsStreamReader> thumbnailsDP;
     Mode liveMode;
     int auditRecordId;
+    Mode auditRecordMode;
+    QElapsedTimer lastReportTime;
 
     QnRtspDataConsumer* dataProcessor;
 
@@ -228,8 +231,11 @@ QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
 {
     Q_D(QnRtspConnectionProcessor);
-    if (d->auditRecordId > 0)
+    if (d->auditRecordId > 0 && d->lastReportTime.isValid() && d->lastReportTime.elapsed() >= QnAuditManager::MIN_PLAYBACK_TIME_TO_LOG)
+    {  
         qnAuditManager->notifyPlaybackInProgress(d->auditRecordId, timestampUsec);
+        d->lastReportTime.restart();
+    }
 }
 
 void QnRtspConnectionProcessor::parseRequest()
@@ -1234,11 +1240,17 @@ int QnRtspConnectionProcessor::composePlay()
     
     if (d->liveMode != Mode_ThumbNails) 
     {
-        if (d->auditRecordId > 0)
+        if (d->auditRecordId > 0 && d->liveMode != d->auditRecordMode) {
             qnAuditManager->notifyPlaybackFinished(d->auditRecordId);
-        qint64 startTimeUces = d->liveMode == Mode_Live ? DATETIME_NOW : d->startTime;
-        bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
-        d->auditRecordId = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUces, isExport);
+            d->auditRecordId = 0;
+        }
+        if (!d->auditRecordId) {
+            d->auditRecordMode = d->liveMode;
+            qint64 startTimeUces = d->liveMode == Mode_Live ? DATETIME_NOW : d->startTime;
+            bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
+            d->auditRecordId = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUces, isExport);
+        }
+        d->lastReportTime.restart();
     }
 
     return CODE_OK;

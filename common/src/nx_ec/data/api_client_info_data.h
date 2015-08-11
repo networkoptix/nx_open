@@ -20,8 +20,6 @@ namespace ec2 {
         QString cpuArchitecture, cpuModelName;
 		qint64 phisicalMemory;
         QString openGLVersion, openGLVendor, openGLRenderer;
-
-		bool operator == (const ApiClientInfoData& rhs) const;
     };
 #define ApiClientInfoData_Fields (id)(parentId) \
     (skin)(fullVersion)(systemInfo)(systemRuntime) \

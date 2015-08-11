@@ -296,7 +296,7 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
             QnScopedPainterFontRollback rollback(painter);
             QnScopedPainterPenRollback rollback2(painter);
             painter->setFont(option.font);
-            painter->setPen(option.backgroundBrush.color());
+            painter->setPen(option.palette.foreground().color());
             painter->drawText(option.rect, Qt::AlignLeft | Qt::AlignVCenter, index.data().toString());
         }
         break;
@@ -308,13 +308,24 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
 
 // ---------------------- QnAuditLogDialog ------------------------------
 
-QnAuditRecordRefList QnAuditLogDialog::filterDataByText()
+QnAuditRecordRefList QnAuditLogDialog::applyFilter()
 {
     QnAuditRecordRefList result;
     QStringList keywords = ui->filterLineEdit->text().split(lit(" "));
 
-    auto filter = [&keywords] (const QnAuditRecord& record) 
+    Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
+    for (const QCheckBox* checkBox: m_filterCheckboxes) 
     {
+        if (!checkBox->isChecked()) 
+            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
+    }
+
+
+    auto filter = [&keywords, &disabledTypes] (const QnAuditRecord& record) 
+    {
+        if (disabledTypes & record.eventType)
+            return false;
+
         bool matched = true;
         QString wholeText = QnAuditLogModel::makeSearchPattern(&record);
         for (const auto& keyword: keywords) {
@@ -340,17 +351,9 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRe
     for (const QnAuditRecord* record: checkedRows) 
         selectedSessions << record->authSession.id;
 
-    Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
-    for (const QCheckBox* checkBox: m_filterCheckboxes) 
-    {
-        if (!checkBox->isChecked()) 
-            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
-    }
-    
-
     QnAuditRecordRefList result;
-    auto filter = [&selectedSessions, &disabledTypes] (const QnAuditRecord* record) {
-        return selectedSessions.contains(record->authSession.id) && !(disabledTypes & record->eventType);
+    auto filter = [&selectedSessions] (const QnAuditRecord* record) {
+        return selectedSessions.contains(record->authSession.id);
     };
     std::copy_if(m_filteredData.begin(), m_filteredData.end(), std::back_inserter(result), filter);
     return result;
@@ -362,19 +365,9 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRec
     for (const QnAuditRecord* record: checkedRows)
         selectedCameras << record->resources[0];
 
-    Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
-    for (const QCheckBox* checkBox: m_filterCheckboxes) 
-    {
-        if (!checkBox->isChecked()) 
-            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
-    }
-
-
     QnAuditRecordRefList result;
-    auto filter = [&selectedCameras, &disabledTypes] (const QnAuditRecord* record) 
+    auto filter = [&selectedCameras] (const QnAuditRecord* record) 
     {
-        if (disabledTypes & record->eventType)
-            return false;
         for (const auto& id: record->resources) {
             if (selectedCameras.contains(id))
                 return true;
@@ -442,7 +435,7 @@ void QnAuditLogDialog::at_typeCheckboxChanged()
     ui->selectAllCheckBox->setCheckState(checkState);
     ui->selectAllCheckBox->blockSignals(false);
 
-    at_updateDetailModel();
+    at_filterChanged();
 };
 
 void QnAuditLogDialog::at_selectAllCheckboxChanged()
@@ -459,12 +452,24 @@ void QnAuditLogDialog::at_selectAllCheckboxChanged()
         checkbox->setChecked(state == Qt::Checked);
         checkbox->blockSignals(false);
     }
-    at_updateDetailModel();
+    at_filterChanged();
 };
+
+void QnAuditLogDialog::at_currentTabChanged()
+{
+    bool allEnabled = (ui->tabWidget->currentIndex() == SessionTab);
+    const Qn::AuditRecordTypes camerasTypes = Qn::AR_ViewLive | Qn::AR_ViewArchive | Qn::AR_ExportVideo | Qn::AR_CameraUpdate | Qn::AR_CameraRemove;
+
+    for(QCheckBox* checkBox: m_filterCheckboxes) {
+        Qn::AuditRecordTypes eventTypes = (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
+        checkBox->setEnabled(allEnabled || (camerasTypes & eventTypes));
+    }
+    at_filterChanged();
+}
 
 void QnAuditLogDialog::at_filterChanged()
 {
-    m_filteredData = filterDataByText();
+    m_filteredData = applyFilter();
 
     if (ui->tabWidget->currentIndex() == SessionTab)
     {
@@ -754,7 +759,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
-    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_currentTabChanged);
     /*
     connect(ui->tabWidget, &QTabWidget::currentChanged, 
         this, [this](int index) {
