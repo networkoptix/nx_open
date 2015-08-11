@@ -371,7 +371,7 @@ namespace ec2
         }
 
         const auto info = QString::fromUtf8( QJson::serialized( clientInfo )  );
-        NX_LOG( lit("%1 to %2 with %3").arg( Q_FUNC_INFO ).arg( addr ).arg( info ),
+        NX_LOG( lit("%1 to %2 with %3").arg( Q_FUNC_INFO ).arg( addr.toString() ).arg( info ),
                 cl_logDEBUG1 );
 
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
