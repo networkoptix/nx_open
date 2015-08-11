@@ -536,6 +536,14 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
     if( !dbRefGuidStr.isEmpty() )
     {
         *dbDirectory = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        if (!QDir().exists(*dbDirectory))
+        {
+            if(!QDir().mkpath(*dbDirectory))
+            {
+                qWarning() << "DB path create failed (" << storageUrl << ")";
+                return false;
+            }
+        }
         return true;
     }
 
@@ -568,7 +576,10 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
 
         storageUrl = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
         if( !QDir().mkpath( storageUrl ) )
+        {
+            qWarning() << "DB path create failed (" << storageUrl << ")";
             return false;
+        }
     }
     *dbDirectory = storageUrl;
     return true;
@@ -610,7 +621,9 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 
         if (!sdb->open(fileName))
         {
-            qWarning() << "can't initialize sqlLite database! Actions log is not created!";
+            qWarning()
+                << "can't initialize sqlLite database! Actions log is not created!"
+                << " file open failed: " << fileName;
             return QnStorageDbPtr();
         }
     }

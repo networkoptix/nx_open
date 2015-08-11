@@ -143,20 +143,20 @@ bool QnFileStorageResource::checkWriteCap() const
 
 bool QnFileStorageResource::checkDBCap() const
 {
-    if (!m_valid || !m_localPath.isEmpty())
+    if (!m_valid)
         return false;
 #ifdef _WIN32
     return true;
 #else    
-    QString storagePath = m_localPath.isEmpty() ? getPath() : m_localPath;
-
+    if (!m_localPath.isEmpty())
+        return false;
     QList<QnPlatformMonitor::PartitionSpace> partitions = 
         qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
             QnPlatformMonitor::NetworkPartition );
 
     for(const QnPlatformMonitor::PartitionSpace& partition: partitions)
     {
-        if(storagePath.startsWith(partition.path))
+        if(getPath().startsWith(partition.path))
             return false;
     }
     return true;
@@ -287,7 +287,6 @@ bool QnFileStorageResource::mountTmpDrive(const QString &url) const
 void QnFileStorageResource::setUrl(const QString& url)
 {
     QMutexLocker lock(&m_mutex);
-
     if (url.contains("://"))
     {
 #ifndef _WIN32
