@@ -497,6 +497,9 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     QnAuthSession result;
     if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
         result.userName = userRes->getName();
+    else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
+        result.userName = tr("Video wall");
+
     result.id = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
     if (result.id.isNull())
         result.id = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);

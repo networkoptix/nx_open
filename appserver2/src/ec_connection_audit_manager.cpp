@@ -72,6 +72,15 @@ namespace ec2
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
         auditRecord.resources.push_back(params.id);
+
+        auto msgProc = QnCommonMessageProcessor::instance();
+        if (msgProc) {
+            QnBusinessEventRulePtr bRule = msgProc->businessRules().value(params.id);
+            if (bRule)
+                auditRecord.addParam("description", QnBusinessStringsHelper::bruleDescriptionText(bRule).toUtf8());
+        }
+
+
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
@@ -146,6 +155,8 @@ namespace ec2
 
         if (eventType != Qn::AR_NotDefined) {
             auto auditRecord = qnAuditManager->prepareRecord(authInfo, eventType);
+            if (!description.isEmpty())
+                auditRecord.addParam("description", description.toUtf8());
             qnAuditManager->addAuditRecord(auditRecord);
         }
     }

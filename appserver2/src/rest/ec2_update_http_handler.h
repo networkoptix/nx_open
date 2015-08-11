@@ -115,6 +115,7 @@ namespace ec2
 
             // replace client GUID to own GUID (take transaction ownership).
             tran.peerID = qnCommon->moduleGUID();
+            tran.deliveryInfo.originatorType = QnTranDeliveryInformation::client;
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
