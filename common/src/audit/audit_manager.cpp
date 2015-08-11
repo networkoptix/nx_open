@@ -127,7 +127,7 @@ void QnAuditManager::notifyPlaybackFinished(int internalId)
     if (itr != m_alivePlaybackInfo.end())
     {
         CameraPlaybackInfo& pbInfo = itr.value();
-        if (pbInfo.timeout.elapsed() >= MIN_PLAYBACK_TIME_TO_LOG && pbInfo.period.durationMs >= MIN_PLAYBACK_TIME_TO_LOG) {
+        if ((pbInfo.isExport || pbInfo.timeout.elapsed() >= MIN_PLAYBACK_TIME_TO_LOG) && pbInfo.period.durationMs >= MIN_PLAYBACK_TIME_TO_LOG) {
             pbInfo.timeout.restart();
             m_closedPlaybackInfo.push_back(std::move(pbInfo)); // finalize old playback record
         }

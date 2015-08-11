@@ -412,6 +412,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
         {
         case Qn::AR_ViewArchive:
         case Qn::AR_ViewLive:
+        case Qn::AR_ExportVideo:
             result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
         case Qn::AR_CameraUpdate:
         {
