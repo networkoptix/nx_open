@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>698</width>
-    <height>82</height>
+    <width>610</width>
+    <height>64</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,6 +28,12 @@
    </property>
    <item>
     <widget class="QGroupBox" name="analogGroupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string>Licensing</string>
      </property>
@@ -64,7 +70,14 @@
        </layout>
       </item>
       <item>
-       <widget class="QnLicensesUsageWidget" name="licensesUsageWidget" native="true"/>
+       <widget class="QnLicensesUsageWidget" name="licensesUsageWidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
