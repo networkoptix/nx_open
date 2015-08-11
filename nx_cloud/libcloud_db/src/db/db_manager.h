@@ -84,9 +84,24 @@ public:
         m_requestQueue.push( std::move( ctx ) );
     }
 
+    //!Overload for updates with no input data
+    void executeUpdate(
+        std::function<DBResult( QSqlDatabase* )> dbUpdateFunc,
+        std::function<void( DBResult )> completionHandler )
+    {
+        openOneMoreConnectionIfNeeded();
+
+        auto ctx = std::make_unique<UpdateWithoutAnyDataExecutor>(
+            std::move( dbUpdateFunc ),
+            std::move( completionHandler ) );
+
+        QnMutexLocker lk( &m_mutex );
+        m_requestQueue.push( std::move( ctx ) );
+    }
+
     template<typename OutputData>
     void executeSelect(
-        std::function<DBResult(OutputData* const)> dbSelectFunc,
+        std::function<DBResult( QSqlDatabase*, OutputData* const )> dbSelectFunc,
         std::function<void( DBResult, OutputData )> completionHandler )
     {
         openOneMoreConnectionIfNeeded();

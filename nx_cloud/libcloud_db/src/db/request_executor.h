@@ -131,6 +131,53 @@ private:
 };
 
 
+class UpdateWithoutAnyDataExecutor
+:
+    public AbstractExecutor
+{
+public:
+    UpdateWithoutAnyDataExecutor(
+        std::function<DBResult( QSqlDatabase* const )> dbUpdateFunc,
+        std::function<void( DBResult )> completionHandler )
+    :
+        m_dbUpdateFunc( std::move( dbUpdateFunc ) ),
+        m_completionHandler( std::move( completionHandler ) )
+    {
+    }
+
+    virtual DBResult execute( QSqlDatabase* const connection ) override
+    {
+        auto completionHandler = std::move( m_completionHandler );
+        if( !connection->transaction() )
+        {
+            completionHandler( DBResult::ioError );
+            return DBResult::ioError;
+        }
+        const auto result = m_dbUpdateFunc( connection );
+        if( result != DBResult::ok )
+        {
+            connection->rollback();
+            completionHandler( result );
+            return result;
+        }
+
+        if( !connection->commit() )
+        {
+            connection->rollback();
+            completionHandler( DBResult::ioError );
+            return DBResult::ioError;
+        }
+
+        completionHandler( DBResult::ok );
+        return DBResult::ok;
+    }
+
+private:
+    std::function<DBResult( QSqlDatabase* const )> m_dbUpdateFunc;
+    std::function<void( DBResult )> m_completionHandler;
+};
+
+
 //!Executor of SELECT requests
 template<typename OutputData>
 class SelectExecutor
