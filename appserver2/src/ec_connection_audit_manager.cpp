@@ -146,6 +146,8 @@ namespace ec2
 
         if (eventType != Qn::AR_NotDefined) {
             auto auditRecord = qnAuditManager->prepareRecord(authInfo, eventType);
+            if (!description.isEmpty())
+                auditRecord.addParam("description", description.toUtf8());
             qnAuditManager->addAuditRecord(auditRecord);
         }
     }
