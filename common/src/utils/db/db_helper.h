@@ -1,8 +1,8 @@
 #ifndef __QN_DB_HELPER_H__
 #define __QN_DB_HELPER_H__
 
-#include <QSqlDatabase>
-#include <QReadWriteLock>
+#include <QtSql/QSqlDatabase>
+#include <QtCore/QReadWriteLock>
 
 class QSqlDatabase;
 
@@ -41,8 +41,13 @@ public:
     QnDbHelper();
     virtual ~QnDbHelper();
 
-    bool execSQLFile(const QString& fileName, QSqlDatabase& database);
-    bool execSQLQuery(const QString& query, QSqlDatabase& database);
+    static bool execSQLQuery(const QString& query, QSqlDatabase& database);
+    /*!
+        \param scriptData SQL commands separated with ;
+    */
+    static bool execSQLScript(const QByteArray& scriptData, QSqlDatabase& database);
+    //!Reads file \a fileName and calls \a QnDbHelper::execSQLScript
+    static bool execSQLFile(const QString& fileName, QSqlDatabase& database);
     virtual QnDbTransaction* getTransaction() = 0;
     //const QnDbTransaction* getTransaction() const;
 

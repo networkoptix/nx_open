@@ -110,13 +110,9 @@ bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database)
     return rez;
 }
 
-bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
+bool QnDbHelper::execSQLScript(const QByteArray& scriptData, QSqlDatabase& database)
 {
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly))
-        return false;
-    QByteArray data = file.readAll();
-    QList<QByteArray> commands = quotedSplit(data);
+    QList<QByteArray> commands = quotedSplit(scriptData);
 #ifdef DB_DEBUG
     int n = commands.size();
     qDebug() << "creating db" << n << "commands queued";
@@ -133,11 +129,24 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
         QSqlQuery ddlQuery(database);
         ddlQuery.prepare(command);
         if (!ddlQuery.exec()) {
-            qWarning() << "Error while executing SQL file" << fileName;
-            qWarning() << "Query was:" << command;
+            qWarning() << "Error executing query:" << command;
             qWarning() << "Error:" << ddlQuery.lastError().text();
             return false;
         }
+    }
+    return true;
+}
+
+bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
+{
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+        return false;
+    QByteArray data = file.readAll();
+    if( !execSQLScript( data, database ) )
+    {
+        qWarning() << "Error while executing SQL file" << fileName;
+        return false;
     }
     return true;
 }

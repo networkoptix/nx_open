@@ -11,6 +11,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <utils/common/log.h>
+#include <utils/db/db_helper.h>
 
 #include "db_manager.h"
 #include "structure_update_statements.h"
@@ -26,6 +27,7 @@ DBStructureUpdater::DBStructureUpdater( DBManager* const dbManager )
     m_dbManager( dbManager )
 {
     m_updateScripts.push_back( createDbVersionTables );
+    m_updateScripts.push_back( createAccountData );
 }
 
 bool DBStructureUpdater::updateStructSync()
@@ -60,9 +62,7 @@ DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection 
         dbVersion < m_updateScripts.size();
         ++dbVersion )
     {
-        QSqlQuery updateQuery( *dbConnection );
-        updateQuery.prepare( m_updateScripts[dbVersion] );
-        if( !updateQuery.exec() )
+        if( !QnDbHelper::execSQLScript( m_updateScripts[dbVersion], *dbConnection ) )
         {
             NX_LOG( lit("DBStructureUpdater. Failure updating to version %1: %2").
                 arg( dbVersion ).arg( dbConnection->lastError().text() ), cl_logWARNING );
