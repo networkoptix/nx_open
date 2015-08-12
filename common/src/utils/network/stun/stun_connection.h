@@ -7,152 +7,93 @@
 #define NX_STUN_CONNECTION_H
 
 #include <functional>
-#include <memory>
-#include <mutex>
-#include <atomic>
+#include <queue>
 
+#include <utils/thread/mutex.h>
 #include <utils/network/connection_server/base_stream_protocol_connection.h>
 #include <utils/network/connection_server/stream_socket_server.h>
-#include <utils/common/stoppable.h>
 
 #include "stun_message.h"
 #include "stun_message_parser.h"
 #include "stun_message_serializer.h"
 
-
 namespace nx {
 namespace stun {
 
-    //!Connects to STUN server, sends requests, receives responses and indications
+//!Connects to STUN server, sends requests, receives responses and indications
+/*!
+    \note Methods of this class are not thread-safe
+    \todo restore interrupted connection ?
+*/
+class AsyncClient
+{
+public:
+    typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+        AsyncClient,
+        Message,
+        MessageParser,
+        MessageSerializer
+    > BaseConnectionType;
+
+    typedef BaseConnectionType ConnectionType;
+
+    typedef std::function< void( SystemError::ErrorCode ) > ConnectionHandler;
+    typedef std::function< void( Message ) > IndicationHandler;
+    typedef std::function< void( SystemError::ErrorCode, Message )> RequestHandler;
+
+    AsyncClient(
+        const SocketAddress& stunServerEndpoint,
+        bool useSsl = false );
+
+    ~AsyncClient();
+
+    Q_DISABLE_COPY(AsyncClient);
+
+    //!Asynchronously openes connection to the server, specified during initialization
     /*!
-        \note Methods of this class are not thread-safe
-        \todo restore interrupted connection ?
+        \param completionHandler will be called once to deliver connection completeness
+        \param indicationHandler will be called for each indication message
+        \return \a false, if could not start asynchronous operation
+        \note It is valid to call \fn sendRequest when connection has not completed yet
     */
-    class ClientConnection
-    :
-        public QnStoppableAsync
+    bool openConnection( ConnectionHandler completionHandler,
+                         IndicationHandler indicationHandler = []( Message ){} );
+
+    //!Sends message asynchronously
+    /*!
+        \param requestHandler Triggered after response has been received or error has occured.
+            \a Message attribute is valid only if first attribute value is \a SystemError::noError
+        \return \a false, if could not start asynchronous operation (this can happen due to lack of resources on host machine)
+        \note It is valid to call this method after If \a StunClientConnection::openConnection has been called and not completed yet
+    */
+    bool sendRequest( Message request, RequestHandler requestHandler );
+
+    //! \note Required by \a nx_api::BaseServerConnection
+    void closeConnection( BaseConnectionType* );
+
+private:
+    enum class State
     {
-    public:
-        typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
-            ClientConnection,
-            Message,
-            MessageParser,
-            MessageSerializer
-        > BaseConnectionType;
-        //!As required by \a nx_api::BaseServerConnection
-        typedef BaseConnectionType ConnectionType;
-
-        ClientConnection(
-            const SocketAddress& stunServerEndpoint,
-            bool useSsl = false );
-
-        virtual ~ClientConnection() {
-            join();
-        }
-
-        //!Implementation of QnStoppableAsync::pleaseStop
-        /*!
-            Cancels ongoing request (if any)
-        */
-        virtual void pleaseStop( std::function<void()>&& completionHandler ) override;
-
-        //!Asynchronously openes connection to the server, specified during initialization
-        /*!
-            \return \a false, if could not start asynchronous operation (this can happen due to lack of resources on host machine)
-            \note It is valid to call \a StunClientConnection::sendRequest when connection has not completed yet
-        */
-        bool openConnection( std::function<void(SystemError::ErrorCode)>&& completionHandler );
-        //!Register handler to be invoked on receiving indication
-        /*!
-            \note \a indicationHandler will be invoked in aio thread
-        */
-        void registerIndicationHandler( std::function<void(Message&&)>&& indicationHandler );
-        //!Sends message asynchronously
-        /*!
-            \param completionHandler Triggered after response has been received or error has occured. 
-                \a Message attribute is valid only if first attribute value is \a SystemError::noError
-            \return \a false, if could not start asynchronous operation (this can happen due to lack of resources on host machine)
-            \note If connection to server has not been opened yet then opens one
-            \note It is valid to call this method after If \a StunClientConnection::openConnection has been called and not completed yet
-        */
-        bool sendRequest(
-            Message&& request,
-            std::function<void(SystemError::ErrorCode, Message&&)>&& completionHandler );
-
-        /*!
-            \note Required by \a nx_api::BaseServerConnection
-        */
-        void closeConnection( BaseConnectionType* );
-
-        // Those error code needs to define in order to make user's callback function know the specific error related 
-        // to our STUN connection process
-
-        static const SystemError::ErrorCode STUN_CONN_CANNOT_READ = 1;
-        static const SystemError::ErrorCode STUN_REPLY_PACKAGE_BROKEN = 2;
-
-    private:
-        std::unique_ptr<AbstractCommunicatingSocket> m_socket;
-        std::unique_ptr<BaseConnectionType> m_baseConnection;
-        const SocketAddress m_stunServerEndpoint;
-
-        /*!
-            \note Required by \a nx_api::BaseStreamProtocolConnection
-        */
-        void processMessage( Message&& msg );
-
-        void onRequestMessageRecv( Message&& msg );
-
-        void onIndicationMessageRecv( Message&& msg );
-        
-        void onConnectionComplete( SystemError::ErrorCode , const std::function<void(SystemError::ErrorCode)>& func );
-
-        void onRequestSend( SystemError::ErrorCode );
-
-        bool dispatchPendingRequest( SystemError::ErrorCode ec );
-
-        bool hasErrorAttribute( const Message& msg );
-
-        void enqueuePendingRequest( Message&& , std::function<void(SystemError::ErrorCode,Message&&)>&& );
-
-        void resetOutstandingRequest();
-
-        // AbstractCommunicationSocket comments says isConnected is not reliable
-        // so I just add a flag to indicate whether we have connected or not
-        enum {
-            NOT_CONNECTED,
-            CONNECTING,
-            CONNECTED
-        };
-        // Not thread safe
-        std::atomic<int> m_state;
-
-        // Set up a pending request list for send request operations.
-        // Because of the following reason:
-        // sendRequest needs to wait for openConnection completion
-
-        struct PendingRequest {
-            bool execute;
-            Message request_message;
-            std::function<void(SystemError::ErrorCode, Message&&)> completion_handler;
-            PendingRequest() : execute(false) {}
-            PendingRequest( Message&& msg , std::function<void(SystemError::ErrorCode,Message&&)>&& func ):
-                execute(false),
-                request_message(std::move(msg)),
-                completion_handler(std::move(func)){}
-        };
-
-        // Using this context to represent the current outstanding request 
-        std::unique_ptr<PendingRequest> m_outstandingRequest;
-        std::mutex m_mutex;
-
-        // Indication handler 
-        std::function<void(Message&&)> m_indicationHandler;
-
-        MessageParser m_messageParser;
-        MessageSerializer m_messageSerializer;
-
-        Q_DISABLE_COPY(ClientConnection)
+        NOT_CONNECTED,
+        CONNECTING,
+        CONNECTED
     };
+
+    void onConnectionComplete( SystemError::ErrorCode code, ConnectionHandler handler );
+    void dispatchRequestsInQueue();
+    void processMessage( Message message );
+
+private:
+    const SocketAddress m_stunServerEndpoint;
+    std::unique_ptr<AbstractCommunicatingSocket> m_socket;
+    std::unique_ptr<BaseConnectionType> m_baseConnection;
+
+    QnMutex m_mutex;
+    State m_state;
+    IndicationHandler m_indicationHandler;
+    std::queue< std::pair< Message, RequestHandler > > m_requestQueue;
+    std::map< Buffer, RequestHandler > m_requestsInProgress;
+};
 
 } // namespase stun
 } // namespase nx
