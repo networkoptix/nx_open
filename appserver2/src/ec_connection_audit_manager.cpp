@@ -128,8 +128,11 @@ namespace ec2
                     description = res->getName();
                     if (res.dynamicCast<QnUserResource>())
                         eventType = Qn::AR_UserRemove;
-                    else if (res.dynamicCast<QnSecurityCamResource>())
+                    else if (res.dynamicCast<QnSecurityCamResource>()) {
                         eventType = Qn::AR_CameraRemove;
+                        if (QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>())
+                            description = lit("%1 (%2)").arg(description).arg(camRes->getHostAddress());
+                    }
                     else if (res.dynamicCast<QnMediaServerResource>())
                         eventType = Qn::AR_ServerRemove;
                 }
