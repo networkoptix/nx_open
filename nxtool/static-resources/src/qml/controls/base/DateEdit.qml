@@ -237,16 +237,15 @@ FocusScope
         thisComponent.setDate(initDate);
     }
 
-    onShowNowChanged:
-    {
-        if (showNow)
-            thisComponent.setDate(initDate);
-    }
-
     onActiveFocusChanged:
     {
         if (activeFocus)
+        {
+            if (!dayInput.activeFocus && !monthInput.activeFocus && !yearInput.activeFocus)
+                dayInput.forceActiveFocus();
+
             return;
+        }
 
         var acceptable = yearInput.text.length && yearInput.acceptableInput
             && monthInput.text.length && monthInput.acceptableInput;
@@ -255,6 +254,8 @@ FocusScope
         var maxDays = impl.daysInMonth(yearInput.text, monthInput.text - 1);
         if (parseInt(dayInput.text) > maxDays)
             dayInput.text = maxDays;
+
+        dayInput.focus = true;
     }
 }
 

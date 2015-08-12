@@ -1,4 +1,4 @@
-import QtQuick 2.0;
+import QtQuick 2.3;
 
 import "../base" as Base;
 import "../rtu" as Rtu;
