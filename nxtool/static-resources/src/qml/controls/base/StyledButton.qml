@@ -13,6 +13,7 @@ QtControls.Button
     property color buttonColor: "#35A0DA";
     property color pressedColor: "#00B1EC";
     property color borderColor: "#CCCCCC";
+    property color borderColorFocus: "#0A0A0A";
 
     property int fontSize: Common.SizeManager.fontSizes.medium;
 
@@ -39,7 +40,7 @@ QtControls.Button
         background: Rectangle
         {
             color: (enabled ? (thisComponent.pressed ? pressedColor : buttonColor) : borderColor);
-            border.color: borderColor;
+            border.color: (thisComponent.activeFocus ? borderColorFocus : borderColor);
         }
     }
 }
