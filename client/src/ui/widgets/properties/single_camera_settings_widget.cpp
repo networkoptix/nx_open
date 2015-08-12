@@ -257,11 +257,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
             m_camera->setAuth( loginEditAuth );
 
         m_camera->setLicenseUsed(ui->licensingWidget->state() == Qt::Checked);
-   //     if (m_camera->isDtsBased()) {
-   //         m_camera->setScheduleDisabled(!ui->analogViewCheckBox->isChecked());
-   //     } else {
-            m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
-   //     }
+        m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
 
         int maxDays = ui->cameraScheduleWidget->maxRecordedDays();
         if (maxDays != QnCameraScheduleWidget::RecordedDaysDontChange) {
@@ -361,7 +357,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
-        ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->getCameraCapabilities() & Qn::IOModuleCapability);
+        ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->hasCameraCapabilities(Qn::IOModuleCapability));
 
         ui->imageControlWidget->updateFromResources(cameras);
 

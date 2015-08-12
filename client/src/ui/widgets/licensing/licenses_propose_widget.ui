@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="analogGroupBox">
+    <widget class="QGroupBox" name="licensingGroupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -41,11 +41,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
-         <widget class="QCheckBox" name="analogViewCheckBox">
-          <property name="text">
-           <string>Use an analog license to view this camera</string>
-          </property>
-         </widget>
+         <widget class="QCheckBox" name="useLicenseCheckBox"/>
         </item>
         <item>
          <spacer name="horizontalSpacer_4">

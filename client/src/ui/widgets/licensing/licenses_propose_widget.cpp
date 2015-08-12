@@ -3,6 +3,7 @@
 
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
+#include <boost/range/algorithm/count_if.hpp>
 
 #include <core/resource/camera_resource.h>
 
@@ -20,10 +21,10 @@ QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    QnCheckbox::autoCleanTristate(ui->analogViewCheckBox);
+    QnCheckbox::autoCleanTristate(ui->useLicenseCheckBox);
 
-    connect(ui->analogViewCheckBox,     &QCheckBox::stateChanged,              this,   &QnLicensesProposeWidget::updateLicenseText);
-    connect(ui->analogViewCheckBox,     &QCheckBox::stateChanged,              this,   &QnLicensesProposeWidget::changed);
+    connect(ui->useLicenseCheckBox,     &QCheckBox::stateChanged,              this,   &QnLicensesProposeWidget::updateLicenseText);
+    connect(ui->useLicenseCheckBox,     &QCheckBox::stateChanged,              this,   &QnLicensesProposeWidget::changed);
 
     auto updateLicensesIfNeeded = [this] { 
         if (!isVisible())
@@ -47,11 +48,10 @@ void QnLicensesProposeWidget::afterContextInitialized() {
     updateLicensesButtonVisible();
 }
 
-
 void QnLicensesProposeWidget::updateLicenseText() {
     QnCamLicenseUsageHelper helper;
 
-    switch(ui->analogViewCheckBox->checkState()) {
+    switch(ui->useLicenseCheckBox->checkState()) {
     case Qt::Checked:
         helper.propose(m_cameras, true);
         break;
@@ -76,41 +76,47 @@ QnVirtualCameraResourceList QnLicensesProposeWidget::cameras() const {
 void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &cameras) {
     m_cameras = cameras;
 
-    updateVisibility();
+    int analogCameras = boost::count_if(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {
+        return camera->isDtsBased(); }
+    );
+    int ioModules = boost::count_if(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {
+        return camera->hasCameraCapabilities(Qn::IOModuleCapability);
+    });
 
-    if (m_cameras.isEmpty())
-        return;
+    setVisible(analogCameras > 0 || ioModules > 0);
 
-    bool licenseUsed = cameras.front()->isLicenseUsed();
+    QString title;
+    if (analogCameras == m_cameras.size())
+        title = tr("Use analog licenses to view these %n cameras", "", analogCameras);
+    else if (ioModules == m_cameras.size())
+        title = tr("Use I/O licenses to enable these %n modules", "", ioModules);
+    else if (ioModules > 0)
+        title = tr("Use licenses for selected cameras and modules");
+    else
+        title = tr("Use licenses for selected cameras");
+    ui->useLicenseCheckBox->setText(title);
 
-    bool sameValue = boost::algorithm::all_of(cameras, [licenseUsed](const QnVirtualCameraResourcePtr &camera) { 
+    bool licenseUsed = m_cameras.isEmpty() ? false : m_cameras.front()->isLicenseUsed();
+
+    bool sameValue = boost::algorithm::all_of(m_cameras, [licenseUsed](const QnVirtualCameraResourcePtr &camera) { 
         return camera->isLicenseUsed() == licenseUsed; 
     });
-    QnCheckbox::setupTristateCheckbox(ui->analogViewCheckBox, sameValue, licenseUsed);
+    QnCheckbox::setupTristateCheckbox(ui->useLicenseCheckBox, sameValue, licenseUsed);
 
     updateLicenseText();
 }
 
 Qt::CheckState QnLicensesProposeWidget::state() const {
-    return ui->analogViewCheckBox->checkState();
+    return ui->useLicenseCheckBox->checkState();
 }
 
 void QnLicensesProposeWidget::setState(Qt::CheckState value) {
     if (value == Qt::PartiallyChecked) {
-        ui->analogViewCheckBox->setTristate(true);
-        ui->analogViewCheckBox->setCheckState(Qt::PartiallyChecked);
+        ui->useLicenseCheckBox->setTristate(true);
+        ui->useLicenseCheckBox->setCheckState(Qt::PartiallyChecked);
     } else {
-        ui->analogViewCheckBox->setTristate(false);
-        ui->analogViewCheckBox->setChecked(value == Qt::Checked);
+        ui->useLicenseCheckBox->setTristate(false);
+        ui->useLicenseCheckBox->setChecked(value == Qt::Checked);
     }
     updateLicenseText();
-}
-
-void QnLicensesProposeWidget::updateVisibility() {
-    bool visible = boost::algorithm::any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {
-        return camera->isDtsBased()
-            || camera->hasCameraCapabilities(Qn::IOModuleCapability);
-    });
-
-    setVisible(visible);
 }
