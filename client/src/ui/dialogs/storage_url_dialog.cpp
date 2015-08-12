@@ -113,7 +113,7 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
     }
     
     QString urlString = normalizePath(path);
-    urlString = lit("file://%1").arg(urlString);
+    urlString = lit("smb://%1").arg(urlString);
     QUrl url(urlString);
     if (!login.isEmpty())
         url.setUserName(login);

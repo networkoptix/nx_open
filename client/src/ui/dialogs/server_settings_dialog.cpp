@@ -237,7 +237,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     pathItem->setData(Qn::StorageUrlRole, item.url);
 
     QUrl url(item.url);
-    if (item.storageType == lit("file"))
+    if (item.storageType == lit("smb"))
         pathItem->setData(Qt::DisplayRole, url.host() + url.path());
     else if (item.storageType == lit("local"))
         pathItem->setData(Qt::DisplayRole, item.url);
