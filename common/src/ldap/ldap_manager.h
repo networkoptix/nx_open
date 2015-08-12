@@ -43,19 +43,12 @@ public:
     QnLdapManager();
     ~QnLdapManager();
 
-    QnLdapUsers fetchUsers();
-    QnLdapUsers users();
+    bool fetchUsers(QnLdapUsers &users);
 
     QString realm() const;
 
     bool authenticateWithDigest(const QString &login, const QString &ha1);
-
-    static bool testSettings(const QnLdapSettings& settings);
-
-private:
-	Q_DECLARE_PRIVATE(QnLdapManager);
-
-	QnLdapManagerPrivate *d_ptr;
+    bool testSettings(const QnLdapSettings& settings);
 };
 
 #endif // LDAP_MANAGER_H_

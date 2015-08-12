@@ -19,7 +19,7 @@ int QnTestLdapSettingsHandler::executePost(const QString &path, const QnRequestP
     fromApiToResource(apiData, settings);
     QnLdapManager *ldapManager = QnLdapManager::instance();
 
-    if (!QnLdapManager::testSettings(settings)) {
+    if (!QnLdapManager::instance()->testSettings(settings)) {
         reply.errorCode = -1;
         reply.errorString = tr("Invalid ldap settings");
     }

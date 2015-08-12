@@ -24,9 +24,8 @@ int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnReques
 
     QnLdapManager *ldapManager = QnLdapManager::instance();
     QnLdapUsers ldapUsers;
-    try {
-        ldapUsers = ldapManager->fetchUsers();
-    } catch (const QnLdapException&) {
+    if (!ldapManager->fetchUsers(ldapUsers))
+    {
         reply.errorCode = 1;
         reply.errorMessage = "Can't authenticate";
         result.setReply(reply);
