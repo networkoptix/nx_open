@@ -25,7 +25,6 @@ namespace nx_hls
         m_live( _isLive ),
         m_streamQuality( streamQuality ),
         m_videoCamera( videoCamera ),
-        m_auditHandle(0),
         m_authSession(authSession)
     {
         //verifying m_playlistManagers will not take much memory
@@ -39,15 +38,14 @@ namespace nx_hls
         
     void HLSSession::updateAuditInfo(qint64 timeUsec)
     {
-        if (m_auditHandle == 0)
+        if (!m_auditHandle)
             m_auditHandle = qnAuditManager->notifyPlaybackStarted(m_authSession, m_videoCamera->resource()->getId(), m_live ? DATETIME_NOW : timeUsec);
-        if (m_auditHandle > 0)
+        if (m_auditHandle)
             qnAuditManager->notifyPlaybackInProgress(m_auditHandle, timeUsec);
     }
 
     HLSSession::~HLSSession()
     {
-        qnAuditManager->notifyPlaybackFinished(m_auditHandle);
         if( m_live )
             m_videoCamera->notInUse( this );
     }

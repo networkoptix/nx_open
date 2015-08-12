@@ -108,7 +108,6 @@ public:
     QnRtspConnectionProcessorPrivate():
         QnTCPConnectionProcessorPrivate(),
         liveMode(Mode_Live),
-        auditRecordId(0),
         auditRecordMode(Mode_Live),
         dataProcessor(0),
         sessionTimeOut(0),
@@ -177,7 +176,7 @@ public:
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     QSharedPointer<QnThumbnailsStreamReader> thumbnailsDP;
     Mode liveMode;
-    int auditRecordId;
+    AuditHandle auditRecordHandle;
     Mode auditRecordMode;
     QElapsedTimer lastReportTime;
 
@@ -223,17 +222,16 @@ QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
     Q_D(QnRtspConnectionProcessor);
 	directDisconnectAll();
-    if (d->auditRecordId > 0)
-        qnAuditManager->notifyPlaybackFinished(d->auditRecordId);
+    d->auditRecordHandle.reset();
     stop();
 }
 
 void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
 {
     Q_D(QnRtspConnectionProcessor);
-    if (d->auditRecordId > 0 && d->lastReportTime.isValid() && d->lastReportTime.elapsed() >= QnAuditManager::MIN_PLAYBACK_TIME_TO_LOG)
+    if (d->auditRecordHandle && d->lastReportTime.isValid() && d->lastReportTime.elapsed() >= QnAuditManager::MIN_PLAYBACK_TIME_TO_LOG)
     {  
-        qnAuditManager->notifyPlaybackInProgress(d->auditRecordId, timestampUsec);
+        qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, timestampUsec);
         d->lastReportTime.restart();
     }
 }
@@ -1240,21 +1238,13 @@ int QnRtspConnectionProcessor::composePlay()
     
     if (d->liveMode != Mode_ThumbNails) 
     {
-        if (d->auditRecordId > 0 && d->liveMode != d->auditRecordMode) {
-            qnAuditManager->notifyPlaybackFinished(d->auditRecordId);
-            d->auditRecordId = 0;
-        }
-        if (!d->auditRecordId) {
-            d->auditRecordMode = d->liveMode;
-            qint64 startTimeUces = d->liveMode == Mode_Live ? DATETIME_NOW : d->startTime;
-            bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
-            d->auditRecordId = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUces, isExport);
-            if (isExport) {
-                qnAuditManager->notifyPlaybackInProgress(d->auditRecordId, startTimeUces);
-                if (d->endTime != AV_NOPTS_VALUE)
-                    qnAuditManager->notifyPlaybackInProgress(d->auditRecordId, d->endTime);
-            }
-        }
+        const qint64 startTimeUsec = d->liveMode == Mode_Live ? DATETIME_NOW : d->startTime;
+        bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
+
+        d->auditRecordHandle = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUsec, isExport);
+
+        if (isExport && d->endTime != AV_NOPTS_VALUE && d->endTime != DATETIME_NOW)
+            qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, d->endTime);
         d->lastReportTime.restart();
     }
 
