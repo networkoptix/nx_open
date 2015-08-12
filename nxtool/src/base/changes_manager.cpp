@@ -481,8 +481,7 @@ void rtu::ChangesManager::Impl::unknownAdded(const QString &ip)
     });
 
     /// Currently, it is supposed to be only one-interface-change action
-    if ((it == m_itfChanges.end()) 
-        || m_context->isDiscoverableFromCurrentNetwork(ip, *it->itfUpdateInfo.front().mask))
+    if (it == m_itfChanges.end())
     {
         return;
     }
