@@ -26,7 +26,7 @@ public:
     /* notify new playback was started from position timestamp
     *  return internal ID of started session
     */
-    int notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& id, qint64 timestampUsec, bool isExport);
+    int notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& id, qint64 timestampUsec, bool isExport = false);
     void notifyPlaybackFinished(int internalId);
     void notifyPlaybackInProgress(int internalId, qint64 timestampUsec);
     void notifySettingsChanged(const QnAuthSession& authInfo, const QString& paramName);

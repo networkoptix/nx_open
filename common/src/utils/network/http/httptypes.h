@@ -365,6 +365,12 @@ namespace nx_http
     //!Contains http header structures
     namespace header
     {
+        //!Parses string "name1=val1; name2=val2; ...". ; separator can be specified
+        void parseDigestAuthParams(
+            const ConstBufferRefType& authenticateParamsStr,
+            QMap<BufferType, BufferType>* const params,
+            char sep = ',' );
+
         //!Http authentication scheme enumeration
         namespace AuthScheme
         {

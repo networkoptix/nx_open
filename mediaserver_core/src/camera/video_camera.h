@@ -72,7 +72,7 @@ public:
         \return true, if started, false if failed to start
     */
     bool ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec );
-
+    QnResourcePtr resource() const { return m_resource; }
 private:
     void createReader(QnServer::ChunksCatalog catalog);
     void stop();

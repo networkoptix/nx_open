@@ -32,6 +32,7 @@
 #include "media_server/settings.h"
 #include "cached_output_stream.h"
 #include "common/common_module.h"
+#include "audit/audit_manager.h"
 
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
@@ -61,7 +62,8 @@ public:
         m_rtStartTime( AV_NOPTS_VALUE ),
         m_lastRtTime( 0 ),
         m_liveMode(liveMode),
-        m_needKeyData(false)
+        m_needKeyData(false),
+        m_auditRecordId(0)
     {
         if( dropLateFrames )
         {
@@ -80,6 +82,8 @@ public:
         if( m_dataOutput.get() )
             m_dataOutput->stop();
     }
+
+    void setAuditRecordId(int value) { m_auditRecordId = value; }
 
     void copyLastGopFromCamera(QnVideoCamera* camera)
     {
@@ -148,6 +152,9 @@ protected:
                 m_needStop = true; // EOF reached
             return true;
         }
+
+        if (media && m_auditRecordId > 0)
+            qnAuditManager->notifyPlaybackInProgress(m_auditRecordId, media->timestamp);
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
         {
@@ -257,6 +264,7 @@ private:
     qint64 m_lastRtTime;
     bool m_liveMode;
     bool m_needKeyData;
+    int m_auditRecordId;
 
     QByteArray toHttpChunk( const char* data, size_t size )
     {
@@ -550,6 +558,7 @@ void QnProgressiveDownloadingConsumer::run()
             maxFramesToCacheBeforeDrop,
             isLive);
 
+        qint64 timeUSec = DATETIME_NOW;
         if (isLive)
         {
             //if camera is offline trying to put it online
@@ -576,7 +585,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         else {
             bool utcFormatOK = false;
-            const qint64 timeUSec = parseDateTime( position );
+            timeUSec = parseDateTime( position );
 
             if (isUTCRequest)
             {
@@ -661,6 +670,10 @@ void QnProgressiveDownloadingConsumer::run()
         sendResponse(CODE_OK, mimeType);
 
         //dataConsumer.sendResponse();
+
+        int auditRecordId = qnAuditManager->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false);
+        dataConsumer.setAuditRecordId(auditRecordId);
+
         dataConsumer.start();
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed
@@ -672,6 +685,8 @@ void QnProgressiveDownloadingConsumer::run()
                  lit("Terminated")))), cl_logDEBUG1 );
 
         dataConsumer.pleaseStop();
+
+        qnAuditManager->notifyPlaybackFinished(auditRecordId);
 
         QnByteArray emptyChunk((unsigned)0,0);
         sendChunk(emptyChunk);

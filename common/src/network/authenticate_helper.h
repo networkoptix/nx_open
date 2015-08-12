@@ -131,7 +131,7 @@ public:
     /*!
         Created key is valid for \a periodMillis milliseconds
         \param periodMillis cannot be greater than \a QnAuthHelper::MAX_AUTHENTICATED_ALIAS_LIFE_TIME_MS
-        \note Returned key is only valid for \a path
+        \note pair<query key name, key value>. Returned key is only valid for \a path
     */
     QPair<QString, QString> createAuthenticationQueryItemForPath( const QString& path, unsigned int periodMillis );
 
@@ -147,7 +147,8 @@ public:
         const QString& userName,
         const QString& password,
         const QString& realm,
-        const QByteArray method );
+        const QByteArray& method,
+        QByteArray nonce = QByteArray() );
 
     static QByteArray symmetricalEncode(const QByteArray& data);
 

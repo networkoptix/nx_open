@@ -720,8 +720,10 @@ namespace nx_hls
                 : HLSSessionPool::generateUniqueID();
             HLSSessionPool::ScopedSessionIDLock lk( HLSSessionPool::instance(), sessionID );
             HLSSession* session = HLSSessionPool::instance()->find( sessionID );
-            if( session )
+            if( session ) {
+                session->updateAuditInfo(startTimestamp);
                 session->getChunkByAlias( streamQuality, aliasIter->second, &startTimestamp, &chunkDuration );
+            }
         }
 
         StreamingChunkCacheKey currentChunkKey(
@@ -853,7 +855,8 @@ namespace nx_hls
                 MSSettings::roSettings()->value( nx_ms_conf::HLS_TARGET_DURATION_MS, nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt(),
                 !startTimestamp,   //if no start date specified, providing live stream
                 streamQuality,
-                videoCamera ) );
+                videoCamera,
+                authSession()) );
         if( newHlsSession->isLive() )
         {
             //LIVE session
