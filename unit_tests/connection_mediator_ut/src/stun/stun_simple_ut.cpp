@@ -37,7 +37,7 @@ protected:
 
     SocketAddress address;
     MultiAddressServer<StunStreamSocketServer> server;
-    StunClientConnection client;
+    ClientConnection client;
 };
 
 TEST_F( StunSimpleTest, PublicAddress )

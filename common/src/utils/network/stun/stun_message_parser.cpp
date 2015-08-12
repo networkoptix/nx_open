@@ -20,11 +20,11 @@ public:
     MessageParserBuffer( std::deque<char>* temp_buffer , const nx::Buffer& buffer ): 
         temp_buffer_(temp_buffer),
         buffer_(buffer), 
-        position_(0){}
+        m_position(0){}
     MessageParserBuffer( const nx::Buffer& buffer ): 
         temp_buffer_(NULL),
         buffer_(buffer), 
-        position_(0){}
+        m_position(0){}
     std::uint16_t NextUint16( bool* ok );
     std::uint32_t NextUint32( bool* ok );
     std::uint8_t NextByte( bool* ok );
@@ -35,13 +35,13 @@ public:
             temp_buffer_->clear();
     }
     std::size_t position() const {
-        return position_;
+        return m_position;
     }
 private:
     bool Ensure( std::size_t byte_size , void* buffer );
     std::deque<char>* temp_buffer_;
     const nx::Buffer& buffer_;
-    std::size_t position_;
+    std::size_t m_position;
     Q_DISABLE_COPY(MessageParserBuffer)
 };
 
@@ -50,14 +50,14 @@ private:
 // the original buffer , so the user buffer will always be consumed over .
 bool MessageParser::MessageParserBuffer::Ensure( std::size_t byte_size , void* buffer ) {
     // Get the available bytes that we can read from the stream
-    std::size_t available_bytes = (temp_buffer_ == NULL ? 0 : temp_buffer_->size()) + buffer_.size() - position_;
+    std::size_t available_bytes = (temp_buffer_ == NULL ? 0 : temp_buffer_->size()) + buffer_.size() - m_position;
     if( available_bytes < byte_size ) {
         // Drain the user buffer here
         if( temp_buffer_ != NULL ) {
-            for( int i = position_ ; i < buffer_.size() ; ++i )
+            for( int i = m_position ; i < buffer_.size() ; ++i )
                 temp_buffer_->push_back(buffer_.at(i));
             // Modify the position pointer here 
-            position_ = buffer_.size();
+            m_position = buffer_.size();
         }
         return false;
     } else {
@@ -74,8 +74,8 @@ bool MessageParser::MessageParserBuffer::Ensure( std::size_t byte_size , void* b
             }
         }
         // 2. Finish the buffer feeding 
-        memcpy(reinterpret_cast<char*>(buffer)+pos,buffer_.constData() + position_, byte_size - pos );
-        position_ += byte_size - pos;
+        memcpy(reinterpret_cast<char*>(buffer)+pos,buffer_.constData() + m_position, byte_size - pos );
+        m_position += byte_size - pos;
         return true;
     }
 }
@@ -117,9 +117,9 @@ void MessageParser::MessageParserBuffer::NextBytes( char* bytes , std::size_t sz
 
 // Parsing for each specific type
 Attribute* MessageParser::parseXORMappedAddress() {
-    if( attribute_.value.size() < 8 || attribute_.value.at(0) != 0 ) 
+    if( m_attribute.value.size() < 8 || m_attribute.value.at(0) != 0 )
         return NULL;
-    MessageParserBuffer buffer(attribute_.value);
+    MessageParserBuffer buffer(m_attribute.value);
     bool ok;
 
     // Parsing the family 
@@ -144,7 +144,7 @@ Attribute* MessageParser::parseXORMappedAddress() {
         attribute->address.ipv4 = xor_addr ^ MAGIC_COOKIE;
     } else {
         // Ensure the buffer
-        if( attribute_.value.size() != 20 )
+        if( m_attribute.value.size() != 20 )
             return NULL;
         // The RFC doesn't indicate how to concatenate, I just assume it with the natural byte order
         std::uint16_t xor_comp;
@@ -162,7 +162,7 @@ Attribute* MessageParser::parseXORMappedAddress() {
             Q_ASSERT(ok);
             attribute->address.ipv6.array[i+2] = 
                 xor_comp ^ *reinterpret_cast< const std::uint16_t* >(
-                        header_.transaction_id.data() + i * 2 );
+                        m_header.transactionId.data() + i * 2 );
         }
     }
     return attribute.release();
@@ -170,9 +170,9 @@ Attribute* MessageParser::parseXORMappedAddress() {
 
 Attribute* MessageParser::parseErrorCode() {
     // Checking for the reserved bits
-    if( *reinterpret_cast<const std::uint16_t*>(attribute_.value.constData()) != 0  || attribute_.value.size() < 4 )
+    if( *reinterpret_cast<const std::uint16_t*>(m_attribute.value.constData()) != 0  || m_attribute.value.size() < 4 )
         return NULL;
-    MessageParserBuffer buffer(attribute_.value);
+    MessageParserBuffer buffer(m_attribute.value);
     bool ok;
     std::uint32_t val = buffer.NextUint32(&ok);
     Q_ASSERT(ok);
@@ -196,10 +196,10 @@ Attribute* MessageParser::parseErrorCode() {
     int code = _class * 100 + number;
 
     // Parsing the UTF encoded error string 
-    std::size_t phrase_length = attribute_.value.size() - 4;
+    std::size_t phrase_length = m_attribute.value.size() - 4;
     nx::String phrase;
     if( phrase_length > 0 ) {
-        phrase = nx::String( attribute_.value.constData() + 4, static_cast<int>(phrase_length) );
+        phrase = nx::String( m_attribute.value.constData() + 4, static_cast<int>(phrase_length) );
         // The RFC says that the decoded UTF8 string should only contain less than 127 characters
         if( phrase.size() > 127 ) {
             return NULL;
@@ -210,10 +210,10 @@ Attribute* MessageParser::parseErrorCode() {
 }
 
 Attribute* MessageParser::parseFingerprint() {
-    if( attribute_.value.size() != 4 )
+    if( m_attribute.value.size() != 4 )
         return NULL;
 
-    MessageParserBuffer buffer(attribute_.value);
+    MessageParserBuffer buffer(m_attribute.value);
     bool ok;
     std::uint32_t xor_crc_32 = buffer.NextUint32(&ok);
     Q_ASSERT(ok);
@@ -230,19 +230,19 @@ Attribute* MessageParser::parseFingerprint() {
 }
 
 Attribute* MessageParser::parseMessageIntegrity() {
-    if( attribute_.value.size() != MessageIntegrity::SHA1_HASH_SIZE )
+    if( m_attribute.value.size() != MessageIntegrity::SHA1_HASH_SIZE )
         return NULL;
     std::unique_ptr<MessageIntegrity> attribute( new MessageIntegrity() );
-    qCopy( attribute_.value.begin() , attribute_.value.end() , attribute->hmac.begin() );
+    qCopy( m_attribute.value.begin() , m_attribute.value.end() , attribute->hmac.begin() );
     return attribute.release();
 }
 
 Attribute* MessageParser::parseUnknownAttribute() {
-    return new Unknown( attribute_.type, attribute_.value );
+    return new Unknown( m_attribute.type, m_attribute.value );
 }
 
 Attribute* MessageParser::parseValue() {
-    switch( attribute_.type ) {
+    switch( m_attribute.type ) {
         case attrs::XOR_MAPPED_ADDRESS: return parseXORMappedAddress();
         case attrs::ERROR_CODE:         return parseErrorCode();
         case attrs::MESSAGE_INTEGRITY:  return parseMessageIntegrity();
@@ -252,7 +252,7 @@ Attribute* MessageParser::parseValue() {
 }
 
 int MessageParser::parseHeaderInitialAndType( MessageParserBuffer& buffer ) {
-    Q_ASSERT(state_ == HEADER_INITIAL_AND_TYPE);
+    Q_ASSERT(m_state == HEADER_INITIAL_AND_TYPE);
     bool ok;
     std::bitset<16> value = buffer.NextUint16(&ok);
     if(!ok) {
@@ -270,52 +270,52 @@ int MessageParser::parseHeaderInitialAndType( MessageParserBuffer& buffer ) {
         // bit order here.
 
         // Method 
-        header_.message_method = 0;
-        header_.message_method |= static_cast<int>(value[0]);
-        header_.message_method |= static_cast<int>(value[1])<<1;
-        header_.message_method |= static_cast<int>(value[2])<<2;
-        header_.message_method |= static_cast<int>(value[3])<<3;
-        header_.message_method |= static_cast<int>(value[5])<<4; // skip the 5th C bit
-        header_.message_method |= static_cast<int>(value[6])<<5; 
-        header_.message_method |= static_cast<int>(value[7])<<6; 
-        header_.message_method |= static_cast<int>(value[9])<<7; // skip the 9th C bit
-        header_.message_method |= static_cast<int>(value[10])<<8; 
-        header_.message_method |= static_cast<int>(value[11])<<9;
-        header_.message_method |= static_cast<int>(value[12])<<10;
-        header_.message_method |= static_cast<int>(value[13])<<11;
+        m_header.method = 0;
+        m_header.method |= static_cast<int>(value[0]);
+        m_header.method |= static_cast<int>(value[1])<<1;
+        m_header.method |= static_cast<int>(value[2])<<2;
+        m_header.method |= static_cast<int>(value[3])<<3;
+        m_header.method |= static_cast<int>(value[5])<<4; // skip the 5th C bit
+        m_header.method |= static_cast<int>(value[6])<<5;
+        m_header.method |= static_cast<int>(value[7])<<6;
+        m_header.method |= static_cast<int>(value[9])<<7; // skip the 9th C bit
+        m_header.method |= static_cast<int>(value[10])<<8;
+        m_header.method |= static_cast<int>(value[11])<<9;
+        m_header.method |= static_cast<int>(value[12])<<10;
+        m_header.method |= static_cast<int>(value[13])<<11;
 
         // Type
-        header_.message_class = 0;
-        header_.message_class |= static_cast<int>(value[4]);
-        header_.message_class |= static_cast<int>(value[8]) <<1;
-        state_ = HEADER_LENGTH;
+        m_header.messageClass = 0;
+        m_header.messageClass |= static_cast<int>(value[4]);
+        m_header.messageClass |= static_cast<int>(value[8]) <<1;
+        m_state = HEADER_LENGTH;
         return SECTION_FINISH;
     }
 }
 
 int MessageParser::parseHeaderLength( MessageParserBuffer& buffer ) {
-    Q_ASSERT(state_ == HEADER_LENGTH);
+    Q_ASSERT(m_state == HEADER_LENGTH);
     bool ok;
     std::uint16_t val = buffer.NextUint16(&ok);
     if(!ok) {
       return IN_PROGRESS;
     }
-    header_.message_length = static_cast<std::size_t>(val);
+    m_header.length = static_cast<std::size_t>(val);
     // Here we do a simple testing for the message length since based on the RCF
     // the message length must contains the bytes with padding which results in
     // the last 2 bits of the message length should always be zero .
     static const std::size_t kLengthMask = 3;
-    if( (header_.message_length & kLengthMask)  != 0 ) {
+    if( (m_header.length & kLengthMask)  != 0 ) {
         // We don't understand such header since the last 2 bits of the length
         // is not zero zero. This is another way to tell if a packet is STUN or not
         return FAILED;
     }
-    state_ = HEADER_MAGIC_ID;
+    m_state = HEADER_MAGIC_ID;
     return SECTION_FINISH;
 }
 
 int MessageParser::parseHeaderMagicCookie( MessageParserBuffer& buffer ) {
-    Q_ASSERT(state_ == HEADER_MAGIC_ID);
+    Q_ASSERT(m_state == HEADER_MAGIC_ID);
     bool ok;
     std::uint32_t magic_id;
     magic_id = buffer.NextUint32(&ok);
@@ -325,27 +325,27 @@ int MessageParser::parseHeaderMagicCookie( MessageParserBuffer& buffer ) {
     if( MAGIC_COOKIE != magic_id ) 
       return FAILED;
     else {
-        state_ = HEADER_TRANSACTION_ID;
+        m_state = HEADER_TRANSACTION_ID;
         return SECTION_FINISH;
     }
 }
 
 int MessageParser::parseHeaderTransactionID( MessageParserBuffer& buffer ) {
-    Q_ASSERT(state_ == HEADER_TRANSACTION_ID );
+    Q_ASSERT(m_state == HEADER_TRANSACTION_ID );
     bool ok;
-    buffer.NextBytes( header_.transaction_id.data(), header_.transaction_id.size(), &ok );
+    buffer.NextBytes( m_header.transactionId.data(), m_header.transactionId.size(), &ok );
     if(!ok) {
       return IN_PROGRESS;
     }
     // We are finished here so we should populate the Message object right now
     // Set left message length for parsing attributes 
-    left_message_length_ = header_.message_length;
+    m_leftMessageLength = m_header.length;
     // Populate the header
-    output_message_->header.messageClass = static_cast<MessageClass>(header_.message_class);
-    output_message_->header.method = static_cast<int>(header_.message_method);
-    output_message_->header.transactionId = header_.transaction_id;
+    m_outputMessage->header.messageClass = static_cast<MessageClass>(m_header.messageClass);
+    m_outputMessage->header.method = static_cast<int>(m_header.method);
+    m_outputMessage->header.transactionId = m_header.transactionId;
 
-    state_ = MORE_VALUE;
+    m_state = MORE_VALUE;
     return SECTION_FINISH;
 }
 
@@ -354,70 +354,70 @@ int MessageParser::parseMoreValue( MessageParserBuffer& buffer ) {
     // If after we finished transaction id, we find out that the length
     // of our body is zero, simply means we are done here since no attributes
     // are associated with our body. 
-    Q_ASSERT(state_ == MORE_VALUE);
-    if( left_message_length_ == 0 ) {
+    Q_ASSERT(m_state == MORE_VALUE);
+    if( m_leftMessageLength == 0 ) {
         buffer.Clear();
-        attribute_.Clear();
-        state_ = HEADER_INITIAL_AND_TYPE;
+        m_attribute.Clear();
+        m_state = HEADER_INITIAL_AND_TYPE;
         return FINISH;
     } else {
-        attribute_.Clear();
-        state_ = ATTRIBUTE_TYPE;
+        m_attribute.Clear();
+        m_state = ATTRIBUTE_TYPE;
         return SECTION_FINISH;
     }
 }
 
 int MessageParser::parseAttributeType( MessageParserBuffer& buffer ) {
-    Q_ASSERT(state_ == ATTRIBUTE_TYPE);
+    Q_ASSERT(m_state == ATTRIBUTE_TYPE);
     bool ok;
-    attribute_.type = buffer.NextUint16(&ok);
+    m_attribute.type = buffer.NextUint16(&ok);
     if(!ok) {
       return IN_PROGRESS;
     }
-    state_ = ATTRIBUTE_LENGTH;
+    m_state = ATTRIBUTE_LENGTH;
     return SECTION_FINISH;
 }
 
 int MessageParser::parseAttributeLength( MessageParserBuffer& buffer ) {
-    Q_ASSERT(state_ == ATTRIBUTE_LENGTH);
+    Q_ASSERT(m_state == ATTRIBUTE_LENGTH);
     bool ok;
-    attribute_.length = buffer.NextUint16(&ok);
+    m_attribute.length = buffer.NextUint16(&ok);
     if(!ok) {
       return IN_PROGRESS;
     }
-    state_ = ATTRIBUTE_VALUE;
+    m_state = ATTRIBUTE_VALUE;
     return SECTION_FINISH;
 }
 
 int MessageParser::parseAttributeValueNotAdd( MessageParserBuffer& buffer ) {
     bool ok;
-    std::size_t padding_length = calculatePaddingSize(attribute_.length);
-    attribute_.value.resize( static_cast<int>(padding_length) );
-    buffer.NextBytes(attribute_.value.data(),padding_length,&ok);
+    std::size_t padding_length = calculatePaddingSize(m_attribute.length);
+    m_attribute.value.resize( static_cast<int>(padding_length) );
+    buffer.NextBytes(m_attribute.value.data(),padding_length,&ok);
     if( !ok ) 
       return IN_PROGRESS;
     // Modify the left message length field : total size 
     // The value length + 2 bytes type + 2 bytes length 
-    left_message_length_ -= 4 + padding_length;
+    m_leftMessageLength -= 4 + padding_length;
     return SECTION_FINISH;
 }
 
 int MessageParser::parseAttributeValue( MessageParserBuffer& buffer ) {
-    Q_ASSERT(state_ == ATTRIBUTE_VALUE);
+    Q_ASSERT(m_state == ATTRIBUTE_VALUE);
     int ret = parseAttributeValueNotAdd(buffer);
     if( ret != SECTION_FINISH ) return ret;
     Attribute* attr = parseValue();
     if( attr == NULL ) return FAILED;
-    output_message_->attributes.emplace( attr->type(), std::unique_ptr<Attribute>(attr) );
+    m_outputMessage->attributes.emplace( attr->type(), std::unique_ptr<Attribute>(attr) );
     switch( attr->type() ) {
     case attrs::FINGER_PRINT:
-        state_ = END_FINGERPRINT;
+        m_state = END_FINGERPRINT;
         break;
     case attrs::MESSAGE_INTEGRITY:
-        state_ = END_MESSAGE_INTEGRITY;
+        m_state = END_MESSAGE_INTEGRITY;
         break;
     default:
-        state_ = MORE_VALUE;
+        m_state = MORE_VALUE;
     }
     return SECTION_FINISH;
 }
@@ -426,19 +426,19 @@ int MessageParser::parseEndWithFingerprint( MessageParserBuffer& buffer ) {
     // Finger print MUST BE the last message, if we meet more message than we
     // expected, we just return error that we cannot handle this message now
     Q_UNUSED(buffer);
-    if( left_message_length_ != 0 )
+    if( m_leftMessageLength != 0 )
         return FAILED;
-    state_ = HEADER_INITIAL_AND_TYPE;
+    m_state = HEADER_INITIAL_AND_TYPE;
     return FINISH;
 }
 
 int MessageParser::parseEndMessageIntegrity( MessageParserBuffer& buffer ) {
     Q_UNUSED(buffer);
-    if( left_message_length_ != 0 ) {
-        state_ = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_TYPE;
+    if( m_leftMessageLength != 0 ) {
+        m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_TYPE;
         return IN_PROGRESS;
     } else {
-        state_ = HEADER_INITIAL_AND_TYPE;
+        m_state = HEADER_INITIAL_AND_TYPE;
         return FINISH;
     }
 }
@@ -446,11 +446,11 @@ int MessageParser::parseEndMessageIntegrity( MessageParserBuffer& buffer ) {
 nx_api::ParserState::Type MessageParser::parse( const nx::Buffer& user_buffer , std::size_t* bytes_transferred ) {
     Q_ASSERT( !user_buffer.isEmpty() );
     // Setting up the buffer environment variables
-    MessageParserBuffer buffer(&temp_buffer_,user_buffer);
+    MessageParserBuffer buffer(&m_tempBuffer,user_buffer);
     // Tick the parsing state machine
     do {
         int ret = 0;                                    
-        switch(state_)
+        switch(m_state)
         {
             case HEADER_INITIAL_AND_TYPE:
                 ret = parseHeaderInitialAndType(buffer);

@@ -42,6 +42,7 @@ public:
     //!Pass message to corresponding processor
     /*!
         \param message This object is not moved in case of failure to find processor
+        \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
     bool dispatchRequest( StunServerConnection* connection, stun::Message&& message );
 

@@ -23,8 +23,8 @@ namespace stun {
     public:
         //!Set message to serialize
         void setMessage( Message&& message ) {
-            message_ = std::move(message);
-            initialized_ = true;
+            m_message = std::move(message);
+            m_initialized = true;
         }
 
         nx_api::SerializerState::Type serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
@@ -61,8 +61,8 @@ namespace stun {
         }
 
     private:
-        Message message_;
-        bool initialized_;
+        Message m_message;
+        bool m_initialized;
     };
 
 } // namespase stun

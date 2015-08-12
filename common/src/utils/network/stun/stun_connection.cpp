@@ -8,7 +8,7 @@
 namespace nx {
 namespace stun {
 
-    StunClientConnection::StunClientConnection(
+    ClientConnection::ClientConnection(
         const SocketAddress& stunServerEndpoint,
         bool useSsl )
     :
@@ -19,7 +19,7 @@ namespace stun {
         m_socket->setNonBlockingMode(true);
     }
 
-    void StunClientConnection::pleaseStop( std::function<void()>&& completionHandler )
+    void ClientConnection::pleaseStop( std::function<void()>&& completionHandler )
     {
         // Cancel the Pending IO operations
         if( m_state == NOT_CONNECTED )
@@ -40,20 +40,20 @@ namespace stun {
             completionHandler();
     }
 
-    void StunClientConnection::enqueuePendingRequest( Message&& msg , std::function<void(SystemError::ErrorCode,Message&&)>&& func ) {
+    void ClientConnection::enqueuePendingRequest( Message&& msg , std::function<void(SystemError::ErrorCode,Message&&)>&& func ) {
         std::lock_guard<std::mutex> lock(m_mutex);
         Q_ASSERT(!m_outstandingRequest);
         m_outstandingRequest.reset( new PendingRequest(std::move(msg),std::move(func)) );
     }
 
-    void StunClientConnection::resetOutstandingRequest() {
+    void ClientConnection::resetOutstandingRequest() {
         if( !m_outstandingRequest )
             return;
         std::lock_guard<std::mutex> lock(m_mutex);
         m_outstandingRequest.reset();
     }
 
-    void StunClientConnection::onConnectionComplete(
+    void ClientConnection::onConnectionComplete(
         SystemError::ErrorCode ec , 
         const std::function<void(SystemError::ErrorCode)>& completion_handler )
     {
@@ -93,7 +93,7 @@ namespace stun {
         }
     }
 
-    void StunClientConnection::onRequestSend( SystemError::ErrorCode ec ) {
+    void ClientConnection::onRequestSend( SystemError::ErrorCode ec ) {
         if( ec ) {
             m_outstandingRequest->completion_handler(ec,Message());
             resetOutstandingRequest();
@@ -103,7 +103,7 @@ namespace stun {
     // This function will _NOT_ remove pending outstanding IO event , so
     // the caller should call resetOustandingRequest per to the semantic 
 
-    bool StunClientConnection::dispatchPendingRequest( SystemError::ErrorCode ec ) {
+    bool ClientConnection::dispatchPendingRequest( SystemError::ErrorCode ec ) {
         // Checking if we have any pending operations
         {
             std::lock_guard<std::mutex> lock(m_mutex);
@@ -119,30 +119,30 @@ namespace stun {
         return m_baseConnection->sendMessage( 
             Message(std::move(m_outstandingRequest->request_message)),
             std::bind(
-                &StunClientConnection::onRequestSend,
+                &ClientConnection::onRequestSend,
                 this,
                 std::placeholders::_1));
     }
 
-    bool StunClientConnection::openConnection( std::function<void(SystemError::ErrorCode)>&& completionHandler )
+    bool ClientConnection::openConnection( std::function<void(SystemError::ErrorCode)>&& completionHandler )
     {
         Q_ASSERT( m_state == NOT_CONNECTED );
         m_state = CONNECTING;
         return m_socket->connectAsync(
             m_stunServerEndpoint,
             std::bind(
-            &StunClientConnection::onConnectionComplete,
+            &ClientConnection::onConnectionComplete,
                 this,
                 std::placeholders::_1,
                 std::move(completionHandler) ) );
     }
 
-    void StunClientConnection::registerIndicationHandler( std::function<void(Message&&)>&& indicationHandler )
+    void ClientConnection::registerIndicationHandler( std::function<void(Message&&)>&& indicationHandler )
     {
         m_indicationHandler = indicationHandler;
     }
 
-    bool StunClientConnection::sendRequest(
+    bool ClientConnection::sendRequest(
         Message&& request,
         std::function<void(SystemError::ErrorCode, Message&&)>&& completionHandler )
     {
@@ -179,14 +179,14 @@ namespace stun {
         }
     }
 
-    void StunClientConnection::closeConnection( BaseConnectionType* connection )
+    void ClientConnection::closeConnection( BaseConnectionType* connection )
     {
         assert( connection == m_baseConnection.get() );
         if( m_socket )
             m_socket->close();
     }
 
-    void StunClientConnection::onRequestMessageRecv( Message&& msg )
+    void ClientConnection::onRequestMessageRecv( Message&& msg )
     {
         // Checking the message to see whether it is an valid message or not
         if( msg.header.messageClass == MessageClass::errorResponse ) {
@@ -202,13 +202,13 @@ namespace stun {
         resetOutstandingRequest();
     }
 
-    void StunClientConnection::onIndicationMessageRecv( Message&& msg )
+    void ClientConnection::onIndicationMessageRecv( Message&& msg )
     {
         if( m_indicationHandler )
             m_indicationHandler(std::move(msg));
     }
 
-    void StunClientConnection::processMessage( Message&& msg )
+    void ClientConnection::processMessage( Message&& msg )
     {
         switch(msg.header.messageClass) {
             case MessageClass::errorResponse:
@@ -223,7 +223,7 @@ namespace stun {
         }
     }
 
-    bool StunClientConnection::hasErrorAttribute( const Message& msg ) {
+    bool ClientConnection::hasErrorAttribute( const Message& msg ) {
         for( auto& attribute : msg.attributes ) {
             if( attribute.second->type() == attrs::ERROR_CODE )
                 return true;

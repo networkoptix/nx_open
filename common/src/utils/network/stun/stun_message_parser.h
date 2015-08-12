@@ -50,16 +50,16 @@ namespace stun {
         };
     public:
         MessageParser() :
-            output_message_(NULL),
-            left_message_length_(0),
-            state_(HEADER_INITIAL_AND_TYPE)
+            m_outputMessage(NULL),
+            m_leftMessageLength(0),
+            m_state(HEADER_INITIAL_AND_TYPE)
         {
-            header_.transaction_id.resize( Header::TRANSACTION_ID_SIZE );
+            m_header.transactionId.resize( Header::TRANSACTION_ID_SIZE );
         }
 
         //!set message object to parse to
         void setMessage( Message* const msg ) {
-            output_message_ = msg;
+            m_outputMessage = msg;
         }
         //!Returns current parse state
         /*!
@@ -76,12 +76,12 @@ namespace stun {
 
         //!Returns current parse state
         nx_api::ParserState::Type state() const {
-            return state_ == HEADER_INITIAL_AND_TYPE ? nx_api::ParserState::init : nx_api::ParserState::inProgress;
+            return m_state == HEADER_INITIAL_AND_TYPE ? nx_api::ParserState::init : nx_api::ParserState::inProgress;
         }
 
         //!Resets parse state and prepares for parsing different data
         void reset() {
-            state_ = HEADER_INITIAL_AND_TYPE;
+            m_state = HEADER_INITIAL_AND_TYPE;
         }
     private:
         class MessageParserBuffer;
@@ -103,12 +103,12 @@ namespace stun {
         int parseAttributeValue( MessageParserBuffer& buffer );
         int parseAttributeFingerprintType( MessageParserBuffer& buffer ) {
             int ret = parseAttributeType(buffer);
-            state_ = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH;
+            m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH;
             return ret;
         }
         int parseAttributeFingerprintLength( MessageParserBuffer& buffer ) {
             int ret = parseAttributeLength(buffer);
-            state_ = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH;
+            m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH;
             return ret;
         }
         int parseAttributeFingerprintValue( MessageParserBuffer& buffer ) {
@@ -119,10 +119,10 @@ namespace stun {
                 // integrity only fingerprint will need to handle. And we just check the
                 // fingerprint message followed by the STUN packet. If we have found one
                 // our parser state converts to a END_FINGERPINT states
-                if( attribute_.type == attrs::FINGER_PRINT ) {
-                    state_ = END_FINGERPRINT;
+                if( m_attribute.type == attrs::FINGER_PRINT ) {
+                    m_state = END_FINGERPRINT;
                 } else {
-                    state_ = MORE_VALUE;
+                    m_state = MORE_VALUE;
                 }
                 return SECTION_FINISH;
             }
@@ -139,10 +139,10 @@ namespace stun {
         }
     private:
         struct STUNHeader {
-            int message_class;
-            int message_method;
-            std::size_t message_length;
-            nx::Buffer transaction_id;
+            int messageClass;
+            int method;
+            std::size_t length;
+            nx::Buffer transactionId;
         };
         struct STUNAttr {
             std::uint16_t length;
@@ -154,13 +154,13 @@ namespace stun {
                 type = 0;
             }
         };
-        STUNHeader header_;
-        STUNAttr attribute_;
-        Message* output_message_;
-        std::size_t left_message_length_;
-        int state_;
+        STUNHeader m_header;
+        STUNAttr m_attribute;
+        Message* m_outputMessage;
+        std::size_t m_leftMessageLength;
+        int m_state;
         // This is for opaque usage  
-        std::deque<char> temp_buffer_;
+        std::deque<char> m_tempBuffer;
     };
 
 } // namespase stun

@@ -17,8 +17,8 @@ using namespace attrs;
 class MessageSerializer::MessageSerializerBuffer {
 public:
     MessageSerializerBuffer( nx::Buffer* buffer ) :
-        buffer_(buffer),
-        header_length_(NULL){}
+        m_buffer(buffer),
+        m_headerLength(NULL){}
 
     void* WriteUint16( std::uint16_t value );
     void* WriteUint32( std::uint32_t value );
@@ -27,40 +27,39 @@ public:
     void* WriteBytes( const char* bytes , std::size_t length );
     void* Poke( std::size_t size );
     std::size_t position() const {
-        return static_cast<std::size_t>(buffer_->size());
+        return static_cast<std::size_t>(m_buffer->size());
     }
     std::size_t size() const {
-        return buffer_->size();
+        return m_buffer->size();
     }
     // Use this function to set up the message length position 
     std::uint16_t* WriteMessageLength() {
-        Q_ASSERT(header_length_ == NULL);
+        Q_ASSERT(m_headerLength == NULL);
         void* ret = Poke(2);
         if( ret == NULL ) return NULL;
-        header_length_ = reinterpret_cast<std::uint16_t*>(ret);
-        return header_length_;
+        m_headerLength = reinterpret_cast<std::uint16_t*>(ret);
+        return m_headerLength;
     }
     std::uint16_t* WriteMessageLength( std::uint16_t length ) {
-        Q_ASSERT(header_length_ != NULL);
-        qToBigEndian(length,reinterpret_cast<uchar*>(header_length_));
-        return header_length_;
+        Q_ASSERT(m_headerLength != NULL);
+        qToBigEndian(length,reinterpret_cast<uchar*>(m_headerLength));
+        return m_headerLength;
     }
     const nx::Buffer* buffer() const {
-        return buffer_;
+        return m_buffer;
     }
 private:
-    nx::Buffer* buffer_;
-    std::uint16_t* header_length_;
+    nx::Buffer* m_buffer;
+    std::uint16_t* m_headerLength;
 };
 
 void* MessageSerializer::MessageSerializerBuffer::Poke( std::size_t size ) {
-    if( static_cast<int>(size) + buffer_->size() > buffer_->capacity() )
+    if( size > static_cast< size_t >( m_buffer->capacity() - m_buffer->size() ) )
         return NULL;
-    else {
-        void* ret = buffer_->data() + buffer_->size();
-        buffer_->resize( buffer_->size() + static_cast<int>(size) );
-        return ret;
-    }
+
+    void* ret = m_buffer->data() + m_buffer->size();
+    m_buffer->resize( m_buffer->size() + static_cast< int >( size ) );
+    return ret;
 }
 // Write the uint16 value into the buffer with bytes order swap 
 void* MessageSerializer::MessageSerializerBuffer::WriteUint16( std::uint16_t value ) {
@@ -115,21 +114,21 @@ void* MessageSerializer::MessageSerializerBuffer::WriteBytes( const char* bytes 
 // Serialization class implementation
 nx_api::SerializerState::Type MessageSerializer::serializeHeaderInitial( MessageSerializerBuffer* buffer ) {
     std::bitset<16> initial(0);
-    // 1. Setting the method bits. 
-    initial[0] = message_.header.method & (1<<0); 
-    initial[1] = message_.header.method & (1<<1); 
-    initial[2] = message_.header.method & (1<<2);
-    initial[3] = message_.header.method & (1<<3);
-    initial[5] = message_.header.method & (1<<4); // skip the 5th bit
-    initial[6] = message_.header.method & (1<<5);
-    initial[7] = message_.header.method & (1<<6); 
-    initial[9] = message_.header.method & (1<<7); // skip the 9th bit
-    initial[10]= message_.header.method & (1<<8);
-    initial[11]= message_.header.method & (1<<9);
-    initial[12]= message_.header.method & (1<<10);
-    initial[13]= message_.header.method & (1<<11);
+    // 1. Setting the method bits.
+    initial[0] = m_message.header.method & (1<<0);
+    initial[1] = m_message.header.method & (1<<1);
+    initial[2] = m_message.header.method & (1<<2);
+    initial[3] = m_message.header.method & (1<<3);
+    initial[5] = m_message.header.method & (1<<4); // skip the 5th bit
+    initial[6] = m_message.header.method & (1<<5);
+    initial[7] = m_message.header.method & (1<<6);
+    initial[9] = m_message.header.method & (1<<7); // skip the 9th bit
+    initial[10]= m_message.header.method & (1<<8);
+    initial[11]= m_message.header.method & (1<<9);
+    initial[12]= m_message.header.method & (1<<10);
+    initial[13]= m_message.header.method & (1<<11);
     // 2. Setting the class bits
-    int message_class = static_cast<int>(message_.header.messageClass);
+    int message_class = static_cast<int>(m_message.header.messageClass);
     initial[4] = message_class & (1<<0);
     initial[8] = message_class & (1<<1);
     // 3. write to the buffer
@@ -153,8 +152,8 @@ nx_api::SerializerState::Type MessageSerializer::serializeMagicCookieAndTransact
         return nx_api::SerializerState::needMoreBufferSpace;
     }
     // Transaction ID
-    if( buffer->WriteBytes( message_.header.transactionId.data(),
-                            message_.header.transactionId.size() ) == NULL ) {
+    if( buffer->WriteBytes( m_message.header.transactionId.data(),
+                            m_message.header.transactionId.size() ) == NULL ) {
         return nx_api::SerializerState::needMoreBufferSpace;
     }
     return nx_api::SerializerState::done;
@@ -221,7 +220,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
         xor_addr[1] = attribute.address.ipv6.array[1] ^ MAGIC_COOKIE_HIGH;
         // XOR for the transaction id
         for( std::size_t i = 2 ; i < 8 ; ++i ) {
-            const auto tid = message_.header.transactionId.data() + (i-2) * 2;
+            const auto tid = m_message.header.transactionId.data() + (i-2) * 2;
             xor_addr[i] = *reinterpret_cast< std::uint16_t* >( tid ) ^
                           attribute.address.ipv6.array[i];
         }
@@ -309,20 +308,20 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCo
 }
 
 bool MessageSerializer::travelAllAttributes( const std::function<bool(const attrs::Attribute*)>& callback ) {
-    auto message_integrity = message_.attributes.find(attrs::MESSAGE_INTEGRITY);
-    auto fingerprint = message_.attributes.find(attrs::FINGER_PRINT);
+    auto message_integrity = m_message.attributes.find(attrs::MESSAGE_INTEGRITY);
+    auto fingerprint = m_message.attributes.find(attrs::FINGER_PRINT);
 
-    for( auto ib = message_.attributes.cbegin() ; ib != message_.attributes.cend() ; ++ib ) {
+    for( auto ib = m_message.attributes.cbegin() ; ib != m_message.attributes.cend() ; ++ib ) {
         if( ib != message_integrity && ib != fingerprint ) {
             if(!callback(ib->second.get())) 
                 return false;
         }
     }
-    if( message_integrity != message_.attributes.cend() ) {
+    if( message_integrity != m_message.attributes.cend() ) {
         if( !callback(message_integrity->second.get()) )
             return false;
     }
-    if( fingerprint != message_.attributes.cend() ) {
+    if( fingerprint != m_message.attributes.cend() ) {
         if( !callback(fingerprint->second.get()) )
             return false;
     }
@@ -353,22 +352,22 @@ bool MessageSerializer::checkMessageIntegratiy() {
     // testing is based on the RFC. 
     // 1. Header
     // Checking the method and it only has 12 bits in the message
-    if( message_.header.method <0 || message_.header.method >= 1<<12 ) {
+    if( m_message.header.method <0 || m_message.header.method >= 1<<12 ) {
         return false;
     }
     // 2. Checking the attributes 
-    auto ib = message_.attributes.find(attrs::FINGER_PRINT);
-    if( ib != message_.attributes.end() && ++ib != message_.attributes.end() ) {
+    auto ib = m_message.attributes.find(attrs::FINGER_PRINT);
+    if( ib != m_message.attributes.end() && ++ib != m_message.attributes.end() ) {
         return false;
     }
-    ib = message_.attributes.find(attrs::MESSAGE_INTEGRITY);
-    if( ib != message_.attributes.end() && ++ib != message_.attributes.end() ) {
+    ib = m_message.attributes.find(attrs::MESSAGE_INTEGRITY);
+    if( ib != m_message.attributes.end() && ++ib != m_message.attributes.end() ) {
         return false;
     }
     // 3. Checking the validation for specific attributes
     // ErrorCode message
-    ib = message_.attributes.find(attrs::ERROR_CODE);
-    if( ib !=  message_.attributes.end() ) {
+    ib = m_message.attributes.find(attrs::ERROR_CODE);
+    if( ib !=  m_message.attributes.end() ) {
         // Checking the error code message
         ErrorDescription* error_code = static_cast<ErrorDescription*>(
             ib->second.get());
@@ -384,7 +383,7 @@ bool MessageSerializer::checkMessageIntegratiy() {
 }
 
 nx_api::SerializerState::Type MessageSerializer::serialize( nx::Buffer* const user_buffer, size_t* const bytesWritten ) {
-    Q_ASSERT(initialized_ && checkMessageIntegratiy());
+    Q_ASSERT(m_initialized && checkMessageIntegratiy());
     Q_ASSERT(user_buffer->size() == 0 && user_buffer->capacity() != 0);
     MessageSerializerBuffer buffer(user_buffer);
     *bytesWritten = user_buffer->size();
@@ -398,7 +397,7 @@ nx_api::SerializerState::Type MessageSerializer::serialize( nx::Buffer* const us
     }
     // setting the header value 
     buffer.WriteMessageLength(length);
-    initialized_ = false;
+    m_initialized = false;
     *bytesWritten = user_buffer->size() - *bytesWritten;
     return nx_api::SerializerState::done;
 }

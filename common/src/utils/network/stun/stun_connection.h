@@ -28,13 +28,13 @@ namespace stun {
         \note Methods of this class are not thread-safe
         \todo restore interrupted connection ?
     */
-    class StunClientConnection
+    class ClientConnection
     :
         public QnStoppableAsync
     {
     public:
         typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
-            StunClientConnection,
+            ClientConnection,
             Message,
             MessageParser,
             MessageSerializer
@@ -42,11 +42,11 @@ namespace stun {
         //!As required by \a nx_api::BaseServerConnection
         typedef BaseConnectionType ConnectionType;
 
-        StunClientConnection(
+        ClientConnection(
             const SocketAddress& stunServerEndpoint,
             bool useSsl = false );
 
-        virtual ~StunClientConnection() {
+        virtual ~ClientConnection() {
             join();
         }
 
@@ -151,7 +151,7 @@ namespace stun {
         MessageParser m_messageParser;
         MessageSerializer m_messageSerializer;
 
-        Q_DISABLE_COPY(StunClientConnection)
+        Q_DISABLE_COPY(ClientConnection)
     };
 
 } // namespase stun
