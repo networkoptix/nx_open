@@ -466,6 +466,7 @@ void rtu::getServerExtraInfo(HttpClient *client
         {
             if (failed)
                 failed(errorCode, errorReason, affected);
+            return;
         }
 
         getTime(client, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout);
