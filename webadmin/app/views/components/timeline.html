@@ -1,7 +1,8 @@
 <div class="timeline">
 
-    <div class="webclient-panel webclient-top-border webclient-bottom-border"><div class="text-left">
-            <span class="webclient-button  caption-row "
+    <div class="webclient-panel webclient-top-border webclient-bottom-border"><div class="text-left" >
+            <span ng-if="!liveOnly"
+                  class="webclient-button  caption-row "
                   ng-mouseup="stopZoom(false)"
                   ng-mouseleave="stopZoom(false)"
                   ng-mousedown="startZoom(false)"
@@ -9,13 +10,17 @@
                   ng-disabled="disableZoomOut">
                 <span class="glyphicon glyphicon-minus"></span>
             </span>
-            <span class="webclient-button caption-row "
+            <span ng-if="!liveOnly"
+                  class="webclient-button caption-row "
                   ng-mouseup="stopZoom(true)"
                   ng-mouseleave="stopZoom(true)"
                   ng-mousedown="startZoom(true)"
 
                   ng-disabled="disableZoomIn">
                 <span class="glyphicon glyphicon-plus"></span>
+            </span>
+            <span ng-if="emptyArchive" class="webclient-button caption-row ">
+                There is no archive for this camera
             </span>
         </div><div class="text-center">
 
@@ -34,7 +39,9 @@
                   ng-click="goToLive()">LIVE</span>
         </div></div>
 
-    <div class="viewport"
+    <div
+         class="viewport"
+         ng-class="{invisible:liveOnly}"
          ng-mouseup="mouseUp($event)"
          ng-mouseleave="mouseLeave($event)"
          ng-mousemove="mouseMove($event)"
