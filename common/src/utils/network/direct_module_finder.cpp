@@ -159,7 +159,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     QnJsonRestResult result;
     QJson::deserialize(data, &result);
     QnModuleInformation moduleInformation;
-    QJson::deserialize(result.reply(), &moduleInformation);
+    QJson::deserialize(result.reply, &moduleInformation);
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
 
