@@ -306,6 +306,8 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
             return tr("Exporting video");
         case Qn::AR_CameraUpdate:
             return tr("Camera updated");
+        case Qn::AR_CameraInsert:
+            return tr("Camera added");
         case Qn::AR_SystemNameChanged:
             return tr("System name changed");
         case Qn::AR_SystemmMerge:
@@ -345,6 +347,7 @@ QString QnAuditLogModel::buttonNameForEvent(Qn::AuditRecordType eventType)
     case Qn::AR_UserUpdate:
     case Qn::AR_ServerUpdate:
     case Qn::AR_CameraUpdate:
+    case Qn::AR_CameraInsert:
         return tr("Settings");
     }
     return QString();
@@ -383,6 +386,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
     case Qn::AR_ExportVideo:
         result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
     case Qn::AR_CameraUpdate:
+    case Qn::AR_CameraInsert:
         result +=  tr("%n cameras", "", data->resources.size());
         break;
     default:
@@ -408,6 +412,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
         case Qn::AR_ViewLive:
         case Qn::AR_ExportVideo:
             result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
+        case Qn::AR_CameraInsert:
         case Qn::AR_CameraUpdate:
         {
             QString txt = tr("%n cameras", "", data->resources.size());
@@ -470,7 +475,7 @@ QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record)
 QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* data)
 {
     QString result = textData(column, data);
-    if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate))
+    if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate || data->eventType == Qn::AR_CameraInsert))
         result += getResourcesString(data->resources); // text description doesn't contain resources for that types, but their names need for search
     return result;
 }
@@ -715,6 +720,7 @@ QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
         return m_colors.exportVideo;
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraRemove:
+    case Qn::AR_CameraInsert:
         return m_colors.updCamera;
     case Qn::AR_SystemNameChanged:
     case Qn::AR_SystemmMerge:
@@ -822,7 +828,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
             return qnSkin->icon("tree/user.png");
         else if (record->eventType == Qn::AR_ServerUpdate)
             return qnSkin->icon("tree/server.png");
-        else if (record->eventType == Qn::AR_CameraUpdate)
+        else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
             return qnSkin->icon("tree/camera.png");
     }
     case Qt::ToolTipRole:

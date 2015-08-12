@@ -26,7 +26,7 @@ Base.Column
         return result;
     }
     
-    function tryApplyChanges () { return impl.tryApplyChanges(); }
+    function tryApplyChanges (warnings) { return impl.tryApplyChanges(warnings); }
     
     anchors.left: (parent ? parent.left : undefined);
 
@@ -60,9 +60,9 @@ Base.Column
     property QtObject impl : QtObject
     {
         readonly property string errorTemplate: 
-            qsTr("Invalid %1 for interface %2 specified. Can't apply changes.");
+            qsTr("Invalid %1 for \"%2\" specified. Can't apply changes.");
         
-        function tryApplyChanges()
+        function tryApplyChanges(warnings)
         {
             if (!thisComponent.changed)
                 return true;
@@ -79,8 +79,10 @@ Base.Column
                 }
 
                 var name = item.adapterNameValue;
-                
+                var interfaceCaption = item.interfaceCaption;
+
                 var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
+                var wrongGateway = (!item.gatewayControl.isEmptyAddress && !item.gatewayControl.acceptableInput);
 
                 var somethingChanged = item.useDHCPControl.changed;
                 if (!useDHCP)   /// do not send address and mask if dhcp is on
@@ -91,25 +93,48 @@ Base.Column
                     }
                     else
                     {
-                        errorDialog.message = errorTemplate.arg(qsTr("ip address")).arg(name);
+                        errorDialog.message = errorTemplate.arg(qsTr("ip address")).arg(interfaceCaption);
                         errorDialog.show();
             
                         item.ipAddressControl.forceActiveFocus();
                         return false;
                     }
 
-                    if (item.subnetMaskControl.acceptableInput)
+                    if (item.subnetMaskControl.acceptableInput
+                        && rtuContext.isValidSubnetMask(item.subnetMaskControl.text))
                     {
                         rtuContext.changesManager().addMaskChange(name, item.subnetMaskControl.text);
                     }
                     else
                     {
-                        errorDialog.message = errorTemplate.arg(qsTr("mask")).arg(name);
+                        errorDialog.message = errorTemplate.arg(qsTr("mask")).arg(interfaceCaption);
                         errorDialog.show();
                         
                         item.subnetMaskControl.forceActiveFocus();
                         return false;
                     }
+
+                    if (!rtuContext.isDiscoverableFromCurrentNetwork(
+                        item.ipAddressControl.text, item.subnetMaskControl.text))
+                    {
+                        warnings.push(("New IP address for \"%1\" is not reachable. Server could be not available after changes applied.")
+                            .arg(interfaceCaption));
+                    }
+
+                    var gatewayDiscoverable = rtuContext.isDiscoverableFromNetwork(
+                        item.ipAddressControl.text, item.subnetMaskControl.text
+                        , item.gatewayControl.text, item.subnetMaskControl.text);
+
+                    if (!wrongGateway && !item.gatewayControl.isEmptyAddress && !gatewayDiscoverable)
+                    {
+                        errorDialog.message = ("Default gateway for \"%1\" is not in the same network as IP. Can't apply changes.")
+                            .arg(interfaceCaption);
+                        errorDialog.show();
+
+                        item.ipAddressControl.forceActiveFocus();
+                        return false;
+                    }
+
                     somethingChanged = true;
                 }
                 
@@ -130,7 +155,7 @@ Base.Column
 
                 if (item.gatewayControl.changed)
                 {
-                    if (!item.gatewayControl.isEmptyAddress && !item.gatewayControl.acceptableInput)
+                    if (wrongGateway)
                     {
                         errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(name);
                         errorDialog.show();

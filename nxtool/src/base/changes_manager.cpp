@@ -18,6 +18,8 @@
 
 namespace
 {
+    enum { kSingleInterfaceChangeCount = 1 };
+
     enum 
     {
         kIfListRequestsPeriod = 2 * 1000
@@ -125,7 +127,15 @@ public:
     
     void serverDiscovered(const rtu::BaseServerInfo &info);
     
+    void serversDisappeared(const IDsVector &ids);
+
+    void unknownAdded(const QString &ip);
+
 private:
+    typedef QHash<QUuid, ItfChangeRequest> ItfChangesContainer;
+
+    void itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it);
+
     void onChangesetApplied(int changesCount);
 
     void sendRequests();
@@ -153,7 +163,6 @@ private:
         , AffectedEntities affected);
     
 private:
-    typedef QHash<QUuid, ItfChangeRequest> ItfChangesContainer;
     typedef QScopedPointer<Changeset> ChangesetPointer;
     typedef QVector<rtu::ServerInfo> ServerInfoValueContainer;
     
@@ -423,6 +432,82 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
         , request.info->extraInfo().password, successful, failed, kIfListRequestsPeriod);
 }
 
+void rtu::ChangesManager::Impl::serversDisappeared(const rtu::IDsVector &ids)
+{
+    for (const QUuid &id: ids)
+    {
+        const auto &it = m_itfChanges.find(id);
+        if (it == m_itfChanges.end())
+            continue;
+
+        ItfChangeRequest &request = it.value();
+    
+        /// TODO: extend logic for several interface changes
+        if (request.itfUpdateInfo.size() != kSingleInterfaceChangeCount)
+            continue;
+
+
+        bool isDHCPTurnOnChange = true;
+        for (const auto &change: request.itfUpdateInfo)
+        {
+            isDHCPTurnOnChange &= (change.useDHCP && *change.useDHCP);
+        }
+    
+        if (!isDHCPTurnOnChange)
+            continue;
+
+        //// If server is disappeared and all changes are dhcp "on"
+        itfRequestSuccessfullyApplied(it);
+    }
+}
+
+void rtu::ChangesManager::Impl::unknownAdded(const QString &ip)
+{
+    /// Searches for the change request
+    const auto &it = std::find_if(m_itfChanges.begin(), m_itfChanges.end()
+        , [ip](const ItfChangeRequest &request)
+    {
+        /// TODO: extend logic for several interface changes
+        if (request.itfUpdateInfo.size() != kSingleInterfaceChangeCount)
+            return false;
+
+        const auto &it = std::find_if(request.itfUpdateInfo.begin(), request.itfUpdateInfo.end()
+            , [ip](const ItfUpdateInfo &updateInfo) 
+        {
+            return ((!updateInfo.useDHCP || !*updateInfo.useDHCP) && updateInfo.ip && *updateInfo.ip == ip);
+        });
+
+        return (it != request.itfUpdateInfo.end());
+    });
+
+    /// Currently, it is supposed to be only one-interface-change action
+    if ((it == m_itfChanges.end()) 
+        || m_context->isDiscoverableFromCurrentNetwork(ip, *it->itfUpdateInfo.front().mask))
+    {
+        return;
+    }
+
+    /// We've found change request with dhcp "off" state, ip that is 
+    /// equals to ip of found unknown entity and ip is from another network.
+    /// So, we suppose that request to change ip is successfully aplied
+
+    itfRequestSuccessfullyApplied(it);
+}
+
+void rtu::ChangesManager::Impl::itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it)
+{
+    const ItfChangeRequest &request = *it;
+    for(const auto &change: request.itfUpdateInfo)
+    {
+        static const QString kSuccessfulReason = QString();
+        addUpdateInfoSummaryItem(*request.info
+            , kSuccessfulReason, change, kAllEntitiesAffected);
+    }
+
+    const int changesCount = request.changesCount;
+    m_itfChanges.erase(it);
+    onChangesetApplied(changesCount);
+}
 
 Changeset &rtu::ChangesManager::Impl::getChangeset()
 {
@@ -893,4 +978,14 @@ int rtu::ChangesManager::appliedChangesCount() const
 void rtu::ChangesManager::serverDiscovered(const rtu::BaseServerInfo &info)
 {
     m_impl->serverDiscovered(info);
+}
+
+void rtu::ChangesManager::serversDisappeared(const IDsVector &ids)
+{
+    m_impl->serversDisappeared(ids);
+}
+
+void rtu::ChangesManager::unknownAdded(const QString &ip)
+{
+    m_impl->unknownAdded(ip);
 }

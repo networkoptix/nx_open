@@ -604,24 +604,22 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
 
-    QStringList urls;
-    QStringList manufacturers;
+    QnManualCameraSearchCameraList camerasToAdd;
     int rowCount = ui->camerasTable->rowCount();
     for (int row = 0; row < rowCount; ++row) {
         if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() != Qt::Checked)
             continue;
 
         QnManualCameraSearchSingleCamera info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualCameraSearchSingleCamera>();
-        urls.append(info.url);
-        manufacturers.append(info.manufacturer);
+        camerasToAdd << info;
     }
-    if (urls.empty()){
+    if (camerasToAdd.empty()){
         QMessageBox::information(this, tr("No cameras selected"), tr("Please select at least one camera"));
         return;
     }
 
     QnConnectionRequestResult result;
-    m_server->apiConnection()->addCameraAsync(urls, manufacturers, username, password, &result, SLOT(processReply(int, const QVariant &, int)));
+    m_server->apiConnection()->addCameraAsync(camerasToAdd, username, password, &result, SLOT(processReply(int, const QVariant &, int)));
     setState(Adding);
 
     QEventLoop loop;
@@ -639,7 +637,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
             QMessageBox::information(
                 this,
                 tr("Success"),
-                tr("%n cameras added successfully.", "", urls.size()) + L'\n' + tr("It might take a few moments to populate them in the tree."),
+                tr("%n cameras added successfully.", "", camerasToAdd.size()) + L'\n' + tr("It might take a few moments to populate them in the tree."),
                 QMessageBox::Ok
             );
         } else {
@@ -647,7 +645,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
                 setState(CamerasOffline);
                 return;
             }
-            QMessageBox::critical(this, tr("Error"), tr("Error while adding %n cameras.", "", urls.size()));
+            QMessageBox::critical(this, tr("Error"), tr("Error while adding %n cameras.", "", camerasToAdd.size()));
         }
     }
     setState(CamerasFound);

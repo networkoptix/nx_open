@@ -107,7 +107,7 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
         if (!data.canConvert<QnAuditRecord*>())
             return base_type::sizeHint(option, index);
         QnAuditRecord* record = data.value<QnAuditRecord*>();
-        if (record->isPlaybackType() || record->eventType == Qn::AR_CameraUpdate)
+        if (record->isPlaybackType() || record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
         {
             bool showDetail = QnAuditLogModel::hasDetail(record);
             if (showDetail || m_widthHint == -1) {
@@ -458,7 +458,7 @@ void QnAuditLogDialog::at_selectAllCheckboxChanged()
 void QnAuditLogDialog::at_currentTabChanged()
 {
     bool allEnabled = (ui->tabWidget->currentIndex() == SessionTab);
-    const Qn::AuditRecordTypes camerasTypes = Qn::AR_ViewLive | Qn::AR_ViewArchive | Qn::AR_ExportVideo | Qn::AR_CameraUpdate | Qn::AR_CameraRemove;
+    const Qn::AuditRecordTypes camerasTypes = Qn::AR_ViewLive | Qn::AR_ViewArchive | Qn::AR_ExportVideo | Qn::AR_CameraUpdate | Qn::AR_CameraInsert | Qn::AR_CameraRemove;
 
     for(QCheckBox* checkBox: m_filterCheckboxes) {
         Qn::AuditRecordTypes eventTypes = (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
@@ -551,7 +551,7 @@ void QnAuditLogDialog::at_updateCheckboxes()
     setupFilterCheckbox(ui->checkBoxLive, colors.watchingLive, Qn::AR_ViewLive);
     setupFilterCheckbox(ui->checkBoxArchive, colors.watchingArchive, Qn::AR_ViewArchive);
     setupFilterCheckbox(ui->checkBoxExport, colors.exportVideo, Qn::AR_ExportVideo);
-    setupFilterCheckbox(ui->checkBoxCameras, colors.updCamera, Qn::AR_CameraUpdate | Qn::AR_CameraRemove);
+    setupFilterCheckbox(ui->checkBoxCameras, colors.updCamera, Qn::AR_CameraUpdate | Qn::AR_CameraRemove | Qn::AR_CameraInsert);
     setupFilterCheckbox(ui->checkBoxSystem, colors.systemActions, Qn::AR_SystemNameChanged | Qn::AR_SystemmMerge | Qn::AR_SettingsChange | Qn::AR_DatabaseRestore);
     setupFilterCheckbox(ui->checkBoxServers, colors.updServer, Qn::AR_ServerUpdate | Qn::AR_ServerRemove);
     setupFilterCheckbox(ui->checkBoxBRules, colors.eventRules, Qn::AR_BEventUpdate | Qn::AR_BEventRemove | Qn::AR_BEventReset);
@@ -958,7 +958,7 @@ void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
         triggerAction(record, Qn::UserSettingsAction,   tr("user(s)"));
     else if (record->eventType == Qn::AR_ServerUpdate)
         triggerAction(record, Qn::ServerSettingsAction, tr("server(s)"));
-    else if (record->eventType == Qn::AR_CameraUpdate)
+    else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
         triggerAction(record, Qn::CameraSettingsAction,   tr("camera(s)"));
 
     if (isMaximized())
@@ -1068,7 +1068,7 @@ void QnAuditLogDialog::makeCameraData()
     QMap<QnUuid, int> activityPerCamera;
     for (const QnAuditRecord& record: m_allData)
     {
-        if (record.isPlaybackType() || record.eventType == Qn::AR_CameraUpdate) {
+        if (record.isPlaybackType() || record.isCameraType()) {
             for (const QnUuid& cameraId: record.resources)
                 activityPerCamera[cameraId]++;
         }
