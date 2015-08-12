@@ -12,7 +12,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         // TODO: detect better resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
         var nativeResolutions = ['Auto', 'hi', 'lo'];
-        var reloadInterval = 30*1000;//30 seconds
+        var reloadInterval = 5*1000;//30 seconds
         var quickReloadInterval = 3*1000;// 3 seconds if something was wrong
         var mimeTypes = {
             'hls': 'application/x-mpegURL',
@@ -113,6 +113,14 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
             return _.find($scope.mediaServers, function (server) {
                 return server.id === id;
+            });
+        }
+        function getCamera(id){
+            if(!$scope.allcameras) {
+                return null;
+            }
+            return _.find($scope.allcameras, function (camera) {
+                return camera.id === id;
             });
         }
 
@@ -255,30 +263,46 @@ angular.module('webadminApp').controller('ViewCtrl',
             url = url.split('/')[2] || url.split('/')[0];
             return url.split(':')[0].split('?')[0];
         }
+        function objectOrderName(object){
+            var num = 0;
+            if(object.url) {
+                var addrArray = object.url.split('.');
+                for (var i = 0; i < addrArray.length; i++) {
+                    var power = 3 - i;
+                    num += ((parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
+                }
+                if (isNaN(num)) {
+                    num = object.url;
+                } else {
+                    num = num.toString(16);
+                    if (num.length < 8) {
+                        num = '0' + num;
+                    }
+                }
+            }
 
+            return object.name + '__' + num;
+        }
         function getCameras() {
 
             var deferred = $q.defer();
 
             mediaserver.getCameras().then(function (data) {
                 var cameras = data.data;
-
-
+                
                 var findMediaStream = function(param){
                     return param.name == "mediaStreams";
                 };
-
-
+                
                 function cameraFilter(camera){
                     // Filter desktop cameras here
-                    if(camera.typeId == desctopCameraTypeId){ // Hide desctop cameras
+                    if(camera.typeId == desktopCameraTypeId){ // Hide desctop cameras
                         return false;
                     }
                     return true;
                 }
 
                 function cameraSorter(camera) {
-
                     camera.url = extractDomain(camera.url);
                     camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
                     camera.server = getServer(camera.parentId);
@@ -289,23 +313,18 @@ angular.module('webadminApp').controller('ViewCtrl',
                     var mediaStreams = _.find(camera.addParams,findMediaStream);
                     camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
 
-                    var num = 0;
-                    var addrArray = camera.url.split('.');
-                    for (var i = 0; i < addrArray.length; i++) {
-                        var power = 3 - i;
-                        num += ((parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
-                    }
-                    if (isNaN(num)) {
-                        num = camera.url;
-                    }else {
-                        num = num.toString(16);
-                        if (num.length < 8) {
-                            num = '0' + num;
-                        }
-                    }
-                    return camera.name + '__' + num;
+                    return objectOrderName(camera);
                 }
 
+                function newCamerasFilter(camera){
+                    var oldCamera = getCamera(camera.Id);
+                    if(!oldCamera){
+                        return true;
+                    }
+
+                    $.extend(oldCamera,camera);
+                    return false;
+                }
                 /*
 
                  // This is for encoders (group cameras):
@@ -350,9 +369,45 @@ angular.module('webadminApp').controller('ViewCtrl',
                 cameras = _.sortBy(cameras, cameraSorter);
 
                 //8. Group by servers
-                $scope.cameras = _.groupBy(cameras, function (camera) {
+                var camerasByServers = _.groupBy(cameras, function (camera) {
                     return camera.parentId;
                 });
+
+                if(!$scope.cameras) {
+                    $scope.cameras = camerasByServers;
+                }else{
+                    for(var serverId in $scope.cameras){
+                        var activeCameras = $scope.cameras[serverId];
+                        var newCameras = camerasByServers[serverId];
+
+                        for(var i = 0; i < activeCameras.length; i++) { // Remove old cameras
+                            if(!_.find(newCameras,function(camera){
+                                    return camera.id == activeCameras[i].id;
+                                }))
+                            {
+                                activeCameras.splice(i, 1);
+                                i--;
+                            }
+                        }
+
+
+
+                        // Merge actual cameras
+                        var newCameras = _.filter(newCameras,newCamerasFilter); //Process old cameras and get new
+
+                        // Add new cameras
+
+                        _.forEach(newCameras,function(camera){ // Add new camera
+                            activeCameras.push(camera);
+                        });
+                    }
+
+                    for(var serverId in camerasByServers){
+                        if(!$scope.cameras[serverId]){
+                            $scope.cameras[serverId] = camerasByServers[serverId];
+                        }
+                    }
+                }
 
                 $scope.allcameras = cameras;
 
@@ -365,16 +420,49 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
         function reloadTree(){
+            function serverSorter(server){
+                server.url = extractDomain(server.url);
+
+                return objectOrderName(server);
+            }
+
+            function newServerFilter(server){
+                var oldserver = getServer(server.id);
+
+                server.collapsed = oldserver? oldserver.collapsed : server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
+
+                if(oldserver){ // refresh old server
+                    $.extend(oldserver,server);
+                }
+
+                return !oldserver;
+            }
 
             var deferred = $q.defer();
 
             mediaserver.getMediaServers().then(function (data) {
-                _.each(data.data, function (server) {
-                    server.url = extractDomain(server.url);
-                    var oldserver = getServer(server.id);
-                    server.collapsed = oldserver? oldserver.collapsed : server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
-                });
-                $scope.mediaServers = data.data;
+
+                if(!$scope.mediaServers) {
+                    $scope.mediaServers = _.sortBy(data.data,serverSorter);
+                }else{
+                    var servers = data.data;
+                    for(var i = 0; i < $scope.mediaServers.length; i++) { // Remove old servers
+                        if(!_.find(servers,function(server){
+                                return server.id == $scope.mediaServers[i].id;
+                            }))
+                        {
+                            $scope.mediaServers.splice(i, 1);
+                            i--;
+                        }
+                    }
+
+
+                    var newServers = _.filter(servers,newServerFilter); // Process all servers - refresh old and find new
+
+                    _.forEach(_.sortBy(newServers,serverSorter),function(server){ // Add new server
+                        $scope.mediaServers.push(server);
+                    });
+                }
 
                 getCameras().then(function(data){
                         deferred.resolve(data);
@@ -402,12 +490,12 @@ angular.module('webadminApp').controller('ViewCtrl',
                 timer = $timeout(reloader, quickReloadInterval);
             });
         }
-        var desctopCameraTypeId = null;
+        var desktopCameraTypeId = null;
         mediaserver.getResourceTypes().then(function(result){
-            desctopCameraTypeId = _.find(result.data,function(type){
+            desktopCameraTypeId = _.find(result.data,function(type){
                 return type.name=='SERVER_DESKTOP_CAMERA';
             });
-            desctopCameraTypeId = desctopCameraTypeId?desctopCameraTypeId.id:null;
+            desktopCameraTypeId = desktopCameraTypeId?desktopCameraTypeId.id:null;
 
             reloader();
         });
