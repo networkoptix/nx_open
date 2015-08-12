@@ -1,6 +1,8 @@
 #include "audit_log_session_model.h"
 
-QnAuditLogMasterModel::QnAuditLogMasterModel(): m_maxActivity(0)
+QnAuditLogMasterModel::QnAuditLogMasterModel(QObject *parent): 
+    QnAuditLogModel(parent), 
+    m_maxActivity(0)
 {
 
 }

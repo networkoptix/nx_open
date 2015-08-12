@@ -15,6 +15,8 @@ class QnAuditManager: public QObject
     Q_OBJECT
 public:
 
+    static const int MIN_PLAYBACK_TIME_TO_LOG = 1000 * 5;
+
     QnAuditManager();
 
     static QnAuditManager* instance();
@@ -24,7 +26,7 @@ public:
     /* notify new playback was started from position timestamp
     *  return internal ID of started session
     */
-    int notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& id, qint64 timestampUsec, bool isExport);
+    int notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& id, qint64 timestampUsec, bool isExport = false);
     void notifyPlaybackFinished(int internalId);
     void notifyPlaybackInProgress(int internalId, qint64 timestampUsec);
     void notifySettingsChanged(const QnAuthSession& authInfo, const QString& paramName);

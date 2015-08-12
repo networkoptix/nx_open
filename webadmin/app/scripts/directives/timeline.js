@@ -14,7 +14,7 @@ angular.module('webadminApp')
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
-                    initialInterval: 1000*60*60*24*365 /* *24*365*/, // no records - show small interval
+                    initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
                     stickToLiveMs: 1000, // Value to stick viewpoert to Live - 1 second
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
                     minMsPerPixel: 1, // Minimum level for zooming:
@@ -734,6 +734,11 @@ angular.module('webadminApp')
                     }else{
                         if(mouseInScrollbar || catchScrollBar){
                             mouseInScrollbar = mouseCoordinate - startCoordinate;
+                            mouseInTimeline = false;
+                        }else{
+                            if(mouseInTimeline){
+                                mouseInTimeline = mouseCoordinate;
+                            }
                         }
                         if(mouseInScrollbarRow){
                             mouseInScrollbarRow = mouseCoordinate - startCoordinate;
@@ -819,8 +824,10 @@ angular.module('webadminApp')
                 var mouseRow = 0;
                 var mouseInScrollbar = false;
                 var mouseInEvents = false;
+                var mouseInTimeline = false;
                 var mouseInScrollbarRow = false;
                 var catchScrollBar = false;
+                var catchTimeline = false;
 
                 function updateMouseCoordinate( event){
                     if(!event){
@@ -828,19 +835,17 @@ angular.module('webadminApp')
                         mouseCoordinate = null;
                         mouseInScrollbar = false;
                         mouseInScrollbarRow = false;
-                        catchScrollBar = false;
                         mouseInEvents = false;
+                        mouseInTimeline = false;
                         return;
                     }
 
                     if($(event.target).is("canvas")){
                         mouseCoordinate = event.offsetX;
                     }else{
-                        console.warn ("unexpected node");
-                        return; //Something strange - ignore it
+                        mouseCoordinate = event.pageX - $(canvas).offset().left;
                     }
                     mouseRow = event.offsetY;
-
 
                     drawOrCheckScrollBar();
                     drawOrCheckEvents();
@@ -909,25 +914,28 @@ angular.module('webadminApp')
 
 
                 scope.mouseUp = function(event){
-                    updateMouseCoordinate(event);
-                    catchScrollBar = false;
-                    console.log("set timer for dblclick here");
-                    console.log("move playing position");
+                    //updateMouseCoordinate(event);
+                    //TODO: "set timer for dblclick here";
+                    //TODO: "move playing position";
                 };
                 scope.mouseLeave = function(event){
-                    updateMouseCoordinate(null);
+                    //updateMouseCoordinate(null);
                 };
                 scope.mouseMove = function(event){
                     updateMouseCoordinate(event);
-                    if(catchScrollBar){
+                    /*if(catchScrollBar){
                         var moveScroll = mouseInScrollbar - catchScrollBar;
                         scope.scaleManager.scroll( scope.scaleManager.scroll() + moveScroll / scope.viewportWidth );
-                    }
+                    }*/
                 };
                 scope.mouseDown = function(event){
-                    updateMouseCoordinate(event);
-                    catchScrollBar = mouseInScrollbar;
+                    // updateMouseCoordinate(event);
+                    // catchScrollBar = mouseInScrollbar;
                 };
+
+
+
+
 
                 // !!! Scrolling functions
 
@@ -1063,6 +1071,35 @@ angular.module('webadminApp')
 
                 // !!! Subscribe for different events which affect timeline
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
+                $(canvas).drag("draginit",function(event){
+                    updateMouseCoordinate(event);
+                    catchScrollBar = mouseInScrollbar;
+                    catchTimeline = mouseInTimeline;
+                });
+                $(canvas).drag("dragstart",function(event,dd){
+                    //updateMouseCoordinate(event);
+                    //catchScrollBar = mouseInScrollbar;
+                });
+                $(canvas).drag("drag",function(event){
+                    updateMouseCoordinate(event);
+
+                    if(catchScrollBar) {
+                        var moveScroll = mouseInScrollbar - catchScrollBar;
+                        scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
+                    }
+                    if(catchTimeline) {
+                        var moveScroll = catchTimeline - mouseInTimeline;
+                        catchTimeline = mouseInTimeline;
+                        scope.scaleManager.scrollByPixels(moveScroll);
+                    }
+                });
+                $(canvas).drag("dragend",function(event,dd){
+                    catchScrollBar = false;
+                    catchTimeline = false;
+                });
+
+
+
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here

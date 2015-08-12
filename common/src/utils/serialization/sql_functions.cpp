@@ -27,15 +27,18 @@ void deserialize_field(const QVariant &value, std::vector<QnUuid> *target)
 
 void serialize_field(const QnAuthSession&authData, QVariant *target) 
 {
-    // todo: need to add encode/decode in a future version. DELIMITER is reserved symbol so far
+    auto encoded = [](QByteArray value) { 
+        return value.replace(DELIMITER, char('_')); 
+    };
+
     QByteArray result;
     result.append(authData.id.toByteArray());
     result.append(DELIMITER);
-    result.append(authData.userName.toUtf8());
+    result.append(encoded(authData.userName.toUtf8()));
     result.append(DELIMITER);
-    result.append(authData.userHost.toUtf8());
+    result.append(encoded(authData.userHost.toUtf8()));
     result.append(DELIMITER);
-    result.append(authData.userAgent.toUtf8());
+    result.append(encoded(authData.userAgent.toUtf8()));
     serialize_field(result, target);
 }
 

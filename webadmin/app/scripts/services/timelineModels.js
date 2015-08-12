@@ -45,7 +45,7 @@ Interval.prototype.addToDate = function(date, count){
         date = new Date(date);
     }
     if(!isDate(date)){
-        console.error("non date " + (typeof date) + ": " + date , Number.isInteger(date) , ((date ^ 0) === date) , (date ^ 0));
+        console.error("non date " + (typeof date) + ": " + date );
         return date;
     }
     if(typeof(count)==='undefined') {
@@ -60,7 +60,7 @@ Interval.prototype.addToDate = function(date, count){
                 date.getSeconds() + count * this.seconds,
                 date.getMilliseconds() + count * this.milliseconds);
     }catch(error){
-        console.log(date);
+        console.error("date problem" , date);
         throw error;
     }
 };
@@ -335,16 +335,21 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
                 var chunks = data.data.reply;
                 if(chunks.length == 0){
-                    console.log("no chunks for this camera");
+                    //console.log("no chunks for this camera");
                 }
 
+                _.forEach(chunks,function(chunk){
+                    chunk.durationMs = parseInt(chunk.durationMs);
+                    chunk.startTimeMs = parseInt(chunk.startTimeMs);
+                });
+
                 for (var i = 0; i < chunks.length; i++) {
-                    var endChunk = parseInt(chunks[i].startTimeMs) + parseInt(chunks[i].durationMs);
+                    var endChunk = chunks[i].startTimeMs + chunks[i].durationMs;
                     if (chunks[i].durationMs < 0) {
                         endChunk = (new Date()).getTime() + 100000;// some date in future
                     }
-                    var addchunk = new Chunk(null, parseInt(chunks[i].startTimeMs), endChunk, level);
-                    self.addChunk(addchunk,null);
+                    var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
+                    self.addChunk(addchunk, null);
                 }
 
                 deferred.resolve(self.chunksTree);
@@ -598,7 +603,7 @@ function ShortCache(cameras,mediaserver,$q){
     this.requestInterval = 90 * 1000;//90 seconds to request
     this.updateInterval = 60 * 1000;//every 60 seconds update
     this.requestDetailization = 1;//the deepest detailization possible
-    this.limitChunks = 10; // limit for number of chunks
+    this.limitChunks = 100; // limit for number of chunks
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
 }
 ShortCache.prototype.init = function(start){
@@ -629,17 +634,15 @@ ShortCache.prototype.update = function(requestPosition,position){
     if(this.updating && !requestPosition){ //Do not send request twice
         return;
     }
-    // console.log("update detailization",this.updating, requestPosition);
 
-    requestPosition = requestPosition || this.playedPosition;
+    requestPosition = Math.round(requestPosition) || Math.round(this.playedPosition);
 
     this.updating = true;
     var self = this;
     this.lastRequestDate = requestPosition;
     this.lastRequestPosition = position || this.played;
 
-    // console.log("lastRequestPosition ",position, this.played, new Date(this.lastRequestDate));
-
+    // Get next {{limitChunks}} chunks
     this.mediaserver.getRecords('/',
             this.cameras[0],
             requestPosition,
@@ -649,15 +652,19 @@ ShortCache.prototype.update = function(requestPosition,position){
         then(function(data){
             self.updating = false;
 
-
             var chunks = data.data.reply;
 
+            _.forEach(chunks,function(chunk){
+                chunk.durationMs = parseInt(chunk.durationMs);
+                chunk.startTimeMs = parseInt(chunk.startTimeMs);
+            });
+
             if(chunks.length == 0){
-                console.log("no chunks for this camera and interval");
+                //console.log("no chunks for this camera and interval");
             }
 
-            if(chunks.length > 0 && parseInt(chunks[0].startTimeMs) < requestPosition){ // Crop first chunk.
-                chunks[0].durationMs -= requestPosition - parseInt(chunks[0].startTimeMs);
+            if(chunks.length > 0 && chunks[0].startTimeMs < requestPosition){ // Crop first chunk.
+                chunks[0].durationMs += chunks[0].startTimeMs - requestPosition ;
                 chunks[0].startTimeMs = requestPosition;
             }
             self.currentDetailization = chunks;
@@ -681,12 +688,12 @@ ShortCache.prototype.update = function(requestPosition,position){
 // Check playing date - return videoposition if possible
 ShortCache.prototype.checkPlayingDate = function(positionDate){
     if(positionDate < this.start){ //Check left boundaries
-        console.log("too left!",new Date(positionDate), new Date(this.start), positionDate - this.start);
+        //console.log("too left!",new Date(positionDate), new Date(this.start), positionDate - this.start);
         return false; // Return negative value - outer code should request new videocache
     }
 
     if(positionDate > this.lastPlayedDate ){
-        console.log("too right!",new Date(positionDate), new Date(this.lastPlayedDate), positionDate - this.lastPlayedDate);
+        //console.log("too right!",new Date(positionDate), new Date(this.lastPlayedDate), positionDate - this.lastPlayedDate);
         return false;
     }
 
@@ -701,7 +708,7 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
     }
 
     if(typeof(lastPosition)=='undefined'){// No checkpoints - go to live
-        console.log("no checkpoints found - use the start point!");
+        //console.log("no checkpoints found - use the start point!");
         return positionDate - this.start;
     }
 
@@ -725,8 +732,6 @@ ShortCache.prototype.setPlayingPosition = function(position){
         // lastPosition  is the nearest position in checkpoints
         // Estimate current playing position
         this.playedPosition = lastPosition + position - this.checkPoints[lastPosition];
-
-        console.log("back on timeline");
 
         this.update(this.checkPoints[lastPosition], lastPosition);// Request detailization from that position and to the future - restore track
     }
@@ -752,11 +757,13 @@ ShortCache.prototype.setPlayingPosition = function(position){
     if(!this.liveMode && this.currentDetailization.length>0
         && (this.currentDetailization[this.currentDetailization.length - 1].durationMs
             + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs
-            < this.playedPosition + this.updateInterval)) { // It's time to update
+            < Math.round(this.playedPosition) + this.updateInterval)) { // It's time to update
+        console.log("it's time to update" , this.currentDetailization[this.currentDetailization.length - 1].durationMs
+            + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs ,
+                this.playedPosition + this.updateInterval
+        );
         this.update();
     }
-
-    //console.log("new played position",new Date(this.playedPosition),i,this.currentDetailization.length);
 
     if(position > this.lastPlayedPosition){
         this.lastPlayedPosition = position; // Save the boundaries of uploaded cache

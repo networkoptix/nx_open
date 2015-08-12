@@ -34,6 +34,14 @@
 #include <ui/models/audit/audit_log_session_model.h>
 #include <ui/models/audit/audit_log_detail_model.h>
 #include <QMouseEvent>
+#include "core/resource/layout_resource.h"
+#include "ui/common/geometry.h"
+#include "ui/style/globals.h"
+#include "ui/workbench/workbench_context_aware.h"
+#include <ui/workbench/workbench_display.h>
+#include "ui/workbench/extensions/workbench_stream_synchronizer.h"
+#include <core/resource/user_resource.h>
+#include "core/resource/media_resource.h"
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -288,7 +296,7 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
             QnScopedPainterFontRollback rollback(painter);
             QnScopedPainterPenRollback rollback2(painter);
             painter->setFont(option.font);
-            painter->setPen(option.backgroundBrush.color());
+            painter->setPen(option.palette.foreground().color());
             painter->drawText(option.rect, Qt::AlignLeft | Qt::AlignVCenter, index.data().toString());
         }
         break;
@@ -300,13 +308,24 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
 
 // ---------------------- QnAuditLogDialog ------------------------------
 
-QnAuditRecordRefList QnAuditLogDialog::filterDataByText()
+QnAuditRecordRefList QnAuditLogDialog::applyFilter()
 {
     QnAuditRecordRefList result;
     QStringList keywords = ui->filterLineEdit->text().split(lit(" "));
 
-    auto filter = [&keywords] (const QnAuditRecord& record) 
+    Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
+    for (const QCheckBox* checkBox: m_filterCheckboxes) 
     {
+        if (!checkBox->isChecked()) 
+            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
+    }
+
+
+    auto filter = [&keywords, &disabledTypes] (const QnAuditRecord& record) 
+    {
+        if (disabledTypes & record.eventType)
+            return false;
+
         bool matched = true;
         QString wholeText = QnAuditLogModel::makeSearchPattern(&record);
         for (const auto& keyword: keywords) {
@@ -332,17 +351,9 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRe
     for (const QnAuditRecord* record: checkedRows) 
         selectedSessions << record->authSession.id;
 
-    Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
-    for (const QCheckBox* checkBox: m_filterCheckboxes) 
-    {
-        if (!checkBox->isChecked()) 
-            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
-    }
-    
-
     QnAuditRecordRefList result;
-    auto filter = [&selectedSessions, &disabledTypes] (const QnAuditRecord* record) {
-        return selectedSessions.contains(record->authSession.id) && !(disabledTypes & record->eventType);
+    auto filter = [&selectedSessions] (const QnAuditRecord* record) {
+        return selectedSessions.contains(record->authSession.id);
     };
     std::copy_if(m_filteredData.begin(), m_filteredData.end(), std::back_inserter(result), filter);
     return result;
@@ -354,19 +365,9 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRec
     for (const QnAuditRecord* record: checkedRows)
         selectedCameras << record->resources[0];
 
-    Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
-    for (const QCheckBox* checkBox: m_filterCheckboxes) 
-    {
-        if (!checkBox->isChecked()) 
-            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
-    }
-
-
     QnAuditRecordRefList result;
-    auto filter = [&selectedCameras, &disabledTypes] (const QnAuditRecord* record) 
+    auto filter = [&selectedCameras] (const QnAuditRecord* record) 
     {
-        if (disabledTypes & record->eventType)
-            return false;
         for (const auto& id: record->resources) {
             if (selectedCameras.contains(id))
                 return true;
@@ -434,7 +435,7 @@ void QnAuditLogDialog::at_typeCheckboxChanged()
     ui->selectAllCheckBox->setCheckState(checkState);
     ui->selectAllCheckBox->blockSignals(false);
 
-    at_updateDetailModel();
+    at_filterChanged();
 };
 
 void QnAuditLogDialog::at_selectAllCheckboxChanged()
@@ -451,12 +452,24 @@ void QnAuditLogDialog::at_selectAllCheckboxChanged()
         checkbox->setChecked(state == Qt::Checked);
         checkbox->blockSignals(false);
     }
-    at_updateDetailModel();
+    at_filterChanged();
 };
+
+void QnAuditLogDialog::at_currentTabChanged()
+{
+    bool allEnabled = (ui->tabWidget->currentIndex() == SessionTab);
+    const Qn::AuditRecordTypes camerasTypes = Qn::AR_ViewLive | Qn::AR_ViewArchive | Qn::AR_ExportVideo | Qn::AR_CameraUpdate | Qn::AR_CameraRemove;
+
+    for(QCheckBox* checkBox: m_filterCheckboxes) {
+        Qn::AuditRecordTypes eventTypes = (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
+        checkBox->setEnabled(allEnabled || (camerasTypes & eventTypes));
+    }
+    at_filterChanged();
+}
 
 void QnAuditLogDialog::at_filterChanged()
 {
-    m_filteredData = filterDataByText();
+    m_filteredData = applyFilter();
 
     if (ui->tabWidget->currentIndex() == SessionTab)
     {
@@ -746,7 +759,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
-    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_currentTabChanged);
     /*
     connect(ui->tabWidget, &QTabWidget::currentChanged, 
         this, [this](int index) {
@@ -852,7 +865,64 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     if (period.durationMs > 0)
         params.setArgument(Qn::TimePeriodRole, period);
     
-    context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+
+    /* Construct and add a new layout. */
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    //layout->addFlags(Qn::local);
+    layout->setId(QnUuid::createUuid());
+    layout->setName(tr("Audit log replay"));
+    if(context()->user())
+        layout->setParentId(context()->user()->getId());
+
+    /* Calculate size of the resulting matrix. */
+    qreal desiredItemAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+
+    /* Calculate best size for layout cells. */
+    qreal desiredCellAspectRatio = desiredItemAspectRatio;
+
+    /* Aspect ratio of the screen free space. */
+    QRectF viewportGeometry = display()->boundedViewportGeometry();
+
+    qreal displayAspectRatio = viewportGeometry.isNull()
+        ? desiredItemAspectRatio
+        : QnGeometry::aspectRatio(viewportGeometry);
+
+    if (resList.size() == 1) {
+        if (QnMediaResourcePtr mediaRes = resList[0].dynamicCast<QnMediaResource>()) {
+            qreal customAspectRatio = mediaRes->customAspectRatio();
+            if (!qFuzzyIsNull(customAspectRatio))
+                desiredCellAspectRatio = customAspectRatio;
+        }
+    }
+
+    const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * resList.size() / desiredCellAspectRatio)));
+
+    for(int i = 0; i < resList.size(); i++) 
+    {
+        QnLayoutItemData item;
+        item.uuid = QnUuid::createUuid();
+        item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
+        item.resource.id = resList[i]->getId();
+        item.resource.path = resList[i]->getUniqueId();
+        item.dataByRole[Qn::ItemTimeRole] = period.startTimeMs;
+
+        QString forcedRotation = resList[i]->getProperty(QnMediaResource::rotationKey());
+        if (!forcedRotation.isEmpty()) 
+            item.rotation = forcedRotation.toInt();
+        
+        layout->addItem(item);
+    }
+
+    layout->setData(Qn::LayoutTimeLabelsRole, true);
+    //layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
+    layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
+    layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
+    layout->setCellAspectRatio(desiredCellAspectRatio);
+    layout->setLocalRange(period);
+
+    resourcePool()->addResource(layout);
+    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+
 }
 
 void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId, const QString& objectName)

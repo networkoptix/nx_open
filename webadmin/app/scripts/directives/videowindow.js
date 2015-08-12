@@ -32,7 +32,6 @@ angular.module('webadminApp')
 
             link: function (scope, element/*, attrs*/) {
 
-
                 var mimeTypes = {
                     'hls': 'application/x-mpegURL',
                     'webm': 'video/webm',
@@ -47,6 +46,9 @@ angular.module('webadminApp')
                 }
 
                 function detectBestFormat(){
+                    scope.flashRequired = false;
+                    scope.noArmSupport = false;
+                    scope.noFormat = false;
                     // return "flashls";
 
                     //This function gets available sources for camera and chooses the best player for this browser
@@ -85,13 +87,17 @@ angular.module('webadminApp')
                     }
 
                     // Hardcode native support
-                    if(window.jscd.os == "Android" && weHaveWebm){
-                        console.warn("hardcoded support for webm on android");
-                        return "webm"; // TODO: Try removing this line.
+                    if(window.jscd.os == "Android" ){
+                        if(weHaveWebm){
+                            return "webm";
+                            // TODO: Try removing this line.
+                        }else {
+                            scope.noArmSupport = true;
+                            return false;
+                        }
                     }
 
                     if(window.jscd.mobile && weHaveHls){
-                        console.warn("hardcoded support for hls on mobile");
                         return "native-hls"; // Only one choice on mobile.
                         // TODO: Try removing this line.
                     }
@@ -113,7 +119,11 @@ angular.module('webadminApp')
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
-
+                            if(weHaveHls) {
+                                scope.flashRequired = true;
+                                return false;
+                            }
+                            scope.noFormat = true;
                             return false; // IE9 - No other supported formats
 
 
@@ -130,16 +140,20 @@ angular.module('webadminApp')
                             if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
                                 return "flashls";
                             }
-                            if(weHaveHls) {
+                            /*if(weHaveHls) {
                                 return "jshls";// We are hoping that we have some good browser
-                            }
-                            if(weHaveRtsp){
+                            }*/
+                            if(weHaveRtsp && window.jscd.flashVersion != '-'){
                                 return "rtsp";
                             }
+                            if(weHaveHls) {
+                                scope.flashRequired = true;
+                                return false;
+                            }
+
+                            scope.noFormat = true;
                             return false; // IE9 - No supported formats
                     }
-
-                    return false; // No supported formats
                 }
 
 
@@ -148,15 +162,11 @@ angular.module('webadminApp')
                 var activePlayer = null;
                 function recyclePlayer(player){
                     if(activePlayer != player) {
-                        element.find("#videowindow").html("");
+                        element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
                     }
                     activePlayer = player;
 
-                }
-
-                function initVideogular() {
-                    scope.videogular = true;
                 }
 
                 // TODO: Create common interface for each player, html5 compatible or something
@@ -164,8 +174,7 @@ angular.module('webadminApp')
                 // TODO: Support new players
 
                 function initNativePlayer(format){
-                    scope.videogular = false;
-                    nativePlayer.init(element.find("#videowindow"), function (api) {
+                    nativePlayer.init(element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
@@ -174,17 +183,20 @@ angular.module('webadminApp')
                             scope.vgApi.addEventListener("timeupdate",function(event,arg2,arg3){
                                 //console.log("timeupdate",event,arg2,arg3,scope.vgApi, scope.vgApi.currentTime);
                                 scope.vgUpdateTime({$currentTime:event.srcElement.currentTime, $duration: event.srcElement.duration});
+                                if(scope.loading) {
+                                    scope.loading = false;
+                                    scope.$digest();
+                                }
                             });
                         }
 
                         scope.vgPlayerReady({$API:scope.vgApi});
                     }, function (api) {
-                        console.alert("some error");
+                        console.error("some error");
                     });
                 }
 
                 function initFlashls() {
-                    scope.videogular = false;
                     scope.flashls = true;
                     scope.flashSource = "components/flashlsChromeless.swf";
                     scope.flashParam = flashlsAPI.flashParams();
@@ -199,8 +211,10 @@ angular.module('webadminApp')
 
                             scope.vgPlayerReady({$API: api});
                         }, function (api) {
-                            console.alert("some error");
+                            console.error("some error");
                         }, function (position, duration) {
+
+                            scope.loading = false;
                             scope.vgUpdateTime({$currentTime: position, $duration: duration});
                         });
                     }else{
@@ -209,9 +223,7 @@ angular.module('webadminApp')
                 }
 
                 function initJsHls(){
-                    scope.videogular = false;
-
-                    jshlsAPI.init( element.find("#videowindow"), function (api) {
+                    jshlsAPI.init( element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
@@ -220,13 +232,12 @@ angular.module('webadminApp')
 
                         scope.vgPlayerReady({$API:api});
                     }, function (api) {
-                        console.alert("some error");
+                        console.error("some error");
                     });
 
                 }
 
                 function initRtsp(){
-                    scope.videogular = false;
                     var locomote = new Locomote('videowindow', /*'bower_components/locomote/dist/Player.swf'/**/'components/Player.swf'/**/);
                     locomote.on('apiReady', function() {
                         scope.vgApi = locomote;
@@ -241,16 +252,16 @@ angular.module('webadminApp')
 
                         /* Start listening for streamStarted event */
                         locomote.on('streamStarted', function() {
-                            console.log('stream has started');
+                            //console.log('stream has started');
                         });
 
                         /* If any error occurs, we should take action */
                         locomote.on('error', function(err) {
-                            console.log(err);
+                            console.error(err);
                         });
 
                         if (scope.vgSrc) {
-                            console.log('play',scope.vgSrc[2].src);
+                            //console.log('play',scope.vgSrc[2].src);
                             scope.vgApi.play(scope.vgSrc[2].src);
                         }
 
@@ -258,11 +269,13 @@ angular.module('webadminApp')
                     });
                 }
 
+                element.bind('contextmenu',function() { return false; }); // Kill context menu
 
 
                 scope.$watch("vgSrc",function(){
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         var format = detectBestFormat();
+                        scope.loading = !!format;
                         recyclePlayer(format);// Remove old player. TODO: recycle it later
 
                         switch(format){

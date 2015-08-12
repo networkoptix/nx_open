@@ -19,6 +19,7 @@ public:
     QString modification;
 
     static QnSystemInformation currentSystemInformation();
+    static QString currentSystemRuntime();
 };
 #define QnSystemInformation_Fields (arch)(platform)(modification)
 

@@ -17,7 +17,6 @@ angular.module('webadminApp')
                     if(pair[1] == 'demo'){
                         proxy = Config.demo;
                     }
-
                     break;
                 }
             }
@@ -32,13 +31,9 @@ angular.module('webadminApp')
         var offlineDialog = null;
         var loginDialog = null;
         function offlineHandler(error){
-
             // Check 401 against offline
-
             if(error.status === 401) {
-
                 var isInFrame = window.self !== window.top; // If we are in frame - do not show dialog
-
                 if (!isInFrame && loginDialog === null) { //Dialog is not displayed
                     loginDialog = $modal.open({
                         templateUrl: 'views/login.html',
@@ -56,10 +51,6 @@ angular.module('webadminApp')
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
                 getSettings(true).catch(function (error) {
-                    console.warn ("remove hack here!!!");
-                    return;
-
-                    $log.error(error);// if server can't handle moduleInformation - it's offline - show dialog alike restart
                     offlineDialog = $modal.open({
                         templateUrl: 'offline_modal',
                         controller: 'OfflineCtrl',
