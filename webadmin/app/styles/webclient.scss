@@ -116,7 +116,6 @@ table.webclient-window>tbody>tr>td.alert{
 
 /* Special hack for loading invisible flash objects */
 .invisible{
-  width: 0 !important;
   height: 0 !important;
   overflow: hidden;
 }
@@ -151,11 +150,11 @@ table.webclient-window>tbody>tr>td.alert{
 
 .webclient-panel>div.text-left,
 .webclient-panel>div.text-right{
-  width:30%;
+  width:40%;
   display:inline-block;
 }
 .webclient-panel>div.text-center{
-  width:40%;
+  width:20%;
   display:inline-block;
 }
 
