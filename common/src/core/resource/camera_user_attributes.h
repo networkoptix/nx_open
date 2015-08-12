@@ -29,6 +29,7 @@ public:
     QList<QnMotionRegion> motionRegions;
     bool scheduleDisabled;
     bool audioEnabled;
+    bool licenseUsed;
     bool cameraControlDisabled;
     QnScheduleTaskList scheduleTasks;
     Qn::SecondStreamQuality secondaryQuality;

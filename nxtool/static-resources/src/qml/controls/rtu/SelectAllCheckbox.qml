@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.3
 
 import "../base" as Base;
 import "../../common" as Common;
@@ -30,6 +30,9 @@ Item
         Base.CheckBox
         {
             id: selectAllCheckbox;
+
+            activeFocusOnPress: false;
+            activeFocusOnTab: false;
 
             anchors.verticalCenter: parent.verticalCenter;
             Binding

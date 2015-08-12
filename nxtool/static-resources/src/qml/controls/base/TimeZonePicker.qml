@@ -13,7 +13,7 @@ ComboBox
 
     dontUseWheel: true;
 
-    activeFocusOnTab: true;
+    activeFocusOnTab: pseudoEnabled;
     activeFocusOnPress: true;
 
     property bool pseudoEnabled: true;

@@ -25,6 +25,7 @@ TextField
             wasOnceChanged = true;
     }
 
+    activeFocusOnTab: true;
     implicitHeight: Common.SizeManager.clickableSizes.medium;
     implicitWidth: implicitHeight * 4;
 
