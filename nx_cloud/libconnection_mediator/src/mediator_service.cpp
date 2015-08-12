@@ -20,7 +20,6 @@
 #include <utils/network/http/server/server_managers.h>
 
 #include "stun/custom_stun.h"
-#include "http/register_http_handler.h"
 #include "stun/stun_message_dispatcher.h"
 #include "listening_peer_pool.h"
 #include "mediaserver_api.h"
