@@ -39,6 +39,12 @@ angular.module('webadminApp').controller('ViewCtrl',
             };
         });
 
+        console.log("browser:");
+        console.log(window.jscd.browser);
+        console.log(window.jscd);
+        console.log(navigator.appName);
+        console.log(navigator);
+
         if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm')){
             $scope.ieNoWebm = true;
         }
@@ -148,7 +154,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             // TODO: check resolution ? 
             $scope.acitveVideoSource = _.filter([
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?' + positionHls + authParam + '&chunked&' + $scope.activeResolution), type: mimeTypes['hls'], transport:'hls'},
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?' + positionHls + authParam + '&' + $scope.activeResolution), type: mimeTypes['hls'], transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
 
                 // Not supported:

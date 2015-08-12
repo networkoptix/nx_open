@@ -19,6 +19,10 @@
         Your device doesn't support playing video from this camera.<br>
     </div>
 
+    <div class="camera-view-informer" ng-if="edgeNoWebm">
+        Video cannot be played.<br>
+        Please, install <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a> for Internet Explorer.<br>
+    </div>
 
     <div class="camera-view-informer" ng-if="errorLoading">
         Video cannot be played.<br>

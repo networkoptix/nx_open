@@ -108,7 +108,7 @@ angular.module('webadminApp')
                     switch(window.jscd.browser){
                         case 'Microsoft Internet Explorer':
                             // Check version here
-                            if(weHaveWebm )
+                            if(weHaveWebm)
                             {
                                 scope.ieNoWebm = true;
                             }
@@ -124,6 +124,13 @@ angular.module('webadminApp')
                                 scope.flashRequired = true;
                                 return false;
                             }
+
+                            if(weHaveWebm)
+                            {
+                                scope.edgeNoWebm = true;
+                                return false;
+                            }
+
                             scope.noFormat = true;
                             return false; // IE9 - No other supported formats
 
