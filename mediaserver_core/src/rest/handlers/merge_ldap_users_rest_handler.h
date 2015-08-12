@@ -8,19 +8,17 @@
 
 #include <QtCore/QByteArray>
 
-#include "rest/server/request_handler.h"
+#include <rest/server/json_rest_handler.h>
 
 
 class QnMergeLdapUsersRestHandler
 :
-    public QnRestRequestHandler
+    public QnJsonRestHandler
 {
     Q_OBJECT
 
 public:
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, 
-                            QByteArray& contentType, const QnRestConnectionProcessor*) override;
+    int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 };
 
 #endif  // MERGE_LDAP_USERS_REST_HANDLER_H

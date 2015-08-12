@@ -18,6 +18,7 @@
 #include "rebuild_archive_reply.h"
 #include "api_ioport_data.h"
 #include "audit/audit_record.h"
+#include "merge_ldap_users_reply.h"
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\
@@ -27,6 +28,7 @@
     (QnStorageSpaceReply)\
     (QnStorageSpaceData)\
     (QnConnectionInfo)\
+    (QnMergeLdapUsersReply)\
     (QnStorageStatusReply)\
     (QnStatisticsDataItem)\
     (QnStatisticsReply)\

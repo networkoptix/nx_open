@@ -86,11 +86,6 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiMergeLdapUsersData>& , const QByteArray&) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
-            return ErrorCode::notImplemented;
-        }
-
         ErrorCode saveTransaction(const QnTransaction<ApiBusinessActionData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -214,7 +209,6 @@ namespace ec2
         QnUuid transactionHash(const ApiUpdateSequenceData& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiTranSyncDoneData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiLicenseOverflowData& ) const            { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
-        QnUuid transactionHash(const ApiMergeLdapUsersData& ) const            { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiClientInfoData& params) const           { return makeHash(params.id.toRfc4122()); }
         QnUuid transactionHash(const ApiReverseConnectionData& ) const          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
 

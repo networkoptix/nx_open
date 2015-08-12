@@ -35,9 +35,6 @@ namespace ec2
             // nothing to do
         }
 
-        void triggerNotification( const QnTransaction<ApiMergeLdapUsersData>& /*tran*/ ) {
-            // nothing to do
-        }
         /*
         void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
             emit disabledChanged( QnUuid(tran.params.id), tran.params.disabled );

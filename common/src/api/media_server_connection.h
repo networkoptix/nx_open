@@ -178,6 +178,7 @@ public:
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 
     int getTimeAsync(QObject *target, const char *slot);
+    int mergeLdapUsersAsync(QObject *target, const char *slot);
 
     //!Requests name of system, mediaserver is currently connected to
     /*!

@@ -12,26 +12,25 @@
 #include <core/resource/user_resource.h>
 #include <ldap/ldap_manager.h>
 #include "api/app_server_connection.h"
+#include "api/model/merge_ldap_users_reply.h"
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 }
 
-int QnMergeLdapUsersRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& /* result */, QByteArray& /* contentType */, const QnRestConnectionProcessor*)
+int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
-    return nx_http::StatusCode::forbidden;
-}
+    QnMergeLdapUsersReply reply;
 
-int QnMergeLdapUsersRestHandler::executePost(const QString& /*path*/, const QnRequestParamList& /*params*/, 
-                                            const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType */, QByteArray& result, QByteArray& contentType
-                                            , const QnRestConnectionProcessor*)
-{
     QnLdapManager *ldapManager = QnLdapManager::instance();
     QnLdapUsers ldapUsers;
     try {
         ldapUsers = ldapManager->fetchUsers();
     } catch (const QnLdapException&) {
-        return nx_http::StatusCode::internalServerError;
+        reply.errorCode = 1;
+        reply.errorMessage = "Can't authenticate";
+        result.setReply(reply);
+        return nx_http::StatusCode::ok;
     }
 
     ec2::AbstractUserManagerPtr userManager = ec2Connection()->getUserManager();
@@ -76,7 +75,6 @@ int QnMergeLdapUsersRestHandler::executePost(const QString& /*path*/, const QnRe
         }
     }
 
-    result = "OK";
-    contentType = "application/text";
+    result.setReply(result);
     return nx_http::StatusCode::ok;
 }

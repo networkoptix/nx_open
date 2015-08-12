@@ -6,7 +6,6 @@
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/api_user_data.h"
-#include "nx_ec/data/api_merge_ldap_users_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 
 
@@ -49,7 +48,6 @@ namespace ec2
         virtual int getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler ) override;
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
-        virtual int mergeLdapUsers( impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;

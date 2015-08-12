@@ -40,6 +40,7 @@
 #include "http/custom_headers.h"
 #include "model/recording_stats_reply.h"
 #include "common/common_module.h"
+#include "model/merge_ldap_users_reply.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -94,6 +95,7 @@ namespace {
         (TestEmailSettingsObject,  "testEmailSettings")
         (TestLdapSettingsObject,   "testLdapSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
+        (MergeLdapUsersObject,     "mergeLdapUsers")
     );
 #if 0
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -302,6 +304,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
+        break;
+    case MergeLdapUsersObject:
+        processJsonReply<QnMergeLdapUsersReply>(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -682,6 +687,10 @@ int QnMediaServerConnection::ptzGetDataAsync(const QnNetworkResourcePtr &camera,
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QnTimeReply), target, slot);
+}
+
+int QnMediaServerConnection::mergeLdapUsersAsync(QObject *target, const char *slot) {
+    return sendAsyncGetRequest(MergeLdapUsersObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QnMergeLdapUsersReply), target, slot);
 }
 
 int QnMediaServerConnection::getSystemNameAsync( QObject* target, const char* slot )

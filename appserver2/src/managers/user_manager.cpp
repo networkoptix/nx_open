@@ -96,19 +96,6 @@ namespace ec2
     }
 
     template<class T>
-    int QnUserManager<T>::mergeLdapUsers( impl::SimpleHandlerPtr handler )
-    {
-        const int reqId = generateRequestID();
-        QnTransaction<ApiMergeLdapUsersData> transaction(ApiCommand::mergeLdapUsers);
-        transaction.isLocal = true;
-
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
-
-        return reqId;
-    }
-
-    template<class T>
     QnTransaction<ApiUserData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
     {
         QnTransaction<ApiUserData> tran(command);

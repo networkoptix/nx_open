@@ -1406,7 +1406,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
     QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
-    QnRestProcessorPool::instance()->registerHandler("ec2/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
