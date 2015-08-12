@@ -77,7 +77,7 @@ QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(
 
     if(protocol == lit("smb")) {
         result.protocol = protocol;
-        result.name = tr("Windows Network Shared Resource");
+        result.name = tr("Network Shared Resource");
         result.urlTemplate = tr("\\\\<Computer Name>\\<Folder>");
         result.urlPattern = lit("\\\\\\\\%1\\\\.+").arg(validHostnamePattern);
     } 
@@ -101,19 +101,10 @@ QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(
 
 QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, const QString& password)
 {
-    if (path.indexOf(lit("://")) != -1) {
-        if (!login.isEmpty()) {
-            QUrl url(path);
-            url.setUserName(login);
-            url.setPassword(password);
-            return url.toString();
-        } else {
-            return path;
-        }
-    }
-    
     QString urlString = normalizePath(path);
-    urlString = lit("file://%1").arg(urlString);
+
+    if (urlString.indexOf(lit("://")) == -1)
+        urlString = lit("smb://%1").arg(urlString);
     QUrl url(urlString);
     if (!login.isEmpty())
         url.setUserName(login);

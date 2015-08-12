@@ -74,7 +74,7 @@
                 </td>
                 <td width="100%" >
                     <div class="view-wrapper">
-                        <div class="view-panel">
+                        <div class="view-panel" ng-class="{'live-only':liveOnly}">
                             <div class="stick-to-top">
                                 <div class="webclient-panel webclient-bottom-border hidden-xs">
                                     <div class="pull-right" >
@@ -138,11 +138,13 @@
                                 </videowindow>
                             </div>
 
-                            <div class="stick-to-bottom hidden-xs">
-                                <timeline records-provider="activeVideoRecords"
-                                      position-handler="switchPosition"
-                                      play-handler="switchPlaying"
-                                      position-provider="positionProvider" ></timeline>
+                            <div class="stick-to-bottom hidden-xs" ng-class="{invisible:liveOnly && (!activeCamera || activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}">
+                                <timeline
+                                    live-only="liveOnly"
+                                    records-provider="activeVideoRecords"
+                                    position-handler="switchPosition"
+                                    play-handler="switchPlaying"
+                                    position-provider="positionProvider" ></timeline>
                             </div>
                         </div>
                     </div>

@@ -319,7 +319,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_BEventUpdate:
             return tr("Business rule updated");
         case Qn::AR_EmailSettings:
-            return tr("E-mail updated");
+            return tr("E-mail settings changed");
         case Qn::AR_CameraRemove:
             return tr("Camera removed");
         case Qn::AR_ServerRemove:

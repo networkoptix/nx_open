@@ -147,6 +147,10 @@ angular.module('webadminApp')
             discoveredPeers:function(){return wrapRequest($http.get(proxy + '/api/discoveredPeers?showAddresses=true')); },
             getMediaServer: function(id){return wrapRequest($http.get(proxy + '/ec2/getMediaServersEx?id=' + id.replace('{','').replace('}',''))); },
             getMediaServers: function(){return wrapRequest($http.get(proxy + '/ec2/getMediaServersEx')); },
+            getResourceTypes:function(){return wrapRequest($http.get(proxy + '/ec2/getResourceTypes')); },
+
+            getLayouts:function(){return wrapRequest($http.get(proxy + '/ec2/getLayouts')); },
+
             getCameras:function(id){
                 if(typeof(id)!=='undefined'){
                     return wrapRequest($http.get(proxy + '/ec2/getCamerasEx?id=' + id.replace('{','').replace('}','')));

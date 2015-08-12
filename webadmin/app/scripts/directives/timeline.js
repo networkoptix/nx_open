@@ -8,6 +8,7 @@ angular.module('webadminApp')
                 recordsProvider: '=',
                 positionProvider: '=',
                 playHandler: '=',
+                liveOnly: '=',
                 ngClick: '&',
                 positionHandler: '='
             },
@@ -1103,6 +1104,9 @@ angular.module('webadminApp')
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
+                        scope.recordsProvider.archiveReadyPromise.then(function(hasArchive){
+                            scope.emptyArchive = !hasArchive;
+                        });
                     }
                 });
                 viewport.mousewheel(mouseWheel);
