@@ -38,11 +38,11 @@ var JSLoaderFragment = {
         var t1 = new Date();
         this.binding.flashObject[this.resourceLoadedFlashCallback](res,len);
         var t2 = new Date();
-        //console.log('encoding/toFlash:' + (t1-t0) + '/' + (t2-t1));
-        //console.log('encoding speed/toFlash:' + Math.round(len/(t1-t0)) + 'kB/s/' + Math.round(res.length/(t2-t1)) + 'kB/s');
+        ////console.log('encoding/toFlash:' + (t1-t0) + '/' + (t2-t1));
+        ////console.log('encoding speed/toFlash:' + Math.round(len/(t1-t0)) + 'kB/s/' + Math.round(res.length/(t2-t1)) + 'kB/s');
     },
     xhrTransferFailed : function(oEvent) {
-        //console.log("An error occurred while transferring the file :" + oEvent.target.status);
+        ////console.log("An error occurred while transferring the file :" + oEvent.target.status);
         this.binding.flashObject[this.resourceFailureFlashCallback](res);
     }
 };
@@ -50,7 +50,7 @@ var JSLoaderFragment = {
 var JSLoaderPlaylist = {
 
     requestPlaylist : function(instanceId,url, resourceLoadedFlashCallback, resourceFailureFlashCallback) {
-        //console.log("JSURLLoader.onRequestResource");
+        ////console.log("JSURLLoader.onRequestResource");
         if(!this.flashObject) {
             this.flashObject = getFlashMovieObject(instanceId);
         }
@@ -78,11 +78,11 @@ var JSLoaderPlaylist = {
         }
     },
     xhrReadBytes : function(event) {
-        //console.log("playlist loaded");
+        ////console.log("playlist loaded");
         this.binding.flashObject[this.resourceLoadedFlashCallback](event.currentTarget.responseText);
     },
     xhrTransferFailed : function(oEvent) {
-        //console.log("An error occurred while transferring the file :" + oEvent.target.status);
+        ////console.log("An error occurred while transferring the file :" + oEvent.target.status);
         this.binding.flashObject[this.resourceFailureFlashCallback](res);
     }
 };
@@ -164,7 +164,7 @@ var flashlsAPI = new (function(){
         this.positionHandler = positionHandler;
 
 
-        console.log("flashls init",readyHandler);
+        //console.log("flashls init",readyHandler);
 
         /*swfobject.embedSWF(
             flashParameters.player,
@@ -177,7 +177,7 @@ var flashlsAPI = new (function(){
             flashParameters.params,
             flashParameters.attributes,
             function(){
-                console.log("swf ready");
+                //console.log("swf ready");
             });*/
 
     };
@@ -187,7 +187,7 @@ var flashlsAPI = new (function(){
         if(!url){
             return;
         }
-        console.log("load video",url);
+        //console.log("load video",url);
         try {
             this.flashObject.playerLoad(url);
         }catch(a){
@@ -364,58 +364,19 @@ var flashlsAPI = new (function(){
 var timer = 0;
 flashlsAPI.flashlsEvents = {
     ready: function(flashTime) {
-        //flashPingDate = flashTime;
-        //jsPingDate = new Date();
-        document.getElementById('mediaInfo').rows[Y_LOW_BUFFER].cells[X_LOW_BUFFER].innerHTML = api.getLowBufferLength().toFixed(2);
-        document.getElementById('mediaInfo').rows[Y_MIN_BUFFER].cells[X_MIN_BUFFER].innerHTML = api.getMinBufferLength().toFixed(2);
-        document.getElementById('mediaInfo').rows[Y_MAX_BUFFER].cells[X_MAX_BUFFER].innerHTML = api.getMaxBufferLength().toFixed(2);
-
-        //this.flashObject = this.getFlashMovieObject();
-        //this.readyHandler(this);
-
-        //console.log("ready",this);
-        //api = new flashlsAPI(getFlashMovieObject());
+        //console.log("ready",flashTime);
     },
     videoSize: function(width, height) {
-        var event = {time : new Date() - jsLoadDate, type : "resize", name : width + 'x' + height};
-        events.video.push(event);
-        var state = api.getCapLeveltoStage();
-        if(!state) {
-            var ratio = width / height;
-            if (height > window.innerHeight-30) {
-                height = window.innerHeight-30;
-                width = Math.round(height * ratio);
-            }
-            api.flashObject.width = width;
-            api.flashObject.height = height;
-            var canvas = document.getElementById('buffered_c');
-            canvas.width = width;
-        }
+        //console.log("videoSize",width, height);
     },
     complete: function() {
-        appendLog("onComplete(), playback completed");
+        //console.log("onComplete(), playback completed");
     },
     error: function(code, url, message) {
-        appendLog("onError():error code:"+ code + " url:" + url + " message:" + message);
+        //console.log("onError():error code:"+ code + " url:" + url + " message:" + message);
     },
     manifest: function(duration, levels, loadmetrics) {
-        appendLog("manifest loaded, playlist duration:"+ duration.toFixed(2));
-        document.getElementById('mediaInfo').rows[Y_DURATION].cells[X_DURATION].innerHTML =  duration.toFixed(2);
-        showCanvas();
-        updateLevelInfo();
-        api.play(-1);
-        api.volume(10);
-        var event = {
-            type : "manifest",
-            name : "",
-            latency : loadmetrics.loading_begin_time - loadmetrics.loading_request_time,
-            load : loadmetrics.loading_end_time - loadmetrics.loading_begin_time,
-            duration : loadmetrics.loading_end_time - loadmetrics.loading_begin_time,
-            bw : Math.round(loadmetrics.bandwidth/1000)
-        };
-        event.time = loadmetrics.loading_request_time - flashLoadDate;
-        events.load.push(event);
-        refreshCanvas();
+        //console.log("manifest loaded, playlist duration:"+ duration.toFixed(2));
     },
     audioLevelLoaded: function(loadmetrics) {
         var event = {
@@ -429,8 +390,7 @@ flashlsAPI.flashlsEvents = {
             bw : Math.round(loadmetrics.bandwidth/1000)
         };
         event.time = loadmetrics.loading_request_time - flashLoadDate;
-        events.load.push(event);
-        refreshCanvas();
+        //console.log("audioLevelLoaded",event.time);
     },
     levelLoaded: function(loadmetrics) {
         var event = {
@@ -444,8 +404,8 @@ flashlsAPI.flashlsEvents = {
             bw : Math.round(loadmetrics.bandwidth/1000)
         };
         event.time = loadmetrics.loading_request_time - flashLoadDate;
-        events.load.push(event);
-        refreshCanvas();
+
+        //console.log("levelLoaded",event);
     },
     fragmentLoaded: function(loadmetrics) {
         var event = {
@@ -463,14 +423,12 @@ flashlsAPI.flashlsEvents = {
         } else {
             event.type =  'fragment main'
         }
-        events.load.push(event);
-        document.getElementById("HlsStats").innerHTML = JSON.stringify(api.getStats(),null,"\t");
-        refreshCanvas();
+        //console.log("fragmentLoaded",event);
     },
     fragmentPlaying: function(playmetrics) {
         var event = {time : new Date() - jsLoadDate, type : "playing frag", name : playmetrics.seqnum + '@' + playmetrics.level, duration : playmetrics.duration*1000};
-        events.video.push(event);
-        updateLevelInfo();
+
+        //console.log("fragmentPlaying",event);
     },
     position: function(timemetrics) {
 
@@ -487,7 +445,7 @@ flashlsAPI.flashlsEvents = {
         var sliding = timemetrics.live_sliding_main;
         var buffer = timemetrics.buffer;
 
-        console.log("position changed",
+        //console.log("position changed",
             (((new Date()).getTime() - timer) / 1000 ).toFixed(2),
             backbuffer.toFixed(2),
             position.toFixed(2),
@@ -499,43 +457,32 @@ flashlsAPI.flashlsEvents = {
     },
     state: function(newState) {
         var event = {time : new Date() - jsLoadDate, type : newState.toLowerCase(), name : ''};
-        events.video.push(event);
-        document.getElementById('mediaInfo').rows[Y_STATE].cells[X_STATE].innerHTML =  newState;
+
+        //console.log("state",event);
     },
     seekState: function(newState) {
         var event = {time : new Date() - jsLoadDate, type : newState.toLowerCase(), name : ''};
-        events.video.push(event);
 
-        if(event.type === 'seeking') {
-            //lastSeekingIdx = events.video.length-1;
-        }
-        if(event.type === 'seeked') {
-            events.video[lastSeekingIdx].duration = event.time - events.video[lastSeekingIdx].time;
-        }
+        //console.log("seekState",event);
     },
     switch: function(newLevel) {
         var event = {time : new Date() - jsLoadDate, type : "levelSwitch", name : newLevel.toFixed()};
-        events.video.push(event);
-        document.getElementById('mediaInfo').rows[Y_LOAD_LEVEL].cells[X_LOAD_LEVEL].innerHTML =  newLevel;
+
+        //console.log("switch",event);
     },
     audioTracksListChange: function(trackList) {
-        var d = document.getElementById('audioControl');
-        var html = '';
-        appendLog("new track list");
-        for (var t in trackList) {
-            appendLog("    " + trackList[t].title + " [" + trackList[t].id + "]");
-            html += '<button onclick="api.setAudioTrack(' +t+ ')">' + trackList[t].title + '</button>';
-        }
-        d.innerHTML = html;
+
+        //console.log("audioTracksListChange",trackList);
     },
     audioTrackChange: function(trackId) {
         var event = {time : new Date() - jsLoadDate, type : "audioTrackChange", name : trackId.toFixed()};
-        events.video.push(event);
-        document.getElementById('mediaInfo').rows[Y_AUDIOTRACKID].cells[X_AUDIOTRACKID].innerHTML = trackId;
+
+        //console.log("audioTrackChange",event);
     },
     id3Updated: function(ID3Data) {
         var event = {time : new Date() - jsLoadDate, type : "ID3Data", id3data: atob(ID3Data)};
-        events.video.push(event);
+
+        //console.log("id3Updated",event);
     },
     requestPlaylist: JSLoaderPlaylist.requestPlaylist.bind(JSLoaderPlaylist),
     abortPlaylist: JSLoaderPlaylist.abortPlaylist.bind(JSLoaderPlaylist),
@@ -546,7 +493,7 @@ flashlsAPI.flashlsEvents = {
 
 window.flashlsCallback = function(eventName, args) {
     if(eventName!="position") {
-        console.log("flashlsCallback", eventName, args);
+        //console.log("flashlsCallback", eventName, args);
     }
     flashlsAPI.embedHandler();
     flashlsAPI.flashlsEvents[eventName].apply(null, args);

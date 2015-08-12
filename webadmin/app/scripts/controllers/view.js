@@ -148,8 +148,8 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             // TODO: check resolution ? 
             $scope.acitveVideoSource = _.filter([
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?' + positionHls + authParam + '&' + $scope.activeResolution), type: mimeTypes['hls'], transport:'hls'},
-                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + $scope.activeResolution + positionHls   + authParam ), type: mimeTypes['hls'], transport:'hls'},
+                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution=' + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
 
                 // Not supported:
                 // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: mimeTypes['mjpeg'] , transport:'mjpeg'},
