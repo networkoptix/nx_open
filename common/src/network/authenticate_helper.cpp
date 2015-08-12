@@ -150,7 +150,8 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
             isProxy ? lit( "proxy_auth" ) : QString::fromLatin1(URL_QUERY_AUTH_KEY_NAME) ).toLatin1();
         if( !authQueryParam.isEmpty() )
         {
-            if( authenticateByUrl( authQueryParam, request.requestLine.method, authUserId ) )
+            if( authenticateByUrl( authQueryParam, request.requestLine.method, authUserId, 
+                                   std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1)))
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = AuthMethod::urlQueryParam;
@@ -669,7 +670,8 @@ AuthResult QnAuthHelper::doCookieAuthorization(const QByteArray& method, const Q
         authResult = authenticateByUrl(
             QUrl::fromPercentEncoding(params.value(URL_QUERY_AUTH_KEY_NAME)).toUtf8(),
             method,
-            &userID );
+            &userID,
+            std::bind(&QnAuthHelper::isCookieNonceValid, this, std::placeholders::_1));
         outUserResource = m_users.value( userID );
         if( authUserId )
             *authUserId = userID;
@@ -764,7 +766,8 @@ QByteArray QnAuthHelper::symmetricalEncode(const QByteArray& data)
     return result;
 }
 
-AuthResult QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, const QByteArray& method, QnUuid* authUserId ) const
+AuthResult QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, const QByteArray& method, QnUuid* authUserId,
+                                           std::function<bool(const QByteArray&)> checkNonceFunc) const
 {
     auto authRecord = QByteArray::fromBase64( authRecordBase64 );
     auto authFields = authRecord.split( ':' );
@@ -775,7 +778,7 @@ AuthResult QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, 
     const auto& nonce = authFields[1];
     const auto& authDigest = authFields[2];
 
-    if( !isNonceValid( nonce ) )
+    if( !checkNonceFunc( nonce ) )
         return Auth_WrongDigest;
     
     QMutexLocker lock( &m_mutex );
