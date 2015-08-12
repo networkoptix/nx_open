@@ -679,7 +679,7 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceS
     } else if(m_renderStatus == Qn::NewFrameRendered) {
         return Qn::EmptyOverlay;
     } else if(!hasVideo) {
-        return Qn::NoVideoDataOverlay;
+        return Qn::EmptyOverlay;
     } else if(m_renderStatus == Qn::NothingRendered || m_renderStatus == Qn::CannotRender) {
         return Qn::LoadingOverlay;
     } else if(QDateTime::currentMSecsSinceEpoch() - m_lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) { 
