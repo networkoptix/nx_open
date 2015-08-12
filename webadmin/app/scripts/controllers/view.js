@@ -9,6 +9,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.activeCamera = null;
 
         var isAdmin = false;
+        var canViewLive = false;
+        var canViewArchive = false;
         var availableCameras = null;
 
         $scope.activeResolution = 'Auto';
@@ -186,6 +188,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.selectCameraById = function (cameraId, position, silent) {
 
+            $scope.hasArchive = false;
             $scope.cameraId = cameraId || $scope.cameraId;
             if(position){
                 position = parseInt(position);
@@ -194,10 +197,15 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.activeCamera = _.find($scope.allcameras, function (camera) {
                 return camera.id === $scope.cameraId;
             });
-
             if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
+                if(canViewArchive) {
+                    $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
+                        console.log("hasArchive",hasArchive);
+                        $scope.hasArchive = hasArchive;
+                    });
+                }
 
                 updateVideoSource(position);
                 updateAvailableResolutions();
@@ -514,6 +522,13 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         mediaserver.getCurrentUser().then(function(result){
             isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
+            canViewLive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewLivePermission);
+            canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewArchivePermission);
+
+            if(!canViewLive){
+                return;
+            }
+
             var userId = result.data.reply.id;
 
             if(isAdmin){

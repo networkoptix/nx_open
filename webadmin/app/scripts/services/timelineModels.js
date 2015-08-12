@@ -233,7 +233,10 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width) {
     var self = this;
     //1. request first detailization to get initial bounds
 
+    var archiveReadyDefer = $q.defer();
+    this.archiveReadyPromise = archiveReadyDefer.promise;
     this.requestInterval(0, self.now() + 10000, 0).then(function () {
+        archiveReadyDefer.resolve(!!self.chunksTree);
         if(!self.chunksTree){
             return; //No chunks for this camera
         }
