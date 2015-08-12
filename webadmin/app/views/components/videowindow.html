@@ -19,7 +19,14 @@
         Your device doesn't support playing video from this camera.<br>
     </div>
 
-    <div id="videowindow" ng-if="flashls" ng-hide="loading">
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        Video cannot be played.<br>
+        Some error happened.<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}">
         <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
                 width="100%" height="100%"
                 id="flashvideo"
@@ -29,6 +36,6 @@
         </object>
     </div>
 
-    <div class="videoplayer" ng-if="!flashls" ng-hide="loading">
+    <div class="videoplayer" ng-if="!flashls" ng-class="{'invisible':loading}">
     </div>
 </div>

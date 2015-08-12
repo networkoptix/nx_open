@@ -49,7 +49,8 @@ angular.module('webadminApp')
                     scope.flashRequired = false;
                     scope.noArmSupport = false;
                     scope.noFormat = false;
-                    // return "flashls";
+
+                    //return "flashls";
 
                     //This function gets available sources for camera and chooses the best player for this browser
 
@@ -185,7 +186,7 @@ angular.module('webadminApp')
                                 scope.vgUpdateTime({$currentTime:event.srcElement.currentTime, $duration: event.srcElement.duration});
                                 if(scope.loading) {
                                     scope.loading = false;
-                                    scope.$digest();
+                                    //scope.$digest();
                                 }
                             });
                         }
@@ -210,10 +211,13 @@ angular.module('webadminApp')
                             }
 
                             scope.vgPlayerReady({$API: api});
-                        }, function (api) {
-                            console.error("some error");
+                        }, function (error) {
+                            scope.errorLoading = true;
+                            scope.loading = false;
+                            scope.flashls = false;// Kill flashls!
+                            scope.$digest();
+                            console.error(error);
                         }, function (position, duration) {
-
                             scope.loading = false;
                             scope.vgUpdateTime({$currentTime: position, $duration: duration});
                         });
@@ -273,6 +277,8 @@ angular.module('webadminApp')
 
 
                 scope.$watch("vgSrc",function(){
+
+                    scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         var format = detectBestFormat();
                         scope.loading = !!format;

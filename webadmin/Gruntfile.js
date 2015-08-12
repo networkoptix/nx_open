@@ -45,7 +45,7 @@ module.exports = function (grunt) {
         // Watches files for changes and runs tasks based on the changed files
         watch: {
             js: {
-                files: ['<%= yeoman.app %>/scripts/{,*/}*.js'],
+                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.app %>/components/**'],
                 tasks: ['newer:jshint:all'],
                 options: {
                     livereload: true
@@ -139,6 +139,13 @@ module.exports = function (grunt) {
                 {context: '/hls/',      host: '10.0.2.169', port: 7011},
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
                 {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
+
+                // Andrey
+                /*{context: '/api/',      host: '10.0.2.95', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.95', port: 7001},
+                {context: '/hls/',      host: '10.0.2.95', port: 7001},
+                {context: '/media/',    host: '10.0.2.95', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.95', port: 7001}/**/
 
                 //Roman Vasilenko  port: 7003,7004,7005,2006
                 /*{context: '/api/', host: '10.0.2.244', port: 7002},

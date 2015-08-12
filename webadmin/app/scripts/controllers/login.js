@@ -38,7 +38,6 @@ angular.module('webadminApp')
                 var auth_digest = md5(digest + ':' + nonce + ':' + method);
                 var auth = Base64.encode(lowercaseLogin + ':' + nonce + ':' + auth_digest);
 
-
                 console.log("debug auth - realm:",realm);
                 console.log("debug auth - nonce:",nonce);
                 console.log("debug auth - login:",lowercaseLogin);

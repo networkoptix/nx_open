@@ -109,10 +109,14 @@ table.webclient-window>tbody>tr>td.alert{
 }
 
 
-
+/* Special hack for loading invisible flash objects */
+.videowindow .videoplayer.invisible{
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden;
+}
 
 .videowindow,
-.videowindow #videowindow,
 .videowindow .videoplayer
 {
   width:100%;

@@ -149,7 +149,6 @@ var flashlsAPI = new (function(){
         }
     };
     this.embedHandler = function (e){
-
         if(!this.flashObject) {
             this.flashObject = this.getFlashMovieObject(); //e.ref is a pointer to the <object>
             this.readyHandler(this);
@@ -163,6 +162,9 @@ var flashlsAPI = new (function(){
         this.readyHandler = readyHandler;
         this.errorHandler = errorHandler;
         this.positionHandler = positionHandler;
+
+
+        console.log("flashls init",readyHandler);
 
         /*swfobject.embedSWF(
             flashParameters.player,
@@ -185,12 +187,22 @@ var flashlsAPI = new (function(){
         if(!url){
             return;
         }
-        //console.log("load video",url);
-        this.flashObject.playerLoad(url);
+        console.log("load video",url);
+        try {
+            this.flashObject.playerLoad(url);
+        }catch(a){
+            this.flashObject = null;
+            this.errorHandler(a);
+        }
     };
 
     this.play = function(offset) {
-        this.flashObject.playerPlay(offset);
+        try {
+            this.flashObject.playerPlay(offset);
+        }catch(a){
+            this.flashObject = null;
+            this.errorHandler(a);
+        }
     };
 
     this.pause = function() {
@@ -530,6 +542,9 @@ flashlsAPI.flashlsEvents = {
 
 
 window.flashlsCallback = function(eventName, args) {
+    if(eventName!="position") {
+        console.log("flashlsCallback", eventName, args);
+    }
     flashlsAPI.embedHandler();
     flashlsAPI.flashlsEvents[eventName].apply(null, args);
 };
