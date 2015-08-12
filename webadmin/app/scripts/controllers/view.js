@@ -8,6 +8,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.cameraId = $scope.cameraId || $routeParams.cameraId || null;
         $scope.activeCamera = null;
 
+        var isAdmin = false;
+        var availableCameras = null;
+
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
@@ -299,7 +302,15 @@ angular.module('webadminApp').controller('ViewCtrl',
                     if(camera.typeId == desktopCameraTypeId){ // Hide desctop cameras
                         return false;
                     }
-                    return true;
+
+                    if(isAdmin){
+                        return true;
+                    }
+
+                    if(availableCameras){
+                        return availableCameras.indexOf(camera.id)>=0;
+                    }
+                    return false;
                 }
 
                 function cameraSorter(camera) {
@@ -317,7 +328,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 }
 
                 function newCamerasFilter(camera){
-                    var oldCamera = getCamera(camera.Id);
+                    var oldCamera = getCamera(camera.id);
                     if(!oldCamera){
                         return true;
                     }
@@ -491,15 +502,44 @@ angular.module('webadminApp').controller('ViewCtrl',
             });
         }
         var desktopCameraTypeId = null;
-        mediaserver.getResourceTypes().then(function(result){
-            desktopCameraTypeId = _.find(result.data,function(type){
-                return type.name=='SERVER_DESKTOP_CAMERA';
+        function requestResourses() {
+            mediaserver.getResourceTypes().then(function (result) {
+                desktopCameraTypeId = _.find(result.data, function (type) {
+                    return type.name == 'SERVER_DESKTOP_CAMERA';
+                });
+                desktopCameraTypeId = desktopCameraTypeId ? desktopCameraTypeId.id : null;
+                reloader();
             });
-            desktopCameraTypeId = desktopCameraTypeId?desktopCameraTypeId.id:null;
+        }
 
-            reloader();
+        mediaserver.getCurrentUser().then(function(result){
+            isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
+            var userId = result.data.reply.id;
+
+            if(isAdmin){
+                requestResourses(); //Show  whole tree
+                return;
+            }
+            mediaserver.getLayouts().then(function(data){
+
+                availableCameras = _.chain(data.data).
+                    filter(function(layout){
+                        return layout.parentId == userId;
+                    }).
+                    map(function(layout){
+                        return layout.items;
+                    }).
+                    flatten().
+                    map(function(item){
+                        return item.resourceId;
+                    }).uniq().value();
+
+                requestResourses();
+            });
+
+
+
         });
-
 
         $scope.$on(
             '$destroy',
