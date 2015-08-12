@@ -165,7 +165,7 @@ bool LdapSession::connect()
         return false;
     }
 #elif defined(Q_OS_LINUX)
-    if (ldap_initialize(ld, QSTOCW(uri.toString())) != LDAP_SUCCESS)
+    if (ldap_initialize(&m_ld, QSTOCW(uri.toString())) != LDAP_SUCCESS)
     {
         m_lastError = LdapErrorStr(LdapGetLastError());
         return false;
