@@ -228,6 +228,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
     dst->name = src.cameraName;
     dst->groupName = src.userDefinedGroupName;
     dst->scheduleDisabled = !src.scheduleEnabled;
+    dst->licenseUsed = src.licenseUsed;
     dst->motionType = src.motionType;
 
     QList<QnMotionRegion> regions;
@@ -258,6 +259,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.cameraName = src->name;
     dst.userDefinedGroupName = src->groupName;
     dst.scheduleEnabled = !src->scheduleDisabled;
+    dst.licenseUsed = src->licenseUsed;
     dst.motionType = src->motionType;
 
     QList<QnMotionRegion> regions;

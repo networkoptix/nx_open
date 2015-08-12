@@ -75,6 +75,85 @@
     </message>
 </context>
 <context>
+    <name>AuditLogDialog</name>
+    <message>
+        <source>Event log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>till</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation type="unfinished">Atualizar</translation>
+    </message>
+    <message>
+        <source>User actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watching archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exporting video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watching live</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login/logout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E-mail settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sessions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Detalhes</translation>
+    </message>
+    <message>
+        <source>All Servers are offline.  Audit data are not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BusinessRuleWidget</name>
     <message>
         <source>Event</source>
@@ -418,6 +497,10 @@
         <source>Enable cameras and servers auto discovery</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enable audit trail</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraOutputBusinessActionWidget</name>
@@ -587,6 +670,37 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Testing connection...</source>
         <translation>Testando conexão...</translation>
+    </message>
+</context>
+<context>
+    <name>CustomHorizontalHeader</name>
+    <message>
+        <source>5 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bitrate for the last recorded:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -763,6 +877,14 @@ Short for &quot;seconds&quot;</extracomment>
         <source>System Settings</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Audit trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open audit trail log</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
@@ -817,6 +939,32 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Right edge</source>
         <translation>Borda direita</translation>
+    </message>
+</context>
+<context>
+    <name>IOStateDisplayWidget</name>
+    <message>
+        <source>IO monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ImageControlWidget</name>
+    <message>
+        <source>Image Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force aspect ratio to:</source>
+        <translation type="unfinished">Forçar Formato para:</translation>
+    </message>
+    <message>
+        <source>Default rotation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens camera</source>
+        <translation type="unfinished">Esta é uma lente tipo olho de peixe</translation>
     </message>
 </context>
 <context>
@@ -1006,6 +1154,17 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>LicensesProposeWidget</name>
+    <message>
+        <source>Licensing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Get More Licenses...</source>
+        <translation type="unfinished">Adquirir Licenças...</translation>
+    </message>
+</context>
+<context>
     <name>LoginDialog</name>
     <message>
         <source>&amp;Test</source>
@@ -1139,24 +1298,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Autenticação</translation>
     </message>
     <message>
-        <source>Force aspect ratio to:</source>
-        <translation>Forçar Formato para:</translation>
-    </message>
-    <message>
-        <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use an analog license to view this camera</source>
-        <translation>Utilize uma licença analógica para essa câmera</translation>
-    </message>
-    <message>
         <source>Enable audio</source>
         <translation>Habilitar áudio</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished">Esta é uma lente tipo olho de peixe</translation>
     </message>
     <message>
         <source>Expert</source>
@@ -1165,14 +1308,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Login:</source>
         <translation>Login:</translation>
-    </message>
-    <message>
-        <source>Image Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Licensing</source>
-        <translation>Lincenciamento</translation>
     </message>
     <message>
         <source>Recording</source>
@@ -1185,10 +1320,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>General</source>
         <translation>Geral</translation>
-    </message>
-    <message>
-        <source>Get More Licenses...</source>
-        <translation>Mais Licenças...</translation>
     </message>
 </context>
 <context>
@@ -2526,6 +2657,22 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Ask About Statistics Reporting</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Audit trail...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording statistics...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -2566,6 +2713,230 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Preview</source>
         <translation type="unfinished">Prévia</translation>
+    </message>
+</context>
+<context>
+    <name>QnAuditLogDialog</name>
+    <message>
+        <source>Play this</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Selection to Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Selection to File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">Procura</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished">Informação</translation>
+    </message>
+    <message>
+        <source>No archive data for that position left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This resources already removed from the system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>user(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>server(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export selected records to a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnAuditLogModel</name>
+    <message>
+        <source>%1d </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1h </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1m </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsuccessful login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watching live</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watching archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exporting video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System name changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System merge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General settings updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Business rule updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E-mail updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Business rule removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Business rule reseted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database restored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play this</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">Ajustes</translation>
+    </message>
+    <message>
+        <source>%1 - %2, </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n action(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Session begins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session ends</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Descrição</translation>
+    </message>
+    <message>
+        <source>View it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to expand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Red mark means that an archive is still available</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2684,22 +3055,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Starts/Stops</source>
         <translation>Iniciar/Parar</translation>
-    </message>
-    <message>
-        <source>start</source>
-        <translation>início</translation>
-    </message>
-    <message>
-        <source>stop</source>
-        <translation>pausa</translation>
-    </message>
-    <message>
-        <source>While %1</source>
-        <translation>Enquanto %1</translation>
-    </message>
-    <message>
-        <source>On %1 %2</source>
-        <translation>Em %1 %2</translation>
     </message>
     <message>
         <source>Administrators only</source>
@@ -3966,6 +4321,97 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnIOPortItemDelegate</name>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open circuit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grounded circuit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnIOPortSettingsWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnIOPortsViewModel</name>
+    <message>
+        <source>#</source>
+        <translation type="unfinished">#</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished">Tipo</translation>
+    </message>
+    <message>
+        <source>Default state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">Nome</translation>
+    </message>
+    <message>
+        <source>Pulse time(ms)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnIOStateDisplayWidget</name>
+    <message>
+        <source>IO port error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to %1 IO port &apos;%2&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>turn on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>turn off</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnImageControlWidget</name>
+    <message>
+        <source>4:3</source>
+        <translation type="unfinished">4:3</translation>
+    </message>
+    <message>
+        <source>16:9</source>
+        <translation type="unfinished">16:9</translation>
+    </message>
+    <message>
+        <source>1:1</source>
+        <translation type="unfinished">1:1</translation>
+    </message>
+    <message>
+        <source>%1 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnLayoutExportTool</name>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
@@ -4280,6 +4726,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnLicensesProposeWidget</name>
+    <message numerus="yes">
+        <source>Use analog licenses to view these %n cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Use I/O licenses to enable these %n modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Use licenses for selected cameras and modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use licenses for selected cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnLoginDialog</name>
     <message>
         <source>Connect to Server...</source>
@@ -4580,34 +5051,6 @@ Short for &quot;seconds&quot;</extracomment>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
-    <message>
-        <source>4:3</source>
-        <translation>4:3</translation>
-    </message>
-    <message>
-        <source>16:9</source>
-        <translation>16:9</translation>
-    </message>
-    <message>
-        <source>1:1</source>
-        <translation>1:1</translation>
-    </message>
-    <message>
-        <source>0 degrees</source>
-        <translation type="unfinished">0 graus</translation>
-    </message>
-    <message>
-        <source>90 degrees</source>
-        <translation type="unfinished">90 graus</translation>
-    </message>
-    <message>
-        <source>180 degrees</source>
-        <translation type="unfinished">180 graus</translation>
-    </message>
-    <message>
-        <source>270 degrees</source>
-        <translation type="unfinished">270 graus</translation>
-    </message>
     <message>
         <source>Invalid schedule</source>
         <translation type="unfinished"></translation>
@@ -5145,6 +5588,88 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Select folder...</source>
         <translation>Selecionar pasta...</translation>
+    </message>
+</context>
+<context>
+    <name>QnRecordingStatsDialog</name>
+    <message>
+        <source>Copy Selection to Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Selection to File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export selected events to file</source>
+        <translation type="unfinished">Exportar eventos selecionados em arquivo</translation>
+    </message>
+</context>
+<context>
+    <name>QnRecordingStatsModel</name>
+    <message numerus="yes">
+        <source>%n years</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n months</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n days</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hours</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Total %1 camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras with non empty archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage space occupied by camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived duration in calendar days between the first record and the current moment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average bitrate for the recorded period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Space</source>
+        <translation type="unfinished">Espaço</translation>
+    </message>
+    <message>
+        <source>Calendar Days</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5766,72 +6291,12 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
-        <source>4:3</source>
-        <translation>4:3</translation>
-    </message>
-    <message>
-        <source>16:9</source>
-        <translation>16:9</translation>
-    </message>
-    <message>
-        <source>1:1</source>
-        <translation>1:1</translation>
-    </message>
-    <message>
-        <source>0 degrees</source>
-        <translation type="unfinished">0 graus</translation>
-    </message>
-    <message>
-        <source>90 degrees</source>
-        <translation type="unfinished">90 graus</translation>
-    </message>
-    <message>
-        <source>180 degrees</source>
-        <translation type="unfinished">180 graus</translation>
-    </message>
-    <message>
-        <source>270 degrees</source>
-        <translation type="unfinished">270 graus</translation>
-    </message>
-    <message>
         <source>Do not record motion</source>
         <translation>Não gravar por movimento</translation>
     </message>
     <message>
-        <source>Invalid schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Confirm motion regions reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Hardware (Camera built-in)</source>
         <translation>Hardware (câmera embutida)</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FPS value is too high</source>
-        <translation type="unfinished">Valor de FPS é muito alto</translation>
-    </message>
-    <message>
-        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished">FPS atual na grade de esquema é %1. FPS foi diminuído para a quantidade de câmera fps%2.</translation>
-    </message>
-    <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished">Para software de movimento 2. fps são reservados para fluxo secundário. FPS atual na grade é %1. FPS foi diminuindo para %2.</translation>
     </message>
 </context>
 <context>
@@ -5950,6 +6415,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Please check authentication information in camera settings</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No video stream</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageSpaceSlider</name>
@@ -5974,14 +6443,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Coldstore Network Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>coldstore://&lt;Address&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7571,6 +8032,61 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
 </context>
 <context>
+    <name>RecordingStatsDialog</name>
+    <message>
+        <source>Recording statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation type="unfinished">Atualizar</translation>
+    </message>
+    <message>
+        <source>All Servers are offline. Logs are not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>10 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forecast for full storage(s) usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional storage:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1000 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ResourceBrowserWidget</name>
     <message>
         <source>X</source>
@@ -7704,6 +8220,15 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Storages</source>
         <translation>Storages</translation>
     </message>
+    <message>
+        <source>Protocol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unchecking the storage will cause nothing but writing stop.
+It won&apos;t deny oldest footage removing from the drive.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SignDialog</name>
@@ -7739,10 +8264,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>Representante:</translation>
     </message>
     <message>
-        <source>Force aspect ratio to:</source>
-        <translation>Forçar Formato para:</translation>
-    </message>
-    <message>
         <source>Sensitivity:</source>
         <translation>Sensibilidade:</translation>
     </message>
@@ -7771,18 +8292,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>Página da Web:</translation>
     </message>
     <message>
-        <source>Image Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Esta é uma lente tipo olho de peixe</translation>
-    </message>
-    <message>
         <source>Software (Max FPS may be slightly decreased on Server)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7803,10 +8312,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>Movimento</translation>
     </message>
     <message>
-        <source>Use an analog license to view this camera</source>
-        <translation>Utilize uma licença analógica para essa câmera</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation>Endereço</translation>
     </message>
@@ -7817,10 +8322,6 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Firmware:</source>
         <translation>Firmware:</translation>
-    </message>
-    <message>
-        <source>Licensing</source>
-        <translation>Licenciando</translation>
     </message>
     <message>
         <source>Recording</source>
@@ -7863,16 +8364,16 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>Detecção de Movimento:</translation>
     </message>
     <message>
-        <source>Get More Licenses...</source>
-        <translation>Mais licenças...</translation>
-    </message>
-    <message>
         <source>Camera settings</source>
         <translation>Ajustes de Câmera</translation>
     </message>
     <message>
         <source>MAC Address:</source>
         <translation>Enderçeo MAC:</translation>
+    </message>
+    <message>
+        <source>IO ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

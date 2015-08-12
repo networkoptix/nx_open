@@ -3,6 +3,9 @@
 
 #include <limits>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+#include <boost/algorithm/cxx11/all_of.hpp>
+
 #include <QtWidgets/QMessageBox>
 
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
@@ -12,19 +15,16 @@
 #include <core/resource/camera_resource.h>
 
 #include <ui/common/read_only.h>
+#include <ui/common/checkbox_utils.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/style/warning_style.h>
+#include <ui/widgets/licensing/licenses_propose_widget.h>
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/widgets/properties/camera_settings_widget_p.h>
-
-#include <utils/license_usage_helper.h>
-#include "ui/help/help_topics.h"
-#include "ui/help/help_topic_accessor.h"
-
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
-
 
 namespace {
 
@@ -58,51 +58,40 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     m_inUpdateMaxFps(false)
 {
     ui->setupUi(this);
+    ui->licensingWidget->initializeContext(this);
+    ui->cameraScheduleWidget->initializeContext(this);
 
-    QnCamLicenseUsageHelper helper;
-    ui->licensesUsageWidget->init(&helper);
-
-    ui->cameraScheduleWidget->setContext(context());
-    connect(context(), &QnWorkbenchContext::userChanged, this, &QnMultipleCameraSettingsWidget::updateLicensesButtonVisible);
+    QnCheckbox::autoCleanTristate(ui->enableAudioCheckBox);
 
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->enableAudioCheckBox,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->enableAudioCheckBox,    SIGNAL(clicked()),                      this,   SLOT(at_enableAudioCheckBox_clicked()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
+
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(recordingSettingsChanged()),     this,   SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(controlsChangesApplied()),       this,   SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
+
+    connect(ui->cameraScheduleWidget,   &QnCameraScheduleWidget::recordingSettingsChanged,      this,   &QnMultipleCameraSettingsWidget::at_dbDataChanged);
+    connect(ui->cameraScheduleWidget,   &QnCameraScheduleWidget::recordingSettingsChanged,      this,   [this] {m_hasScheduleChanges = true;});
+    connect(ui->cameraScheduleWidget,   &QnCameraScheduleWidget::controlsChangesApplied,        this,   [this] {m_hasScheduleControlsChanges = false;});
+    connect(ui->cameraScheduleWidget,   &QnCameraScheduleWidget::gridParamsChanged,             this,   [this] {m_hasScheduleControlsChanges = true;});
+
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged(int)));
 
-    connect(ui->moreLicensesButton,     &QPushButton::clicked,                  this,   &QnMultipleCameraSettingsWidget::moreLicensesRequested);
-    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()));
-    connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
+    connect(ui->licensingWidget,         &QnLicensesProposeWidget::changed,      this,   &QnMultipleCameraSettingsWidget::at_dbDataChanged);
+    connect(ui->licensingWidget,         &QnLicensesProposeWidget::changed,      this,   [this] {
+        ui->cameraScheduleWidget->setScheduleEnabled(ui->licensingWidget->state() == Qt::Checked);
+    });
 
     connect(ui->imageControlWidget,     &QnImageControlWidget::changed,         this,   &QnMultipleCameraSettingsWidget::at_dbDataChanged);
     connect(ui->expertSettingsWidget,   SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(archiveRangeChanged()),          this,   SLOT(at_dbDataChanged()));
 
-
     /* Set up context help. */
     setHelpTopic(this,                  Qn::CameraSettings_Multi_Help);
     setHelpTopic(ui->tabRecording,      Qn::CameraSettings_Recording_Help);
 
-    auto updateLicensesIfNeeded = [this] { 
-        if (!isVisible())
-            return;
-        updateLicenseText();
-    };
-
-    QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
-    connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,  updateLicensesIfNeeded);
-
     updateFromResources();
-    updateLicensesButtonVisible();
 }
 
 QnMultipleCameraSettingsWidget::~QnMultipleCameraSettingsWidget() {
@@ -209,8 +198,10 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && camera->isAudioSupported()) 
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
 
-        if (m_hasScheduleEnabledChanges)
+        if (m_hasScheduleEnabledChanges) {
+            camera->setLicenseUsed(ui->cameraScheduleWidget->isScheduleEnabled());
             camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
+        }
 
         if (m_hasScheduleChanges)
             camera->setScheduleTasks(scheduleTasks);
@@ -282,7 +273,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
     {
         QnScopedUpdateRollback rollback(ui->cameraScheduleWidget);
         ui->imageControlWidget->updateFromResources(m_cameras);
-
+        ui->licensingWidget->setCameras(m_cameras);
 
         if(m_cameras.empty()) {
             ui->loginEdit->setText(QString());
@@ -295,57 +286,57 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
             ui->cameraScheduleWidget->setChangesDisabled(true);
             ui->cameraScheduleWidget->setMotionAvailable(false);
-            ui->analogGroupBox->setVisible(false);
         } else {
             /* Aggregate camera parameters first. */
             ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
-            ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
-            ui->analogGroupBox->setVisible(false);
 
-            
+            using boost::algorithm::any_of;
+            using boost::algorithm::all_of;
 
-            /* Update checkbox state based on camera value. */
-            auto setupCheckbox = [](QCheckBox* checkBox, bool firstCamera, bool value){
-                Qt::CheckState state = value ? Qt::Checked : Qt::Unchecked;
-                if (firstCamera) {
-                    checkBox->setTristate(false);
-                    checkBox->setCheckState(state);
+            const bool isDtsBased        = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->isDtsBased(); });
+            const bool hasVideo          = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->hasVideo(0); });
+            const bool audioSupported    = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->isAudioSupported(); });
+            const bool audioForced       = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->isAudioForced(); });
+            const bool isMotionAvailable = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->hasMotion(); });
+
+            const bool audioEnabled      = m_cameras.front()->isAudioEnabled();
+            const bool sameAudioEnabled  = all_of(m_cameras, [audioEnabled](const QnVirtualCameraResourcePtr &camera) {
+                return camera->isAudioEnabled() == audioEnabled; 
+            });
+
+            ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
+            ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);            
+            ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !isDtsBased);
+            ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
+            ui->expertTab->setEnabled(!isDtsBased && hasVideo);
+            QnCheckbox::setupTristateCheckbox(ui->enableAudioCheckBox, sameAudioEnabled, audioEnabled);
+
+            {           
+                QSet<QString> logins, passwords;
+
+                for (const QnVirtualCameraResourcePtr &camera: m_cameras) {
+                    logins.insert(camera->getAuth().user());
+                    passwords.insert(camera->getAuth().password());
+                }          
+
+                if (logins.size() == 1) {
+                    ui->loginEdit->setText(*logins.begin());
+                    ui->loginEdit->setPlaceholderText(QString());
+                } else {
+                    ui->loginEdit->setText(QString());
+                    ui->loginEdit->setPlaceholderText(tr("<multiple values>", "LoginEdit"));
                 }
-                else if (state != checkBox->checkState()) {
-                    checkBox->setTristate(true);
-                    checkBox->setCheckState(Qt::PartiallyChecked);
+                m_loginWasEmpty = ui->loginEdit->text().isEmpty();
+
+                if (passwords.size() == 1) {
+                    ui->passwordEdit->setText(*passwords.begin());
+                    ui->passwordEdit->setPlaceholderText(QString());
+                } else {
+                    ui->passwordEdit->setText(QString());
+                    ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
                 }
-            };
-
-            bool firstCamera = true; 
-            QSet<QString> logins, passwords;
-            bool audioSupported = false;
-            bool audioForced = false;
-
-
-            bool hasVideo = true;
-            bool isDtsBased = false;
-            for (const QnVirtualCameraResourcePtr &camera: m_cameras) 
-            {
-                hasVideo &= camera->hasVideo(0);
-                logins.insert(camera->getAuth().user());
-                passwords.insert(camera->getAuth().password());
-
-                audioSupported |= camera->isAudioSupported();
-                audioForced |= camera->isAudioForced();
-
-                if (camera->isDtsBased())
-                    isDtsBased = true;
-
-                setupCheckbox(ui->analogViewCheckBox,   firstCamera, !camera->isScheduleDisabled());
-                setupCheckbox(ui->enableAudioCheckBox,  firstCamera, camera->isAudioEnabled());
-
-                firstCamera = false;
+                m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
             }
-            ui->analogGroupBox->setVisible(isDtsBased);
-
-            ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);
-           
 
             ui->expertSettingsWidget->updateFromResources(m_cameras);
 
@@ -401,38 +392,10 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             updateMaxFPS();
 
-            bool isMotionAvailable = true;
-            for (const QnVirtualCameraResourcePtr &camera: m_cameras) 
-                isMotionAvailable &= camera->hasMotion();
-            ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
-
-            /* Write camera parameters out. */
-
-            if (logins.size() == 1) {
-                ui->loginEdit->setText(*logins.begin());
-                ui->loginEdit->setPlaceholderText(QString());
-            } else {
-                ui->loginEdit->setText(QString());
-                ui->loginEdit->setPlaceholderText(tr("<multiple values>", "LoginEdit"));
-            }
-            m_loginWasEmpty = ui->loginEdit->text().isEmpty();
-
-            if (passwords.size() == 1) {
-                ui->passwordEdit->setText(*passwords.begin());
-                ui->passwordEdit->setPlaceholderText(QString());
-            } else {
-                ui->passwordEdit->setText(QString());
-                ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
-            }
-            m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
-            
-            ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !isDtsBased);
-            ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
-            ui->expertTab->setEnabled(!isDtsBased && hasVideo);
         }
 
         ui->cameraScheduleWidget->setCameras(m_cameras);
-        updateLicenseText();
+        
     }
 
     setHasDbChanges(false);
@@ -487,70 +450,10 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChange
     m_hasScheduleControlsChanges = false;
 }
 
-void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
-    at_dbDataChanged();
-
-    m_hasScheduleChanges = true;
-}
-
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged(int state) {
-    if (state == Qt::PartiallyChecked) {
-        ui->analogViewCheckBox->setTristate(true);
-        ui->analogViewCheckBox->setCheckState(Qt::PartiallyChecked);
-    } else {
-        ui->analogViewCheckBox->setTristate(false);
-        ui->analogViewCheckBox->setChecked(state == Qt::Checked);
-    }
-    updateLicenseText();
+    ui->licensingWidget->setState(static_cast<Qt::CheckState>(state));
     at_dbDataChanged();
-
     m_hasScheduleEnabledChanges = true;
-}
-
-void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged() {
-    m_hasScheduleControlsChanges = true;
-}
-
-void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied() {
-    m_hasScheduleControlsChanges = false;
-}
-
-void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked() {
-    Qt::CheckState state = ui->enableAudioCheckBox->checkState();
-
-    ui->enableAudioCheckBox->setTristate(false);
-    if (state == Qt::PartiallyChecked)
-        ui->enableAudioCheckBox->setCheckState(Qt::Checked);
-}
-
-void QnMultipleCameraSettingsWidget::at_analogViewCheckBox_clicked() {
-    Qt::CheckState state = ui->analogViewCheckBox->checkState();
-
-    ui->analogViewCheckBox->setTristate(false);
-    if (state == Qt::PartiallyChecked)
-        ui->analogViewCheckBox->setCheckState(Qt::Checked);
-    ui->cameraScheduleWidget->setScheduleEnabled(ui->analogViewCheckBox->isChecked());
-}
-
-void QnMultipleCameraSettingsWidget::updateLicensesButtonVisible() {
-    ui->moreLicensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
-}
-
-void QnMultipleCameraSettingsWidget::updateLicenseText() {
-    QnCamLicenseUsageHelper helper;
-
-    switch(ui->analogViewCheckBox->checkState()) {
-    case Qt::Checked:
-        helper.propose(m_cameras, true);
-        break;
-    case Qt::Unchecked:
-        helper.propose(m_cameras, false);
-        break;
-    default:
-        break;
-    }
-
-    ui->licensesUsageWidget->loadData(&helper);
 }
 
 void QnMultipleCameraSettingsWidget::updateMaxFPS(){

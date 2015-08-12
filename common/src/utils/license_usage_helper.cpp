@@ -304,6 +304,7 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /*= NULL*/):
     /* Listening to all changes that can affect licenses usage. */
     auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
         connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged,  this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged,       this, &QnLicenseUsageWatcher::licenseUsageChanged);
         connect(camera, &QnVirtualCameraResource::groupNameChanged,         this, &QnLicenseUsageWatcher::licenseUsageChanged);
         connect(camera, &QnVirtualCameraResource::groupIdChanged,           this, &QnLicenseUsageWatcher::licenseUsageChanged);
     };
@@ -356,7 +357,7 @@ void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &propose
 }
 
 bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera) {
-    return !camera->isScheduleDisabled() && !isValid(camera->licenseType());
+    return camera->isLicenseUsed() && !isValid(camera->licenseType());
 }
 
 QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
@@ -384,7 +385,7 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
             continue;
         
         Qn::LicenseType lt = camera->licenseType();
-        bool requiresLicense = !camera->isScheduleDisabled();
+        bool requiresLicense = camera->isLicenseUsed();
         if (requiresLicense)
             basicUsedLicenses[lt]++;
 

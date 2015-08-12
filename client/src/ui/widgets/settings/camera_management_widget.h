@@ -21,9 +21,6 @@ public:
 
     virtual bool hasChanges() const override;
 
-private slots:
-    void at_autoDiscoveryCheckBox_clicked();
-
 private:
     QScopedPointer<Ui::CameraManagementWidget> ui;
 };
