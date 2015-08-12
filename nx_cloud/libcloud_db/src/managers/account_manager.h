@@ -21,6 +21,23 @@
 namespace nx {
 namespace cdb {
 
+class EMailManager;
+namespace conf
+{
+    class Settings;
+}
+
+//!Just a dummy for cache
+template<class KeyType, class CachedType>
+class Cache
+{
+public:
+    void add( KeyType key, CachedType value )
+    {
+        //TODO #ak
+    }
+};
+
 /*!
     \note Methods of this class are re-enterable
 */
@@ -29,24 +46,31 @@ class AccountManager
     public Singleton<AccountManager>
 {
 public:
-    //!Adds account in "not activated" state and sends verification email to the address provided
+    AccountManager(
+        EMailManager* const emailManager,
+        const conf::Settings& settings );
+
+    //!Adds account in "not activated" state and sends verification email to the email address provided
     void addAccount(
         const AuthorizationInfo& authzInfo,
         data::AccountData&& accountData,
-        std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler );
+        std::function<void(ResultCode)> completionHandler );
     //!On success, account moved to "activated" state
     void verifyAccountEmailAddress(
         const AuthorizationInfo& authzInfo,
-        const std::basic_string<uint8_t>& emailVerificationCode,
+        data::EmailVerificationCode&& emailVerificationCode,
         std::function<void(ResultCode)> completionHandler );
     
-    //void getAccounts(/*TODO*/);
     void getAccountByLogin(
         const AuthorizationInfo& authzInfo,
         const std::string& userName,
         std::function<void(ResultCode, data::AccountData)> completionHandler );
     
 private:
+    EMailManager* const m_emailManager;
+    const conf::Settings& m_settings;
+    Cache<QnUuid, data::AccountData> m_cache;
+
     db::DBResult insertAccount(
         QSqlDatabase* const tran,
         const data::AccountData& accountData,
@@ -55,7 +79,7 @@ private:
         db::DBResult resultCode,
         data::AccountData accountData,
         data::EmailVerificationCode resultData,
-        std::function<void(ResultCode, data::EmailVerificationCode)> completionHandler );
+        std::function<void(ResultCode)> completionHandler );
 };
 
 }   //cdb

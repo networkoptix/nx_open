@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <set>
+#include <string>
 #include <map>
 #include <limits>
 
@@ -249,6 +250,19 @@ QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(bool,         Bool,   toBool)
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QJsonArray,   Array,  toArray)
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QJsonObject,  Object, toObject)
 #undef QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS
+
+
+inline void serialize(QnJsonContext *, const std::string &value, QJsonValue *target) {
+    *target = QJsonValue(QString::fromStdString(value));
+}
+
+inline bool deserialize(QnJsonContext *, const QJsonValue &value, std::string *target) {
+    if(value.type() != QJsonValue::String)
+        return false;
+
+    *target = value.toString().toStdString();
+    return true;
+}
 
 
 #define QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(TYPE)                    \

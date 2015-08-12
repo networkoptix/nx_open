@@ -41,8 +41,9 @@ public:
     std::list<SocketAddress> endpointsToListen() const;
     QString dataDir() const;
     
-    Logging logging() const;
-    db::ConnectionOptions dbConnectionOptions() const;
+    const Logging& logging() const;
+    const db::ConnectionOptions& dbConnectionOptions() const;
+    const QString& cloudBackendUrl() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
     void load( int argc, char **argv );
@@ -57,6 +58,7 @@ private:
 
     Logging m_logging;
     db::ConnectionOptions m_dbConnectionOptions;
+    QString m_cloudBackendUrl;
 
     void fillSupportedCmdParameters();
     void loadConfiguration();

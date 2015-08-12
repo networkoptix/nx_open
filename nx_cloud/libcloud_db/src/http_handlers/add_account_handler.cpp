@@ -19,7 +19,7 @@ const QString AddAccountHttpHandler::HANDLER_PATH = QLatin1String("/add_account"
 
 AddAccountHttpHandler::AddAccountHttpHandler()
 :
-    AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::EmailVerificationCode>(
+    AbstractFiniteMsgBodyHttpHandler<data::AccountData>(
         EntityType::account,
         DataActionType::insert )
 {
@@ -33,9 +33,7 @@ void AddAccountHttpHandler::processRequest(
     AuthorizationInfo&& authzInfo,
     data::AccountData&& accountData,
     nx_http::Response* const /*response*/,
-    std::function<void(
-        const nx_http::StatusCode::Value statusCode,
-        const data::EmailVerificationCode& output )>&& completionHandler )
+    std::function<void( nx_http::StatusCode::Value statusCode )>&& completionHandler )
 {
     m_completionHandler = std::move( completionHandler );
     AccountManager::instance()->addAccount(
@@ -44,20 +42,13 @@ void AddAccountHttpHandler::processRequest(
         std::bind(
             &AddAccountHttpHandler::addAccountDone,
             this,
-            std::placeholders::_1,
-            std::placeholders::_2 ) );
+            std::placeholders::_1 ) );
 }
 
-void AddAccountHttpHandler::addAccountDone(
-    ResultCode resultCode,
-    data::EmailVerificationCode outData )
+void AddAccountHttpHandler::addAccountDone( ResultCode resultCode )
 {
     auto completionHandler = std::move(m_completionHandler);
-    completionHandler(
-        resultCode == ResultCode::ok
-            ? nx_http::StatusCode::ok
-            : nx_http::StatusCode::forbidden,
-        std::move( outData ) );
+    completionHandler( resultCodeToHttpStatusCode(resultCode) );
 }
 
 }   //cdb

@@ -21,7 +21,7 @@ namespace cdb {
 
 class AddAccountHttpHandler
 :
-    public AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::EmailVerificationCode>
+    public AbstractFiniteMsgBodyHttpHandler<data::AccountData>
 {
 public:
     static const QString HANDLER_PATH;
@@ -35,18 +35,12 @@ protected:
         AuthorizationInfo&& authzInfo,
         data::AccountData&& accountData,
         nx_http::Response* const response,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            const data::EmailVerificationCode& output )>&& completionHandler ) override;
+        std::function<void( nx_http::StatusCode::Value statusCode )>&& completionHandler ) override;
 
 private:
-    std::function<void(
-        const nx_http::StatusCode::Value statusCode,
-        const data::EmailVerificationCode& output )> m_completionHandler;
+    std::function<void( nx_http::StatusCode::Value statusCode )> m_completionHandler;
 
-    void addAccountDone(
-        ResultCode resultCode,
-        data::EmailVerificationCode outData );
+    void addAccountDone( ResultCode resultCode );
 };
 
 }   //cdb

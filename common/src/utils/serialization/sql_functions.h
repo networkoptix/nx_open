@@ -1,6 +1,8 @@
 #ifndef QN_SERIALIZATION_SQL_FUNCTIONS_H
 #define QN_SERIALIZATION_SQL_FUNCTIONS_H
 
+#include <string>
+
 #include <utils/common/uuid.h>
 
 #include "sql.h"
@@ -76,8 +78,16 @@ inline void serialize_field(const QString &value, QVariant *target) {
     *target = QVariant::fromValue<QString>(value.isNull() ? lit("") : value);
 }
 
+inline void serialize_field(const std::string &value, QVariant *target) {
+    *target = QVariant::fromValue<QString>(QString::fromStdString(value));
+}
+
 inline void deserialize_field(const QVariant &value, QString *target) { 
     *target = value.value<QString>();
+}
+
+inline void deserialize_field(const QVariant &value, std::string *target) { 
+    *target = value.value<QString>().toStdString();
 }
 
 

@@ -46,6 +46,8 @@ public:
     //!Executes data modification request that spawns some output data
     /*!
         Hold multiple threads inside. \a dbUpdateFunc is executed within random thread.
+        Transaction is started before \a dbUpdateFunc call. 
+        Transaction committed if \a dbUpdateFunc succeeded.
         \param dbUpdateFunc This function may executed SQL commands and fill output data
         \param completionHandler DB operation result is passed here. Output data is valid only if operation succeeded
         \note DB operation may fail even if \a dbUpdateFunc finished successfully (e.g., transaction commit fails)

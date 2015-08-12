@@ -53,6 +53,9 @@ namespace
 
     static const QLatin1String DB_MAX_CONNECTIONS( "db/maxConnections" );
     static const QLatin1String DEFAULT_DB_MAX_CONNECTIONS( "1" );
+
+    static const QLatin1String CLOUD_DB_URL( "db/maxConnections" );
+    static const QLatin1String DEFAULT_CLOUD_DB_URL( "http://nowhere.com:3346/" );
 }
 
 
@@ -82,14 +85,19 @@ bool Settings::showHelp() const
     return m_showHelp;
 }
 
-Logging Settings::logging() const
+const Logging& Settings::logging() const
 {
     return m_logging;
 }
 
-db::ConnectionOptions Settings::dbConnectionOptions() const
+const db::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
+}
+
+const QString& Settings::cloudBackendUrl() const
+{
+    return m_cloudBackendUrl;
 }
 
 std::list<SocketAddress> Settings::endpointsToListen() const
@@ -163,6 +171,8 @@ void Settings::loadConfiguration()
     m_dbConnectionOptions.maxConnectionCount = m_settings.value( DB_MAX_CONNECTIONS, DEFAULT_DB_MAX_CONNECTIONS ).toUInt();
     if( m_dbConnectionOptions.maxConnectionCount == 0 )
         m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
+
+    m_cloudBackendUrl = m_settings.value( CLOUD_DB_URL, DEFAULT_CLOUD_DB_URL ).toString();
 }
 
 }   //conf

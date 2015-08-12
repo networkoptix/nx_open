@@ -24,7 +24,6 @@ enum class ResultCode
     dbError
 };
 
-
 enum class EntityType
 {
     none,
