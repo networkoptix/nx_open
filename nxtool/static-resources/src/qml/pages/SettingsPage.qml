@@ -24,23 +24,38 @@ FocusScope
         id: warningDialog;
 
         title: "Warning";
+        buttons: (NxRtu.Buttons.Cancel | NxRtu.Buttons.Ok);
         styledButtons: NxRtu.Buttons.Ok;
         dontShowText: "Do not show warnings";
 
-        function showWarnings(warnings, onFinishedCallback)
+        function showWarnings(warnings, onFinishedCallback, onCanceledCallback)
         {
             impl.onFinishedCallback = onFinishedCallback;
+            impl.onCanceledCallback = onCanceledCallback;
             impl.warnings = warnings;
             impl.show(0);
         }
 
-        onButtonClicked: { impl.show(impl.currentIndex + 1); }
+        onButtonClicked:
+        {
+            if (id === NxRtu.Buttons.Ok)
+            {
+                impl.show(impl.currentIndex + 1);
+            }
+            else if (impl.onCanceledCallback)
+            {
+                impl.onCanceledCallback();
+            }
+        }
+
         onDontShowNextTimeChanged: { rtuContext.showWarnings = !dontShow; }
 
         property QtObject impl: QtObject
         {
             id: impl;
+
             property var onFinishedCallback;
+            property var onCanceledCallback;
             property var warnings;
             property int currentIndex: 0;
 
@@ -85,10 +100,18 @@ FocusScope
         {
             if (warnings.length)
             {
-                warningDialog.showWarnings(warnings, function()
+                var finishCallback = function()
                 {
                     rtuContext.changesManager().applyChanges();
-                });
+                };
+
+                var cancelCallback = function()
+                {
+                    rtuContext.changesManager().clearChanges();
+                }
+
+                warningDialog.showWarnings(warnings
+                    , finishCallback, cancelCallback);
             }
             else
                 rtuContext.changesManager().applyChanges();

@@ -146,7 +146,7 @@ Base.Column
                     if (!rtuContext.isDiscoverableFromCurrentNetwork(
                         item.ipAddressControl.text, item.subnetMaskControl.text))
                     {
-                        warnings.push(("New IP address for \"%1\" is not reachable. Server could be not available after changes applied.")
+                        warnings.push(("The IP address of \"%1\" is about to be assigned is in a different subnet. The unit will be unreachable after the changes are made. Proceed?")
                             .arg(interfaceCaption));
                     }
 
