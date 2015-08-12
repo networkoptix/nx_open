@@ -14,6 +14,7 @@ struct QnAuditRecord
 
     bool isLoginType() const { return eventType == Qn::AR_Login || eventType == Qn::AR_UnauthorizedLogin; }
     bool isPlaybackType() const { return eventType == Qn::AR_ViewArchive || eventType == Qn::AR_ViewLive || eventType == Qn::AR_ExportVideo; }
+    bool isCameraType() const { return eventType == Qn::AR_CameraUpdate || eventType == Qn::AR_CameraInsert || eventType == Qn::AR_CameraRemove; }
 
     QnByteArrayConstRef extractParam(const QnLatin1Array& name) const;
     void addParam(const QnLatin1Array& name, const QnLatin1Array& value);
