@@ -17,7 +17,7 @@ Expandable.MaskedSettingsPanel
     extraWarned: !((NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
         || (rtuContext.selection.count === 1));
 
-    function tryApplyChanges()
+    function tryApplyChanges(warnings)
     {
         if (!changed)
             return true;

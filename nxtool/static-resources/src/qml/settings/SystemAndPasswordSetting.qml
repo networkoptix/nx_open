@@ -11,7 +11,7 @@ Expandable.MaskedSettingsPanel
 
     changed:  (maskedArea && maskedArea.changed?  true : false);
     
-    function tryApplyChanges()
+    function tryApplyChanges(warnings)
     {
         if (!changed)
             return true;

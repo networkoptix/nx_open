@@ -274,6 +274,25 @@ QnStorageManager::QnStorageManager():
     m_removeEmtyDirTimer.restart();
 }
 
+
+void QnStorageManager::getCurrentlyUsedLocalPathes(QList<QString> *pathList) const
+{
+    assert(pathList);
+    for (const auto &entry: m_localPathsInUse)
+        pathList->append(entry);
+}
+
+
+void QnStorageManager::addLocalPathInUse(const QString &path)
+{
+    m_localPathsInUse.append(path);
+}
+
+void QnStorageManager::removeFromLocalPathInUse(const QString &path)
+{
+    m_localPathsInUse.removeAll(path);
+}
+
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
 void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter)
 {
@@ -517,6 +536,14 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
     if( !dbRefGuidStr.isEmpty() )
     {
         *dbDirectory = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        if (!QDir().exists(*dbDirectory))
+        {
+            if(!QDir().mkpath(*dbDirectory))
+            {
+                qWarning() << "DB path create failed (" << storageUrl << ")";
+                return false;
+            }
+        }
         return true;
     }
 
@@ -549,7 +576,10 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
 
         storageUrl = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
         if( !QDir().mkpath( storageUrl ) )
+        {
+            qWarning() << "DB path create failed (" << storageUrl << ")";
             return false;
+        }
     }
     *dbDirectory = storageUrl;
     return true;
@@ -591,7 +621,9 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 
         if (!sdb->open(fileName))
         {
-            qWarning() << "can't initialize sqlLite database! Actions log is not created!";
+            qWarning()
+                << "can't initialize sqlLite database! Actions log is not created!"
+                << " file open failed: " << fileName;
             return QnStorageDbPtr();
         }
     }

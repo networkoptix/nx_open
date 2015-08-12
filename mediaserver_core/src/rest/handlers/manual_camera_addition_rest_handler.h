@@ -23,7 +23,7 @@ private:
     int searchStartAction(const QnRequestParams &params, QnJsonRestResult &result);
     int searchStatusAction(const QnRequestParams &params, QnJsonRestResult &result);
     int searchStopAction(const QnRequestParams &params, QnJsonRestResult &result);
-    int addCamerasAction(const QnRequestParams &params, QnJsonRestResult &result);
+    int addCamerasAction(const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
 
     /**
      * @brief getSearchStatus               Get status of the manual camera search process. Thread-safe.

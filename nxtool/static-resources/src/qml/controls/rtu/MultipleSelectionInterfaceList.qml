@@ -10,7 +10,7 @@ Base.Column
     property alias forceUseDHCP: forceUseDHCPChecklBox.checked;
     property alias changed: forceUseDHCPChecklBox.changed;
     
-    function tryApplyChanges() 
+    function tryApplyChanges(warnings)
     {
         if (!forceUseDHCPChecklBox.changed)
             return true;
