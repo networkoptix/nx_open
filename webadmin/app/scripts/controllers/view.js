@@ -5,6 +5,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.playerApi = false;
         $scope.cameras = {};
+        $scope.liveOnly = true;
         $scope.cameraId = $scope.cameraId || $routeParams.cameraId || null;
         $scope.activeCamera = null;
 
@@ -188,7 +189,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.selectCameraById = function (cameraId, position, silent) {
 
-            $scope.hasArchive = false;
+
             $scope.cameraId = cameraId || $scope.cameraId;
             if(position){
                 position = parseInt(position);
@@ -200,10 +201,11 @@ angular.module('webadminApp').controller('ViewCtrl',
             if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
+
+                $scope.liveOnly = true;
                 if(canViewArchive) {
                     $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
-                        console.log("hasArchive",hasArchive);
-                        $scope.hasArchive = hasArchive;
+                        $scope.liveOnly = !hasArchive;
                     });
                 }
 

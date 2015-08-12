@@ -19,7 +19,7 @@
                   ng-disabled="disableZoomIn">
                 <span class="glyphicon glyphicon-plus"></span>
             </span>
-            <span ng-if="emptyArchive">
+            <span ng-if="emptyArchive" class="webclient-button caption-row ">
                 There is no archive for this camera
             </span>
         </div><div class="text-center">
@@ -39,8 +39,9 @@
                   ng-click="goToLive()">LIVE</span>
         </div></div>
 
-    <div collapse="liveOnly"
+    <div
          class="viewport"
+         ng-class="{invisible:liveOnly}"
          ng-mouseup="mouseUp($event)"
          ng-mouseleave="mouseLeave($event)"
          ng-mousemove="mouseMove($event)"

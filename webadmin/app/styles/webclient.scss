@@ -92,7 +92,7 @@ table.webclient-window>tbody>tr>td.alert{
   width:100%;
   top:0;
 
-  background-color: rgba(28, 35, 39, 0.6);
+  /*background-color: rgba(28, 35, 39, 0.6);*/
 
   border-bottom: 1px solid transparent;
 }
@@ -101,7 +101,7 @@ table.webclient-window>tbody>tr>td.alert{
   width:100%;
   bottom:0;
 
-  background-color: rgba(28, 35, 39, 0.6);
+  /*background-color: rgba(28, 35, 39, 0.6);*/
 
   border-top: 1px solid transparent;
 }
@@ -110,12 +110,12 @@ table.webclient-window>tbody>tr>td.alert{
   height:100%;
 
   padding: 0px 20px;
-  background-color: rgba(28, 35, 39, 0.6);
+  /*background-color: rgba(28, 35, 39, 0.6);*/
 }
 
 
 /* Special hack for loading invisible flash objects */
-.videowindow .videoplayer.invisible{
+.invisible{
   width: 0 !important;
   height: 0 !important;
   overflow: hidden;
