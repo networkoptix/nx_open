@@ -29,12 +29,14 @@ namespace nx_hls
             ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
             "MediaQuality enum suddenly contains too large values: consider changing HLSSession::m_playlistManagers type" );  
         m_playlistManagers.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
-        m_videoCamera->inUse( this );
+        if( m_live )
+            m_videoCamera->inUse( this );
     }
 
     HLSSession::~HLSSession()
     {
-        m_videoCamera->notInUse( this );
+        if( m_live )
+            m_videoCamera->notInUse( this );
     }
 
     const QString& HLSSession::id() const
