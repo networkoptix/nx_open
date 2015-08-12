@@ -39,12 +39,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             };
         });
 
-        console.log("browser:");
-        console.log(window.jscd.browser);
-        console.log(window.jscd);
-        console.log(navigator.appName);
-        console.log(navigator);
-
         if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm')){
             $scope.ieNoWebm = true;
         }
