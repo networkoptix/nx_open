@@ -93,7 +93,7 @@ QnLdapUsers QnLdapManager::fetchUsers() {
     QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
 
     QUrl uri = settings.uri;
-#if defined Q_OS_WINDOWS
+#if defined Q_OS_WIN
     if (uri.scheme() == lit("ldaps"))
         d->ld = ldap_sslinit(QSTOCW(uri.host()), uri.port(), 1);
     else
