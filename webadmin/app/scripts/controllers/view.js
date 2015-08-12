@@ -271,6 +271,9 @@ angular.module('webadminApp').controller('ViewCtrl',
 
                 function cameraFilter(camera){
                     // Filter desktop cameras here
+                    if(camera.typeId == desctopCameraTypeId){ // Hide desctop cameras
+                        return false;
+                    }
                     return true;
                 }
 
@@ -399,8 +402,16 @@ angular.module('webadminApp').controller('ViewCtrl',
                 timer = $timeout(reloader, quickReloadInterval);
             });
         }
+        var desctopCameraTypeId = null;
+        mediaserver.getResourceTypes().then(function(result){
+            desctopCameraTypeId = _.find(result.data,function(type){
+                return type.name=='SERVER_DESKTOP_CAMERA';
+            });
+            desctopCameraTypeId = desctopCameraTypeId?desctopCameraTypeId.id:null;
 
-        reloader();
+            reloader();
+        });
+
 
         $scope.$on(
             '$destroy',
