@@ -25,6 +25,18 @@ Expandable.MaskedSettingsPanel
         return maskedArea.flaggedItem.currentItem.tryApplyChanges();
     }
 
+    onMaskedAreaChanged:
+    {
+        if (!warned)
+            return;
+
+        var flagged = maskedArea.flaggedItem;
+        if (!flagged || !flagged.currentItem || !flagged.currentItem.timeZonePickerControl)
+            return;
+
+        flagged.currentItem.timeZonePickerControl.forceActiveFocus();
+    }
+
     propertiesGroupName: qsTr("Set Device Date & Time");
     propertiesDelegate: FocusScope
     {
@@ -111,6 +123,8 @@ Expandable.MaskedSettingsPanel
                         return true;
                     }
 
+                    property alias timeZonePickerControl: timeZonePicker;
+
                     property bool changed: (timeZonePicker.changed || timePicker.changed
                         || datePicker.changed || useCurrentTimeCheckbox.changed);
     
@@ -177,6 +191,8 @@ Expandable.MaskedSettingsPanel
                             datePicker.setDate(dateTime);
                             timePicker.setTime(dateTime, true);
                         }
+
+                        KeyNavigation.tab: datePicker;
                     }
 
                     Row
@@ -191,10 +207,17 @@ Expandable.MaskedSettingsPanel
 
                             enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags)
                                 && !useCurrentTimeCheckbox.checked;
+
+                            KeyNavigation.tab: selectDateButton;
+                            KeyNavigation.backtab: timeZonePicker;
                         }
 
                         Base.Button
                         {
+                            id: selectDateButton;
+
+                            activeFocusOnTab: true;
+
                             width: datePicker.height;
                             height: datePicker.height;
 
@@ -220,6 +243,9 @@ Expandable.MaskedSettingsPanel
                                 anchors.centerIn: parent;
                                 source: "qrc:/resources/calendar.png";
                             }
+
+                            KeyNavigation.tab: timePicker;
+                            KeyNavigation.backtab: datePicker;
                         }
                     }
 
@@ -231,12 +257,18 @@ Expandable.MaskedSettingsPanel
                             && !useCurrentTimeCheckbox.checked;
                         initTime: (rtuContext.selection && rtuContext.selection !== null ?
                             rtuContext.selection.dateTime : undefined);
+
+                        KeyNavigation.tab: useCurrentTimeCheckbox;
+                        KeyNavigation.backtab: selectDateButton;
                     }
                     
                     Base.CheckBox
                     {
                         id: useCurrentTimeCheckbox;
         
+                        activeFocusOnTab: true;
+                        activeFocusOnPress: true;
+
                         text: qsTr("Set current date/time");
                         initialCheckedState: Qt.Unchecked;
                         enabled: (NxRtu.Constants.AllowChangeDateTimeFlag & rtuContext.selection.flags);

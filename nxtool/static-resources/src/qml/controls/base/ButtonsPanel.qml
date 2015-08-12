@@ -1,10 +1,10 @@
-import QtQuick 2.0;
+import QtQuick 2.3;
 
 import "../../common" as Common;
 
 import networkoptix.rtu 1.0 as NxRtu;
 
-Item
+FocusScope
 {
     id: thisComponent;
 
@@ -16,9 +16,16 @@ Item
 
     signal buttonClicked(int id);
     
-    
     width: row.width + row.anchors.rightMargin * 2;
     height: buttonHeight + spacing * 2;
+
+    activeFocusOnTab: false;
+
+    onActiveFocusChanged:
+    {
+        if (activeFocus && enabled)
+            nextItemInFocusChain(false).forceActiveFocus();
+    }
 
     Row
     {
