@@ -45,11 +45,11 @@ angular.module('webadminApp')
                 ipCookie('auth_rtsp',auth_rtsp, { path: '/' });
 
 
-                //Old cookies:
-                ipCookie('response',auth_digest, { path: '/' }); // TODO: REMOVE
-                ipCookie('username',lowercaseLogin, { path: '/' }); // TODO: REMOVE
-                //var authKey = Base64.encode(lowercaseLogin + ':0:' + digest); // TODO: REMOVE
-                //ipCookie('authKey',authKey, { path: '/' }); // TODO: REMOVE
+                //Old cookies:  // TODO: REMOVE THIS SECTION
+                //ipCookie('response',auth_digest, { path: '/' });
+                //ipCookie('username',lowercaseLogin, { path: '/' });
+                //var authKey = Base64.encode(lowercaseLogin + ':0:' + digest);
+                //ipCookie('authKey',authKey, { path: '/' });
 
                 // Check auth again
                 $scope.authorizing = true;

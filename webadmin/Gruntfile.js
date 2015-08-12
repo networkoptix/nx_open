@@ -134,14 +134,14 @@ module.exports = function (grunt) {
 
 
                 // Olya
-                /*{context: '/api/',      host: '10.0.2.169', port: 7011},
+                {context: '/api/',      host: '10.0.2.169', port: 7011},
                 {context: '/ec2/',      host: '10.0.2.169', port: 7011},
                 {context: '/hls/',      host: '10.0.2.169', port: 7011},
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
                 {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
 
                 //Roman Vasilenko  port: 7003,7004,7005,2006
-                {context: '/api/', host: '10.0.2.244', port: 7002},
+                /*{context: '/api/', host: '10.0.2.244', port: 7002},
                 {context: '/ec2/', host: '10.0.2.244', port: 7002},
                 {context: '/hls/', host: '10.0.2.244', port: 7002},
                 {context: '/media/', host: '10.0.2.244', port: 7002},
