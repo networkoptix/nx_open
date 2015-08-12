@@ -17,8 +17,8 @@
 namespace 
 {
     const QString kApiNamespaceTag = "/api/";
-
-    const QString kModuleInformationCommand = kApiNamespaceTag + "moduleInformation";
+    
+    const QString kModuleInfoAuthCommand = kApiNamespaceTag + "moduleInformationAuthenticated";
     const QString kConfigureCommand = kApiNamespaceTag + "configure";
     const QString kIfConfigCommand = kApiNamespaceTag + "ifconfig";
     const QString kSetTimeCommand = kApiNamespaceTag + "settime";
@@ -281,6 +281,29 @@ namespace /// Parsers stuff
 
         return true;
     }
+
+    ///
+
+    void checkAuth(rtu::HttpClient *client
+        , const rtu::BaseServerInfo &baseInfo
+        , const QString &password
+        , const rtu::OperationCallback &callback
+        , int timeout = rtu::HttpClient::kUseDefaultTimeout)
+    {
+
+        static const rtu::AffectedEntities affected = rtu::kNoEntitiesAffected;
+        if (!client)
+        {
+            if (callback)
+                callback(rtu::kUnspecifiedError, kInvalidRequest, affected);
+            return;
+        }
+
+        const QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port, password, kModuleInfoAuthCommand);
+        client->sendGet(url, makeReplyCallback(callback, affected)
+            , makeErrorCallback(callback, affected), timeout);
+    }
+
 }
 
 ///
@@ -408,7 +431,7 @@ void rtu::getServerExtraInfo(HttpClient *client
     }
 
     const auto &getTimeFailed = [failed](const int errorCode 
-        , const QString &reason, AffectedEntities affected)
+        , const QString &reason, AffectedEntities /* affectedEntities */)
     {
         if (failed)
             failed(errorCode, reason, affected);
@@ -436,7 +459,19 @@ void rtu::getServerExtraInfo(HttpClient *client
         getIfList(client, baseInfo, password, ifListSuccessful, ifListFailed, timeout);
     };
 
-    return getTime(client, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout);
+    const auto &callback = [failed, client, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout]
+        (const int errorCode, const QString &errorReason, AffectedEntities /* affectedEntities */)
+    {
+        if (errorCode != kNoErrorReponse)
+        {
+            if (failed)
+                failed(errorCode, errorReason, affected);
+        }
+
+        getTime(client, baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout);
+    };
+
+    return checkAuth(client, baseInfo, password, callback, timeout);
 }
 
 ///
