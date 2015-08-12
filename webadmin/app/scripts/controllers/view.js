@@ -5,7 +5,43 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.playerApi = false;
         $scope.cameras = {};
+        $scope.cameraId = $scope.cameraId || $routeParams.cameraId || null;
         $scope.activeCamera = null;
+
+        $scope.activeResolution = 'Auto';
+        // TODO: detect better resolution here?
+        var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
+        var nativeResolutions = ['Auto', 'hi', 'lo'];
+        var reloadInterval = 30*1000;//30 seconds
+        var quickReloadInterval = 3*1000;// 3 seconds if something was wrong
+        var mimeTypes = {
+            'hls': 'application/x-mpegURL',
+            'webm': 'video/webm',
+            'rtsp': 'application/x-rtsp',
+            'flv': 'video/x-flv',
+            'mp4': 'video/mp4',
+            'mjpeg':'video/x-motion-jpeg'
+        };
+
+        $scope.activeFormat = 'Auto';
+        $scope.availableFormats = [
+            'Auto',
+            'video/webm',
+            'application/x-mpegURL',
+            'application/x-rtsp'
+        ];
+
+        $scope.settings = {id: ""};
+
+        mediaserver.getSettings().then(function (r) {
+            $scope.settings = {
+                id: r.data.reply.id
+            };
+        });
+
+        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm')){
+            $scope.ieNoWebm = true;
+        }
 
         if(window.jscd.mobile) {
             $scope.mobileStore = window.jscd.os == "iOS"?"appstore":"googleplay";
@@ -25,26 +61,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.hasMobileApp = !!found;
         }
 
-
-        $scope.activeResolution = 'Auto';
-        // detect max resolution here?
-        var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
-        var nativeResolutions = ['Auto', 'hi', 'lo'];
-        var reloadInterval = 30*1000;//30 seconds
-        var quickReloadInterval = 3*1000;// 3 seconds if something was wrong
-        var mimeTypes = {
-            'hls': 'application/x-mpegURL',
-            'webm': 'video/webm',
-            'rtsp': 'application/x-rtsp',
-            'flv': 'video/x-flv',
-            'mp4': 'video/mp4',
-            'mjpeg':'video/x-motion-jpeg'
-        };
-
-
-        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm')){
-            $scope.ieNoWebm = true;
-        }
 
         function browserSupports(type){
             var v = document.createElement('video');
@@ -90,20 +106,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         updateAvailableResolutions();
 
 
-        $scope.activeFormat = 'Auto';
-        $scope.availableFormats = [
-            'Auto',
-            'video/webm',
-            'application/x-mpegURL',
-            'application/x-rtsp'
-        ];
-
-        $scope.settings = {id: ""};
-        mediaserver.getSettings().then(function (r) {
-            $scope.settings = {
-                id: r.data.reply.id
-            };
-        });
 
         function getServer(id) {
             if(!$scope.mediaServers) {
@@ -146,8 +148,8 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             // TODO: check resolution ? 
             $scope.acitveVideoSource = _.filter([
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?' + positionHls + authParam + '&chunked&' + $scope.activeResolution), type: mimeTypes['hls'], transport:'hls'},
-                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
+                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + $scope.activeResolution + positionHls   + authParam ), type: mimeTypes['hls'], transport:'hls'},
+                { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution=' + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
 
                 // Not supported:
                 // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: mimeTypes['mjpeg'] , transport:'mjpeg'},
@@ -229,7 +231,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.selectResolution = function(resolution){
             /*if(resolution == "auto" || resolution == "Auto" || resolution == "AUTO"){
-                resolution = "320p";
+                resolution = "320p"; //TODO: detect better resolution here
             }*/
 
             if($scope.activeResolution == resolution){
@@ -389,7 +391,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         var timer = false;
         function reloader(){
             reloadTree().then(function(){
-                $scope.selectCameraById($scope.cameraId,$location.search().time || false,firstTime);
+                $scope.selectCameraById($scope.cameraId,$location.search().time || false, !firstTime);
                 firstTime = false;
                 timer = $timeout(reloader, reloadInterval);
             },function(error){
