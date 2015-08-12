@@ -197,6 +197,9 @@ var flashlsAPI = new (function(){
     };
 
     this.play = function(offset) {
+        if(!this.flashObject){
+            return;
+        }
         try {
             this.flashObject.playerPlay(offset);
         }catch(a){

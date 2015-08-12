@@ -28,8 +28,8 @@ angular.module('webadminApp')
             ipCookie.remove('realm',{ path: '/' });
 
             // TODO: REMOVE OBSOLETE COOKIES
-            ipCookie.remove('username',{ path: '/' });
-            ipCookie.remove('response',{ path: '/' });
+            // ipCookie.remove('username',{ path: '/' });
+            // ipCookie.remove('response',{ path: '/' });
 
             window.location.reload();
         };

@@ -56,8 +56,8 @@ angular.module('webadminApp')
                 ipCookie('auth_rtsp',auth_rtsp, { path: '/' });
 
                 //Old cookies:  // TODO: REMOVE THIS SECTION
-                ipCookie('response',auth_digest, { path: '/' });
-                ipCookie('username',lowercaseLogin, { path: '/' });
+                //ipCookie('response',auth_digest, { path: '/' });
+                //ipCookie('username',lowercaseLogin, { path: '/' });
 
                 // Check auth again
                 $scope.authorizing = true;
