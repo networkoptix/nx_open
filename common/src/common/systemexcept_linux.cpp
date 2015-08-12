@@ -72,6 +72,10 @@ static pthread_t mainThread(0);
 static ThreadKeeper allThreads;
 static struct sigaction originalHandlers[_NSIG] = {};
 
+static bool isLogFileOpened(false);
+static pthread_t problemThread(0);
+static int logFile(-1);
+
 static std::string getCrashPrefix()
 {
     const std::string program(program_invocation_name);
@@ -100,6 +104,8 @@ static int printFd(int fd, Args ... args)
 static int openLogFile()
 {
     int log = open(crashFile.c_str(), O_CREAT | O_WRONLY, 0666);
+    if (log < 0) return log;
+
     int status = open("/proc/self/status", O_RDONLY);
     if (status < 0) return log;
 
@@ -148,8 +154,12 @@ static void signalHandler(int signal, siginfo_t* info, void* data)
     }
 
     const auto thisThread = pthread_self();
-    static const auto problemThread = thisThread;
-    static const auto logFile = openLogFile();
+    if (!isLogFileOpened)
+    {
+        isLogFileOpened = true;
+        problemThread = thisThread;
+        logFile = openLogFile();
+    }
 
     if (logFile < 0)
     {
