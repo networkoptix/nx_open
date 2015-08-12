@@ -13,10 +13,9 @@ class QnAuditLogMasterModel: public QnAuditLogModel
 {
     Q_OBJECT
     typedef QnAuditLogModel base_type;
-    QnAuditLogMasterModel();
 public:
     virtual void setData(const QnAuditRecordRefList &data) override;
-    QnAuditLogMasterModel(QObject *parent = NULL): QnAuditLogModel(parent) {}
+    QnAuditLogMasterModel(QObject *parent = NULL);
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     virtual ~QnAuditLogMasterModel() {}
 private:

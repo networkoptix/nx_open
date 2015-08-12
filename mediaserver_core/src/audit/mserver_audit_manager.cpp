@@ -80,7 +80,7 @@ int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAud
 
     QMutexLocker lock(&m_mutex);
     if (record.isLoginType() && record.rangeEndSec) {
-		// it will be auto deleted later if fill session last activity time
+        // it will be auto deleted later if fill session last activity time
         if (m_knownSessions.contains(record.authSession.id))
             m_knownSessions[record.authSession.id] = qnSyncTime->currentMSecsSinceEpoch();
     }

@@ -105,6 +105,16 @@
                                     <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
                                     <destFileName>sdk.zip</destFileName>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>nx_storage_sdk</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>archive</classifier>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
+                                    <destFileName>storage_sdk.zip</destFileName>
+                                </artifactItem>
                             </artifactItems>
                             <stripVersion>true</stripVersion>
                         </configuration>

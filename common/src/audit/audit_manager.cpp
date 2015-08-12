@@ -7,7 +7,6 @@ static QnAuditManager* m_globalInstance = 0;
 
 namespace
 {
-    const int MIN_PLAYBACK_TIME_TO_LOG = 1000 * 5;
     const qint64 GROUP_TIME_THRESHOLD = 1000ll * 30;
 }
 
@@ -127,7 +126,9 @@ void QnAuditManager::notifyPlaybackFinished(int internalId)
     if (itr != m_alivePlaybackInfo.end())
     {
         CameraPlaybackInfo& pbInfo = itr.value();
-        if ((pbInfo.isExport || pbInfo.timeout.elapsed() >= MIN_PLAYBACK_TIME_TO_LOG) && pbInfo.period.durationMs >= MIN_PLAYBACK_TIME_TO_LOG) {
+        if ((pbInfo.isExport  && pbInfo.period.durationMs > 0) || 
+            (pbInfo.timeout.elapsed() >= MIN_PLAYBACK_TIME_TO_LOG && pbInfo.period.durationMs >= MIN_PLAYBACK_TIME_TO_LOG)) 
+        {
             pbInfo.timeout.restart();
             m_closedPlaybackInfo.push_back(std::move(pbInfo)); // finalize old playback record
         }

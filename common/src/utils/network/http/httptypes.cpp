@@ -795,21 +795,21 @@ namespace nx_http
 
                 return result;
             }
+        }
 
-
-            void parseDigestAuthParams(
-                const ConstBufferRefType& authenticateParamsStr,
-                QMap<BufferType, BufferType>* const params )
+        void parseDigestAuthParams(
+            const ConstBufferRefType& authenticateParamsStr,
+            QMap<BufferType, BufferType>* const params,
+            char sep )
+        {
+            const std::vector<ConstBufferRefType>& paramsList = splitQuotedString( authenticateParamsStr, sep );
+            for( const ConstBufferRefType& token : paramsList )
             {
-                const std::vector<ConstBufferRefType>& paramsList = splitQuotedString( authenticateParamsStr, ',' );
-                for( const ConstBufferRefType& token : paramsList )
-                {
-                    const auto& nameAndValue = splitQuotedString( token.trimmed(), '=' );
-                    if( nameAndValue.empty() )
-                        continue;
-                    ConstBufferRefType value = nameAndValue.size() > 1 ? nameAndValue[1] : ConstBufferRefType();
-                    params->insert( nameAndValue[0].trimmed(), value.trimmed( "\"" ) );
-                }
+                const auto& nameAndValue = splitQuotedString( token.trimmed(), '=' );
+                if( nameAndValue.empty() )
+                    continue;
+                ConstBufferRefType value = nameAndValue.size() > 1 ? nameAndValue[1] : ConstBufferRefType();
+                params->insert( nameAndValue[0].trimmed(), value.trimmed( "\"" ) );
             }
         }
 
