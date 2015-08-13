@@ -10,8 +10,6 @@
 #include <string>
 #include <vector>
 
-#include <utils/common/singleton.h>
-
 #include "access_control/types.h"
 #include "data/account_data.h"
 #include "db/db_manager.h"
@@ -42,13 +40,12 @@ public:
     \note Methods of this class are re-enterable
 */
 class AccountManager
-:
-    public Singleton<AccountManager>
 {
 public:
     AccountManager(
-        EMailManager* const emailManager,
-        const conf::Settings& settings );
+        const conf::Settings& settings,
+        db::DBManager* const dbManager,
+        EMailManager* const emailManager );
 
     //!Adds account in "not activated" state and sends verification email to the email address provided
     void addAccount(
@@ -67,8 +64,9 @@ public:
         std::function<void(ResultCode, data::AccountData)> completionHandler );
     
 private:
-    EMailManager* const m_emailManager;
     const conf::Settings& m_settings;
+    db::DBManager* const m_dbManager;
+    EMailManager* const m_emailManager;
     Cache<QnUuid, data::AccountData> m_cache;
 
     db::DBResult insertAccount(

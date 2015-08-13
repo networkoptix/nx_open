@@ -13,6 +13,7 @@
 
 #include <QtCore/QDir>
 
+#include <utils/common/cpp14.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/network/aio/aioservice.h>
@@ -22,6 +23,9 @@
 #include "access_control/authentication_manager.h"
 #include "db/db_manager.h"
 #include "http_handlers/add_account_handler.h"
+#include "managers/account_manager.h"
+#include "managers/email_manager.h"
+#include "managers/system_manager.h"
 
 #include "version.h"
 
@@ -75,6 +79,16 @@ int CloudDBProcess::executeApplication()
         std::this_thread::sleep_for( std::chrono::seconds( DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC ) );
     }
 
+    EMailManager emailManager( settings );
+
+    //creating data managers
+    AccountManager accountManager(
+        settings,
+        &dbManager,
+        &emailManager );
+
+    SystemManager systemManager( &dbManager );
+
     //contains singletones common for http server
     nx_http::ServerManagers httpServerManagers;
 
@@ -85,7 +99,10 @@ int CloudDBProcess::executeApplication()
     httpServerManagers.setAuthenticationManager( &authenticationManager );
 
     //registering HTTP handlers
-    registerApiHandlers( &httpMessageDispatcher );
+    registerApiHandlers(
+        &httpMessageDispatcher,
+        &accountManager,
+        &systemManager );
 
     using namespace std::placeholders;
 
@@ -151,10 +168,16 @@ void CloudDBProcess::initializeLogging( const conf::Settings& settings )
     }
 }
 
-void CloudDBProcess::registerApiHandlers( nx_http::MessageDispatcher* const msgDispatcher )
+void CloudDBProcess::registerApiHandlers(
+    nx_http::MessageDispatcher* const msgDispatcher,
+    AccountManager* const accountManager,
+    SystemManager* const /*systemManager*/ )
 {
     msgDispatcher->registerRequestProcessor<cdb::AddAccountHttpHandler>(
-        cdb::AddAccountHttpHandler::HANDLER_PATH );
+        cdb::AddAccountHttpHandler::HANDLER_PATH,
+        [accountManager]() -> cdb::AddAccountHttpHandler* {
+            return new cdb::AddAccountHttpHandler( accountManager );
+        } );
 }
 
 }   //cdb

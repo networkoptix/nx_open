@@ -10,6 +10,12 @@ namespace nx {
 namespace cdb {
 
 
+EMailManager::EMailManager( const conf::Settings& settings )
+:
+    m_settings( settings )
+{
+}
+
 void EMailManager::sendEmailAsync(
     const QString& emailAddress,
     const QString& emailBody )

@@ -13,6 +13,12 @@
 namespace nx {
 namespace cdb {
 
+SystemManager::SystemManager( db::DBManager* const dbManager )
+:
+    m_dbManager( dbManager )
+{
+}
+
 void SystemManager::bindSystemToAccount(
     const AuthorizationInfo& authzInfo,
     data::SystemData&& systemData,
@@ -26,7 +32,7 @@ void SystemManager::bindSystemToAccount(
     }
 
     using namespace std::placeholders;
-    db::DBManager::instance()->executeUpdate<data::SystemData>(
+    m_dbManager->executeUpdate<data::SystemData>(
         std::bind(&SystemManager::insertSystemToDB, this, _1, _2),
         std::move(systemData),
         std::bind(&SystemManager::systemAdded, this, _1, _2, std::move(completionHandler)) );

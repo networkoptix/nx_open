@@ -55,7 +55,7 @@ public:
 };
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
-void fromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData );
+bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData );
 
 #define AccountData_Fields (id)(email)(passwordHa1)(fullName)(statusCode)
 

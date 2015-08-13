@@ -11,6 +11,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <mustache/mustache_helper.h>
+#include <utils/common/log.h>
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
@@ -30,11 +31,13 @@ static const int UNCONFIRMED_ACCOUNT_EXPIRATION_SEC = 3*24*60*60;
 
 
 AccountManager::AccountManager(
-    EMailManager* const emailManager,
-    const conf::Settings& settings )
+    const conf::Settings& settings,
+    db::DBManager* const dbManager,
+    EMailManager* const emailManager )
 :
-    m_emailManager( emailManager ),
-    m_settings( settings )
+    m_settings( settings ),
+    m_dbManager( dbManager ),
+    m_emailManager( emailManager )
 {
 }
 
@@ -46,7 +49,7 @@ void AccountManager::addAccount(
     //TODO #ak
     
     using namespace std::placeholders;
-    db::DBManager::instance()->executeUpdate<data::AccountData, data::EmailVerificationCode>(
+    m_dbManager->executeUpdate<data::AccountData, data::EmailVerificationCode>(
         std::bind(&AccountManager::insertAccount, this, _1, _2, _3),
         std::move(accountData),
         std::bind(&AccountManager::accountAdded, this, _1, _2, _3, std::move(completionHandler)) );
@@ -98,6 +101,24 @@ db::DBResult AccountManager::insertAccount(
         return db::DBResult::ioError;
     resultData->code.assign( emailVerificationCode.constData(), emailVerificationCode.size() );
 
+    //sending confirmation email
+    QVariantHash emailParams;
+    emailParams[CLOUD_BACKEND_URL_PARAM] = m_settings.cloudBackendUrl(); //TODO #ak use something like QN_CLOUD_BACKEND_URL;
+    emailParams[CONFIRMATION_CODE_PARAM] = QString::fromStdString( resultData->code );
+    QString emailToSend;
+    if( !renderTemplateFromFile(
+            CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME,
+            emailParams,
+            &emailToSend ) )
+    {
+        NX_LOG( lit("AccountManager. Failed to render confirmation email to send to %1").
+            arg(QString::fromStdString(accountData.email)), cl_logWARNING );
+        return db::DBResult::ioError;
+    }
+    m_emailManager->sendEmailAsync(
+        QString::fromStdString( accountData.email ),
+        emailToSend );
+
     return db::DBResult::ok;
 }
 
@@ -109,16 +130,6 @@ void AccountManager::accountAdded(
 {
     if( resultCode == db::DBResult::ok )
     {
-        //sending confirmation email
-        QVariantHash emailParams;
-        emailParams[CLOUD_BACKEND_URL_PARAM] = m_settings.cloudBackendUrl(); //TODO #ak use something like QN_CLOUD_BACKEND_URL;
-        emailParams[CONFIRMATION_CODE_PARAM] = QString::fromStdString(resultData.code);
-        m_emailManager->sendEmailAsync(
-            QString::fromStdString(accountData.email),
-            renderTemplateFromFile(
-                CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME,
-                emailParams ) );
-
         //updating cache
         m_cache.add( accountData.id, std::move(accountData) );
     }

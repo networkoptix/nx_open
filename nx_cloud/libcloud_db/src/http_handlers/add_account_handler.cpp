@@ -15,13 +15,15 @@
 namespace nx {
 namespace cdb {
 
+
 const QString AddAccountHttpHandler::HANDLER_PATH = QLatin1String("/add_account");
 
-AddAccountHttpHandler::AddAccountHttpHandler()
+AddAccountHttpHandler::AddAccountHttpHandler( AccountManager* const accountManager )
 :
     AbstractFiniteMsgBodyHttpHandler<data::AccountData>(
         EntityType::account,
-        DataActionType::insert )
+        DataActionType::insert ),
+    m_accountManager( accountManager )
 {
 }
 
@@ -32,11 +34,10 @@ AddAccountHttpHandler::~AddAccountHttpHandler()
 void AddAccountHttpHandler::processRequest(
     AuthorizationInfo&& authzInfo,
     data::AccountData&& accountData,
-    nx_http::Response* const /*response*/,
-    std::function<void( nx_http::StatusCode::Value statusCode )>&& completionHandler )
+    std::function<void( nx_http::StatusCode::Value )>&& completionHandler )
 {
     m_completionHandler = std::move( completionHandler );
-    AccountManager::instance()->addAccount(
+    m_accountManager->addAccount(
         authzInfo,
         std::move(accountData),
         std::bind(
@@ -50,6 +51,7 @@ void AddAccountHttpHandler::addAccountDone( ResultCode resultCode )
     auto completionHandler = std::move(m_completionHandler);
     completionHandler( resultCodeToHttpStatusCode(resultCode) );
 }
+
 
 }   //cdb
 }   //nx

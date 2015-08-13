@@ -40,6 +40,10 @@ typedef DataInsertUpdateEvent<data::SystemData> SystemInsertUpdateEvent;
 
 
 
+namespace db {
+    class DBManager;
+}
+
 
 /*!
     Provides methods for manipulating system data on persisent storage.
@@ -49,6 +53,8 @@ typedef DataInsertUpdateEvent<data::SystemData> SystemInsertUpdateEvent;
 class SystemManager
 {
 public:
+    SystemManager( db::DBManager* const dbManager );
+
     //!Binds system to an account associated with \a authzInfo
     void bindSystemToAccount(
         const AuthorizationInfo& authzInfo,
@@ -94,6 +100,8 @@ public:
     void unregisterNotificationReceiver( int receiverID );
 
 private:
+    db::DBManager* const m_dbManager;
+
     db::DBResult insertSystemToDB(
         QSqlDatabase* const tran,
         const data::SystemData& newSystem );

@@ -28,6 +28,9 @@ namespace nx_http
 namespace nx {
 namespace cdb {
 
+class AccountManager;
+class SystemManager;
+
 class CloudDBProcess
 :
     public QtService<QtSingleCoreApplication>,
@@ -50,7 +53,10 @@ private:
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
 
     void initializeLogging( const conf::Settings& settings );
-    void registerApiHandlers( nx_http::MessageDispatcher* const msgDispatcher );
+    void registerApiHandlers(
+        nx_http::MessageDispatcher* const msgDispatcher,
+        AccountManager* const accountManager,
+        SystemManager* const systemManager );
 };
 
 }   //cdb

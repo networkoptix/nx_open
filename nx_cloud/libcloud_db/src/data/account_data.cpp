@@ -26,9 +26,16 @@ bool AccountData::getAsVariant( int resID, QVariant* const value ) const
     return false;
 }
 
-void fromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData )
+bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData )
 {
-    //TODO #ak
+    accountData->id = QnUuid(urlQuery.queryItemValue( lit("id") ));
+    accountData->email = urlQuery.queryItemValue( lit("email") ).toUtf8();
+    accountData->passwordHa1 = urlQuery.queryItemValue( lit("passwordHa1") ).toUtf8();
+    accountData->fullName = urlQuery.queryItemValue( lit("fullName") ).toUtf8();
+    bool success = false;
+    accountData->statusCode =
+        QnLexical::deserialized<AccountStatus>( lit( "statusCode" ), asInvalid, &success );
+    return success;
 }
 
 

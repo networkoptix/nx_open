@@ -14,7 +14,6 @@
 #include <QtSql/QSqlDatabase>
 
 #include <utils/common/cpp14.h>
-#include <utils/common/singleton.h>
 #include <utils/thread/mutex.h>
 #include <utils/common/threadqueue.h>
 
@@ -33,8 +32,6 @@ namespace db {
     Scales DB operations on multiple threads
  */
 class DBManager
-:
-    public Singleton<DBManager>
 {
 public:
     DBManager( const ConnectionOptions& connectionOptions );

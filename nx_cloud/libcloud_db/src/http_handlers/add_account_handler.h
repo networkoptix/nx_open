@@ -19,6 +19,8 @@
 namespace nx {
 namespace cdb {
 
+class AccountManager;
+
 class AddAccountHttpHandler
 :
     public AbstractFiniteMsgBodyHttpHandler<data::AccountData>
@@ -26,7 +28,7 @@ class AddAccountHttpHandler
 public:
     static const QString HANDLER_PATH;
 
-    AddAccountHttpHandler();
+    AddAccountHttpHandler( AccountManager* const accountManager );
     virtual ~AddAccountHttpHandler();
 
 protected:
@@ -34,11 +36,11 @@ protected:
     virtual void processRequest(
         AuthorizationInfo&& authzInfo,
         data::AccountData&& accountData,
-        nx_http::Response* const response,
-        std::function<void( nx_http::StatusCode::Value statusCode )>&& completionHandler ) override;
+        std::function<void( nx_http::StatusCode::Value )>&& completionHandler ) override;
 
 private:
-    std::function<void( nx_http::StatusCode::Value statusCode )> m_completionHandler;
+    std::function<void( nx_http::StatusCode::Value )> m_completionHandler;
+    AccountManager* const m_accountManager;
 
     void addAccountDone( ResultCode resultCode );
 };

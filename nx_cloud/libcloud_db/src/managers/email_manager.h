@@ -13,14 +13,22 @@ namespace nx {
 namespace cdb {
 
 
+namespace conf {
+    class Settings;
+}
+
+
 //!Responsible for sending emails
 class EMailManager
 {
 public:
-    EMailManager();
+    EMailManager( const conf::Settings& settings );
 
     //!Adds email to the internal queue and returns. Email will be sent as soon as possible
     void sendEmailAsync( const QString& emailAddress, const QString& emailBody );
+
+private:
+    const conf::Settings& m_settings;
 };
 
 

@@ -6,9 +6,12 @@
 #ifndef NX_HTTP_MESSAGE_DISPATCHER_H
 #define NX_HTTP_MESSAGE_DISPATCHER_H
 
+#include <memory>
+
 #include "abstract_http_request_handler.h"
 #include "http_server_connection.h"
 #include "utils/network/connection_server/message_dispatcher.h"
+#include "utils/common/cpp14.h"
 
 #define SINGLE_REQUEST_PROCESSOR_PER_REQUEST
 
@@ -42,6 +45,16 @@ namespace nx_http
             return m_processors.emplace( path, messageProcessor ).second;
         }
 #else
+        template<typename RequestHandlerType>
+        bool registerRequestProcessor(
+            const QString& path,
+            std::function<RequestHandlerType*()> factoryFunc )
+        {
+            return m_factories.emplace(
+                path,
+                factoryFunc ).second;
+        }
+
         template<typename RequestHandlerType>
         bool registerRequestProcessor( const QString& path )
         {
