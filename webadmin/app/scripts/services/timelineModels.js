@@ -886,8 +886,6 @@ ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode){
     }
 
     if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
-
-        console.log("tryTo checkWatchPlaying",this.wasForcedToStopWatchPlaying);
         this.checkWatchPlaying(date,liveMode);
     }
     if(this.watchPlayingPosition){

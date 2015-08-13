@@ -6,7 +6,7 @@
                   ng-mouseup="stopZoom(false)"
                   ng-mouseleave="stopZoom(false)"
                   ng-mousedown="startZoom(false)"
-
+                  ng-class="{disabled:disableZoomOut}"
                   ng-disabled="disableZoomOut">
                 <span class="glyphicon glyphicon-minus"></span>
             </span>
@@ -15,7 +15,7 @@
                   ng-mouseup="stopZoom(true)"
                   ng-mouseleave="stopZoom(true)"
                   ng-mousedown="startZoom(true)"
-
+                  ng-class="{disabled:disableZoomIn}"
                   ng-disabled="disableZoomIn">
                 <span class="glyphicon glyphicon-plus"></span>
             </span>

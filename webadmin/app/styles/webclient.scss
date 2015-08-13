@@ -172,6 +172,10 @@ table.webclient-window>tbody>tr>td.alert{
   background-color: rgba(198,234,255,0.05);
 }
 
+.webclient-button.disabled{
+  opacity:0.1;
+}
+
 
 .webclient-top-border{
   border-top: 1px solid #263137;
@@ -371,6 +375,19 @@ table.webclient-window>tbody>tr>td.alert{
 
 @media only screen and (min-device-width: 641px) and (max-device-width:961px) {
   /* For general iPad layouts */
+  .cameras-panel{
+    font-size:80%;
+  }
+  .dark-theme .nav > li > a {
+    padding-left: 75px;
+  }
+  .camera-preview {
+    margin-left: -60px;
+  }
+  .dark-theme .nav > li.active > a {
+    padding-left: 72px;
+  }
+
 
   .webclient-window .cameras-panel {
     height: 100%;
