@@ -9,6 +9,7 @@ angular.module('webadminApp')
                 positionProvider: '=',
                 playHandler: '=',
                 liveOnly: '=',
+                canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '='
             },
@@ -65,7 +66,7 @@ angular.module('webadminApp')
                     labelPadding: 10,
                     lineWidth: 1,
 
-                    chunkHeight:35/110, // %    //Height for event line
+                    chunkHeight:30/110, // %    //Height for event line
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
@@ -81,18 +82,23 @@ angular.module('webadminApp')
                     scrollBarColor: [53,70,79],
                     scrollBarHighlightColor: [53,70,79,0.8],
 
-                    timeMarkerColor: [255,255,255], // Timemarker color
-                    timeMarkerTextColor: [0,0,0],
-                    pointerMarkerColor: [0,0,0], // Mouse pointer marker color
+                    timeMarkerColor: [215,223,227], // Timemarker color
+                    timeMarkerTextColor: [12,21,23],
+                    pointerMarkerColor: [12,21,23], // Mouse pointer marker color
                     pointerMarkerTextColor: [255,255,255],
-                    markerFont:{
-                        size:12,
+                    markerDateFont:{
+                        size:15,
                         weight:400,
                         face:"Roboto"
                     },
-                    markerWidth: 120,
-                    markerHeight: 45/110,
-                    markerTriangleHeight: 10/110,
+                    markerTimeFont:{
+                        size:17,
+                        weight:500,
+                        face:"Roboto"
+                    },
+                    markerWidth: 140,
+                    markerHeight: 50/110,
+                    markerTriangleHeight: 6/110,
                     dateFormat: 'd mmmm yyyy', // Timemarker format for date
                     timeFormat: 'HH:MM:ss', // Timemarker format for time
 
@@ -123,7 +129,7 @@ angular.module('webadminApp')
                     oldStyle:false,
 
                     labelAlign:"above",// center, left, above
-                    labelHeight:25/110, // %
+                    labelHeight:30/110, // %
                     labelFont:{
                         size:15,
                         weight:400,
@@ -199,7 +205,7 @@ angular.module('webadminApp')
 
 
                     labelAlign:"above",// center, left, above
-                    labelHeight:35/110, // %
+                    labelHeight:40/110, // %
                     labelFont:{
                         size:15,
                         weight:400,
@@ -672,7 +678,7 @@ angular.module('webadminApp')
 
                     context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
 
-                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+                    context.clearRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
 
                     if(scope.recordsProvider && scope.recordsProvider.chunksTree) {
 
@@ -701,8 +707,10 @@ angular.module('webadminApp')
                     if(!context){
                         return;
                     }
+                    context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
 
-                    context.clearRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+
 
                     var level = scope.scaleManager.levels.events.level;
                     var levelIndex = scope.scaleManager.levels.events.index;
@@ -782,9 +790,7 @@ angular.module('webadminApp')
                             mouseInScrollbar = mouseCoordinate - startCoordinate;
                             mouseInTimeline = false;
                         }else{
-                            if(mouseInTimeline){
-                                mouseInTimeline = mouseCoordinate;
-                            }
+                            mouseInTimeline = mouseCoordinate;
                         }
                         if(mouseInScrollbarRow){
                             mouseInScrollbarRow = mouseCoordinate - startCoordinate;
@@ -824,8 +830,10 @@ angular.module('webadminApp')
                     context.strokeStyle = blurColor(markerColor,1);
                     context.fillStyle = blurColor(markerColor,1);
 
+                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
+
                     context.beginPath();
-                    context.moveTo(coordinate + 0.5, 0);
+                    context.moveTo(coordinate + 0.5, top);
                     context.lineTo(coordinate + 0.5, Math.round(scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight));
                     context.stroke();
 
@@ -842,22 +850,24 @@ angular.module('webadminApp')
 
                     // Triangle
                     context.beginPath();
-                    context.moveTo(coordinate + timelineConfig.markerTriangleHeight * scope.viewportHeight, height);
-                    context.lineTo(coordinate, height + timelineConfig.markerTriangleHeight * scope.viewportHeight);
-                    context.lineTo(coordinate - timelineConfig.markerTriangleHeight * scope.viewportHeight, height);
+                    context.moveTo(coordinate + timelineConfig.markerTriangleHeight * scope.viewportHeight + 0.5, height);
+                    context.lineTo(coordinate + 0.5, height + timelineConfig.markerTriangleHeight * scope.viewportHeight);
+                    context.lineTo(coordinate - timelineConfig.markerTriangleHeight * scope.viewportHeight + 0.5, height);
                     context.closePath();
                     context.fill();
 
                     // Labels
                     context.fillStyle = blurColor(textColor,1);
-                    context.font = formatFont(timelineConfig.markerFont);
+                    context.font = formatFont(timelineConfig.markerDateFont);
                     coordinate = startCoord + timelineConfig.markerWidth /2; // Set actual center of the marker
 
                     var dateString = dateFormat(date, timelineConfig.dateFormat);
                     var dateWidth = context.measureText(dateString).width;
-                    var textStart = (height - timelineConfig.markerFont.size) / 2;
+                    var textStart = (height - timelineConfig.markerDateFont.size) / 2;
                     context.fillText(dateString,coordinate - dateWidth/2, textStart);
 
+
+                    context.font = formatFont(timelineConfig.markerTimeFont);
                     dateString = dateFormat(date, timelineConfig.timeFormat);
                     dateWidth = context.measureText(dateString).width;
                     textStart = height/2 + textStart;
@@ -886,12 +896,12 @@ angular.module('webadminApp')
                         return;
                     }
 
-                    if($(event.target).is("canvas")){
+                    if($(event.target).is("canvas") && event.offsetX){
                         mouseCoordinate = event.offsetX;
                     }else{
                         mouseCoordinate = event.pageX - $(canvas).offset().left;
                     }
-                    mouseRow = event.offsetY;
+                    mouseRow = event.offsetY || (event.pageY - $(canvas).offset().top);
 
                     drawOrCheckScrollBar();
                     drawOrCheckEvents();
@@ -945,8 +955,15 @@ angular.module('webadminApp')
                         );
                 }
 
+
+                var preventClick = false;
+
+
                 scope.dblClick = function(event){
                     updateMouseCoordinate(event);
+                    if(preventClick){
+                        return;
+                    }
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         scope.zoom(true);
@@ -959,6 +976,10 @@ angular.module('webadminApp')
                 };
                 scope.click = function(event){
                     updateMouseCoordinate(event);
+                    if(preventClick){
+                        return;
+                    }
+
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         var date = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
@@ -972,7 +993,6 @@ angular.module('webadminApp')
                         }
                     }
                 };
-
 
                 scope.mouseUp = function(event){
                     //updateMouseCoordinate(event);
@@ -994,8 +1014,47 @@ angular.module('webadminApp')
                     // catchScrollBar = mouseInScrollbar;
                 };
 
+                scope.draginit = function(event){
+                    updateMouseCoordinate(event);
+                    catchScrollBar = mouseInScrollbar;
+                    catchTimeline = mouseInTimeline;
+                    scope.scaleManager.stopWatching();
+                };
+                scope.drag = function(event){
+                    updateMouseCoordinate(event);
 
+                    if(catchScrollBar) {
+                        var moveScroll = mouseInScrollbar - catchScrollBar;
+                        scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
+                    }
+                    if(catchTimeline) {
+                        var moveScroll = catchTimeline - mouseInTimeline;
+                        catchTimeline = mouseInTimeline;
+                        scope.scaleManager.scrollByPixels(moveScroll);
+                    }
+                };
+                scope.drastart = function(event){};
+                scope.dragend = function(event){
+                    catchScrollBar = false;
+                    catchTimeline = false;
+                    scope.scaleManager.releaseWatching();
 
+                    preventClick = true;
+                    setTimeout(function(){
+                        preventClick = false;
+                    }, timelineConfig.animationDuration);
+                    updateMouseCoordinate(null);
+                };
+
+                $(canvas).drag("draginit",scope.draginit);
+                $(canvas).drag("dragstart",scope.drastart);
+                $(canvas).drag("drag",scope.drag);
+                $(canvas).drag("dragend",scope.dragend);
+
+                $(canvas).bind("touchstart", scope.draginit);
+                $(canvas).bind("touchmove", scope.drag);
+                $(canvas).bind("touchend", scope.dragend);
+                $(canvas).bind("touchcancel",scope.dragend);
 
 
                 // !!! Scrolling functions
@@ -1021,8 +1080,13 @@ angular.module('webadminApp')
                     }
                 };
                 scope.startZoom = function(zoomIn) {
+                    if(scope.disableZoomOut&&!zoomIn || scope.disableZoomIn&&zoomIn){
+                        return;
+                    }
+
                     zoomingNow = true;
                     zoomingIn = zoomIn;
+
                     processZooming();
                 };
 
@@ -1048,6 +1112,8 @@ angular.module('webadminApp')
 
                     return false;
                 }
+
+
                 scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 
                     var maxZoom = scope.scaleManager.fullZoomOutValue();
@@ -1066,7 +1132,7 @@ angular.module('webadminApp')
                         scope.disableZoomIn = false;
                     }
 
-                    //Find final levels for this zoom
+                    //Find final levels for this zoom and run animation:
                     var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);
                     if(levelsChanged(newTargetLevels, targetLevels)){
                         targetLevels = newTargetLevels;
@@ -1074,7 +1140,6 @@ angular.module('webadminApp')
                         if( scope.zooming == 1){ // We need to run animation again
                             scope.zooming = 0;
                         }
-
 
                         // This allows us to continue (and slowdown, mb) animation every time
                         animateScope.animate(scope,"zooming",1,"dryResistance").then(function(){
@@ -1097,6 +1162,7 @@ angular.module('webadminApp')
                         delayWatchingPlayingPosition();
                     }
 
+
                     if(!instant) {
                         if(!scope.zoomTarget) {
                             scope.zoomTarget = scope.scaleManager.zoom();
@@ -1114,6 +1180,10 @@ angular.module('webadminApp')
                 };
 
                 scope.goToLive = function(){
+                    if(scope.positionProvider.liveMode){
+                        scope.scaleManager.watchPlaying();
+                        return;
+                    }
                     var moveDate = scope.scaleManager.screenCoordinateToDate(1);
                     animateScope.progress(scope, "goingToLive" ).then(
                         function(){
@@ -1142,35 +1212,7 @@ angular.module('webadminApp')
 
                 // !!! Subscribe for different events which affect timeline
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
-                $(canvas).drag("draginit",function(event){
-                    updateMouseCoordinate(event);
-                    catchScrollBar = mouseInScrollbar;
-                    catchTimeline = mouseInTimeline;
-                    scope.scaleManager.stopWatching();
-                });
-                $(canvas).drag("dragstart",function(event,dd){
-                    //updateMouseCoordinate(event);
-                    //catchScrollBar = mouseInScrollbar;
-                });
-                $(canvas).drag("drag",function(event){
-                    updateMouseCoordinate(event);
 
-                    if(catchScrollBar) {
-                        var moveScroll = mouseInScrollbar - catchScrollBar;
-                        scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
-                    }
-                    if(catchTimeline) {
-                        var moveScroll = catchTimeline - mouseInTimeline;
-                        catchTimeline = mouseInTimeline;
-                        scope.scaleManager.scrollByPixels(moveScroll);
-                    }
-                });
-
-                $(canvas).drag("dragend",function(event,dd){
-                    catchScrollBar = false;
-                    catchTimeline = false;
-                    scope.scaleManager.releaseWatching();
-                });
 
 
 
