@@ -7,6 +7,8 @@
 #include "core/resource/camera_resource.h"
 #include "api/common_message_processor.h"
 #include "business/business_strings_helper.h"
+#include "nx_ec/data/api_conversion_functions.h"
+#include "business/business_event_rule.h"
 
 namespace ec2
 {
@@ -72,14 +74,9 @@ namespace ec2
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
         auditRecord.resources.push_back(params.id);
-
-        auto msgProc = QnCommonMessageProcessor::instance();
-        if (msgProc) {
-            QnBusinessEventRulePtr bRule = msgProc->businessRules().value(params.id);
-            if (bRule)
-                auditRecord.addParam("description", QnBusinessStringsHelper::bruleDescriptionText(bRule).toUtf8());
-        }
-
+        QnBusinessEventRulePtr bRule(new QnBusinessEventRule());
+        fromApiToResource(params, bRule, 0);
+        auditRecord.addParam("description", QnBusinessStringsHelper::bruleDescriptionText(bRule).toUtf8());
 
         qnAuditManager->addAuditRecord(auditRecord);
     }

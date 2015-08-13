@@ -126,7 +126,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/', host: '192.168.56.101',port: 9000}/**/
 
                 // Masha
-                {context: '/api/',      host: '10.0.2.186', port: 7001},
+                /*{context: '/api/',      host: '10.0.2.186', port: 7001},
                 {context: '/ec2/',      host: '10.0.2.186', port: 7001},
                 {context: '/hls/',      host: '10.0.2.186', port: 7001},
                 {context: '/media/',    host: '10.0.2.186', port: 7001},
@@ -134,7 +134,7 @@ module.exports = function (grunt) {
 
 
                 // Olya
-                /*{context: '/api/',      host: '10.0.2.169', port: 7011},
+                {context: '/api/',      host: '10.0.2.169', port: 7011},
                 {context: '/ec2/',      host: '10.0.2.169', port: 7011},
                 {context: '/hls/',      host: '10.0.2.169', port: 7011},
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
@@ -363,7 +363,7 @@ module.exports = function (grunt) {
 
         // Performs rewrites based on rev and the useminPrepare configuration
         usemin: {
-            html: ['<%= yeoman.dist %>/{,*/}{*.html,*.xsl}'],
+            html: ['<%= yeoman.dist %>/{*.html,*.xsl}'],
             css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
             options: {
                 assetsDirs: [
@@ -478,8 +478,7 @@ module.exports = function (grunt) {
                         flatten: true,
                         dest: '<%= yeoman.dist %>/fonts',
                         src: ['bower_components/sass-bootstrap/fonts/*']
-                    }
-                    ,
+                    },
                     {
                         expand: true,
                         cwd: '<%= yeoman.app %>',

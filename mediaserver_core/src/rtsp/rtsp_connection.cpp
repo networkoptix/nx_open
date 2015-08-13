@@ -1432,7 +1432,7 @@ void QnRtspConnectionProcessor::run()
     {
         for (int i = 0; i < 3 && !m_needStop; ++i)
         {
-            if(!qnAuthHelper->authenticate(d->request, d->response))
+            if(qnAuthHelper->authenticate(d->request, d->response) != Auth_OK)
             {
                 sendResponse(CODE_AUTH_REQUIRED);
                 if (readRequest()) 
