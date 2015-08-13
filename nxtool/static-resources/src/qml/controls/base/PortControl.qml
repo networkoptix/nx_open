@@ -12,6 +12,7 @@ Base.TextField
     readonly property string emptyPortString: "<different>";
 
     initialText: (initialPort ? initialPort.toString() : emptyPortString);
+
     horizontalAlignment: TextInput.AlignRight
     
     onActiveFocusChanged: 
@@ -40,5 +41,10 @@ Base.TextField
             lastValidValue = text;
     }
 
+    Component.onCompleted:
+    {
+        if (!initialPort)
+            placeholderText = emptyPortString;
+    }
 }
 
