@@ -1361,10 +1361,6 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncStorages = true;
         }
     }
-    else if (updateName == lit(":/updates/42_add_license_to_user_attr.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncCameraUserAttributes = true;
-    }
 
     return true;
 }
@@ -1675,8 +1671,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             dewarping_params,               \
             min_archive_days,               \
             max_archive_days,               \
-            prefered_server_id,             \
-            license_used)                   \
+            prefered_server_id )            \
          VALUES (                           \
             :cameraID,                      \
             :cameraName,                    \
@@ -1690,8 +1685,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :dewarpingParams,               \
             :minArchiveDays,                \
             :maxArchiveDays,                \
-            :preferedServerId,              \
-            :licenseUsed)                   \
+            :preferedServerId )             \
         ");
     QnSql::bind(data, &insQuery);
     if( !insQuery.exec() )
@@ -3072,8 +3066,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributes
             dewarping_params as dewarpingParams,         \
             min_archive_days as minArchiveDays,          \
             max_archive_days as maxArchiveDays,          \
-            prefered_server_id as preferedServerId,      \
-            license_used as licenseUsed                  \
+            prefered_server_id as preferedServerId       \
          FROM vms_camera_user_attributes                 \
          LEFT JOIN vms_resource r on r.guid = camera_guid     \
          %1                                              \
@@ -3130,8 +3123,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList
             cu.dewarping_params as dewarpingParams,            \
             cu.min_archive_days as minArchiveDays,             \
             cu.max_archive_days as maxArchiveDays,             \
-            cu.prefered_server_id as preferedServerId,         \
-            cu.license_used as licenseUsed                     \
+            cu.prefered_server_id as preferedServerId          \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_camera c on c.resource_ptr_id = r.id \
