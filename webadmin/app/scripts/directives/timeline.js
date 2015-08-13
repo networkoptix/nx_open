@@ -92,7 +92,7 @@ angular.module('webadminApp')
                     },
                     markerTimeFont:{
                         size:17,
-                        weight:400,
+                        weight:500,
                         face:"Roboto"
                     },
                     markerWidth: 140,
@@ -893,12 +893,12 @@ angular.module('webadminApp')
                         return;
                     }
 
-                    if($(event.target).is("canvas")){
+                    if($(event.target).is("canvas") && event.offsetX){
                         mouseCoordinate = event.offsetX;
                     }else{
                         mouseCoordinate = event.pageX - $(canvas).offset().left;
                     }
-                    mouseRow = event.offsetY;
+                    mouseRow = event.offsetY || (event.pageY - $(canvas).offset().top);
 
                     drawOrCheckScrollBar();
                     drawOrCheckEvents();
@@ -1011,18 +1011,13 @@ angular.module('webadminApp')
                     // catchScrollBar = mouseInScrollbar;
                 };
 
-
-                $(canvas).drag("draginit",function(event){
+                scope.draginit = function(event){
                     updateMouseCoordinate(event);
                     catchScrollBar = mouseInScrollbar;
                     catchTimeline = mouseInTimeline;
                     scope.scaleManager.stopWatching();
-                });
-                $(canvas).drag("dragstart",function(event,dd){
-                    //updateMouseCoordinate(event);
-                    //catchScrollBar = mouseInScrollbar;
-                });
-                $(canvas).drag("drag",function(event){
+                };
+                scope.drag = function(event){
                     updateMouseCoordinate(event);
 
                     if(catchScrollBar) {
@@ -1034,9 +1029,9 @@ angular.module('webadminApp')
                         catchTimeline = mouseInTimeline;
                         scope.scaleManager.scrollByPixels(moveScroll);
                     }
-                });
-
-                $(canvas).drag("dragend",function(event,dd){
+                };
+                scope.drastart = function(event){};
+                scope.dragend = function(event){
                     catchScrollBar = false;
                     catchTimeline = false;
                     scope.scaleManager.releaseWatching();
@@ -1045,8 +1040,18 @@ angular.module('webadminApp')
                     setTimeout(function(){
                         preventClick = false;
                     }, timelineConfig.animationDuration);
-                });
+                    updateMouseCoordinate(null);
+                };
 
+                $(canvas).drag("draginit",scope.draginit);
+                $(canvas).drag("dragstart",scope.drastart);
+                $(canvas).drag("drag",scope.drag);
+                $(canvas).drag("dragend",scope.dragend);
+
+                $(canvas).bind("touchstart", scope.draginit);
+                $(canvas).bind("touchmove", scope.drag);
+                $(canvas).bind("touchend", scope.dragend);
+                $(canvas).bind("touchcancel",scope.dragend);
 
 
                 // !!! Scrolling functions
