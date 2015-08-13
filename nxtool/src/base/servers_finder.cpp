@@ -290,7 +290,7 @@ void rtu::ServersFinder::Impl::updateServers()
         if ((address.protocol() != QAbstractSocket::IPv4Protocol))
             continue;
 
-        SocketsContainer::iterator &it = m_sockets.find(address);
+        SocketsContainer::iterator it = m_sockets.find(address);
         if (it == m_sockets.end())
         {
             it = m_sockets.insert(address, SocketPtr(new QUdpSocket()));
