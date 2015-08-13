@@ -1,14 +1,14 @@
 <div class="container-fluid dark-theme row">
    <table style="width:100%" class="webclient-window">
         <tbody>
-            <tr ng-if="hasMobileApp || ieNoWebm">
+            <tr class="alerts-row" ng-if="hasMobileApp && !mobileAppNotified || ieNoWebm && !ieNoWebmNotified ">
                 <td colspan="2" class="alert">
-                    <div class="webclient-panel mobile-alert" ng-if="hasMobileApp" collapse="mobileAppNotified">
+                    <div class="webclient-panel mobile-alert" ng-if="hasMobileApp && !mobileAppNotified">
                         <div class="pull-right" >
                             <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
                                 Install
                             </a>
-                            <span class="webclient-button caption-row" ng-click="mobileAppNotified=true"><span class="glyphicon glyphicon-remove"></span></span>
+                            <span class="webclient-button caption-row" ng-click="mobileAppAlertClose()"><span class="glyphicon glyphicon-remove"></span></span>
                         </div>
                         <div>
                             <span class="caption-row ">
@@ -17,12 +17,12 @@
                         </div>
                     </div>
 
-                    <div class="webclient-panel mobile-alert" ng-if="ieNoWebm" collapse="mobileAppNotified">
+                    <div class="webclient-panel mobile-alert" ng-if="ieNoWebm && !ieNoWebmNotified">
                         <div class="pull-right" >
                             <a ng-href="https://tools.google.com/dlpage/webmmf/" class="btn webclient-button caption-row" >
                                 Install
                             </a>
-                            <span class="webclient-button caption-row" ng-click="mobileAppNotified=true"><span class="glyphicon glyphicon-remove"></span></span>
+                            <span class="webclient-button caption-row" ng-click="ieNoWebmAlertClose()"><span class="glyphicon glyphicon-remove"></span></span>
                         </div>
                         <div>
                             <span class="caption-row ">
