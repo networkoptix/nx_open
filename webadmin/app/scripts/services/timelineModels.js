@@ -624,6 +624,10 @@ ShortCache.prototype.update = function(requestPosition,position){
             _.forEach(chunks,function(chunk){
                 chunk.durationMs = parseInt(chunk.durationMs);
                 chunk.startTimeMs = parseInt(chunk.startTimeMs);
+
+                if(chunk.durationMs == -1){
+                    chunk.durationMs = (new Date()).getTime() - chunk.startTimeMs + 10000;//in future
+                }
             });
 
             if(chunks.length == 0){
