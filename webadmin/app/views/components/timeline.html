@@ -6,8 +6,7 @@
                   ng-mouseup="stopZoom(false)"
                   ng-mouseleave="stopZoom(false)"
                   ng-mousedown="startZoom(false)"
-                  ng-class="{'btn-disabled':disableZoomOut}"
-                  ng-disabled="disableZoomOut">
+                  ng-class="{disabled:disableZoomOut}">
                 <span class="glyphicon glyphicon-minus"></span>
             </span>
             <span ng-if="!liveOnly"
@@ -15,8 +14,7 @@
                   ng-mouseup="stopZoom(true)"
                   ng-mouseleave="stopZoom(true)"
                   ng-mousedown="startZoom(true)"
-                  ng-class="{'btn-disabled':disableZoomIn}"
-                  ng-disabled="disableZoomIn">
+                  ng-class="{disabled:disableZoomIn}">
                 <span class="glyphicon glyphicon-plus"></span>
             </span>
             <span ng-if="emptyArchive" class="caption-row ">
@@ -35,7 +33,6 @@
         </div><div class="text-right" >
             <span class="webclient-button caption-row live-button"
                   ng-class="{'active':positionProvider.liveMode}"
-                  ng-disabled="positionProvider.liveMode"
                   ng-click="goToLive()">LIVE</span>
         </div></div>
 
@@ -81,10 +78,10 @@
         <span class="btn btn-sm btn-default">
             Preset:
         </span>
-        <button type="button" class="btn btn-sm "
+        <span type="button" class="btn btn-sm "
                 ng-class="{'btn-primary':preset == activePreset, 'btn-default':preset != activePreset}"
                 ng-repeat="preset in presets"
-                ng-click="selectPreset(preset)">{{$index}}</button>
+                ng-click="selectPreset(preset)">{{$index}}</span>
     </div>
 </div>
 -->

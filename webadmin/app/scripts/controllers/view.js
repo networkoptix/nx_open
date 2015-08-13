@@ -613,5 +613,4 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.ieNoWebmNotified = true;
             setTimeout(updateHeights,50);
         };
-
     });

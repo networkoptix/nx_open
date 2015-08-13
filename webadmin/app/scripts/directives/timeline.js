@@ -1079,8 +1079,13 @@ angular.module('webadminApp')
                     }
                 };
                 scope.startZoom = function(zoomIn) {
+                    if(scope.disableZoomOut&&!zoomIn || scope.disableZoomIn&&zoomIn){
+                        return;
+                    }
+
                     zoomingNow = true;
                     zoomingIn = zoomIn;
+
                     processZooming();
                 };
 
@@ -1174,6 +1179,10 @@ angular.module('webadminApp')
                 };
 
                 scope.goToLive = function(){
+                    if(scope.positionProvider.liveMode){
+                        scope.scaleManager.watchPlaying();
+                        return;
+                    }
                     var moveDate = scope.scaleManager.screenCoordinateToDate(1);
                     animateScope.progress(scope, "goingToLive" ).then(
                         function(){
