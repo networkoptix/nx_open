@@ -30,9 +30,9 @@ protected:
         EXPECT_TRUE( server.bind() );
         EXPECT_TRUE( server.listen() );
 
-        SyncQueue< SystemError::ErrorCode > waiter;
-        EXPECT_TRUE( client.openConnection( waiter.pusher() ) );
-        EXPECT_EQ( waiter.pop(), SystemError::noError );
+        //SyncQueue< SystemError::ErrorCode > waiter;
+        //EXPECT_TRUE( client.openConnection( waiter.pusher() ) );
+        //EXPECT_EQ( waiter.pop(), SystemError::noError );
     }
 
     SocketAddress address;
