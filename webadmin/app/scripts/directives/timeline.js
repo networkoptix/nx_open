@@ -65,7 +65,7 @@ angular.module('webadminApp')
                     labelPadding: 10,
                     lineWidth: 1,
 
-                    chunkHeight:35/110, // %    //Height for event line
+                    chunkHeight:30/110, // %    //Height for event line
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
@@ -85,14 +85,19 @@ angular.module('webadminApp')
                     timeMarkerTextColor: [0,0,0],
                     pointerMarkerColor: [0,0,0], // Mouse pointer marker color
                     pointerMarkerTextColor: [255,255,255],
-                    markerFont:{
-                        size:12,
+                    markerDateFont:{
+                        size:15,
                         weight:400,
                         face:"Roboto"
                     },
-                    markerWidth: 120,
-                    markerHeight: 45/110,
-                    markerTriangleHeight: 10/110,
+                    markerTimeFont:{
+                        size:17,
+                        weight:400,
+                        face:"Roboto"
+                    },
+                    markerWidth: 140,
+                    markerHeight: 50/110,
+                    markerTriangleHeight: 6/110,
                     dateFormat: 'd mmmm yyyy', // Timemarker format for date
                     timeFormat: 'HH:MM:ss', // Timemarker format for time
 
@@ -123,7 +128,7 @@ angular.module('webadminApp')
                     oldStyle:false,
 
                     labelAlign:"above",// center, left, above
-                    labelHeight:25/110, // %
+                    labelHeight:30/110, // %
                     labelFont:{
                         size:15,
                         weight:400,
@@ -199,7 +204,7 @@ angular.module('webadminApp')
 
 
                     labelAlign:"above",// center, left, above
-                    labelHeight:35/110, // %
+                    labelHeight:40/110, // %
                     labelFont:{
                         size:15,
                         weight:400,
@@ -824,8 +829,10 @@ angular.module('webadminApp')
                     context.strokeStyle = blurColor(markerColor,1);
                     context.fillStyle = blurColor(markerColor,1);
 
+                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
+
                     context.beginPath();
-                    context.moveTo(coordinate + 0.5, 0);
+                    context.moveTo(coordinate + 0.5, top);
                     context.lineTo(coordinate + 0.5, Math.round(scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight));
                     context.stroke();
 
@@ -842,22 +849,24 @@ angular.module('webadminApp')
 
                     // Triangle
                     context.beginPath();
-                    context.moveTo(coordinate + timelineConfig.markerTriangleHeight * scope.viewportHeight, height);
-                    context.lineTo(coordinate, height + timelineConfig.markerTriangleHeight * scope.viewportHeight);
-                    context.lineTo(coordinate - timelineConfig.markerTriangleHeight * scope.viewportHeight, height);
+                    context.moveTo(coordinate + timelineConfig.markerTriangleHeight * scope.viewportHeight + 0.5, height);
+                    context.lineTo(coordinate + 0.5, height + timelineConfig.markerTriangleHeight * scope.viewportHeight);
+                    context.lineTo(coordinate - timelineConfig.markerTriangleHeight * scope.viewportHeight + 0.5, height);
                     context.closePath();
                     context.fill();
 
                     // Labels
                     context.fillStyle = blurColor(textColor,1);
-                    context.font = formatFont(timelineConfig.markerFont);
+                    context.font = formatFont(timelineConfig.markerDateFont);
                     coordinate = startCoord + timelineConfig.markerWidth /2; // Set actual center of the marker
 
                     var dateString = dateFormat(date, timelineConfig.dateFormat);
                     var dateWidth = context.measureText(dateString).width;
-                    var textStart = (height - timelineConfig.markerFont.size) / 2;
+                    var textStart = (height - timelineConfig.markerDateFont.size) / 2;
                     context.fillText(dateString,coordinate - dateWidth/2, textStart);
 
+
+                    context.font = formatFont(timelineConfig.markerTimeFont);
                     dateString = dateFormat(date, timelineConfig.timeFormat);
                     dateWidth = context.measureText(dateString).width;
                     textStart = height/2 + textStart;
