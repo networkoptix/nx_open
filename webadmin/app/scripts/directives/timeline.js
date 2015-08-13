@@ -300,6 +300,7 @@ angular.module('webadminApp')
                     drawTimeMarker(context);
                     drawPointerMarker(context);
 
+
                     //debugEvents(context);//DOTO: remove debug here
                 }
 
@@ -811,7 +812,7 @@ angular.module('webadminApp')
                 function drawMarker(context, date,markerColor,textColor){
                     var coordinate =  scope.scaleManager.dateToScreenCoordinate(date);
 
-                    if(coordinate < - timelineConfig.markerWidth/2 || coordinate > scope.viewportWidth + timelineConfig.markerWidth/2 ) {
+                    if(coordinate < 0 || coordinate > scope.viewportWidth ) {
                         return;
                     }
 
@@ -914,22 +915,36 @@ angular.module('webadminApp')
                         scope.zoomTo(zoomTarget, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),window.jscd.touch);
                     } else {
                         scope.scaleManager.scrollByPixels(event.deltaX);
+                        delayWatchingPlayingPosition();
                     }
                     scope.$apply();
                 }
 
+                var stopDelay = null;
+                function delayWatchingPlayingPosition(){
+                    if(!stopDelay) {
+                        scope.scaleManager.stopWatching();
+                    }else{
+                        clearTimeout(stopDelay);
+                    }
+                    stopDelay = setTimeout(function(){
+                        scope.scaleManager.releaseWatching();
+                        stopDelay = null;
+                    },timelineConfig.animationDuration);
+                }
+
                 function animateScroll(targetPosition){
+                    delayWatchingPlayingPosition();
                     animateScope.animate(scope,"scrollPosition",targetPosition).
                         then(
-                        function(){
-                            scope.scaleManager.checkWatchPlaying(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
-                        },
-                        function(){},
-                        function(value){
-                            scope.scaleManager.scroll(value);
-                        }
-                    );
+                            function(){},
+                            function(){},
+                            function(value){
+                                scope.scaleManager.scroll(value);
+                            }
+                        );
                 }
+
                 scope.dblClick = function(event){
                     updateMouseCoordinate(event);
                     if(!mouseInScrollbarRow) {
@@ -948,7 +963,7 @@ angular.module('webadminApp')
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         var date = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
                         scope.positionHandler(scope.scaleManager.screenCoordinateToDate(mouseCoordinate));
-                        scope.scaleManager.watchPlaying(true,date);
+                        scope.scaleManager.watchPlaying(date);
 
                     }else{
                         if(!mouseInScrollbar){
@@ -1060,10 +1075,10 @@ angular.module('webadminApp')
                             scope.zooming = 0;
                         }
 
+
                         // This allows us to continue (and slowdown, mb) animation every time
                         animateScope.animate(scope,"zooming",1,"dryResistance").then(function(){
                             currentLevels = scope.scaleManager.levels;
-                            scope.scaleManager.checkWatchPlaying(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
                         },function(){
                             // ignore animation re-run
                         });
@@ -1079,12 +1094,15 @@ angular.module('webadminApp')
                         } else {
                             scope.scaleManager.zoom(value);
                         }
+                        delayWatchingPlayingPosition();
                     }
 
                     if(!instant) {
                         if(!scope.zoomTarget) {
                             scope.zoomTarget = scope.scaleManager.zoom();
                         }
+
+                        delayWatchingPlayingPosition();
                         animateScope.animate(scope, "zoomTarget", zoomTarget, slow?"linear":"dryResistance").then(
                             function () {},
                             function () {},
@@ -1102,7 +1120,7 @@ angular.module('webadminApp')
                             var activeDate = (new Date()).getTime();
                             scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
 
-                            scope.scaleManager.watchPlaying(true);
+                            scope.scaleManager.watchPlaying();
                         },
                         function(){},
                         function(val){
@@ -1116,7 +1134,7 @@ angular.module('webadminApp')
 
                 scope.playPause = function(){
                     if(!scope.positionProvider.playing){
-                        scope.scaleManager.watchPlaying(true);
+                        scope.scaleManager.watchPlaying();
                     }
 
                     scope.playHandler(!scope.positionProvider.playing);
@@ -1128,6 +1146,7 @@ angular.module('webadminApp')
                     updateMouseCoordinate(event);
                     catchScrollBar = mouseInScrollbar;
                     catchTimeline = mouseInTimeline;
+                    scope.scaleManager.stopWatching();
                 });
                 $(canvas).drag("dragstart",function(event,dd){
                     //updateMouseCoordinate(event);
@@ -1146,10 +1165,11 @@ angular.module('webadminApp')
                         scope.scaleManager.scrollByPixels(moveScroll);
                     }
                 });
+
                 $(canvas).drag("dragend",function(event,dd){
                     catchScrollBar = false;
                     catchTimeline = false;
-                    scope.scaleManager.checkWatchPlaying(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
+                    scope.scaleManager.releaseWatching();
                 });
 
 

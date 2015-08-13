@@ -833,41 +833,43 @@ ScaleManager.prototype.updateCurrentInterval = function(){
 };
 
 
+ScaleManager.prototype.stopWatching = function(){
+    this.watchPlayingPosition = false;
+    this.wasForcedToStopWatchPlaying = true;
+};
 
-ScaleManager.prototype.watchPlaying = function(flag,date){
-    if(flag) {
-        var targetPoint = date? (this.dateToScreenCoordinate(date) / this.viewportWidth) : 0.5;
-        if(targetPoint>1){
-            targetPoint = 0.5;
-        }
-        this.setAnchorDateAndPoint(date || this.anchorDate, targetPoint);
+ScaleManager.prototype.releaseWatching = function(){
+    this.wasForcedToStopWatchPlaying = false;
+};
 
+ScaleManager.prototype.watchPlaying = function(date){
+    this.watchPlayingPosition = true;
+    this.wasForcedToStopWatchPlaying = false;
 
+    if(!date){
+        return;
     }
-
-    console.log("watchPlaying",flag,date,targetPoint);
-
-    this.watchPlayingPosition = flag;
+    var targetPoint = this.dateToScreenCoordinate(date) / this.viewportWidth;
+    if(targetPoint>1){
+        targetPoint = 0.5;
+    }
+    this.setAnchorDateAndPoint(date, targetPoint);
 };
 
 ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
     var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
+
     if(this.anchorDate == date){
-        this.watchPlaying(flag,date);
+        this.watchPlaying(date);
     }
 
-
-    console.log("checkWatchPlaying",date,targetPoint,liveMode);
-
     if(0 <= targetPoint && targetPoint <= 1 ){ 
-        this.watchPlaying(true,date); // Let's watch
+        this.watchPlaying(date); // Let's watch
     }
 
     if(liveMode && targetPoint > 1 && this.end - this.visibleEnd < this.stickToLiveMs ){
-        this.watchPlaying(true);
+        this.watchPlaying(date);
     }
-
-    this.watchPlaying(false);
 };
 
 ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode){
@@ -879,8 +881,12 @@ ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode){
         this.setEnd(date);
     }
 
+    if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
+
+        console.log("tryTo checkWatchPlaying",this.wasForcedToStopWatchPlaying);
+        this.checkWatchPlaying(date,liveMode);
+    }
     if(this.watchPlayingPosition){
-        console.log("setAnchorDateAndPoint");
         this.setAnchorDateAndPoint(date, liveMode?1:this.anchorPoint);
     }
 };
