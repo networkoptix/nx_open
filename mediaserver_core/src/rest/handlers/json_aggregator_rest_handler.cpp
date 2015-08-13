@@ -9,23 +9,21 @@ bool QnJsonAggregatorRestHandler::executeCommad(const QString &command, const Qn
 {
     QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(command);
     if (!handler) {
-        result.setError(QnJsonRestResult::InvalidParameter);
-        result.setErrorString(lit("Rest handler '%1' is not found").arg(command));
+        result.setError(QnJsonRestResult::InvalidParameter, lit("Rest handler '%1' is not found").arg(command));
         return false;
     }
     
     QSharedPointer<QnJsonRestHandler> jsonHandler = handler.dynamicCast<QnJsonRestHandler>();
     if (!jsonHandler) {
-        result.setError(QnJsonRestResult::InvalidParameter);
-        result.setErrorString(lit("Rest handler '%1' is not json handler. It is not supported").arg(command));
+        result.setError(QnJsonRestResult::InvalidParameter, lit("Rest handler '%1' is not json handler. It is not supported").arg(command));
         return false;
     }
     QnJsonRestResult subResult;
     jsonHandler->executeGet(command, params, subResult, owner);
     QVariantMap subResultWithErr;
-    subResultWithErr["error"] = subResult.error();
-    subResultWithErr["errorString"] = subResult.errorString();
-    subResultWithErr["reply"] = subResult.reply().toVariant();
+    subResultWithErr["error"] = subResult.error;
+    subResultWithErr["errorString"] = subResult.errorString;
+    subResultWithErr["reply"] = subResult.reply;
     fullData[command] = subResultWithErr;
     return true;
 }
