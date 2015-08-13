@@ -5,7 +5,6 @@
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
-#include "api/model/merge_ldap_users_reply.h"
 
 namespace Ui {
     class QnUserManagementWidget;
@@ -27,5 +26,5 @@ private:
 
 private slots:
     void at_refreshButton_clicked();
-    void at_mergeLdapUsersAsync_finished(int, QnMergeLdapUsersReply, int, QString);
+    void at_mergeLdapUsersAsync_finished(int status, int handle, const QString &errorString);
 };

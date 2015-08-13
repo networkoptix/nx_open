@@ -40,7 +40,6 @@
 #include "http/custom_headers.h"
 #include "model/recording_stats_reply.h"
 #include "common/common_module.h"
-#include "model/merge_ldap_users_reply.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -198,9 +197,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case TestEmailSettingsObject:
         processJsonReply<QnTestEmailSettingsReply>(this, response, handle);
         break;
-    case TestLdapSettingsObject:
-        processJsonReply<QnTestLdapSettingsReply>(this, response, handle);
-        break;
     case CameraAddObject:
         emitFinished(this, response.status, handle);
         break;
@@ -305,8 +301,11 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
         break;
+    case TestLdapSettingsObject:
+        processJsonReply(this, response, handle);
+        break;
     case MergeLdapUsersObject:
-        processJsonReply<QnMergeLdapUsersReply>(this, response, handle);
+        processJsonReply(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -691,7 +690,7 @@ int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
 }
 
 int QnMediaServerConnection::mergeLdapUsersAsync(QObject *target, const char *slot) {
-    return sendAsyncGetRequest(MergeLdapUsersObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QnMergeLdapUsersReply), target, slot);
+    return sendAsyncGetRequest(MergeLdapUsersObject, QnRequestParamList(), nullptr, target, slot);
 }
 
 int QnMediaServerConnection::getSystemNameAsync( QObject* target, const char* slot )
@@ -714,7 +713,7 @@ int QnMediaServerConnection::testLdapSettingsAsync(const QnLdapSettings &setting
     headers << QnRequestParam("content-type",   "application/json");
     ec2::ApiLdapSettingsData data;
     ec2::fromResourceToApi(settings, data);
-    return sendAsyncPostRequest(TestLdapSettingsObject, headers, QnRequestParamList(), QJson::serialized(data), QN_STRINGIZE_TYPE(QnTestLdapSettingsReply), target, slot);
+    return sendAsyncPostRequest(TestLdapSettingsObject, headers, QnRequestParamList(), QJson::serialized(data), nullptr, target, slot);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(

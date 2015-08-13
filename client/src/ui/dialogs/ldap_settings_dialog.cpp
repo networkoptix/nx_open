@@ -8,7 +8,6 @@
 #include <core/resource/media_server_resource.h>
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
-#include <api/model/test_ldap_settings_reply.h>
 #include <utils/common/ldap.h>
 
 #include <ui/style/warning_style.h>
@@ -87,7 +86,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     timeoutTimer->setInterval(testLdapTimeoutMSec / dialog->ui->testProgressBar->maximum());
     timeoutTimer->start();
 
-    testHandle = serverConnection->testLdapSettingsAsync(settings, dialog, SLOT(at_testLdapSettingsFinished(int, const QnTestLdapSettingsReply&, int)));
+    testHandle = serverConnection->testLdapSettingsAsync(settings, dialog, SLOT(at_testLdapSettingsFinished(int,int,QString)));
 }
 
 void QnLdapSettingsDialogPrivate::showTestResult(const QString &text) {
@@ -200,11 +199,11 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
 
 QnLdapSettingsDialog::~QnLdapSettingsDialog() {}
 
-void QnLdapSettingsDialog::at_testLdapSettingsFinished(int status, const QnTestLdapSettingsReply &reply, int handle) {
+void QnLdapSettingsDialog::at_testLdapSettingsFinished(int status, int handle, const QString &errorString) {
     if (handle != d->testHandle)
         return;
 
-    d->stopTesting(status != 0 || reply.errorCode != 0 ? tr("Failed") : tr("Success"));
+    d->stopTesting(status != 0 || !errorString.isEmpty() ? tr("Failed") : tr("Success"));
 }
 
 void QnLdapSettingsDialog::accept() {

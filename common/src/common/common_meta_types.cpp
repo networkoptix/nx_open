@@ -21,7 +21,6 @@
 #include <api/model/statistics_reply.h>
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/test_email_settings_reply.h>
-#include <api/model/test_ldap_settings_reply.h>
 #include <api/model/configure_reply.h>
 #include <api/model/upload_update_reply.h>
 #include <api/runtime_info_manager.h>
@@ -72,7 +71,6 @@
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
-#include "api/model/merge_ldap_users_reply.h"
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -184,8 +182,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnStatisticsReply>();
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnTestEmailSettingsReply>();
-    qRegisterMetaType<QnTestLdapSettingsReply>();
-    qRegisterMetaType<QnMergeLdapUsersReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
     qRegisterMetaType<QnStorageScanData>();
     qRegisterMetaType<QnManualCameraSearchReply>();

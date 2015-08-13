@@ -9,7 +9,6 @@
 #include "statistics_reply.h"
 #include "connection_info.h"
 #include "test_email_settings_reply.h"
-#include "test_ldap_settings_reply.h"
 #include "ping_reply.h"
 #include "recording_stats_reply.h"
 #include "camera_list_reply.h"
@@ -18,7 +17,6 @@
 #include "rebuild_archive_reply.h"
 #include "api_ioport_data.h"
 #include "audit/audit_record.h"
-#include "merge_ldap_users_reply.h"
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\
@@ -28,14 +26,12 @@
     (QnStorageSpaceReply)\
     (QnStorageSpaceData)\
     (QnConnectionInfo)\
-    (QnMergeLdapUsersReply)\
     (QnStorageStatusReply)\
     (QnStatisticsDataItem)\
     (QnStatisticsReply)\
     (QnTimeReply)\
     (QnStorageScanData)\
     (QnTestEmailSettingsReply)\
-    (QnTestLdapSettingsReply)\
     (QnCompatibilityItem)\
     (QnPingReply)\
     (QnCameraListReply)\

@@ -14,7 +14,6 @@
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
 #include "api/model/test_email_settings_reply.h"
-#include "api/model/test_ldap_settings_reply.h"
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/camera_list_reply.h>
@@ -24,7 +23,6 @@
 #include "media_server_connection.h"
 #include "model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
-#include "model/merge_ldap_users_reply.h"
 
 class QnTimePeriodList;
 
@@ -48,7 +46,6 @@ signals:
     void finished(int status, const QnStringBoolPairList &reply, int handle, const QString &errorString);
     void finished(int status, const QnTimeReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnTestEmailSettingsReply &reply, int handle, const QString &errorString);
-    void finished(int status, const QnTestLdapSettingsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnManualCameraSearchReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle, const QString &errorString);
@@ -67,7 +64,6 @@ signals:
     void finished(int status, const QList<QnModuleInformation> &reply, int handle, const QString &errorString);
     void finished(int status, const QnRecordingStatsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnAuditRecordList&reply, int handle, const QString &errorString);
-    void finished(int status, const QnMergeLdapUsersReply &reply, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

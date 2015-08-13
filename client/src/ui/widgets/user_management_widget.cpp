@@ -63,10 +63,15 @@ void QnUserManagementWidget::at_refreshButton_clicked() {
     if (!server)
         return;
 
-    server->apiConnection()->mergeLdapUsersAsync(this, SLOT(at_mergeLdapUsersAsync_finished(int, QnMergeLdapUsersReply, int, QString)));
+    server->apiConnection()->mergeLdapUsersAsync(this, SLOT(at_mergeLdapUsersAsync_finished(int,int,QString)));
 }
 
-void QnUserManagementWidget::at_mergeLdapUsersAsync_finished(int, QnMergeLdapUsersReply reply, int, QString) {
+void QnUserManagementWidget::at_mergeLdapUsersAsync_finished(int status, int handle, const QString &errorString) {
+    Q_UNUSED(handle)
+
+    if (status == 0 && errorString.isEmpty())
+        return;
+
     // TODO: dk, please show correct message here in case of error
 }
 

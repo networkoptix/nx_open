@@ -12,23 +12,18 @@
 #include <core/resource/user_resource.h>
 #include <ldap/ldap_manager.h>
 #include "api/app_server_connection.h"
-#include "api/model/merge_ldap_users_reply.h"
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 }
 
-int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
-{
-    QnMergeLdapUsersReply reply;
+int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) {
+    QN_UNUSED(path, params, body);
 
     QnLdapManager *ldapManager = QnLdapManager::instance();
     QnLdapUsers ldapUsers;
-    if (!ldapManager->fetchUsers(ldapUsers))
-    {
-        reply.errorCode = 1;
-        reply.errorMessage = "Can't authenticate";
-        result.setReply(reply);
+    if (!ldapManager->fetchUsers(ldapUsers)) {
+        result.setError(QnRestResult::CantProcessRequest, lit("Can't authenticate"));
         return nx_http::StatusCode::ok;
     }
 
@@ -74,6 +69,5 @@ int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnReques
         }
     }
 
-    result.setReply(result);
     return nx_http::StatusCode::ok;
 }
