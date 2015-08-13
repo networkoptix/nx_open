@@ -283,6 +283,17 @@ table.webclient-window>tbody>tr>td.alert{
   margin-left:-80px;
 }
 
+.camera-node.Unauthorized ,
+.camera-node.Offline {
+  color:#698796 !important;
+}
+
+
+.camera-node.Unauthorized small,
+.camera-node.Offline small{
+  color: #49626F;
+}
+
 .camera-node.Unauthorized .camera-preview,
 .camera-node.Offline .camera-preview{
   background-color: #212A2F;
