@@ -381,7 +381,8 @@ public:
         AR_BEventRemove      = 0x8000,
         AR_UserRemove        = 0x10000,
         AR_BEventReset       = 0x20000,
-        AR_DatabaseRestore   = 0x40000
+        AR_DatabaseRestore   = 0x40000,
+        AR_CameraInsert      = 0x80000
     };
 
     Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)

@@ -46,10 +46,11 @@ angular.module('webadminApp')
                 }
 
                 function detectBestFormat(){
-
                     scope.flashRequired = false;
                     scope.noArmSupport = false;
-                    // return "flashls";
+                    scope.noFormat = false;
+
+                    //return "flashls";
 
                     //This function gets available sources for camera and chooses the best player for this browser
 
@@ -88,7 +89,7 @@ angular.module('webadminApp')
 
                     // Hardcode native support
                     if(window.jscd.os == "Android" ){
-                        if(weHaveWebm){hjg
+                        if(weHaveWebm){
                             return "webm";
                             // TODO: Try removing this line.
                         }else {
@@ -107,7 +108,7 @@ angular.module('webadminApp')
                     switch(window.jscd.browser){
                         case 'Microsoft Internet Explorer':
                             // Check version here
-                            if(weHaveWebm )
+                            if(weHaveWebm)
                             {
                                 scope.ieNoWebm = true;
                             }
@@ -119,7 +120,18 @@ angular.module('webadminApp')
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
-                            scope.flashRequired = true;
+                            if(weHaveHls) {
+                                scope.flashRequired = true;
+                                return false;
+                            }
+
+                            if(weHaveWebm)
+                            {
+                                scope.edgeNoWebm = true;
+                                return false;
+                            }
+
+                            scope.noFormat = true;
                             return false; // IE9 - No other supported formats
 
 
@@ -142,7 +154,12 @@ angular.module('webadminApp')
                             if(weHaveRtsp && window.jscd.flashVersion != '-'){
                                 return "rtsp";
                             }
-                            scope.flashRequired = true;
+                            if(weHaveHls) {
+                                scope.flashRequired = true;
+                                return false;
+                            }
+
+                            scope.noFormat = true;
                             return false; // IE9 - No supported formats
                     }
                 }
@@ -176,7 +193,7 @@ angular.module('webadminApp')
                                 scope.vgUpdateTime({$currentTime:event.srcElement.currentTime, $duration: event.srcElement.duration});
                                 if(scope.loading) {
                                     scope.loading = false;
-                                    scope.$digest();
+                                    //scope.$digest();
                                 }
                             });
                         }
@@ -201,10 +218,13 @@ angular.module('webadminApp')
                             }
 
                             scope.vgPlayerReady({$API: api});
-                        }, function (api) {
-                            console.error("some error");
+                        }, function (error) {
+                            scope.errorLoading = true;
+                            scope.loading = false;
+                            scope.flashls = false;// Kill flashls!
+                            scope.$digest();
+                            console.error(error);
                         }, function (position, duration) {
-
                             scope.loading = false;
                             scope.vgUpdateTime({$currentTime: position, $duration: duration});
                         });
@@ -260,9 +280,12 @@ angular.module('webadminApp')
                     });
                 }
 
+                element.bind('contextmenu',function() { return false; }); // Kill context menu
 
 
                 scope.$watch("vgSrc",function(){
+
+                    scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         var format = detectBestFormat();
                         scope.loading = !!format;

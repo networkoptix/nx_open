@@ -68,6 +68,11 @@ public:
     static qint64 infiniteDuration();
 
     /**
+     * \returns distance from the nearest period edge to the time in ms. Returns zerro if timeMs inside period
+     */
+    qint64 distanceToTime(qint64 timeMs) const;
+
+    /**
      * \return                          Type of this time period.
      */
     Qn::TimePeriodType type() const;

@@ -1071,7 +1071,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         return Qn::OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == Qn::Unauthorized) {
         return Qn::UnauthorizedOverlay;
-    } else if (m_camera && m_camera->isDtsBased() && m_camera->isScheduleDisabled()) {
+    } else if (m_camera && m_camera->isDtsBased() && !m_camera->isLicenseUsed()) {
         return Qn::AnalogWithoutLicenseOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivity)) {
         if (!qnRuntime->isVideoWallMode())

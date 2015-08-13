@@ -92,10 +92,20 @@ public:
     }
 };
 
+enum AuthResult
+{
+    Auth_OK,            // OK
+    Auth_WrongLogin,    // invalid login
+    Auth_WrongDigest,   // invalid or empty digest
+    Auth_WrongPassword, // invalid password
+    Auth_Forbidden      // no auth mehod found or custom auth scheme without login/password is failed
+};
+
+
 class QnAuthHelper: public QObject
 {
     Q_OBJECT
-
+    
 public:
     static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
 
@@ -106,7 +116,7 @@ public:
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side
-    bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
+    AuthResult authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
     //!Authenticates request on client side
     /*!
         Usage:\n
@@ -115,17 +125,17 @@ public:
         - client calls this method supplying received response. This method adds necessary headers to request
         - client sends request to server
     */
-    bool authenticate(
+    AuthResult authenticate(
         const QAuthenticator& auth,
         const nx_http::Response& response,
         nx_http::Request* const request,
         HttpAuthenticationClientContext* const authenticationCtx );
     //!Same as above, but uses cached authentication info
-    bool authenticate(
+    AuthResult authenticate(
         const QAuthenticator& auth,
         nx_http::Request* const request,
         const HttpAuthenticationClientContext* const authenticationCtx );
-    bool authenticate(const QString& login, const QByteArray& digest) const;
+    AuthResult authenticate(const QString& login, const QByteArray& digest) const;
 
     QnAuthMethodRestrictionList* restrictionList();
 
@@ -133,7 +143,7 @@ public:
     /*!
         Created key is valid for \a periodMillis milliseconds
         \param periodMillis cannot be greater than \a QnAuthHelper::MAX_AUTHENTICATED_ALIAS_LIFE_TIME_MS
-        \note Returned key is only valid for \a path
+        \note pair<query key name, key value>. Returned key is only valid for \a path
     */
     QPair<QString, QString> createAuthenticationQueryItemForPath( const QString& path, unsigned int periodMillis );
 
@@ -149,7 +159,8 @@ public:
         const QString& userName,
         const QString& password,
         const QString& realm,
-        const QByteArray method );
+        const QByteArray& method,
+        QByteArray nonce = QByteArray() );
 
     static QByteArray symmetricalEncode(const QByteArray& data);
 
@@ -209,10 +220,10 @@ private:
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
     bool isCookieNonceValid(const QByteArray& nonce);
-    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
+    AuthResult doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
                       std::function<bool(const QByteArray&)> checkNonceFunc, QnUserResourcePtr* const outUserResource = nullptr);
-    bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
-    bool doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
+    AuthResult doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
+    AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
     mutable QMutex m_mutex;
     static QnAuthHelper* m_instance;
@@ -233,7 +244,7 @@ private:
     /*!
         \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
     */
-    bool authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId ) const;
+    AuthResult authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId, std::function<bool(const QByteArray&)> checkNonceFunc) const;
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
     void applyClientCalculatedPasswordHashToResource(
         const QnUserResourcePtr& userResource,

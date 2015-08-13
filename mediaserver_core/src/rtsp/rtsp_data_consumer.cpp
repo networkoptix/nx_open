@@ -62,8 +62,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_previousScaledRtpTimestamp(-1),
     m_framesSinceRangeCheck(0),
     m_prevStartTime(AV_NOPTS_VALUE),
-    m_prevEndTime(AV_NOPTS_VALUE),
-    m_lastReportTime(AV_NOPTS_VALUE)
+    m_prevEndTime(AV_NOPTS_VALUE)
 {
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
@@ -571,10 +570,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     static AVRational r = {1, 1000000};
     AVRational time_base = {1, (int)codecEncoder->getFrequency() };
 
-    if (qAbs(media->timestamp - m_lastReportTime) > 1000000ll) { // > 1 second
-        m_lastReportTime = media->timestamp;
-        m_owner->notifyMediaRangeUsed(m_lastReportTime);
-    }
+    m_owner->notifyMediaRangeUsed(media->timestamp);
 
     m_sendBuffer.resize(4); // reserve space for RTP TCP header
     while(!m_needStop && codecEncoder->getNextPacket(m_sendBuffer))

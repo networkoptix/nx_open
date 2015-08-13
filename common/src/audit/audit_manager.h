@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QElapsedTimer>
 
+#include "audit_manager_fwd.h"
 #include "api/model/audit/audit_record.h"
 #include "api/model/audit/auth_session.h"
 #include "recording/time_period.h"
@@ -15,6 +16,10 @@ class QnAuditManager: public QObject
     Q_OBJECT
 public:
 
+    static const int MIN_PLAYBACK_TIME_TO_LOG = 1000 * 5;
+    static const int AGGREGATION_TIME_MS = 1000 * 5;
+    static const qint64 MIN_SEEK_DISTANCE_TO_LOG = 1000 * 60;
+
     QnAuditManager();
 
     static QnAuditManager* instance();
@@ -24,15 +29,15 @@ public:
     /* notify new playback was started from position timestamp
     *  return internal ID of started session
     */
-    int notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& id, qint64 timestampUsec, bool isExport);
-    void notifyPlaybackFinished(int internalId);
-    void notifyPlaybackInProgress(int internalId, qint64 timestampUsec);
+    AuditHandle notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& id, qint64 timestampUsec, bool isExport = false);
+    void notifyPlaybackInProgress(const AuditHandle& handle, qint64 timestampUsec);
     void notifySettingsChanged(const QnAuthSession& authInfo, const QString& paramName);
 
     /* return internal id of inserted record. Returns <= 0 if error */
     int addAuditRecord(const QnAuditRecord& record);
     int updateAuditRecord(int internalId, const QnAuditRecord& record);
     bool enabled() const;
+    QnTimePeriod playbackRange(const AuditHandle& handle) const;
 public slots:
     void at_connectionOpened(const QnAuthSession &data);
     void at_connectionClosed(const QnAuthSession &data);
@@ -63,8 +68,10 @@ private:
         QnTimePeriod period;        // watching playback range
         qint64 startTimeUsec;       // startTime from PLAY command
         qint64 creationTimeMs;      // record creation time
-        QElapsedTimer timeout;      // how many ms session is alive
+        QElapsedTimer aliveTimeout; // lifetime timeout
+        QElapsedTimer timeout;      // how many ms session is unused
         bool isExport;
+        AuditHandle handle;
 
         QnAuditRecord toAuditRecord() const;
     };

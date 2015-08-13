@@ -233,13 +233,18 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width) {
     var self = this;
     //1. request first detailization to get initial bounds
 
+    var archiveReadyDefer = $q.defer();
+    this.archiveReadyPromise = archiveReadyDefer.promise;
     this.requestInterval(0, self.now() + 10000, 0).then(function () {
+        archiveReadyDefer.resolve(!!self.chunksTree);
         if(!self.chunksTree){
             return; //No chunks for this camera
         }
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
         var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,self.width);
-        self.requestInterval(self.chunksTree.start, self.now(), nextLevel + 1);
+        if(nextLevel<RulerModel.levels.length-1) {
+            self.requestInterval(self.chunksTree.start, self.now(), nextLevel + 1);
+        }
     });
 
     //2. getCameraHistory

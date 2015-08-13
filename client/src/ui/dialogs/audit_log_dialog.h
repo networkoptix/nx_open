@@ -79,6 +79,7 @@ private slots:
     void at_updateDetailModel();
     void at_typeCheckboxChanged();
     void at_filterChanged();
+    void at_currentTabChanged();
     void at_selectAllCheckboxChanged();
     void at_updateCheckboxes();
     void at_masterGridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
@@ -99,7 +100,7 @@ private:
     void setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes);
     void processPlaybackAction(const QnAuditRecord* record);
     void triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId, const QString& objectName);
-    QnAuditRecordRefList filterDataByText();
+    QnAuditRecordRefList applyFilter();
     QSize calcButtonSize(const QFont& font) const;
     void setupSessionsGrid();
     void setupCamerasGrid();

@@ -72,6 +72,15 @@ namespace ec2
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
         auditRecord.resources.push_back(params.id);
+
+        auto msgProc = QnCommonMessageProcessor::instance();
+        if (msgProc) {
+            QnBusinessEventRulePtr bRule = msgProc->businessRules().value(params.id);
+            if (bRule)
+                auditRecord.addParam("description", QnBusinessStringsHelper::bruleDescriptionText(bRule).toUtf8());
+        }
+
+
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
@@ -119,8 +128,11 @@ namespace ec2
                     description = res->getName();
                     if (res.dynamicCast<QnUserResource>())
                         eventType = Qn::AR_UserRemove;
-                    else if (res.dynamicCast<QnSecurityCamResource>())
+                    else if (res.dynamicCast<QnSecurityCamResource>()) {
                         eventType = Qn::AR_CameraRemove;
+                        if (QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>())
+                            description = lit("%1 (%2)").arg(description).arg(camRes->getHostAddress());
+                    }
                     else if (res.dynamicCast<QnMediaServerResource>())
                         eventType = Qn::AR_ServerRemove;
                 }
@@ -146,6 +158,8 @@ namespace ec2
 
         if (eventType != Qn::AR_NotDefined) {
             auto auditRecord = qnAuditManager->prepareRecord(authInfo, eventType);
+            if (!description.isEmpty())
+                auditRecord.addParam("description", description.toUtf8());
             qnAuditManager->addAuditRecord(auditRecord);
         }
     }

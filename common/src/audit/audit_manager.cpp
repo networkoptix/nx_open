@@ -7,7 +7,7 @@ static QnAuditManager* m_globalInstance = 0;
 
 namespace
 {
-    const int MIN_PLAYBACK_TIME_TO_LOG = 1000 * 5;
+    const qint64 GROUP_TIME_THRESHOLD = 1000ll * 30;
 }
 
 QnAuditRecord QnAuditManager::CameraPlaybackInfo::toAuditRecord() const
@@ -98,50 +98,69 @@ void QnAuditManager::at_connectionClosed(const QnAuthSession &data)
     m_openedConnections.remove(data.id);
 }
 
-int QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& cameraId, qint64 timestampUsec, bool isExport)
+AuditHandle QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& cameraId, qint64 timestampUsec, bool isExport)
 {
     if (!enabled())
-        return -1;
+        return AuditHandle();
+
+    // check for existing data
+
+    QMutexLocker lock(&m_mutex);
+    for (auto itr = m_alivePlaybackInfo.begin(); itr != m_alivePlaybackInfo.end(); ++itr)
+    {
+        CameraPlaybackInfo& pbInfo = *itr;
+        if (pbInfo.session == session && pbInfo.cameraId == cameraId && pbInfo.isExport == isExport) 
+        {
+            bool isLive = pbInfo.startTimeUsec == DATETIME_NOW && timestampUsec == DATETIME_NOW;
+            if (isLive || pbInfo.period.distanceToTime(timestampUsec/1000) < MIN_SEEK_DISTANCE_TO_LOG) 
+            {
+                if (timestampUsec != DATETIME_NOW)
+                    pbInfo.period.addPeriod(QnTimePeriod(timestampUsec/1000, 1));
+                pbInfo.timeout.invalidate();
+                return pbInfo.handle;
+            }
+        }
+    }
+
+    // create new one
 
     CameraPlaybackInfo pbInfo;
     pbInfo.session = session;
     pbInfo.cameraId = cameraId;
     pbInfo.startTimeUsec = timestampUsec;
+    if (timestampUsec != DATETIME_NOW)
+        pbInfo.period.addPeriod(QnTimePeriod(timestampUsec/1000, 1));
     pbInfo.creationTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     pbInfo.isExport = isExport;
-    pbInfo.timeout.restart();
-    int handle = ++m_internalIdCounter;
-    QMutexLocker lock(&m_mutex);
-    m_alivePlaybackInfo.insert(handle, std::move(pbInfo));
+    pbInfo.timeout.invalidate();
+    pbInfo.aliveTimeout.restart();
+    pbInfo.handle = std::make_shared<int>(++m_internalIdCounter);
+    AuditHandle handle = pbInfo.handle;
+    m_alivePlaybackInfo.insert(*handle, std::move(pbInfo));
     return handle;
 }
 
-void QnAuditManager::notifyPlaybackFinished(int internalId)
-{
-    if (!enabled())
-        return;
 
+QnTimePeriod QnAuditManager::playbackRange(const AuditHandle& handle) const
+{
     QMutexLocker lock(&m_mutex);
-    auto itr = m_alivePlaybackInfo.find(internalId);
+    if (!handle)
+        return QnTimePeriod();
+    auto itr = m_alivePlaybackInfo.find(*handle);
     if (itr != m_alivePlaybackInfo.end())
-    {
-        CameraPlaybackInfo& pbInfo = itr.value();
-        if (pbInfo.timeout.elapsed() >= MIN_PLAYBACK_TIME_TO_LOG && pbInfo.period.durationMs >= MIN_PLAYBACK_TIME_TO_LOG) {
-            pbInfo.timeout.restart();
-            m_closedPlaybackInfo.push_back(std::move(pbInfo)); // finalize old playback record
-        }
-        m_alivePlaybackInfo.erase(itr);
-    }
+        return itr.value().period;
+    else
+        return QnTimePeriod();
 }
 
-void QnAuditManager::notifyPlaybackInProgress(int internalId, qint64 timestampUsec)
+void QnAuditManager::notifyPlaybackInProgress(const AuditHandle& handle, qint64 timestampUsec)
 {
     if (!enabled())
         return;
 
     qint64 timestampMs = timestampUsec / 1000;
     QMutexLocker lock(&m_mutex);
-    auto itr = m_alivePlaybackInfo.find(internalId);
+    auto itr = m_alivePlaybackInfo.find(*handle);
     if (itr != m_alivePlaybackInfo.end())
     {
         CameraPlaybackInfo& pbInfo = itr.value();
@@ -154,7 +173,7 @@ bool QnAuditManager::canJoinRecords(const QnAuditRecord& left, const QnAuditReco
 {
     if (left.eventType != right.eventType)
         return false;
-    bool peridOK = qAbs(left.rangeStartSec - right.rangeStartSec) * 1000ll < MAX_FRAME_DURATION;
+    bool peridOK = qAbs(left.rangeStartSec - right.rangeStartSec) * 1000ll < GROUP_TIME_THRESHOLD;
     bool sessionOK = left.authSession == right.authSession;
     return peridOK && sessionOK;
 }
@@ -174,6 +193,32 @@ void QnAuditManager::notifySettingsChanged(const QnAuthSession& authInfo, const 
 
 void QnAuditManager::at_timer()
 {
+    QMutexLocker lock(&m_mutex);
+
+    for (auto itr = m_alivePlaybackInfo.begin(); itr != m_alivePlaybackInfo.end();)
+    {
+        CameraPlaybackInfo& pbInfo = itr.value();
+        if (pbInfo.handle.use_count() == 1) 
+        {
+            if (!pbInfo.timeout.isValid())
+                pbInfo.timeout.restart(); // record isn't using any more. start remove timer
+            if (pbInfo.timeout.elapsed() >= AGGREGATION_TIME_MS / 2) 
+            {
+                // move to delete list
+                if ((pbInfo.isExport  && pbInfo.period.durationMs > 0) || 
+                    (pbInfo.aliveTimeout.elapsed() >= (MIN_PLAYBACK_TIME_TO_LOG + AGGREGATION_TIME_MS / 2) && pbInfo.period.durationMs >= MIN_PLAYBACK_TIME_TO_LOG)) 
+                {
+                    m_closedPlaybackInfo.push_back(std::move(itr.value()));
+                }
+                itr = m_alivePlaybackInfo.erase(itr);
+            }
+            else
+                ++itr;
+        }
+        else
+            ++itr;
+    }
+
     processDelayedRecords(m_closedPlaybackInfo);
     processDelayedRecords(m_changedSettings);
 }
@@ -185,11 +230,10 @@ void QnAuditManager::processDelayedRecords(QVector<T>& recordsToAggregate)
     bool recordProcessed;
     do
     {
-        QMutexLocker lock(&m_mutex);
         recordProcessed = false;
         for (auto itr = recordsToAggregate.begin(); itr != recordsToAggregate.end(); ++itr)
         {
-            if (itr->timeout.elapsed() > MIN_PLAYBACK_TIME_TO_LOG) 
+            if (itr->timeout.elapsed() > AGGREGATION_TIME_MS) 
             {
                 // aggregate data. join other records to this one
                 QnAuditRecord record = itr->toAuditRecord();

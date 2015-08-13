@@ -17,13 +17,12 @@
 .dark-theme{
   color:white;
   background-color: #1C2327;
-  position:absolute;
+  /*position:absolute;
   top:0px;
+  padding-top:50px;*/
   height:100%;
-  padding-top:50px;
-}
-.videowindow{
-  background-color: #1C2327;
+  width:100%;
+  margin-top: -20px !important;
 }
 
 .dark-theme .caret{
@@ -45,6 +44,10 @@ table.webclient-window>tbody>tr>td{
   height:100%;
   vertical-align: top;
   padding:0;
+}
+
+table.webclient-window>tbody>tr>td.alert{
+  height:auto;
 }
 .cameras-panel{
   overflow-y: auto;
@@ -79,12 +82,17 @@ table.webclient-window>tbody>tr>td{
   padding-top:80px;
 }
 
+
+.view-panel.live-only{
+  padding-bottom:100px;
+}
+
 .view-panel .stick-to-top{
   position:absolute;
   width:100%;
   top:0;
 
-  background-color: rgba(28, 35, 39, 0.6);
+  /*background-color: rgba(28, 35, 39, 0.6);*/
 
   border-bottom: 1px solid transparent;
 }
@@ -93,7 +101,7 @@ table.webclient-window>tbody>tr>td{
   width:100%;
   bottom:0;
 
-  background-color: rgba(28, 35, 39, 0.6);
+  /*background-color: rgba(28, 35, 39, 0.6);*/
 
   border-top: 1px solid transparent;
 }
@@ -102,14 +110,17 @@ table.webclient-window>tbody>tr>td{
   height:100%;
 
   padding: 0px 20px;
-  background-color: rgba(28, 35, 39, 0.6);
+  /*background-color: rgba(28, 35, 39, 0.6);*/
 }
 
 
-
+/* Special hack for loading invisible flash objects */
+.invisible{
+  height: 0 !important;
+  overflow: hidden;
+}
 
 .videowindow,
-.videowindow #videowindow,
 .videowindow .videoplayer
 {
   width:100%;
@@ -139,11 +150,11 @@ table.webclient-window>tbody>tr>td{
 
 .webclient-panel>div.text-left,
 .webclient-panel>div.text-right{
-  width:30%;
+  width:40%;
   display:inline-block;
 }
 .webclient-panel>div.text-center{
-  width:40%;
+  width:20%;
   display:inline-block;
 }
 
@@ -261,6 +272,12 @@ table.webclient-window>tbody>tr>td{
   background-color: #212A2F;
   border: 1px solid #171C1F;
 }
+
+.camera-node.Unauthorized .camera-preview img,
+.camera-node.Offline .camera-preview img{
+  display:none;
+}
+
 .camera-preview>.camera-preview-image {
   display:block;
   position: relative;

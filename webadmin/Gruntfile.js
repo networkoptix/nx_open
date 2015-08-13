@@ -12,11 +12,14 @@ module.exports = function (grunt) {
     // Load grunt tasks automatically
     require('load-grunt-tasks')(grunt);
 
+
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
 
     grunt.loadNpmTasks('grunt-protractor-webdriver');
     grunt.loadNpmTasks('grunt-protractor-runner');
+    grunt.loadNpmTasks('grunt-wiredep');
+
 
     // Define the configuration for all the tasks
     grunt.initConfig({
@@ -42,7 +45,7 @@ module.exports = function (grunt) {
         // Watches files for changes and runs tasks based on the changed files
         watch: {
             js: {
-                files: ['<%= yeoman.app %>/scripts/{,*/}*.js'],
+                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.app %>/components/**'],
                 tasks: ['newer:jshint:all'],
                 options: {
                     livereload: true
@@ -129,17 +132,33 @@ module.exports = function (grunt) {
                 {context: '/media/',    host: '10.0.2.186', port: 7001},
                 {context: '/proxy/',    host: '10.0.2.186', port: 7001}/**/
 
+
+                // Olya
+                /*{context: '/api/',      host: '10.0.2.169', port: 7011},
+                {context: '/ec2/',      host: '10.0.2.169', port: 7011},
+                {context: '/hls/',      host: '10.0.2.169', port: 7011},
+                {context: '/media/',    host: '10.0.2.169', port: 7011},
+                {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
+
+                // Andrey
+                /*{context: '/api/',      host: '10.0.2.95', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.95', port: 7001},
+                {context: '/hls/',      host: '10.0.2.95', port: 7001},
+                {context: '/media/',    host: '10.0.2.95', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.95', port: 7001}/**/
+
                 //Roman Vasilenko  port: 7003,7004,7005,2006
-                /*{context: '/api/', host: '10.0.2.244', port: 7005},
-                {context: '/ec2/', host: '10.0.2.244', port: 7005},
-                {context: '/hls/', host: '10.0.2.244', port: 7005},
-                {context: '/media/', host: '10.0.2.244', port: 7005},
-                {context: '/proxy/', host: '10.0.2.244', port: 7005}*/
+                /*{context: '/api/', host: '10.0.2.244', port: 7002},
+                {context: '/ec2/', host: '10.0.2.244', port: 7002},
+                {context: '/hls/', host: '10.0.2.244', port: 7002},
+                {context: '/media/', host: '10.0.2.244', port: 7002},
+                {context: '/proxy/', host: '10.0.2.244', port: 7002}/**/
 
             ],
             livereload: {
                 options: {
                     middleware: function (connect, options) {
+                        var serveStatic = require('serve-static');
                         if (!Array.isArray(options.base)) {
                             options.base = [options.base];
                         }
@@ -149,12 +168,12 @@ module.exports = function (grunt) {
 
                         // Serve static files.
                         options.base.forEach(function (base) {
-                            middlewares.push(connect.static(base));
+                            middlewares.push(serveStatic(base));
                         });
 
                         // Make directory browse-able.
-                        var directory = options.directory || options.base[options.base.length - 1];
-                        middlewares.push(connect.directory(directory));
+                        //var directory = options.directory || options.base[options.base.length - 1];
+                        //middlewares.push(connect.directory(directory));
 
                         return middlewares;
                     },
@@ -288,14 +307,7 @@ module.exports = function (grunt) {
         },
 
         // Automatically inject Bower components into the app
-        'bower-install': {
-            app: {
-                html: '<%= yeoman.app %>/index.html',
-                ignorePath: '<%= yeoman.app %>/'
-            }
-        },
-
-
+       
         // Compiles Sass to CSS and generates necessary files if requested
         compass: {
             options: {
@@ -562,7 +574,6 @@ module.exports = function (grunt) {
         grunt.task.run([
             'clean:server',
             'wiredep',
-            'bower-install',
             'concurrent:server',
             'autoprefixer',
             'configureProxies:server',
@@ -593,7 +604,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', [
         'clean:dist',
-        'bower-install',
+        'wiredep',
         'useminPrepare',
         'concurrent:dist',
         'autoprefixer',

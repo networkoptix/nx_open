@@ -8,13 +8,15 @@
 * QnFileStorageResource uses custom implemented IO access
 */
 
+class QnStorageManager;
+
 class QnFileStorageResource: public QnStorageResource
 {
 private:
     static const QString FROM_SEP;
     static const QString TO_SEP;
 public:
-    QnFileStorageResource();
+    QnFileStorageResource(QnStorageManager *storageManager);
     ~QnFileStorageResource();
 
     static QnStorageResource* instance(const QString&);
@@ -70,10 +72,11 @@ private:
     mutable bool m_durty;
 
 private:
-    mutable QMutex  m_mutexPermission;
-    mutable int     m_capabilities;
-    mutable QString m_localPath;
-    bool            m_valid;
+    mutable QMutex      m_mutexPermission;
+    mutable int         m_capabilities;
+    mutable QString     m_localPath;
+    bool                m_valid;
+    QnStorageManager    *m_storageManager;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

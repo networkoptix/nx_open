@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.3;
 
 import "." as Base;
 import "../../common" as Common;
@@ -35,6 +35,22 @@ FocusScope
         secondOctet.initialText = arr[1];
         thirdOctet.initialText = arr[2];
         fourthOctet.initialText = arr[3];
+    }
+
+    onActiveFocusChanged:
+    {
+        if (activeFocus)
+        {
+            if (!firstOctet.activeFocus && !secondOctet.activeFocus
+                && !thirdOctet.activeFocus && !fourthOctet.activeFocus)
+            {
+                firstOctet.forceActiveFocus();
+            }
+        }
+        else
+        {
+            firstOctet.focus = true;
+        }
     }
 
     Rectangle
@@ -79,6 +95,7 @@ FocusScope
         {
             id: firstOctet;
             nextOctet: secondOctet;
+            prevOctet: thisComponent.KeyNavigation.backtab;
         }
 
         IpDot
@@ -113,6 +130,7 @@ FocusScope
         IpOctet
         {
             id: fourthOctet;
+            nextOctet: thisComponent.KeyNavigation.tab;
             prevOctet: thirdOctet;
         }
     }

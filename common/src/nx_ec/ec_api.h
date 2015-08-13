@@ -1231,6 +1231,7 @@ namespace ec2
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
         virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) = 0;
         virtual void setContext( const ResourceContext& resCtx ) = 0;
+        virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
 
         /**
         * \returns                         Whether this connection factory is working in compatibility mode.

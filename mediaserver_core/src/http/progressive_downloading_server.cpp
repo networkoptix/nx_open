@@ -32,6 +32,7 @@
 #include "media_server/settings.h"
 #include "cached_output_stream.h"
 #include "common/common_module.h"
+#include "audit/audit_manager.h"
 
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
@@ -80,6 +81,8 @@ public:
         if( m_dataOutput.get() )
             m_dataOutput->stop();
     }
+
+    void setAuditHandle(const AuditHandle& handle) { m_auditHandle = handle; }
 
     void copyLastGopFromCamera(QnVideoCamera* camera)
     {
@@ -148,6 +151,9 @@ protected:
                 m_needStop = true; // EOF reached
             return true;
         }
+
+        if (media && m_auditHandle)
+            qnAuditManager->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
         {
@@ -257,6 +263,7 @@ private:
     qint64 m_lastRtTime;
     bool m_liveMode;
     bool m_needKeyData;
+    AuditHandle m_auditHandle;
 
     QByteArray toHttpChunk( const char* data, size_t size )
     {
@@ -550,6 +557,7 @@ void QnProgressiveDownloadingConsumer::run()
             maxFramesToCacheBeforeDrop,
             isLive);
 
+        qint64 timeUSec = DATETIME_NOW;
         if (isLive)
         {
             //if camera is offline trying to put it online
@@ -576,7 +584,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         else {
             bool utcFormatOK = false;
-            const qint64 timeUSec = parseDateTime( position );
+            timeUSec = parseDateTime( position );
 
             if (isUTCRequest)
             {
@@ -661,6 +669,9 @@ void QnProgressiveDownloadingConsumer::run()
         sendResponse(CODE_OK, mimeType);
 
         //dataConsumer.sendResponse();
+
+        dataConsumer.setAuditHandle(qnAuditManager->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false));
+
         dataConsumer.start();
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed

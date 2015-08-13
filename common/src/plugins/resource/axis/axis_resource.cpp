@@ -1069,7 +1069,7 @@ QnIOPortDataList QnPlAxisResource::mergeIOSettings(const QnIOPortDataList& camer
 
 bool QnPlAxisResource::ioPortErrorOccured()
 {
-    if (getCameraCapabilities() & Qn::IOModuleCapability) {
+    if (hasCameraCapabilities(Qn::IOModuleCapability)) {
         return false; // it's error if can't read IO state for IO module
     }
     else {

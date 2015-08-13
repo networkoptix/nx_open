@@ -1656,6 +1656,14 @@ void MediaServerProcess::run()
         QnResourceDiscoveryManager::instance(),
         qnResPool,
         qnResTypePool );
+    //passing settings
+    std::map<QString, QVariant> confParams;
+    for( const auto& paramName: MSSettings::roSettings()->allKeys() )
+    {
+        if( paramName.startsWith( lit("ec") ) )
+            confParams.emplace( paramName, MSSettings::roSettings()->value( paramName ) );
+    }
+    ec2ConnectionFactory->setConfParams(std::move(confParams));
     ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
@@ -1740,6 +1748,12 @@ void MediaServerProcess::run()
             false
         );                    
     }
+
+    QnStoragePluginFactory::instance()->registerStoragePlugin(
+        "smb",
+        QnFileStorageResource::instance,
+        false
+    );
 
     if (needToStop())
         return;
@@ -1931,6 +1945,7 @@ void MediaServerProcess::run()
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
     selfInformation.flags = m_mediaServer->getServerFlags();
+    selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
     qnCommon->setModuleInformation(selfInformation);
     qnCommon->bindModuleinformation(m_mediaServer);
@@ -2161,6 +2176,8 @@ void MediaServerProcess::run()
 #endif
 
     exec();
+
+
 
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
 

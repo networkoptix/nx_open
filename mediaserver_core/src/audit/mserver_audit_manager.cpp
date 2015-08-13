@@ -52,6 +52,8 @@ int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
 
     if (record.eventType == Qn::AR_Login)
     {
+        if (m_knownSessions.contains(record.authSession.id))
+            return -1;
         m_knownSessions.insert(record.authSession.id, UINT_MAX * 1000ll);
     }
     else if (record.eventType == Qn::AR_UnauthorizedLogin) {
@@ -77,8 +79,11 @@ int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAud
         Q_ASSERT(record.resources.empty());
 
     QMutexLocker lock(&m_mutex);
-    if (record.isLoginType() && record.rangeEndSec)
-        m_knownSessions.remove(record.authSession.id);
+    if (record.isLoginType() && record.rangeEndSec) {
+        // it will be auto deleted later if fill session last activity time
+        if (m_knownSessions.contains(record.authSession.id))
+            m_knownSessions[record.authSession.id] = qnSyncTime->currentMSecsSinceEpoch();
+    }
 
     return qnEventsDB->updateAuditRecord(internalId, filteredRecord(record));
 }

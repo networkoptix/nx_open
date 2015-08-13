@@ -36,7 +36,7 @@
             }
         }
         // MSIE
-        else if ((verOffset = nAgt.indexOf('MSIE')) != -1) {
+        else if ((verOffset = nAgt.indexOf('MSIE')) != -1 || (verOffset = nAgt.indexOf('Edge')) != -1) {
             browser = 'Microsoft Internet Explorer';
             version = nAgt.substring(verOffset + 5);
         }

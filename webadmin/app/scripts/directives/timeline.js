@@ -8,6 +8,7 @@ angular.module('webadminApp')
                 recordsProvider: '=',
                 positionProvider: '=',
                 playHandler: '=',
+                liveOnly: '=',
                 ngClick: '&',
                 positionHandler: '='
             },
@@ -667,10 +668,6 @@ angular.module('webadminApp')
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
                     mouseInEvents = mouseRow > top && (mouseRow < top + timelineConfig.chunkHeight * scope.viewportHeight);
 
-                    if(mouseInEvents){
-                        mouseInEvents = mouseCoordinate;
-                    }
-
                     if(!context){
                         return;
                     }
@@ -738,6 +735,11 @@ angular.module('webadminApp')
                     }else{
                         if(mouseInScrollbar || catchScrollBar){
                             mouseInScrollbar = mouseCoordinate - startCoordinate;
+                            mouseInTimeline = false;
+                        }else{
+                            if(mouseInTimeline){
+                                mouseInTimeline = mouseCoordinate;
+                            }
                         }
                         if(mouseInScrollbarRow){
                             mouseInScrollbarRow = mouseCoordinate - startCoordinate;
@@ -823,9 +825,10 @@ angular.module('webadminApp')
                 var mouseRow = 0;
                 var mouseInScrollbar = false;
                 var mouseInEvents = false;
+                var mouseInTimeline = false;
                 var mouseInScrollbarRow = false;
                 var catchScrollBar = false;
-                var catchEvents = false;
+                var catchTimeline = false;
 
                 function updateMouseCoordinate( event){
                     if(!event){
@@ -834,6 +837,7 @@ angular.module('webadminApp')
                         mouseInScrollbar = false;
                         mouseInScrollbarRow = false;
                         mouseInEvents = false;
+                        mouseInTimeline = false;
                         return;
                     }
 
@@ -919,8 +923,8 @@ angular.module('webadminApp')
                     //updateMouseCoordinate(null);
                 };
                 scope.mouseMove = function(event){
-                    /*&updateMouseCoordinate(event);
-                    if(catchScrollBar){
+                    updateMouseCoordinate(event);
+                    /*if(catchScrollBar){
                         var moveScroll = mouseInScrollbar - catchScrollBar;
                         scope.scaleManager.scroll( scope.scaleManager.scroll() + moveScroll / scope.viewportWidth );
                     }*/
@@ -1071,7 +1075,7 @@ angular.module('webadminApp')
                 $(canvas).drag("draginit",function(event){
                     updateMouseCoordinate(event);
                     catchScrollBar = mouseInScrollbar;
-                    catchEvents = mouseInEvents;
+                    catchTimeline = mouseInTimeline;
                 });
                 $(canvas).drag("dragstart",function(event,dd){
                     //updateMouseCoordinate(event);
@@ -1084,15 +1088,15 @@ angular.module('webadminApp')
                         var moveScroll = mouseInScrollbar - catchScrollBar;
                         scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
                     }
-                    if(catchEvents) {
-                        var moveScroll = catchEvents - mouseInEvents;
-                        catchEvents = mouseInEvents;
+                    if(catchTimeline) {
+                        var moveScroll = catchTimeline - mouseInTimeline;
+                        catchTimeline = mouseInTimeline;
                         scope.scaleManager.scrollByPixels(moveScroll);
                     }
                 });
                 $(canvas).drag("dragend",function(event,dd){
                     catchScrollBar = false;
-                    catchEvents = false;
+                    catchTimeline = false;
                 });
 
 
@@ -1100,6 +1104,9 @@ angular.module('webadminApp')
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
+                        scope.recordsProvider.archiveReadyPromise.then(function(hasArchive){
+                            scope.emptyArchive = !hasArchive;
+                        });
                     }
                 });
                 viewport.mousewheel(mouseWheel);

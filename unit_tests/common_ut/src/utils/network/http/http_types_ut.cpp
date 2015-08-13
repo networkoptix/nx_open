@@ -549,3 +549,21 @@ TEST( HttpHeaderTest, Authorization_parse )
         ASSERT_EQ( auth.basic->password, "open sesame" );
     }
 }
+
+TEST( HttpHeaderTest, parseDigestAuthParams )
+{
+    {
+        static const char testData[] =
+            "X-runtime-guid={9968ed68-0a83-47f6-adb6-af50cd9bcad2}; csrftoken=JWGZ9bRtEBNoa7kELHWx0ZJdpqqMgbVp; "
+            "X-runtime-guid={d189fb72-54d7-4e7a-b2aa-90712e5f3a55}; Authorization=Digest; nonce=51d1c3e51d750; "
+            "realm=networkoptix; auth=YWRtaW46NTFkMWMzZTUxZDc1MDo2YjA5YmJhYjFmMGY4NDE3ZmI1ZmYwNzcyZGE0MmJjNA%3D%3D; "
+            "auth_rtsp=YWRtaW46NTFkMWMzZTUxZDc1MDo3M2I1MDVhYTMzNjcyNDZmNDEzYWQ2ZThkZjg1MDRkZQ%3D%3D; "
+            "response=6b09bbab1f0f8417fb5ff0772da42bc4; username=admin";
+        QMap<nx_http::BufferType, nx_http::BufferType> params;
+        nx_http::header::parseDigestAuthParams(
+            QByteArray::fromRawData( testData, sizeof( testData ) - 1 ),
+            &params,
+            ';' );
+        ASSERT_EQ( params["auth"], "YWRtaW46NTFkMWMzZTUxZDc1MDo2YjA5YmJhYjFmMGY4NDE3ZmI1ZmYwNzcyZGE0MmJjNA%3D%3D" );
+    }
+}

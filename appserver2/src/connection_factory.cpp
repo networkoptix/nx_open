@@ -316,6 +316,11 @@ namespace ec2
         m_resCtx = resCtx;
     }
 
+    void Ec2DirectConnectionFactory::setConfParams( std::map<QString, QVariant> confParams )
+    {
+        m_settingsInstance.loadParams( std::move( confParams ) );
+    }
+
     int Ec2DirectConnectionFactory::establishDirectConnection( const QUrl& url, impl::ConnectHandlerPtr handler )
     {
         const int reqID = generateRequestID();
@@ -364,6 +369,10 @@ namespace ec2
                 return INVALID_REQ_ID;
             ++m_runningRequests;
         }
+
+        const auto info = QString::fromUtf8( QJson::serialized( clientInfo )  );
+        NX_LOG( lit("%1 to %2 with %3").arg( Q_FUNC_INFO ).arg( addr.toString() ).arg( info ),
+                cl_logDEBUG1 );
 
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
@@ -533,6 +542,7 @@ namespace ec2
 #endif
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+        connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
         
 		if (!loginInfo.clientInfo.id.isNull())
         {
@@ -544,7 +554,7 @@ namespace ec2
 			if (result != ErrorCode::ok)
 				return result;
 
-			if (infos.size() && clientInfo == infos.front())
+            if (infos.size() && QJson::serialized(clientInfo) == QJson::serialized(infos.front()))
 			{
 				NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
 					cl_logDEBUG2);

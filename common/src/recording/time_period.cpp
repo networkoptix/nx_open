@@ -182,6 +182,14 @@ bool QnTimePeriod::isValid() const {
     return durationMs == ::infiniteDuration || durationMs > 0;
 }
 
+qint64 QnTimePeriod::distanceToTime(qint64 timeMs) const
+{
+    if (timeMs >= startTimeMs) 
+        return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
+    else
+        return startTimeMs - timeMs;
+}
+
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {
     const QString fmt = lit("dd MM yyyy hh:mm:ss");
     if (!period.isInfinite())
