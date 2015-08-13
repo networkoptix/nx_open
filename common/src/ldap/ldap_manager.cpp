@@ -20,11 +20,15 @@ public:
     {
     }
 
-    QnLdapFilter and(const QnLdapFilter& arg) {
+    QnLdapFilter operator &(const QnLdapFilter& arg) {
         if (arg.isEmpty())
             return *this;
 
         return QnLdapFilter(QString(lit("(&%1%2)")).arg(toCompoundString()).arg(arg.toCompoundString()));
+    }
+
+    operator QString() const {
+        return toString();
     }
 
     QString toString() const {
@@ -257,7 +261,7 @@ bool LdapSession::fetchUsers(QnLdapUsers &users)
 
     LDAPMessage *result, *e;
 
-    QString filter = QnLdapFilter(m_dType->Filter()).and(m_settings.searchFilter).toString();
+    QString filter = QnLdapFilter(m_dType->Filter()) & m_settings.searchFilter;
     rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
     if (rc != LDAP_SUCCESS)
     {
@@ -298,7 +302,7 @@ bool LdapSession::testSettings()
 
     LDAPMessage *result;
 
-    QString filter = QnLdapFilter(m_dType->Filter()).and(m_settings.searchFilter).toString();
+    QString filter = QnLdapFilter(m_dType->Filter()) & m_settings.searchFilter;
     rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
     if (rc != LDAP_SUCCESS)
     {
