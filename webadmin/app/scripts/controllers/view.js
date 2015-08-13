@@ -122,12 +122,18 @@ angular.module('webadminApp').controller('ViewCtrl',
             });
         }
         function getCamera(id){
-            if(!$scope.allcameras) {
+            if(!$scope.cameras) {
                 return null;
             }
-            return _.find($scope.allcameras, function (camera) {
-                return camera.id === id;
-            });
+            for(var serverId in $scope.cameras) {
+                var cam = _.find($scope.cameras[serverId], function (camera) {
+                    return camera.id === id;
+                });
+                if(cam){
+                    return cam;
+                }
+            }
+            return null;
         }
 
         $scope.playerReady = function(API){
@@ -195,9 +201,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 position = parseInt(position);
             }
 
-            $scope.activeCamera = _.find($scope.allcameras, function (camera) {
-                return camera.id === $scope.cameraId;
-            });
+            $scope.activeCamera = getCamera ($scope.cameraId);
             if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
@@ -429,8 +433,6 @@ angular.module('webadminApp').controller('ViewCtrl',
                         }
                     }
                 }
-
-                $scope.allcameras = cameras;
 
                 deferred.resolve(cameras);
             }, function (error) {
