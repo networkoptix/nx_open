@@ -197,6 +197,7 @@
 #include "http/iomonitor_tcp_server.h"
 #include "rest/handlers/multiserver_chunks_rest_handler.h"
 #include "audit/mserver_audit_manager.h"
+#include "utils/common/waiting_for_qthread_to_empty_event_queue.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -2168,8 +2169,9 @@ void MediaServerProcess::run()
 #endif
 
     exec();
-
-
+    disconnect(0,0, this, 0);
+    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( QThread::currentThread(), 3 );
+    waitingForObjectsToBeFreed.join();
 
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
 
