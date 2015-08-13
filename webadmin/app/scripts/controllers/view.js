@@ -508,7 +508,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 timer = $timeout(reloader, reloadInterval);
             },function(error){
                 console.error(error);
-                timer = $timeout(reloader, quickReloadInterval);
+                //timer = $timeout(reloader, quickReloadInterval);
             });
         }
         var desktopCameraTypeId = null;
