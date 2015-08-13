@@ -11,7 +11,6 @@ public:
 
 private:
     QnModuleInformation remoteModuleInformation(const QUrl &url, const QAuthenticator &auth, int &status);
-    QnLicenseList remoteLicenses(const QUrl &url, const QAuthenticator &auth, int &status);
 };
 
 #endif // PING_SYSTEM_REST_HANDLER_H

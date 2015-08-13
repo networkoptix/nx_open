@@ -5,10 +5,17 @@
 #include <QtCore/QUrl>
 
 #include <core/resource/resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <licensing/license.h>
+#include <licensing/remote_licenses.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
 #include <ui/dialogs/merge_systems_dialog.h>
+#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 #include <ui/help/help_topics.h>
@@ -73,7 +80,10 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const Q
             break;
     }
 
-    m_connectTool = new QnConnectToCurrentSystemTool(context(), this);
+    if (!validateStartLicenses(targets, user, password))
+        return;
+
+    m_connectTool = new QnConnectToCurrentSystemTool(this);
 
     QnProgressDialog *progressDialog = new QnProgressDialog(mainWindow());
     progressDialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -127,4 +137,53 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     default:
         break;
     }
+}
+
+bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(const QSet<QnUuid> &targets, const QString &user, const QString &password) {
+
+    QnLicenseListHelper helper(qnLicensePool->getLicenses());
+    if (helper.totalLicenseByType(Qn::LC_Start) == 0)
+        return true; /* We have no start licenses so all is OK. */
+
+    QnMediaServerResourceList aliveServers;
+
+    foreach (const QnUuid &id, targets) {
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+        if (server)
+            aliveServers << server;
+    }
+
+    /* Handle this error elsewhere */
+    if (aliveServers.isEmpty())
+        return true;
+
+    bool serversWithStartLicenses = std::any_of(aliveServers.cbegin(), aliveServers.cend(), [this, &user, &password](const QnMediaServerResourcePtr &server) {
+        return serverHasStartLicenses(server, user, password);
+    });
+
+    /* Check if all OK */
+    if (!serversWithStartLicenses)
+        return true;
+
+    QString message = tr("Warning: You are about to merge Systems with START licenses.\n"\
+        "As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.\n"\
+        "If you understand this and would like to proceed please click Merge to continue.\n");
+
+    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning"), message, QnMessageBox::Cancel);
+    messageBox.addButton(tr("Merge"), QnMessageBox::AcceptRole);
+
+    return messageBox.exec() != QnMessageBox::Cancel;
+}
+
+bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(const QnMediaServerResourcePtr &server, const QString &user, const QString &password) {
+    QAuthenticator auth;
+    auth.setUser(user);
+    auth.setPassword(password);
+
+    /* Check if there is a valid starter license in the remote system. */
+    QnLicenseList remoteLicensesList = remoteLicenses(server->getUrl(), auth);
+
+    /* Warn that some of the licenses will be deactivated. */
+    QnLicenseListHelper remoteHelper(remoteLicensesList);
+    return remoteHelper.totalLicenseByType(Qn::LC_Start) > 0;
 }

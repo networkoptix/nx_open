@@ -2,9 +2,7 @@
 
 #include "common/common_module.h"
 #include <licensing/license.h>
-
-#include <nx_ec/data/api_license_data.h>
-#include <nx_ec/data/api_conversion_functions.h>
+#include <licensing/remote_licenses.h>
 
 #include "utils/network/module_information.h"
 #include "utils/network/simple_http_client.h"
@@ -12,7 +10,7 @@
 #include "utils/common/app_info.h"
 #include "utils/network/module_finder.h"
 
-#define START_LICENSES_DEBUG
+//#define START_LICENSES_DEBUG
 
 namespace {
     const int defaultTimeoutMs = 10 * 1000;
@@ -80,15 +78,7 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     if (helper.totalLicenseByType(Qn::LC_Start) > 0) {
 
         /* Check if there is a valid starter license in the remote system. */
-        int status;
-        QnLicenseList remoteLicensesList = remoteLicenses(url, auth, status);
-        if (status != CL_HTTP_SUCCESS) {
-            if (status == CL_HTTP_AUTH_REQUIRED)
-                result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
-            else
-                result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
-            return CODE_OK;
-        }
+        QnLicenseList remoteLicensesList = remoteLicenses(url, auth);
 
         /* Warn that some of the licenses will be deactivated. */
         QnLicenseListHelper remoteHelper(remoteLicensesList);
@@ -116,22 +106,4 @@ QnModuleInformation QnPingSystemRestHandler::remoteModuleInformation(const QUrl 
     bool success = true;
     QnJsonRestResult json = QJson::deserialized<QnJsonRestResult>(data, QnJsonRestResult(), &success);
     return json.deserialized<QnModuleInformation>();
-}
-
-QnLicenseList QnPingSystemRestHandler::remoteLicenses(const QUrl &url, const QAuthenticator &auth, int &status) {
-    QnLicenseList result;
-
-    CLSimpleHTTPClient client(url, defaultTimeoutMs, auth);
-    status = client.doGET(lit("ec2/getLicenses"));
-
-    if (status != CL_HTTP_SUCCESS)
-        return result;
-
-    QByteArray data;
-    client.readAll(data);
-
-    ec2::ApiLicenseDataList apiLicenses = QJson::deserialized<ec2::ApiLicenseDataList>(data);
-    fromApiToResourceList(apiLicenses, result);
-
-    return result;
 }
