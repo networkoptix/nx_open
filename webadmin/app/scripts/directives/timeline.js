@@ -81,9 +81,9 @@ angular.module('webadminApp')
                     scrollBarColor: [53,70,79],
                     scrollBarHighlightColor: [53,70,79,0.8],
 
-                    timeMarkerColor: [255,255,255], // Timemarker color
-                    timeMarkerTextColor: [0,0,0],
-                    pointerMarkerColor: [0,0,0], // Mouse pointer marker color
+                    timeMarkerColor: [215,223,227], // Timemarker color
+                    timeMarkerTextColor: [12,21,23],
+                    pointerMarkerColor: [12,21,23], // Mouse pointer marker color
                     pointerMarkerTextColor: [255,255,255],
                     markerDateFont:{
                         size:15,
