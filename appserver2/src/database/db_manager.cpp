@@ -279,7 +279,6 @@ QnDbManager::QnDbManager()
     m_isBackupRestore(false),
     m_needResyncLayout(false),
     m_needResyncbRules(false),
-    m_needResyncUsers(false),
     m_dbReadOnly(false)
 {
 }
@@ -573,10 +572,6 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         }
         if (m_needResyncbRules) {
             if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
-                return false;
-        }
-        if (m_needResyncUsers) {
-            if (!fillTransactionLogInternal<ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
                 return false;
         }
     }
@@ -1346,10 +1341,6 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/37_remove_empty_layouts.sql")) {
         return removeEmptyLayoutsFromTransactionLog();
-    }
-    else if (updateName == lit(":/updates/41_user_realm_recalc_tran_log.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncUsers = true;
     }
 
     return true;
