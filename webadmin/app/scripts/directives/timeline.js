@@ -954,8 +954,15 @@ angular.module('webadminApp')
                         );
                 }
 
+
+                var preventClick = false;
+
+
                 scope.dblClick = function(event){
                     updateMouseCoordinate(event);
+                    if(preventClick){
+                        return;
+                    }
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         scope.zoom(true);
@@ -968,6 +975,10 @@ angular.module('webadminApp')
                 };
                 scope.click = function(event){
                     updateMouseCoordinate(event);
+                    if(preventClick){
+                        return;
+                    }
+
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         var date = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
@@ -981,7 +992,6 @@ angular.module('webadminApp')
                         }
                     }
                 };
-
 
                 scope.mouseUp = function(event){
                     //updateMouseCoordinate(event);
@@ -1004,6 +1014,40 @@ angular.module('webadminApp')
                 };
 
 
+                $(canvas).drag("draginit",function(event){
+                    updateMouseCoordinate(event);
+                    catchScrollBar = mouseInScrollbar;
+                    catchTimeline = mouseInTimeline;
+                    scope.scaleManager.stopWatching();
+                });
+                $(canvas).drag("dragstart",function(event,dd){
+                    //updateMouseCoordinate(event);
+                    //catchScrollBar = mouseInScrollbar;
+                });
+                $(canvas).drag("drag",function(event){
+                    updateMouseCoordinate(event);
+
+                    if(catchScrollBar) {
+                        var moveScroll = mouseInScrollbar - catchScrollBar;
+                        scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
+                    }
+                    if(catchTimeline) {
+                        var moveScroll = catchTimeline - mouseInTimeline;
+                        catchTimeline = mouseInTimeline;
+                        scope.scaleManager.scrollByPixels(moveScroll);
+                    }
+                });
+
+                $(canvas).drag("dragend",function(event,dd){
+                    catchScrollBar = false;
+                    catchTimeline = false;
+                    scope.scaleManager.releaseWatching();
+
+                    preventClick = true;
+                    setTimeout(function(){
+                        preventClick = false;
+                    }, timelineConfig.animationDuration);
+                });
 
 
 
@@ -1151,35 +1195,7 @@ angular.module('webadminApp')
 
                 // !!! Subscribe for different events which affect timeline
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
-                $(canvas).drag("draginit",function(event){
-                    updateMouseCoordinate(event);
-                    catchScrollBar = mouseInScrollbar;
-                    catchTimeline = mouseInTimeline;
-                    scope.scaleManager.stopWatching();
-                });
-                $(canvas).drag("dragstart",function(event,dd){
-                    //updateMouseCoordinate(event);
-                    //catchScrollBar = mouseInScrollbar;
-                });
-                $(canvas).drag("drag",function(event){
-                    updateMouseCoordinate(event);
 
-                    if(catchScrollBar) {
-                        var moveScroll = mouseInScrollbar - catchScrollBar;
-                        scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
-                    }
-                    if(catchTimeline) {
-                        var moveScroll = catchTimeline - mouseInTimeline;
-                        catchTimeline = mouseInTimeline;
-                        scope.scaleManager.scrollByPixels(moveScroll);
-                    }
-                });
-
-                $(canvas).drag("dragend",function(event,dd){
-                    catchScrollBar = false;
-                    catchTimeline = false;
-                    scope.scaleManager.releaseWatching();
-                });
 
 
 
