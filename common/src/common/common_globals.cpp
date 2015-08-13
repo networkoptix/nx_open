@@ -19,6 +19,8 @@ namespace Qn
                 return "application/xml";
             case CompressedPeriodsFormat:
                 return "application/x-periods";
+            case UrlQueryFormat:
+                return "application/x-url-query";
             default:
                 assert(false);
                 return "unsupported";
@@ -39,7 +41,9 @@ namespace Qn
             return XmlFormat;
         if (httpContentType == "application/x-periods")
             return CompressedPeriodsFormat;
-        
+        if (httpContentType == "application/x-url-query")
+            return UrlQueryFormat;
+
         return UnsupportedFormat;
     }
 }

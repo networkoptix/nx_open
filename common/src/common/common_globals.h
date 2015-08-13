@@ -607,6 +607,7 @@ public:
         CsvFormat           = 3,
         XmlFormat           = 4,
         CompressedPeriodsFormat = 5, // used for chunks data only
+        UrlQueryFormat      = 6,     //will be added in future for parsing url query (e.g., name1=val1&name2=val2)
 
         UnsupportedFormat   = -1
     };
