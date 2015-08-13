@@ -536,7 +536,7 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
                 if (authUserId)
                     *authUserId = user->getId();
 
-                if (calcResponse == response)
+                //if (calcResponse == response)
                     return Auth_OK;
             }
         }
