@@ -53,8 +53,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     /* set system name */
     int changeSystemNameResult = changeSystemName(systemName, sysIdTime, wholeSystem, tranLogTime);
     if (changeSystemNameResult == ResultFail) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("SYSTEM_NAME"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
     }
 
     /* reset connections if systemName is changed */
@@ -69,16 +68,14 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     /* set port */
     int changePortResult = changePort(port);
     if (changePortResult == ResultFail) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Port is busy"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Port is busy"));
         port = 0;   //not switching port
     }
 
     /* set password */
     int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, cryptSha512Hash, oldPassword);
     if (changeAdminPasswordResult == ResultFail) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("PASSWORD"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
     }
 
     QnConfigureReply reply;

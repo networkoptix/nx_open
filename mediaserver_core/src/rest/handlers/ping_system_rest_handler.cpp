@@ -16,20 +16,17 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     QString password = params.value(lit("password"));
 
     if (url.isEmpty()) {
-        result.setError(QnJsonRestResult::MissingParameter);
-        result.setErrorString(lit("url"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("url"));
         return CODE_OK;
     }
 
     if (!url.isValid()) {
-        result.setError(QnJsonRestResult::InvalidParameter);
-        result.setErrorString(lit("url"));
+        result.setError(QnJsonRestResult::InvalidParameter, lit("url"));
         return CODE_OK;
     }
 
     if (password.isEmpty()) {
-        result.setError(QnJsonRestResult::MissingParameter);
-        result.setErrorString(lit("password"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("password"));
         return CODE_OK;
     }
 
@@ -51,10 +48,8 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     QByteArray data;
     client.readAll(data);
 
-    QnJsonRestResult json;
-    QJson::deserialize(data, &json);
-    QnModuleInformation moduleInformation;
-    QJson::deserialize(json.reply(), &moduleInformation);
+    QnJsonRestResult json = QJson::deserialized<QnJsonRestResult>(data);
+    QnModuleInformation moduleInformation = json.deserialized<QnModuleInformation>();
 
     if (moduleInformation.systemName.isEmpty()) {
         /* Hmm there's no system name. It would be wrong system. Reject it. */
