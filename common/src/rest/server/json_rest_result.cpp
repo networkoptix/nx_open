@@ -6,9 +6,9 @@ QnRestResult::QnRestResult():
     error(NoError) 
 {}
 
-void QnRestResult::setError(Error error, const QString &errorText) {
-    error = error;
-    errorString = errorText.toLatin1();
+void QnRestResult::setError(Error errorValue, const QString &errorStringValue) {
+    error = errorValue;
+    errorString = errorStringValue;
 }
 
 QnJsonRestResult::QnJsonRestResult() :

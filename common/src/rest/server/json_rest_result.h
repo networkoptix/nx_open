@@ -25,10 +25,10 @@ public:
     };
 
     Error error;
-    QnLatin1Array errorString;
+    QString errorString;
 
     QnRestResult();
-    void setError(Error error, const QString &errorString = QString());
+    void setError(Error errorValue, const QString &errorStringValue = QString());
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnRestResult::Error)
 

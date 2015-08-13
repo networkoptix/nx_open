@@ -81,7 +81,7 @@ protected:
                 status = 1;
             }
             if (jsonDeserialized)
-                errorString = QString::fromLatin1(result.errorString);
+                errorString = result.errorString;
         } else {
 #ifdef JSON_REPLY_DEBUG
             qnWarning("Error processing request: %1.", response.errorString);
@@ -112,7 +112,7 @@ protected:
                 status = 1;
             }
             if (deserialized)
-                errorString = QString::fromLatin1(result.errorString);
+                errorString = result.errorString;
         } else {
 #ifdef JSON_REPLY_DEBUG
             qnWarning("Error processing request: %1.", response.errorString);
