@@ -811,7 +811,7 @@ angular.module('webadminApp')
                 function drawMarker(context, date,markerColor,textColor){
                     var coordinate =  scope.scaleManager.dateToScreenCoordinate(date);
 
-                    if(coordinate < 0 || coordinate > scope.viewportWidth ) {
+                    if(coordinate < - timelineConfig.markerWidth/2 || coordinate > scope.viewportWidth + timelineConfig.markerWidth/2 ) {
                         return;
                     }
 
@@ -918,6 +918,18 @@ angular.module('webadminApp')
                     scope.$apply();
                 }
 
+                function animateScroll(targetPosition){
+                    animateScope.animate(scope,"scrollPosition",targetPosition).
+                        then(
+                        function(){
+                            scope.scaleManager.checkWatchPlaying(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
+                        },
+                        function(){},
+                        function(value){
+                            scope.scaleManager.scroll(value);
+                        }
+                    );
+                }
                 scope.dblClick = function(event){
                     updateMouseCoordinate(event);
                     if(!mouseInScrollbarRow) {
@@ -925,14 +937,8 @@ angular.module('webadminApp')
                         scope.zoom(true);
                     }else{
                         if(!mouseInScrollbar){
-                            animateScope.animate(scope,"scrollPosition",(mouseInScrollbarRow>0?1:0)).
-                                then(
-                                    function(){},
-                                    function(){},
-                                    function(value){
-                                        scope.scaleManager.scroll(value);
-                                    }
-                                );
+                            animateScroll((mouseInScrollbarRow>0?1:0));
+
                         }
                     }
                 };
@@ -940,19 +946,14 @@ angular.module('webadminApp')
                     updateMouseCoordinate(event);
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
+                        var date = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
                         scope.positionHandler(scope.scaleManager.screenCoordinateToDate(mouseCoordinate));
+                        scope.scaleManager.watchPlaying(true,date);
+
                     }else{
                         if(!mouseInScrollbar){
                             scope.scrollPosition = scope.scaleManager.scroll() ;
-
-                            animateScope.animate(scope,"scrollPosition", mouseCoordinate / scope.viewportWidth).
-                                then(
-                                    function(){},
-                                    function(){},
-                                    function(value){
-                                        scope.scaleManager.scroll(value);
-                                    }
-                                );
+                            animateScroll(mouseCoordinate / scope.viewportWidth);
                         }
                     }
                 };
@@ -1062,6 +1063,7 @@ angular.module('webadminApp')
                         // This allows us to continue (and slowdown, mb) animation every time
                         animateScope.animate(scope,"zooming",1,"dryResistance").then(function(){
                             currentLevels = scope.scaleManager.levels;
+                            scope.scaleManager.checkWatchPlaying(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
                         },function(){
                             // ignore animation re-run
                         });
@@ -1099,6 +1101,8 @@ angular.module('webadminApp')
                         function(){
                             var activeDate = (new Date()).getTime();
                             scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
+
+                            scope.scaleManager.watchPlaying(true);
                         },
                         function(){},
                         function(val){
@@ -1111,7 +1115,11 @@ angular.module('webadminApp')
                 };
 
                 scope.playPause = function(){
-                    scope.playHandler(!scope.positionProvider.playing)
+                    if(!scope.positionProvider.playing){
+                        scope.scaleManager.watchPlaying(true);
+                    }
+
+                    scope.playHandler(!scope.positionProvider.playing);
                 };
 
                 // !!! Subscribe for different events which affect timeline
@@ -1141,6 +1149,7 @@ angular.module('webadminApp')
                 $(canvas).drag("dragend",function(event,dd){
                     catchScrollBar = false;
                     catchTimeline = false;
+                    scope.scaleManager.checkWatchPlaying(scope.positionProvider.playedPosition,scope.positionProvider.liveMode);
                 });
 
 

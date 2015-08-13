@@ -832,20 +832,60 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.updateLevels();
 };
 
-ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode){
+
+
+ScaleManager.prototype.watchPlaying = function(flag,date){
+    if(flag) {
+        var targetPoint = date? (this.dateToScreenCoordinate(date) / this.viewportWidth) : 0.5;
+        if(targetPoint>1){
+            targetPoint = 0.5;
+        }
+        this.setAnchorDateAndPoint(date || this.anchorDate, targetPoint);
+
+
+    }
+
+    console.log("watchPlaying",flag,date,targetPoint);
+
+    this.watchPlayingPosition = flag;
+};
+
+ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
     var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
     if(this.anchorDate == date){
-        return;
+        this.watchPlaying(flag,date);
     }
-    if(0 <= targetPoint && targetPoint <= 1 ){ // Live mode
-        this.setAnchorDateAndPoint(date, this.anchorPoint);
+
+
+    console.log("checkWatchPlaying",date,targetPoint,liveMode);
+
+    if(0 <= targetPoint && targetPoint <= 1 ){ 
+        this.watchPlaying(true,date); // Let's watch
     }
 
     if(liveMode && targetPoint > 1 && this.end - this.visibleEnd < this.stickToLiveMs ){
+        this.watchPlaying(true);
+    }
+
+    this.watchPlaying(false);
+};
+
+ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode){
+    if(this.anchorDate == date){
+        return;
+    }
+
+    if(date > this.end){
         this.setEnd(date);
-        this.setAnchorDateAndPoint(date, 1);
+    }
+
+    if(this.watchPlayingPosition){
+        console.log("setAnchorDateAndPoint");
+        this.setAnchorDateAndPoint(date, liveMode?1:this.anchorPoint);
     }
 };
+
+
 
 ScaleManager.prototype.tryToRestoreAnchorDate = function(date){
     var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
