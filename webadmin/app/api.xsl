@@ -137,7 +137,7 @@
 
 
                                                 </h4> <div class="well">
-                                                    <xsl:value-of select="description"/>
+                                                    <xsl:copy-of select="description/*"/>
                                                 </div> <dl>
                                                     <dt>Parameters</dt>
                                                     <dd>
@@ -159,7 +159,7 @@
                                                                                 <xsl:value-of select="name"/>
                                                                             </td>
                                                                             <td>
-                                                                                <xsl:value-of select="description"/>
+                                                                                <xsl:copy-of select="description/*"/>
                                                                             </td>
                                                                             <td>
                                                                                 <xsl:value-of select="optional"/>
@@ -174,7 +174,7 @@
                                                                   data-placement="right"
                                                                   data-trigger="hover focus click">
                                                                                                     <xsl:attribute name="title">
-                                                                                                        <xsl:value-of select="description"/>
+                                                                                                        <xsl:copy-of select="description/*"/>
                                                                                                     </xsl:attribute> (?) </a>
                                                                                             </li>
                                                                                         </xsl:for-each>
@@ -245,7 +245,7 @@
                                 <xsl:value-of select="name"/>
                             </td>
                             <td>
-                                <xsl:value-of select="description"/>
+                                <xsl:copy-of select="description/*"/>
                             </td>
                         </tr>
                     </xsl:for-each>

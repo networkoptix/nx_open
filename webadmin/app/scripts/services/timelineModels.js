@@ -376,7 +376,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
  * @param level
  * @return Array
  */
-CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
+CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,restrictLevel){
 
     if(start instanceof Date)
     {
@@ -389,7 +389,7 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
 
     // Splice existing intervals and check, if we need an update from server
     var result = [];
-    this.selectRecords(result,start,end,level,null);
+    this.selectRecords(result,start,end,level,null,restrictLevel);
 
     /*this.logcounter = this.logcounter||0;
     this.logcounter ++;
@@ -547,7 +547,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
  * @param parent - parent for recursive call
  * @param result - heap for recursive call
  */
-CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent){
+CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent,restrictLevel){
     parent = parent || this.chunksTree;
 
     if(!parent){
@@ -564,7 +564,9 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     if(parent.children.length == 0){
-        result.push(parent); // Bad chunk, but no choice
+        if(!restrictLevel) {
+            result.push(parent); // Bad chunk, but no choice
+        }
         return;
     }
 
@@ -574,11 +576,14 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     // iterate blind spots:
-    var blindSpots = this.getBlindSpotsInCache(parent.start,parent.end,parent.level+1);
-    for (i = 0; i < blindSpots.length; i++) {
-        var spot = blindSpots[i];
-        if( spot.start >= start || spot.end <= end ){
-            result.push(spot);
+    if(!restrictLevel || parent.level + 1 == level) {
+
+        var blindSpots = this.getBlindSpotsInCache(parent.start, parent.end, parent.level + 1);
+        for (i = 0; i < blindSpots.length; i++) {
+            var spot = blindSpots[i];
+            if (spot.start >= start || spot.end <= end) {
+                result.push(spot);
+            }
         }
     }
 };
