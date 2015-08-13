@@ -30,9 +30,13 @@ public:
     bool isDiagnosticsVisible() const;
     void setDiagnosticsVisible(bool diagnosticsVisible);
 
+    bool isIoEnableButtonVisible() const;
+    void setEnableButtonVisible(bool visible);
+
 signals:
     void statusOverlayChanged();
     void diagnosticsRequested();
+    void ioEnableRequested();
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -48,6 +52,8 @@ private:
         NoVideoStreamText,
         AnalogLicenseText,
         VideowallLicenseText,
+        IoModuleDisabledText,
+        IoModuleLicenseRequiredText,
         TextCount
     };
 
@@ -55,7 +61,7 @@ private:
     void paintPixmap(QPainter *painter, const QPixmap &picture, qreal imageSize);
 
     void updateLayout();
-    void updateDiagnosticsButtonOpacity(bool animate = true);
+    void updateButtonsOpacity(bool animate = true);
 
 private:
     QSharedPointer<QnPausedPainter> m_pausedPainter;
@@ -67,6 +73,8 @@ private:
 
     bool m_diagnosticsVisible;
     QnTextButtonWidget *m_diagnosticsButton;
+    bool m_ioEnableButtonVisible;
+    QnTextButtonWidget *m_ioEnableButton;
     std::unique_ptr<QPixmap> m_ioSpeakerPixmap;
 };
 

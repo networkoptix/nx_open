@@ -182,6 +182,7 @@ private slots:
     void at_ioModuleButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
     void at_statusOverlayWidget_diagnosticsRequested();
+    void at_statusOverlayWidget_ioEnableRequested();
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);

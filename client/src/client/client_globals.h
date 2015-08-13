@@ -181,6 +181,7 @@ namespace Qn {
         VideowallWithoutLicenseOverlay,
         ServerOfflineOverlay,
         ServerUnauthorizedOverlay,
+        IoModuleDisabledOverlay,
 
         OverlayCount
     };

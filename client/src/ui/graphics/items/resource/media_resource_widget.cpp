@@ -295,6 +295,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         timer->start(1000 * 60); /* Update icon button every minute. */
 
         connect(statusOverlayWidget(), &QnStatusOverlayWidget::diagnosticsRequested,    this,   &QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested);
+        connect(statusOverlayWidget(), &QnStatusOverlayWidget::ioEnableRequested,       this,   &QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested);
 
         bool diagnosticsAllowed = menu()->canTrigger(Qn::CameraDiagnosticsAction, m_camera);
         statusOverlayWidget()->setDiagnosticsVisible(diagnosticsAllowed);
@@ -1099,6 +1100,8 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         return Qn::OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == Qn::Unauthorized) {
         return Qn::UnauthorizedOverlay;
+    } else if (m_camera && m_camera->hasFlags(Qn::io_module) && (!m_camera->isLicenseUsed() || QnCamLicenseUsageHelper().isOverflowForCamera(m_camera))) {
+        return Qn::IoModuleDisabledOverlay;
     } else if (m_camera && m_camera->isDtsBased() && !m_camera->isLicenseUsed()) {
         return Qn::AnalogWithoutLicenseOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivity)) {
@@ -1320,6 +1323,22 @@ void QnMediaResourceWidget::updateCustomAspectRatio() {
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
     menu()->trigger(Qn::CameraDiagnosticsAction, m_camera);
+}
+
+void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
+    if (!m_camera)
+        return;
+
+    if (m_camera->isLicenseUsed())
+        return;
+
+    QnCamLicenseUsageHelper helper;
+    helper.propose(QnVirtualCameraResourceList() << m_camera, true);
+
+    if (helper.isOverflowForCamera(m_camera))
+        statusOverlayWidget()->setEnableButtonVisible(false);
+    else
+        updateStatusOverlay();
 }
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
