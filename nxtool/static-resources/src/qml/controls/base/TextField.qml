@@ -12,6 +12,8 @@ TextField
 
     property bool clearOnInitValue: false;
 
+    placeholderText: initialText;
+
     property bool changed: changedBase;
     property bool changedBase: ((text !== initialText)
         && (!clearOnInitValue || (text.length || wasOnceChanged)));
@@ -23,6 +25,12 @@ TextField
     {
         if (clearOnInitValue && (text != "") && (text != initialText))
             wasOnceChanged = true;
+    }
+
+    onChangedChanged:
+    {
+        if (changed)
+            placeholderText = "";
     }
 
     activeFocusOnTab: true;
