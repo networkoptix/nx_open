@@ -168,12 +168,21 @@ table.webclient-window>tbody>tr>td.alert{
   text-align: center;
   cursor:pointer;
 }
+
 .webclient-button:hover{
   background-color: rgba(198,234,255,0.05);
 }
 
 .webclient-button.disabled{
   opacity:0.1;
+}
+
+.webclient-button.active{
+  background-color: rgba(198,234,255,0.1);
+}
+
+.webclient-button .glyphicon{
+  top:3px;
 }
 
 

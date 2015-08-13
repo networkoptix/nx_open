@@ -677,7 +677,7 @@ angular.module('webadminApp')
 
                     context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
 
-                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+                    context.clearRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
 
                     if(scope.recordsProvider && scope.recordsProvider.chunksTree) {
 
@@ -706,8 +706,10 @@ angular.module('webadminApp')
                     if(!context){
                         return;
                     }
+                    context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
 
-                    context.clearRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+
 
                     var level = scope.scaleManager.levels.events.level;
                     var levelIndex = scope.scaleManager.levels.events.index;
@@ -1077,8 +1079,13 @@ angular.module('webadminApp')
                     }
                 };
                 scope.startZoom = function(zoomIn) {
+                    if(scope.disableZoomOut&&!zoomIn || scope.disableZoomIn&&zoomIn){
+                        return;
+                    }
+
                     zoomingNow = true;
                     zoomingIn = zoomIn;
+
                     processZooming();
                 };
 
@@ -1104,6 +1111,8 @@ angular.module('webadminApp')
 
                     return false;
                 }
+
+
                 scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 
                     var maxZoom = scope.scaleManager.fullZoomOutValue();
@@ -1122,7 +1131,7 @@ angular.module('webadminApp')
                         scope.disableZoomIn = false;
                     }
 
-                    //Find final levels for this zoom
+                    //Find final levels for this zoom and run animation:
                     var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);
                     if(levelsChanged(newTargetLevels, targetLevels)){
                         targetLevels = newTargetLevels;
@@ -1130,7 +1139,6 @@ angular.module('webadminApp')
                         if( scope.zooming == 1){ // We need to run animation again
                             scope.zooming = 0;
                         }
-
 
                         // This allows us to continue (and slowdown, mb) animation every time
                         animateScope.animate(scope,"zooming",1,"dryResistance").then(function(){
@@ -1153,6 +1161,7 @@ angular.module('webadminApp')
                         delayWatchingPlayingPosition();
                     }
 
+
                     if(!instant) {
                         if(!scope.zoomTarget) {
                             scope.zoomTarget = scope.scaleManager.zoom();
@@ -1170,6 +1179,10 @@ angular.module('webadminApp')
                 };
 
                 scope.goToLive = function(){
+                    if(scope.positionProvider.liveMode){
+                        scope.scaleManager.watchPlaying();
+                        return;
+                    }
                     var moveDate = scope.scaleManager.screenCoordinateToDate(1);
                     animateScope.progress(scope, "goingToLive" ).then(
                         function(){
