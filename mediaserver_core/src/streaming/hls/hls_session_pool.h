@@ -18,6 +18,7 @@
 
 #include "hls_playlist_manager.h"
 #include "api/model/audit/auth_session.h"
+#include "audit/audit_manager_fwd.h"
 
 
 class QnVideoCamera;
@@ -69,7 +70,7 @@ namespace nx_hls
         QPair<QString, QString> m_playlistAuthenticationQueryItem;
         QPair<QString, QString> m_chunkAuthenticationQueryItem;
         mutable QMutex m_mutex;
-        int m_auditHandle;
+        AuditHandle m_auditHandle;
         QnAuthSession m_authSession;
     };
 

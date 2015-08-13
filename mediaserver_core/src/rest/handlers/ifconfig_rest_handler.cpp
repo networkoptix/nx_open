@@ -172,25 +172,25 @@ bool QnIfConfigRestHandler::checkData(const QnNetworkAddressEntryList& newSettin
             continue;
 
         if (!value.ipAddr.isNull() && !isValidIP(value.ipAddr)) {
-            *errString = tr("Invalid IP address for interface '%1'").arg(value.name);
+            *errString = lit("Invalid IP address for interface '%1'").arg(value.name);
             return false;
         }
         
         if (!value.netMask.isNull() && !isValidMask(value.netMask)) {
-            *errString = tr("Invalid network mask for interface '%1'").arg(value.name);
+            *errString = lit("Invalid network mask for interface '%1'").arg(value.name);
             return false;
         }
 
         if (!value.gateway.isEmpty()) 
         {
             if (!isValidIP(value.gateway)) {
-                *errString = tr("Invalid gateway address for interface '%1'").arg(value.name);
+                *errString = lit("Invalid gateway address for interface '%1'").arg(value.name);
                 return false;
             }
             if (!value.netMask.isEmpty() && !value.ipAddr.isEmpty()) 
             {
                 if (getNetworkAddr(value.ipAddr, value.netMask) != getNetworkAddr(value.gateway, value.netMask)) {
-                    *errString = tr("IP address and gateway belong to different networks for interface '%1'").arg(value.name);
+                    *errString = lit("IP address and gateway belong to different networks for interface '%1'").arg(value.name);
                     return false;
                 }
             }
@@ -218,13 +218,11 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
 
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!mServer) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Internal server error"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
         return CODE_OK;
     }
     if (!(mServer->getServerFlags() & Qn::SF_IfListCtrl)) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("This server doesn't support interface list control"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("This server doesn't support interface list control"));
         return CODE_OK;
     }
 
@@ -232,16 +230,14 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
     QnNetworkAddressEntryList currentSettings = readNetworSettings(&ok);
     if (!ok) 
     {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't read network settings file"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't read network settings file"));
         return CODE_OK;
     }
     
     QnNetworkAddressEntryList newSettings;
     if (!QJson::deserialize(body, &newSettings)) 
     {
-        result.setError(QnJsonRestResult::InvalidParameter);
-        result.setErrorString(lit("Invalid message body format"));
+        result.setError(QnJsonRestResult::InvalidParameter, lit("Invalid message body format"));
         return CODE_OK;
     }
 
@@ -249,14 +245,12 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
 
     QString errString;
     if (!checkData(currentSettings, &errString)) {
-        result.setError(QnJsonRestResult::InvalidParameter);
-        result.setErrorString(errString);
+        result.setError(QnJsonRestResult::InvalidParameter, errString);
         return CODE_OK;
     }
 
     if (!writeNetworSettings(currentSettings)) {
-        result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't write network settings file"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't write network settings file"));
     }
     return CODE_OK;
 }
@@ -268,7 +262,7 @@ void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestPar
     Q_UNUSED(owner);
 
     QnJsonRestResult reply;
-    if (!QJson::deserialize(body, &reply) || reply.error() !=  QnJsonRestResult::NoError)
+    if (!QJson::deserialize(body, &reply) || reply.error !=  QnJsonRestResult::NoError)
         return;
 
     bool ok = false;

@@ -649,7 +649,7 @@
   <customwidget>
    <class>QnLicensesUsageWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/licenses_usage_widget.h</header>
+   <header location="global">ui/widgets/licensing/licenses_usage_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

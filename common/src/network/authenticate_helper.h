@@ -226,7 +226,7 @@ private:
     /*!
         \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
     */
-    AuthResult authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId ) const;
+    AuthResult authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId, std::function<bool(const QByteArray&)> checkNonceFunc) const;
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
 };
 

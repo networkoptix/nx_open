@@ -16,6 +16,17 @@
     </message>
 </context>
 <context>
+    <name>QnActiResource</name>
+    <message>
+        <source>Output %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Camera output</source>
@@ -277,6 +288,26 @@
     <message>
         <source>Conflicting Server: %1</source>
         <translation>Konflikt mit Server: %1</translation>
+    </message>
+    <message>
+        <source>start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -577,6 +608,22 @@
         <source>Unknown error</source>
         <translation>Unbekannter Fehler</translation>
     </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseUsageHelper</name>
@@ -641,6 +688,20 @@
     <message>
         <source>Preset #</source>
         <translation>Voreinstellung #</translation>
+    </message>
+</context>
+<context>
+    <name>QnPlAxisResource</name>
+    <message>
+        <source>Can&apos;t initialize IO port settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPlOnvifResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -890,6 +951,17 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>Ungültiger Parameter</translation>
+    </message>
+</context>
+<context>
+    <name>QnThirdPartyResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

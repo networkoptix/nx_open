@@ -802,7 +802,6 @@ void RTPSession::addCommonHeaders(nx_http::HttpHeaders& headers)
 {
     headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
-    headers.insert( nx_http::HttpHeader(Qn::EC2_INTERNAL_RTP_FORMAT, "1" ));
 }
 
 nx_http::Request RTPSession::createDescribeRequest()
@@ -1881,11 +1880,11 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
                 return true;
         }
 
-        if( !qnAuthHelper->authenticate(
+        if( qnAuthHelper->authenticate(
                 m_auth,
                 response,
                 &request,
-                &m_rtspAuthCtx ) )
+                &m_rtspAuthCtx ) != Auth_OK)
             return false;
     }
 

@@ -11,6 +11,16 @@ Base.Column
 {
     id: thisComponent;
 
+    property Item firstIpLine: repeater.itemAt(0);
+    property Item lastIpLine: repeater.itemAt(repeater.count - 1);
+
+    Component.onCompleted:
+    {
+        firstIpLine = repeater.itemAt(0);
+        if (firstIpLine && enabled)
+            firstIpLine.ipAddressControl.forceActiveFocus();
+    }
+
     property bool changed:
     {      
         var result = false;
@@ -30,6 +40,8 @@ Base.Column
     
     anchors.left: (parent ? parent.left : undefined);
 
+    activeFocusOnTab: false;
+
     Repeater
     {
         id: repeater;
@@ -47,6 +59,23 @@ Base.Column
             
             adapterNameValue: model.adapterName;
             interfaceCaption: model.readableName;
+        }
+
+        onItemAdded:
+        {
+            if (index !== 0)
+            {
+                var prevChild = itemAt(index - 1);
+                item.KeyNavigation.backtab = (prevChild ? prevChild.dnsControl : null);
+                prevChild.KeyNavigation.tab = item.ipAddressControl;
+            }
+            else
+            {
+                item.KeyNavigation.backtab = item.ipAddressControl;
+                item.ipAddressControl.forceActiveFocus();
+            }
+
+            item.KeyNavigation.tab = thisComponent.KeyNavigation.tab;
         }
     }
     
@@ -117,7 +146,7 @@ Base.Column
                     if (!rtuContext.isDiscoverableFromCurrentNetwork(
                         item.ipAddressControl.text, item.subnetMaskControl.text))
                     {
-                        warnings.push(("New IP address for \"%1\" is not reachable. Server could be not available after changes applied.")
+                        warnings.push(("The IP address of \"%1\" is about to be assigned is in a different subnet. The unit will be unreachable after the changes are made. Proceed?")
                             .arg(interfaceCaption));
                     }
 
@@ -131,7 +160,11 @@ Base.Column
                             .arg(interfaceCaption);
                         errorDialog.show();
 
-                        item.ipAddressControl.forceActiveFocus();
+                        if (item.ipAddressControl.changed)
+                            item.ipAddressControl.forceActiveFocus();
+                        else
+                            item.gatewayControl.forceActiveFocus();
+
                         return false;
                     }
 
@@ -142,7 +175,7 @@ Base.Column
                 {
                     if (!item.dnsControl.isEmptyAddress && !item.dnsControl.acceptableInput)
                     {
-                        errorDialog.message = errorTemplate.arg(qsTr("dns")).arg(name);
+                        errorDialog.message = errorTemplate.arg(qsTr("dns")).arg(interfaceCaption);
                         errorDialog.show();
                         
                         item.dnsControl.forceActiveFocus();
@@ -157,7 +190,7 @@ Base.Column
                 {
                     if (wrongGateway)
                     {
-                        errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(name);
+                        errorDialog.message = errorTemplate.arg(qsTr("gateway")).arg(interfaceCaption);
                         errorDialog.show();
                         
                         item.gatewayControl.forceActiveFocus();

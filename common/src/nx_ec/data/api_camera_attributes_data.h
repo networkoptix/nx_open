@@ -39,13 +39,22 @@ namespace ec2
 
     struct ApiCameraAttributesData : ApiData
     {
-        ApiCameraAttributesData(): scheduleEnabled(true), motionType(Qn::MT_Default), audioEnabled(false), secondaryStreamQuality(Qn::SSQualityNotDefined),
-                         controlEnabled(true), minArchiveDays(0), maxArchiveDays(0) {}
+        ApiCameraAttributesData(): 
+            scheduleEnabled(true),
+            licenseUsed(true),
+            motionType(Qn::MT_Default),
+            audioEnabled(false),
+            secondaryStreamQuality(Qn::SSQualityNotDefined),
+            controlEnabled(true),
+            minArchiveDays(0),
+            maxArchiveDays(0) 
+        {}
 
         QnUuid              cameraID;
         QString             cameraName;
         QString             userDefinedGroupName;
         bool                scheduleEnabled;
+        bool                licenseUsed;
         Qn::MotionType      motionType;
         QnLatin1Array       motionMask;
         std::vector<ApiScheduleTaskData>  scheduleTasks;
@@ -57,8 +66,22 @@ namespace ec2
         int                 maxArchiveDays;
         QnUuid              preferedServerId;
     };
-#define ApiCameraAttributesData_Fields_Short (userDefinedGroupName)(scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
-    (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
+
+#define ApiCameraAttributesData_Fields_Short \
+    (userDefinedGroupName)  \
+    (scheduleEnabled)       \
+    (licenseUsed)           \
+    (motionType)            \
+    (motionMask)            \
+    (scheduleTasks)         \
+    (audioEnabled)          \
+    (secondaryStreamQuality)\
+    (controlEnabled)        \
+    (dewarpingParams)       \
+    (minArchiveDays)        \
+    (maxArchiveDays)        \
+    (preferedServerId)
+
 #define ApiCameraAttributesData_Fields (cameraID) (cameraName) ApiCameraAttributesData_Fields_Short
 
 } // namespace ec2

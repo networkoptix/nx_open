@@ -43,8 +43,8 @@ struct QnManualCameraSearchSingleCamera {
     QString url;
     QString manufacturer;
     QString vendor;
-    bool existsInPool;
     QString uniqueId;
+    bool existsInPool;
 
     QnManualCameraSearchSingleCamera(): existsInPool(false) {}
 

@@ -46,26 +46,22 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         takeRemoteSettings = false;
 
     if (url.isEmpty()) {
-        result.setError(QnJsonRestResult::MissingParameter);
-        result.setErrorString(lit("url"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("url"));
         return nx_http::StatusCode::ok;
     }
 
     if (!url.isValid()) {
-        result.setError(QnJsonRestResult::InvalidParameter);
-        result.setErrorString(lit("url"));
+        result.setError(QnJsonRestResult::InvalidParameter, lit("url"));
         return nx_http::StatusCode::ok;
     }
 
     if (password.isEmpty()) {
-        result.setError(QnJsonRestResult::MissingParameter);
-        result.setErrorString(lit("password"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("password"));
         return nx_http::StatusCode::ok;
     }
 
     if (currentPassword.isEmpty()) {
-        result.setError(QnJsonRestResult::MissingParameter);
-        result.setErrorString(lit("currentPassword"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("currentPassword"));
         return nx_http::StatusCode::ok;
     }
 
@@ -75,8 +71,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         return nx_http::StatusCode::internalServerError;
 
     if (!admin->checkPassword(currentPassword)) {
-        result.setError(QnJsonRestResult::InvalidParameter);
-        result.setErrorString(lit("currentPassword"));
+        result.setError(QnJsonRestResult::InvalidParameter, lit("currentPassword"));
         return nx_http::StatusCode::ok;
     }
 
@@ -102,10 +97,8 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     client.readAll(data);
     client.close();
 
-    QnJsonRestResult json;
-    QJson::deserialize(data, &json);
-    QnModuleInformationWithAddresses moduleInformation;
-    QJson::deserialize(json.reply(), &moduleInformation);
+    QnJsonRestResult json = QJson::deserialized<QnJsonRestResult>(data);
+    QnModuleInformationWithAddresses moduleInformation = json.deserialized<QnModuleInformationWithAddresses>();
 
     if (moduleInformation.systemName.isEmpty()) {
         /* Hmm there's no system name. It would be wrong system. Reject it. */
@@ -255,7 +248,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
 
             QnJsonRestResult result;
             QnPingReply reply;
-            if (QJson::deserialize(data, &result) && QJson::deserialize(result.reply(), &reply)) {
+            if (QJson::deserialize(data, &result) && QJson::deserialize(result.reply, &reply)) {
                 remoteSysTime = reply.sysIdTime;
                 remoteTranLogTime = reply.tranLogTime;
             }

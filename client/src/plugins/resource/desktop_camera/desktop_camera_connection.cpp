@@ -194,9 +194,6 @@ QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, c
     connection(0),
     processor(0)
 {
-    m_auth.username = QnAppServerConnectionFactory::url().userName();
-    m_auth.password = QnAppServerConnectionFactory::url().password();
-    m_auth.clientGuid = qnCommon->moduleGUID();
 }
 
 QnDesktopCameraConnection::~QnDesktopCameraConnection()
@@ -228,6 +225,7 @@ void QnDesktopCameraConnection::run()
 {
     while (!m_needStop)
     {
+        QAuthenticator auth;
         {
             QMutexLocker lock(&m_mutex);
             delete processor;
@@ -235,13 +233,17 @@ void QnDesktopCameraConnection::run()
             delete connection;
             connection = 0;
 
-            QAuthenticator auth;
-            auth.setUser(m_auth.username);
-            auth.setPassword(m_auth.password);
+            auth.setUser(QnAppServerConnectionFactory::url().userName());
+            auth.setPassword(QnAppServerConnectionFactory::url().password());
 
             connection = new CLSimpleHTTPClient(m_server->getApiUrl(), CONNECT_TIMEOUT, auth);
             connection->addHeader("user-name", auth.user().toUtf8());
-            connection->addHeader("user-id", m_auth.clientGuid.toString().toUtf8());
+            connection->addHeader("user-id", qnCommon->moduleGUID().toByteArray());
+        }
+
+        if (auth.user().isEmpty() || auth.password().isEmpty()) {
+            terminatedSleep(1000 * 10);
+            continue;
         }
 
         CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));

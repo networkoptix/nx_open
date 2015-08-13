@@ -30,10 +30,17 @@ FocusScope
 
     onInitTimeChanged: { impl.updateFromTime(initTime.toLocaleTimeString(), true); }
 
-    onShowNowChanged:
+    onActiveFocusChanged:
     {
-        if (showNow)
-            time = initTime;
+        if (!activeFocus)
+        {
+            hoursInput.focus = true;
+        }
+        else if (!hoursInput.activeFocus && !minutesInput.activeFocus
+            && !secondsInput.activeFocus && !apInput.activeFocus)
+        {
+            hoursInput.forceActiveFocus();
+        }
     }
 
     Timer

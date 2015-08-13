@@ -9,6 +9,7 @@
 #include <core/resource/media_server_resource.h>
 #include <ec2_statictics_reporter.h>
 
+#include <ui/common/checkbox_utils.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
@@ -22,22 +23,13 @@ QnCameraManagementWidget::QnCameraManagementWidget(QWidget *parent):
     setHelpTopic(ui->autoDiscoveryCheckBox, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
     setWarningStyle(ui->settingsWarningLabel);
 
-    connect(ui->autoDiscoveryCheckBox,  &QCheckBox::clicked,  this,  &QnCameraManagementWidget::at_autoDiscoveryCheckBox_clicked);
+    QnCheckbox::autoCleanTristate(ui->autoDiscoveryCheckBox);
     connect(ui->autoSettingsCheckBox,   &QCheckBox::clicked,  this,  [this]{
         ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked());
     });
 }
 
 QnCameraManagementWidget::~QnCameraManagementWidget() {
-    return;
-}
-
-void QnCameraManagementWidget::at_autoDiscoveryCheckBox_clicked() {
-    Qt::CheckState state = ui->autoDiscoveryCheckBox->checkState();
-
-    ui->autoDiscoveryCheckBox->setTristate(false);
-    if (state == Qt::PartiallyChecked)
-        ui->autoDiscoveryCheckBox->setCheckState(Qt::Checked);
 }
 
 void QnCameraManagementWidget::updateFromSettings() {

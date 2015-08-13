@@ -59,23 +59,15 @@ public:
     void setExportScheduleButtonEnabled(bool enabled);
 signals:
     void hasChangesChanged();
-    void moreLicensesRequested();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
-    void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
-    void at_cameraScheduleWidget_gridParamsChanged();
-    void at_cameraScheduleWidget_controlsChangesApplied();
-
-    void at_enableAudioCheckBox_clicked();
-    void at_analogViewCheckBox_clicked();
 
     void updateMaxFPS();
-    void updateLicenseText();
-    void updateLicensesButtonVisible();
+
 protected:
     QnCameraSettingsWidgetPrivate* d_ptr;
 
@@ -87,6 +79,7 @@ private:
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
+
     QnVirtualCameraResourceList m_cameras;
     bool m_hasDbChanges;
     bool m_hasScheduleChanges;
