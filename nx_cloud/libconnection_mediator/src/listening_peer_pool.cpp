@@ -1,13 +1,12 @@
 #include "listening_peer_pool.h"
 
 #include "stun/custom_stun.h"
-#include "stun/stun_message_dispatcher.h"
 #include "mediaserver_api.h"
 
 namespace nx {
 namespace hpm {
 
-ListeningPeerPool::ListeningPeerPool( STUNMessageDispatcher* dispatcher,
+ListeningPeerPool::ListeningPeerPool( stun::MessageDispatcher* dispatcher,
                                       MediaserverApiIf* mediaserverApi )
     : m_mediaserverApi( mediaserverApi )
 {
@@ -22,7 +21,8 @@ ListeningPeerPool::ListeningPeerPool( STUNMessageDispatcher* dispatcher,
     );
 }
 
-bool ListeningPeerPool::ping( StunServerConnection* connection, stun::Message&& message )
+bool ListeningPeerPool::ping( stun::ServerConnection* connection,
+                              stun::Message&& message )
 {
     const auto systemAttr = message.getAttribute< attrs::SystemId >();
     if( !systemAttr )
@@ -60,7 +60,8 @@ bool ListeningPeerPool::ping( StunServerConnection* connection, stun::Message&& 
     return connection->sendMessage( std::move( response ) );
 }
 
-bool ListeningPeerPool::listen( StunServerConnection* /*connection*/, stun::Message&& /*message*/ )
+bool ListeningPeerPool::listen( stun::ServerConnection* /*connection*/,
+                                stun::Message&& /*message*/ )
 {
     //retrieving requests parameters:
         //peer id
@@ -77,7 +78,8 @@ bool ListeningPeerPool::listen( StunServerConnection* /*connection*/, stun::Mess
     return false;
 }
 
-bool ListeningPeerPool::connect( StunServerConnection* /*connection*/, stun::Message&& /*message*/ )
+bool ListeningPeerPool::connect( stun::ServerConnection* /*connection*/,
+                                 stun::Message&& /*message*/ )
 {
     //retrieving requests parameters:
         //address to connect to. This address has following format: {server_guid}.{system_name} or just {system_name}. 
@@ -96,8 +98,8 @@ bool ListeningPeerPool::connect( StunServerConnection* /*connection*/, stun::Mes
     return false;
 }
 
-bool ListeningPeerPool::errorResponse(
-        StunServerConnection* connection, stun::Message& request, int code, String reason )
+bool ListeningPeerPool::errorResponse( stun::ServerConnection* connection,
+                                       stun::Message& request, int code, String reason )
 {
     stun::Message response( stun::Header(
         stun::MessageClass::errorResponse, request.header.method,

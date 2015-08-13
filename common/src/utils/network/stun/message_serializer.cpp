@@ -3,7 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "stun_message_serializer.h"
+#include "message_serializer.h"
+
 #include <QtEndian>
 #include <bitset>
 

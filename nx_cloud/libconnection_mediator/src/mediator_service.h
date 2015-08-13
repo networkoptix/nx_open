@@ -16,8 +16,7 @@
 #include <utils/common/stoppable.h>
 #include <utils/network/connection_server/multi_address_server.h>
 #include <utils/network/http/server/http_stream_socket_server.h>
-
-#include "stun/stun_stream_socket_server.h"
+#include <utils/network/stun/stream_socket_server.h>
 
 namespace nx {
 namespace hpm {
@@ -42,8 +41,7 @@ private:
     std::unique_ptr<QSettings> m_settings;
     int m_argc;
     char** m_argv;
-    std::unique_ptr<MultiAddressServer<StunStreamSocketServer>> m_multiAddressStunServer;
-    std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
+    std::unique_ptr<MultiAddressServer<stun::SocketServer>> m_multiAddressStunServer;
 
     QString getDataDirectory();
     int printHelp();

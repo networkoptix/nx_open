@@ -1,21 +1,13 @@
-/**********************************************************
-* 30 sep 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_STUN_CONNECTION_H
-#define NX_STUN_CONNECTION_H
-
-#include <functional>
-#include <list>
+#ifndef NX_STUN_ASYNC_CLIENT_H
+#define NX_STUN_ASYNC_CLIENT_H
 
 #include <utils/thread/mutex.h>
 #include <utils/network/connection_server/base_stream_protocol_connection.h>
 #include <utils/network/connection_server/stream_socket_server.h>
 
-#include "stun_message.h"
-#include "stun_message_parser.h"
-#include "stun_message_serializer.h"
+#include "message.h"
+#include "message_parser.h"
+#include "message_serializer.h"
 
 namespace nx {
 namespace stun {
@@ -104,4 +96,4 @@ private:
 } // namespase stun
 } // namespase nx
 
-#endif  //NX_STUN_CONNECTION_H
+#endif // NX_STUN_ASYNC_CLIENT_H

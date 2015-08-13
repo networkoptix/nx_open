@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <utils/network/stun/stun_message_serializer.h>
-#include <utils/network/stun/stun_message_parser.h>
+#include <utils/network/stun/message_serializer.h>
+#include <utils/network/stun/message_parser.h>
 
 namespace nx {
 namespace stun {

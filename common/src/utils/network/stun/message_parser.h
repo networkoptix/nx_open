@@ -5,12 +5,13 @@
 
 #ifndef STUN_MESSAGE_PARSER_H
 #define STUN_MESSAGE_PARSER_H
+
 #include <memory>
 #include <cstdint>
 #include <deque>
 
 #include <utils/network/abstract_socket.h>
-#include <utils/network/stun/stun_message.h>
+#include <utils/network/stun/message.h>
 #include <utils/network/buffer.h>
 
 #include "../connection_server/base_protocol_message_types.h"

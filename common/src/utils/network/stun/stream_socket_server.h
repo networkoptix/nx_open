@@ -7,27 +7,29 @@
 #define STUN_STREAM_SOCKET_SERVER_H
 
 #include <utils/network/connection_server/stream_socket_server.h>
+#include <utils/network/connection_server/stream_socket_server.h>
 
-#include "stun_server_connection.h"
+#include "server_connection.h"
 
 namespace nx {
-namespace hpm {
+namespace stun {
 
-class StunStreamSocketServer
+class SocketServer
 :
-    public StreamSocketServer<StunStreamSocketServer, StunServerConnection>
+    public StreamSocketServer<SocketServer, ServerConnection>
 {
-    typedef StreamSocketServer<StunStreamSocketServer, StunServerConnection> base_type;
+    typedef StreamSocketServer<SocketServer, ServerConnection> base_type;
 
 public:
-    StunStreamSocketServer( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
+    SocketServer( bool sslRequired,
+                  SocketFactory::NatTraversalType natTraversalRequired )
     :
         base_type( sslRequired, natTraversalRequired )
     {
     }
 };
 
-} // namespace hpm
+} // namespace stun
 } // namespace nx
 
 #endif  //STUN_STREAM_SOCKET_SERVER_H

@@ -10,7 +10,8 @@
 #include <functional>
 #include <utils/network/buffer.h>
 
-#include "stun_message.h"
+#include "message.h"
+
 #include "../connection_server/base_protocol_message_types.h"
 
 

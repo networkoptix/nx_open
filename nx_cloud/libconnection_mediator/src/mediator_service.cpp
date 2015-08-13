@@ -20,7 +20,6 @@
 #include <utils/network/http/server/server_managers.h>
 
 #include "stun/custom_stun.h"
-#include "stun/stun_message_dispatcher.h"
 #include "listening_peer_pool.h"
 #include "mediaserver_api.h"
 #include "version.h"
@@ -113,47 +112,22 @@ int MediatorProcess::executeApplication()
         return 1;
     }
 
-    //TODO opening database
-    RegisteredDomainsDataManager registeredDomainsDataManager;
-
-    // no need for http interface so far
-    /*
-    nx_http::ServerManagers httpServerManagers;
-
-    nx_http::MessageDispatcher httpMessageDispatcher;
-    httpServerManagers.setDispatcher( &httpMessageDispatcher );
-
-    AuthenticationManager authenticationManager;
-    httpServerManagers.setAuthenticationManager( &authenticationManager );
-
-    RegisterSystemHttpHandler registerHttpHandler;
-    httpMessageDispatcher.registerRequestProcessor(
-        RegisterSystemHttpHandler::HANDLER_PATH,
-        &registerHttpHandler );
-    */
-
-    using namespace std::placeholders;
-
     //STUN handlers
-    STUNMessageDispatcher stunMessageDispatcher;
+    stun::MessageDispatcher stunMessageDispatcher;
     MediaserverApi mediaserverApi;
     ListeningPeerPool listeningPeerPool( &stunMessageDispatcher, &mediaserverApi );
 
     //accepting STUN requests by both tcp and udt
-    m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>( stunAddrToListenList, true, SocketFactory::nttAuto ) );
-    m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>( httpAddrToListenList, true, SocketFactory::nttDisabled ) );
+    m_multiAddressStunServer.reset( new MultiAddressServer<stun::SocketServer>(
+        stunAddrToListenList, true, SocketFactory::nttAuto ) );
 
     if( !m_multiAddressStunServer->bind() )
         return 2;
-    if( !m_multiAddressHttpServer->bind() )
-        return 3;
 
     //TODO: #ak process privilege reduction should be made here
 
     if( !m_multiAddressStunServer->listen() )
         return 4;
-    if( !m_multiAddressHttpServer->listen() )
-        return 5;
 
     //TODO #ak remove qt event loop
     //application's main loop
@@ -161,7 +135,6 @@ int MediatorProcess::executeApplication()
 
     //stopping accepting incoming connections
     m_multiAddressStunServer.reset();
-    m_multiAddressHttpServer.reset();
 
     return result;
 }

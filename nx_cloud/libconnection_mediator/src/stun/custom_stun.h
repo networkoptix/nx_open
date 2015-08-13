@@ -7,7 +7,7 @@
 #define NX_CUSTOM_STUN_H
 
 #include <utils/network/socket_common.h>
-#include <utils/network/stun/stun_message.h>
+#include <utils/network/stun/message.h>
 #include <utils/common/uuid.h>
 
 namespace nx {

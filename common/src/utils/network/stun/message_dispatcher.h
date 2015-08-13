@@ -10,25 +10,24 @@
 #include <memory>
 #include <unordered_map>
 
-#include <utils/common/singleton.h>
-#include <utils/common/stoppable.h>
-#include <utils/network/connection_server/message_dispatcher.h>
+#include "utils/common/singleton.h"
+#include "utils/common/stoppable.h"
 
-#include "stun_server_connection.h"
+#include "server_connection.h"
 
 namespace nx {
-namespace hpm {
+namespace stun {
 
 //!Dispatches STUN protocol messages to corresponding processor
 /*!
     \note This class methods are not thread-safe
 */
-class STUNMessageDispatcher
+class MessageDispatcher
 :
-    public Singleton<STUNMessageDispatcher>
+    public Singleton<MessageDispatcher>
 {
 public:
-    typedef std::function< bool( StunServerConnection*, stun::Message&& ) > MessageProcessorType;
+    typedef std::function< bool( ServerConnection*, stun::Message&& ) > MessageProcessorType;
 
     /*!
         \param messageProcessor Ownership of this object is not passed
@@ -44,13 +43,13 @@ public:
         \param message This object is not moved in case of failure to find processor
         \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
-    bool dispatchRequest( StunServerConnection* connection, stun::Message&& message );
+    bool dispatchRequest( ServerConnection* connection, stun::Message&& message );
 
 private:
     std::unordered_map<int, MessageProcessorType> m_processors;
 };
 
-} // namespace hpm
+} // namespace stun
 } // namespace nx
 
 #endif  //STUN_MESSAGE_DISPATCHER_H

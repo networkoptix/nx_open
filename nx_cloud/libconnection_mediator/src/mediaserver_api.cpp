@@ -3,9 +3,6 @@
 #include <utils/network/http/httpclient.h>
 #include <utils/common/log.h>
 
-#include "stun/custom_stun.h"
-#include "stun/stun_message_dispatcher.h"
-
 #include <QJsonDocument>
 
 namespace nx {

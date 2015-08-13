@@ -1,11 +1,6 @@
-/**********************************************************
-* 30 sep 2014
-* a.kolesnikov
-***********************************************************/
+#include "async_client.h"
 
-#include <utils/common/guard.h>
-
-#include "stun_connection.h"
+#include "utils/common/guard.h"
 
 namespace nx {
 namespace stun {

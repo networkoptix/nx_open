@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "stun_message.h"
+#include "message.h"
 
 namespace nx {
 namespace stun {
