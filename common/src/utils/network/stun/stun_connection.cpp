@@ -180,8 +180,8 @@ void AsyncClient::onConnectionComplete(
     }
 
     m_baseConnection.reset( new BaseConnectionType( this, std::move(socket) ) );
-    m_baseConnection->setMessageHandler( std::bind(
-        &AsyncClient::processMessage, this, std::placeholders::_1 ) );
+    m_baseConnection->setMessageHandler( 
+        [this]( Message msg ){ processMessage(std::move(msg)); } );
 
     if( !m_baseConnection->startReadingConnection() )
     {
