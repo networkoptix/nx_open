@@ -583,6 +583,7 @@ namespace ec2
         bool m_isBackupRestore;
         bool m_needResyncLayout;
         bool m_needResyncbRules;
+        bool m_needResyncUsers;
         bool m_dbReadOnly;
     };
 };
