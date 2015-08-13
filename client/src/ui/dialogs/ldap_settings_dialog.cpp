@@ -122,6 +122,7 @@ QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
     result.adminDn = dialog->ui->adminDnLineEdit->text();
     result.adminPassword = dialog->ui->passwordLineEdit->text();
     result.searchBase = dialog->ui->searchBaseLineEdit->text();
+    result.searchFilter = dialog->ui->searchFilterLineEdit->text();
     return result;
 }
 
@@ -137,6 +138,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
     dialog->ui->adminDnLineEdit->setText(settings.adminDn);
     dialog->ui->passwordLineEdit->setText(settings.adminPassword);
     dialog->ui->searchBaseLineEdit->setText(settings.searchBase);
+    dialog->ui->searchFilterLineEdit->setText(settings.searchFilter);
     dialog->ui->testStackWidget->setCurrentWidget(dialog->ui->testResultPage);
     dialog->ui->testResultLabel->setText(QString());
 }

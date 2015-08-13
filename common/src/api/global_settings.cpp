@@ -52,6 +52,7 @@ namespace {
     const QString ldapAdminDn(lit("ldapAdminDn"));
     const QString ldapAdminPassword(lit("ldapAdminPassword"));
     const QString ldapSearchBase(lit("ldapSearchBase"));
+    const QString ldapSearchFilter(lit("ldapSearchFilter"));
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent): 
@@ -79,6 +80,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_ldapAdminDnAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapAdminDn, QString(), this);
     m_ldapAdminPasswordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapAdminPassword, QString(), this);
     m_ldapSearchBaseAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapSearchBase, QString(), this);
+    m_ldapSearchFilterAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapSearchFilter, QString(), this);
 
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
@@ -100,6 +102,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << m_ldapAdminDnAdaptor
         << m_ldapAdminPasswordAdaptor
         << m_ldapSearchBaseAdaptor
+        << m_ldapSearchFilterAdaptor
         ;
 
     m_allAdaptors 
@@ -215,6 +218,7 @@ QnLdapSettings QnGlobalSettings::ldapSettings() const {
     result.adminDn = m_ldapAdminDnAdaptor->value();
     result.adminPassword = m_ldapAdminPasswordAdaptor->value();
     result.searchBase = m_ldapSearchBaseAdaptor->value();
+    result.searchFilter = m_ldapSearchFilterAdaptor->value();
     return result;
 }
 
@@ -223,6 +227,7 @@ void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings) {
     m_ldapAdminDnAdaptor->setValue(settings.adminDn);
     m_ldapAdminPasswordAdaptor->setValue(settings.adminPassword);
     m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
+    m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
 }
 
 QnEmailSettings QnGlobalSettings::emailSettings() const {

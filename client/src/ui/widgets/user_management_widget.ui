@@ -32,14 +32,14 @@
      <item>
       <widget class="QPushButton" name="refreshButton">
        <property name="text">
-        <string>Refresh</string>
+        <string>Import from LDAP</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="ldapSettingsButton">
        <property name="text">
-        <string>LDAP Settings</string>
+        <string>LDAP Settings...</string>
        </property>
       </widget>
      </item>

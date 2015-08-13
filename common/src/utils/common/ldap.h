@@ -8,6 +8,7 @@ struct QnLdapSettings {
     QString adminDn;
     QString adminPassword;
     QString searchBase;
+    QString searchFilter;
 
     bool equals(const QnLdapSettings &other) const;
     bool isValid() const;

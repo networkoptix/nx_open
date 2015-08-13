@@ -16,8 +16,9 @@ namespace ec2
         QString adminDn;
         QString adminPassword;
         QString searchBase;
+        QString searchFilter;
     };
-#define ApiLdapSettingsData_Fields (uri)(adminDn)(adminPassword)(searchBase)
+#define ApiLdapSettingsData_Fields (uri)(adminDn)(adminPassword)(searchBase)(searchFilter)
 } // namespace ec2
 
 #endif // QN_API_LDAP_DATA_H

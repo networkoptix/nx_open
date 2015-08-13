@@ -74,6 +74,20 @@
       <item row="3" column="1">
        <widget class="QLineEdit" name="searchBaseLineEdit"/>
       </item>
+       <item row="4" column="0">
+         <widget class="QLabel" name="searchFilterLabel">
+           <property name="text">
+             <string>Search Filter:</string>
+           </property>
+         </widget>
+       </item>
+       <item row="4" column="1">
+         <widget class="QLineEdit" name="searchFilterLineEdit">
+           <property name="placeholderText">
+             <string>Optional</string>
+           </property>
+         </widget>
+       </item>
      </layout>
     </widget>
    </item>

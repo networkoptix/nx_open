@@ -8,6 +8,47 @@
 #include <QtCore/QCryptographicHash>
 #include <stdio.h>
 
+class QnLdapFilter
+{
+public:
+    QnLdapFilter()
+    {
+    }
+
+    QnLdapFilter(const QString& str)
+        : m_value(str.trimmed())
+    {
+    }
+
+    QnLdapFilter and(const QnLdapFilter& arg) {
+        if (arg.isEmpty())
+            return *this;
+
+        return QnLdapFilter(QString(lit("(&%1%2)")).arg(toCompoundString()).arg(arg.toCompoundString()));
+    }
+
+    QString toString() const {
+        return m_value;
+    }
+
+    bool isEmpty() const {
+        return m_value.isEmpty();
+    }
+
+    bool isSimple() const {
+        return isEmpty() || m_value[0] != QLatin1Char('(');
+    }
+
+    QString toCompoundString() const {
+        if (isSimple())
+            return m_value;
+
+        return QString(lit("(%1)")).arg(m_value);
+    }
+private:
+    QString m_value;
+};
+
 enum LdapVendor {
     ActiveDirectory,
     OpenLdap
@@ -192,7 +233,7 @@ bool LdapSession::connect()
     LdapVendor vendor;
     if (!detectLdapVendor(vendor))
     {
-        // error is set be detectLdapVendor
+        // error is set by detectLdapVendor
         return false;
     }
 
@@ -216,7 +257,8 @@ bool LdapSession::fetchUsers(QnLdapUsers &users)
 
     LDAPMessage *result, *e;
 
-    rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, m_dType->Filter().isEmpty() ? 0 : QSTOCW(m_dType->Filter()), NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
+    QString filter = QnLdapFilter(m_dType->Filter()).and(m_settings.searchFilter).toString();
+    rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
     if (rc != LDAP_SUCCESS)
     {
         m_lastError = LdapErrorStr(rc);
@@ -256,7 +298,8 @@ bool LdapSession::testSettings()
 
     LDAPMessage *result;
 
-    rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, m_dType->Filter().isEmpty() ? 0 : QSTOCW(m_dType->Filter()), NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
+    QString filter = QnLdapFilter(m_dType->Filter()).and(m_settings.searchFilter).toString();
+    rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
     if (rc != LDAP_SUCCESS)
     {
         m_lastError = LdapErrorStr(rc);

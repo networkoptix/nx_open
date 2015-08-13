@@ -90,6 +90,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_ldapAdminDnAdaptor;
     QnResourcePropertyAdaptor<QString> *m_ldapAdminPasswordAdaptor;
     QnResourcePropertyAdaptor<QString> *m_ldapSearchBaseAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_ldapSearchFilterAdaptor;
 
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;

@@ -406,6 +406,7 @@ void fromResourceToApi(const QnLdapSettings &src, ApiLdapSettingsData &dst) {
     dst.adminDn = src.adminDn;
     dst.adminPassword = src.adminPassword;
     dst.searchBase = src.searchBase;
+    dst.searchFilter = src.searchFilter;
 }
 
 void fromApiToResource(const ApiLdapSettingsData &src, QnLdapSettings &dst) {
@@ -413,6 +414,7 @@ void fromApiToResource(const ApiLdapSettingsData &src, QnLdapSettings &dst) {
     dst.adminDn = src.adminDn;
     dst.adminPassword = src.adminPassword;
     dst.searchBase = src.searchBase;
+    dst.searchFilter = src.searchFilter;
 }
 
 void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, const ResourceContext &ctx) {
