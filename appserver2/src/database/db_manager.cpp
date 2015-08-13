@@ -1330,7 +1330,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return removeServerStatusFromTransactionLog();
     }
     else if (updateName == lit(":/updates/31_move_group_name_to_user_attrs.sql")) {
-        m_needResyncCameraUserAttributes = true;
+        if (!m_dbJustCreated)
+            m_needResyncCameraUserAttributes = true;
     }
     else if (updateName == lit(":/updates/32_default_business_rules.sql")) {
         for(const auto& bRule: QnBusinessEventRule::getSystemRules())
@@ -1342,7 +1343,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         }
     }
     else if (updateName == lit(":/updates/33_resync_layout.sql")) {
-        m_needResyncLayout = true;
+        if (!m_dbJustCreated)
+            m_needResyncLayout = true;
     }
     else if (updateName == lit(":/updates/35_fix_onvif_mt.sql")) {
         return removeWrongSupportedMotionTypeForONVIF();
@@ -1354,8 +1356,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return removeEmptyLayoutsFromTransactionLog();
     }
     else if (updateName == lit(":/updates/41_resync_tran_log.sql")) {
-        m_needResyncUsers = true;
-        m_needResyncStorages = true;
+        if (!m_dbJustCreated) {
+            m_needResyncUsers = true;
+            m_needResyncStorages = true;
+        }
     }
 
     return true;
