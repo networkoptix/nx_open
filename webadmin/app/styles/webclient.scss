@@ -185,6 +185,13 @@ table.webclient-window>tbody>tr>td.alert{
   top:3px;
 }
 
+.weblcient-hint{
+  font-size:78%;
+  color:#698796;
+  display:inline-block;
+  padding-right:10px;
+}
+
 
 .webclient-top-border{
   border-top: 1px solid #263137;
@@ -199,17 +206,11 @@ table.webclient-window>tbody>tr>td.alert{
   color: #3A911E;
 }
 
-.webclient-button>.dropdown-menu{
+.webclient-button.open>.dropdown-menu{
   display: block;
   min-width: auto;
   border-radius: 0;
   padding:0;
-}
-.webclient-button>.dropdown-menu.collapse{
-  display: none;
-}
-.webclient-button>.dropdown-menu.collapse.in{
-  display: block;
 }
 
 
@@ -280,6 +281,17 @@ table.webclient-window>tbody>tr>td.alert{
 
   position:absolute;
   margin-left:-80px;
+}
+
+.camera-node.Unauthorized ,
+.camera-node.Offline {
+  color:#698796 !important;
+}
+
+
+.camera-node.Unauthorized small,
+.camera-node.Offline small{
+  color: #49626F;
 }
 
 .camera-node.Unauthorized .camera-preview,
