@@ -206,17 +206,11 @@ table.webclient-window>tbody>tr>td.alert{
   color: #3A911E;
 }
 
-.webclient-button>.dropdown-menu{
+.webclient-button.open>.dropdown-menu{
   display: block;
   min-width: auto;
   border-radius: 0;
   padding:0;
-}
-.webclient-button>.dropdown-menu.collapse{
-  display: none;
-}
-.webclient-button>.dropdown-menu.collapse.in{
-  display: block;
 }
 
 

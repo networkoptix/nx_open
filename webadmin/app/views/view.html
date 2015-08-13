@@ -96,11 +96,12 @@
                                         <span class="caption-row weblcient-hint">
                                             Resolution:
                                         </span>
-                                        <div class="webclient-button caption-row btn-group" ng-click="resolutionCollapsed = !resolutionCollapsed">
-                                                <span >
-                                                    {{activeResolution}} <span class="caret"></span>
-                                                </span>
-                                            <ul class="dropdown-menu" collapse="!resolutionCollapsed" role="menu">
+                                        <div class="webclient-button caption-row btn-group dropdown">
+                                             <!--ng-click="resolutionExpanded = !resolutionExpanded;$event.preventDefault();"-->
+                                            <span data-toggle="dropdown" >
+                                                {{activeResolution}} <span class="caret"></span>
+                                            </span>
+                                            <ul class="dropdown-menu" > <!--collapse="!resolutionExpanded"-->
                                                 <li ng-repeat="resolution in availableResolutions"><a href="#"
                                                       ng-class="{active:resolution == activeResolution}"
                                                       ng-click="selectResolution(resolution);$event.preventDefault();">{{resolution}}</a></li>
