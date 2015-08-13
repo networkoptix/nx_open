@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+
+    <xs:import namespace="http://www.w3.org/1999/xhtml"
+               schemaLocation="http://www.w3.org/MarkUp/SCHEMA/xhtml11.xsd"/>
+
     <xs:element name="apidoc">
         <xs:complexType>
             <xs:sequence>
@@ -24,7 +29,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="urlPrefix" type="xs:string"/>
+    <xs:element name="urlPrefix" type="xs:string" />
     <xs:element name="groupName" type="xs:string"/>
     <xs:element name="groupDescription" type="xs:string"/>
     <xs:element name="functions">
@@ -39,10 +44,10 @@
             <xs:sequence>
                 <xs:element ref="name"/>
                 <xs:element ref="caption" minOccurs="0" maxOccurs="1"/>
-                <xs:element ref="description"/>
-                <xs:element ref="method"/>
-                <xs:element ref="params"/>
-                <xs:element ref="result"/>
+                <xs:element ref="description" minOccurs="0"/>
+                <xs:element ref="method" minOccurs="0" />
+                <xs:element ref="params" minOccurs="0" />
+                <xs:element ref="result" minOccurs="0" />
             </xs:sequence>
             <xs:attribute name="proprietary" type="xs:boolean" default="false" use="optional"/>
         </xs:complexType>
@@ -59,7 +64,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="name"/>
-                <xs:element ref="description"/>
+                <xs:element ref="description" minOccurs="0"/>
                 <xs:element ref="optional"/>
                 <xs:element minOccurs="0" ref="values"/>
             </xs:sequence>
@@ -77,7 +82,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="name"/>
-                <xs:element ref="description"/>
+                <xs:element ref="description" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -100,11 +105,18 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="name"/>
-                <xs:element ref="description"/>
+                <xs:element ref="description" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="name" type="xs:string"/>
     <xs:element name="caption" type="xs:string"/>
-    <xs:element name="description" type="xs:string"/>
+    <xs:element name="description">
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:any namespace="http://www.w3.org/1999/xhtml" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
 </xs:schema>
