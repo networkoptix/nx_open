@@ -12,6 +12,8 @@ TextField
 
     property bool clearOnInitValue: false;
 
+    placeholderText: initialText;
+
     property bool changed: changedBase;
     property bool changedBase: ((text !== initialText)
         && (!clearOnInitValue || (text.length || wasOnceChanged)));
@@ -25,6 +27,13 @@ TextField
             wasOnceChanged = true;
     }
 
+    onChangedChanged:
+    {
+        if (changed)
+            placeholderText = "";
+    }
+
+    activeFocusOnTab: true;
     implicitHeight: Common.SizeManager.clickableSizes.medium;
     implicitWidth: implicitHeight * 4;
 
