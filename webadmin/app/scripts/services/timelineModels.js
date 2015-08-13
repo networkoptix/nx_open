@@ -335,7 +335,6 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
         self.lockRequests = true; // We may lock requests here if we have no tree yet
         this.mediaserver.getRecords('/', this.cameras[0], start, end, detailization)
             .then(function (data) {
-                self.cacheRequestedInterval(start,end,level);
 
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
                 var chunks = data.data.reply;
@@ -357,6 +356,8 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                     self.addChunk(addchunk, null);
                 }
 
+                self.cacheRequestedInterval(start,end,level);
+
                 deferred.resolve(self.chunksTree);
             }, function (error) {
                 deferred.reject(error);
@@ -376,7 +377,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
  * @param level
  * @return Array
  */
-CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,restrictLevel){
+CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,debugLevel){
 
     if(start instanceof Date)
     {
@@ -389,7 +390,7 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,r
 
     // Splice existing intervals and check, if we need an update from server
     var result = [];
-    this.selectRecords(result,start,end,level,null,restrictLevel);
+    this.selectRecords(result,start,end,level,null,debugLevel);
 
     /*this.logcounter = this.logcounter||0;
     this.logcounter ++;
@@ -401,8 +402,7 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,r
         this.debug();
     }*/
 
-
-    var needUpdate = !this.checkRequestedIntervalCache(start,end,level);
+    var needUpdate = !debugLevel && !this.checkRequestedIntervalCache(start,end,level);
     if(needUpdate){ // Request update
         this.requestInterval(start, end, level);
     }
@@ -447,88 +447,48 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
         return;
     }
 
-    if(parent.level === chunk.level - 1){ //We are on good level here - find position and add
-        for (i = 0; i < parent.children.length; i++) {
-            if(parent.children[i].start == chunk.start && parent.children[i].end == chunk.end){//dublicate
-                return;
-            }
-
-            if(parent.children[i].end >= chunk.start && parent.children[i].start <= chunk.start){ // Intersection here
-
-                if(parent.children[i].end >= chunk.end){// One contains another
-                    console.warn("skipped contained chunk 1",chunk,parent.children[i],i,parent);
-                    return; //Skip it
-                }
-                //TODO: uncomment back!
-                //console.error("impossible situation 1 - intersection in chunks",chunk,parent.children[i],i,parent);
-                return;
-            }
-
-            if(parent.children[i].start >= chunk.start){
-                if(parent.children[i].start < chunk.end ){
-                    //Mb Join two chunks?
-
-                    if(parent.children[i].end <= chunk.start ){// One contains another
-                        console.warn("skipped contained chunk 2",chunk,parent.children[i],i,parent);
-                        return; //Skip it
-                    }
-                    //TODO: uncomment back!
-                    //console.error("impossible situation 2 - intersection in chunks",chunk,parent.children[i],i,parent);
-                    return;
-                }
-                break;
-            }
-        }
-        parent.children.splice(i, 0, chunk);//Just add chunk here and return
-        return;
-    }
-    var currentDetailization =  (parent.level<RulerModel.levels.length-1)?
-        RulerModel.levels[parent.level + 1].interval.getMilliseconds():
-        RulerModel.levels[RulerModel.length - 1].interval.getMilliseconds();
     for (var i = 0; i < parent.children.length; i++) {
-        var currentChunk = parent.children[i];
-        if (currentChunk.end < chunk.start) { //no intersection - no way we need this chunk now
+        var iteratingChunk = parent.children[i];
+
+        if (iteratingChunk.end < chunk.start) { //no intersection - no way we need this chunk now
             continue;
         }
 
-        if(currentChunk.start <= chunk.start && currentChunk.end >= chunk.end){ // Really good new parent
-            this.addChunk(chunk, currentChunk);
-            return;
-        }
-
-        //Here we have either intersection or missing parent at all
-        if(currentChunk.start - chunk.end < currentDetailization){ //intersection (negative value) or close enough chunk
-            currentChunk.start = chunk.start;//increase left boundaries
-            this.addChunk(chunk, currentChunk);
-            return;
-        }
-
-        if(i>0){//We can try encreasing prev. chunk
-
-            if(chunk.start - parent.children[i-1].end < currentDetailization){
-                parent.children[i-1].end = chunk.end; // Increase previous chunk
-                this.addChunk(chunk, parent.children[i-1]);
-                return;
+        if (iteratingChunk.end >= chunk.end && iteratingChunk.start <= chunk.start) { // Contained chunk
+            if (iteratingChunk.level != chunk.level) { // Add inside ot ignore
+                this.addChunk(chunk, iteratingChunk);
             }
+            return;
         }
 
-        parent.children.splice(i, 0, new Chunk(parent, chunk.start, chunk.end, parent.level + 1)); //Create new children and go deeper
+        if (iteratingChunk.start < chunk.end) { // Intersection here!
+            //TODO: wtf!
+            //   console.log("WTF!",iteratingChunk,chunk);
+            iteratingChunk.end = Math.max(iteratingChunk.end, chunk.end);//Increase smaller chunk
+            iteratingChunk.start = Math.min(iteratingChunk.start, chunk.start);//Increase smaller chunk
+            if (iteratingChunk.level != chunk.level) { // Add inside ot ignore
+                this.addChunk(chunk, iteratingChunk);
+            }
+            return;
+        }
+
+        // No intersection - add here
+        if (parent.level == chunk.level - 1) {
+            parent.children.splice(i, 0, chunk);//Just add chunk here and return
+        } else {
+            parent.children.splice(i, 0, new Chunk(parent, chunk.start, chunk.end, parent.level + 1)); //Create new children and go deeper
+            this.addChunk(chunk, parent.children[i]);
+        }
+        return;
+    }
+
+    if (parent.level == chunk.level - 1) {
+        parent.children.push(chunk);
+    }else {
+        //Add new last chunk and go deeper
+        parent.children.push(new Chunk(parent, chunk.start, chunk.end, parent.level + 1)); //Create new chunk
         this.addChunk(chunk, parent.children[i]);
-        return;
     }
-
-    //Try to encrease last chunk from parent
-
-    if(chunk.start - parent.children[i-1].end < currentDetailization){
-        parent.children[i-1].end = chunk.end; // Increase previous chunk
-        this.addChunk(chunk, parent.children[i-1]);
-        return;
-    }
-
-    //Add new last chunk and go deeper
-    parent.children.push(new Chunk(parent, chunk.start, chunk.end, parent.level + 1)); //Create new chunk
-    this.addChunk(chunk, parent.children[i]);
-
 };
 
 /**
@@ -547,7 +507,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
  * @param parent - parent for recursive call
  * @param result - heap for recursive call
  */
-CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent,restrictLevel){
+CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent,debugLevel){
     parent = parent || this.chunksTree;
 
     if(!parent){
@@ -564,10 +524,10 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     if(parent.children.length == 0){
-        if(!restrictLevel) {
+        if(!debugLevel) {
             result.push(parent); // Bad chunk, but no choice
+            return;
         }
-        return;
     }
 
     // Iterate children:
@@ -576,14 +536,11 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     // iterate blind spots:
-    if(!restrictLevel || parent.level + 1 == level) {
-
-        var blindSpots = this.getBlindSpotsInCache(parent.start, parent.end, parent.level + 1);
-        for (i = 0; i < blindSpots.length; i++) {
-            var spot = blindSpots[i];
-            if (spot.start >= start || spot.end <= end) {
-                result.push(spot);
-            }
+    var blindSpots = this.getBlindSpotsInCache(parent.start, parent.end, parent.level + 1);
+    for (i = 0; i < blindSpots.length; i++) {
+        var spot = blindSpots[i];
+        if (spot.start >= start || spot.end <= end) {
+            result.push(spot);
         }
     }
 };

@@ -70,7 +70,9 @@ angular.module('webadminApp')
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
                     loadingChunkColor: [58,145,30,0.5],
+
                     blindChunkColor:  [255,128,128,0.5],
+                    highlighChunkColor: [255,255,0,1],
 
                     scrollBarSpeed: 0.1, // By default - scroll by 10%
                     scrollBarHeight: 20/110, // %
@@ -297,6 +299,8 @@ angular.module('webadminApp')
                     drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
                     drawPointerMarker(context);
+
+                    //debugEvents(context);//DOTO: remove debug here
                 }
 
                 function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
@@ -663,8 +667,33 @@ angular.module('webadminApp')
                     }
                 }
 
+                function debugEvents(context){
+
+                    context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
+
+                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+
+                    if(scope.recordsProvider && scope.recordsProvider.chunksTree) {
+
+                        var targetLevelIndex = scope.scaleManager.levels.events.index;
+
+                        for(var levelIndex=0;levelIndex<RulerModel.levels.length;levelIndex++) {
+                            var level = RulerModel.levels[levelIndex];
+                            var start = scope.scaleManager.alignStart(level);
+                            var end = scope.scaleManager.alignEnd(level);
+                            // 1. Splice events
+                            var events = scope.recordsProvider.getIntervalRecords(start, end, levelIndex, true );
+
+                            // 2. Draw em!
+                            for (var i = 0; i < events.length; i++) {
+                                drawEvent(context, events[i], levelIndex, true, targetLevelIndex);
+                            }
+                        }
+                    }
+                }
                 // !!! Draw events
                 function drawOrCheckEvents(context){
+
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
                     mouseInEvents = mouseRow > top && (mouseRow < top + timelineConfig.chunkHeight * scope.viewportHeight);
 
@@ -672,9 +701,7 @@ angular.module('webadminApp')
                         return;
                     }
 
-                    context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
-
-                    context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+                    context.clearRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
 
                     var level = scope.scaleManager.levels.events.level;
                     var levelIndex = scope.scaleManager.levels.events.index;
@@ -691,7 +718,7 @@ angular.module('webadminApp')
                         }
                     }
                 }
-                function drawEvent(context,chunk, levelIndex){
+                function drawEvent(context,chunk, levelIndex, debug, targetLevelIndex){
                     var startCoordinate = scope.scaleManager.dateToScreenCoordinate(chunk.start);
                     var endCoordinate = scope.scaleManager.dateToScreenCoordinate(chunk.end);
 
@@ -700,13 +727,30 @@ angular.module('webadminApp')
 
                     context.fillStyle = exactChunk? blurColor(timelineConfig.exactChunkColor,blur):blurColor(timelineConfig.loadingChunkColor,blur);
 
-                    /*if(!chunk.level){ //blind spot!
-                        context.fillStyle = blurColor(timelineConfig.blindChunkColor,blur);
-                    }*/
+                    if(debug && targetLevelIndex == levelIndex){
+                        context.fillStyle = blurColor(timelineConfig.highlighChunkColor,1);
+                    }
+                    // TODO: uncomment debug here, we may very well have blind spots, we just need to test them
+                    if(/*debug &&*/ !chunk.level){ //blind spot!
+                        context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
+                    }
 
-                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
 
-                    context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2, top , (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, timelineConfig.chunkHeight * scope.viewportHeight);
+                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
+                    var height = timelineConfig.chunkHeight * scope.viewportHeight;
+
+                    if(debug){
+                        top += (1+levelIndex)/RulerModel.levels.length * height;
+                        height /= RulerModel.levels.length;
+                        if(height>5) {
+                            console.log(height);
+                        }
+                    }
+
+                    context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
+                        top,
+                        (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
+                        height);
                 }
 
                 var scrollBarWidth = 0;
