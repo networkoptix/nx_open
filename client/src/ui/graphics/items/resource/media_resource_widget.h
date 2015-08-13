@@ -36,14 +36,6 @@ public:
     static const Button EnhancementButton   = static_cast<Button>(0x100);
     static const Button DbgScreenshotButton = static_cast<Button>(0x200);
     static const Button IoModuleButton      = static_cast<Button>(0x400);
-#define ScreenshotButton ScreenshotButton
-#define MotionSearchButton MotionSearchButton
-#define PtzButton PtzButton
-#define FishEyeButton FishEyeButton
-#define ZoomWindowButton ZoomWindowButton
-#define EnhancementButton EnhancementButton
-#define DbgScreenshotButton DbgScreenshotButton
-#define IoModuleButton IoModuleButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
