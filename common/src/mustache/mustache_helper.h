@@ -3,6 +3,9 @@
 
 #include "mustache/mustache.h"
 
-QString renderTemplateFromFile(const QString& filename, const QVariantHash& contextMap);
+bool renderTemplateFromFile(
+    const QString& filename,
+    const QVariantHash& contextMap,
+    QString* const renderedMail );
 
 #endif // _MUSTACHE_MUSTACHE_HELPER_H_

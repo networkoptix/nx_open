@@ -638,7 +638,8 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
         contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
     }
 
-    QString messageBody = renderTemplateFromFile(attachmentData.templatePath, contextMap);
+    QString messageBody;
+    renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
 
     ec2::ApiEmailData data(
         recipients,
