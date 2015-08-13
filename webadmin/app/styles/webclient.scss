@@ -82,12 +82,17 @@ table.webclient-window>tbody>tr>td.alert{
   padding-top:80px;
 }
 
+
+.view-panel.live-only{
+  padding-bottom:100px;
+}
+
 .view-panel .stick-to-top{
   position:absolute;
   width:100%;
   top:0;
 
-  background-color: rgba(28, 35, 39, 0.6);
+  /*background-color: rgba(28, 35, 39, 0.6);*/
 
   border-bottom: 1px solid transparent;
 }
@@ -96,7 +101,7 @@ table.webclient-window>tbody>tr>td.alert{
   width:100%;
   bottom:0;
 
-  background-color: rgba(28, 35, 39, 0.6);
+  /*background-color: rgba(28, 35, 39, 0.6);*/
 
   border-top: 1px solid transparent;
 }
@@ -105,14 +110,17 @@ table.webclient-window>tbody>tr>td.alert{
   height:100%;
 
   padding: 0px 20px;
-  background-color: rgba(28, 35, 39, 0.6);
+  /*background-color: rgba(28, 35, 39, 0.6);*/
 }
 
 
-
+/* Special hack for loading invisible flash objects */
+.invisible{
+  height: 0 !important;
+  overflow: hidden;
+}
 
 .videowindow,
-.videowindow #videowindow,
 .videowindow .videoplayer
 {
   width:100%;
@@ -142,11 +150,11 @@ table.webclient-window>tbody>tr>td.alert{
 
 .webclient-panel>div.text-left,
 .webclient-panel>div.text-right{
-  width:30%;
+  width:40%;
   display:inline-block;
 }
 .webclient-panel>div.text-center{
-  width:40%;
+  width:20%;
   display:inline-block;
 }
 

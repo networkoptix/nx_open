@@ -37,6 +37,19 @@ angular.module('webadminApp')
                 var method = md5("GET:");
                 var auth_digest = md5(digest + ':' + nonce + ':' + method);
                 var auth = Base64.encode(lowercaseLogin + ':' + nonce + ':' + auth_digest);
+
+                /*
+                console.log("debug auth - realm:",realm);
+                console.log("debug auth - nonce:",nonce);
+                console.log("debug auth - login:",lowercaseLogin);
+                console.log("debug auth - password:",$scope.user.password);
+                console.log("debug auth - digest = md5(login:realm:password):",digest);
+                console.log("debug auth - method:","GET:");
+                console.log("debug auth - md5(method):",method);
+                console.log("debug auth -  auth_digest = md5(digest:nonce:md5(method)):",auth_digest);
+                console.log("debug auth -  auth = base64(login:nonce:auth_digest):",auth);
+                */
+
                 ipCookie('auth',auth, { path: '/' });
 
                 var rtspmethod = md5("PLAY:");
@@ -44,12 +57,9 @@ angular.module('webadminApp')
                 var auth_rtsp = Base64.encode(lowercaseLogin + ':' + nonce + ':' + rtsp_digest);
                 ipCookie('auth_rtsp',auth_rtsp, { path: '/' });
 
-
-                //Old cookies:
-                ipCookie('response',auth_digest, { path: '/' }); // TODO: REMOVE
-                ipCookie('username',lowercaseLogin, { path: '/' }); // TODO: REMOVE
-                //var authKey = Base64.encode(lowercaseLogin + ':0:' + digest); // TODO: REMOVE
-                //ipCookie('authKey',authKey, { path: '/' }); // TODO: REMOVE
+                //Old cookies:  // TODO: REMOVE THIS SECTION
+                //ipCookie('response',auth_digest, { path: '/' });
+                //ipCookie('username',lowercaseLogin, { path: '/' });
 
                 // Check auth again
                 $scope.authorizing = true;

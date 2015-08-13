@@ -306,7 +306,11 @@
                 </property>
             </activation>
             <modules>
-                <module>unit_tests/common</module>
+                <module>unit_tests/build_ut</module>
+                <module>unit_tests/common_ut</module>
+                <module>unit_tests/image_library_plugin_ut</module>
+                <module>unit_tests/mediaserver_core_ut</module>
+                <module>unit_tests/traytool_ut</module>
             </modules>
         </profile>
        <profile>
@@ -434,7 +438,7 @@
             </activation>
             <modules>
                 <module>nxtool</module>
-            </modules>    
+            </modules>
         </profile>
 
         <profile>

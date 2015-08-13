@@ -65,6 +65,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
     Q_D(QnUniversalRequestProcessor);
 
     int retryCount = 0;
+    bool logReported = false;
     if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
@@ -73,20 +74,20 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         QElapsedTimer t;
         t.restart();
         AuthMethod::Value usedMethod = AuthMethod::noAuth;
-        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &usedMethod))
+        AuthResult authResult;
+        while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &usedMethod)) != Auth_OK)
         {
-            // report error for digest for second try only, for any other used type report immediately
-            if (usedMethod != AuthMethod::noAuth) 
-            {   // noAuth with fail result possible if no digest in database yet, we need one more request to fill it.
-                int retryThreshold = (usedMethod == AuthMethod::httpDigest ? 0 : -1);
-                if (d->authenticatedOnce)
-                    ++retryThreshold;
-                if (retryCount > retryThreshold)
-                {
-                    auto session = authSession();
-                    session.id = QnUuid::createUuid();
-                    qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
-                }
+            int retryThreshold = 0;
+            if (authResult == Auth_WrongDigest)
+                retryThreshold = MAX_AUTH_RETRY_COUNT;
+            else if (d->authenticatedOnce)
+                retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
+            if (retryCount >= retryThreshold && !logReported)
+            {   
+                logReported = true;
+                auto session = authSession();
+                session.id = QnUuid::createUuid();
+                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
             }
 
             if( !d->socket->isConnected() )
@@ -137,9 +138,9 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if (t.elapsed() >= AUTH_TIMEOUT)
                 return false; // close connection
         }
-        d->authenticatedOnce = true;
+        if (usedMethod != AuthMethod::noAuth)
+            d->authenticatedOnce = true;
     }
-
     return true;
 }
 

@@ -62,8 +62,7 @@ public:
         m_rtStartTime( AV_NOPTS_VALUE ),
         m_lastRtTime( 0 ),
         m_liveMode(liveMode),
-        m_needKeyData(false),
-        m_auditRecordId(0)
+        m_needKeyData(false)
     {
         if( dropLateFrames )
         {
@@ -83,7 +82,7 @@ public:
             m_dataOutput->stop();
     }
 
-    void setAuditRecordId(int value) { m_auditRecordId = value; }
+    void setAuditHandle(const AuditHandle& handle) { m_auditHandle = handle; }
 
     void copyLastGopFromCamera(QnVideoCamera* camera)
     {
@@ -153,8 +152,8 @@ protected:
             return true;
         }
 
-        if (media && m_auditRecordId > 0)
-            qnAuditManager->notifyPlaybackInProgress(m_auditRecordId, media->timestamp);
+        if (media && m_auditHandle)
+            qnAuditManager->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
         {
@@ -264,7 +263,7 @@ private:
     qint64 m_lastRtTime;
     bool m_liveMode;
     bool m_needKeyData;
-    int m_auditRecordId;
+    AuditHandle m_auditHandle;
 
     QByteArray toHttpChunk( const char* data, size_t size )
     {
@@ -671,8 +670,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         //dataConsumer.sendResponse();
 
-        int auditRecordId = qnAuditManager->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false);
-        dataConsumer.setAuditRecordId(auditRecordId);
+        dataConsumer.setAuditHandle(qnAuditManager->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false));
 
         dataConsumer.start();
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
@@ -685,8 +683,6 @@ void QnProgressiveDownloadingConsumer::run()
                  lit("Terminated")))), cl_logDEBUG1 );
 
         dataConsumer.pleaseStop();
-
-        qnAuditManager->notifyPlaybackFinished(auditRecordId);
 
         QnByteArray emptyChunk((unsigned)0,0);
         sendChunk(emptyChunk);

@@ -1743,6 +1743,12 @@ void MediaServerProcess::run()
         );                    
     }
 
+    QnStoragePluginFactory::instance()->registerStoragePlugin(
+        "smb",
+        QnFileStorageResource::instance,
+        false
+    );
+
     if (needToStop())
         return;
 
