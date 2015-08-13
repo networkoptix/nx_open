@@ -9,6 +9,7 @@ angular.module('webadminApp')
                 positionProvider: '=',
                 playHandler: '=',
                 liveOnly: '=',
+                canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '='
             },
