@@ -266,6 +266,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         };
 
+        $scope.enableFullScreen = screenfull.enabled;
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
                 screenfull.request($(".videowindow").get(0));
