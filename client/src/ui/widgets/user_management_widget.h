@@ -27,5 +27,5 @@ private:
 
 private slots:
     void at_refreshButton_clicked();
-    int at_mergeLdapUsersAsync_finished(int, QnMergeLdapUsersReply, int, QString);
+    void at_mergeLdapUsersAsync_finished(int, QnMergeLdapUsersReply, int, QString);
 };

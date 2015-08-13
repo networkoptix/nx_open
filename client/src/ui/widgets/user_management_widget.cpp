@@ -7,13 +7,14 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <api/global_settings.h>
 #include <utils/common/ldap.h>
+#include <utils/network/http/asynchttpclient.h>
+#include <common/common_module.h>
+#include <client/client_meta_types.h>
 #include <ui/models/user_list_model.h>
 #include <ui/actions/action_manager.h>
-#include <client/client_meta_types.h>
-#include <utils/network/http/asynchttpclient.h>
-#include "core/resource_management/resource_pool.h"
 #include <ui/dialogs/ldap_settings_dialog.h>
 
 class QnUserManagementWidgetPrivate : public QObject {
@@ -57,20 +58,16 @@ void QnUserManagementWidget::at_refreshButton_clicked() {
             return;
     }
 
-    foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllServers()) {
-        if (server->getStatus() != Qn::Online)
-            continue;
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+    Q_ASSERT(server);
+    if (!server)
+        return;
 
-        int handle = server->apiConnection()->mergeLdapUsersAsync(this, SLOT(at_mergeLdapUsersAsync_finished(int, QnMergeLdapUsersReply, int, QString)));
-        break;
-    }
-
-    // QnAppServerConnectionFactory::getConnection2()->getUserManager()->mergeLdapUsers();
+    server->apiConnection()->mergeLdapUsersAsync(this, SLOT(at_mergeLdapUsersAsync_finished(int, QnMergeLdapUsersReply, int, QString)));
 }
 
-int QnUserManagementWidget::at_mergeLdapUsersAsync_finished(int, QnMergeLdapUsersReply reply, int, QString) {
+void QnUserManagementWidget::at_mergeLdapUsersAsync_finished(int, QnMergeLdapUsersReply reply, int, QString) {
     // TODO: dk, please show correct message here in case of error
-    return 0;
 }
 
 bool QnUserManagementWidgetPrivate::openLdapSettings() {
