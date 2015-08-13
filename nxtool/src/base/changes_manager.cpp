@@ -129,7 +129,7 @@ public:
     
     void serversDisappeared(const IDsVector &ids);
 
-    void unknownAdded(const QString &ip);
+    bool unknownAdded(const QString &ip);
 
 private:
     typedef QHash<QUuid, ItfChangeRequest> ItfChangesContainer;
@@ -358,6 +358,9 @@ bool changesApplied(const rtu::InterfaceInfoList &itf
 
 void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &baseInfo)
 {
+    if (unknownAdded(baseInfo.hostAddress))
+        return;
+
     const auto &it = m_itfChanges.find(baseInfo.id);
     if (it == m_itfChanges.end())
         return;
@@ -461,12 +464,13 @@ void rtu::ChangesManager::Impl::serversDisappeared(const rtu::IDsVector &ids)
     }
 }
 
-void rtu::ChangesManager::Impl::unknownAdded(const QString &ip)
+bool rtu::ChangesManager::Impl::unknownAdded(const QString &ip)
 {
     /// Searches for the change request
     const auto &it = std::find_if(m_itfChanges.begin(), m_itfChanges.end()
         , [ip](const ItfChangeRequest &request)
     {
+        /// Currently it is supposed to be only one-interface-change action
         /// TODO: extend logic for several interface changes
         if (request.itfUpdateInfo.size() != kSingleInterfaceChangeCount)
             return false;
@@ -480,10 +484,9 @@ void rtu::ChangesManager::Impl::unknownAdded(const QString &ip)
         return (it != request.itfUpdateInfo.end());
     });
 
-    /// Currently, it is supposed to be only one-interface-change action
     if (it == m_itfChanges.end())
     {
-        return;
+        return false;
     }
 
     /// We've found change request with dhcp "off" state, ip that is 
@@ -491,6 +494,7 @@ void rtu::ChangesManager::Impl::unknownAdded(const QString &ip)
     /// So, we suppose that request to change ip is successfully aplied
 
     itfRequestSuccessfullyApplied(it);
+    return true;
 }
 
 void rtu::ChangesManager::Impl::itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it)
