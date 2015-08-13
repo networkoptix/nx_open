@@ -172,6 +172,10 @@ table.webclient-window>tbody>tr>td.alert{
   background-color: rgba(198,234,255,0.05);
 }
 
+.webclient-button.disabled{
+  opacity:0.1;
+}
+
 
 .webclient-top-border{
   border-top: 1px solid #263137;

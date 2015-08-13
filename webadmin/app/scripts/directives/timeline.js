@@ -787,9 +787,7 @@ angular.module('webadminApp')
                             mouseInScrollbar = mouseCoordinate - startCoordinate;
                             mouseInTimeline = false;
                         }else{
-                            if(mouseInTimeline){
-                                mouseInTimeline = mouseCoordinate;
-                            }
+                            mouseInTimeline = mouseCoordinate;
                         }
                         if(mouseInScrollbarRow){
                             mouseInScrollbarRow = mouseCoordinate - startCoordinate;
