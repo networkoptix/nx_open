@@ -279,6 +279,8 @@ QnDbManager::QnDbManager()
     m_isBackupRestore(false),
     m_needResyncLayout(false),
     m_needResyncbRules(false),
+    m_needResyncUsers(false),
+    m_needResyncStorages(false),
     m_dbReadOnly(false)
 {
 }
@@ -574,6 +576,15 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
             if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
                 return false;
         }
+        if (m_needResyncUsers) {
+            if (!fillTransactionLogInternal<ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
+                return false;
+        }
+        if (m_needResyncStorages) {
+            if (!fillTransactionLogInternal<ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
+                return false;
+        }
+
     }
 
     // Set admin user's password
@@ -1341,6 +1352,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/37_remove_empty_layouts.sql")) {
         return removeEmptyLayoutsFromTransactionLog();
+    }
+    else if (updateName == lit(":/updates/41_resync_tran_log.sql")) {
+        m_needResyncUsers = true;
+        m_needResyncStorages = true;
     }
 
     return true;
