@@ -201,13 +201,14 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.selectCameraById = function (cameraId, position, silent) {
-
+            var oldTimePosition = null;
+            if($scope.positionProvider && !$scope.positionProvider.liveMode){
+                oldTimePosition = $scope.positionProvider.playedPosition;
+            }
 
             $scope.storage.cameraId  = cameraId || $scope.storage.cameraId  ;
 
-            if(position){
-                position = parseInt(position);
-            }
+            position = position?parseInt(position):oldTimePosition;
 
             $scope.activeCamera = getCamera ($scope.storage.cameraId  );
             if (!silent && $scope.activeCamera) {
