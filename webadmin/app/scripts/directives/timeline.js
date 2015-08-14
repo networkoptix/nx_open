@@ -9,6 +9,7 @@ angular.module('webadminApp')
                 positionProvider: '=',
                 playHandler: '=',
                 liveOnly: '=',
+                canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '='
             },
@@ -65,12 +66,14 @@ angular.module('webadminApp')
                     labelPadding: 10,
                     lineWidth: 1,
 
-                    chunkHeight:35/110, // %    //Height for event line
+                    chunkHeight:30/110, // %    //Height for event line
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
                     loadingChunkColor: [58,145,30,0.5],
+
                     blindChunkColor:  [255,128,128,0.5],
+                    highlighChunkColor: [255,255,0,1],
 
                     scrollBarSpeed: 0.1, // By default - scroll by 10%
                     scrollBarHeight: 20/110, // %
@@ -79,18 +82,23 @@ angular.module('webadminApp')
                     scrollBarColor: [53,70,79],
                     scrollBarHighlightColor: [53,70,79,0.8],
 
-                    timeMarkerColor: [255,255,255], // Timemarker color
-                    timeMarkerTextColor: [0,0,0],
-                    pointerMarkerColor: [0,0,0], // Mouse pointer marker color
+                    timeMarkerColor: [215,223,227], // Timemarker color
+                    timeMarkerTextColor: [12,21,23],
+                    pointerMarkerColor: [12,21,23], // Mouse pointer marker color
                     pointerMarkerTextColor: [255,255,255],
-                    markerFont:{
-                        size:12,
+                    markerDateFont:{
+                        size:15,
                         weight:400,
                         face:"Roboto"
                     },
-                    markerWidth: 120,
-                    markerHeight: 45/110,
-                    markerTriangleHeight: 10/110,
+                    markerTimeFont:{
+                        size:17,
+                        weight:500,
+                        face:"Roboto"
+                    },
+                    markerWidth: 140,
+                    markerHeight: 50/110,
+                    markerTriangleHeight: 6/110,
                     dateFormat: 'd mmmm yyyy', // Timemarker format for date
                     timeFormat: 'HH:MM:ss', // Timemarker format for time
 
@@ -121,7 +129,7 @@ angular.module('webadminApp')
                     oldStyle:false,
 
                     labelAlign:"above",// center, left, above
-                    labelHeight:25/110, // %
+                    labelHeight:30/110, // %
                     labelFont:{
                         size:15,
                         weight:400,
@@ -197,7 +205,7 @@ angular.module('webadminApp')
 
 
                     labelAlign:"above",// center, left, above
-                    labelHeight:35/110, // %
+                    labelHeight:40/110, // %
                     labelFont:{
                         size:15,
                         weight:400,
@@ -297,6 +305,9 @@ angular.module('webadminApp')
                     drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
                     drawPointerMarker(context);
+
+
+                    //debugEvents(context);//DOTO: remove debug here
                 }
 
                 function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
@@ -663,18 +674,43 @@ angular.module('webadminApp')
                     }
                 }
 
+                function debugEvents(context){
+
+                    context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
+
+                    context.clearRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+
+                    if(scope.recordsProvider && scope.recordsProvider.chunksTree) {
+
+                        var targetLevelIndex = scope.scaleManager.levels.events.index;
+
+                        for(var levelIndex=0;levelIndex<RulerModel.levels.length;levelIndex++) {
+                            var level = RulerModel.levels[levelIndex];
+                            var start = scope.scaleManager.alignStart(level);
+                            var end = scope.scaleManager.alignEnd(level);
+                            // 1. Splice events
+                            var events = scope.recordsProvider.getIntervalRecords(start, end, levelIndex, true );
+
+                            // 2. Draw em!
+                            for (var i = 0; i < events.length; i++) {
+                                drawEvent(context, events[i], levelIndex, true, targetLevelIndex);
+                            }
+                        }
+                    }
+                }
                 // !!! Draw events
                 function drawOrCheckEvents(context){
+
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
                     mouseInEvents = mouseRow > top && (mouseRow < top + timelineConfig.chunkHeight * scope.viewportHeight);
 
                     if(!context){
                         return;
                     }
-
                     context.fillStyle = blurColor(timelineConfig.chunksBgColor,1);
 
                     context.fillRect(0, top, scope.viewportWidth , timelineConfig.chunkHeight * scope.viewportHeight);
+
 
                     var level = scope.scaleManager.levels.events.level;
                     var levelIndex = scope.scaleManager.levels.events.index;
@@ -691,7 +727,7 @@ angular.module('webadminApp')
                         }
                     }
                 }
-                function drawEvent(context,chunk, levelIndex){
+                function drawEvent(context,chunk, levelIndex, debug, targetLevelIndex){
                     var startCoordinate = scope.scaleManager.dateToScreenCoordinate(chunk.start);
                     var endCoordinate = scope.scaleManager.dateToScreenCoordinate(chunk.end);
 
@@ -700,13 +736,30 @@ angular.module('webadminApp')
 
                     context.fillStyle = exactChunk? blurColor(timelineConfig.exactChunkColor,blur):blurColor(timelineConfig.loadingChunkColor,blur);
 
-                    /*if(!chunk.level){ //blind spot!
-                        context.fillStyle = blurColor(timelineConfig.blindChunkColor,blur);
-                    }*/
+                    if(debug && targetLevelIndex == levelIndex){
+                        context.fillStyle = blurColor(timelineConfig.highlighChunkColor,1);
+                    }
+                    // TODO: uncomment debug here, we may very well have blind spots, we just need to test them
+                    if(/*debug &&*/ !chunk.level){ //blind spot!
+                        context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
+                    }
 
-                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight; // Top border
 
-                    context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2, top , (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2, timelineConfig.chunkHeight * scope.viewportHeight);
+                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
+                    var height = timelineConfig.chunkHeight * scope.viewportHeight;
+
+                    if(debug){
+                        top += (1+levelIndex)/RulerModel.levels.length * height;
+                        height /= RulerModel.levels.length;
+                        if(height>5) {
+                            console.log(height);
+                        }
+                    }
+
+                    context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
+                        top,
+                        (endCoordinate - startCoordinate) + timelineConfig.minChunkWidth/2,
+                        height);
                 }
 
                 var scrollBarWidth = 0;
@@ -737,9 +790,7 @@ angular.module('webadminApp')
                             mouseInScrollbar = mouseCoordinate - startCoordinate;
                             mouseInTimeline = false;
                         }else{
-                            if(mouseInTimeline){
-                                mouseInTimeline = mouseCoordinate;
-                            }
+                            mouseInTimeline = mouseCoordinate;
                         }
                         if(mouseInScrollbarRow){
                             mouseInScrollbarRow = mouseCoordinate - startCoordinate;
@@ -779,8 +830,10 @@ angular.module('webadminApp')
                     context.strokeStyle = blurColor(markerColor,1);
                     context.fillStyle = blurColor(markerColor,1);
 
+                    var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
+
                     context.beginPath();
-                    context.moveTo(coordinate + 0.5, 0);
+                    context.moveTo(coordinate + 0.5, top);
                     context.lineTo(coordinate + 0.5, Math.round(scope.viewportHeight - timelineConfig.scrollBarHeight * scope.viewportHeight));
                     context.stroke();
 
@@ -797,22 +850,24 @@ angular.module('webadminApp')
 
                     // Triangle
                     context.beginPath();
-                    context.moveTo(coordinate + timelineConfig.markerTriangleHeight * scope.viewportHeight, height);
-                    context.lineTo(coordinate, height + timelineConfig.markerTriangleHeight * scope.viewportHeight);
-                    context.lineTo(coordinate - timelineConfig.markerTriangleHeight * scope.viewportHeight, height);
+                    context.moveTo(coordinate + timelineConfig.markerTriangleHeight * scope.viewportHeight + 0.5, height);
+                    context.lineTo(coordinate + 0.5, height + timelineConfig.markerTriangleHeight * scope.viewportHeight);
+                    context.lineTo(coordinate - timelineConfig.markerTriangleHeight * scope.viewportHeight + 0.5, height);
                     context.closePath();
                     context.fill();
 
                     // Labels
                     context.fillStyle = blurColor(textColor,1);
-                    context.font = formatFont(timelineConfig.markerFont);
+                    context.font = formatFont(timelineConfig.markerDateFont);
                     coordinate = startCoord + timelineConfig.markerWidth /2; // Set actual center of the marker
 
                     var dateString = dateFormat(date, timelineConfig.dateFormat);
                     var dateWidth = context.measureText(dateString).width;
-                    var textStart = (height - timelineConfig.markerFont.size) / 2;
+                    var textStart = (height - timelineConfig.markerDateFont.size) / 2;
                     context.fillText(dateString,coordinate - dateWidth/2, textStart);
 
+
+                    context.font = formatFont(timelineConfig.markerTimeFont);
                     dateString = dateFormat(date, timelineConfig.timeFormat);
                     dateWidth = context.measureText(dateString).width;
                     textStart = height/2 + textStart;
@@ -841,12 +896,12 @@ angular.module('webadminApp')
                         return;
                     }
 
-                    if($(event.target).is("canvas")){
+                    if($(event.target).is("canvas") && event.offsetX){
                         mouseCoordinate = event.offsetX;
                     }else{
                         mouseCoordinate = event.pageX - $(canvas).offset().left;
                     }
-                    mouseRow = event.offsetY;
+                    mouseRow = event.offsetY || (event.pageY - $(canvas).offset().top);
 
                     drawOrCheckScrollBar();
                     drawOrCheckEvents();
@@ -870,49 +925,74 @@ angular.module('webadminApp')
                         scope.zoomTo(zoomTarget, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),window.jscd.touch);
                     } else {
                         scope.scaleManager.scrollByPixels(event.deltaX);
+                        delayWatchingPlayingPosition();
                     }
                     scope.$apply();
                 }
 
+                var stopDelay = null;
+                function delayWatchingPlayingPosition(){
+                    if(!stopDelay) {
+                        scope.scaleManager.stopWatching();
+                    }else{
+                        clearTimeout(stopDelay);
+                    }
+                    stopDelay = setTimeout(function(){
+                        scope.scaleManager.releaseWatching();
+                        stopDelay = null;
+                    },timelineConfig.animationDuration);
+                }
+
+                function animateScroll(targetPosition){
+                    delayWatchingPlayingPosition();
+                    animateScope.animate(scope,"scrollPosition",targetPosition).
+                        then(
+                            function(){},
+                            function(){},
+                            function(value){
+                                scope.scaleManager.scroll(value);
+                            }
+                        );
+                }
+
+
+                var preventClick = false;
+
+
                 scope.dblClick = function(event){
                     updateMouseCoordinate(event);
+                    if(preventClick){
+                        return;
+                    }
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
                         scope.zoom(true);
                     }else{
                         if(!mouseInScrollbar){
-                            animateScope.animate(scope,"scrollPosition",(mouseInScrollbarRow>0?1:0)).
-                                then(
-                                    function(){},
-                                    function(){},
-                                    function(value){
-                                        scope.scaleManager.scroll(value);
-                                    }
-                                );
+                            animateScroll((mouseInScrollbarRow>0?1:0));
+
                         }
                     }
                 };
                 scope.click = function(event){
                     updateMouseCoordinate(event);
+                    if(preventClick){
+                        return;
+                    }
+
                     if(!mouseInScrollbarRow) {
                         scope.scaleManager.setAnchorCoordinate(mouseCoordinate);// Set position to keep
+                        var date = scope.scaleManager.screenCoordinateToDate(mouseCoordinate);
                         scope.positionHandler(scope.scaleManager.screenCoordinateToDate(mouseCoordinate));
+                        scope.scaleManager.watchPlaying(date);
+
                     }else{
                         if(!mouseInScrollbar){
                             scope.scrollPosition = scope.scaleManager.scroll() ;
-
-                            animateScope.animate(scope,"scrollPosition", mouseCoordinate / scope.viewportWidth).
-                                then(
-                                    function(){},
-                                    function(){},
-                                    function(value){
-                                        scope.scaleManager.scroll(value);
-                                    }
-                                );
+                            animateScroll(mouseCoordinate / scope.viewportWidth);
                         }
                     }
                 };
-
 
                 scope.mouseUp = function(event){
                     //updateMouseCoordinate(event);
@@ -934,8 +1014,47 @@ angular.module('webadminApp')
                     // catchScrollBar = mouseInScrollbar;
                 };
 
+                scope.draginit = function(event){
+                    updateMouseCoordinate(event);
+                    catchScrollBar = mouseInScrollbar;
+                    catchTimeline = mouseInTimeline;
+                    scope.scaleManager.stopWatching();
+                };
+                scope.drag = function(event){
+                    updateMouseCoordinate(event);
 
+                    if(catchScrollBar) {
+                        var moveScroll = mouseInScrollbar - catchScrollBar;
+                        scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
+                    }
+                    if(catchTimeline) {
+                        var moveScroll = catchTimeline - mouseInTimeline;
+                        catchTimeline = mouseInTimeline;
+                        scope.scaleManager.scrollByPixels(moveScroll);
+                    }
+                };
+                scope.drastart = function(event){};
+                scope.dragend = function(event){
+                    catchScrollBar = false;
+                    catchTimeline = false;
+                    scope.scaleManager.releaseWatching();
 
+                    preventClick = true;
+                    setTimeout(function(){
+                        preventClick = false;
+                    }, timelineConfig.animationDuration);
+                    updateMouseCoordinate(null);
+                };
+
+                $(canvas).drag("draginit",scope.draginit);
+                $(canvas).drag("dragstart",scope.drastart);
+                $(canvas).drag("drag",scope.drag);
+                $(canvas).drag("dragend",scope.dragend);
+
+                $(canvas).bind("touchstart", scope.draginit);
+                $(canvas).bind("touchmove", scope.drag);
+                $(canvas).bind("touchend", scope.dragend);
+                $(canvas).bind("touchcancel",scope.dragend);
 
 
                 // !!! Scrolling functions
@@ -961,8 +1080,13 @@ angular.module('webadminApp')
                     }
                 };
                 scope.startZoom = function(zoomIn) {
+                    if(scope.disableZoomOut&&!zoomIn || scope.disableZoomIn&&zoomIn){
+                        return;
+                    }
+
                     zoomingNow = true;
                     zoomingIn = zoomIn;
+
                     processZooming();
                 };
 
@@ -988,6 +1112,8 @@ angular.module('webadminApp')
 
                     return false;
                 }
+
+
                 scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 
                     var maxZoom = scope.scaleManager.fullZoomOutValue();
@@ -1006,7 +1132,7 @@ angular.module('webadminApp')
                         scope.disableZoomIn = false;
                     }
 
-                    //Find final levels for this zoom
+                    //Find final levels for this zoom and run animation:
                     var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);
                     if(levelsChanged(newTargetLevels, targetLevels)){
                         targetLevels = newTargetLevels;
@@ -1033,12 +1159,16 @@ angular.module('webadminApp')
                         } else {
                             scope.scaleManager.zoom(value);
                         }
+                        delayWatchingPlayingPosition();
                     }
+
 
                     if(!instant) {
                         if(!scope.zoomTarget) {
                             scope.zoomTarget = scope.scaleManager.zoom();
                         }
+
+                        delayWatchingPlayingPosition();
                         animateScope.animate(scope, "zoomTarget", zoomTarget, slow?"linear":"dryResistance").then(
                             function () {},
                             function () {},
@@ -1050,11 +1180,17 @@ angular.module('webadminApp')
                 };
 
                 scope.goToLive = function(){
+                    if(scope.positionProvider.liveMode){
+                        scope.scaleManager.watchPlaying();
+                        return;
+                    }
                     var moveDate = scope.scaleManager.screenCoordinateToDate(1);
                     animateScope.progress(scope, "goingToLive" ).then(
                         function(){
                             var activeDate = (new Date()).getTime();
                             scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
+
+                            scope.scaleManager.watchPlaying();
                         },
                         function(){},
                         function(val){
@@ -1067,37 +1203,16 @@ angular.module('webadminApp')
                 };
 
                 scope.playPause = function(){
-                    scope.playHandler(!scope.positionProvider.playing)
+                    if(!scope.positionProvider.playing){
+                        scope.scaleManager.watchPlaying();
+                    }
+
+                    scope.playHandler(!scope.positionProvider.playing);
                 };
 
                 // !!! Subscribe for different events which affect timeline
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
-                $(canvas).drag("draginit",function(event){
-                    updateMouseCoordinate(event);
-                    catchScrollBar = mouseInScrollbar;
-                    catchTimeline = mouseInTimeline;
-                });
-                $(canvas).drag("dragstart",function(event,dd){
-                    //updateMouseCoordinate(event);
-                    //catchScrollBar = mouseInScrollbar;
-                });
-                $(canvas).drag("drag",function(event){
-                    updateMouseCoordinate(event);
 
-                    if(catchScrollBar) {
-                        var moveScroll = mouseInScrollbar - catchScrollBar;
-                        scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
-                    }
-                    if(catchTimeline) {
-                        var moveScroll = catchTimeline - mouseInTimeline;
-                        catchTimeline = mouseInTimeline;
-                        scope.scaleManager.scrollByPixels(moveScroll);
-                    }
-                });
-                $(canvas).drag("dragend",function(event,dd){
-                    catchScrollBar = false;
-                    catchTimeline = false;
-                });
 
 
 

@@ -17,6 +17,8 @@ namespace Qn
                 return "text/csv";
             case XmlFormat:
                 return "application/xml";
+            case CompressedPeriodsFormat:
+                return "application/x-periods";
             default:
                 assert(false);
                 return "unsupported";

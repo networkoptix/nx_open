@@ -839,6 +839,8 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
     if (!m_auth.videowall.isNull())
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());
     session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+    session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
+
 
     if (server) {
         QNetworkProxy proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);

@@ -122,12 +122,18 @@ angular.module('webadminApp').controller('ViewCtrl',
             });
         }
         function getCamera(id){
-            if(!$scope.allcameras) {
+            if(!$scope.cameras) {
                 return null;
             }
-            return _.find($scope.allcameras, function (camera) {
-                return camera.id === id;
-            });
+            for(var serverId in $scope.cameras) {
+                var cam = _.find($scope.cameras[serverId], function (camera) {
+                    return camera.id === id;
+                });
+                if(cam){
+                    return cam;
+                }
+            }
+            return null;
         }
 
         $scope.playerReady = function(API){
@@ -195,9 +201,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 position = parseInt(position);
             }
 
-            $scope.activeCamera = _.find($scope.allcameras, function (camera) {
-                return camera.id === $scope.cameraId;
-            });
+            $scope.activeCamera = getCamera ($scope.cameraId);
             if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
@@ -262,6 +266,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         };
 
+        $scope.enableFullScreen = screenfull.enabled;
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
                 screenfull.request($(".videowindow").get(0));
@@ -430,8 +435,6 @@ angular.module('webadminApp').controller('ViewCtrl',
                     }
                 }
 
-                $scope.allcameras = cameras;
-
                 deferred.resolve(cameras);
             }, function (error) {
                 deferred.reject(error);
@@ -508,7 +511,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 timer = $timeout(reloader, reloadInterval);
             },function(error){
                 console.error(error);
-                timer = $timeout(reloader, quickReloadInterval);
+                //timer = $timeout(reloader, quickReloadInterval);
             });
         }
         var desktopCameraTypeId = null;
@@ -572,24 +575,43 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
 
-        (function (){
-            // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
-            // But I kept it for all browsers to avoid future possible bugs in different browsers
-            // Now every browser behaves the same way
+        // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
+        // But I kept it for all browsers to avoid future possible bugs in different browsers
+        // Now every browser behaves the same way
 
-            var $window = $(window);
-            var $top = $("#top");
-            var $viewPanel = $(".view-panel");
-            var $camerasPanel = $(".cameras-panel");
-            var updateHeights = function() {
-                var windowHeight = $window.height();
-                var topHeight = $top.height();
-                var viewportHeight = (windowHeight - topHeight) + "px";
+        var $window = $(window);
+        var $top = $("#top");
+        var $viewPanel = $(".view-panel");
+        var $camerasPanel = $(".cameras-panel");
+        var updateHeights = function() {
+            var windowHeight = $window.height();
+            var topHeight = $top.height();
 
-                $camerasPanel.css("height",viewportHeight );
-                $viewPanel.css("height",viewportHeight );
-            };
-            updateHeights();
-            $window.resize(updateHeights);
-        })();
+            var topAlertHeight = 0;
+
+            var topAlert = $("td.alert");
+            if(topAlert.length){
+                topAlertHeight = topAlert.height();
+            }
+
+            var viewportHeight = (windowHeight - topHeight - topAlertHeight) + "px";
+
+            $camerasPanel.css("height",viewportHeight );
+            $viewPanel.css("height",viewportHeight );
+        };
+
+        updateHeights();
+        setTimeout(updateHeights,50);
+        $window.resize(updateHeights);
+
+        $scope.mobileAppAlertClose = function(){
+            $scope.mobileAppNotified  = true;
+            setTimeout(updateHeights,50);
+        };
+
+        $scope.ieNoWebmAlertClose = function(){
+            $scope.ieNoWebmNotified = true;
+            setTimeout(updateHeights,50);
+        };
+
     });

@@ -135,6 +135,8 @@ table.webclient-window>tbody>tr>td.alert{
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+
   margin-left: auto;
   margin-right: auto;
 }
@@ -166,8 +168,28 @@ table.webclient-window>tbody>tr>td.alert{
   text-align: center;
   cursor:pointer;
 }
+
 .webclient-button:hover{
   background-color: rgba(198,234,255,0.05);
+}
+
+.webclient-button.disabled{
+  opacity:0.1;
+}
+
+.webclient-button.active{
+  background-color: rgba(198,234,255,0.1);
+}
+
+.webclient-button .glyphicon{
+  top:3px;
+}
+
+.weblcient-hint{
+  font-size:78%;
+  color:#698796;
+  display:inline-block;
+  padding-right:10px;
 }
 
 
@@ -184,17 +206,11 @@ table.webclient-window>tbody>tr>td.alert{
   color: #3A911E;
 }
 
-.webclient-button>.dropdown-menu{
+.webclient-button.open>.dropdown-menu{
   display: block;
   min-width: auto;
   border-radius: 0;
   padding:0;
-}
-.webclient-button>.dropdown-menu.collapse{
-  display: none;
-}
-.webclient-button>.dropdown-menu.collapse.in{
-  display: block;
 }
 
 
@@ -267,6 +283,17 @@ table.webclient-window>tbody>tr>td.alert{
   margin-left:-80px;
 }
 
+.camera-node.Unauthorized ,
+.camera-node.Offline {
+  color:#698796 !important;
+}
+
+
+.camera-node.Unauthorized small,
+.camera-node.Offline small{
+  color: #49626F;
+}
+
 .camera-node.Unauthorized .camera-preview,
 .camera-node.Offline .camera-preview{
   background-color: #212A2F;
@@ -283,6 +310,7 @@ table.webclient-window>tbody>tr>td.alert{
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
 
   margin-left: auto;
   margin-right: auto;
@@ -300,6 +328,7 @@ table.webclient-window>tbody>tr>td.alert{
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
 
   font-weight: 400;
   font-size:130%;
@@ -367,6 +396,19 @@ table.webclient-window>tbody>tr>td.alert{
 
 @media only screen and (min-device-width: 641px) and (max-device-width:961px) {
   /* For general iPad layouts */
+  .cameras-panel{
+    font-size:80%;
+  }
+  .dark-theme .nav > li > a {
+    padding-left: 75px;
+  }
+  .camera-preview {
+    margin-left: -60px;
+  }
+  .dark-theme .nav > li.active > a {
+    padding-left: 72px;
+  }
+
 
   .webclient-window .cameras-panel {
     height: 100%;

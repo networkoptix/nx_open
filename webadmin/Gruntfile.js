@@ -363,7 +363,7 @@ module.exports = function (grunt) {
 
         // Performs rewrites based on rev and the useminPrepare configuration
         usemin: {
-            html: ['<%= yeoman.dist %>/{,*/}{*.html,*.xsl}'],
+            html: ['<%= yeoman.dist %>/{*.html,*.xsl}'],
             css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
             options: {
                 assetsDirs: [
@@ -478,8 +478,7 @@ module.exports = function (grunt) {
                         flatten: true,
                         dest: '<%= yeoman.dist %>/fonts',
                         src: ['bower_components/sass-bootstrap/fonts/*']
-                    }
-                    ,
+                    },
                     {
                         expand: true,
                         cwd: '<%= yeoman.app %>',

@@ -279,6 +279,8 @@ QnDbManager::QnDbManager()
     m_isBackupRestore(false),
     m_needResyncLayout(false),
     m_needResyncbRules(false),
+    m_needResyncUsers(false),
+    m_needResyncStorages(false),
     m_dbReadOnly(false)
 {
 }
@@ -574,6 +576,15 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
             if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
                 return false;
         }
+        if (m_needResyncUsers) {
+            if (!fillTransactionLogInternal<ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
+                return false;
+        }
+        if (m_needResyncStorages) {
+            if (!fillTransactionLogInternal<ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
+                return false;
+        }
+
     }
 
     // Set admin user's password
@@ -1319,7 +1330,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return removeServerStatusFromTransactionLog();
     }
     else if (updateName == lit(":/updates/31_move_group_name_to_user_attrs.sql")) {
-        m_needResyncCameraUserAttributes = true;
+        if (!m_dbJustCreated)
+            m_needResyncCameraUserAttributes = true;
     }
     else if (updateName == lit(":/updates/32_default_business_rules.sql")) {
         for(const auto& bRule: QnBusinessEventRule::getSystemRules())
@@ -1331,7 +1343,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         }
     }
     else if (updateName == lit(":/updates/33_resync_layout.sql")) {
-        m_needResyncLayout = true;
+        if (!m_dbJustCreated)
+            m_needResyncLayout = true;
     }
     else if (updateName == lit(":/updates/35_fix_onvif_mt.sql")) {
         return removeWrongSupportedMotionTypeForONVIF();
@@ -1341,6 +1354,16 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/37_remove_empty_layouts.sql")) {
         return removeEmptyLayoutsFromTransactionLog();
+    }
+    else if (updateName == lit(":/updates/41_resync_tran_log.sql")) {
+        if (!m_dbJustCreated) {
+            m_needResyncUsers = true;
+            m_needResyncStorages = true;
+        }
+    }
+    else if (updateName == lit(":/updates/42_add_license_to_user_attr.sql")) {
+        if (!m_dbJustCreated)
+            m_needResyncCameraUserAttributes = true;
     }
 
     return true;
@@ -1652,7 +1675,8 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             dewarping_params,               \
             min_archive_days,               \
             max_archive_days,               \
-            prefered_server_id )            \
+            prefered_server_id,             \
+            license_used)                   \
          VALUES (                           \
             :cameraID,                      \
             :cameraName,                    \
@@ -1666,7 +1690,8 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :dewarpingParams,               \
             :minArchiveDays,                \
             :maxArchiveDays,                \
-            :preferedServerId )             \
+            :preferedServerId,              \
+            :licenseUsed)                   \
         ");
     QnSql::bind(data, &insQuery);
     if( !insQuery.exec() )
@@ -3047,7 +3072,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributes
             dewarping_params as dewarpingParams,         \
             min_archive_days as minArchiveDays,          \
             max_archive_days as maxArchiveDays,          \
-            prefered_server_id as preferedServerId       \
+            prefered_server_id as preferedServerId,      \
+            license_used as licenseUsed                  \
          FROM vms_camera_user_attributes                 \
          LEFT JOIN vms_resource r on r.guid = camera_guid     \
          %1                                              \
@@ -3104,7 +3130,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList
             cu.dewarping_params as dewarpingParams,            \
             cu.min_archive_days as minArchiveDays,             \
             cu.max_archive_days as maxArchiveDays,             \
-            cu.prefered_server_id as preferedServerId          \
+            cu.prefered_server_id as preferedServerId,         \
+            cu.license_used as licenseUsed                     \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_camera c on c.resource_ptr_id = r.id \

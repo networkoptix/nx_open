@@ -24,8 +24,11 @@
                 <meta name="viewport" content="width=device-width"/>
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
                 <link rel="stylesheet" href="styles/409938f1.vendor.css">
+                </link> <!-- This is strange hack, I know -->
 
-                <link rel="stylesheet" href="styles/55d7854c.main.css">
+                <link rel="stylesheet" href="styles/092a3cdd.main.css">
+
+                </link><!-- This is strange hack, I know -->
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
