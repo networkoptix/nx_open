@@ -157,6 +157,8 @@ void QnAuditManager::notifyPlaybackInProgress(const AuditHandle& handle, qint64 
 {
     if (!enabled())
         return;
+    if (timestampUsec == DATETIME_NOW || timestampUsec == AV_NOPTS_VALUE || timestampUsec <= 0)
+        return;
 
     qint64 timestampMs = timestampUsec / 1000;
     QMutexLocker lock(&m_mutex);
