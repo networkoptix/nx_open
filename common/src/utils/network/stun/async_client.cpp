@@ -176,11 +176,12 @@ void AsyncClient::onConnectionComplete(
 
     m_baseConnection.reset( new BaseConnectionType( this, std::move(socket) ) );
     m_baseConnection->setMessageHandler( 
-        [this]( Message msg ){ processMessage(std::move(msg)); } );
+        [ this ]( Message message ){ processMessage( std::move(message) ); } );
 
     if( !m_baseConnection->startReadingConnection() )
     {
         code = SystemError::notConnected;
+        m_state = State::NOT_CONNECTED;
         return;
     }
 

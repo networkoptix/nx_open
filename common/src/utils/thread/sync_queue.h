@@ -14,6 +14,7 @@ class SyncQueue
 public:
     Result pop();
     void push(Result result);
+    bool isEmpty();
 
     std::function< void( Result ) > pusher();
 
@@ -55,6 +56,13 @@ void SyncQueue<Result>::push(Result result)
     m_queue.push( std::move( result ) );
     if( wasEmpty )
         m_condition.wakeOne();
+}
+
+template< typename Result>
+bool SyncQueue<Result>::isEmpty()
+{
+    QnMutexLocker lock( &m_mutex );
+    return m_queue.empty();
 }
 
 template< typename Result>
