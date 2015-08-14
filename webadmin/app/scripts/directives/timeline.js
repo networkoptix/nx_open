@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .directive('timeline', ['$interval','$timeout','animateScope', function ($interval,$timeout,animateScope) {
+    .directive('timeline', ['$interval','$timeout','animateScope', function ($interval,$timeout,animateScope, $log) {
         return {
             restrict: 'E',
             scope: {
@@ -22,6 +22,7 @@ angular.module('webadminApp')
                     minMsPerPixel: 1, // Minimum level for zooming:
 
                     zoomSpeed: 0.025, // Zoom speed for dblclick
+                    zoomAccuracy: 0.00001,
                     slowZoomSpeed: 0.01, // Zoom speed for holding buttons
                     maxVerticalScrollForZoom: 250, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
@@ -267,7 +268,7 @@ angular.module('webadminApp')
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
                 var canvas = element.find('canvas').get(0);
-                scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100, timelineConfig.stickToLiveMs); //Init boundariesProvider
+                scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100, timelineConfig.stickToLiveMs, timelineConfig.zoomAccuracy); //Init boundariesProvider
 
                 // !!! Initialization functions
                 function updateTimelineHeight(){
@@ -306,8 +307,7 @@ angular.module('webadminApp')
                     drawTimeMarker(context);
                     drawPointerMarker(context);
 
-
-                    //debugEvents(context);//DOTO: remove debug here
+                    //debugEvents(context);
                 }
 
                 function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
@@ -921,6 +921,7 @@ angular.module('webadminApp')
                                 zoomTarget = scope.scaleManager.zoom();
                             }
                             zoomTarget -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
+                            zoomTarget = scope.scaleManager.boundZoom(zoomTarget);
                         }
                         scope.zoomTo(zoomTarget, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),window.jscd.touch);
                     } else {
@@ -977,6 +978,7 @@ angular.module('webadminApp')
                 scope.click = function(event){
                     updateMouseCoordinate(event);
                     if(preventClick){
+                        console.log("click prevented");
                         return;
                     }
 
@@ -995,6 +997,8 @@ angular.module('webadminApp')
                 };
 
                 scope.mouseUp = function(event){
+
+                    console.log("mouseUp");
                     //updateMouseCoordinate(event);
                     //TODO: "set timer for dblclick here";
                     //TODO: "move playing position";
@@ -1012,9 +1016,13 @@ angular.module('webadminApp')
                 scope.mouseDown = function(event){
                     // updateMouseCoordinate(event);
                     // catchScrollBar = mouseInScrollbar;
+
+                    console.log("mouseDown");
                 };
 
                 scope.draginit = function(event){
+
+                    console.log("draginit");
                     updateMouseCoordinate(event);
                     catchScrollBar = mouseInScrollbar;
                     catchTimeline = mouseInTimeline;
@@ -1060,10 +1068,14 @@ angular.module('webadminApp')
                 // !!! Scrolling functions
 
 
-                // !!! Functions for buttons on view
+                // !!! Zooming function
                 scope.zoom = function(zoomIn,slow,slowAnimation) {
-                    var zoomTarget = scope.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?timelineConfig.slowZoomSpeed:timelineConfig.zoomSpeed);
+                    zoomTarget = scope.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?timelineConfig.slowZoomSpeed:timelineConfig.zoomSpeed);
                     scope.zoomTo(zoomTarget,null,false,slowAnimation);
+                };
+                scope.zoomOut = function(){
+                    zoomTarget = scope.scaleManager.boundZoom(1);
+                    scope.zoomTo(zoomTarget);
                 };
 
                 var zoomingNow = false;
@@ -1089,10 +1101,7 @@ angular.module('webadminApp')
 
                     processZooming();
                 };
-
-
                 scope.zooming = 1; // init animation value
-
                 function levelsChanged(newLevels,oldLevels){
                     if(newLevels.labels.index != oldLevels.labels.index) {
                         return true;
@@ -1112,25 +1121,15 @@ angular.module('webadminApp')
 
                     return false;
                 }
-
-
+                function checkZoomButtons(){
+                    var zoom = scope.scaleManager.zoom();
+                    scope.disableZoomOut = zoom >= scope.scaleManager.fullZoomOutValue() - timelineConfig.zoomAccuracy;
+                    scope.disableZoomIn = zoom <= scope.scaleManager.fullZoomInValue() + timelineConfig.zoomAccuracy;
+                }
                 scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 
-                    var maxZoom = scope.scaleManager.fullZoomOutValue();
-                    if(zoomTarget >= maxZoom ) {
-                        zoomTarget = maxZoom;
-                        scope.disableZoomOut = true;
-                    }else{
-                        scope.disableZoomOut = false;
-                    }
+                    zoomTarget = scope.scaleManager.boundZoom(zoomTarget);
 
-                    var minZoom = scope.scaleManager.fullZoomInValue();
-                    if(zoomTarget <= minZoom ) {
-                        zoomTarget = minZoom;
-                        scope.disableZoomIn = true;
-                    }else{
-                        scope.disableZoomIn = false;
-                    }
 
                     //Find final levels for this zoom and run animation:
                     var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);
@@ -1159,6 +1158,7 @@ angular.module('webadminApp')
                         } else {
                             scope.scaleManager.zoom(value);
                         }
+                        $timeout(checkZoomButtons);
                         delayWatchingPlayingPosition();
                     }
 
@@ -1178,6 +1178,9 @@ angular.module('webadminApp')
                         scope.zoomTarget = scope.scaleManager.zoom();
                     }
                 };
+
+
+
 
                 scope.goToLive = function(){
                     if(scope.positionProvider.liveMode){
@@ -1212,9 +1215,6 @@ angular.module('webadminApp')
 
                 // !!! Subscribe for different events which affect timeline
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
-
-
-
 
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {

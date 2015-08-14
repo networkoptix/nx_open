@@ -575,9 +575,13 @@ function ShortCache(cameras,mediaserver,$q){
 }
 ShortCache.prototype.init = function(start){
 
+
+    console.log("init shortcache",start);
     this.liveMode = false;
     if(!start){
         this.liveMode = true;
+
+        console.log("live mode!");
         start = (new Date()).getTime();
     }
     this.start = start;
@@ -721,18 +725,23 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
     //this.liveMode = false;
     if(i == this.currentDetailization.length){ // We have no good detailization for this moment - pretend to be playing live
-        this.playedPosition = (new Date()).getTime();
-        this.liveMode = true;
+
+        if(!this.updating){
+            this.playedPosition = (new Date()).getTime();
+            this.liveMode = true;
+        }
     }
 
     if(!this.liveMode && this.currentDetailization.length>0
         && (this.currentDetailization[this.currentDetailization.length - 1].durationMs
             + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs
             < Math.round(this.playedPosition) + this.updateInterval)) { // It's time to update
-        console.log("it's time to update" , this.currentDetailization[this.currentDetailization.length - 1].durationMs
+
+        /*console.log("it's time to update" , this.currentDetailization[this.currentDetailization.length - 1].durationMs
             + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs ,
                 this.playedPosition + this.updateInterval
-        );
+        );*/
+
         this.update();
     }
 
@@ -748,10 +757,11 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth,stickToLiveMs){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth,stickToLiveMs,zoomAccuracy){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
+    this.zoomAccuracy = zoomAccuracy;
 
     this.levels = {
         top:  {index:0,level:RulerModel.levels[0]},
@@ -791,7 +801,11 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
     this.end = end;
+    var needZoomOut =  this.fullZoomOutValue() - this.zoom() < this.zoomAccuracy;
     this.updateTotalInterval();
+    if(needZoomOut){
+        this.zoom(1);
+    }
 };
 
 ScaleManager.prototype.bound = function (min,val,max){
@@ -922,6 +936,10 @@ ScaleManager.prototype.fullZoomOutValue = function(){
 };
 ScaleManager.prototype.fullZoomInValue = function(){
     return this.msToZoom(this.minMsPerPixel);
+};
+
+ScaleManager.prototype.boundZoom = function(zoomTarget){
+    return this.bound(this.fullZoomInValue(),zoomTarget,this.fullZoomOutValue());
 };
 
 
@@ -1070,6 +1088,7 @@ ScaleManager.prototype.msToZoom = function(ms){
 
 
 ScaleManager.prototype.targetLevels = function(zoomTarget){
+    zoomTarget = this.boundZoom(zoomTarget);
     var msPerPixel = this.zoomToMs(zoomTarget);
     return this.calcLevels(msPerPixel);
 };
@@ -1079,6 +1098,16 @@ ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (fro
         return this.msToZoom(this.msPerPixel);
     }
     this.msPerPixel = this.zoomToMs(zoomValue);
+
+    /* Make it sticky */
+    if(zoomValue - this.fullZoomInValue() < this.zoomAccuracy){
+        this.msPerPixel = this.minMsPerPixel;
+    }
+
+    if(this.fullZoomOutValue()-zoomValue  < this.zoomAccuracy){
+        this.msPerPixel = this.maxMsPerPixel;
+    }
+
     this.updateCurrentInterval();
 };
 ScaleManager.prototype.zoomAroundDate = function(zoomValue, aroundDate){

@@ -18,7 +18,8 @@
     "jquery-mousewheel": "~3.1.12",
     "angular-cookie": "~4.0.6",
     "grunt-scp": "~0.1.8",
-    "screenfull": "~2.0.0"
+    "screenfull": "~2.0.0",
+    "ngstorage": "~0.3.7"
   },
   "devDependencies": {
     "angular-mocks": "1.2.6",

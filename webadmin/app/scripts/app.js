@@ -7,7 +7,8 @@ angular.module('webadminApp', [
     'ngRoute',
     //'ngTouch',
     'ui.bootstrap',
-    'tc.chartjs'
+    'tc.chartjs',
+    'ngStorage'
 ]).config(function ($routeProvider) {
     $routeProvider
         .when('/settings', {
