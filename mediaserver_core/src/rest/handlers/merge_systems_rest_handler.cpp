@@ -220,7 +220,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
 }
 
 bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const QString &systemName, const QString &user, const QString &password, QnUserResourcePtr &admin,
-                                                    QnRestConnectionProcessor* owner) 
+                                                    const QnRestConnectionProcessor* owner) 
 {
     qint64 remoteSysTime = 0;
     qint64 remoteTranLogTime = 0;
