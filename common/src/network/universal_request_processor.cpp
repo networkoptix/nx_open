@@ -84,10 +84,14 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
                 retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
             if (retryCount >= retryThreshold && !logReported)
             {   
-                logReported = true;
-                auto session = authSession();
-                session.id = QnUuid::createUuid();
-                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
+                auto usernameItr = d->request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
+                bool dontLog = usernameItr != d->request.headers.end() && !QUuid(usernameItr->second).isNull();
+                if (!dontLog) {
+                    logReported = true;
+                    auto session = authSession();
+                    session.id = QnUuid::createUuid();
+                    qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
+                }
             }
 
             if( !d->socket->isConnected() )

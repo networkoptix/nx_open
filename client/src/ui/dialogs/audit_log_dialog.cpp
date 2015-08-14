@@ -1051,10 +1051,15 @@ void QnAuditLogDialog::makeSessionData()
 {
     m_sessionData.clear();
     QMap<QnUuid, int> activityPerSession;
+    QSet<QnUuid> processedLogins;
     for (const QnAuditRecord& record: m_allData)
     {
-        if (record.isLoginType())
+        if (record.isLoginType()) {
+            if (processedLogins.contains(record.authSession.id))
+                continue;
             m_sessionData << record;
+            processedLogins << record.authSession.id;
+        }
         activityPerSession[record.authSession.id]++;
     }
 
