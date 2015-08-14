@@ -126,10 +126,10 @@
                             </div>
 
                             <div class="float-size hidden-xs">
-                                <div class="camera-view-informer" ng-if="activeCamera.status == 'Offline' && !positionSelected ">
+                                <div class="camera-view-informer" ng-if="!positionSelected && activeCamera.status == 'Offline' ">
                                     <div class="camera-view-offline camera-view-message-icon"></div><br/><div class="camera-view-message">OFFLINE</div>
                                 </div>
-                                <div class="camera-view-informer" ng-if="activeCamera.status == 'Unauthorized' && !positionSelected" >
+                                <div class="camera-view-informer" ng-if="!positionSelected && activeCamera.status == 'Unauthorized'" >
                                     <div class="camera-view-unauthorized camera-view-message-icon"></div>
                                     <br/>
                                     <div class="camera-view-message">UNAUTHORIZED</div>

@@ -143,6 +143,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         function updateVideoSource(playing) {
             var live = !playing;
 
+            $scope.positionSelected = !!playing;
+
             if(!$scope.positionProvider){
                 return;
             }
@@ -197,7 +199,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
             $scope.cameraId = cameraId || $scope.cameraId;
-            $scope.positionSelected = !!position;
+
             if(position){
                 position = parseInt(position);
             }
@@ -526,6 +528,11 @@ angular.module('webadminApp').controller('ViewCtrl',
             });
         }
 
+        $scope.$watch("positionProvider.liveMode",function(mode){
+            if(mode){
+                $scope.positionSelected = false;
+            }
+        });
         mediaserver.getCurrentUser().then(function(result){
             isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
             canViewLive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewLivePermission);

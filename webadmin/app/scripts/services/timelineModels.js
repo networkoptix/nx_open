@@ -729,10 +729,12 @@ ShortCache.prototype.setPlayingPosition = function(position){
         && (this.currentDetailization[this.currentDetailization.length - 1].durationMs
             + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs
             < Math.round(this.playedPosition) + this.updateInterval)) { // It's time to update
-        console.log("it's time to update" , this.currentDetailization[this.currentDetailization.length - 1].durationMs
+
+        /*console.log("it's time to update" , this.currentDetailization[this.currentDetailization.length - 1].durationMs
             + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs ,
                 this.playedPosition + this.updateInterval
-        );
+        );*/
+
         this.update();
     }
 
