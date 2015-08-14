@@ -7,9 +7,12 @@
 namespace nx {
 namespace stun {
 
-AsyncClient::AsyncClient( const SocketAddress& endpoint, bool useSsl )
+static const AsyncClient::Timeouts DEFAULT_TIMEOUTS = { 3000, 3000 };
+
+AsyncClient::AsyncClient( const SocketAddress& endpoint, bool useSsl, Timeouts timeouts )
     : m_endpoint( endpoint )
     , m_useSsl( useSsl )
+    , m_timeouts( timeouts )
     , m_state( State::NOT_CONNECTED )
 {
 }
@@ -107,6 +110,8 @@ bool AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
             const auto socket = SocketFactory::createStreamSocket(
                         m_useSsl, SocketFactory::nttDisabled );
             socket->setNonBlockingMode( true );
+            socket->setSendTimeout( m_timeouts.send );
+            socket->setRecvTimeout( m_timeouts.recv );
 
             m_state = State::CONNECTING;
             return socket->connectAsync(
@@ -219,8 +224,9 @@ void AsyncClient::processMessage( Message message )
     switch( message.header.messageClass )
     {
         case MessageClass::request:
-            // TODO: NX_LOG
             Q_ASSERT_X( false, Q_FUNC_INFO, "client does not support requests" );
+            NX_LOG( lit( "%1 client does not support requests" )
+                    .arg( QString::fromUtf8( Q_FUNC_INFO ) ), cl_logERROR );
             return;
 
         case MessageClass::errorResponse:

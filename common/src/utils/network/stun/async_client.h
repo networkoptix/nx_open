@@ -13,10 +13,6 @@ namespace nx {
 namespace stun {
 
 //!Connects to STUN server, sends requests, receives responses and indications
-/*!
-    \note Methods of this class are not thread-safe
-    \todo restore interrupted connection ?
-*/
 class AsyncClient
 {
 public:
@@ -34,8 +30,11 @@ public:
     typedef std::function< void( Message ) > IndicationHandler;
     typedef std::function< void( SystemError::ErrorCode, Message )> RequestHandler;
 
+    static const struct Timeouts { uint send, recv; } DEFAULT_TIMEOUTS;
+
     // TODO: pass timeouts
-    AsyncClient( const SocketAddress& endpoint, bool useSsl = false );
+    AsyncClient( const SocketAddress& endpoint, bool useSsl = false,
+                 Timeouts timeouts = DEFAULT_TIMEOUTS );
     ~AsyncClient();
     Q_DISABLE_COPY( AsyncClient );
 
@@ -82,6 +81,7 @@ private:
 private:
     const SocketAddress m_endpoint;
     const bool m_useSsl;
+    const Timeouts m_timeouts;
     std::unique_ptr< BaseConnectionType > m_baseConnection;
 
     QnMutex m_mutex;
