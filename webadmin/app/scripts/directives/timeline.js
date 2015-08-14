@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .directive('timeline', ['$interval','$timeout','animateScope', function ($interval,$timeout,animateScope) {
+    .directive('timeline', ['$interval','$timeout','animateScope', function ($interval,$timeout,animateScope, $log) {
         return {
             restrict: 'E',
             scope: {
@@ -978,6 +978,7 @@ angular.module('webadminApp')
                 scope.click = function(event){
                     updateMouseCoordinate(event);
                     if(preventClick){
+                        console.log("click prevented");
                         return;
                     }
 
@@ -996,6 +997,8 @@ angular.module('webadminApp')
                 };
 
                 scope.mouseUp = function(event){
+
+                    console.log("mouseUp");
                     //updateMouseCoordinate(event);
                     //TODO: "set timer for dblclick here";
                     //TODO: "move playing position";
@@ -1013,9 +1016,13 @@ angular.module('webadminApp')
                 scope.mouseDown = function(event){
                     // updateMouseCoordinate(event);
                     // catchScrollBar = mouseInScrollbar;
+
+                    console.log("mouseDown");
                 };
 
                 scope.draginit = function(event){
+
+                    console.log("draginit");
                     updateMouseCoordinate(event);
                     catchScrollBar = mouseInScrollbar;
                     catchTimeline = mouseInTimeline;

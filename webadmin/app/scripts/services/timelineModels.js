@@ -574,9 +574,14 @@ function ShortCache(cameras,mediaserver,$q){
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
 }
 ShortCache.prototype.init = function(start){
+
+
+    console.log("init shortcache",start);
     this.liveMode = false;
     if(!start){
         this.liveMode = true;
+
+        console.log("live mode!");
         start = (new Date()).getTime();
     }
     this.start = start;
@@ -720,8 +725,11 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
     //this.liveMode = false;
     if(i == this.currentDetailization.length){ // We have no good detailization for this moment - pretend to be playing live
-        this.playedPosition = (new Date()).getTime();
-        this.liveMode = true;
+
+        if(!this.updating){
+            this.playedPosition = (new Date()).getTime();
+            this.liveMode = true;
+        }
     }
 
     if(!this.liveMode && this.currentDetailization.length>0

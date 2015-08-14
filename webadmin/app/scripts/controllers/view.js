@@ -154,6 +154,8 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return;
             }
 
+            console.log("playing",playing);
+
             $scope.positionProvider.init(playing);
             if(live){
                 playing = (new Date()).getTime();
