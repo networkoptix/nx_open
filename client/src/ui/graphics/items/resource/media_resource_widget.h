@@ -175,6 +175,7 @@ private slots:
     void at_camDisplay_liveChanged();
     void at_statusOverlayWidget_diagnosticsRequested();
     void at_statusOverlayWidget_ioEnableRequested();
+    void at_statusOverlayWidget_moreLicensesRequested();
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
@@ -192,6 +193,7 @@ private:
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility();
+    Q_SLOT void updateOverlayButton();
 
 private:
     /** Media resource. */

@@ -355,9 +355,20 @@ QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceLi
     propose(proposedCameras, proposedEnable);
 }
 
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable, QObject *parent):
+    base_type(parent)
+{
+    init();
+    propose(proposedCamera, proposedEnable);
+}
+
 void QnCamLicenseUsageHelper::init() {
     QnCamLicenseUsageWatcher* usageWatcher = new QnCamLicenseUsageWatcher(this);
     connect(usageWatcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, &QnLicenseUsageHelper::invalidate);
+}
+
+void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable) {
+    return propose(QnVirtualCameraResourceList() << proposedCamera, proposedEnable);
 }
 
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable) {
