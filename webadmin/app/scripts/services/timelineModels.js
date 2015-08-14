@@ -574,7 +574,6 @@ function ShortCache(cameras,mediaserver,$q){
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
 }
 ShortCache.prototype.init = function(start){
-
     this.liveMode = false;
     if(!start){
         this.liveMode = true;

@@ -235,6 +235,12 @@ angular.module('webadminApp').controller('ViewCtrl',
                 }
                 if ($scope.positionProvider) {
                     $scope.positionProvider.playing = play;
+
+                    if(!play){
+                        $timeout(function(){
+                            $scope.positionProvider.liveMode = false; // Do it async
+                        },50);
+                    }
                 }
             }
         };
