@@ -181,7 +181,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateInfoText();
 
     /* Set up overlays */
-    if (m_camera->flags() & Qn::io_module) {
+    if (m_camera->hasFlags(Qn::io_module)) {
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
         m_ioModuleOverlayWidget->setCamera(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
@@ -1059,7 +1059,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result &= ~PtzButton;
     }
 
-    if ((resource()->toResource()->flags() & Qn::io_module) && hasVideo)
+    if ((resource()->toResource()->hasFlags(Qn::io_module)) && hasVideo)
         result |= IoModuleButton;
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo) {
