@@ -49,6 +49,9 @@ void QnSystemSettingsWidget::updateFromSettings() {
 }
 
 void QnSystemSettingsWidget::submitToSettings() {
+    if (!hasChanges())
+        return;
+
     QnGlobalSettings *settings = QnGlobalSettings::instance();
     
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked) {
@@ -65,6 +68,7 @@ void QnSystemSettingsWidget::submitToSettings() {
 
     const auto servers = qnResPool->getResources<QnMediaServerResource>();
     bool statisticsReportAllowed = ec2::Ec2StaticticsReporter::isAllowed(servers);
+
     if (!ec2::Ec2StaticticsReporter::isDefined(servers)
         || ui->statisticsReportCheckBox->isChecked() != statisticsReportAllowed) {
         ec2::Ec2StaticticsReporter::setAllowed(servers, ui->statisticsReportCheckBox->isChecked());
