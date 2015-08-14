@@ -1061,10 +1061,14 @@ angular.module('webadminApp')
                 // !!! Scrolling functions
 
 
-                // !!! Functions for buttons on view
+                // !!! Zooming function
                 scope.zoom = function(zoomIn,slow,slowAnimation) {
-                    var zoomTarget = scope.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?timelineConfig.slowZoomSpeed:timelineConfig.zoomSpeed);
+                    zoomTarget = scope.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?timelineConfig.slowZoomSpeed:timelineConfig.zoomSpeed);
                     scope.zoomTo(zoomTarget,null,false,slowAnimation);
+                };
+                scope.zoomOut = function(){
+                    zoomTarget = scope.scaleManager.boundZoom(1);
+                    scope.zoomTo(zoomTarget);
                 };
 
                 var zoomingNow = false;
@@ -1090,10 +1094,7 @@ angular.module('webadminApp')
 
                     processZooming();
                 };
-
-
                 scope.zooming = 1; // init animation value
-
                 function levelsChanged(newLevels,oldLevels){
                     if(newLevels.labels.index != oldLevels.labels.index) {
                         return true;
@@ -1113,12 +1114,10 @@ angular.module('webadminApp')
 
                     return false;
                 }
-
-
                 function checkZoomButtons(){
-                    var zoomTarget = scope.scaleManager.zoom();
-                    scope.disableZoomOut = zoomTarget >= scope.scaleManager.fullZoomOutValue() - timelineConfig.zoomAccuracy;
-                    scope.disableZoomIn = zoomTarget <= scope.scaleManager.fullZoomInValue() + timelineConfig.zoomAccuracy;
+                    var zoom = scope.scaleManager.zoom();
+                    scope.disableZoomOut = zoom >= scope.scaleManager.fullZoomOutValue() - timelineConfig.zoomAccuracy;
+                    scope.disableZoomIn = zoom <= scope.scaleManager.fullZoomInValue() + timelineConfig.zoomAccuracy;
                 }
                 scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 
@@ -1172,6 +1171,9 @@ angular.module('webadminApp')
                         scope.zoomTarget = scope.scaleManager.zoom();
                     }
                 };
+
+
+
 
                 scope.goToLive = function(){
                     if(scope.positionProvider.liveMode){
