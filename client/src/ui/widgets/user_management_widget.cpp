@@ -18,15 +18,16 @@
 #include <ui/dialogs/ldap_settings_dialog.h>
 
 class QnUserManagementWidgetPrivate : public QObject {
+    Q_DECLARE_PUBLIC(QnUserManagementWidget)
 public:
-    QnUserManagementWidget *widget;
+    QnUserManagementWidget *q_ptr;
 
     QnUserListModel *usersModel;
     QnSortedUserListModel *sortModel;
 
     QnUserManagementWidgetPrivate(QnUserManagementWidget *parent)
         : QObject(parent)
-        , widget(parent)
+        , q_ptr(parent)
         , usersModel(new QnUserListModel(parent))
         , sortModel(new QnSortedUserListModel(parent))
     {
@@ -40,11 +41,13 @@ public:
 };
 
 void QnUserManagementWidgetPrivate::at_usersTable_activated(const QModelIndex &index) {
+    Q_Q(QnUserManagementWidget);
+
     QnUserResourcePtr user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
     if (!user)
         return;
 
-    widget->menu()->trigger(Qn::UserSettingsAction, QnActionParameters(user));
+    q->menu()->trigger(Qn::UserSettingsAction, QnActionParameters(user));
 }
 
 void QnUserManagementWidgetPrivate::at_usersTable_clicked(const QModelIndex &index) {
@@ -53,6 +56,8 @@ void QnUserManagementWidgetPrivate::at_usersTable_clicked(const QModelIndex &ind
 }
 
 void QnUserManagementWidget::at_refreshButton_clicked() {
+    Q_D(QnUserManagementWidget);
+
     if (!QnGlobalSettings::instance()->ldapSettings().isValid()) {
         if (!d->openLdapSettings())
             return;
@@ -76,7 +81,9 @@ void QnUserManagementWidget::at_mergeLdapUsersAsync_finished(int status, int han
 }
 
 bool QnUserManagementWidgetPrivate::openLdapSettings() {
-    QScopedPointer<QnLdapSettingsDialog> dialog(new QnLdapSettingsDialog(widget));
+    Q_Q(QnUserManagementWidget);
+
+    QScopedPointer<QnLdapSettingsDialog> dialog(new QnLdapSettingsDialog(q));
     dialog->setWindowModality(Qt::ApplicationModal);
     return dialog->exec() == QDialogButtonBox::Ok;
 }
@@ -86,8 +93,10 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
     , ui(new Ui::QnUserManagementWidget)
-    , d(new QnUserManagementWidgetPrivate(this))
+    , d_ptr(new QnUserManagementWidgetPrivate(this))
 {
+    Q_D(QnUserManagementWidget);
+
     ui->setupUi(this);
 
     ui->usersTable->setModel(d->sortModel);
@@ -99,7 +108,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     connect(ui->usersTable,             &QTableView::clicked,       d,      &QnUserManagementWidgetPrivate::at_usersTable_clicked);
 
     connect(ui->ldapSettingsButton,     &QPushButton::clicked,      d,      &QnUserManagementWidgetPrivate::openLdapSettings);
-    connect(ui->refreshButton,          &QPushButton::clicked,      this,      &QnUserManagementWidget::at_refreshButton_clicked);
+    connect(ui->refreshButton,          &QPushButton::clicked,      this,   &QnUserManagementWidget::at_refreshButton_clicked);
 }
 
 QnUserManagementWidget::~QnUserManagementWidget() {

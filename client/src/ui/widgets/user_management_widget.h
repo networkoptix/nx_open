@@ -21,8 +21,8 @@ public:
 
 private:
     QScopedPointer<Ui::QnUserManagementWidget> ui;
-    QnUserManagementWidgetPrivate *d;
-    friend class QnUserManagementWidgetPrivate;
+    QScopedPointer<QnUserManagementWidgetPrivate> const d_ptr;
+    Q_DECLARE_PRIVATE(QnUserManagementWidget)
 
 private slots:
     void at_refreshButton_clicked();

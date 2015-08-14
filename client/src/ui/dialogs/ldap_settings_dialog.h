@@ -25,6 +25,6 @@ private slots:
 
 private:
     QScopedPointer<Ui::LdapSettingsDialog> ui;
-    QnLdapSettingsDialogPrivate *d;
-    friend class QnLdapSettingsDialogPrivate;
+    QScopedPointer<QnLdapSettingsDialogPrivate> const d_ptr;
+    Q_DECLARE_PRIVATE(QnLdapSettingsDialog)
 };
