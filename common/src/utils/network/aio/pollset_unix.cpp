@@ -148,29 +148,32 @@ namespace aio
                     continue;   //skipping socket
 
                 //processing all triggered events one by one
-                if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLIN )
+                if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLERR )
                 {
-                    handlerToUse = aio::etRead;
-                    triggeredEvent = aio::etRead;
+                    //reporting aio::etError to every one who listens
+                    pollSetImpl->epollEventsArray[currentIndex].events |= socketData->second.eventsMask & (EPOLLIN | EPOLLOUT);
+                    handlerToUse = (socketData->second.eventsMask & EPOLLIN) ? aio::etRead : aio::etWrite;
+                    triggeredEvent = aio::etError;
                 }
-                else if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLOUT )
-                {
-                    handlerToUse = aio::etWrite;
-                    triggeredEvent = aio::etWrite;
-                }
-                else if( pollSetImpl->epollEventsArray[currentIndex].events & (EPOLLHUP | EPOLLRDHUP) )
+                else
+                if( pollSetImpl->epollEventsArray[currentIndex].events & (EPOLLHUP | EPOLLRDHUP) )
                 {
                     //reporting events to every one who listens
                     pollSetImpl->epollEventsArray[currentIndex].events |= socketData->second.eventsMask & (EPOLLIN | EPOLLOUT);
                     handlerToUse = (socketData->second.eventsMask & EPOLLIN) ? aio::etRead : aio::etWrite;
                     triggeredEvent = handlerToUse;
                 }
-                else if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLERR )
+                else
+                if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLIN )
                 {
-                    //reporting aio::etError to every one who listens
-                    pollSetImpl->epollEventsArray[currentIndex].events |= socketData->second.eventsMask & (EPOLLIN | EPOLLOUT);
-                    handlerToUse = (socketData->second.eventsMask & EPOLLIN) ? aio::etRead : aio::etWrite;
-                    triggeredEvent = aio::etError;
+                    handlerToUse = aio::etRead;
+                    triggeredEvent = aio::etRead;
+                }
+                else
+                if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLOUT )
+                {
+                    handlerToUse = aio::etWrite;
+                    triggeredEvent = aio::etWrite;
                 }
                 return;
             }
