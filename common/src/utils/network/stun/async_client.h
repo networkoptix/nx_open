@@ -70,7 +70,8 @@ private:
     {
         NOT_CONNECTED,
         CONNECTING,
-        CONNECTED
+        CONNECTED,
+        TERMINATED,
     };
 
     bool openConnectionImpl( QnMutexLockerBase* lock );
@@ -81,7 +82,7 @@ private:
 private:
     const SocketAddress m_endpoint;
     const bool m_useSsl;
-    std::unique_ptr<BaseConnectionType> m_baseConnection;
+    std::unique_ptr< BaseConnectionType > m_baseConnection;
 
     QnMutex m_mutex;
     State m_state;

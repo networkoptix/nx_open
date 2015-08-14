@@ -1,6 +1,8 @@
 #include "async_client.h"
 
+#include "common/common_globals.h"
 #include "utils/common/guard.h"
+#include "utils/common/log.h"
 
 namespace nx {
 namespace stun {
@@ -18,9 +20,11 @@ AsyncClient::~AsyncClient()
         QnMutexLocker lock( &m_mutex );
         if( m_state == State::NOT_CONNECTED )
             return;
+
+        m_state = State::TERMINATED;
     }
 
-    m_baseConnection->closeConnection();
+    m_baseConnection.reset();
 }
 
 bool AsyncClient::openConnection( ConnectionHandler connectHandler,
@@ -53,21 +57,26 @@ bool AsyncClient::sendRequest( Message request, RequestHandler requestHandler )
 
         case State::CONNECTED:
             return dispatchRequestsInQueue( &lock );
-    };
 
-    Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is corupted" );
-    return false;
+        default:
+            Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
+            NX_LOG( lit( "%1 m_state has invalid value: %2" )
+                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+                    .arg( static_cast< int >( m_state ) ), cl_logERROR );
+            return false;
+    };
 }
 
 void AsyncClient::closeConnection( BaseConnectionType* connection )
 {
-    Q_ASSERT( connection == m_baseConnection.get() );
+    Q_ASSERT( !m_baseConnection || connection == m_baseConnection.get() );
 
     ConnectionHandler disconnectHandler;
     std::list< RequestHandler > droppedRequests;
     {
         QnMutexLocker lock( &m_mutex );
-        m_state = State::NOT_CONNECTED;
+        if( m_state != State::TERMINATED )
+            m_state = State::NOT_CONNECTED;
 
         for( auto& request : m_requestQueue )
             droppedRequests.push_back( std::move(request.second) );
@@ -114,10 +123,14 @@ bool AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
         case State::CONNECTING:
             // m_connectHandler will be called in onConnectionComplete
             return true;
-    }
 
-    Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is corupted" );
-    return false;
+        default:
+            Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
+            NX_LOG( lit( "%1 m_state has invalid value: %2" )
+                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+                    .arg( static_cast< int >( m_state ) ), cl_logERROR );
+            return false;
+    }
 }
 
 bool AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
@@ -140,8 +153,14 @@ bool AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
                 const auto ret = m_requestsInProgress.insert( std::make_pair(
                     transactionId, std::move( handler ) ) );
 
-                // TODO: NX_LOG
-                Q_ASSERT_X( ret.second, Q_FUNC_INFO, "transactionId must be unique" );
+                if ( !ret.second )
+                {
+                    Q_ASSERT_X( false, Q_FUNC_INFO, "transactionId is not unique" );
+                    NX_LOG( lit( "%1 transactionId is not unique: %2" )
+                            .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+                            .arg( QString::fromUtf8( transactionId.toHex() ) ),
+                            cl_logERROR );
+                }
             } );
 
         if( !ret )
@@ -166,8 +185,10 @@ void AsyncClient::onConnectionComplete(
     } );
 
     QnMutexLocker lock( &m_mutex );
-    std::swap( connectionHandler, m_connectHandler);
+    if( m_state == State::TERMINATED )
+        return;
 
+    std::swap( connectionHandler, m_connectHandler);
     if( code != SystemError::noError )
     {
         m_state = State::NOT_CONNECTED;
@@ -192,6 +213,9 @@ void AsyncClient::onConnectionComplete(
 void AsyncClient::processMessage( Message message )
 {
     QnMutexLocker lock( &m_mutex );
+    if( m_state == State::TERMINATED )
+        return;
+
     switch( message.header.messageClass )
     {
         case MessageClass::request:
@@ -204,9 +228,13 @@ void AsyncClient::processMessage( Message message )
         {
             // find corresponding handler by transactionId
             const auto it = m_requestsInProgress.find( message.header.transactionId );
-            if( it == m_requestsInProgress.end() ) {
-                // TODO: NX_LOG
+            if( it == m_requestsInProgress.end() )
+            {
                 Q_ASSERT_X( false, Q_FUNC_INFO, "unexpected transactionId" );
+                NX_LOG( lit( "%1 unexpected transactionId: %2" )
+                        .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+                        .arg( QString::fromUtf8( message.header.transactionId.toHex() ) ),
+                        cl_logERROR );
                 return;
             }
 
@@ -228,10 +256,15 @@ void AsyncClient::processMessage( Message message )
                 handler( std::move( message ) );
             }
             return;
-    }
 
-    Q_ASSERT_X( false, Q_FUNC_INFO, "message.header.messageClass is corupted" );
-    return;
+        default:
+            Q_ASSERT_X( false, Q_FUNC_INFO, "messageClass is invalid" );
+            NX_LOG( lit( "%1 messageClass has invalid value: %2" )
+                    .arg( QString::fromUtf8( Q_FUNC_INFO ) )
+                    .arg( static_cast< int >( message.header.messageClass ) ),
+                    cl_logERROR );
+            return;
+    }
 }
 
 } // namespase stun
