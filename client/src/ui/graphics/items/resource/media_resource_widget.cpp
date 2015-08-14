@@ -185,12 +185,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
         m_ioModuleOverlayWidget->setCamera(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
-        if (m_camera->hasVideo(m_display->mediaProvider())) {
-            m_ioModuleOverlayWidget->setOpacity(0.0);
-            addOverlayWidget(m_ioModuleOverlayWidget, Invisible, true, true);
-        } else {
-            addOverlayWidget(m_ioModuleOverlayWidget, Visible, true, true);
-        }
+        m_ioModuleOverlayWidget->setOpacity(0.0);
+        addOverlayWidget(m_ioModuleOverlayWidget, Invisible, true, true);
+
+        QnCamLicenseUsageWatcher *watcher = new QnCamLicenseUsageWatcher(m_camera, this);
+        connect(watcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, &QnMediaResourceWidget::updateIoModuleVisibility);
+
+        updateIoModuleVisibility();
     }
 
     /* Set up buttons. */
@@ -1321,6 +1322,21 @@ void QnMediaResourceWidget::updateCustomAspectRatio() {
     m_display->camDisplay()->setOverridenAspectRatio(m_resource->customAspectRatio());
 }
 
+void QnMediaResourceWidget::updateIoModuleVisibility() {
+    auto button = buttonBar()->button(IoModuleButton);
+    bool licenseOverflow = QnCamLicenseUsageHelper().isOverflowForCamera(m_camera);
+    bool licenceUsed = m_camera->isLicenseUsed();
+    bool ioModule = m_camera->hasFlags(Qn::io_module);
+
+    OverlayVisibility visibility =
+            ((button && button->isChecked()) || (ioModule && !m_camera->hasVideo(m_display->mediaProvider())))
+            && licenceUsed && !licenseOverflow
+            ? Visible : Invisible;
+
+    setOverlayWidgetVisibility(m_ioModuleOverlayWidget, visibility);
+    statusOverlayWidget()->setEnableButtonVisible(!licenceUsed && !licenseOverflow);
+}
+
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
     menu()->trigger(Qn::CameraDiagnosticsAction, m_camera);
 }
@@ -1335,10 +1351,7 @@ void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
     QnCamLicenseUsageHelper helper;
     helper.propose(QnVirtualCameraResourceList() << m_camera, true);
 
-    if (helper.isOverflowForCamera(m_camera))
-        statusOverlayWidget()->setEnableButtonVisible(false);
-    else
-        updateStatusOverlay();
+    updateIoModuleVisibility();
 }
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged() {

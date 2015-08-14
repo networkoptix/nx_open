@@ -219,6 +219,11 @@
             "windowColor": "#801010c0",
             "frameColor": "#801010ff",
             "textColor": "#ffffffff"
+        },
+        "#ioEnableButton": {
+            "windowColor": "#801010c0",
+            "frameColor": "#801010ff",
+            "textColor": "#ffffffff"
         }
     },   
     

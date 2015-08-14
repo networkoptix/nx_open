@@ -146,7 +146,7 @@ void QnStatusOverlayWidget::setEnableButtonVisible(bool visible) {
     if (m_ioEnableButtonVisible == visible)
         return;
 
-    m_ioEnableButtonVisible = true;
+    m_ioEnableButtonVisible = visible;
 
     updateButtonsOpacity(false);
 }
