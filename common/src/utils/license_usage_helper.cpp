@@ -292,6 +292,29 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
 QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /*= NULL*/):
     base_type(parent)
 {
+    init(QnVirtualCameraResourcePtr());
+}
+
+QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(const QnVirtualCameraResourcePtr &camera, QObject *parent)
+    : base_type(parent)
+{
+    init(camera);
+}
+
+void QnCamLicenseUsageWatcher::init(const QnVirtualCameraResourcePtr &camera) {
+    /* Listening to all changes that can affect licenses usage. */
+    auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
+        connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged,  this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged,       this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(camera, &QnVirtualCameraResource::groupNameChanged,         this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(camera, &QnVirtualCameraResource::groupIdChanged,           this, &QnLicenseUsageWatcher::licenseUsageChanged);
+    };
+
+    if (camera) {
+        connectToCamera(camera);
+        return;
+    }
+
     /* Call update if camera was added or removed. */
     auto updateIfNeeded = [this](const QnResourcePtr &resource) {
         if (resource.dynamicCast<QnVirtualCameraResource>())
@@ -300,14 +323,6 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /*= NULL*/):
 
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
-
-    /* Listening to all changes that can affect licenses usage. */
-    auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
-        connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged,  this, &QnLicenseUsageWatcher::licenseUsageChanged);
-        connect(camera, &QnVirtualCameraResource::licenseUsedChanged,       this, &QnLicenseUsageWatcher::licenseUsageChanged);
-        connect(camera, &QnVirtualCameraResource::groupNameChanged,         this, &QnLicenseUsageWatcher::licenseUsageChanged);
-        connect(camera, &QnVirtualCameraResource::groupIdChanged,           this, &QnLicenseUsageWatcher::licenseUsageChanged);
-    };
 
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   [this, connectToCamera](const QnResourcePtr &resource) {
         if (const QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())

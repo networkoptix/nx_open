@@ -91,6 +91,14 @@ struct QnStatisticsColors {
 #define QnStatisticsColors_Fields (grid)(frame)(cpu)(ram)(hdds)(network)
 
 
+struct QnIoModuleColors {
+    QnIoModuleColors();
+
+    QColor idLabel;
+};
+#define QnIoModuleColors_Fields (idLabel)
+
+
 struct QnScheduleGridColors {
 public:
     QnScheduleGridColors();
@@ -220,7 +228,7 @@ struct QnServerUpdatesColors {
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
-    (QnServerUpdatesColors)
+    (QnServerUpdatesColors)(QnIoModuleColors)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
