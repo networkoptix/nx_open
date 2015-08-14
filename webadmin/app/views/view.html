@@ -126,16 +126,16 @@
                             </div>
 
                             <div class="float-size hidden-xs">
-                                <div class="camera-view-informer" ng-if="activeCamera.status == 'Offline' && positionProvider.liveMode ">
+                                <div class="camera-view-informer" ng-if="activeCamera.status == 'Offline' && !positionSelected ">
                                     <div class="camera-view-offline camera-view-message-icon"></div><br/><div class="camera-view-message">OFFLINE</div>
                                 </div>
-                                <div class="camera-view-informer" ng-if="activeCamera.status == 'Unauthorized' && positionProvider.liveMode " >
+                                <div class="camera-view-informer" ng-if="activeCamera.status == 'Unauthorized' && !positionSelected" >
                                     <div class="camera-view-unauthorized camera-view-message-icon"></div>
                                     <br/>
                                     <div class="camera-view-message">UNAUTHORIZED</div>
                                 </div>
 
-                                <videowindow ng-class="{invisible: positionProvider.liveMode && (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
+                                <videowindow ng-class="{invisible: !positionSelected && (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
                                              vg-update-time="updateTime($currentTime, $duration)"
                                              vg-player-ready="playerReady($API)"
                                              vg-src="acitveVideoSource">

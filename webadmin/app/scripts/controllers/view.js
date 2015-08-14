@@ -197,6 +197,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
             $scope.cameraId = cameraId || $scope.cameraId;
+            $scope.positionSelected = !!position;
             if(position){
                 position = parseInt(position);
             }
@@ -506,7 +507,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         var timer = false;
         function reloader(){
             reloadTree().then(function(){
-                $scope.selectCameraById($scope.cameraId,$location.search().time || false, !firstTime);
+                $scope.selectCameraById($scope.cameraId, firstTime && $location.search().time || false, !firstTime);
                 firstTime = false;
                 timer = $timeout(reloader, reloadInterval);
             },function(error){
