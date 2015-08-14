@@ -239,7 +239,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                     if(!play){
                         $timeout(function(){
                             $scope.positionProvider.liveMode = false; // Do it async
-                        },50);
+                        });
                     }
                 }
             }
@@ -341,7 +341,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                     camera.url = extractDomain(camera.url);
                     camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
                     camera.server = getServer(camera.parentId);
-                    if(camera.server.status == 'Offline'){
+                    if(camera.server && camera.server.status == 'Offline'){
                         camera.status = 'Offline';
                     }
 

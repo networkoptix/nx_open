@@ -22,6 +22,7 @@ angular.module('webadminApp')
                     minMsPerPixel: 1, // Minimum level for zooming:
 
                     zoomSpeed: 0.025, // Zoom speed for dblclick
+                    zoomAccuracy: 0.00001,
                     slowZoomSpeed: 0.01, // Zoom speed for holding buttons
                     maxVerticalScrollForZoom: 250, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
@@ -267,7 +268,7 @@ angular.module('webadminApp')
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
                 var canvas = element.find('canvas').get(0);
-                scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100, timelineConfig.stickToLiveMs); //Init boundariesProvider
+                scope.scaleManager = new ScaleManager( timelineConfig.minMsPerPixel,timelineConfig.maxMsPerPixel, timelineConfig.initialInterval, 100, timelineConfig.stickToLiveMs, timelineConfig.zoomAccuracy); //Init boundariesProvider
 
                 // !!! Initialization functions
                 function updateTimelineHeight(){
@@ -306,8 +307,7 @@ angular.module('webadminApp')
                     drawTimeMarker(context);
                     drawPointerMarker(context);
 
-
-                    //debugEvents(context);//DOTO: remove debug here
+                    //debugEvents(context);
                 }
 
                 function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
@@ -921,6 +921,7 @@ angular.module('webadminApp')
                                 zoomTarget = scope.scaleManager.zoom();
                             }
                             zoomTarget -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
+                            zoomTarget = scope.scaleManager.boundZoom(zoomTarget);
                         }
                         scope.zoomTo(zoomTarget, scope.scaleManager.screenCoordinateToDate(mouseCoordinate),window.jscd.touch);
                     } else {
@@ -1114,23 +1115,15 @@ angular.module('webadminApp')
                 }
 
 
+                function checkZoomButtons(){
+                    var zoomTarget = scope.scaleManager.zoom();
+                    scope.disableZoomOut = zoomTarget >= scope.scaleManager.fullZoomOutValue();
+                    scope.disableZoomIn = zoomTarget <= scope.scaleManager.fullZoomInValue();
+                }
                 scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 
-                    var maxZoom = scope.scaleManager.fullZoomOutValue();
-                    if(zoomTarget >= maxZoom ) {
-                        zoomTarget = maxZoom;
-                        scope.disableZoomOut = true;
-                    }else{
-                        scope.disableZoomOut = false;
-                    }
+                    zoomTarget = scope.scaleManager.boundZoom(zoomTarget);
 
-                    var minZoom = scope.scaleManager.fullZoomInValue();
-                    if(zoomTarget <= minZoom ) {
-                        zoomTarget = minZoom;
-                        scope.disableZoomIn = true;
-                    }else{
-                        scope.disableZoomIn = false;
-                    }
 
                     //Find final levels for this zoom and run animation:
                     var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);
@@ -1159,6 +1152,7 @@ angular.module('webadminApp')
                         } else {
                             scope.scaleManager.zoom(value);
                         }
+                        $timeout(checkZoomButtons);
                         delayWatchingPlayingPosition();
                     }
 
@@ -1212,9 +1206,6 @@ angular.module('webadminApp')
 
                 // !!! Subscribe for different events which affect timeline
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
-
-
-
 
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
