@@ -82,8 +82,9 @@ namespace attrs
     }
 }
 
-Message::Message( Header header_ )
+Message::Message( Header header_, AttributesMap attributes_ )
     : header( std::move(header_) )
+    , attributes( std::move(attributes_) )
 {
 }
 

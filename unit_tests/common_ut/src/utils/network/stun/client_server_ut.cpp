@@ -16,69 +16,83 @@ class StunClientServerTest
         : public ::testing::Test
 {
 protected:
-    typedef MultiAddressServer< SocketServer > Server;
+    static quint16 newPort()
+    {
+        static quint16 port = 3345;
+        return ++port; // to avoid possible address overlap
+    }
 
     StunClientServerTest()
-        // qrand() is used to avoid possible address overlap
-        : address( lit( "127.0.0.1"), 3345 + (qrand() % 100) )
+        : address( lit( "127.0.0.1"), newPort() )
         , client( address )
     {
     }
 
-    std::unique_ptr< Server > makeServer()
+    void startServer()
     {
-        auto server = std::make_unique< Server >(
-                    std::list< SocketAddress >( 1, address ),
+        server = std::make_unique< SocketServer >(
                     false, SocketFactory::nttAuto );
 
-        EXPECT_TRUE( server->bind() );
+        EXPECT_TRUE( server->bind( address ) );
         EXPECT_TRUE( server->listen() );
+    }
 
-        return std::move(server);
+    void stopServer()
+    {
+        server.reset();
+    }
+
+    void injectIndication( Header indication )
+    {
+        server->foreachConnection( [ & ]( ServerConnection* connection  )
+        {
+            connection->sendMessage( Message( indication ) );
+        } );
     }
 
     const SocketAddress address;
     AsyncClient client;
+    std::unique_ptr< SocketServer > server;
 };
 
 TEST_F( StunClientServerTest, Connectivity )
 {
     SyncQueue< SystemError::ErrorCode > connected;
     SyncQueue< SystemError::ErrorCode > disconnected;
-    SyncQueue< Message > indication;
+    SyncQueue< Message > indicated;
 
     // 1. try to connect with no server
     ASSERT_TRUE( client.openConnection(
-        connected.pusher(), indication.pusher(), disconnected.pusher() ) );
+        connected.pusher(), indicated.pusher(), disconnected.pusher() ) );
 
     ASSERT_EQ( connected.pop(), SystemError::connectionRefused );
     EXPECT_TRUE( connected.isEmpty() );
-    EXPECT_TRUE( indication.isEmpty() );
+    EXPECT_TRUE( indicated.isEmpty() );
     EXPECT_TRUE( disconnected.isEmpty() );
 
     // 2. connect to normal server
-    auto server = makeServer();
+    startServer();
 
     ASSERT_TRUE( client.openConnection(
-        connected.pusher(), indication.pusher(), disconnected.pusher() ) );
+        connected.pusher(), indicated.pusher(), disconnected.pusher() ) );
 
     ASSERT_EQ( connected.pop(), SystemError::noError );
     EXPECT_TRUE( connected.isEmpty() );
-    EXPECT_TRUE( indication.isEmpty() );
+    EXPECT_TRUE( indicated.isEmpty() );
     EXPECT_TRUE( disconnected.isEmpty() );
 
     // 3. remove server and see what's gonna happen
-    server.reset();
+    stopServer();
 
     ASSERT_EQ( disconnected.pop(), SystemError::connectionReset );
     EXPECT_TRUE( connected.isEmpty() );
-    EXPECT_TRUE( indication.isEmpty() );
+    EXPECT_TRUE( indicated.isEmpty() );
     EXPECT_TRUE( disconnected.isEmpty() );
 }
 
 TEST_F( StunClientServerTest, RequestResponse )
 {
-    const auto server = makeServer();
+    startServer();
     {
         Message request( Header( MessageClass::request, MethodType::BINDING ) );
 
@@ -119,7 +133,26 @@ TEST_F( StunClientServerTest, RequestResponse )
 
 TEST_F( StunClientServerTest, Indication )
 {
-    // TODO
+    SyncQueue< SystemError::ErrorCode > connected;
+    SyncQueue< SystemError::ErrorCode > disconnected;
+    SyncQueue< Message > indicated;
+
+    startServer();
+    ASSERT_TRUE( client.openConnection(
+        connected.pusher(), indicated.pusher(), disconnected.pusher() ) );
+    ASSERT_EQ( connected.pop(), SystemError::noError );
+
+    injectIndication( Header( MessageClass::indication, 0x777 ) );
+    const auto indication = indicated.pop();
+    EXPECT_EQ( indication.header.messageClass, MessageClass::indication );
+    EXPECT_EQ( indication.header.method, 0x777 );
+
+    stopServer();
+    ASSERT_EQ( disconnected.pop(), SystemError::connectionReset );
+
+    EXPECT_TRUE( connected.isEmpty() );
+    EXPECT_TRUE( indicated.isEmpty() );
+    EXPECT_TRUE( disconnected.isEmpty() );
 }
 
 } // namespace test

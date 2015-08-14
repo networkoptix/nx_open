@@ -227,7 +227,8 @@ public:
     Header header;
     AttributesMap attributes;
 
-    explicit Message( Header header = Header() );
+    explicit Message( Header header_ = Header(),
+                      AttributesMap attributes_ = AttributesMap() );
 
     Message( Message&& message );
     Message& operator = ( Message&& message );
