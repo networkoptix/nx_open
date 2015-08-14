@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q) {
+    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q,$sessionStorage) {
 
         $scope.playerApi = false;
         $scope.cameras = {};
@@ -618,13 +618,17 @@ angular.module('webadminApp').controller('ViewCtrl',
         setTimeout(updateHeights,50);
         $window.resize(updateHeights);
 
+
+
+        $scope.session = $sessionStorage;
+
         $scope.mobileAppAlertClose = function(){
-            $scope.mobileAppNotified  = true;
+            $scope.session.mobileAppNotified  = true;
             setTimeout(updateHeights,50);
         };
 
         $scope.ieNoWebmAlertClose = function(){
-            $scope.ieNoWebmNotified = true;
+            $scope.session.ieNoWebmNotified = true;
             setTimeout(updateHeights,50);
         };
 

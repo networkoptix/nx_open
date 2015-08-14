@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('NavigationCtrl', function ($scope, $location, mediaserver, ipCookie) {
+    .controller('NavigationCtrl', function ($scope, $location, mediaserver, ipCookie, $sessionStorage) {
         $scope.user = {
             isAdmin: true
         };
@@ -35,9 +35,11 @@ angular.module('webadminApp')
         };
 
         $scope.webclientEnabled = Config.webclientEnabled;
-        $scope.alertVisible = !$scope.isActive("/view");
+        $scope.alertVisible = true;
+
+        $scope.session = $sessionStorage;
 
         $scope.closeAlert = function(){
-            $scope.alertVisible = false;
+            $scope.session.serverInfoAlertHidden = true;
         }
     });
