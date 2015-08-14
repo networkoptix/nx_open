@@ -1117,8 +1117,8 @@ angular.module('webadminApp')
 
                 function checkZoomButtons(){
                     var zoomTarget = scope.scaleManager.zoom();
-                    scope.disableZoomOut = zoomTarget >= scope.scaleManager.fullZoomOutValue();
-                    scope.disableZoomIn = zoomTarget <= scope.scaleManager.fullZoomInValue();
+                    scope.disableZoomOut = zoomTarget >= scope.scaleManager.fullZoomOutValue() - timelineConfig.zoomAccuracy;
+                    scope.disableZoomIn = zoomTarget <= scope.scaleManager.fullZoomInValue() + timelineConfig.zoomAccuracy;
                 }
                 scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 

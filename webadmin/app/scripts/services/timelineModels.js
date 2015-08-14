@@ -793,7 +793,7 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
     this.end = end;
-    var needZoomOut = this.zoom() == this.fullZoomOutValue();
+    var needZoomOut =  this.fullZoomOutValue() - this.zoom() < this.zoomAccuracy;
     this.updateTotalInterval();
     if(needZoomOut){
         this.zoom(1);
@@ -1080,6 +1080,7 @@ ScaleManager.prototype.msToZoom = function(ms){
 
 
 ScaleManager.prototype.targetLevels = function(zoomTarget){
+    zoomTarget = this.boundZoom(zoomTarget);
     var msPerPixel = this.zoomToMs(zoomTarget);
     return this.calcLevels(msPerPixel);
 };
