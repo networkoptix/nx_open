@@ -39,6 +39,27 @@ public:
     {
     }
 
+    void addTaskNonSafe(
+        const quint64 timerID,
+        std::function<void( quint64 )> taskHandler,
+        const unsigned int delayMillis )
+    {
+        const qint64 taskTime = QDateTime::currentMSecsSinceEpoch() + delayMillis;
+
+        if( !timeToTask.insert( make_pair(
+                make_pair( taskTime, timerID ),
+                taskHandler ) ).second )
+        {
+            //ASSERT( false );
+        }
+        if( !taskToTime.insert( make_pair( timerID, taskTime ) ).second )
+        {
+            //ASSERT( false );
+        }
+
+        cond.wakeOne();
+    }
+
     void deleteTaskNonSafe( const quint64 timerID )
     {
         const map<quint64, qint64>::iterator it = taskToTime.find( timerID );
@@ -97,25 +118,33 @@ quint64 TimerManager::addTimer(
 
     QMutexLocker lk( &m_impl->mtx );
 
-    const qint64 taskTime = QDateTime::currentMSecsSinceEpoch() + delay;
     quint64 timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
     if( timerID == 0 )
-        lastTaskID.fetchAndAddOrdered(1);     //0 is a reserved value
-
-    if( !m_impl->timeToTask.insert( make_pair(
-            make_pair( taskTime, timerID ),
-            taskHandler ) ).second )
-    {
-        //ASSERT( false );
-    }
-    if( !m_impl->taskToTime.insert( make_pair( timerID, taskTime ) ).second )
-    {
-        //ASSERT( false );
-    }
-
-    m_impl->cond.wakeOne();
+        timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
+    m_impl->addTaskNonSafe( timerID, taskHandler, delay );
 
     return timerID;
+}
+
+bool TimerManager::modifyTimerDelay(
+    quint64 timerID,
+    const unsigned int newDelayMillis )
+{
+    QMutexLocker lk( &m_impl->mtx );
+    if( m_impl->runningTaskID == timerID )
+        return false; //timer being executed at the moment
+
+    //fetching handler
+    auto taskIter = m_impl->taskToTime.find( timerID );
+    if( taskIter == m_impl->taskToTime.end() )
+        return false;   //no timer with requested id
+    auto handlerIter = m_impl->timeToTask.find( std::make_pair( taskIter->second, timerID ) );
+    assert( handlerIter != m_impl->timeToTask.end() );
+    auto taskHandler = std::move(handlerIter->second);
+
+    m_impl->deleteTaskNonSafe( timerID );
+    m_impl->addTaskNonSafe( timerID, taskHandler, newDelayMillis );
+    return true;
 }
 
 void TimerManager::deleteTimer( const quint64& timerID )
@@ -204,4 +233,79 @@ void TimerManager::run()
     }
 
     NX_LOG( lit("TimerManager stopped"), cl_logDEBUG1 );
+}
+
+
+
+
+TimerManager::TimerGuard::TimerGuard()
+:
+    m_timerID( 0 )
+{
+}
+
+TimerManager::TimerGuard::TimerGuard( quint64 timerID )
+:
+    m_timerID( timerID )
+{
+}
+
+TimerManager::TimerGuard::TimerGuard( TimerGuard&& right )
+:
+    m_timerID( right.m_timerID )
+{
+    right.m_timerID = 0;
+}
+
+TimerManager::TimerGuard::~TimerGuard()
+{
+    reset();
+}
+
+TimerManager::TimerGuard& TimerManager::TimerGuard::operator=( TimerManager::TimerGuard&& right )
+{
+    if( &right == this )
+        return *this;
+
+    reset();
+
+    m_timerID = right.m_timerID;
+    right.m_timerID = 0;
+    return *this;
+}
+
+//!Cancels timer and blocks until running handler returns
+void TimerManager::TimerGuard::reset()
+{
+    if( !m_timerID )
+        return;
+    TimerManager::instance()->joinAndDeleteTimer( m_timerID );
+    m_timerID = 0;
+}
+
+quint64 TimerManager::TimerGuard::get() const
+{
+    return m_timerID;
+}
+
+quint64 TimerManager::TimerGuard::release()
+{
+    const auto result = m_timerID;
+    m_timerID = 0;
+    return result;
+}
+
+TimerManager::TimerGuard::operator bool_type() const
+{
+    return m_timerID ? &TimerGuard::this_type_does_not_support_comparisons : 0;
+}
+
+bool TimerManager::TimerGuard::operator==( const TimerManager::TimerGuard& right ) const
+{
+    return m_timerID == right.m_timerID;
+}
+
+bool TimerManager::TimerGuard::operator!=( const TimerManager::TimerGuard& right ) const
+{
+    return m_timerID != right.m_timerID;
 }
