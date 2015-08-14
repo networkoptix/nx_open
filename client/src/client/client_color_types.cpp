@@ -80,6 +80,10 @@ QnStatisticsColors::QnStatisticsColors() {
         << QColor(255, 52, 132);
 }
 
+QnIoModuleColors::QnIoModuleColors() {
+    idLabel = QColor(0x57, 0x57, 0x57);
+}
+
 QnScheduleGridColors::QnScheduleGridColors() {
     normalLabel =   QColor(255, 255, 255, 255);
     weekendLabel =  QColor(255, 128, 128, 255);
