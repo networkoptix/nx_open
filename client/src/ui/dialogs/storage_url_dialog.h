@@ -43,6 +43,8 @@ private:
     static ProtocolDescription protocolDescription(const QString &protocol);
 
     QString makeUrl(const QString& path, const QString& login, const QString& password);
+    bool storageAlreadyUsed(const QString &path) const;
+
 private slots:
     void updateComboBox();
 
