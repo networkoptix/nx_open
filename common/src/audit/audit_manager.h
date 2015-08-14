@@ -39,8 +39,8 @@ public:
     bool enabled() const;
     QnTimePeriod playbackRange(const AuditHandle& handle) const;
 public slots:
-    void at_connectionOpened(const QnAuthSession &data);
-    void at_connectionClosed(const QnAuthSession &data);
+    void at_connectionOpened(const QnAuthSession &session);
+    void at_connectionClosed(const QnAuthSession &session);
 private slots:
     void setEnabled(bool value);
 protected:
@@ -48,8 +48,8 @@ protected:
     virtual int updateAuditRecordInternal(int internalId, const QnAuditRecord& record) = 0;
 private slots:
     void at_timer();
-protected:
 private:
+    int registerNewConnection(const QnAuthSession &data, bool explicitCall);
 
     struct AuditConnection
     {
@@ -97,10 +97,10 @@ private:
     mutable QMutex m_mutex;
     QTimer m_timer;
     std::atomic<bool> m_enabled;
-
+    QElapsedTimer m_sessionCleanupTimer;
 private:
     bool canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right);
-    
+    void cleanupExpiredSessions();
     template <class T>
     void processDelayedRecords(QVector<T>& recordsToAggregate); // group and write to DB playback records
 };

@@ -331,6 +331,7 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     if (!videowallGuid.isNull())
         extraHeaders.insert(QString::fromLatin1(Qn::VIDEOWALL_GUID_HEADER_NAME), videowallGuid.toString());
     extraHeaders.insert(QString::fromLatin1(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
+    extraHeaders.insert(QString::fromLatin1("User-Agent"), QString::fromLatin1(nx_http::userAgentString()));
     setExtraHeaders(extraHeaders);
 }
 

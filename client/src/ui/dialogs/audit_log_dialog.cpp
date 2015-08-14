@@ -347,13 +347,16 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
 
 QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRecordRefList& checkedRows)
 {
-    QSet<QnUuid> selectedSessions;
+    QMap<QnUuid, int> selectedSessions;
     for (const QnAuditRecord* record: checkedRows) 
-        selectedSessions << record->authSession.id;
+        selectedSessions.insert(record->authSession.id, record->rangeStartSec);
 
     QnAuditRecordRefList result;
     auto filter = [&selectedSessions] (const QnAuditRecord* record) {
-        return selectedSessions.contains(record->authSession.id);
+        if (record->eventType == Qn::AR_Login)
+            return selectedSessions.value(record->authSession.id) == record->rangeStartSec; // hide duplicate login from difference servers
+        else
+            return selectedSessions.contains(record->authSession.id);
     };
     std::copy_if(m_filteredData.begin(), m_filteredData.end(), std::back_inserter(result), filter);
     return result;
@@ -1051,13 +1054,26 @@ void QnAuditLogDialog::makeSessionData()
 {
     m_sessionData.clear();
     QMap<QnUuid, int> activityPerSession;
+    QMap<QnUuid, QnAuditRecord> processedLogins;
     for (const QnAuditRecord& record: m_allData)
     {
-        if (record.isLoginType())
-            m_sessionData << record;
+        if (record.isLoginType()) 
+        {
+            auto itr = processedLogins.find(record.authSession.id);
+            if (itr == processedLogins.end())
+                processedLogins.insert(record.authSession.id, record);
+            else {
+                // group sessions because of different servers may have same session
+                QnAuditRecord& existRecord = itr.value();
+                existRecord.rangeStartSec = qMin(existRecord.rangeStartSec, record.rangeStartSec);
+                existRecord.rangeEndSec = qMax(existRecord.rangeEndSec, record.rangeEndSec);
+            }
+        }
         activityPerSession[record.authSession.id]++;
     }
-
+    m_sessionData.reserve(processedLogins.size());
+    for (auto& value: processedLogins)
+        m_sessionData.push_back(std::move(value));
     for (QnAuditRecord& record: m_sessionData)
         record.addParam("childCnt", QByteArray::number(activityPerSession.value(record.authSession.id)));
 }
