@@ -1,5 +1,5 @@
-#include "camera_management_widget.h"
-#include "ui_camera_management_widget.h"
+#include "system_settings_widget.h"
+#include "ui_system_settings_widget.h"
 
 #include <api/global_settings.h>
 
@@ -14,9 +14,9 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
 
-QnCameraManagementWidget::QnCameraManagementWidget(QWidget *parent):
+QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     QnAbstractPreferencesWidget(parent),
-    ui(new Ui::CameraManagementWidget)
+    ui(new Ui::SystemSettingsWidget)
 {
     ui->setupUi(this);
 
@@ -29,10 +29,10 @@ QnCameraManagementWidget::QnCameraManagementWidget(QWidget *parent):
     });
 }
 
-QnCameraManagementWidget::~QnCameraManagementWidget() {
+QnSystemSettingsWidget::~QnSystemSettingsWidget() {
 }
 
-void QnCameraManagementWidget::updateFromSettings() {
+void QnSystemSettingsWidget::updateFromSettings() {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
 
     QSet<QString> disabledVendors = settings->disabledVendorsSet();
@@ -48,7 +48,7 @@ void QnCameraManagementWidget::updateFromSettings() {
     ui->statisticsReportCheckBox->setChecked(ec2::Ec2StaticticsReporter::isAllowed(qnResPool->getResources<QnMediaServerResource>()));
 }
 
-void QnCameraManagementWidget::submitToSettings() {
+void QnSystemSettingsWidget::submitToSettings() {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
     
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked) {
@@ -72,7 +72,7 @@ void QnCameraManagementWidget::submitToSettings() {
     }
 }
 
-bool QnCameraManagementWidget::hasChanges() const  {
+bool QnSystemSettingsWidget::hasChanges() const  {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
 
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked
