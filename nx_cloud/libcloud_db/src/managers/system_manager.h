@@ -11,9 +11,10 @@
 #include <string>
 #include <vector>
 
+#include <utils/db/db_manager.h>
+
 #include "access_control/types.h"
 #include "data/system_data.h"
-#include "db/db_manager.h"
 #include "data_event.h"
 #include "types.h"
 
@@ -40,10 +41,6 @@ typedef DataInsertUpdateEvent<data::SystemData> SystemInsertUpdateEvent;
 
 
 
-namespace db {
-    class DBManager;
-}
-
 
 /*!
     Provides methods for manipulating system data on persisent storage.
@@ -53,7 +50,7 @@ namespace db {
 class SystemManager
 {
 public:
-    SystemManager( db::DBManager* const dbManager );
+    SystemManager( nx::db::DBManager* const dbManager );
 
     //!Binds system to an account associated with \a authzInfo
     void bindSystemToAccount(
@@ -100,13 +97,13 @@ public:
     void unregisterNotificationReceiver( int receiverID );
 
 private:
-    db::DBManager* const m_dbManager;
+    nx::db::DBManager* const m_dbManager;
 
-    db::DBResult insertSystemToDB(
+    nx::db::DBResult insertSystemToDB(
         QSqlDatabase* const tran,
         const data::SystemData& newSystem );
     void systemAdded(
-        db::DBResult resultCode,
+        nx::db::DBResult resultCode,
         data::SystemData systemData,
         std::function<void(ResultCode)> completionHandler );
 };

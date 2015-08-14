@@ -14,20 +14,33 @@
 #include <utils/db/db_helper.h>
 
 #include "db_manager.h"
-#include "structure_update_statements.h"
 
 
 namespace nx {
-namespace cdb {
 namespace db {
+
+static const char createDbVersionTable[] = 
+"                                                   \
+CREATE TABLE db_version_data (                      \
+    db_version      integer NOT NULL DEFAULT 0      \
+);                                                  \
+\n                                                  \
+INSERT INTO db_version_data ( db_version )          \
+                   VALUES ( 0 );                    \
+";
+
 
 
 DBStructureUpdater::DBStructureUpdater( DBManager* const dbManager )
 :
     m_dbManager( dbManager )
 {
-    m_updateScripts.push_back( createDbVersionTables );
-    m_updateScripts.push_back( createAccountData );
+    m_updateScripts.push_back( createDbVersionTable );
+}
+
+void DBStructureUpdater::addUpdateScript( const QByteArray& updateScript )
+{
+    m_updateScripts.push_back( updateScript );
 }
 
 bool DBStructureUpdater::updateStructSync()
@@ -51,11 +64,11 @@ DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection 
 {
     //reading current DB version
     QSqlQuery fetchDbVersionQuery( *dbConnection );
-    fetchDbVersionQuery.prepare( "SELECT db_version FROM internal_data" );
+    fetchDbVersionQuery.prepare( lit("SELECT db_version FROM db_version_data") );
     size_t dbVersion = 0;
-    //absense of table internal_data is normal: DB is just empty
+    //absense of table db_version_data is normal: DB is just empty
     if( fetchDbVersionQuery.exec() && fetchDbVersionQuery.next() )
-        dbVersion = fetchDbVersionQuery.value("db_version").toUInt();
+        dbVersion = fetchDbVersionQuery.value(lit("db_version")).toUInt();
 
     //applying scripts missing in current DB
     for( ;
@@ -72,11 +85,10 @@ DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection 
 
     //updating db version
     QSqlQuery updateDbVersion( *dbConnection );
-    updateDbVersion.prepare( "UPDATE internal_data SET db_version = :dbVersion" );
-    updateDbVersion.bindValue( ":dbVersion", dbVersion );
+    updateDbVersion.prepare( lit("UPDATE db_version_data SET db_version = :dbVersion") );
+    updateDbVersion.bindValue( lit(":dbVersion"), dbVersion );
     return updateDbVersion.exec() ? DBResult::ok : DBResult::ioError;
 }
 
 }   //db
-}   //cdb
 }   //nx

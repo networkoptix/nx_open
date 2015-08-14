@@ -7,13 +7,12 @@
 
 #include "access_control/authorization_manager.h"
 #include "data/cdb_ns.h"
-#include "db/db_manager.h"
 
 
 namespace nx {
 namespace cdb {
 
-SystemManager::SystemManager( db::DBManager* const dbManager )
+SystemManager::SystemManager( nx::db::DBManager* const dbManager )
 :
     m_dbManager( dbManager )
 {
@@ -70,7 +69,7 @@ void SystemManager::getSystems(
     }
 }
 
-db::DBResult SystemManager::insertSystemToDB(
+nx::db::DBResult SystemManager::insertSystemToDB(
     QSqlDatabase* const tran,
     const data::SystemData& newSystem )
 {
@@ -80,20 +79,23 @@ db::DBResult SystemManager::insertSystemToDB(
     //TODO #ak sql: fetching transaction id
     TransactionSequence transactionID = 0;
 
-    return db::DBResult::ok;
+    return nx::db::DBResult::ok;
 }
 
 void SystemManager::systemAdded(
-    db::DBResult dbResult,
+    nx::db::DBResult dbResult,
     data::SystemData systemData,
     std::function<void(ResultCode)> completionHandler )
 {
-    if( dbResult == db::DBResult::ok )
+    if( dbResult == nx::db::DBResult::ok )
     {
         //TODO #ak updating account cache
         //m_cache.recordModified( transactionID, newSystem.id, newSystem );
     }
-    completionHandler( dbResult == db::DBResult::ok ? ResultCode::ok : ResultCode::dbError );
+    completionHandler(
+        dbResult == nx::db::DBResult::ok
+            ? ResultCode::ok
+            : ResultCode::dbError );
 }
 
 }   //cdb

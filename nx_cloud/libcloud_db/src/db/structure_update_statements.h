@@ -12,17 +12,6 @@ namespace cdb {
 namespace db {
 
 
-static const char createDbVersionTables[] = 
-"                                                   \
-CREATE TABLE internal_data (                        \
-    db_version      integer NOT NULL DEFAULT 0      \
-);                                                  \
-\n                                                  \
-INSERT INTO internal_data ( db_version )            \
-                   VALUES ( 0 );                    \
-";
-
-
 //!Account table
 static const char createAccountData[] =
 "                                                                   \

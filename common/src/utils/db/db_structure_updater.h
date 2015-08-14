@@ -17,7 +17,6 @@
 class QSqlDatabase;
 
 namespace nx {
-namespace cdb {
 namespace db {
 
 class DBManager;
@@ -31,18 +30,19 @@ class DBStructureUpdater
 public:
     DBStructureUpdater( DBManager* const );
 
+    void addUpdateScript( const QByteArray& updateScript );
+
     bool updateStructSync();
 
 private:
     DBManager* const m_dbManager;
-    std::vector<const char*> m_updateScripts;
+    std::vector<QByteArray> m_updateScripts;
     std::promise<DBResult> m_dbUpdatePromise;
 
     DBResult updateDbInternal( QSqlDatabase* const dbConnection );
 };
 
 }   //db
-}   //cdb
 }   //nx
 
 #endif  //DB_STRUCTURE_UPDATER_H

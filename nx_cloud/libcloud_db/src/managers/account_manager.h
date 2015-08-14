@@ -10,9 +10,10 @@
 #include <string>
 #include <vector>
 
+#include <utils/db/db_manager.h>
+
 #include "access_control/types.h"
 #include "data/account_data.h"
-#include "db/db_manager.h"
 #include "types.h"
 
 
@@ -44,7 +45,7 @@ class AccountManager
 public:
     AccountManager(
         const conf::Settings& settings,
-        db::DBManager* const dbManager,
+        nx::db::DBManager* const dbManager,
         EMailManager* const emailManager );
 
     //!Adds account in "not activated" state and sends verification email to the email address provided
@@ -65,16 +66,16 @@ public:
     
 private:
     const conf::Settings& m_settings;
-    db::DBManager* const m_dbManager;
+    nx::db::DBManager* const m_dbManager;
     EMailManager* const m_emailManager;
     Cache<QnUuid, data::AccountData> m_cache;
 
-    db::DBResult insertAccount(
+    nx::db::DBResult insertAccount(
         QSqlDatabase* const tran,
         const data::AccountData& accountData,
         data::EmailVerificationCode* const resultData );
     void accountAdded(
-        db::DBResult resultCode,
+        nx::db::DBResult resultCode,
         data::AccountData accountData,
         data::EmailVerificationCode resultData,
         std::function<void(ResultCode)> completionHandler );

@@ -11,9 +11,8 @@
 #include <QtCore/QSettings>
 
 #include <utils/common/command_line_parser.h>
+#include <utils/db/types.h>
 #include <utils/network/socket_common.h>
-
-#include "db/types.h"
 
 
 namespace nx {

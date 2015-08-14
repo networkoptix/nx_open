@@ -12,6 +12,7 @@
 #include <qtservice.h>
 
 #include <utils/common/stoppable.h>
+#include <utils/db/db_manager.h>
 #include <utils/network/connection_server/multi_address_server.h>
 #include <utils/network/http/server/http_stream_socket_server.h>
 
@@ -57,6 +58,7 @@ private:
         nx_http::MessageDispatcher* const msgDispatcher,
         AccountManager* const accountManager,
         SystemManager* const systemManager );
+    bool updateDB( nx::db::DBManager* const dbManager );
 };
 
 }   //cdb

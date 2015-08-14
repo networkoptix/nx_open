@@ -32,7 +32,7 @@ static const int UNCONFIRMED_ACCOUNT_EXPIRATION_SEC = 3*24*60*60;
 
 AccountManager::AccountManager(
     const conf::Settings& settings,
-    db::DBManager* const dbManager,
+    nx::db::DBManager* const dbManager,
     EMailManager* const emailManager )
 :
     m_settings( settings ),

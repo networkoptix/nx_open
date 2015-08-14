@@ -16,12 +16,13 @@
 #include <utils/common/cpp14.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
+#include <utils/db/db_structure_updater.h>
 #include <utils/network/aio/aioservice.h>
 #include <utils/network/http/server/http_message_dispatcher.h>
 #include <utils/network/http/server/server_managers.h>
 
 #include "access_control/authentication_manager.h"
-#include "db/db_manager.h"
+#include "db/structure_update_statements.h"
 #include "http_handlers/add_account_handler.h"
 #include "managers/account_manager.h"
 #include "managers/email_manager.h"
@@ -70,13 +71,19 @@ int CloudDBProcess::executeApplication()
         return 1;
     }
 
-    db::DBManager dbManager( settings.dbConnectionOptions() );
+    nx::db::DBManager dbManager( settings.dbConnectionOptions() );
     for( ;; )
     {
         if( dbManager.init() )
             break;
         NX_LOG( lit("Cannot start application due to DB connect error"), cl_logALWAYS );
         std::this_thread::sleep_for( std::chrono::seconds( DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC ) );
+    }
+
+    if( !updateDB( &dbManager ) )
+    {
+        NX_LOG( "Could not update DB to current vesion", cl_logALWAYS );
+        return 2;
     }
 
     EMailManager emailManager( settings );
@@ -178,6 +185,14 @@ void CloudDBProcess::registerApiHandlers(
         [accountManager]() -> cdb::AddAccountHttpHandler* {
             return new cdb::AddAccountHttpHandler( accountManager );
         } );
+}
+
+bool CloudDBProcess::updateDB( nx::db::DBManager* const dbManager )
+{
+    //updating DB structure to actual state
+    nx::db::DBStructureUpdater dbStructureUpdater( dbManager );
+    dbStructureUpdater.addUpdateScript( db::createAccountData );
+    return dbStructureUpdater.updateStructSync();
 }
 
 }   //cdb

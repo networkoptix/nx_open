@@ -9,11 +9,8 @@
 
 #include <utils/common/log.h>
 
-#include "db_structure_updater.h"
-
 
 namespace nx {
-namespace cdb {
 namespace db {
 
 
@@ -32,12 +29,7 @@ DBManager::~DBManager()
 
 bool DBManager::init()
 {
-    if( !openOneMoreConnectionIfNeeded() )
-        return false;
-
-    //updating DB structure to actual state
-    DBStructureUpdater dbStructureUpdater( this );
-    return dbStructureUpdater.updateStructSync();
+    return openOneMoreConnectionIfNeeded();
 }
 
 bool DBManager::openOneMoreConnectionIfNeeded()
@@ -76,5 +68,4 @@ bool DBManager::openOneMoreConnectionIfNeeded()
 
 
 }   //db
-}   //cdb
 }   //nx

@@ -12,7 +12,6 @@
 
 
 namespace nx {
-namespace cdb {
 namespace db {
 
 
@@ -73,5 +72,4 @@ void DbRequestExecutionThread::run()
 
 
 }   //db
-}   //cdb
 }   //nx
