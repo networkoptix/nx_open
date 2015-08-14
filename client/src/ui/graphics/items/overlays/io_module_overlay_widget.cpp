@@ -40,15 +40,22 @@ namespace {
             return m_isOn;
         }
 
-        void setOn(bool f) {
-            if (f == m_isOn)
+        void setOn(bool on) {
+            if (on == m_isOn)
                 return;
 
-            m_isOn = f;
+            m_isOn = on;
             setPixmap(m_isOn ? m_onPixmap : m_offPixmap);
         }
     };
 
+    void clearLayout(QGraphicsLayout *layout) {
+        while (layout->count() > 0) {
+            QGraphicsLayoutItem *item = layout->itemAt(0);
+            layout->removeAt(0);
+            delete item;
+        }
+    }
 }
 
 class QnIoModuleOverlayWidgetPrivate : public Connective<QObject> {
@@ -111,11 +118,26 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlay
 {
     widget->setAutoFillBackground(true);
 
+    inputsLayout = new QGraphicsGridLayout();
+    inputsLayout->setColumnAlignment(0, Qt::AlignRight);
+    inputsLayout->setColumnAlignment(1, Qt::AlignCenter);
+    inputsLayout->setColumnAlignment(2, Qt::AlignLeft);
+    inputsLayout->setColumnStretchFactor(2, 1);
+
+    outputsLayout = new QGraphicsGridLayout();
+    outputsLayout->setColumnAlignment(0, Qt::AlignRight);
+    outputsLayout->setColumnAlignment(1, Qt::AlignCenter);
+    outputsLayout->setColumnAlignment(2, Qt::AlignLeft);
+    outputsLayout->setColumnStretchFactor(2, 1);
+
     leftLayout = new QGraphicsLinearLayout();
     leftLayout->setOrientation(Qt::Vertical);
+    leftLayout->addItem(inputsLayout);
     leftLayout->addStretch();
+
     rightLayout = new QGraphicsLinearLayout();
     rightLayout->setOrientation(Qt::Vertical);
+    rightLayout->addItem(outputsLayout);
     rightLayout->addStretch();
 
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout();
@@ -199,6 +221,7 @@ void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::M
         outputsLayout->setRowAlignment(row, Qt::AlignCenter);
     } else {
         int row = inputsLayout->rowCount();
+
         GraphicsLabel *descriptionLabel = new GraphicsLabel(data->ioConfigData.inputName, q);
         descriptionLabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
         descriptionLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
@@ -212,43 +235,8 @@ void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::M
 }
 
 void QnIoModuleOverlayWidgetPrivate::updateControls() {
-    if (inputsLayout) {
-        leftLayout->removeItem(inputsLayout);
-
-        while (inputsLayout->count() > 0) {
-            QGraphicsLayoutItem *item = inputsLayout->itemAt(0);
-            inputsLayout->removeAt(0);
-            delete item;
-        }
-
-        delete inputsLayout;
-    }
-
-    if (outputsLayout) {
-        rightLayout->removeItem(outputsLayout);
-
-        while (outputsLayout->count() > 0) {
-            QGraphicsLayoutItem *item = outputsLayout->itemAt(0);
-            outputsLayout->removeAt(0);
-            delete item;
-        }
-
-        delete outputsLayout;
-    }
-
-    inputsLayout = new QGraphicsGridLayout();
-    inputsLayout->setColumnAlignment(0, Qt::AlignRight);
-    inputsLayout->setColumnAlignment(1, Qt::AlignCenter);
-    inputsLayout->setColumnAlignment(2, Qt::AlignLeft);
-    inputsLayout->setColumnStretchFactor(2, 1);
-    leftLayout->insertItem(0, inputsLayout);
-
-    outputsLayout = new QGraphicsGridLayout();
-    outputsLayout->setColumnAlignment(0, Qt::AlignRight);
-    outputsLayout->setColumnAlignment(1, Qt::AlignCenter);
-    outputsLayout->setColumnAlignment(2, Qt::AlignLeft);
-    outputsLayout->setColumnStretchFactor(2, 1);
-    rightLayout->insertItem(0, outputsLayout);
+    clearLayout(inputsLayout);
+    clearLayout(outputsLayout);
 
     for (const auto &value: camera->getIOPorts())
         model[value.id].ioConfigData = value;

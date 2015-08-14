@@ -45,7 +45,7 @@ void GraphicsPixmap::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 }
 
 Qt::AspectRatioMode GraphicsPixmap::aspectRatioMode() const {
-    Q_D(GraphicsPixmap);
+    Q_D(const GraphicsPixmap);
     return d->aspectRatioMode;
 }
 
@@ -60,7 +60,7 @@ void GraphicsPixmap::setAspectRatioMode(Qt::AspectRatioMode mode) {
 }
 
 QPixmap GraphicsPixmap::pixmap() const {
-    Q_D(GraphicsPixmap);
+    Q_D(const GraphicsPixmap);
     return d->pixmap;
 }
 
