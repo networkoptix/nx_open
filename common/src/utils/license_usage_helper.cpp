@@ -5,7 +5,6 @@
 
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/algorithm/fill.hpp>
-#include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
 #include <core/resource/resource.h>
