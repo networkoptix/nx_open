@@ -20,5 +20,6 @@ public:
     void setColors(const QnIoModuleColors &colors);
 
 private:
-    QnIoModuleOverlayWidgetPrivate *d;
+    QScopedPointer<QnIoModuleOverlayWidgetPrivate> const d_ptr;
+    Q_DECLARE_PRIVATE(QnIoModuleOverlayWidget)
 };

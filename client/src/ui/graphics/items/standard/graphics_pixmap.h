@@ -25,5 +25,6 @@ protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
 private:
-    GraphicsPixmapPrivate *d;
+    QScopedPointer<GraphicsPixmapPrivate> const d_ptr;
+    Q_DECLARE_PRIVATE(GraphicsPixmap)
 };

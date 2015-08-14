@@ -54,8 +54,11 @@ namespace {
 class QnIoModuleOverlayWidgetPrivate : public Connective<QObject> {
     typedef Connective<QObject> base_type;
 
+    Q_DISABLE_COPY(QnIoModuleOverlayWidgetPrivate)
+    Q_DECLARE_PUBLIC(QnIoModuleOverlayWidget)
+
 public:
-    QnIoModuleOverlayWidget *widget;
+    QnIoModuleOverlayWidget * const q_ptr;
     QGraphicsLinearLayout *leftLayout;
     QGraphicsLinearLayout *rightLayout;
     QGraphicsGridLayout *inputsLayout;
@@ -79,10 +82,10 @@ public:
     QMap<QString, ModelData> model;
     QTimer *timer;
 
-    QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget *parent);
+    QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget *widget);
 
     void setCamera(const QnVirtualCameraResourcePtr &camera);
-    void addIOItem(ModelData *data);
+    void addIoItem(ModelData *data);
     void updateControls();
 
     void openConnection();
@@ -96,9 +99,9 @@ public:
     void at_timerTimeout();
 };
 
-QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget *parent)
-    : base_type(parent)
-    , widget(parent)
+QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget *widget)
+    : base_type(widget)
+    , q_ptr(widget)
     , inputsLayout(nullptr)
     , outputsLayout(nullptr)
     , connectionOpened(false)
@@ -131,6 +134,8 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlay
 }
 
 void QnIoModuleOverlayWidgetPrivate::setCamera(const QnVirtualCameraResourcePtr &camera) {
+    Q_Q(QnIoModuleOverlayWidget);
+
     timer->stop();
 
     if (this->camera)
@@ -140,7 +145,7 @@ void QnIoModuleOverlayWidgetPrivate::setCamera(const QnVirtualCameraResourcePtr 
 
     if (!camera) {
         monitor.reset();
-        widget->setEnabled(false);
+        q->setEnabled(false);
         return;
     }
 
@@ -157,21 +162,23 @@ void QnIoModuleOverlayWidgetPrivate::setCamera(const QnVirtualCameraResourcePtr 
     updateControls();
 }
 
-void QnIoModuleOverlayWidgetPrivate::addIOItem(QnIoModuleOverlayWidgetPrivate::ModelData *data) {
+void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::ModelData *data) {
     if (!inputsLayout || !outputsLayout)
         return;
 
     if (data->ioConfigData.portType != Qn::PT_Input && data->ioConfigData.portType != Qn::PT_Output)
         return;
 
-    GraphicsLabel *portIdLabel = new GraphicsLabel(data->ioConfigData.id, widget);
+    Q_Q(QnIoModuleOverlayWidget);
+
+    GraphicsLabel *portIdLabel = new GraphicsLabel(data->ioConfigData.id, q);
     portIdLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
     portIdLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
     QPalette palette = portIdLabel->palette();
     palette.setColor(QPalette::WindowText, colors.idLabel);
     portIdLabel->setPalette(palette);
 
-    data->indicator = new IndicatorWidget(indicatorOnPixmap, indicatorOffPixmap, widget);
+    data->indicator = new IndicatorWidget(indicatorOnPixmap, indicatorOffPixmap, q);
     data->indicator->setOn(data->ioState.isActive);
 
     if (data->ioConfigData.portType == Qn::PT_Output) {
@@ -182,7 +189,7 @@ void QnIoModuleOverlayWidgetPrivate::addIOItem(QnIoModuleOverlayWidgetPrivate::M
         button->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
         button->setAutoDefault(false);
         connect(button, &QPushButton::clicked, this, &QnIoModuleOverlayWidgetPrivate::at_buttonClicked);
-        QGraphicsProxyWidget *buttonProxy = new QGraphicsProxyWidget(widget);
+        QGraphicsProxyWidget *buttonProxy = new QGraphicsProxyWidget(q);
         buttonProxy->setWidget(button);
 
         outputsLayout->addItem(portIdLabel, row, 0);
@@ -192,7 +199,7 @@ void QnIoModuleOverlayWidgetPrivate::addIOItem(QnIoModuleOverlayWidgetPrivate::M
         outputsLayout->setRowAlignment(row, Qt::AlignCenter);
     } else {
         int row = inputsLayout->rowCount();
-        GraphicsLabel *descriptionLabel = new GraphicsLabel(data->ioConfigData.inputName, widget);
+        GraphicsLabel *descriptionLabel = new GraphicsLabel(data->ioConfigData.inputName, q);
         descriptionLabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
         descriptionLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
@@ -247,7 +254,7 @@ void QnIoModuleOverlayWidgetPrivate::updateControls() {
         model[value.id].ioConfigData = value;
 
     for (auto it = model.begin(); it != model.end(); ++it)
-        addIOItem(&it.value());
+        addIoItem(&it.value());
 
     if (!connectionOpened)
         openConnection();
@@ -270,12 +277,15 @@ void QnIoModuleOverlayWidgetPrivate::at_cameraPropertyChanged(const QnResourcePt
 }
 
 void QnIoModuleOverlayWidgetPrivate::at_connectionOpened() {
+    Q_Q(QnIoModuleOverlayWidget);
     connectionOpened = true;
-    widget->setEnabled(true);
+    q->setEnabled(true);
 }
 
 void QnIoModuleOverlayWidgetPrivate::at_connectionClosed() {
-    widget->setEnabled(false);
+    Q_Q(QnIoModuleOverlayWidget);
+
+    q->setEnabled(false);
     connectionOpened = false;
 
     for (auto it = model.begin(); it != model.end(); ++it)
@@ -333,8 +343,8 @@ void QnIoModuleOverlayWidgetPrivate::at_timerTimeout() {
             data.indicator->setOn(data.ioState.isActive);
             data.buttonPressTime.invalidate();
             QString portName = data.ioConfigData.getName();
-            QString message = wrongState ? tr("Failed to turn on IO port '%2'")
-                                         : tr("Failed to turn off IO port '%2'");
+            QString message = wrongState ? tr("Failed to turn on IO port '%1'")
+                                         : tr("Failed to turn off IO port '%1'");
             QMessageBox::warning(0, tr("IO port error"), message.arg(portName));
         }
     }
@@ -343,22 +353,24 @@ void QnIoModuleOverlayWidgetPrivate::at_timerTimeout() {
 
 QnIoModuleOverlayWidget::QnIoModuleOverlayWidget(QGraphicsWidget *parent)
     : base_type(parent)
-    , d(new QnIoModuleOverlayWidgetPrivate(this))
+    , d_ptr(new QnIoModuleOverlayWidgetPrivate(this))
 {
-
 }
 
 QnIoModuleOverlayWidget::~QnIoModuleOverlayWidget() {}
 
 void QnIoModuleOverlayWidget::setCamera(const QnVirtualCameraResourcePtr &camera) {
+    Q_D(QnIoModuleOverlayWidget);
     d->setCamera(camera);
 }
 
 const QnIoModuleColors &QnIoModuleOverlayWidget::colors() const {
+    Q_D(const QnIoModuleOverlayWidget);
     return d->colors;
 }
 
 void QnIoModuleOverlayWidget::setColors(const QnIoModuleColors &colors) {
+    Q_D(QnIoModuleOverlayWidget);
     d->colors = colors;
     d->updateControls();
 }

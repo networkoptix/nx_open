@@ -2,30 +2,29 @@
 
 #include <ui/common/geometry.h>
 
-class GraphicsPixmapPrivate : public QObject {
+class GraphicsPixmapPrivate {
 public:
-    GraphicsPixmap *widget;
     QPixmap pixmap;
     Qt::AspectRatioMode aspectRatioMode;
 
-    GraphicsPixmapPrivate(GraphicsPixmap *parent)
-        : QObject(parent)
-        , widget(parent)
-        , aspectRatioMode(Qt::KeepAspectRatio)
+    GraphicsPixmapPrivate()
+        : aspectRatioMode(Qt::KeepAspectRatio)
     {}
 };
 
 GraphicsPixmap::GraphicsPixmap(QGraphicsItem *parent)
     : base_type(parent)
-    , d(new GraphicsPixmapPrivate(this))
+    , d_ptr(new GraphicsPixmapPrivate())
 {
 
 }
 
 GraphicsPixmap::GraphicsPixmap(const QPixmap &pixmap, QGraphicsItem *parent)
     : base_type(parent)
-    , d(new GraphicsPixmapPrivate(this))
+    , d_ptr(new GraphicsPixmapPrivate())
 {
+    Q_D(GraphicsPixmap);
+
     d->pixmap = pixmap;
 }
 
@@ -33,6 +32,7 @@ GraphicsPixmap::~GraphicsPixmap() {}
 
 void GraphicsPixmap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(widget)
+    Q_D(GraphicsPixmap);
 
     if (d->pixmap.isNull())
         return;
@@ -45,10 +45,13 @@ void GraphicsPixmap::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 }
 
 Qt::AspectRatioMode GraphicsPixmap::aspectRatioMode() const {
+    Q_D(GraphicsPixmap);
     return d->aspectRatioMode;
 }
 
 void GraphicsPixmap::setAspectRatioMode(Qt::AspectRatioMode mode) {
+    Q_D(GraphicsPixmap);
+
     if (d->aspectRatioMode == mode)
         return;
 
@@ -57,15 +60,19 @@ void GraphicsPixmap::setAspectRatioMode(Qt::AspectRatioMode mode) {
 }
 
 QPixmap GraphicsPixmap::pixmap() const {
+    Q_D(GraphicsPixmap);
     return d->pixmap;
 }
 
 void GraphicsPixmap::setPixmap(const QPixmap &pixmap) {
+    Q_D(GraphicsPixmap);
     d->pixmap = pixmap;
     update();
 }
 
 QSizeF GraphicsPixmap::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
+    Q_D(const GraphicsPixmap);
+
     if (!d->pixmap.isNull()) {
         switch (which) {
         case Qt::PreferredSize:
