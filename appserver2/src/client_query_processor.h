@@ -67,7 +67,7 @@ namespace ec2
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
             httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
-                httpClient->setUserName(requestUrl.userName());
+                httpClient->setUserName(requestUrl.userName().toLower());
                 httpClient->setUserPassword(requestUrl.password());
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
@@ -115,7 +115,7 @@ namespace ec2
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
             httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
-                httpClient->setUserName(requestUrl.userName());
+                httpClient->setUserName(requestUrl.userName().toLower());
                 httpClient->setUserPassword(requestUrl.password());
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());

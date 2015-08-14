@@ -458,7 +458,7 @@ void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& ht
     }
     else {
         QUrl url = QnAppServerConnectionFactory::url();
-        httpClient->setUserName(url.userName());
+        httpClient->setUserName(url.userName().toLower());
         if (dbManager) {
             QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
             if (adminUser) {
