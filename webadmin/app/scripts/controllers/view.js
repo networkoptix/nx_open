@@ -1,18 +1,23 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q,$sessionStorage) {
+    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q,$sessionStorage,$localStorage) {
 
+        $scope.session = $sessionStorage;
+        $scope.storage = $localStorage;
+        $scope.storage.serverStates = $scope.storage.serverStates || {};
+        
         $scope.playerApi = false;
         $scope.cameras = {};
         $scope.liveOnly = true;
-        $scope.cameraId = $scope.cameraId || $routeParams.cameraId || null;
+        $scope.storage.cameraId   = $scope.storage.cameraId   || $routeParams.cameraId || null;
         $scope.activeCamera = null;
 
         var isAdmin = false;
         var canViewLive = false;
         var canViewArchive = false;
         var availableCameras = null;
+
 
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
@@ -198,13 +203,13 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.selectCameraById = function (cameraId, position, silent) {
 
 
-            $scope.cameraId = cameraId || $scope.cameraId;
+            $scope.storage.cameraId  = cameraId || $scope.storage.cameraId  ;
 
             if(position){
                 position = parseInt(position);
             }
 
-            $scope.activeCamera = getCamera ($scope.cameraId);
+            $scope.activeCamera = getCamera ($scope.storage.cameraId  );
             if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
@@ -224,6 +229,11 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.selectCamera = function (activeCamera) {
             $location.path('/view/' + activeCamera.id, false);
             $scope.selectCameraById(activeCamera.id,false);
+        };
+
+        $scope.toggleServerCollapsed = function(server){
+            server.collapsed = !server.collapsed;
+            $scope.storage.serverStates[server.id] = server.collapsed;
         };
 
         $scope.switchPlaying = function(play){
@@ -455,14 +465,16 @@ angular.module('webadminApp').controller('ViewCtrl',
         function reloadTree(){
             function serverSorter(server){
                 server.url = extractDomain(server.url);
-
+                server.collapsed = $scope.storage.serverStates[server.id];
                 return objectOrderName(server);
             }
 
             function newServerFilter(server){
                 var oldserver = getServer(server.id);
 
-                server.collapsed = oldserver? oldserver.collapsed : server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
+                server.collapsed = oldserver ? oldserver.collapsed :
+                    $scope.storage.serverStates[server.id] ||
+                    server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
 
                 if(oldserver){ // refresh old server
                     $.extend(oldserver,server);
@@ -515,7 +527,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         var timer = false;
         function reloader(){
             reloadTree().then(function(){
-                $scope.selectCameraById($scope.cameraId, firstTime && $location.search().time || false, !firstTime);
+                $scope.selectCameraById($scope.storage.cameraId  , firstTime && $location.search().time || false, !firstTime);
                 firstTime = false;
                 timer = $timeout(reloader, reloadInterval);
             },function(error){
@@ -620,7 +632,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
 
-        $scope.session = $sessionStorage;
 
         $scope.mobileAppAlertClose = function(){
             $scope.session.mobileAppNotified  = true;

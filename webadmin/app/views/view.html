@@ -40,7 +40,7 @@
                                 <li ng-repeat="server in mediaServers">
                                     <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
                                        title="{{server.url}}"
-                                       ng-click="server.collapsed = !server.collapsed"
+                                       ng-click="toggleServerCollapsed(server)"
                                        class="webclint-panel server-link collapse-group"
                                        ng-class="{offline:server.status!='Online'}">
                                         <div class="pull-right caption-row">
