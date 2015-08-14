@@ -117,6 +117,7 @@ namespace {
         bool licenseUsed = camera->isLicenseUsed();
         bool overflow = QnCamLicenseUsageHelper(camera, true).isOverflowForCamera(camera);
 
+        /* We are returning overflow even if now all is OK, so user will not be suggested to enable camera. */
         return overflow ? LicenseOverflow
                         : (licenseUsed ? LicenseUsed : LicenseNotUsed);
     }
