@@ -1518,7 +1518,7 @@ namespace nx_http
 #   define COMMON_USER_AGENT "Mozilla/5.0"
 #endif
 
-    static const StringType defaultUserAgentString = QN_PRODUCT_NAME "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_USER_AGENT;
+    static const StringType defaultUserAgentString = QN_PRODUCT_NAME_LONG "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_USER_AGENT;
 
     StringType userAgentString()
     {

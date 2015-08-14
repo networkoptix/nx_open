@@ -51,6 +51,7 @@ signals:
     void permissionsChanged(const QnResourcePtr &user);
     void adminChanged(const QnResourcePtr &resource);
     void emailChanged(const QnResourcePtr &user);
+    void realmChanged(const QnResourcePtr &user);
 
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;

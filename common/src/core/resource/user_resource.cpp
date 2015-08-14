@@ -230,6 +230,11 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
             m_email = localOther->m_email;
             modifiedFields << "emailChanged";
         }
+
+        if (m_realm != localOther->m_realm) {
+            m_realm = localOther->m_realm;
+            modifiedFields << "realmChanged";
+        }
     }
 }
 
