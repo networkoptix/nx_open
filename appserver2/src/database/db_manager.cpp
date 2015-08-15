@@ -3007,7 +3007,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     // so it's required to be sorted by parent id
     std::sort(storageList.begin(), storageList.end(),
               [](const ApiStorageData& lhs, const ApiStorageData& rhs)
-              { return lhs.parentId < rhs.parentId; });
+              { return lhs.parentId.toRfc4122() < rhs.parentId.toRfc4122(); });
 
     return ErrorCode::ok;
 }
