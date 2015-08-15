@@ -763,18 +763,9 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_currentTabChanged);
-    /*
-    connect(ui->tabWidget, &QTabWidget::currentChanged, 
-        this, [this](int index) {
-            if (index == SessionTab)
-                ui->gridMaster->adjustSize();
-            else
-                ui->gridCameras->adjustSize();
-            at_filterChanged();
-        }
-    );
-    */
-    
+
+    ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
+    ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 }
 
 QnAuditLogDialog::~QnAuditLogDialog() {
@@ -1074,8 +1065,10 @@ void QnAuditLogDialog::makeSessionData()
     m_sessionData.reserve(processedLogins.size());
     for (auto& value: processedLogins)
         m_sessionData.push_back(std::move(value));
-    for (QnAuditRecord& record: m_sessionData)
+    for (QnAuditRecord& record: m_sessionData) {
         record.addParam("childCnt", QByteArray::number(activityPerSession.value(record.authSession.id)));
+        record.addParam("checked", "1");
+    }
 }
 
 void QnAuditLogDialog::makeCameraData()
@@ -1093,6 +1086,7 @@ void QnAuditLogDialog::makeCameraData()
         QnAuditRecord cameraRecord;
         cameraRecord.resources.push_back(itr.key());
         cameraRecord.addParam("childCnt", QByteArray::number(itr.value())); // used for "user activity" column
+        cameraRecord.addParam("checked", "1");
         m_cameraData.push_back(cameraRecord);
     }
 }
@@ -1103,6 +1097,8 @@ void QnAuditLogDialog::requestFinished()
     setGridGeneralCheckState(ui->gridCameras, Qt::Unchecked);
     makeSessionData();
     makeCameraData();
+    static_cast<QnCheckBoxedHeaderView*>(ui->gridMaster->horizontalHeader())->setCheckState(Qt::Checked);
+    static_cast<QnCheckBoxedHeaderView*>(ui->gridCameras->horizontalHeader())->setCheckState(Qt::Checked);
     at_filterChanged();
 
     ui->gridMaster->setDisabled(false);

@@ -32,6 +32,8 @@ signals:
 protected:
     virtual void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override;
     virtual QSize sectionSizeFromContents(int logicalIndex) const override;
+    virtual void mousePressEvent(QMouseEvent *e) override;
+    virtual void mouseReleaseEvent(QMouseEvent *e) override;
 private slots:
     void at_sectionClicked(int logicalIndex);
 private:
