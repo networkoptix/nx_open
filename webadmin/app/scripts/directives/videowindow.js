@@ -204,8 +204,9 @@ angular.module('webadminApp')
                                 var video = event.srcElement || event.originalTarget;
                                 scope.vgUpdateTime({$currentTime:video.currentTime, $duration: video.duration});
                                 if(scope.loading) {
-                                    scope.loading = false;
-                                    //scope.$digest();
+                                    $timeout(function(){
+                                        scope.loading = false;
+                                    });
                                 }
                             });
                         }
