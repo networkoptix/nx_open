@@ -303,7 +303,10 @@ QList<QnMediaServerResourcePtr> QnRecordingStatsDialog::getServerList() const
 
 void QnRecordingStatsDialog::setServer(QnMediaServerResourcePtr mserver)
 {
-    m_mserver = mserver;
+    if (mserver != m_mserver) {
+        m_mserver = mserver;
+        updateData();
+    }
 }
 
 void QnRecordingStatsDialog::query(qint64 bitrateAnalizePeriodMs)
@@ -441,15 +444,6 @@ void QnRecordingStatsDialog::enableUpdateData()
         if (isVisible())
             updateData();
     }
-}
-
-void QnRecordingStatsDialog::setVisible(bool value)
-{
-    // TODO: #Elric use showEvent instead. 
-
-    if (value && !isVisible())
-        updateData();
-    QDialog::setVisible(value);
 }
 
 qint64 QnRecordingStatsDialog::sliderPositionToBytes(int value) const
