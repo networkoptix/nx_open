@@ -19,6 +19,7 @@
 #include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
 #include <utils/common/timermanager.h>
+#include <utils/common/singleton.h>
 #include <utils/network/time/abstract_accurate_time_fetcher.h>
 #include <utils/network/http/httptypes.h>
 
@@ -107,7 +108,8 @@ namespace ec2
     :
         public QObject,
         public QnStoppable,
-        public EnableMultiThreadDirectConnection<TimeSynchronizationManager>
+        public EnableMultiThreadDirectConnection<TimeSynchronizationManager>,
+        public Singleton<TimeSynchronizationManager>
     {
         Q_OBJECT
 
@@ -124,8 +126,6 @@ namespace ec2
         */
         TimeSynchronizationManager( Qn::PeerType peerType );
         virtual ~TimeSynchronizationManager();
-
-        static TimeSynchronizationManager* instance();
 
         //!Implemenattion of QnStoppable::pleaseStop
         virtual void pleaseStop() override;

@@ -193,8 +193,6 @@ namespace ec2
     //////////////////////////////////////////////
     //   TimeSynchronizationManager
     //////////////////////////////////////////////
-    static std::atomic<TimeSynchronizationManager*> TimeManager_instance( nullptr );
-
     static const size_t MILLIS_PER_SEC = 1000;
     static const size_t INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC = 0;
     static const size_t MIN_INTERNET_SYNC_TIME_PERIOD_SEC = 60;
@@ -204,12 +202,16 @@ namespace ec2
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*MILLIS_PER_SEC;
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 60*MILLIS_PER_SEC;
     static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 60;
+    //!Reporting time synchronization information to other peers once per this period
+    static const int TIME_SYNC_SEND_TIMEOUT_SEC = 10;
 #else
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*60*MILLIS_PER_SEC;
     //!Once per 10 minutes checking if manual time server selection is required
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*60*MILLIS_PER_SEC;
     //!Accurate time is fetched from internet with this period
     static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 24*60*60;
+    //!Reporting time synchronization information to other peers once per this period
+    static const int TIME_SYNC_SEND_TIMEOUT_SEC = 10*60;
 #endif
     //!If time synchronization with internet failes, period is multiplied on this value, but it cannot exceed \a MAX_PUBLIC_SYNC_TIME_PERIOD_SEC
     static const size_t INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF = 2;
@@ -221,8 +223,6 @@ namespace ec2
     static const qint64 MAX_SYNC_VS_INTERNET_TIME_DRIFT_MS = 20*MILLIS_PER_SEC;
     static const int MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES = 15;
     static const int MAX_RTT_TIME_MS = 10 * 1000;
-    //!Reporting time synchronization information to other peers once per this period
-    static const int TIME_SYNC_SEND_TIMEOUT_SEC = 10 * 60;
     //!Maximum time drift between servers that we want to keep up to
     static const int MAX_DESIRED_TIME_DRIFT_MS = 1000;
     //!Considering that other server's time is retrieved with error not less then \a MIN_GET_TIME_ERROR_MS
@@ -251,21 +251,11 @@ namespace ec2
         m_timeSynchronized( false ),
         m_internetSynchronizationFailureCount( 0 )
     {
-        assert( TimeManager_instance.load(std::memory_order_relaxed) == nullptr );
-        TimeManager_instance.store( this, std::memory_order_relaxed );
     }
 
     TimeSynchronizationManager::~TimeSynchronizationManager()
     {
-        assert( TimeManager_instance.load(std::memory_order_relaxed) == this );
-        TimeManager_instance.store( nullptr, std::memory_order_relaxed );
-
         pleaseStop();
-    }
-
-    TimeSynchronizationManager* TimeSynchronizationManager::instance()
-    {
-        return TimeManager_instance.load(std::memory_order_relaxed);
     }
 
     void TimeSynchronizationManager::pleaseStop()
@@ -633,7 +623,6 @@ namespace ec2
         lock->relock();
 
         //informing all servers we can about time change as soon as possible
-        QMutexLocker lk( &m_mutex );
         for( std::pair<const QnUuid, PeerContext>& peerCtx: m_peersToSendTimeSyncTo )
         {
             TimerManager::instance()->modifyTimerDelay(
