@@ -975,6 +975,7 @@ angular.module('webadminApp')
                 scope.click = function(event){
                     updateMouseCoordinate(event);
                     if(preventClick){
+                        console.log("preventClick");
                         return;
                     }
 

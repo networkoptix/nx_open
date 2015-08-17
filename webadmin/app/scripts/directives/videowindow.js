@@ -189,6 +189,9 @@ angular.module('webadminApp')
                 // TODO: Support new players
 
                 function initNativePlayer(format){
+
+                    scope.native = true;
+                    scope.flashls = false;
                     nativePlayer.init(element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
@@ -213,6 +216,7 @@ angular.module('webadminApp')
 
                 function initFlashls() {
                     scope.flashls = true;
+                    scope.native = false;
                     scope.flashSource = "components/flashlsChromeless.swf";
                     scope.flashParam = flashlsAPI.flashParams();
 
@@ -229,6 +233,7 @@ angular.module('webadminApp')
                             scope.errorLoading = true;
                             scope.loading = false;
                             scope.flashls = false;// Kill flashls!
+                            scope.native = false;
                             scope.$digest();
                             console.error(error);
                         }, function (position, duration) {
@@ -297,6 +302,7 @@ angular.module('webadminApp')
                         var format = detectBestFormat();
 
                         scope.loading = !!format;
+
                         recyclePlayer(format);// Remove old player. TODO: recycle it later
 
                         switch(format){
