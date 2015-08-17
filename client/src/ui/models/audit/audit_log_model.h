@@ -38,6 +38,9 @@ public:
         ColumnCount
     };
 
+    static const QByteArray ChildCntParamName;
+    static const QByteArray CheckedParamName;
+
     QnAuditLogModel(QObject *parent = NULL);
     virtual ~QnAuditLogModel();
 

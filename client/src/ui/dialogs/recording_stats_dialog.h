@@ -40,9 +40,6 @@ public:
     void disableUpdateData();
     void enableUpdateData();
     void setServer(QnMediaServerResourcePtr mserver);
-protected:
-    void setVisible(bool value) override;
-
 private slots:
     void updateData();
     void at_gotStatiscits(int httpStatus, const QnRecordingStatsReply& data, int requestNum);

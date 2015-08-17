@@ -40,6 +40,8 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
+                scope.debugMode = false;
+
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
                     return src?src.src:null;
@@ -47,6 +49,7 @@ angular.module('webadminApp')
 
                 function detectBestFormat(){
                     scope.flashRequired = false;
+                    scope.flashOrWebmRequired = false;
                     scope.noArmSupport = false;
                     scope.noFormat = false;
 
@@ -113,13 +116,19 @@ angular.module('webadminApp')
                                 scope.ieNoWebm = true;
                             }
 
-                            if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
+                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
                                 return "flashls";
                             }
 
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
+
+                            if(weHaveHls && weHaveWebm){
+
+                                scope.flashOrWebmRequired = true;
+                                return false;
+                            }
                             if(weHaveHls) {
                                 scope.flashRequired = true;
                                 return false;
@@ -145,13 +154,13 @@ angular.module('webadminApp')
                         case "Opera":
                         case "Webkit":
                         default:
-                            if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
+                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
                                 return "flashls";
                             }
                             /*if(weHaveHls) {
                                 return "jshls";// We are hoping that we have some good browser
                             }*/
-                            if(weHaveRtsp && window.jscd.flashVersion != '-'){
+                            if(weHaveRtsp && window.jscd.flashVersion){
                                 return "rtsp";
                             }
                             if(weHaveHls) {
@@ -182,6 +191,9 @@ angular.module('webadminApp')
                 // TODO: Support new players
 
                 function initNativePlayer(format){
+
+                    scope.native = true;
+                    scope.flashls = false;
                     nativePlayer.init(element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
@@ -189,11 +201,12 @@ angular.module('webadminApp')
                             scope.vgApi.load(getFormatSrc(format),mimeTypes[format]);
 
                             scope.vgApi.addEventListener("timeupdate",function(event,arg2,arg3){
-                                //console.log("timeupdate",event,arg2,arg3,scope.vgApi, scope.vgApi.currentTime);
-                                scope.vgUpdateTime({$currentTime:event.srcElement.currentTime, $duration: event.srcElement.duration});
+                                var video = event.srcElement || event.originalTarget;
+                                scope.vgUpdateTime({$currentTime:video.currentTime, $duration: video.duration});
                                 if(scope.loading) {
-                                    scope.loading = false;
-                                    //scope.$digest();
+                                    $timeout(function(){
+                                        scope.loading = false;
+                                    });
                                 }
                             });
                         }
@@ -206,6 +219,7 @@ angular.module('webadminApp')
 
                 function initFlashls() {
                     scope.flashls = true;
+                    scope.native = false;
                     scope.flashSource = "components/flashlsChromeless.swf";
                     scope.flashParam = flashlsAPI.flashParams();
 
@@ -222,6 +236,7 @@ angular.module('webadminApp')
                             scope.errorLoading = true;
                             scope.loading = false;
                             scope.flashls = false;// Kill flashls!
+                            scope.native = false;
                             scope.$digest();
                             console.error(error);
                         }, function (position, duration) {
@@ -280,7 +295,7 @@ angular.module('webadminApp')
                     });
                 }
 
-                element.bind('contextmenu',function() { return false; }); // Kill context menu
+                element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
 
 
                 scope.$watch("vgSrc",function(){
@@ -288,7 +303,9 @@ angular.module('webadminApp')
                     scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         var format = detectBestFormat();
+
                         scope.loading = !!format;
+
                         recyclePlayer(format);// Remove old player. TODO: recycle it later
 
                         switch(format){
