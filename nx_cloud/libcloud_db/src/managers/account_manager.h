@@ -35,6 +35,12 @@ public:
     {
         //TODO #ak
     }
+
+    bool get( KeyType key, CachedType* const value )
+    {
+        //TODO #ak
+        return false;
+    }
 };
 
 /*!
@@ -59,9 +65,9 @@ public:
         data::EmailVerificationCode&& emailVerificationCode,
         std::function<void(ResultCode)> completionHandler );
     
-    void getAccountByLogin(
+    //!Retrieves account corresponding to authorization data \a authzInfo
+    void getAccount(
         const AuthorizationInfo& authzInfo,
-        const std::string& userName,
         std::function<void(ResultCode, data::AccountData)> completionHandler );
     
 private:
@@ -70,6 +76,7 @@ private:
     EMailManager* const m_emailManager;
     Cache<QnUuid, data::AccountData> m_cache;
 
+    //add_account DB operations
     nx::db::DBResult insertAccount(
         QSqlDatabase* const tran,
         const data::AccountData& accountData,
@@ -79,6 +86,15 @@ private:
         data::AccountData accountData,
         data::EmailVerificationCode resultData,
         std::function<void(ResultCode)> completionHandler );
+
+    //verify_account DB operations
+    nx::db::DBResult verifyAccount(
+        QSqlDatabase* const tran,
+        const data::EmailVerificationCode& verificationCode );
+    void accountVerified(
+        nx::db::DBResult resultCode,
+        data::EmailVerificationCode resultData,
+        std::function<void( ResultCode )> completionHandler );
 };
 
 }   //cdb

@@ -15,6 +15,7 @@
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
+#include "data/cdb_ns.h"
 #include "email_manager.h"
 #include "settings.h"
 #include "version.h"
@@ -46,8 +47,6 @@ void AccountManager::addAccount(
     data::AccountData&& accountData,
     std::function<void(ResultCode)> completionHandler )
 {
-    //TODO #ak
-    
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::AccountData, data::EmailVerificationCode>(
         std::bind(&AccountManager::insertAccount, this, _1, _2, _3),
@@ -60,15 +59,33 @@ void AccountManager::verifyAccountEmailAddress(
     data::EmailVerificationCode&& emailVerificationCode,
     std::function<void(ResultCode)> completionHandler )
 {
-    //TODO #ak
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate<data::EmailVerificationCode>(
+        std::bind( &AccountManager::verifyAccount, this, _1, _2 ),
+        std::move( emailVerificationCode ),
+        std::bind( &AccountManager::accountVerified, this, _1, _2, std::move( completionHandler ) ) );
 }
 
-void AccountManager::getAccountByLogin(
+void AccountManager::getAccount(
     const AuthorizationInfo& authzInfo,
-    const std::string& userName,
     std::function<void(ResultCode, data::AccountData)> completionHandler )
 {
-    //TODO #ak
+    QnUuid accountID;
+    if( !authzInfo.get( param::accountID, &accountID ) )
+    {
+        completionHandler( ResultCode::notAuthorized, data::AccountData() );
+        return;
+    }
+
+    data::AccountData resultData;
+    if( !m_cache.get( accountID, &resultData ) )
+    {
+        //very strange: account has been authenticated, but not found in the database
+        completionHandler( ResultCode::notFound, data::AccountData() );
+        return;
+    }
+
+    completionHandler( ResultCode::ok, std::move(resultData) );
 }
 
 db::DBResult AccountManager::insertAccount(
@@ -105,19 +122,10 @@ db::DBResult AccountManager::insertAccount(
     QVariantHash emailParams;
     emailParams[CLOUD_BACKEND_URL_PARAM] = m_settings.cloudBackendUrl(); //TODO #ak use something like QN_CLOUD_BACKEND_URL;
     emailParams[CONFIRMATION_CODE_PARAM] = QString::fromStdString( resultData->code );
-    QString emailToSend;
-    if( !renderTemplateFromFile(
-            CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME,
-            emailParams,
-            &emailToSend ) )
-    {
-        NX_LOG( lit("AccountManager. Failed to render confirmation email to send to %1").
-            arg(QString::fromStdString(accountData.email)), cl_logWARNING );
-        return db::DBResult::ioError;
-    }
-    m_emailManager->sendEmailAsync(
+    m_emailManager->renderAndSendEmailAsync(
         QString::fromStdString( accountData.email ),
-        emailToSend );
+        CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME,
+        emailParams );
 
     return db::DBResult::ok;
 }
@@ -136,6 +144,31 @@ void AccountManager::accountAdded(
     
     completionHandler( resultCode == db::DBResult::ok ? ResultCode::ok : ResultCode::dbError );
 }
+
+
+nx::db::DBResult AccountManager::verifyAccount(
+    QSqlDatabase* const tran,
+    const data::EmailVerificationCode& verificationCode )
+{
+    //TODO #ak
+    return db::DBResult::ioError;
+}
+
+void AccountManager::accountVerified(
+    nx::db::DBResult resultCode,
+    data::EmailVerificationCode verificationCode,
+    std::function<void( ResultCode )> completionHandler )
+{
+    if( resultCode == db::DBResult::ok )
+    {
+        //TODO #ak updating cache
+        //m_cache.add( accountData.id, std::move( accountData ) );
+    }
+
+    completionHandler( resultCode == db::DBResult::ok ? ResultCode::ok : ResultCode::dbError );
+    //TODO #ak
+}
+
 
 }   //cdb
 }   //nx

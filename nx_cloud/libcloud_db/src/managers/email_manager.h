@@ -26,6 +26,10 @@ public:
 
     //!Adds email to the internal queue and returns. Email will be sent as soon as possible
     void sendEmailAsync( const QString& emailAddress, const QString& emailBody );
+    void renderAndSendEmailAsync(
+        const QString& emailAddress,
+        const QString& templateFileName,
+        const QVariantHash& emailParams );
 
 private:
     const conf::Settings& m_settings;
