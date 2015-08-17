@@ -29,7 +29,7 @@
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar -lSecur32 -lWldap32</windows.oslibs>
         <linux.oslibs>-lssl -lsigar -lldap</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx -lldap</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
