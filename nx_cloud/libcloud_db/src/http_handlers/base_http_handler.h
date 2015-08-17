@@ -40,6 +40,25 @@ public:
 protected:
     const EntityType m_entityType;
     const DataActionType m_actionType;
+
+    bool authorize(
+        const stree::AbstractResourceReader& dataToAuthorize,
+        stree::AbstractResourceWriter* const authzInfo )
+    {
+        //performing authorization
+        //  authorization is performed here since it can depend on input data which 
+        //  needs to be deserialized depending on request type
+        if( !AuthorizationManager::instance()->authorize(
+                dataToAuthorize,
+                this->m_entityType,
+                this->m_actionType,
+                authzInfo ) )   //using same object since we can move it
+        {
+            this->requestCompleted( nx_http::StatusCode::unauthorized );
+            return false;
+        }
+        return true;
+    }
 };
 
 }   //detail
@@ -68,18 +87,10 @@ public:
         stree::ResourceContainer&& authInfo,
         Input inputData ) override
     {
-        //performing authorization
-        //  authorization is performed here since it can depend on input data which 
-        //  needs to be deserialized depending on request type
-        if( !AuthorizationManager::instance()->authorize(
+        if( !authorize(
                 stree::MultiSourceResourceReader( authInfo, inputData ),
-                this->m_entityType,
-                this->m_actionType,
-                &authInfo ) )   //using same object since we can move it
-        {
-            this->requestCompleted( nx_http::StatusCode::unauthorized, Output() );
+                &authInfo ) )
             return;
-        }
 
         processRequest(
             AuthorizationInfo( std::move( authInfo ) ),
@@ -131,15 +142,10 @@ public:
         //performing authorization
         //  authorization is performed here since it can depend on input data which 
         //  needs to be deserialized depending on request type
-        if( !AuthorizationManager::instance()->authorize(
+        if( !authorize(
                 stree::MultiSourceResourceReader( authInfo, inputData ),
-                this->m_entityType,
-                this->m_actionType,
-                &authInfo ) )   //using same object since we can move it
-        {
-            this->requestCompleted( nx_http::StatusCode::unauthorized );
+                &authInfo ) )
             return;
-        }
 
         processRequest(
             AuthorizationInfo( std::move( authInfo ) ),
@@ -183,18 +189,8 @@ public:
         const nx_http::HttpServerConnection& /*connection*/,
         stree::ResourceContainer&& authInfo ) override
     {
-        //performing authorization
-        //  authorization is performed here since it can depend on input data which 
-        //  needs to be deserialized depending on request type
-        if( !AuthorizationManager::instance()->authorize(
-                authInfo,
-                this->m_entityType,
-                this->m_actionType,
-                &authInfo ) )   //using same object since we can move it
-        {
-            this->requestCompleted( nx_http::StatusCode::unauthorized );
+        if( !authorize( authInfo, &authInfo ) )
             return;
-        }
 
         processRequest(
             AuthorizationInfo( std::move( authInfo ) ),
@@ -238,18 +234,8 @@ public:
         const nx_http::HttpServerConnection& /*connection*/,
         stree::ResourceContainer&& authInfo ) override
     {
-        //performing authorization
-        //  authorization is performed here since it can depend on input data which 
-        //  needs to be deserialized depending on request type
-        if( !AuthorizationManager::instance()->authorize(
-                authInfo,
-                this->m_entityType,
-                this->m_actionType,
-                &authInfo ) )   //using same object since we can move it
-        {
-            this->requestCompleted( nx_http::StatusCode::unauthorized );
+        if( !authorize( authInfo, &authInfo ) )
             return;
-        }
 
         processRequest(
             AuthorizationInfo( std::move( authInfo ) ),
