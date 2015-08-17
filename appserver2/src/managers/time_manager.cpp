@@ -230,7 +230,7 @@ namespace ec2
     /*!
         This should help against redundant clock resync
     */
-    static const int MIN_GET_TIME_ERROR_MS = 250;
+    static const int MIN_GET_TIME_ERROR_MS = 100;
 
     static_assert( MIN_INTERNET_SYNC_TIME_PERIOD_SEC > 0, "MIN_INTERNET_SYNC_TIME_PERIOD_SEC MUST be > 0!" );
     static_assert( MIN_INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SEC,
@@ -594,7 +594,8 @@ namespace ec2
             localMonotonicClock,
             remotePeerSyncTime,
             remotePeerTimePriorityKey ); 
-        ++m_usedTimeSyncInfo.timePriorityKey.sequence;   //for case if synchronizing because of time drift
+        if( needAdjustClockDueToLargeDrift )
+            ++m_usedTimeSyncInfo.timePriorityKey.sequence;   //for case if synchronizing because of time drift
         const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime + m_monotonicClock.elapsed() - m_usedTimeSyncInfo.monotonicClockValue;
         //saving synchronized time to DB
         m_timeSynchronized = true;
