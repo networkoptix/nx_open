@@ -65,14 +65,14 @@ DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection 
     //reading current DB version
     QSqlQuery fetchDbVersionQuery( *dbConnection );
     fetchDbVersionQuery.prepare( lit("SELECT db_version FROM db_version_data") );
-    size_t dbVersion = 0;
+    qint64 dbVersion = 0;
     //absense of table db_version_data is normal: DB is just empty
     if( fetchDbVersionQuery.exec() && fetchDbVersionQuery.next() )
         dbVersion = fetchDbVersionQuery.value(lit("db_version")).toUInt();
 
     //applying scripts missing in current DB
     for( ;
-        dbVersion < m_updateScripts.size();
+        static_cast< size_t >( dbVersion ) < m_updateScripts.size();
         ++dbVersion )
     {
         if( !QnDbHelper::execSQLScript( m_updateScripts[dbVersion], *dbConnection ) )

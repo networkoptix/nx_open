@@ -14,7 +14,7 @@ namespace nx {
 namespace db {
 
 
-static const int WAITING_TASKS_COEFF = 5;
+static const size_t WAITING_TASKS_COEFF = 5;
 
 DBManager::DBManager( const ConnectionOptions& connectionOptions )
 :
@@ -38,7 +38,8 @@ bool DBManager::openOneMoreConnectionIfNeeded()
         QnMutexLocker lk( &m_mutex );   
 
         const auto effectiveDBConnectionCount = m_dbThreadPool.size() + m_connectionsBeingAdded;
-        if( m_requestQueue.size() < effectiveDBConnectionCount * WAITING_TASKS_COEFF ||  //task number is not too high
+        const auto queueSize = static_cast< size_t >( m_requestQueue.size() );
+        if( queueSize < effectiveDBConnectionCount * WAITING_TASKS_COEFF ||  //task number is not too high
             effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount )    //pool size is already at maximum
         {
             return true;

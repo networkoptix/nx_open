@@ -106,7 +106,7 @@ public:
         openOneMoreConnectionIfNeeded();
 
         auto ctx = std::make_unique<SelectExecutor<OutputData>>(
-            std::move( dbUpdateFunc ),
+            std::move( dbSelectFunc ),
             std::move( completionHandler ) );
 
         QnMutexLocker lk( &m_mutex );
