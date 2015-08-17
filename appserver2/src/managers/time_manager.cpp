@@ -643,13 +643,6 @@ namespace ec2
                 transport->remotePeer().id,
                 SocketAddress( remoteAddr.host(), remoteAddr.port() ) );
         }
-
-        //using namespace std::placeholders;
-        //auto transportSocket = transport->getSocket();
-        //if( transportSocket )
-        //    transportSocket->toggleStatisticsCollection( true );
-        //transport->setBeforeSendingChunkHandler( std::bind( &TimeSynchronizationManager::onBeforeSendingTransaction, this, _1, _2 ) );
-        //transport->setHttpChunkExtensonHandler( std::bind( &TimeSynchronizationManager::onTransactionReceived, this, _1, _2 ) );
     }
 
     void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data )
