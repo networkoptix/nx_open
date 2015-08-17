@@ -22,6 +22,9 @@
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
+QnAuditLogModel::ChildCntParamName("childCnt");
+QnAuditLogModel::CheckedParamName("checked");
+
 namespace
 {
     QString firstResourceName(const QnAuditRecord *d1)
@@ -140,7 +143,7 @@ public:
 
     static bool lessThanActivity(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return d1->extractParam("childCnt").toUInt() < d2->extractParam("childCnt").toUInt();
+        return d1->extractParam(ChildCntParamName).toUInt() < d2->extractParam("childCnt").toUInt();
     }
 
     void updateIndex()
@@ -520,7 +523,7 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data
     case PlayButtonColumn:
         return buttonNameForEvent(data->eventType);
     case UserActivityColumn:
-        return tr("%n action(s)", "", data->extractParam("childCnt").toUInt());
+        return tr("%n action(s)", "", data->extractParam(ChildCntParamName).toUInt());
     }
 
     return QString();
@@ -625,7 +628,7 @@ Qt::CheckState QnAuditLogModel::checkState() const
 
     for (int i = 0; i < m_index->size(); ++i)
     {
-        if (m_index->at(i)->extractParam("checked") ==  "1")
+        if (m_index->at(i)->extractParam(CheckedParamName) ==  "1")
             onExist = true;
         else
             offExist = true;
@@ -643,13 +646,13 @@ void QnAuditLogModel::setCheckState(Qt::CheckState state)
     if (state == Qt::Checked) {
         for (int i = 0; i < m_index->size(); ++i)
         {
-            m_index->at(i)->addParam("checked", "1");
+            m_index->at(i)->addParam(CheckedParamName, "1");
         }
     } 
     else if (state == Qt::Unchecked) {
         for (int i = 0; i < m_index->size(); ++i)
         {
-            m_index->at(i)->removeParam("checked");
+            m_index->at(i)->removeParam(CheckedParamName);
         }
     }
     else {
@@ -675,9 +678,9 @@ bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, i
     if (role == Qt::CheckStateRole)
     {
         if (value == Qt::Checked)
-            m_index->at(index.row())->addParam("checked", "1");
+            m_index->at(index.row())->addParam(CheckedParamName, "1");
         else
-            m_index->at(index.row())->removeParam("checked");
+            m_index->at(index.row())->removeParam(CheckedParamName);
         emit dataChanged(index, index, QVector<int>() << role);
         return true;
     }
@@ -691,7 +694,7 @@ QnAuditRecordRefList QnAuditLogModel::checkedRows()
     QnAuditRecordRefList result;
     for (const auto& record: m_index->data())
     {
-        if (record->extractParam("checked") == "1")
+        if (record->extractParam(CheckedParamName) == "1")
             result.push_back(record);
     }
     return result;
@@ -781,7 +784,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
     switch(role) {
     case Qt::CheckStateRole:
         if (column == SelectRowColumn)
-            return record->extractParam("checked") == "1" ? Qt::Checked : Qt::Unchecked;
+            return record->extractParam(CheckedParamName) == "1" ? Qt::Checked : Qt::Unchecked;
         else
             return QVariant();
     case Qt::DisplayRole:
