@@ -87,7 +87,7 @@ public:
         stree::ResourceContainer&& authInfo,
         Input inputData ) override
     {
-        if( !authorize(
+        if( !this->authorize(
                 stree::MultiSourceResourceReader( authInfo, inputData ),
                 &authInfo ) )
             return;
@@ -142,7 +142,7 @@ public:
         //performing authorization
         //  authorization is performed here since it can depend on input data which 
         //  needs to be deserialized depending on request type
-        if( !authorize(
+        if( !this->authorize(
                 stree::MultiSourceResourceReader( authInfo, inputData ),
                 &authInfo ) )
             return;
@@ -189,7 +189,7 @@ public:
         const nx_http::HttpServerConnection& /*connection*/,
         stree::ResourceContainer&& authInfo ) override
     {
-        if( !authorize( authInfo, &authInfo ) )
+        if( !this->authorize( authInfo, &authInfo ) )
             return;
 
         processRequest(
@@ -234,7 +234,7 @@ public:
         const nx_http::HttpServerConnection& /*connection*/,
         stree::ResourceContainer&& authInfo ) override
     {
-        if( !authorize( authInfo, &authInfo ) )
+        if( !this->authorize( authInfo, &authInfo ) )
             return;
 
         processRequest(
