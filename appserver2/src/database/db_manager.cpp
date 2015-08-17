@@ -3007,7 +3007,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     // so it's required to be sorted by parent id
     std::sort(storageList.begin(), storageList.end(),
               [](const ApiStorageData& lhs, const ApiStorageData& rhs)
-              { return lhs.parentId < rhs.parentId; });
+              { return lhs.parentId.toRfc4122() < rhs.parentId.toRfc4122(); });
 
     return ErrorCode::ok;
 }
@@ -3249,7 +3249,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
     if( result != ErrorCode::ok )
         return result;
     //merging storages
-    std::sort(storages.begin(), storages.end(), [](const ApiStorageData& left, const ApiStorageData& right) { return left.parentId.toRfc4122() < right.parentId.toRfc4122();} );
     mergeObjectListData( serverExList, storages, &ApiMediaServerDataEx::storages, &ApiMediaServerDataEx::id, &ApiStorageData::parentId );
 
     //reading properties

@@ -70,8 +70,8 @@ private:
         qint64 creationTimeMs;      // record creation time
         QElapsedTimer aliveTimeout; // lifetime timeout
         QElapsedTimer timeout;      // how many ms session is unused
-        bool isExport;
-        AuditHandle handle;
+        bool isExport;              // either export or archive/live access
+        AuditHandle handle;         // internal handle. It's int with counter. AuditManager will delete handle if it unused (refCnt=1) within some period of time
 
         QnAuditRecord toAuditRecord() const;
     };

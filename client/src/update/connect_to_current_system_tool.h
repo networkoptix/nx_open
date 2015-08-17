@@ -25,7 +25,7 @@ public:
         Canceled
     };
 
-    explicit QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent = 0);
+    explicit QnConnectToCurrentSystemTool(QObject *parent = 0);
     ~QnConnectToCurrentSystemTool();
 
     bool tryClose(bool force);

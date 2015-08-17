@@ -241,9 +241,27 @@
             "windowColor": "#801010c0",
             "frameColor": "#801010ff",
             "textColor": "#ffffffff"
+        },
+        "#ioEnableButton": {
+            "windowColor": "#801010c0",
+            "frameColor": "#801010ff",
+            "textColor": "#ffffffff"
         }
     },
     
+    "QnIoModuleOverlayWidget": {
+        "palette": {
+            "default": {
+                "window": "#d0d0d0",
+                "windowText": "#000000",
+                "buttonText": "#000000"
+            }
+        },
+        "colors": {
+            "idLabel": "#575757"
+        }
+    },
+
     "QnStyledTooltipWidget": {
         "windowColor": "QColor(255, 255, 255, 192)",
         "frameColor": "#808080",
