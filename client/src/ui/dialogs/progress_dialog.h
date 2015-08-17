@@ -50,7 +50,7 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 
-#include <ui/dialogs/dialog_base.h>
+#include <ui/dialogs/dialog.h>
 
 class QPushButton;
 class QLabel;
@@ -64,7 +64,7 @@ class QnProgressDialogPrivate;
  * 
  * This behavior is controlled via <tt>isEventProcessor</tt> property.
  */
-class QnProgressDialog : public QnDialogBase {
+class QnProgressDialog : public QnDialog {
     Q_OBJECT
     Q_PROPERTY(bool wasCanceled READ wasCanceled)
     Q_PROPERTY(int minimum READ minimum WRITE setMinimum)
@@ -76,7 +76,7 @@ class QnProgressDialog : public QnDialogBase {
     Q_PROPERTY(QString labelText READ labelText WRITE setLabelText)
     Q_PROPERTY(bool isEventProcessor READ isEventProcessor WRITE setEventProcessor)
 
-    typedef QnDialogBase base_type;
+    typedef QnDialog base_type;
 public:
     explicit QnProgressDialog(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Dialog);
     QnProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = 0, Qt::WindowFlags flags = Qt::Dialog);

@@ -3,14 +3,17 @@
 
 #include <QtWidgets/QDialog>
 
-#include <ui/dialogs/dialog_base.h>
+#include <ui/dialogs/dialog.h>
 
 namespace Ui {
     class QnCredentialsDialog;
 }
 
-class QnCredentialsDialog : public QnDialogBase {
+class QnCredentialsDialog : public QnDialog {
     Q_OBJECT
+
+    typedef QnDialog base_type;
+
 public:
     explicit QnCredentialsDialog(QWidget *parent = 0);
     ~QnCredentialsDialog();

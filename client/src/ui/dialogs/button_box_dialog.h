@@ -5,15 +5,15 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 
-#include <ui/dialogs/dialog_base.h>
+#include <ui/dialogs/dialog.h>
 #include <utils/common/connective.h>
 
 /**
  * Button box dialog that can be queried for the button that was clicked to close it.
  */
-class QnButtonBoxDialog: public Connective<QnDialogBase> {
+class QnButtonBoxDialog: public Connective<QnDialog> {
     Q_OBJECT;
-    typedef Connective<QnDialogBase> base_type;
+    typedef Connective<QnDialog> base_type;
 
 public:
     QnButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);

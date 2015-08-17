@@ -5,7 +5,7 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtCore/QScopedPointer>
 
-#include <ui/dialogs/dialog_base.h>
+#include <ui/dialogs/dialog.h>
 
 class QnCheckableMessageBoxPrivate;
 
@@ -16,7 +16,7 @@ class QnCheckableMessageBoxPrivate;
  * The message label can open external URLs.
  * If user cancel the dialog (e.g. with "Esc" button) cancelButton will be returned as a result.
  */
-class QnCheckableMessageBox: public QnDialogBase {
+class QnCheckableMessageBox: public QnDialog {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(QPixmap iconPixmap READ iconPixmap WRITE setIconPixmap)
@@ -24,6 +24,8 @@ class QnCheckableMessageBox: public QnDialogBase {
     Q_PROPERTY(QString checkBoxText READ checkBoxText WRITE setCheckBoxText)
     Q_PROPERTY(QDialogButtonBox::StandardButtons buttons READ standardButtons WRITE setStandardButtons)
     Q_PROPERTY(QDialogButtonBox::StandardButton defaultButton READ defaultButton WRITE setDefaultButton)
+
+    typedef QnDialog base_type;
 
 public:
     explicit QnCheckableMessageBox(QWidget *parent);

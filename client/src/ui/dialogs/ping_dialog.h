@@ -3,13 +3,13 @@
 
 #include <QDialog>
 #include <utils/ping_utility.h>
-#include <ui/dialogs/dialog_base.h>
+#include <ui/dialogs/dialog.h>
 
 class QTextEdit;
 
-class QnPingDialog : public QnDialogBase {
+class QnPingDialog : public QnDialog {
     Q_OBJECT
-    typedef QnDialogBase base_type;
+    typedef QnDialog base_type;
 public:
     explicit QnPingDialog(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 

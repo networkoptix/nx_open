@@ -8,7 +8,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/dialog_base.h>
+#include <ui/dialogs/dialog.h>
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnCameraListModel;
@@ -19,10 +19,10 @@ namespace Ui {
     class CameraListDialog;
 }
 
-class QnCameraListDialog: public QnWorkbenchStateDependentDialog<QnDialogBase> {
+class QnCameraListDialog: public QnWorkbenchStateDependentDialog<QnDialog> {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentDialog<QnDialogBase> base_type;
+    typedef QnWorkbenchStateDependentDialog<QnDialog> base_type;
 
 public:
     explicit QnCameraListDialog(QWidget *parent = NULL);

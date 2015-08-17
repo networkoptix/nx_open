@@ -4,7 +4,7 @@
 #include <QtWidgets/QDialog>
 
 #include <utils/common/id.h>
-#include <ui/dialogs/dialog_base.h>
+#include <ui/dialogs/dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
@@ -14,8 +14,11 @@ class QnUpdateDialog;
 class QnServerUpdatesWidget;
 class QnMediaServerUpdateTool;
 
-class QnUpdateDialog : public QnDialogBase, public QnWorkbenchContextAware {
+class QnUpdateDialog : public QnDialog, public QnWorkbenchContextAware {
     Q_OBJECT
+
+    typedef QnDialog base_type;
+
 public:
     explicit QnUpdateDialog(QnWorkbenchContext *context, QWidget *parent = 0);
     ~QnUpdateDialog();

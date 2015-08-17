@@ -4,7 +4,7 @@
 #include <ui/widgets/server_updates_widget.h>
 
 QnUpdateDialog::QnUpdateDialog(QnWorkbenchContext *context, QWidget *parent) :
-    QnDialogBase(parent),
+    base_type(parent),
     QnWorkbenchContextAware(context),
     ui(new Ui::QnUpdateDialog)
 {

@@ -3,16 +3,18 @@
 
 #include <QtWidgets/QDialog>
 
-#include <ui/dialogs/dialog_base.h>
+#include <ui/dialogs/dialog.h>
 
 namespace Ui {
     class ImagePreviewDialog;
 }
 
-class QnImagePreviewDialog : public QnDialogBase
+class QnImagePreviewDialog : public QnDialog
 {
     Q_OBJECT
     
+    typedef QnDialog base_type;
+
 public:
     explicit QnImagePreviewDialog(QWidget *parent = 0);
     ~QnImagePreviewDialog();
