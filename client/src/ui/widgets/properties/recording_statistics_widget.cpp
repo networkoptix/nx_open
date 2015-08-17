@@ -1,5 +1,5 @@
-#include "recording_stats_dialog.h"
-#include "ui_recording_stats_dialog.h"
+#include "recording_statistics_widget.h"
+#include "ui_recording_statistics_widget.h"
 
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
@@ -34,137 +34,154 @@
 #include "utils/common/synctime.h"
 
 namespace {
+
     const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
     const qint64 SECS_PER_DAY = 3600 * 24;
     const qint64 SECS_PER_WEEK = SECS_PER_DAY * 7;
     static const qint64 BYTES_IN_GB = 1000000000ll;
     static const qint64 BYTES_IN_TB = 1000ll * BYTES_IN_GB;
-    
+
     static const qint64 EXTRA_DATA_BASE[] = {10 * BYTES_IN_GB, 1 * BYTES_IN_TB, 10 * BYTES_IN_TB, 100 * BYTES_IN_TB, 1000 * BYTES_IN_TB};
     static const int EXTRA_DATA_ARRAY_SIZE = sizeof(EXTRA_DATA_BASE) / sizeof(EXTRA_DATA_BASE[0]);
     static const int TICKS_PER_INTERVAL = 100;
     static const int SPACE_INTERVAL = 4;
 
-}
-
-class CustomHorizontalHeader: public QHeaderView
-{
-private:
-    QComboBox* m_comboBox;
-
-private:
-    void updateComboBox() 
+    class QnRecordingStatsItemDelegate: public QStyledItemDelegate 
     {
-        QRect rect(sectionViewportPosition(QnRecordingStatsModel::BitrateColumn), 0,  sectionSize(QnRecordingStatsModel::BitrateColumn), height());
-        int width = m_comboBox->minimumSizeHint().width();
-        rect.adjust(qMax(SPACE_INTERVAL, rect.width() - width), 0, -SPACE_INTERVAL, 0);
-        m_comboBox->setGeometry(rect);
-    }
+        typedef QStyledItemDelegate base_type;
 
-public:
-    CustomHorizontalHeader(QWidget *parent = 0) : QHeaderView(Qt::Horizontal, parent)
+    public:
+        explicit QnRecordingStatsItemDelegate(QObject *parent = NULL): 
+            base_type(parent) 
+        {}
+
+        virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override {
+            Q_ASSERT(index.isValid());
+
+            QStyleOptionViewItem opt = option;
+            initStyleOption(&opt, index);
+
+            const QWidget *widget = option.widget;
+            QStyle *style = widget ? widget->style() : QApplication::style();
+
+            if (index.column() != QnRecordingStatsModel::CameraNameColumn)
+            {
+                // draw chart manually
+                QnScopedPainterTransformRollback rollback(painter);
+                QnScopedPainterBrushRollback rollback2(painter);
+
+                QPoint shift = opt.rect.topLeft();
+                painter->translate(shift);
+                opt.rect.translate(-shift);
+
+                qreal realData = index.data(Qn::RecordingStatChartDataRole).toReal();
+                qreal forecastData = index.data(Qn::RecordingStatForecastDataRole).toReal();
+
+
+                QColor baseColor = opt.backgroundBrush.color(); //opt.palette.color(QPalette::Normal, QPalette::Base);
+
+                QVariant value = index.data(Qn::RecordingStatColorsDataRole);
+                QnRecordingStatsColors colors;
+                if (value.isValid() && value.canConvert<QnRecordingStatsColors>())
+                    colors = qvariant_cast<QnRecordingStatsColors>(value);
+
+                if (opt.state & QStyle::State_Selected) {
+                    // alternate row color
+                    const int shift = 16;
+                    baseColor = shiftColor(baseColor, shift, shift, shift);
+                    colors.chartMainColor = shiftColor(colors.chartMainColor, shift, shift, shift);
+                    colors.chartForecastColor = shiftColor(colors.chartForecastColor, shift, shift, shift);
+                }
+                painter->fillRect(opt.rect, baseColor);
+
+                //opt.rect.setWidth(opt.rect.width() - 4);
+                opt.rect.adjust(2, 1, -2, -1);
+
+                painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), colors.chartForecastColor);
+                painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), colors.chartMainColor);
+
+                painter->setFont(opt.font);
+                painter->setPen(opt.palette.foreground().color());
+                painter->drawText(opt.rect, Qt::AlignRight | Qt::AlignVCenter, index.data().toString());
+
+            }
+            else {
+                style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
+            }
+        }
+    };
+
+
+
+    class CustomHorizontalHeader: public QHeaderView
     {
-        m_comboBox = new QComboBox(this);
-        m_comboBox->addItem(tr("5 minutes"), 5 * 60);
-        m_comboBox->addItem(tr("Hour"),  60 * 60);
-        m_comboBox->addItem(tr("Day"),   3600 * 24);
-        m_comboBox->addItem(tr("Week"),  3600 * 24 * 7);
-        m_comboBox->addItem(tr("Month"), 3600 * 24 * 30);
-        m_comboBox->addItem(tr("All data"), 0);
-        m_comboBox->setCurrentIndex(m_comboBox->count()-1);
+    private:
+        QComboBox* m_comboBox;
 
-        connect(this, &QHeaderView::sectionResized, this, [this]() { updateComboBox();}, Qt::DirectConnection);
-        connect(this, &QHeaderView::sectionResized, this, [this]() { updateComboBox();}, Qt::QueuedConnection);
-    }
-
-    virtual void showEvent(QShowEvent *e) override
-    {
-        QHeaderView::showEvent(e);
-        updateComboBox();
-        m_comboBox->show();
-    }
-
-    virtual void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override
-    {
-        QHeaderView::paintSection(painter, rect, logicalIndex);
-        if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
+    private:
+        void updateComboBox() 
         {
-            QnScopedPainterFontRollback rollback(painter);
-            QnScopedPainterPenRollback rollback2(painter);
-            painter->setFont(font());
-            painter->setPen(palette().foreground().color());
+            QRect rect(sectionViewportPosition(QnRecordingStatsModel::BitrateColumn), 0,  sectionSize(QnRecordingStatsModel::BitrateColumn), height());
             int width = m_comboBox->minimumSizeHint().width();
-            QRect r(rect);
-            r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
-            painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last recorded:"));
+            rect.adjust(qMax(SPACE_INTERVAL, rect.width() - width), 0, -SPACE_INTERVAL, 0);
+            m_comboBox->setGeometry(rect);
         }
-    }
-    QComboBox* comboBox() const { return m_comboBox; }
-    int durationForBitrate() const {
-        return m_comboBox->itemData(m_comboBox->currentIndex()).toInt();
-    }
-};
 
-void QnRecordingStatsItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
-{
-    Q_ASSERT(index.isValid());
+    public:
+        CustomHorizontalHeader(QWidget *parent = 0) : QHeaderView(Qt::Horizontal, parent)
+        {
+            m_comboBox = new QComboBox(this);
+            m_comboBox->addItem(tr("5 minutes"), 5 * 60);
+            m_comboBox->addItem(tr("Hour"),  60 * 60);
+            m_comboBox->addItem(tr("Day"),   3600 * 24);
+            m_comboBox->addItem(tr("Week"),  3600 * 24 * 7);
+            m_comboBox->addItem(tr("Month"), 3600 * 24 * 30);
+            m_comboBox->addItem(tr("All data"), 0);
+            m_comboBox->setCurrentIndex(m_comboBox->count()-1);
 
-    QStyleOptionViewItem opt = option;
-    initStyleOption(&opt, index);
-
-    const QWidget *widget = option.widget;
-    QStyle *style = widget ? widget->style() : QApplication::style();
-
-    if (index.column() != QnRecordingStatsModel::CameraNameColumn)
-    {
-        // draw chart manually
-        QnScopedPainterTransformRollback rollback(painter);
-        QnScopedPainterBrushRollback rollback2(painter);
-
-        QPoint shift = opt.rect.topLeft();
-        painter->translate(shift);
-        opt.rect.translate(-shift);
-
-        qreal realData = index.data(Qn::RecordingStatChartDataRole).toReal();
-        qreal forecastData = index.data(Qn::RecordingStatForecastDataRole).toReal();
-        
-
-        QColor baseColor = opt.backgroundBrush.color(); //opt.palette.color(QPalette::Normal, QPalette::Base);
-
-        QVariant value = index.data(Qn::RecordingStatColorsDataRole);
-        QnRecordingStatsColors colors;
-        if (value.isValid() && value.canConvert<QnRecordingStatsColors>())
-            colors = qvariant_cast<QnRecordingStatsColors>(value);
-        
-        if (opt.state & QStyle::State_Selected) {
-            // alternate row color
-            const int shift = 16;
-            baseColor = shiftColor(baseColor, shift, shift, shift);
-            colors.chartMainColor = shiftColor(colors.chartMainColor, shift, shift, shift);
-            colors.chartForecastColor = shiftColor(colors.chartForecastColor, shift, shift, shift);
+            connect(this, &QHeaderView::sectionResized, this, [this]() { updateComboBox();}, Qt::DirectConnection);
+            connect(this, &QHeaderView::sectionResized, this, [this]() { updateComboBox();}, Qt::QueuedConnection);
         }
-        painter->fillRect(opt.rect, baseColor);
 
-        //opt.rect.setWidth(opt.rect.width() - 4);
-        opt.rect.adjust(2, 1, -2, -1);
-        
-        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), colors.chartForecastColor);
-        painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), colors.chartMainColor);
+        virtual void showEvent(QShowEvent *e) override
+        {
+            QHeaderView::showEvent(e);
+            updateComboBox();
+            m_comboBox->show();
+        }
 
-        painter->setFont(opt.font);
-        painter->setPen(opt.palette.foreground().color());
-        painter->drawText(opt.rect, Qt::AlignRight | Qt::AlignVCenter, index.data().toString());
+        virtual void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override
+        {
+            QHeaderView::paintSection(painter, rect, logicalIndex);
+            if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
+            {
+                QnScopedPainterFontRollback rollback(painter);
+                QnScopedPainterPenRollback rollback2(painter);
+                painter->setFont(font());
+                painter->setPen(palette().foreground().color());
+                int width = m_comboBox->minimumSizeHint().width();
+                QRect r(rect);
+                r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
+                painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last recorded:"));
+            }
+        }
 
-    }
-    else {
-        style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
-    }
+        QComboBox* comboBox() const { 
+            return m_comboBox; 
+        }
+
+        int durationForBitrate() const {
+            return m_comboBox->itemData(m_comboBox->currentIndex()).toInt();
+        }
+    };
+
 }
 
-
-QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
+QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /*= 0*/):
     base_type(parent),
-    ui(new Ui::RecordingStatsDialog),
+    QnWorkbenchContextAware(parent),
+    ui(new Ui::RecordingStatisticsWidget),
+    m_server(server),
     m_model(new QnRecordingStatsModel(this)),
     m_requests(),
     m_updateDisabled(false),
@@ -174,25 +191,22 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     m_clipboardAction(NULL),
     m_lastMouseButton(Qt::NoButton),
     m_allData(),
-    m_hidenCameras(),
-    m_availStorages(),
-    m_mserver()
+    m_hiddenCameras(),
+    m_availStorages()
+
 {
     ui->setupUi(this);
     setWarningStyle(ui->warningLabel);
-
-    //setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
-    
 
     auto sortModel = new QnSortedRecordingStatsModel(this);
     sortModel->setSourceModel(m_model);
     ui->gridEvents->setModel(sortModel);
     ui->gridEvents->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
-    
+
     CustomHorizontalHeader* headers = new CustomHorizontalHeader(this);
     ui->gridEvents->setHorizontalHeader(headers);
-    connect(headers->comboBox(), QnComboboxCurrentIndexChanged, this, &QnRecordingStatsDialog::updateData);
+    connect(headers->comboBox(), QnComboboxCurrentIndexChanged, this, &QnRecordingStatisticsWidget::updateData);
 
     headers->setSectionsClickable(true);
     headers->setStretchLastSection(true);
@@ -213,55 +227,42 @@ QnRecordingStatsDialog::QnRecordingStatsDialog(QWidget *parent):
     QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
     mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
     ui->gridEvents->viewport()->installEventFilter(mouseSignalizer);
-    connect(mouseSignalizer, &QnAbstractEventSignalizer::activated, this, &QnRecordingStatsDialog::at_mouseButtonRelease);
+    connect(mouseSignalizer, &QnAbstractEventSignalizer::activated, this, &QnRecordingStatisticsWidget::at_mouseButtonRelease);
 
     ui->gridEvents->addAction(m_clipboardAction);
     ui->gridEvents->addAction(m_exportAction);
 
     ui->loadingProgressBar->hide();
 
-    connect(m_clipboardAction,      &QAction::triggered,                this,   &QnRecordingStatsDialog::at_clipboardAction_triggered);
-    connect(m_exportAction,         &QAction::triggered,                this,   &QnRecordingStatsDialog::at_exportAction_triggered);
+    connect(m_clipboardAction,      &QAction::triggered,                this,   &QnRecordingStatisticsWidget::at_clipboardAction_triggered);
+    connect(m_exportAction,         &QAction::triggered,                this,   &QnRecordingStatisticsWidget::at_exportAction_triggered);
     connect(m_selectAllAction,      &QAction::triggered,                ui->gridEvents, &QTableView::selectAll);
 
-    connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnRecordingStatsDialog::updateData);
+    connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnRecordingStatisticsWidget::updateData);
 
-    connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnRecordingStatsDialog::at_eventsGrid_clicked);
-    connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnRecordingStatsDialog::at_eventsGrid_customContextMenuRequested);
+    connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnRecordingStatisticsWidget::at_eventsGrid_clicked);
+    connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested);
     connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
 
-    connect(ui->checkBoxForecast,   &QCheckBox::stateChanged, this, &QnRecordingStatsDialog::at_forecastParamsChanged);
-    connect(ui->extraSpaceSlider,   &QSlider::valueChanged,   this, &QnRecordingStatsDialog::at_forecastParamsChanged);
+    connect(ui->checkBoxForecast,   &QCheckBox::stateChanged, this, &QnRecordingStatisticsWidget::at_forecastParamsChanged);
+    connect(ui->extraSpaceSlider,   &QSlider::valueChanged,   this, &QnRecordingStatisticsWidget::at_forecastParamsChanged);
     connect(ui->extraSizeSpinBox,   SIGNAL(valueChanged(double)),   this, SLOT(at_forecastParamsChanged()));
 
-    connect(m_model, &QnRecordingStatsModel::colorsChanged, this, &QnRecordingStatsDialog::at_updateColors);
+    connect(m_model, &QnRecordingStatsModel::colorsChanged, this, &QnRecordingStatisticsWidget::at_updateColors);
     at_updateColors();
 
     ui->mainGridLayout->activate();
+
 }
 
-void QnRecordingStatsDialog::at_updateColors()
-{
-    auto colors = m_model->colors();
-    
-    QPalette palette = ui->labelUsageColor->palette();
-    palette.setColor(ui->labelUsageColor->backgroundRole(), colors.chartMainColor);
-    ui->labelUsageColor->setPalette(palette);
-    ui->labelUsageColor->setAutoFillBackground(true);
-    ui->labelUsageColor->update();
+QnRecordingStatisticsWidget::~QnRecordingStatisticsWidget()
+{}
 
-    palette = ui->labelUsageColor->palette();
-    palette.setColor(ui->labelForecastColor->backgroundRole(), colors.chartForecastColor);
-    ui->labelForecastColor->setPalette(palette);
-    ui->labelForecastColor->setAutoFillBackground(true);
-    ui->labelForecastColor->update();
+void QnRecordingStatisticsWidget::updateFromSettings() {
+    updateData();
 }
 
-QnRecordingStatsDialog::~QnRecordingStatsDialog() {
-}
-
-void QnRecordingStatsDialog::updateData()
-{
+void QnRecordingStatisticsWidget::updateData() {
     if (m_updateDisabled) {
         m_dirty = true;
         return;
@@ -288,46 +289,46 @@ void QnRecordingStatsDialog::updateData()
     m_dirty = false;
 }
 
-QList<QnMediaServerResourcePtr> QnRecordingStatsDialog::getServerList() const
-{
-    QList<QnMediaServerResourcePtr> result;
-    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
-    foreach(const QnResourcePtr& r, resList) {
-        QnMediaServerResourcePtr mServer = r.dynamicCast<QnMediaServerResource>();
-        if (mServer)
-            result << mServer;
-    }
 
-    return result;
+void QnRecordingStatisticsWidget::at_updateColors()
+{
+    auto colors = m_model->colors();
+
+    QPalette palette = ui->labelUsageColor->palette();
+    palette.setColor(ui->labelUsageColor->backgroundRole(), colors.chartMainColor);
+    ui->labelUsageColor->setPalette(palette);
+    ui->labelUsageColor->setAutoFillBackground(true);
+    ui->labelUsageColor->update();
+
+    palette = ui->labelUsageColor->palette();
+    palette.setColor(ui->labelForecastColor->backgroundRole(), colors.chartForecastColor);
+    ui->labelForecastColor->setPalette(palette);
+    ui->labelForecastColor->setAutoFillBackground(true);
+    ui->labelForecastColor->update();
 }
 
-void QnRecordingStatsDialog::setServer(QnMediaServerResourcePtr mserver)
-{
-    m_mserver = mserver;
-}
-
-void QnRecordingStatsDialog::query(qint64 bitrateAnalizePeriodMs)
+void QnRecordingStatisticsWidget::query(qint64 bitrateAnalizePeriodMs)
 {
     m_requests.clear();
     m_allData.clear();
     m_availStorages.clear();
 
-    if (!m_mserver)
+    if (!m_server)
         return;
 
-    if (m_mserver->getStatus() == Qn::Online)
+    if (m_server->getStatus() == Qn::Online)
     {
-        int handle = m_mserver->apiConnection()->getRecordingStatisticsAsync(
+        int handle = m_server->apiConnection()->getRecordingStatisticsAsync(
             bitrateAnalizePeriodMs,
             this, SLOT(at_gotStatiscits(int, const QnRecordingStatsReply&, int)));
-        m_requests.insert(handle, m_mserver->getId());
-        handle = m_mserver->apiConnection()->getStorageSpaceAsync(
+        m_requests.insert(handle, m_server->getId());
+        handle = m_server->apiConnection()->getStorageSpaceAsync(
             this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
-        m_requests.insert(handle, m_mserver->getId());
+        m_requests.insert(handle, m_server->getId());
     }
 }
 
-void QnRecordingStatsDialog::at_gotStatiscits(int httpStatus, const QnRecordingStatsReply& data, int requestNum)
+void QnRecordingStatisticsWidget::at_gotStatiscits(int httpStatus, const QnRecordingStatsReply& data, int requestNum)
 {
     if (!m_requests.contains(requestNum))
         return;
@@ -342,7 +343,7 @@ void QnRecordingStatsDialog::at_gotStatiscits(int httpStatus, const QnRecordingS
     }
 }
 
-void QnRecordingStatsDialog::at_gotStorageSpace(int httpStatus, const QnStorageSpaceReply& data, int requestNum)
+void QnRecordingStatisticsWidget::at_gotStorageSpace(int httpStatus, const QnStorageSpaceReply& data, int requestNum)
 {
     if (!m_requests.contains(requestNum))
         return;
@@ -356,30 +357,30 @@ void QnRecordingStatsDialog::at_gotStorageSpace(int httpStatus, const QnStorageS
     }
 }
 
-void QnRecordingStatsDialog::requestFinished()
+void QnRecordingStatisticsWidget::requestFinished()
 {
     QnRecordingStatsReply existsCameras;
-    m_hidenCameras.clear();
+    m_hiddenCameras.clear();
     for (const auto& camera: m_allData) 
     {
         if (qnResPool->hasSuchResource(camera.uniqueId))
             existsCameras << camera;
         else
-            m_hidenCameras << camera;
+            m_hiddenCameras << camera;
     }
     m_model->setModelData(existsCameras);
-       
+
     ui->gridEvents->setDisabled(false);
     setCursor(Qt::ArrowCursor);
     ui->loadingProgressBar->hide();
     at_forecastParamsChanged();
 }
 
-void QnRecordingStatsDialog::at_eventsGrid_clicked(const QModelIndex& /*idx*/)
+void QnRecordingStatisticsWidget::at_eventsGrid_clicked(const QModelIndex& /*idx*/)
 {
 }
 
-void QnRecordingStatsDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
+void QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested(const QPoint&)
 {
     QMenu* menu = 0;
     QModelIndex idx = ui->gridEvents->currentIndex();
@@ -411,48 +412,24 @@ void QnRecordingStatsDialog::at_eventsGrid_customContextMenuRequested(const QPoi
     menu->deleteLater();
 }
 
-void QnRecordingStatsDialog::at_exportAction_triggered()
+void QnRecordingStatisticsWidget::at_exportAction_triggered()
 {
     QnGridWidgetHelper::exportToFile(ui->gridEvents, this, tr("Export selected events to file"));
 }
 
-void QnRecordingStatsDialog::at_clipboardAction_triggered()
+void QnRecordingStatisticsWidget::at_clipboardAction_triggered()
 {
     QnGridWidgetHelper::copyToClipboard(ui->gridEvents);
 }
 
-void QnRecordingStatsDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
+void QnRecordingStatisticsWidget::at_mouseButtonRelease(QObject* sender, QEvent* event)
 {
     Q_UNUSED(sender)
-    QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
+        QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
     m_lastMouseButton = me->button();
 }
 
-void QnRecordingStatsDialog::disableUpdateData()
-{
-    m_updateDisabled = true;
-}
-
-void QnRecordingStatsDialog::enableUpdateData()
-{
-    m_updateDisabled = false;
-    if (m_dirty) {
-        m_dirty = false;
-        if (isVisible())
-            updateData();
-    }
-}
-
-void QnRecordingStatsDialog::setVisible(bool value)
-{
-    // TODO: #Elric use showEvent instead. 
-
-    if (value && !isVisible())
-        updateData();
-    QDialog::setVisible(value);
-}
-
-qint64 QnRecordingStatsDialog::sliderPositionToBytes(int value) const
+qint64 QnRecordingStatisticsWidget::sliderPositionToBytes(int value) const
 {
     if (value == 0)
         return 0;
@@ -464,12 +441,12 @@ qint64 QnRecordingStatsDialog::sliderPositionToBytes(int value) const
     qint64 k1 = EXTRA_DATA_BASE[idx];
     qint64 k2 = EXTRA_DATA_BASE[idx+1];
     int intervalTicks = value % TICKS_PER_INTERVAL;
-    
+
     qint64 step = (k2 - k1) / TICKS_PER_INTERVAL;
     return k1 + step * intervalTicks;
 }
 
-int QnRecordingStatsDialog::bytesToSliderPosition (qint64 value) const
+int QnRecordingStatisticsWidget::bytesToSliderPosition (qint64 value) const
 {
     int idx = 0;
     for (; idx < EXTRA_DATA_ARRAY_SIZE-1; ++idx)
@@ -482,7 +459,7 @@ int QnRecordingStatsDialog::bytesToSliderPosition (qint64 value) const
     return idx * TICKS_PER_INTERVAL + value / step;
 }
 
-void QnRecordingStatsDialog::at_forecastParamsChanged()
+void QnRecordingStatisticsWidget::at_forecastParamsChanged()
 {
     if (!ui->gridEvents->isEnabled())
         return;
@@ -491,7 +468,7 @@ void QnRecordingStatsDialog::at_forecastParamsChanged()
     bool fcEnabled = ui->checkBoxForecast->isChecked();
     ui->extraSpaceSlider->setEnabled(fcEnabled);
     for (int i = 0; i < ui->gridLayoutForecast->count(); ++i)
-    //for (const auto& object: ui->gridLayoutForecast->getItemPosition() ())
+        //for (const auto& object: ui->gridLayoutForecast->getItemPosition() ())
     {
         QWidget* object = ui->gridLayoutForecast->itemAt(i)->widget();
         if (QSlider* slider = dynamic_cast<QSlider*>(object))
@@ -522,7 +499,7 @@ void QnRecordingStatsDialog::at_forecastParamsChanged()
     ui->gridEvents->setEnabled(true);
 }
 
-void QnRecordingStatsDialog::updateColumnWidth()
+void QnRecordingStatisticsWidget::updateColumnWidth()
 {
     int minWidth = 0;
     auto* headers = ui->gridEvents->horizontalHeader();
@@ -556,7 +533,7 @@ void QnRecordingStatsDialog::updateColumnWidth()
     }
 }
 
-QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBytes)
+QnRecordingStatsReply QnRecordingStatisticsWidget::getForecastData(qint64 extraSizeBytes)
 {
     const QnRecordingStatsReply modelData = m_model->modelData();
     ForecastData forecastData;
@@ -595,7 +572,7 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
             forecastData.extraSpace += qMax(0ll, storageSpaceData.freeSpace - storageSpaceData.reservedSpace);
     }
     // 2.2 take into account archive of removed cameras
-    for (const auto& hiddenCam: m_hidenCameras)
+    for (const auto& hiddenCam: m_hiddenCameras)
         forecastData.extraSpace += hiddenCam.recordedBytes;
 
     // 2.3 add user extra data
@@ -604,7 +581,7 @@ QnRecordingStatsReply QnRecordingStatsDialog::getForecastData(qint64 extraSizeBy
     return doForecastMainStep(forecastData, forecastStep);
 }
 
-QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ForecastData& forecastData, qint64 forecastStep)
+QnRecordingStatsReply QnRecordingStatisticsWidget::doForecastMainStep(ForecastData& forecastData, qint64 forecastStep)
 {
     // Go to the future, one step is a one day and spend extraSpace
     qint64 prevExtraSpace = -1;
@@ -644,3 +621,4 @@ QnRecordingStatsReply QnRecordingStatsDialog::doForecastMainStep(ForecastData& f
         result << value.stats;
     return result;
 }
+

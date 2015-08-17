@@ -353,11 +353,6 @@ namespace Qn {
         BusinessEventsLogAction,
 
         /**
-         * Opens recording statistics dialog.
-         */
-        RecordingStatisticsAction,
-
-        /**
          * Opens camera list dialog.
          */
         CameraListAction,

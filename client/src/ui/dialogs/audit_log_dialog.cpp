@@ -991,19 +991,6 @@ void QnAuditLogDialog::updateData()
     m_dirty = false;
 }
 
-QList<QnMediaServerResourcePtr> QnAuditLogDialog::getServerList() const
-{
-    QList<QnMediaServerResourcePtr> result;
-    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
-    foreach(const QnResourcePtr& r, resList) {
-        QnMediaServerResourcePtr mServer = r.dynamicCast<QnMediaServerResource>();
-        if (mServer)
-            result << mServer;
-    }
-
-    return result;
-}
-
 void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
 {
     m_sessionModel->clearData();
@@ -1017,7 +1004,7 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     m_filteredData.clear();
 
 
-    QList<QnMediaServerResourcePtr> mediaServerList = getServerList();
+    auto mediaServerList = qnResPool->getAllServers();
     foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
     {
         if (mserver->getStatus() == Qn::Online)
