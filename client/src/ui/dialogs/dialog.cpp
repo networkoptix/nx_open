@@ -5,7 +5,7 @@ namespace
 {
     void cancelDrag(QDialog *dialog)
     {
-        Q_ASSERT_X(dialog, "cancelDrag", "Dialog is null");
+        Q_ASSERT_X(dialog, Q_FUNC_INFO, "Dialog is null");
         /// Cancels any drag event 
         dialog->grabMouse();
         dialog->releaseMouse();
@@ -20,7 +20,7 @@ QnDialog::QnDialog(QWidget * parent, Qt::WindowFlags flags)
 
 void QnDialog::show(QDialog *dialog)
 {
-    Q_ASSERT_X(dialog, "QnDialog::show", "Dialog is null");
+    Q_ASSERT_X(dialog, Q_FUNC_INFO, "Dialog is null");
 
     if (!dialog)
         return;
