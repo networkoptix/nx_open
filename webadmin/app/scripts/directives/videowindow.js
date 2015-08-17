@@ -190,7 +190,7 @@ angular.module('webadminApp')
                 // TODO: move supported info to config
                 // TODO: Support new players
 
-                function initNativePlayer(format){
+                function initNativePlayer(nativeFormat){
 
                     scope.native = true;
                     scope.flashls = false;
@@ -198,7 +198,11 @@ angular.module('webadminApp')
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
-                            scope.vgApi.load(getFormatSrc(format),mimeTypes[format]);
+
+                            $timeout(function(){
+                                scope.loading = !!format;
+                            });
+                            scope.vgApi.load(getFormatSrc(nativeFormat),mimeTypes[nativeFormat]);
 
                             scope.vgApi.addEventListener("timeupdate",function(event,arg2,arg3){
                                 var video = event.srcElement || event.originalTarget;
@@ -228,16 +232,20 @@ angular.module('webadminApp')
                             scope.vgApi = api;
 
                             if (scope.vgSrc) {
+                                $timeout(function(){
+                                    scope.loading = !!format;
+                                });
                                 scope.vgApi.load(getFormatSrc('hls'));
                             }
 
                             scope.vgPlayerReady({$API: api});
                         }, function (error) {
-                            scope.errorLoading = true;
-                            scope.loading = false;
-                            scope.flashls = false;// Kill flashls!
-                            scope.native = false;
-                            scope.$digest();
+                            $timeout(function(){
+                                scope.errorLoading = true;
+                                scope.loading = false;
+                                scope.flashls = false;// Kill flashls!
+                                scope.native = false;
+                            });
                             console.error(error);
                         }, function (position, duration) {
                             scope.loading = false;
@@ -253,6 +261,10 @@ angular.module('webadminApp')
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
+
+                            $timeout(function(){
+                                scope.loading = !!format;
+                            });
                             scope.vgApi.load(getFormatSrc('hls'));
                         }
 
@@ -270,6 +282,11 @@ angular.module('webadminApp')
 
                         /* Tell Locomote to play the specified media */
                         if(!scope.vgApi.load ) {
+
+                            $timeout(function(){
+                                scope.loading = !!format;
+                            });
+
                             scope.vgApi.load = scope.vgApi.play;
                             scope.vgApi.play = function(){
                                 scope.vgApi.load(getFormatSrc('rtsp'));
@@ -296,17 +313,16 @@ angular.module('webadminApp')
                 }
 
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
-
+                var format = null;
 
                 scope.$watch("vgSrc",function(){
 
+                    scope.loading = false;
                     scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         var format = detectBestFormat();
 
-                        scope.loading = !!format;
-
-                        recyclePlayer(format);// Remove old player. TODO: recycle it later
+                        recyclePlayer(format);// Remove or recycle old player.
 
                         switch(format){
                             case "flashls":
@@ -324,6 +340,9 @@ angular.module('webadminApp')
                             case "native-hls":
                                 initNativePlayer("hls");
                                 break;
+
+                            case null: //Do nothing
+                                return;
 
                             case "webm":
                             default:
