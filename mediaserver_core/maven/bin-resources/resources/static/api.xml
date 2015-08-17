@@ -1714,7 +1714,7 @@
                         Url format for downloading fragment of archive by specifying fragment start time and duration.
                         Fragment can be downloaded in mpeg-2/ts (.ts) format or matroska (.mkv).
                         No transcoding is done.
-                        Stream format can be one of following: ts, mkv, mp4
+                        Stream format can be one of following: ts, mkv
                         Example: http://&lt;server_ip&gt;:&lt;port&gt;/hls/12AB42FD5912.mkv?startDatetime=2015-02-05T19:00&amp;duration=10
                     </description>
                     <method>GET</method>
