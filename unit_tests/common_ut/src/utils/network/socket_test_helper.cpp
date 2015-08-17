@@ -212,7 +212,7 @@ void RandomDataTcpServer::join()
 
 bool RandomDataTcpServer::start()
 {
-    m_serverSocket.reset( SocketFactory::createStreamServerSocket() );
+    m_serverSocket = SocketFactory::createStreamServerSocket();
     if( !m_serverSocket->bind(SocketAddress()) ||
         !m_serverSocket->listen() )
     {

@@ -29,8 +29,11 @@ public:
 QnProxySenderConnection::QnProxySenderConnection(
         const SocketAddress& proxyServerUrl, const QnUuid& guid,
         QnUniversalTcpListener* owner)
-    : QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate,
-        QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket()), owner, false)
+    : QnUniversalRequestProcessor(
+          new QnProxySenderConnectionPrivate,
+          QSharedPointer<AbstractStreamSocket>(
+                SocketFactory::createStreamSocket().release()),
+          owner, false)
 {
     Q_D(QnProxySenderConnection);
     d->proxyServerUrl = proxyServerUrl;

@@ -81,7 +81,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, co
 
 void CLSimpleHTTPClient::initSocket(bool ssl)
 {
-    m_sock = TCPSocketPtr(SocketFactory::createStreamSocket(ssl));
+    m_sock = TCPSocketPtr(SocketFactory::createStreamSocket(ssl).release());
 
     if( !m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout) )
     {

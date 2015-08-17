@@ -92,6 +92,17 @@ TEST_F( StunClientServerTest, Connectivity )
 
 TEST_F( StunClientServerTest, RequestResponse )
 {
+    // try to sendRequest with no server
+    {
+        Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
+
+        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        ASSERT_TRUE( client.sendRequest( std::move( request ), waiter.pusher() ) );
+
+        const auto result = waiter.pop();
+        ASSERT_EQ( result.first, SystemError::connectionReset );
+    }
+
     startServer();
     {
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );

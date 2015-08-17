@@ -53,7 +53,9 @@ void ServerConnection::processBindingRequest( Message message )
     response.newAttribute< stun::attrs::XorMappedAddress >(
                 peer.port, peer.address.ipv4() );
 
-    Q_ASSERT( sendMessage( std::move( response ) ) );
+    const auto ret = sendMessage( std::move( response ) );
+    // TODO: NX_LOG
+    Q_ASSERT_X( ret, Q_FUNC_INFO, "Could not send message" );
 }
 
 void ServerConnection::processCustomRequest( Message message )
@@ -71,7 +73,9 @@ void ServerConnection::processCustomRequest( Message message )
     response.newAttribute< stun::attrs::ErrorDescription >(
         404, "Method is not supported" );
 
-    Q_ASSERT( sendMessage( std::move( response ) ) );
+    const auto ret = sendMessage( std::move( response ) );
+    // TODO: NX_LOG
+    Q_ASSERT_X( ret, Q_FUNC_INFO, "Could not send message" );
 }
 
 } // namespace stun

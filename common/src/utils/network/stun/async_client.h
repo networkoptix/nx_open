@@ -24,7 +24,6 @@ public:
     > BaseConnectionType;
 
     typedef BaseConnectionType ConnectionType;
-    typedef std::unique_ptr< AbstractStreamSocket > SocketPtr;
 
     typedef std::function< void( SystemError::ErrorCode ) > ConnectionHandler;
     typedef std::function< void( Message ) > IndicationHandler;
@@ -67,15 +66,16 @@ public:
 private:
     enum class State
     {
-        NOT_CONNECTED,
-        CONNECTING,
-        CONNECTED,
-        TERMINATED,
+        disconnected,
+        connecting,
+        connected,
+        terminated,
     };
 
     bool openConnectionImpl( QnMutexLockerBase* lock );
+    void closeConnectionImpl( QnMutexLockerBase* lock );
     bool dispatchRequestsInQueue( QnMutexLockerBase* lock );
-    void onConnectionComplete( SocketPtr socket, SystemError::ErrorCode code );
+    void onConnectionComplete( SystemError::ErrorCode code );
     void processMessage( Message message );
 
 private:
@@ -90,6 +90,7 @@ private:
     IndicationHandler m_indicationHandler;
     ConnectionHandler m_disconnectHandler;
 
+    std::unique_ptr< AbstractStreamSocket > m_connectingSocket;
     std::list< std::pair< Message, RequestHandler > > m_requestQueue;
     std::map< Buffer, RequestHandler > m_requestsInProgress;
 };

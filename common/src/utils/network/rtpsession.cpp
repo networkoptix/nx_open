@@ -74,11 +74,11 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_tcpMode = useTCP;
     if (!m_tcpMode) 
     {
-        m_mediaSocket = SocketFactory::createDatagramSocket();
+        m_mediaSocket = SocketFactory::createDatagramSocket().release();
         m_mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
         m_mediaSocket->setRecvTimeout(500);
 
-        m_rtcpSocket = SocketFactory::createDatagramSocket();
+        m_rtcpSocket = SocketFactory::createDatagramSocket().release();
         m_rtcpSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
         m_rtcpSocket->setRecvTimeout(500);
     }
@@ -401,7 +401,7 @@ RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_responseBufferLen = 0;
 
     if( !m_tcpSock )
-        m_tcpSock.reset( SocketFactory::createStreamSocket() );
+        m_tcpSock = SocketFactory::createStreamSocket();
 
     m_additionalReadBuffer = new char[ADDITIONAL_READ_BUFFER_CAPACITY];
 

@@ -88,7 +88,7 @@ bool QnTcpListener::bindToLocalAddress()
 {
     Q_D(QnTcpListener);
 
-    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
+    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL).release();
     if( !d->serverSocket->setReuseAddrFlag( true ) ||
         !d->serverSocket->bind( SocketAddress( d->serverAddress.toString(), d->localPort ) ) ||
         !d->serverSocket->listen() )

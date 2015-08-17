@@ -112,17 +112,15 @@ private:
 class UdtSocketProfileServer : public UdtSocketProfile {
 public:
     UdtSocketProfileServer( const ServerConfig& config ) :
+        server_socket_(SocketFactory::createStreamServerSocket(
+            false, config.tcp ? SocketFactory::nttDisabled : SocketFactory::nttEnabled)),
         address_(config.address),
         port_(config.port),
         current_conn_size_(0),
         total_recv_bytes_(0),
         broken_or_error_conn_(0),
-        closed_conn_(0) {
-            if( config.tcp ) {
-                server_socket_.reset( SocketFactory::createStreamServerSocket(false,SocketFactory::nttDisabled) );
-            } else {
-                server_socket_.reset( SocketFactory::createStreamServerSocket(false,SocketFactory::nttEnabled) );
-            }
+        closed_conn_(0)
+    {
     }
     virtual bool run() {
         if(!server_socket_->bind( SocketAddress(HostAddress(address_),port_)))
@@ -456,7 +454,7 @@ void UdtSocketProfileClient::ScheduleConnection() {
                                                (connected_socket_size_ < maximum_allowed_concurrent_connection_) ; ++i ) {
         if( random_.Roll( GetConnectionProbability() ) ) {
             SocketFactory::NatTraversalType type = tcp_ ? SocketFactory::NatTraversalType::nttDisabled : SocketFactory::NatTraversalType::nttEnabled;
-            std::unique_ptr<Connection> conn(  new Connection( SocketFactory::createStreamSocket( false , type ) ) );
+            std::unique_ptr<Connection> conn(  new Connection( SocketFactory::createStreamSocket( false , type ).release() ) );
             conn->socket->setNonBlockingMode(true);
             conn->socket->setReuseAddrFlag(true);
             if( !conn->socket->bind(SocketAddress(HostAddress::anyHost,reused_port_)) )

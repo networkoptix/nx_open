@@ -10,12 +10,12 @@
 #include "ssl_socket.h"
 
 
-AbstractDatagramSocket* SocketFactory::createDatagramSocket()
+std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket()
 {
-    return new UDPSocket();
+    return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket() );
 }
 
-AbstractStreamSocket* SocketFactory::createStreamSocket(
+std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
     bool sslRequired,
     SocketFactory::NatTraversalType natTraversalRequired )
 {
@@ -43,10 +43,10 @@ AbstractStreamSocket* SocketFactory::createStreamSocket(
         result = new QnSSLSocket(result, false);
 #endif
     
-    return result;
+    return std::unique_ptr< AbstractStreamSocket >( result );
 }
 
-AbstractStreamServerSocket* SocketFactory::createStreamServerSocket(
+std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
     bool sslRequired,
     SocketFactory::NatTraversalType natTraversalRequired )
 {
@@ -74,5 +74,6 @@ AbstractStreamServerSocket* SocketFactory::createStreamServerSocket(
     if( sslRequired )
         serverSocket = new SSLServerSocket(serverSocket, true);
 #endif // ENABLE_SSL
-    return serverSocket;
+
+    return std::unique_ptr< AbstractStreamServerSocket >( serverSocket );
 }

@@ -25,14 +25,14 @@ public:
         nttDisabled
     };
 
-    static AbstractDatagramSocket* createDatagramSocket();
+    static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket();
     /*!
         \param sslRequired If \a true than it is guaranteed that returned object can be safely cast to \a AbstractEncryptedStreamSocket
     */
-    static AbstractStreamSocket* createStreamSocket(
+    static std::unique_ptr< AbstractStreamSocket > createStreamSocket(
         bool sslRequired = false,
         NatTraversalType natTraversalRequired = nttAuto );
-    static AbstractStreamServerSocket* createStreamServerSocket(
+    static std::unique_ptr< AbstractStreamServerSocket > createStreamServerSocket(
         bool sslRequired = false,
         NatTraversalType natTraversalRequired = nttAuto );
 

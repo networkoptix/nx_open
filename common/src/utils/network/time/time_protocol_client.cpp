@@ -65,7 +65,8 @@ bool TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::E
 
     {
         QnMutexLocker lk( &m_mutex );
-        m_tcpSock.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
+        m_tcpSock.reset( SocketFactory::createStreamSocket(
+                             false, SocketFactory::nttDisabled ).release() );
         if( !m_tcpSock )
             return false;
     }

@@ -113,9 +113,10 @@ namespace nx_api
             m_connectionCloseHandlers.push_front( std::move(handler) );
         }
 
-        template< typename Task >
-        bool executeInIoThread( Task task )
-        { return m_streamSocket->post( std::move(task) ); }
+        const std::unique_ptr< AbstractCommunicatingSocket >& socket()
+        {
+            return m_streamSocket;
+        }
 
     protected:
         SocketAddress getForeignAddress()
