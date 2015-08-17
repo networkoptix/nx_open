@@ -105,6 +105,12 @@
         },
         {
             "keys": [
+                "ACTI|V32"
+            ],
+            "forceONVIF": true
+        },
+        {
+            "keys": [
                 "ACTI|KCM3311","ACTI|KCM7211","ACTI|KCM5611","ACTI|KCM5311","Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T",
                 "Sony|SNC-XM636",
             "DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20"
