@@ -20,7 +20,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(AccountStatus,
 )
 
 
-bool AccountData::getAsVariant( int resID, QVariant* const value ) const
+bool AccountData::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
 {
     //TODO #ak
     return false;
@@ -29,9 +29,9 @@ bool AccountData::getAsVariant( int resID, QVariant* const value ) const
 bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData )
 {
     accountData->id = QnUuid(urlQuery.queryItemValue( lit("id") ));
-    accountData->email = urlQuery.queryItemValue( lit("email") ).toUtf8();
-    accountData->passwordHa1 = urlQuery.queryItemValue( lit("passwordHa1") ).toUtf8();
-    accountData->fullName = urlQuery.queryItemValue( lit("fullName") ).toUtf8();
+    accountData->email = urlQuery.queryItemValue( lit("email") ).toStdString();
+    accountData->passwordHa1 = urlQuery.queryItemValue( lit("passwordHa1") ).toStdString();
+    accountData->fullName = urlQuery.queryItemValue( lit("fullName") ).toStdString();
     bool success = false;
     accountData->statusCode =
         QnLexical::deserialized<AccountStatus>( lit( "statusCode" ), asInvalid, &success );

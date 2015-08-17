@@ -73,11 +73,11 @@ public:
         //  needs to be deserialized depending on request type
         if( !AuthorizationManager::instance()->authorize(
                 stree::MultiSourceResourceReader( authInfo, inputData ),
-                m_entityType,
-                m_actionType,
+                this->m_entityType,
+                this->m_actionType,
                 &authInfo ) )   //using same object since we can move it
         {
-            requestCompleted( nx_http::StatusCode::unauthorized, Output() );
+            this->requestCompleted( nx_http::StatusCode::unauthorized, Output() );
             return;
         }
 
@@ -85,8 +85,8 @@ public:
             AuthorizationInfo( std::move( authInfo ) ),
             std::move( inputData ),
             std::bind(
-                static_cast<void (AbstractFusionRequestHandler<Input, Output>::*)(nx_http::StatusCode::Value, Output)>
-                    (&AbstractFusionRequestHandler<Input, Output>::requestCompleted),
+                static_cast<void (nx_http::AbstractFusionRequestHandler<Input, Output>::*)(nx_http::StatusCode::Value, Output)>
+                    (&nx_http::AbstractFusionRequestHandler<Input, Output>::requestCompleted),
                 this,
                 std::placeholders::_1,
                 std::placeholders::_2 ) );
@@ -133,11 +133,11 @@ public:
         //  needs to be deserialized depending on request type
         if( !AuthorizationManager::instance()->authorize(
                 stree::MultiSourceResourceReader( authInfo, inputData ),
-                m_entityType,
-                m_actionType,
+                this->m_entityType,
+                this->m_actionType,
                 &authInfo ) )   //using same object since we can move it
         {
-            requestCompleted( nx_http::StatusCode::unauthorized );
+            this->requestCompleted( nx_http::StatusCode::unauthorized );
             return;
         }
 
@@ -145,7 +145,7 @@ public:
             AuthorizationInfo( std::move( authInfo ) ),
             std::move( inputData ),
             std::bind(
-                &AbstractFusionRequestHandler<Input, void>::requestCompleted,
+                &nx_http::AbstractFusionRequestHandler<Input, void>::requestCompleted,
                 this,
                 std::placeholders::_1 ) );
     }
@@ -188,19 +188,19 @@ public:
         //  needs to be deserialized depending on request type
         if( !AuthorizationManager::instance()->authorize(
                 authInfo,
-                m_entityType,
-                m_actionType,
+                this->m_entityType,
+                this->m_actionType,
                 &authInfo ) )   //using same object since we can move it
         {
-            requestCompleted( nx_http::StatusCode::unauthorized );
+            this->requestCompleted( nx_http::StatusCode::unauthorized );
             return;
         }
 
         processRequest(
             AuthorizationInfo( std::move( authInfo ) ),
             std::bind(
-                static_cast<void (AbstractFusionRequestHandler<void, Output>::*)(nx_http::StatusCode::Value, Output)>
-                    (&AbstractFusionRequestHandler<void, Output>::requestCompleted),
+                static_cast<void (nx_http::AbstractFusionRequestHandler<void, Output>::*)(nx_http::StatusCode::Value, Output)>
+                    (&nx_http::AbstractFusionRequestHandler<void, Output>::requestCompleted),
                 this,
                 std::placeholders::_1,
                 std::placeholders::_2 ) );
@@ -243,11 +243,11 @@ public:
         //  needs to be deserialized depending on request type
         if( !AuthorizationManager::instance()->authorize(
                 authInfo,
-                m_entityType,
-                m_actionType,
+                this->m_entityType,
+                this->m_actionType,
                 &authInfo ) )   //using same object since we can move it
         {
-            requestCompleted( nx_http::StatusCode::unauthorized );
+            this->requestCompleted( nx_http::StatusCode::unauthorized );
             return;
         }
 

@@ -6,7 +6,7 @@
 #ifndef NX_ABSTRACT_FUSION_REQUEST_HANDLER_DETAIL_H
 #define NX_ABSTRACT_FUSION_REQUEST_HANDLER_DETAIL_H
 
-#include "abstract_http_request_handler.h"
+#include "../abstract_http_request_handler.h"
 
 #include <type_traits>
 
@@ -231,23 +231,23 @@ private:
             const nx_http::StatusCode::Value statusCode,
             std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) override
     {
-        m_completionHandler = std::move( completionHandler );
-        m_requestMethod = request.requestLine.method;
+        this->m_completionHandler = std::move( completionHandler );
+        this->m_requestMethod = request.requestLine.method;
 
-        Qn::SerializationFormat inputDataFormat = m_outputDataFormat;
-        if( !getDataFormat( request, &inputDataFormat ) )
+        Qn::SerializationFormat inputDataFormat = this->m_outputDataFormat;
+        if( !this->getDataFormat( request, &inputDataFormat ) )
             return;
 
         //parse request message body using fusion
         Input inputData;
-        if( !parseAnyFusionFormat<Input>(
+        if( !this->template parseAnyFusionFormat<Input>(
                 inputDataFormat,
                 request.requestLine.method == nx_http::Method::GET
                     ? request.requestLine.url.query().toUtf8()
                     : request.messageBody,
                 &inputData ) )
         {
-            requestCompleted( nx_http::StatusCode::badRequest );
+            this->requestCompleted( nx_http::StatusCode::badRequest );
             return;
         }
 

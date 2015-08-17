@@ -22,6 +22,7 @@
     <name>Nx Cloud Connection Mediator Lib</name>
 
     <properties>
+        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${company.name} Mediator Lib</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent</qt.libs>

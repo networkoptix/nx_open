@@ -123,7 +123,7 @@ QString Settings::dataDir() const
 
 #ifdef Q_OS_LINUX
     QString defVarDirName = QString( "/opt/%1/%2/var" ).arg( VER_LINUX_ORGANIZATION_NAME ).arg( VER_PRODUCTNAME_STR );
-    QString varDirName = m_settings->value( "varDir", defVarDirName ).toString();
+    QString varDirName = m_settings.value( "varDir", defVarDirName ).toString();
     return varDirName;
 #else
     const QStringList& dataDirList = QStandardPaths::standardLocations( QStandardPaths::DataLocation );

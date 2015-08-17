@@ -17,8 +17,8 @@ EMailManager::EMailManager( const conf::Settings& settings )
 }
 
 void EMailManager::sendEmailAsync(
-    const QString& emailAddress,
-    const QString& emailBody )
+    const QString& /*emailAddress*/,
+    const QString& /*emailBody*/ )
 {
     //TODO #ak
 }

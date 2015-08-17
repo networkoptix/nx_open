@@ -14,11 +14,11 @@ AuthorizationInfo::AuthorizationInfo()
 {
 }
 
-AuthorizationInfo::AuthorizationInfo( stree::ResourceContainer&& rc )
+AuthorizationInfo::AuthorizationInfo( stree::ResourceContainer&& /*rc*/ )
 {
 }
 
-bool AuthorizationInfo::getAsVariant( int resID, QVariant* const value ) const
+bool AuthorizationInfo::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
 {
     //TODO #ak
     return false;

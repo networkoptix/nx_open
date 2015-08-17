@@ -75,10 +75,10 @@ private:
             const nx_http::StatusCode::Value statusCode,
             std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) override
     {
-        m_completionHandler = std::move( completionHandler );
-        m_requestMethod = request.requestLine.method;
+        this->m_completionHandler = std::move( completionHandler );
+        this->m_requestMethod = request.requestLine.method;
 
-        if( !getDataFormat( request ) )
+        if( !this->getDataFormat( request ) )
             return;
 
         processRequest(
