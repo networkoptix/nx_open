@@ -22,8 +22,8 @@
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
-QnAuditLogModel::ChildCntParamName("childCnt");
-QnAuditLogModel::CheckedParamName("checked");
+const QByteArray QnAuditLogModel::ChildCntParamName("childCnt");
+const QByteArray QnAuditLogModel::CheckedParamName("checked");
 
 namespace
 {
