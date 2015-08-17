@@ -280,7 +280,7 @@ module.exports = function (grunt) {
                 files:[
                     {
                         dot: true,
-                        src: '<%= yeoman.dist %>/../../mediaserver/maven/bin-resources/resources/static/*'
+                        src: '<%= yeoman.dist %>/../../mediaserver_core/maven/bin-resources/resources/static/*'
                     }
                 ],
                 options: {
@@ -501,7 +501,7 @@ module.exports = function (grunt) {
                 expand: true,
                 nonull:true,
                 cwd: '<%= yeoman.app %>/../dist',
-                dest: '../mediaserver/maven/bin-resources/resources/static/',
+                dest: '../mediaserver_core/maven/bin-resources/resources/static/',
                 src: '**'
             }
         },
