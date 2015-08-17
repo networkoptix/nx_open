@@ -297,7 +297,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         //paintFlashingText(painter, m_staticTexts[NoVideoStreamText], 0.125);
         if (!m_ioSpeakerPixmap)
             m_ioSpeakerPixmap.reset(new QPixmap(qnSkin->pixmap("item/io_speaker.png")));
-        paintPixmap(painter, *m_ioSpeakerPixmap, 0.125);
+        paintPixmap(painter, *m_ioSpeakerPixmap, 0.064);
         break;
     case Qn::IoModuleDisabledOverlay:
         paintFlashingText(painter, m_staticTexts[IoModuleDisabledText], 0.125);
