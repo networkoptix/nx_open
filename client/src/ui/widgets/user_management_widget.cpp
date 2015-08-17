@@ -4,18 +4,21 @@
 #include <QtCore/QSortFilterProxyModel>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
+#include <client/client_meta_types.h>
+#include <common/common_module.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <api/global_settings.h>
-#include <utils/common/ldap.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <common/common_module.h>
-#include <client/client_meta_types.h>
+
 #include <ui/models/user_list_model.h>
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
+
+#include <utils/common/ldap.h>
+#include <utils/network/http/asynchttpclient.h>
 
 class QnUserManagementWidgetPrivate : public QObject {
     Q_DECLARE_PUBLIC(QnUserManagementWidget)
@@ -58,10 +61,9 @@ void QnUserManagementWidgetPrivate::at_usersTable_clicked(const QModelIndex &ind
 void QnUserManagementWidget::at_refreshButton_clicked() {
     Q_D(QnUserManagementWidget);
 
-    if (!QnGlobalSettings::instance()->ldapSettings().isValid()) {
-        if (!d->openLdapSettings())
-            return;
-    }
+    if (!QnGlobalSettings::instance()->ldapSettings().isValid()) 
+        return;
+    
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
     Q_ASSERT(server);
@@ -104,11 +106,20 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     ui->usersTable->horizontalHeader()->setSectionResizeMode(QnUserListModel::PermissionsColumn, QHeaderView::Stretch);
     ui->usersTable->sortByColumn(QnUserListModel::NameColumn, Qt::AscendingOrder);
 
+    auto updateFetchButton = [this]{
+        ui->refreshButton->setEnabled(QnGlobalSettings::instance()->ldapSettings().isValid());
+    };
+
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::ldapSettingsChanged, this, updateFetchButton);
+    
+
     connect(ui->usersTable,             &QTableView::activated,     d,      &QnUserManagementWidgetPrivate::at_usersTable_activated);
     connect(ui->usersTable,             &QTableView::clicked,       d,      &QnUserManagementWidgetPrivate::at_usersTable_clicked);
 
     connect(ui->ldapSettingsButton,     &QPushButton::clicked,      d,      &QnUserManagementWidgetPrivate::openLdapSettings);
     connect(ui->refreshButton,          &QPushButton::clicked,      this,   &QnUserManagementWidget::at_refreshButton_clicked);
+
+    updateFetchButton();
 }
 
 QnUserManagementWidget::~QnUserManagementWidget() {
