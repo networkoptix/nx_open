@@ -40,6 +40,9 @@ int QnTimeSyncRestHandler::executeGet(
     connection->response()->headers.emplace(
         TIME_SYNC_HEADER_NAME,
         TimeSynchronizationManager::instance()->getTimeSyncInfo().toString() );
+    connection->response()->headers.emplace(
+        Qn::PEER_GUID_HEADER_NAME,
+        qnCommon->moduleGUID().toByteArray() );
 
     return nx_http::StatusCode::ok;
 }

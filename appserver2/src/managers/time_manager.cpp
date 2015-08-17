@@ -230,7 +230,7 @@ namespace ec2
     /*!
         This should help against redundant clock resync
     */
-    static const int MIN_GET_TIME_ERROR_MS = 70;
+    static const int MIN_GET_TIME_ERROR_MS = 250;
 
     static_assert( MIN_INTERNET_SYNC_TIME_PERIOD_SEC > 0, "MIN_INTERNET_SYNC_TIME_PERIOD_SEC MUST be > 0!" );
     static_assert( MIN_INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SEC,
@@ -573,12 +573,13 @@ namespace ec2
             arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logDEBUG2 );
 
         //time difference between this server and remote one is not that great
+        const auto timeDifference = remotePeerSyncTime - getSyncTimeNonSafe();
         const bool maxTimeDriftExceeded =
-            (abs( remotePeerSyncTime - getSyncTimeNonSafe() ) >=
-                std::max<qint64>( timeErrorEstimation * 2, MIN_GET_TIME_ERROR_MS ));
+            (abs( timeDifference ) >= std::max<qint64>( timeErrorEstimation * 2, MIN_GET_TIME_ERROR_MS ));
+        const bool needAdjustClockDueToLargeDrift = maxTimeDriftExceeded && (remotePeerID > qnCommon->moduleGUID());
         //if there is new maximum remotePeerTimePriorityKey than updating delta and emitting timeChanged
         if( (remotePeerTimePriorityKey <= m_usedTimeSyncInfo.timePriorityKey) &&
-            !(maxTimeDriftExceeded && (remotePeerTimePriorityKey.seed > m_localTimePriorityKey.seed)) )
+            !needAdjustClockDueToLargeDrift )
         {
             return; //not applying time
         }
@@ -746,10 +747,13 @@ namespace ec2
             //reading time sync information from remote server
             auto timeSyncHeaderIter = clientPtr->response()->headers.find( QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME );
             if( timeSyncHeaderIter != clientPtr->response()->headers.end() )
+            {
+                auto sock = clientPtr->takeSocket();
                 processTimeSyncInfoHeader(
                     peerID,
                     timeSyncHeaderIter->second,
-                    clientPtr->takeSocket().data() );
+                    sock.data() );
+            }
         }
 
         QMutexLocker lk( &m_mutex );
