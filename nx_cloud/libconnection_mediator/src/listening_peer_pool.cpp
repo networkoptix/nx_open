@@ -6,62 +6,21 @@
 namespace nx {
 namespace hpm {
 
-ListeningPeerPool::ListeningPeerPool( stun::MessageDispatcher* dispatcher,
-                                      MediaserverApiIf* mediaserverApi )
-    : m_mediaserverApi( mediaserverApi )
+ListeningPeerPool::ListeningPeerPool( stun::MessageDispatcher* dispatcher )
 {
     using namespace std::placeholders;
-    Q_ASSERT(
-        dispatcher->registerRequestProcessor(
-            methods::PING, std::bind( &ListeningPeerPool::ping, this, _1, _2 ) ) &&
+    const auto result =
         dispatcher->registerRequestProcessor(
             methods::LISTEN, std::bind( &ListeningPeerPool::listen, this, _1, _2 ) ) &&
         dispatcher->registerRequestProcessor(
-            methods::CONNECT, std::bind( &ListeningPeerPool::connect, this, _1, _2 ) )
-    );
+            methods::CONNECT, std::bind( &ListeningPeerPool::connect, this, _1, _2 ) );
+
+    // TODO: NX_LOG
+    Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register one of processors" );
 }
 
-bool ListeningPeerPool::ping( stun::ServerConnection* connection,
-                              stun::Message&& message )
-{
-    const auto systemAttr = message.getAttribute< attrs::SystemId >();
-    if( !systemAttr )
-        return errorResponse( connection, message, stun::error::BAD_REQUEST,
-                              "Attribute SystemId is required" );
-
-    const auto serverAttr = message.getAttribute< attrs::ServerId >();
-    if( !serverAttr )
-        return errorResponse( connection, message, stun::error::BAD_REQUEST,
-                              "Attribute ServerId is required" );
-
-    const auto authAttr = message.getAttribute< attrs::Authorization >();
-    if( !authAttr )
-        return errorResponse( connection, message, stun::error::BAD_REQUEST,
-                              "Attribute Authorization is required" );
-
-    // TODO: check for authorization
-
-    const auto endpointsAttr = message.getAttribute< attrs::PublicEndpointList >();
-    if( !endpointsAttr )
-        return errorResponse( connection, message, stun::error::BAD_REQUEST,
-                              "Attribute PublicEndpointList is required" );
-
-    std::list< SocketAddress > endpoints = endpointsAttr->get();
-    endpoints.remove_if( [ & ]( const SocketAddress& addr )
-    {
-        return !m_mediaserverApi->ping( addr, serverAttr->get() );
-    } );
-
-    stun::Message response( stun::Header(
-        stun::MessageClass::successResponse, message.header.method,
-        std::move( message.header.transactionId ) ) );
-
-    response.newAttribute< attrs::PublicEndpointList >( endpoints );
-    return connection->sendMessage( std::move( response ) );
-}
-
-bool ListeningPeerPool::listen( stun::ServerConnection* /*connection*/,
-                                stun::Message&& /*message*/ )
+void ListeningPeerPool::listen( stun::ServerConnection* connection,
+                                stun::Message message )
 {
     //retrieving requests parameters:
         //peer id
@@ -75,11 +34,12 @@ bool ListeningPeerPool::listen( stun::ServerConnection* /*connection*/,
     //binding to address, sending success response
         //NOTE single server is allowed to listen on multiple mediators
 
-    return false;
+    errorResponse( connection, message.header, stun::error::SERVER_ERROR,
+                   "Method is not implemented yet" );
 }
 
-bool ListeningPeerPool::connect( stun::ServerConnection* /*connection*/,
-                                 stun::Message&& /*message*/ )
+void ListeningPeerPool::connect( stun::ServerConnection* connection,
+                                 stun::Message message )
 {
     //retrieving requests parameters:
         //address to connect to. This address has following format: {server_guid}.{system_name} or just {system_name}. 
@@ -95,18 +55,8 @@ bool ListeningPeerPool::connect( stun::ServerConnection* /*connection*/,
 
     //sending success response with selected server address
 
-    return false;
-}
-
-bool ListeningPeerPool::errorResponse( stun::ServerConnection* connection,
-                                       stun::Message& request, int code, String reason )
-{
-    stun::Message response( stun::Header(
-        stun::MessageClass::errorResponse, request.header.method,
-        std::move( request.header.transactionId ) ) );
-
-    response.newAttribute< stun::attrs::ErrorDescription >( code, std::move(reason) );
-    return connection->sendMessage( std::move( response ) );
+    errorResponse( connection, message.header, stun::error::SERVER_ERROR,
+                   "Method is not implemented yet" );
 }
 
 } // namespace hpm

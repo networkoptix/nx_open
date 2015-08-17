@@ -27,7 +27,7 @@ class MessageDispatcher
     public Singleton<MessageDispatcher>
 {
 public:
-    typedef std::function< bool( ServerConnection*, stun::Message&& ) > MessageProcessorType;
+    typedef std::function< void( ServerConnection*, stun::Message ) > MessageProcessor;
 
     /*!
         \param messageProcessor Ownership of this object is not passed
@@ -36,17 +36,17 @@ public:
         \return \a true if \a requestProcessor has been registered, \a false otherwise
         \note Message processing function MUST be non-blocking
     */
-    bool registerRequestProcessor( int method, MessageProcessorType&& messageProcessor );
+    bool registerRequestProcessor( int method, MessageProcessor processor );
 
     //!Pass message to corresponding processor
     /*!
         \param message This object is not moved in case of failure to find processor
         \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
-    bool dispatchRequest( ServerConnection* connection, stun::Message&& message );
+    bool dispatchRequest( ServerConnection* connection, stun::Message message );
 
 private:
-    std::unordered_map<int, MessageProcessorType> m_processors;
+    std::unordered_map<int, MessageProcessor> m_processors;
 };
 
 } // namespace stun

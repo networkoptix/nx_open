@@ -22,8 +22,10 @@ class MediaserverApiMock
         : public MediaserverApiIf
 {
 public:
-    MOCK_METHOD2( ping, bool( const SocketAddress& address,
-                              const QnUuid& expectedId ) );
+    MediaserverApiMock( stun::MessageDispatcher* dispatcher )
+        : MediaserverApiIf( dispatcher ) {}
+
+    MOCK_METHOD2( pingServer, bool( const SocketAddress&, const QnUuid& ) );
 };
 
 class StunCustomTest : public testing::Test
@@ -32,7 +34,8 @@ protected:
     StunCustomTest()
         : address( lit( "127.0.0.1"), 3345 + qrand() / 100 )
         , server( std::list< SocketAddress >( 1, address ), false, SocketFactory::nttAuto )
-        , listeningPeerPool( &stunMessageDispatcher, &mediaserverApi )
+        , mediaserverApi( &stunMessageDispatcher )
+        , listeningPeerPool( &stunMessageDispatcher )
         , client( address )
     {
         EXPECT_TRUE( server.bind() );
@@ -65,9 +68,9 @@ TEST_F( StunCustomTest, Ping )
     request.newAttribute< hpm::attrs::PublicEndpointList >( allEndpoints );
 
     // Suppose only one address is pingable
-    EXPECT_CALL( mediaserverApi, ping( GOOD_ADDRESS, SERVER_ID ) )
+    EXPECT_CALL( mediaserverApi, pingServer( GOOD_ADDRESS, SERVER_ID ) )
         .Times( 1 ).WillOnce( ::testing::Return( true ) );
-    EXPECT_CALL( mediaserverApi, ping( BAD_ADDRESS, SERVER_ID ) )
+    EXPECT_CALL( mediaserverApi, pingServer( BAD_ADDRESS, SERVER_ID ) )
         .Times( 1 ).WillOnce( ::testing::Return( false ) );
 
     SyncMultiQueue< SystemError::ErrorCode, Message > waiter;

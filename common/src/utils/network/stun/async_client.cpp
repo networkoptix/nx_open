@@ -7,7 +7,7 @@
 namespace nx {
 namespace stun {
 
-static const AsyncClient::Timeouts DEFAULT_TIMEOUTS = { 3000, 3000 };
+const AsyncClient::Timeouts AsyncClient::DEFAULT_TIMEOUTS = { 3000, 3000 };
 
 AsyncClient::AsyncClient( const SocketAddress& endpoint, bool useSsl, Timeouts timeouts )
     : m_endpoint( endpoint )

@@ -6,13 +6,10 @@
 #ifndef LISTENING_PEER_POOL_H
 #define LISTENING_PEER_POOL_H
 
-#include <utils/network/stun/server_connection.h>
-#include <utils/network/stun/message_dispatcher.h>
+#include "request_processor.h"
 
 namespace nx {
 namespace hpm {
-
-class MediaserverApiIf;
 
 //!This class instance keeps information about all currently listening peers, processes STUN requests \a bind, \a connect and sends \a connection_requested indication
 /*!
@@ -20,20 +17,13 @@ class MediaserverApiIf;
     \note Is a single-tone
 */
 class ListeningPeerPool
+        : protected RequestProcessor
 {
 public:
-    ListeningPeerPool( stun::MessageDispatcher* dispatcher,
-                       MediaserverApiIf* mediaserverApi );
+    ListeningPeerPool( stun::MessageDispatcher* dispatcher );
 
-    bool ping( stun::ServerConnection* connection, stun::Message&& message );
-    bool listen( stun::ServerConnection* connection, stun::Message&& message );
-    bool connect( stun::ServerConnection* connection, stun::Message&& message );
-
-private:
-    bool errorResponse( stun::ServerConnection* connection,
-                        stun::Message& request, int code, String reason );
-
-    MediaserverApiIf* m_mediaserverApi;
+    void listen( stun::ServerConnection* connection, stun::Message message );
+    void connect( stun::ServerConnection* connection, stun::Message message );
 };
 
 } // namespace hpm

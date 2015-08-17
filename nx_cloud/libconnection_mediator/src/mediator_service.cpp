@@ -114,8 +114,8 @@ int MediatorProcess::executeApplication()
 
     //STUN handlers
     stun::MessageDispatcher stunMessageDispatcher;
-    MediaserverApi mediaserverApi;
-    ListeningPeerPool listeningPeerPool( &stunMessageDispatcher, &mediaserverApi );
+    MediaserverApi mediaserverApi( &stunMessageDispatcher );
+    ListeningPeerPool listeningPeerPool( &stunMessageDispatcher );
 
     //accepting STUN requests by both tcp and udt
     m_multiAddressStunServer.reset( new MultiAddressServer<stun::SocketServer>(

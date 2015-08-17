@@ -1,5 +1,7 @@
 #include "mediaserver_api.h"
 
+#include <api/model/ping_reply.h>
+#include <rest/server/json_rest_result.h>
 #include <utils/network/http/httpclient.h>
 #include <utils/common/log.h>
 
@@ -8,11 +10,51 @@
 namespace nx {
 namespace hpm {
 
-MediaserverApiIf::~MediaserverApiIf()
+MediaserverApiIf::MediaserverApiIf( stun::MessageDispatcher* dispatcher )
+{
+    using namespace std::placeholders;
+    const auto result =
+        dispatcher->registerRequestProcessor(
+            methods::PING, std::bind( &MediaserverApiIf::ping, this, _1, _2 ) );
+
+    // TODO: NX_LOG
+    Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register ping processor" );
+}
+
+void MediaserverApiIf::ping( stun::ServerConnection* connection,
+                             stun::Message message )
+{
+    if( const auto mediaserver = getMediaserverData( connection, message ) )
+    {
+        const auto endpointsAttr = message.getAttribute< attrs::PublicEndpointList >();
+        if( !endpointsAttr )
+        {
+            errorResponse( connection, message.header, stun::error::BAD_REQUEST,
+                           "Attribute PublicEndpointList is required" );
+            return;
+        }
+
+        std::list< SocketAddress > endpoints = endpointsAttr->get();
+        endpoints.remove_if( [ & ]( const SocketAddress& addr )
+                             { return !pingServer( addr, mediaserver->serverId ); } );
+
+        stun::Message response( stun::Header(
+            stun::MessageClass::successResponse, message.header.method,
+            std::move( message.header.transactionId ) ) );
+
+        response.newAttribute< attrs::PublicEndpointList >( endpoints );
+        connection->sendMessage( std::move( response ) );
+    }
+}
+
+// impl
+
+MediaserverApi::MediaserverApi( stun::MessageDispatcher* dispatcher )
+    : MediaserverApiIf( dispatcher )
 {
 }
 
-bool MediaserverApi::ping( const SocketAddress& address, const QnUuid& expectedId )
+bool MediaserverApi::pingServer( const SocketAddress& address, const QnUuid& expectedId )
 {
     QUrl url( address.address.toString() );
     url.setPort( address.port );
@@ -27,40 +69,30 @@ bool MediaserverApi::ping( const SocketAddress& address, const QnUuid& expectedI
     }
 
     const auto buffer = client.fetchMessageBodyBuffer();
-    const QVariantMap responce = QJsonDocument::fromJson(buffer).toVariant().toMap();
-    if( responce.isEmpty() ) {
-        NX_LOG( lit("%1 Url %2 response is invalid JSON: %3")
+
+    QnJsonRestResult result;
+    if( !QJson::deserialize( buffer, &result ) )
+    {
+        NX_LOG( lit("%1 Url %2 response is a bad REST result: %3")
                 .arg( Q_FUNC_INFO ).arg( url.toString() )
                 .arg( QString::fromUtf8( buffer ) ), cl_logDEBUG1 );
         return false;
     }
 
-    const auto reply = responce.value( lit("reply") ).toMap();
-    if( reply.isEmpty() ) {
-        NX_LOG( lit("%1 Url %2 response does not contain valid field reply: ")
-                .arg( Q_FUNC_INFO ).arg( url.toString() ), cl_logDEBUG1 );
-        return false;
-    }
-
-    const auto moduleGuid = reply.value( lit("moduleGuid") ).toString();
-    if( moduleGuid.isEmpty() ) {
-        NX_LOG( lit("%1 Url %2 reply does not contain valid field moduleGuid")
-                .arg( Q_FUNC_INFO ).arg( url.toString() ), cl_logDEBUG1 );
-        return false;
-    }
-
-    const QnUuid urlId( moduleGuid );
-    if( urlId.isNull() ) {
-        NX_LOG( lit("%1 Url %2 returns invalid moduleGuid: %3")
+    QnPingReply reply;
+    if( !QJson::deserialize( result.reply(), &reply ) )
+    {
+        NX_LOG( lit("%1 Url %2 response is a bad REST result: %3")
                 .arg( Q_FUNC_INFO ).arg( url.toString() )
-                .arg( moduleGuid ), cl_logDEBUG1 );
+                .arg( result.reply().toString() ), cl_logDEBUG1 );
         return false;
     }
 
-    if( urlId != expectedId) {
+    if( reply.moduleGuid != expectedId) {
         NX_LOG( lit("%1 Url %2 moduleGuid %3 doesnt match expectedId %4")
                 .arg( Q_FUNC_INFO ).arg( url.toString() )
-                .arg( urlId.toString() ).arg( expectedId.toString() ), cl_logDEBUG1 );
+                .arg( reply.moduleGuid.toString() )
+                .arg( expectedId.toString() ), cl_logDEBUG1 );
         return false;
     }
 

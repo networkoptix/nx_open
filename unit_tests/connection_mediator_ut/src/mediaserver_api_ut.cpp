@@ -10,16 +10,17 @@ namespace test {
 
 TEST( MediaserverApi, DISABLED_Hardcode )
 {
-    MediaserverApi api;
+    stun::MessageDispatcher dispatcher;
+    MediaserverApi api( &dispatcher );
 
-    EXPECT_TRUE( api.ping( lit("localhost:7001"),
-                           lit("{0000000F-8aeb-7d56-2bc7-67afae00335c}") ) );
+    EXPECT_TRUE( api.pingServer(
+        lit("localhost:7001"), lit("{0000000F-8aeb-7d56-2bc7-67afae00335c}") ) );
 
-    EXPECT_FALSE( api.ping( lit("localhost:7002"), // wrong port
-                            lit("{0000000F-8aeb-7d56-2bc7-67afae00335c}") ) );
+    EXPECT_FALSE( api.pingServer( // wrong port
+        lit("localhost:7002"), lit("{0000000F-8aeb-7d56-2bc7-67afae00335c}") ) );
 
-    EXPECT_FALSE( api.ping( lit("localhost:7001"), // wrong uuid
-                            lit("{1000000F-8aeb-7d56-2bc7-67afae00335c}") ) );
+    EXPECT_FALSE( api.pingServer( // wrong uuid
+        lit("localhost:7001"), lit("{1000000F-8aeb-7d56-2bc7-67afae00335c}") ) );
 
 }
 

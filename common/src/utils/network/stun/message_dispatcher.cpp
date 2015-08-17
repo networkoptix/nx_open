@@ -9,19 +9,20 @@ namespace nx {
 namespace stun {
 
 bool MessageDispatcher::registerRequestProcessor(
-        int method, MessageProcessorType&& messageProcessor )
+        int method, MessageProcessor processor )
 {
-    return m_processors.emplace( method, std::move(messageProcessor) ).second;
+    return m_processors.emplace( method, std::move(processor) ).second;
 }
 
 bool MessageDispatcher::dispatchRequest(
-        ServerConnection* connection, stun::Message&& message )
+        ServerConnection* connection, stun::Message message )
 {
     const auto it = m_processors.find( message.header.method );
     if( it == m_processors.end() )
         return false;
 
-    return it->second( connection, std::move( message ) );
+    it->second( connection, std::move( message ) );
+    return true;
 }
 
 } // namespace stun
