@@ -154,8 +154,6 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return;
             }
 
-            console.log("playing",playing);
-
             $scope.positionProvider.init(playing);
             if(live){
                 playing = (new Date()).getTime();
@@ -262,11 +260,9 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             //var playing = $scope.positionProvider.checkPlayingDate(val);
 
-            //console.log("switchPosition", new Date(val), playing);
             //if(playing === false) {
                 updateVideoSource(val);//We have nothing more to do with it.
             /*}else{
-                console.log("try to seek time",playing/1000);
                 $scope.playerAPI.seekTime(playing); // Jump to buffered video
             }*/
         };

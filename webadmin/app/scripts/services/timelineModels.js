@@ -11,8 +11,6 @@ function Chunk(boundaries,start,end,level,title,extension){
     var format = 'dd.mm.yyyy HH:MM';
     this.title = (typeof(title) === 'undefined' || title === null) ? dateFormat(start,format) + ' - ' + dateFormat(end,format):title ;
 
-    //console.log("create chunk ",this.level, this.title);
-
     this.children = [];
 
     _.extend(this, extension);
@@ -338,9 +336,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
                 var chunks = data.data.reply;
-                if(chunks.length == 0){
-                    //console.log("no chunks for this camera");
-                }
+                //if(chunks.length == 0){} // No chunks for this camera
 
                 _.forEach(chunks,function(chunk){
                     chunk.durationMs = parseInt(chunk.durationMs);
@@ -395,7 +391,7 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,d
     /*this.logcounter = this.logcounter||0;
     this.logcounter ++;
     if(this.logcounter % 1000 === 0) {
-        console.log("splice: ============================================================");
+        log("splice: ============================================================");
         for (var i = 0; i < result.length; i++) {
             result[i].debug();
         }
@@ -463,7 +459,6 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
 
         if (iteratingChunk.start < chunk.end) { // Intersection here!
             //TODO: wtf!
-            //   console.log("WTF!",iteratingChunk,chunk);
             iteratingChunk.end = Math.max(iteratingChunk.end, chunk.end);//Increase smaller chunk
             iteratingChunk.start = Math.min(iteratingChunk.start, chunk.start);//Increase smaller chunk
             if (iteratingChunk.level != chunk.level) { // Add inside ot ignore
@@ -574,14 +569,9 @@ function ShortCache(cameras,mediaserver,$q){
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
 }
 ShortCache.prototype.init = function(start){
-
-
-    console.log("init shortcache",start);
     this.liveMode = false;
     if(!start){
         this.liveMode = true;
-
-        console.log("live mode!");
         start = (new Date()).getTime();
     }
     this.start = start;
@@ -634,9 +624,8 @@ ShortCache.prototype.update = function(requestPosition,position){
                 }
             });
 
-            if(chunks.length == 0){
-                //console.log("no chunks for this camera and interval");
-            }
+            //if(chunks.length == 0){ } // no chunks for this camera and interval
+
 
             if(chunks.length > 0 && chunks[0].startTimeMs < requestPosition){ // Crop first chunk.
                 chunks[0].durationMs += chunks[0].startTimeMs - requestPosition ;
@@ -663,12 +652,10 @@ ShortCache.prototype.update = function(requestPosition,position){
 // Check playing date - return videoposition if possible
 ShortCache.prototype.checkPlayingDate = function(positionDate){
     if(positionDate < this.start){ //Check left boundaries
-        //console.log("too left!",new Date(positionDate), new Date(this.start), positionDate - this.start);
         return false; // Return negative value - outer code should request new videocache
     }
 
     if(positionDate > this.lastPlayedDate ){
-        //console.log("too right!",new Date(positionDate), new Date(this.lastPlayedDate), positionDate - this.lastPlayedDate);
         return false;
     }
 
@@ -683,7 +670,6 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
     }
 
     if(typeof(lastPosition)=='undefined'){// No checkpoints - go to live
-        //console.log("no checkpoints found - use the start point!");
         return positionDate - this.start;
     }
 
@@ -737,10 +723,7 @@ ShortCache.prototype.setPlayingPosition = function(position){
             + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs
             < Math.round(this.playedPosition) + this.updateInterval)) { // It's time to update
 
-        /*console.log("it's time to update" , this.currentDetailization[this.currentDetailization.length - 1].durationMs
-            + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs ,
-                this.playedPosition + this.updateInterval
-        );*/
+        // TODO: update live detailization?
 
         this.update();
     }
