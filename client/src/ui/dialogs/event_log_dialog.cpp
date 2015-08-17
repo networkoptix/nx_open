@@ -236,19 +236,6 @@ void QnEventLogDialog::updateData()
     m_dirty = false;
 }
 
-QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
-{
-    QList<QnMediaServerResourcePtr> result;
-    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
-    foreach(const QnResourcePtr& r, resList) {
-        QnMediaServerResourcePtr mServer = r.dynamicCast<QnMediaServerResource>();
-        if (mServer)
-            result << mServer;
-    }
-
-    return result;
-}
-
 void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                              QnBusiness::EventType eventType,
                              QnBusiness::ActionType actionType)
@@ -257,8 +244,8 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
     m_allEvents.clear();
 
 
-    QList<QnMediaServerResourcePtr> mediaServerList = getServerList();
-    foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
+    auto mediaServerList = qnResPool->getAllServers();
+    for (const QnMediaServerResourcePtr& mserver: mediaServerList)
     {
         if (mserver->getStatus() == Qn::Online)
         {

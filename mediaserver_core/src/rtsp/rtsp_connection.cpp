@@ -109,6 +109,7 @@ public:
         QnTCPConnectionProcessorPrivate(),
         liveMode(Mode_Live),
         auditRecordMode(Mode_Live),
+        lastMediaPacketTime(AV_NOPTS_VALUE),
         dataProcessor(0),
         sessionTimeOut(0),
         useProprietaryFormat(false),
@@ -179,6 +180,7 @@ public:
     AuditHandle auditRecordHandle;
     Mode auditRecordMode;
     QElapsedTimer lastReportTime;
+    qint64 lastMediaPacketTime;
 
     QnRtspDataConsumer* dataProcessor;
 
@@ -222,6 +224,9 @@ QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
     Q_D(QnRtspConnectionProcessor);
 	directDisconnectAll();
+    if (d->auditRecordHandle && d->lastMediaPacketTime != AV_NOPTS_VALUE)
+        qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, d->lastMediaPacketTime);
+
     d->auditRecordHandle.reset();
     stop();
 }
@@ -234,6 +239,7 @@ void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
         qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, timestampUsec);
         d->lastReportTime.restart();
     }
+    d->lastMediaPacketTime = timestampUsec;
 }
 
 void QnRtspConnectionProcessor::parseRequest()
@@ -1240,11 +1246,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         const qint64 startTimeUsec = d->liveMode == Mode_Live ? DATETIME_NOW : d->startTime;
         bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
-
         d->auditRecordHandle = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUsec, isExport);
-
-        if (isExport && d->endTime != AV_NOPTS_VALUE && d->endTime != DATETIME_NOW)
-            qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, d->endTime);
         d->lastReportTime.restart();
     }
 
@@ -1430,7 +1432,7 @@ void QnRtspConnectionProcessor::run()
     {
         for (int i = 0; i < 3 && !m_needStop; ++i)
         {
-            if(!qnAuthHelper->authenticate(d->request, d->response))
+            if(qnAuthHelper->authenticate(d->request, d->response) != Auth_OK)
             {
                 sendResponse(CODE_AUTH_REQUIRED);
                 if (readRequest()) 

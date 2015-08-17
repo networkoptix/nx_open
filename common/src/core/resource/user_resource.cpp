@@ -67,7 +67,7 @@ void QnUserResource::generateHash() {
     hash.append(md5.result().toHex());
 
     QByteArray digest = nx_http::calcHa1(
-        getName(),
+        getName().toLower(),
         QnAppInfo::realm(),
         password );
 
@@ -82,7 +82,7 @@ bool QnUserResource::checkPassword(const QString &password) {
     
     if( !m_digest.isEmpty() )
     {
-        return nx_http::calcHa1( m_name, m_realm, password ) == m_digest;
+        return nx_http::calcHa1( m_name.toLower(), m_realm, password ) == m_digest;
     }
     else
     {
@@ -273,6 +273,11 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
         if (m_email != localOther->m_email) {
             m_email = localOther->m_email;
             modifiedFields << "emailChanged";
+        }
+
+		if (m_realm != localOther->m_realm) {
+            m_realm = localOther->m_realm;
+            modifiedFields << "realmChanged";
         }
 
         if (m_isEnabled != localOther->m_isEnabled) {

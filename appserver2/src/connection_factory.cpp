@@ -360,7 +360,7 @@ namespace ec2
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = nx_http::calcHa1(
-            loginInfo.login, QnAppInfo::realm(), addr.password() );
+            loginInfo.login.toLower(), QnAppInfo::realm(), addr.password() );
         loginInfo.clientInfo = clientInfo;
 
         {
@@ -601,7 +601,7 @@ namespace ec2
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = nx_http::calcHa1(
-            loginInfo.login, QnAppInfo::realm(), addr.password() );
+            loginInfo.login.toLower(), QnAppInfo::realm(), addr.password() );
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
         m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(

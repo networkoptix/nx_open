@@ -53,7 +53,6 @@ private slots:
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
 
 private:
-    QList<QnMediaServerResourcePtr> getServerList() const;
     QString getTextForNCameras(int n) const;
     QStandardItem* createEventTree(QStandardItem* rootItem, QnBusiness::EventType value);
 

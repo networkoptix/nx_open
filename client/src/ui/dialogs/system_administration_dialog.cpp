@@ -5,7 +5,7 @@
 
 #include <ui/widgets/settings/popup_settings_widget.h>
 #include <ui/widgets/settings/license_manager_widget.h>
-#include <ui/widgets/settings/camera_management_widget.h>
+#include <ui/widgets/settings/system_settings_widget.h>
 #include <ui/widgets/settings/smtp_settings_widget.h>
 #include <ui/widgets/settings/database_management_widget.h>
 #include <ui/widgets/settings/time_server_selection_widget.h>

@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RecordingStatsDialog</class>
- <widget class="QDialog" name="RecordingStatsDialog">
+ <class>RecordingStatisticsWidget</class>
+ <widget class="QWidget" name="RecordingStatisticsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1170</width>
-    <height>719</height>
+    <width>1030</width>
+    <height>853</height>
    </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Recording Statistics</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -436,13 +433,6 @@
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -452,9 +442,6 @@
    <header location="global">ui/widgets/table_view.h</header>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>refreshButton</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

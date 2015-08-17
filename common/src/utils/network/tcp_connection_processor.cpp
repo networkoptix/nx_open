@@ -495,12 +495,27 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
 {
     Q_D(const QnTCPConnectionProcessor);
     QnAuthSession result;
+
+    QByteArray existSession = nx_http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
+    if (!existSession.isEmpty()) {
+        result.fromByteArray(existSession);
+        return result;
+    }
+
     if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
         result.userName = userRes->getName();
     else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");
 
     result.id = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (result.id.isNull()) {
+        QByteArray nonce = d->request.getCookieValue("auth");
+        if (!nonce.isEmpty()) {
+            QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+            md5Hash.addData( nonce );
+            result.id = QnUuid::fromRfc4122(md5Hash.result());
+        }
+    }
     if (result.id.isNull())
         result.id = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
     if (result.id.isNull()) {

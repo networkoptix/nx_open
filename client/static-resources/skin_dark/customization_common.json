@@ -197,7 +197,7 @@
         },    
         "palette": { "default": { "window": "black" } }
     },
-    
+
     "QnVideowallScreenWidget": {
         "palette": { "default": { "window": "#000000ff" } }
     },
@@ -215,13 +215,26 @@
             "window": "#00000080",
             "windowText": "#801010c0"
         }},
-        "#diagnosticsButton": { 
+        "#statusOverlayButton": {
             "windowColor": "#801010c0",
             "frameColor": "#801010ff",
             "textColor": "#ffffffff"
         }
     },   
     
+    "QnIoModuleOverlayWidget": {
+        "palette": {
+            "default": {
+                "window": "#222222",
+                "windowText": "#ffffff",
+                "buttonText": "#ffffff"
+            }
+        },
+        "colors": {
+            "idLabel": "#575757"
+        }
+    },
+
     "QnStyledTooltipWidget": {
         "windowColor": "QColor(0, 0, 0, 255)",
         "frameColor": "QColor(203, 210, 233, 128)",

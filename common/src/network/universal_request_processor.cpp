@@ -82,7 +82,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
                 retryThreshold = MAX_AUTH_RETRY_COUNT;
             else if (d->authenticatedOnce)
                 retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
-            if (retryCount >= retryThreshold && !logReported)
+            if (retryCount >= retryThreshold && !logReported && authResult != Auth_WrongInternalLogin)
             {   
                 logReported = true;
                 auto session = authSession();

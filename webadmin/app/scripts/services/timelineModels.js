@@ -335,7 +335,6 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
         self.lockRequests = true; // We may lock requests here if we have no tree yet
         this.mediaserver.getRecords('/', this.cameras[0], start, end, detailization)
             .then(function (data) {
-                self.cacheRequestedInterval(start,end,level);
 
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
                 var chunks = data.data.reply;
@@ -357,6 +356,8 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                     self.addChunk(addchunk, null);
                 }
 
+                self.cacheRequestedInterval(start,end,level);
+
                 deferred.resolve(self.chunksTree);
             }, function (error) {
                 deferred.reject(error);
@@ -376,7 +377,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
  * @param level
  * @return Array
  */
-CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
+CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,debugLevel){
 
     if(start instanceof Date)
     {
@@ -389,7 +390,7 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
 
     // Splice existing intervals and check, if we need an update from server
     var result = [];
-    this.selectRecords(result,start,end,level,null);
+    this.selectRecords(result,start,end,level,null,debugLevel);
 
     /*this.logcounter = this.logcounter||0;
     this.logcounter ++;
@@ -401,8 +402,7 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
         this.debug();
     }*/
 
-
-    var needUpdate = !this.checkRequestedIntervalCache(start,end,level);
+    var needUpdate = !debugLevel && !this.checkRequestedIntervalCache(start,end,level);
     if(needUpdate){ // Request update
         this.requestInterval(start, end, level);
     }
@@ -447,88 +447,48 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
         return;
     }
 
-    if(parent.level === chunk.level - 1){ //We are on good level here - find position and add
-        for (i = 0; i < parent.children.length; i++) {
-            if(parent.children[i].start == chunk.start && parent.children[i].end == chunk.end){//dublicate
-                return;
-            }
-
-            if(parent.children[i].end >= chunk.start && parent.children[i].start <= chunk.start){ // Intersection here
-
-                if(parent.children[i].end >= chunk.end){// One contains another
-                    console.warn("skipped contained chunk 1",chunk,parent.children[i],i,parent);
-                    return; //Skip it
-                }
-                //TODO: uncomment back!
-                //console.error("impossible situation 1 - intersection in chunks",chunk,parent.children[i],i,parent);
-                return;
-            }
-
-            if(parent.children[i].start >= chunk.start){
-                if(parent.children[i].start < chunk.end ){
-                    //Mb Join two chunks?
-
-                    if(parent.children[i].end <= chunk.start ){// One contains another
-                        console.warn("skipped contained chunk 2",chunk,parent.children[i],i,parent);
-                        return; //Skip it
-                    }
-                    //TODO: uncomment back!
-                    //console.error("impossible situation 2 - intersection in chunks",chunk,parent.children[i],i,parent);
-                    return;
-                }
-                break;
-            }
-        }
-        parent.children.splice(i, 0, chunk);//Just add chunk here and return
-        return;
-    }
-    var currentDetailization =  (parent.level<RulerModel.levels.length-1)?
-        RulerModel.levels[parent.level + 1].interval.getMilliseconds():
-        RulerModel.levels[RulerModel.length - 1].interval.getMilliseconds();
     for (var i = 0; i < parent.children.length; i++) {
-        var currentChunk = parent.children[i];
-        if (currentChunk.end < chunk.start) { //no intersection - no way we need this chunk now
+        var iteratingChunk = parent.children[i];
+
+        if (iteratingChunk.end < chunk.start) { //no intersection - no way we need this chunk now
             continue;
         }
 
-        if(currentChunk.start <= chunk.start && currentChunk.end >= chunk.end){ // Really good new parent
-            this.addChunk(chunk, currentChunk);
-            return;
-        }
-
-        //Here we have either intersection or missing parent at all
-        if(currentChunk.start - chunk.end < currentDetailization){ //intersection (negative value) or close enough chunk
-            currentChunk.start = chunk.start;//increase left boundaries
-            this.addChunk(chunk, currentChunk);
-            return;
-        }
-
-        if(i>0){//We can try encreasing prev. chunk
-
-            if(chunk.start - parent.children[i-1].end < currentDetailization){
-                parent.children[i-1].end = chunk.end; // Increase previous chunk
-                this.addChunk(chunk, parent.children[i-1]);
-                return;
+        if (iteratingChunk.end >= chunk.end && iteratingChunk.start <= chunk.start) { // Contained chunk
+            if (iteratingChunk.level != chunk.level) { // Add inside ot ignore
+                this.addChunk(chunk, iteratingChunk);
             }
+            return;
         }
 
-        parent.children.splice(i, 0, new Chunk(parent, chunk.start, chunk.end, parent.level + 1)); //Create new children and go deeper
+        if (iteratingChunk.start < chunk.end) { // Intersection here!
+            //TODO: wtf!
+            //   console.log("WTF!",iteratingChunk,chunk);
+            iteratingChunk.end = Math.max(iteratingChunk.end, chunk.end);//Increase smaller chunk
+            iteratingChunk.start = Math.min(iteratingChunk.start, chunk.start);//Increase smaller chunk
+            if (iteratingChunk.level != chunk.level) { // Add inside ot ignore
+                this.addChunk(chunk, iteratingChunk);
+            }
+            return;
+        }
+
+        // No intersection - add here
+        if (parent.level == chunk.level - 1) {
+            parent.children.splice(i, 0, chunk);//Just add chunk here and return
+        } else {
+            parent.children.splice(i, 0, new Chunk(parent, chunk.start, chunk.end, parent.level + 1)); //Create new children and go deeper
+            this.addChunk(chunk, parent.children[i]);
+        }
+        return;
+    }
+
+    if (parent.level == chunk.level - 1) {
+        parent.children.push(chunk);
+    }else {
+        //Add new last chunk and go deeper
+        parent.children.push(new Chunk(parent, chunk.start, chunk.end, parent.level + 1)); //Create new chunk
         this.addChunk(chunk, parent.children[i]);
-        return;
     }
-
-    //Try to encrease last chunk from parent
-
-    if(chunk.start - parent.children[i-1].end < currentDetailization){
-        parent.children[i-1].end = chunk.end; // Increase previous chunk
-        this.addChunk(chunk, parent.children[i-1]);
-        return;
-    }
-
-    //Add new last chunk and go deeper
-    parent.children.push(new Chunk(parent, chunk.start, chunk.end, parent.level + 1)); //Create new chunk
-    this.addChunk(chunk, parent.children[i]);
-
 };
 
 /**
@@ -547,7 +507,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
  * @param parent - parent for recursive call
  * @param result - heap for recursive call
  */
-CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent){
+CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent,debugLevel){
     parent = parent || this.chunksTree;
 
     if(!parent){
@@ -564,8 +524,10 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     if(parent.children.length == 0){
-        result.push(parent); // Bad chunk, but no choice
-        return;
+        if(!debugLevel) {
+            result.push(parent); // Bad chunk, but no choice
+            return;
+        }
     }
 
     // Iterate children:
@@ -574,10 +536,10 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     // iterate blind spots:
-    var blindSpots = this.getBlindSpotsInCache(parent.start,parent.end,parent.level+1);
+    var blindSpots = this.getBlindSpotsInCache(parent.start, parent.end, parent.level + 1);
     for (i = 0; i < blindSpots.length; i++) {
         var spot = blindSpots[i];
-        if( spot.start >= start || spot.end <= end ){
+        if (spot.start >= start || spot.end <= end) {
             result.push(spot);
         }
     }
@@ -613,9 +575,13 @@ function ShortCache(cameras,mediaserver,$q){
 }
 ShortCache.prototype.init = function(start){
 
+
+    console.log("init shortcache",start);
     this.liveMode = false;
     if(!start){
         this.liveMode = true;
+
+        console.log("live mode!");
         start = (new Date()).getTime();
     }
     this.start = start;
@@ -662,6 +628,10 @@ ShortCache.prototype.update = function(requestPosition,position){
             _.forEach(chunks,function(chunk){
                 chunk.durationMs = parseInt(chunk.durationMs);
                 chunk.startTimeMs = parseInt(chunk.startTimeMs);
+
+                if(chunk.durationMs == -1){
+                    chunk.durationMs = (new Date()).getTime() - chunk.startTimeMs;//in future
+                }
             });
 
             if(chunks.length == 0){
@@ -755,18 +725,23 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
     //this.liveMode = false;
     if(i == this.currentDetailization.length){ // We have no good detailization for this moment - pretend to be playing live
-        this.playedPosition = (new Date()).getTime();
-        this.liveMode = true;
+
+        if(!this.updating){
+            this.playedPosition = (new Date()).getTime();
+            this.liveMode = true;
+        }
     }
 
     if(!this.liveMode && this.currentDetailization.length>0
         && (this.currentDetailization[this.currentDetailization.length - 1].durationMs
             + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs
             < Math.round(this.playedPosition) + this.updateInterval)) { // It's time to update
-        console.log("it's time to update" , this.currentDetailization[this.currentDetailization.length - 1].durationMs
+
+        /*console.log("it's time to update" , this.currentDetailization[this.currentDetailization.length - 1].durationMs
             + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs ,
                 this.playedPosition + this.updateInterval
-        );
+        );*/
+
         this.update();
     }
 
@@ -782,10 +757,11 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth,stickToLiveMs){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth,stickToLiveMs,zoomAccuracy){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
+    this.zoomAccuracy = zoomAccuracy;
 
     this.levels = {
         top:  {index:0,level:RulerModel.levels[0]},
@@ -825,7 +801,11 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
     this.end = end;
+    var needZoomOut =  this.fullZoomOutValue() - this.zoom() < this.zoomAccuracy;
     this.updateTotalInterval();
+    if(needZoomOut){
+        this.zoom(1);
+    }
 };
 
 ScaleManager.prototype.bound = function (min,val,max){
@@ -870,20 +850,64 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.updateLevels();
 };
 
-ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode){
-    var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
-    if(this.anchorDate == date){
+
+ScaleManager.prototype.stopWatching = function(){
+    this.watchPlayingPosition = false;
+    this.wasForcedToStopWatchPlaying = true;
+};
+
+ScaleManager.prototype.releaseWatching = function(){
+    this.wasForcedToStopWatchPlaying = false;
+};
+
+ScaleManager.prototype.watchPlaying = function(date){
+    this.watchPlayingPosition = true;
+    this.wasForcedToStopWatchPlaying = false;
+
+    if(!date){
         return;
     }
-    if(0 <= targetPoint && targetPoint <= 1 ){ // Live mode
-        this.setAnchorDateAndPoint(date, this.anchorPoint);
+    var targetPoint = this.dateToScreenCoordinate(date) / this.viewportWidth;
+    if(targetPoint>1){
+        targetPoint = 0.5;
+    }
+    this.setAnchorDateAndPoint(date, targetPoint);
+};
+
+ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
+    var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
+
+    if(this.anchorDate == date){
+        this.watchPlaying(date);
+    }
+
+    if(0 <= targetPoint && targetPoint <= 1 ){ 
+        this.watchPlaying(date); // Let's watch
     }
 
     if(liveMode && targetPoint > 1 && this.end - this.visibleEnd < this.stickToLiveMs ){
-        this.setEnd(date);
-        this.setAnchorDateAndPoint(date, 1);
+        this.watchPlaying(date);
     }
 };
+
+ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode){
+    if(this.anchorDate == date){
+        return;
+    }
+
+    if(date > this.end){
+        this.setEnd(date);
+    }
+
+    if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
+        this.checkWatchPlaying(date,liveMode);
+    }
+    if(this.watchPlayingPosition){
+        this.setAnchorDateAndPoint(date, liveMode?1:this.anchorPoint);
+    }
+};
+
+
 
 ScaleManager.prototype.tryToRestoreAnchorDate = function(date){
     var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
@@ -912,6 +936,10 @@ ScaleManager.prototype.fullZoomOutValue = function(){
 };
 ScaleManager.prototype.fullZoomInValue = function(){
     return this.msToZoom(this.minMsPerPixel);
+};
+
+ScaleManager.prototype.boundZoom = function(zoomTarget){
+    return this.bound(this.fullZoomInValue(),zoomTarget,this.fullZoomOutValue());
 };
 
 
@@ -1060,6 +1088,7 @@ ScaleManager.prototype.msToZoom = function(ms){
 
 
 ScaleManager.prototype.targetLevels = function(zoomTarget){
+    zoomTarget = this.boundZoom(zoomTarget);
     var msPerPixel = this.zoomToMs(zoomTarget);
     return this.calcLevels(msPerPixel);
 };
@@ -1069,6 +1098,16 @@ ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (fro
         return this.msToZoom(this.msPerPixel);
     }
     this.msPerPixel = this.zoomToMs(zoomValue);
+
+    /* Make it sticky */
+    if(zoomValue - this.fullZoomInValue() < this.zoomAccuracy){
+        this.msPerPixel = this.minMsPerPixel;
+    }
+
+    if(this.fullZoomOutValue()-zoomValue  < this.zoomAccuracy){
+        this.msPerPixel = this.maxMsPerPixel;
+    }
+
     this.updateCurrentInterval();
 };
 ScaleManager.prototype.zoomAroundDate = function(zoomValue, aroundDate){

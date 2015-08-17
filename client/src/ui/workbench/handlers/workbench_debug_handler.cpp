@@ -8,14 +8,15 @@
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
+#include <ui/dialogs/dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/workaround/qtbug_workaround.h>
 
 // -------------------------------------------------------------------------- //
 // QnDebugControlDialog
 // -------------------------------------------------------------------------- //
-class QnDebugControlDialog: public QDialog, public QnWorkbenchContextAware {
-    typedef QDialog base_type;
+class QnDebugControlDialog: public QnDialog, public QnWorkbenchContextAware {
+    typedef QnDialog base_type;
 
 public:
     QnDebugControlDialog(QWidget *parent = NULL):

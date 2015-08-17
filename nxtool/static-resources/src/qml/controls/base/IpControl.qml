@@ -95,7 +95,7 @@ FocusScope
         {
             id: firstOctet;
             nextOctet: secondOctet;
-            prevOctet: thisComponent.KeyNavigation.backtab;
+            //prevOctet: thisComponent.KeyNavigation.backtab;
         }
 
         IpDot

@@ -67,6 +67,7 @@ signals:
     void permissionsChanged(const QnResourcePtr &user);
     void adminChanged(const QnResourcePtr &resource);
     void emailChanged(const QnResourcePtr &user);
+	void realmChanged(const QnResourcePtr &user);
     void enabledChanged(const QnResourcePtr &user);
     void ldapChanged(const QnResourcePtr &user);
 

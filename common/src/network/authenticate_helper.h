@@ -96,6 +96,7 @@ enum AuthResult
 {
     Auth_OK,            // OK
     Auth_WrongLogin,    // invalid login
+    Auth_WrongInternalLogin, // invalid login used for internal auth scheme
     Auth_WrongDigest,   // invalid or empty digest
     Auth_WrongPassword, // invalid password
     Auth_Forbidden      // no auth mehod found or custom auth scheme without login/password is failed

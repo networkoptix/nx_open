@@ -6,8 +6,6 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QMessageBox>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 

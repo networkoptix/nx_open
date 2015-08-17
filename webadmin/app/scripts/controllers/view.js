@@ -1,18 +1,23 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q) {
+    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q,$sessionStorage,$localStorage) {
 
+        $scope.session = $sessionStorage;
+        $scope.storage = $localStorage;
+        $scope.storage.serverStates = $scope.storage.serverStates || {};
+        
         $scope.playerApi = false;
         $scope.cameras = {};
         $scope.liveOnly = true;
-        $scope.cameraId = $scope.cameraId || $routeParams.cameraId || null;
+        $scope.storage.cameraId   = $scope.storage.cameraId   || $routeParams.cameraId || null;
         $scope.activeCamera = null;
 
         var isAdmin = false;
         var canViewLive = false;
         var canViewArchive = false;
         var availableCameras = null;
+
 
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
@@ -122,12 +127,18 @@ angular.module('webadminApp').controller('ViewCtrl',
             });
         }
         function getCamera(id){
-            if(!$scope.allcameras) {
+            if(!$scope.cameras) {
                 return null;
             }
-            return _.find($scope.allcameras, function (camera) {
-                return camera.id === id;
-            });
+            for(var serverId in $scope.cameras) {
+                var cam = _.find($scope.cameras[serverId], function (camera) {
+                    return camera.id === id;
+                });
+                if(cam){
+                    return cam;
+                }
+            }
+            return null;
         }
 
         $scope.playerReady = function(API){
@@ -137,9 +148,13 @@ angular.module('webadminApp').controller('ViewCtrl',
         function updateVideoSource(playing) {
             var live = !playing;
 
+            $scope.positionSelected = !!playing;
+
             if(!$scope.positionProvider){
                 return;
             }
+
+            console.log("playing",playing);
 
             $scope.positionProvider.init(playing);
             if(live){
@@ -188,16 +203,16 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.selectCameraById = function (cameraId, position, silent) {
-
-
-            $scope.cameraId = cameraId || $scope.cameraId;
-            if(position){
-                position = parseInt(position);
+            var oldTimePosition = null;
+            if($scope.positionProvider && !$scope.positionProvider.liveMode){
+                oldTimePosition = $scope.positionProvider.playedPosition;
             }
 
-            $scope.activeCamera = _.find($scope.allcameras, function (camera) {
-                return camera.id === $scope.cameraId;
-            });
+            $scope.storage.cameraId  = cameraId || $scope.storage.cameraId  ;
+
+            position = position?parseInt(position):oldTimePosition;
+
+            $scope.activeCamera = getCamera ($scope.storage.cameraId  );
             if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
@@ -219,6 +234,11 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.selectCameraById(activeCamera.id,false);
         };
 
+        $scope.toggleServerCollapsed = function(server){
+            server.collapsed = !server.collapsed;
+            $scope.storage.serverStates[server.id] = server.collapsed;
+        };
+
         $scope.switchPlaying = function(play){
             if($scope.playerAPI) {
                 if (play) {
@@ -228,6 +248,12 @@ angular.module('webadminApp').controller('ViewCtrl',
                 }
                 if ($scope.positionProvider) {
                     $scope.positionProvider.playing = play;
+
+                    if(!play){
+                        $timeout(function(){
+                            $scope.positionProvider.liveMode = false; // Do it async
+                        });
+                    }
                 }
             }
         };
@@ -262,6 +288,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         };
 
+        $scope.enableFullScreen = screenfull.enabled;
         $scope.fullScreen = function(){
             if (screenfull.enabled) {
                 screenfull.request($(".videowindow").get(0));
@@ -327,7 +354,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                     camera.url = extractDomain(camera.url);
                     camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
                     camera.server = getServer(camera.parentId);
-                    if(camera.server.status == 'Offline'){
+                    if(camera.server && camera.server.status == 'Offline'){
                         camera.status = 'Offline';
                     }
 
@@ -430,8 +457,6 @@ angular.module('webadminApp').controller('ViewCtrl',
                     }
                 }
 
-                $scope.allcameras = cameras;
-
                 deferred.resolve(cameras);
             }, function (error) {
                 deferred.reject(error);
@@ -443,14 +468,16 @@ angular.module('webadminApp').controller('ViewCtrl',
         function reloadTree(){
             function serverSorter(server){
                 server.url = extractDomain(server.url);
-
+                server.collapsed = $scope.storage.serverStates[server.id];
                 return objectOrderName(server);
             }
 
             function newServerFilter(server){
                 var oldserver = getServer(server.id);
 
-                server.collapsed = oldserver? oldserver.collapsed : server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
+                server.collapsed = oldserver ? oldserver.collapsed :
+                    $scope.storage.serverStates[server.id] ||
+                    server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
 
                 if(oldserver){ // refresh old server
                     $.extend(oldserver,server);
@@ -503,12 +530,12 @@ angular.module('webadminApp').controller('ViewCtrl',
         var timer = false;
         function reloader(){
             reloadTree().then(function(){
-                $scope.selectCameraById($scope.cameraId,$location.search().time || false, !firstTime);
+                $scope.selectCameraById($scope.storage.cameraId  , firstTime && $location.search().time || false, !firstTime);
                 firstTime = false;
                 timer = $timeout(reloader, reloadInterval);
             },function(error){
                 console.error(error);
-                timer = $timeout(reloader, quickReloadInterval);
+                //timer = $timeout(reloader, quickReloadInterval);
             });
         }
         var desktopCameraTypeId = null;
@@ -522,6 +549,11 @@ angular.module('webadminApp').controller('ViewCtrl',
             });
         }
 
+        $scope.$watch("positionProvider.liveMode",function(mode){
+            if(mode){
+                $scope.positionSelected = false;
+            }
+        });
         mediaserver.getCurrentUser().then(function(result){
             isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
             canViewLive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewLivePermission);
@@ -572,24 +604,46 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
 
-        (function (){
-            // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
-            // But I kept it for all browsers to avoid future possible bugs in different browsers
-            // Now every browser behaves the same way
+        // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
+        // But I kept it for all browsers to avoid future possible bugs in different browsers
+        // Now every browser behaves the same way
 
-            var $window = $(window);
-            var $top = $("#top");
-            var $viewPanel = $(".view-panel");
-            var $camerasPanel = $(".cameras-panel");
-            var updateHeights = function() {
-                var windowHeight = $window.height();
-                var topHeight = $top.height();
-                var viewportHeight = (windowHeight - topHeight) + "px";
+        var $window = $(window);
+        var $top = $("#top");
+        var $viewPanel = $(".view-panel");
+        var $camerasPanel = $(".cameras-panel");
+        var updateHeights = function() {
+            var windowHeight = $window.height();
+            var topHeight = $top.height();
 
-                $camerasPanel.css("height",viewportHeight );
-                $viewPanel.css("height",viewportHeight );
-            };
-            updateHeights();
-            $window.resize(updateHeights);
-        })();
+            var topAlertHeight = 0;
+
+            var topAlert = $("td.alert");
+            if(topAlert.length){
+                topAlertHeight = topAlert.height();
+            }
+
+            var viewportHeight = (windowHeight - topHeight - topAlertHeight) + "px";
+
+            $camerasPanel.css("height",viewportHeight );
+            $viewPanel.css("height",viewportHeight );
+        };
+
+        updateHeights();
+        setTimeout(updateHeights,50);
+        $window.resize(updateHeights);
+
+
+
+
+        $scope.mobileAppAlertClose = function(){
+            $scope.session.mobileAppNotified  = true;
+            setTimeout(updateHeights,50);
+        };
+
+        $scope.ieNoWebmAlertClose = function(){
+            $scope.session.ieNoWebmNotified = true;
+            setTimeout(updateHeights,50);
+        };
+
     });

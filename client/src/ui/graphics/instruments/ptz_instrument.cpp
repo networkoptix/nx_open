@@ -144,7 +144,7 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     connect(overlay->focusAutoButton(), &QnImageButtonWidget::clicked,  this, &PtzInstrument::at_focusAutoButton_clicked);
     connect(overlay->modeButton(),      &QnImageButtonWidget::clicked,  this, &PtzInstrument::at_modeButton_clicked);
 
-    widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false, false);
+    widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false, QnResourceWidget::TopControlsLayer);
 
     return overlay;
 }

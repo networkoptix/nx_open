@@ -29,14 +29,11 @@ int detail::OverlayedBase::overlayWidgetIndex(QGraphicsWidget *widget) const {
     return -1;
 }
 
-void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility, bool autoRotate, bool bindToViewport, bool placeOverControls, bool isControlsWidget) {
+void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility, bool autoRotate, bool bindToViewport, qreal z) {
     if(!widget) {
         qnNullWarning(widget);
         return;
     }
-
-    if (isControlsWidget)
-        m_controlsWidget = widget;
 
     QnViewportBoundWidget *boundWidget = dynamic_cast<QnViewportBoundWidget *>(widget);
     if(bindToViewport && !boundWidget) {
@@ -50,6 +47,7 @@ void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget, OverlayVis
     }
     QGraphicsWidget *childWidget = boundWidget ? boundWidget : widget;
     childWidget->setParentItem(m_widget);
+    childWidget->setZValue(z);
 
     QnFixedRotationTransform *rotationTransform = NULL;
     if(autoRotate) {
@@ -64,18 +62,7 @@ void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget, OverlayVis
     overlay.childWidget = childWidget;
     overlay.boundWidget = boundWidget;
     overlay.rotationTransform = rotationTransform;
-
-    if(placeOverControls || !m_controlsWidget) {
-        m_overlayWidgets.push_back(overlay);
-    } else {
-        int index = overlayWidgetIndex(m_controlsWidget);
-        if(index == -1) {
-            m_overlayWidgets.push_back(overlay);
-        } else {
-            m_overlayWidgets.insert(index, overlay);
-            overlay.childWidget->stackBefore(m_overlayWidgets[index + 1].childWidget);
-        }
-    }
+    m_overlayWidgets.append(overlay);
 
     updateOverlayWidgetsGeometry();
 }
