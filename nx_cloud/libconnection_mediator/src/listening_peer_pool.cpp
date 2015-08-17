@@ -11,9 +11,9 @@ ListeningPeerPool::ListeningPeerPool( stun::MessageDispatcher* dispatcher )
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
-            methods::LISTEN, std::bind( &ListeningPeerPool::listen, this, _1, _2 ) ) &&
+            methods::listen, std::bind( &ListeningPeerPool::listen, this, _1, _2 ) ) &&
         dispatcher->registerRequestProcessor(
-            methods::CONNECT, std::bind( &ListeningPeerPool::connect, this, _1, _2 ) );
+            methods::connect, std::bind( &ListeningPeerPool::connect, this, _1, _2 ) );
 
     // TODO: NX_LOG
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register one of processors" );
@@ -34,7 +34,7 @@ void ListeningPeerPool::listen( stun::ServerConnection* connection,
     //binding to address, sending success response
         //NOTE single server is allowed to listen on multiple mediators
 
-    errorResponse( connection, message.header, stun::error::SERVER_ERROR,
+    errorResponse( connection, message.header, stun::error::serverError,
                    "Method is not implemented yet" );
 }
 
@@ -55,7 +55,7 @@ void ListeningPeerPool::connect( stun::ServerConnection* connection,
 
     //sending success response with selected server address
 
-    errorResponse( connection, message.header, stun::error::SERVER_ERROR,
+    errorResponse( connection, message.header, stun::error::serverError,
                    "Method is not implemented yet" );
 }
 

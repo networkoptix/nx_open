@@ -120,7 +120,7 @@ namespace stun {
                 // integrity only fingerprint will need to handle. And we just check the
                 // fingerprint message followed by the STUN packet. If we have found one
                 // our parser state converts to a END_FINGERPINT states
-                if( m_attribute.type == attrs::FINGER_PRINT ) {
+                if( m_attribute.type == attrs::fingerPrint ) {
                     m_state = END_FINGERPRINT;
                 } else {
                     m_state = MORE_VALUE;

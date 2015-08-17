@@ -243,10 +243,10 @@ Attribute* MessageParser::parseUnknownAttribute() {
 
 Attribute* MessageParser::parseValue() {
     switch( m_attribute.type ) {
-        case attrs::XOR_MAPPED_ADDRESS: return parseXORMappedAddress();
-        case attrs::ERROR_CODE:         return parseErrorCode();
-        case attrs::MESSAGE_INTEGRITY:  return parseMessageIntegrity();
-        case attrs::FINGER_PRINT:       return parseFingerprint();
+        case attrs::xorMappedAddress: return parseXORMappedAddress();
+        case attrs::errorCode:         return parseErrorCode();
+        case attrs::messageIntegrity:  return parseMessageIntegrity();
+        case attrs::fingerPrint:       return parseFingerprint();
         default:                        return parseUnknownAttribute();
     }
 }
@@ -410,10 +410,10 @@ int MessageParser::parseAttributeValue( MessageParserBuffer& buffer ) {
     if( attr == NULL ) return FAILED;
     m_outputMessage->attributes.emplace( attr->type(), std::unique_ptr<Attribute>(attr) );
     switch( attr->type() ) {
-    case attrs::FINGER_PRINT:
+    case attrs::fingerPrint:
         m_state = END_FINGERPRINT;
         break;
-    case attrs::MESSAGE_INTEGRITY:
+    case attrs::messageIntegrity:
         m_state = END_MESSAGE_INTEGRITY;
         break;
     default:

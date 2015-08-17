@@ -28,7 +28,7 @@ void ServerConnection::processMessage( Message message )
         case MessageClass::request:
             switch( message.header.method )
             {
-                case BINDING:
+                case bindingMethod:
                     processBindingRequest( std::move( message ) );
                     break;
 
@@ -47,7 +47,7 @@ void ServerConnection::processBindingRequest( Message message )
 {
     Message response( stun::Header(
         MessageClass::successResponse,
-        BINDING, std::move( message.header.transactionId ) ) );
+        bindingMethod, std::move( message.header.transactionId ) ) );
 
     SocketAddress peer( peer_address_ );
     response.newAttribute< stun::attrs::XorMappedAddress >(

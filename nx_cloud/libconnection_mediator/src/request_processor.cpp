@@ -16,7 +16,7 @@ boost::optional< RequestProcessor::MediaserverData >
     const auto systemAttr = request.getAttribute< attrs::SystemId >();
     if( !systemAttr )
     {
-        errorResponse( connection, request.header, stun::error::BAD_REQUEST,
+        errorResponse( connection, request.header, stun::error::badRequest,
                        "Attribute SystemId is required" );
         return boost::none;
     }
@@ -24,7 +24,7 @@ boost::optional< RequestProcessor::MediaserverData >
     auto systemId = systemAttr->get();
     if( systemId.isNull() )
     {
-        errorResponse( connection, request.header, stun::error::BAD_REQUEST,
+        errorResponse( connection, request.header, stun::error::badRequest,
                        "Attribute SystemId is not a valid UUID" );
         return boost::none;
     }
@@ -32,7 +32,7 @@ boost::optional< RequestProcessor::MediaserverData >
     const auto serverAttr = request.getAttribute< attrs::ServerId >();
     if( !serverAttr )
     {
-        errorResponse( connection, request.header, stun::error::BAD_REQUEST,
+        errorResponse( connection, request.header, stun::error::badRequest,
                        "Attribute ServerId is required" );
         return boost::none;
     }
@@ -40,7 +40,7 @@ boost::optional< RequestProcessor::MediaserverData >
     auto serverId = serverAttr->get();
     if( serverId.isNull() )
     {
-        errorResponse( connection, request.header, stun::error::BAD_REQUEST,
+        errorResponse( connection, request.header, stun::error::badRequest,
                        "Attribute ServerId is not a valid UUID" );
         return boost::none;
     }
@@ -48,7 +48,7 @@ boost::optional< RequestProcessor::MediaserverData >
     const auto authAttr = request.getAttribute< attrs::Authorization >();
     if( !authAttr )
     {
-        errorResponse( connection, request.header, stun::error::BAD_REQUEST,
+        errorResponse( connection, request.header, stun::error::badRequest,
                        "Attribute Authorization is required" );
         return boost::none;
     }

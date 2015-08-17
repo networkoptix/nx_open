@@ -28,7 +28,7 @@ void partialParse( MessageParser& parser, const Buffer& message, size_t partSize
 
 TEST( StunMessageSerialization, BindingRequest )
 {
-    Message request( Header( MessageClass::request, MethodType::BINDING ) );
+    Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
     request.header.transactionId = Buffer::fromHex( DEFAULT_TID );
 
     size_t serializedSize;
@@ -52,14 +52,14 @@ TEST( StunMessageSerialization, BindingRequest )
     partialParse(parser, serializedMessage, 1); // parse by 1 byte chunks
 
     ASSERT_EQ( parsed.header.messageClass, MessageClass::request );
-    ASSERT_EQ( parsed.header.method, MethodType::BINDING );
+    ASSERT_EQ( parsed.header.method, MethodType::bindingMethod );
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
     ASSERT_EQ( parsed.attributes.size(), 0 );
 }
 
 TEST( StunMessageSerialization, BindingResponse )
 {
-    Message response( Header( MessageClass::successResponse, MethodType::BINDING ) );
+    Message response( Header( MessageClass::successResponse, MethodType::bindingMethod ) );
     response.header.transactionId = Buffer::fromHex( DEFAULT_TID );
     response.newAttribute< attrs::XorMappedAddress >( 0x1234, 0x12345678 );
 
@@ -88,7 +88,7 @@ TEST( StunMessageSerialization, BindingResponse )
 
     ASSERT_EQ( serializedMessage.size(), serializedSize );
     ASSERT_EQ( parsed.header.messageClass, MessageClass::successResponse );
-    ASSERT_EQ( parsed.header.method, MethodType::BINDING );
+    ASSERT_EQ( parsed.header.method, MethodType::bindingMethod );
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
     ASSERT_EQ( parsed.attributes.size(), 1 );
 
@@ -99,7 +99,7 @@ TEST( StunMessageSerialization, BindingResponse )
 
 TEST( StunMessageSerialization, BindingError )
 {
-    Message response( Header( MessageClass::errorResponse, MethodType::BINDING ) );
+    Message response( Header( MessageClass::errorResponse, MethodType::bindingMethod ) );
     response.header.transactionId = Buffer::fromHex( DEFAULT_TID );
     response.newAttribute< attrs::ErrorDescription >( 401, "Unauthorized" );
 
@@ -128,7 +128,7 @@ TEST( StunMessageSerialization, BindingError )
 
     ASSERT_EQ( serializedMessage.size(), serializedSize );
     ASSERT_EQ( parsed.header.messageClass, MessageClass::errorResponse );
-    ASSERT_EQ( parsed.header.method, MethodType::BINDING );
+    ASSERT_EQ( parsed.header.method, MethodType::bindingMethod );
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
     ASSERT_EQ( parsed.attributes.size(), 1 );
 
@@ -141,7 +141,7 @@ TEST( StunMessageSerialization, BindingError )
 
 TEST( StunMessageSerialization, CustomIndication )
 {
-    Message response( Header( MessageClass::indication, MethodType::USER_METHOD + 1 ) );
+    Message response( Header( MessageClass::indication, MethodType::userMethod + 1 ) );
     response.header.transactionId = Buffer::fromHex( DEFAULT_TID );
     response.newAttribute< attrs::Unknown >( 0x9001, "ua1v" );
     response.newAttribute< attrs::Unknown >( 0x9002, "ua2v" );
@@ -171,7 +171,7 @@ TEST( StunMessageSerialization, CustomIndication )
 
     ASSERT_EQ( serializedMessage.size(), serializedSize );
     ASSERT_EQ( parsed.header.messageClass, MessageClass::indication );
-    ASSERT_EQ( parsed.header.method, MethodType::USER_METHOD + 1 );
+    ASSERT_EQ( parsed.header.method, MethodType::userMethod + 1 );
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
     ASSERT_EQ( parsed.attributes.size(), 2 );
 

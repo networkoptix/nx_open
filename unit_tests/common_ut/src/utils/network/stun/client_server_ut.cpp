@@ -94,7 +94,7 @@ TEST_F( StunClientServerTest, RequestResponse )
 {
     startServer();
     {
-        Message request( Header( MessageClass::request, MethodType::BINDING ) );
+        Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         ASSERT_TRUE( client.sendRequest( std::move( request ), waiter.pusher() ) );
@@ -104,7 +104,7 @@ TEST_F( StunClientServerTest, RequestResponse )
 
         const auto& response = result.second;
         ASSERT_EQ( response.header.messageClass, MessageClass::successResponse );
-        ASSERT_EQ( response.header.method, MethodType::BINDING );
+        ASSERT_EQ( response.header.method, MethodType::bindingMethod );
 
         const auto addr = response.getAttribute< stun::attrs::XorMappedAddress >();
         ASSERT_NE( addr, nullptr );

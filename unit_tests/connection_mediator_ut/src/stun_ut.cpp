@@ -59,7 +59,7 @@ TEST_F( StunCustomTest, Ping )
     static const SocketAddress GOOD_ADDRESS( lit( "hello.world:123" ) );
     static const SocketAddress BAD_ADDRESS ( lit( "world.hello:321" ) );
 
-    Message request( Header( MessageClass::request, methods::PING ) );
+    Message request( Header( MessageClass::request, methods::ping ) );
     request.newAttribute< hpm::attrs::SystemId >( SYSTEM_ID );
     request.newAttribute< hpm::attrs::ServerId >( SERVER_ID );
     request.newAttribute< hpm::attrs::Authorization >( "some_auth_data" );
@@ -81,7 +81,7 @@ TEST_F( StunCustomTest, Ping )
 
     const auto& response = result.second;
     ASSERT_EQ( response.header.messageClass, MessageClass::successResponse );
-    ASSERT_EQ( response.header.method, methods::PING );
+    ASSERT_EQ( response.header.method, methods::ping );
 
     const auto endpoints = response.getAttribute< attrs::PublicEndpointList >();
     ASSERT_NE( endpoints, nullptr );

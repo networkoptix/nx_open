@@ -46,8 +46,8 @@ enum class MessageClass
 //!Contains STUN method types defined in RFC
 enum MethodType
 {
-    BINDING = 1,
-    USER_METHOD //!< Starting value for custom STUN methods
+    bindingMethod = 1,
+    userMethod //!< Starting value for custom STUN methods
 };
 
 class Header
@@ -71,12 +71,12 @@ namespace error
 {
     enum Value
     {
-        TRY_ALTERNATE       = 300,
-        BAD_REQUEST         = 400,
-        UNAUTHTORIZED       = 401,
-        UNKNOWN_ATTRIBUTE   = 420,
-        STALE_NONCE         = 438,
-        SERVER_ERROR        = 500,
+        tryAlternate        = 300,
+        badRequest          = 400,
+        unauthtorized       = 401,
+        unknownAttribute    = 420,
+        staleNonce          = 438,
+        serverError         = 500,
     };
 }
 
@@ -85,21 +85,21 @@ namespace attrs
 {
     enum Type
     {
-        MAPPED_ADDRESS      = 0x0001,
-        USER_NAME           = 0x0006,
-        MESSAGE_INTEGRITY   = 0x0008,
-        ERROR_CODE          = 0x0009,
-        UNKNOWN_ATTRIBUTE   = 0x000A,
-        REALM               = 0x0014,
-        NONCE               = 0x0015,
-        XOR_MAPPED_ADDRESS  = 0x0020,
+        mappedAddress       = 0x0001,
+        userName            = 0x0006,
+        messageIntegrity    = 0x0008,
+        errorCode           = 0x0009,
+        unknown             = 0x000A,
+        realm               = 0x0014,
+        nonce               = 0x0015,
+        xorMappedAddress    = 0x0020,
 
-        SOFTWARE            = 0x8022,
-        ALTERNATE_SERVER    = 0x8023,
-        FINGER_PRINT        = 0x8028,
+        software            = 0x8022,
+        alternateServer     = 0x8023,
+        fingerPrint         = 0x8028,
 
-        USER_DEFINED        = 0x9000, //!<we need this to identify our private extended stun attr
-        UNKNOWN             = 0xFFFF,
+        userDefined         = 0x9000, //!<we need this to identify our private extended stun attr
+        unknownReserved     = 0xFFFF,
     };
 
     class Attribute
@@ -117,7 +117,7 @@ namespace attrs
         public Attribute
     {
     public:
-        static const int TYPE = XOR_MAPPED_ADDRESS;
+        static const int TYPE = xorMappedAddress;
 
         enum
         {
@@ -155,7 +155,7 @@ namespace attrs
         public Attribute
     {
     public:
-        static const int TYPE = ERROR_CODE;
+        static const int TYPE = errorCode;
 
         ErrorDescription( int code_, nx::String phrase = nx::String() );
         virtual int type() const override { return TYPE; }
@@ -173,7 +173,7 @@ namespace attrs
         public Attribute
     {
     public:
-        static const int TYPE = FINGER_PRINT;
+        static const int TYPE = fingerPrint;
 
         FingerPrint( uint32_t crc32_ );
         virtual int type() const override { return TYPE; }
@@ -188,7 +188,7 @@ namespace attrs
         public Attribute
     {
     public:
-        static const int TYPE = MESSAGE_INTEGRITY;
+        static const int TYPE = messageIntegrity;
         static const int SHA1_HASH_SIZE = 20;
 
         virtual int type() const override { return TYPE; }
@@ -202,7 +202,7 @@ namespace attrs
         public Attribute
     {
     public:
-        static const int TYPE = UNKNOWN_ATTRIBUTE;
+        static const int TYPE = unknown;
 
         Unknown( int userType_, nx::Buffer value_ = nx::Buffer() );
         virtual int type() const override { return userType; }

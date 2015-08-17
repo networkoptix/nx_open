@@ -187,16 +187,16 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( MessageSerializerBuffer* buffer ,const attrs::Attribute* attribute , std::size_t* value ) {
     switch( attribute->type() ) {
-    case attrs::ERROR_CODE:
+    case attrs::errorCode:
         return serializeAttributeValue_ErrorCode( buffer , *static_cast<const ErrorDescription*>(attribute) ,value);
-    case attrs::FINGER_PRINT:
+    case attrs::fingerPrint:
         return serializeAttributeValue_Fingerprint( buffer , *static_cast<const FingerPrint*>(attribute) ,value);
-    case attrs::XOR_MAPPED_ADDRESS:
+    case attrs::xorMappedAddress:
         return serializeAttributeValue_XORMappedAddress( buffer , *static_cast<const XorMappedAddress*>(attribute) ,value);
-    case attrs::MESSAGE_INTEGRITY:
+    case attrs::messageIntegrity:
         return serializeAttributeValue_MessageIntegrity( buffer , *static_cast<const MessageIntegrity*>(attribute) ,value);
     default:
-        if( attribute->type() > attrs::UNKNOWN_ATTRIBUTE )
+        if( attribute->type() > attrs::unknown )
             return serializeAttributeValue_UnknownAttribute( buffer , *static_cast<const Unknown*>(attribute) ,value);
         Q_ASSERT(0);
         return nx_api::SerializerState::done;
@@ -309,8 +309,8 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCo
 }
 
 bool MessageSerializer::travelAllAttributes( const std::function<bool(const attrs::Attribute*)>& callback ) {
-    auto message_integrity = m_message.attributes.find(attrs::MESSAGE_INTEGRITY);
-    auto fingerprint = m_message.attributes.find(attrs::FINGER_PRINT);
+    auto message_integrity = m_message.attributes.find(attrs::messageIntegrity);
+    auto fingerprint = m_message.attributes.find(attrs::fingerPrint);
 
     for( auto ib = m_message.attributes.cbegin() ; ib != m_message.attributes.cend() ; ++ib ) {
         if( ib != message_integrity && ib != fingerprint ) {
@@ -357,17 +357,17 @@ bool MessageSerializer::checkMessageIntegratiy() {
         return false;
     }
     // 2. Checking the attributes 
-    auto ib = m_message.attributes.find(attrs::FINGER_PRINT);
+    auto ib = m_message.attributes.find(attrs::fingerPrint);
     if( ib != m_message.attributes.end() && ++ib != m_message.attributes.end() ) {
         return false;
     }
-    ib = m_message.attributes.find(attrs::MESSAGE_INTEGRITY);
+    ib = m_message.attributes.find(attrs::messageIntegrity);
     if( ib != m_message.attributes.end() && ++ib != m_message.attributes.end() ) {
         return false;
     }
     // 3. Checking the validation for specific attributes
     // ErrorCode message
-    ib = m_message.attributes.find(attrs::ERROR_CODE);
+    ib = m_message.attributes.find(attrs::errorCode);
     if( ib !=  m_message.attributes.end() ) {
         // Checking the error code message
         ErrorDescription* error_code = static_cast<ErrorDescription*>(

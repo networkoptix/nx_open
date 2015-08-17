@@ -15,7 +15,7 @@ MediaserverApiIf::MediaserverApiIf( stun::MessageDispatcher* dispatcher )
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
-            methods::PING, std::bind( &MediaserverApiIf::ping, this, _1, _2 ) );
+            methods::ping, std::bind( &MediaserverApiIf::ping, this, _1, _2 ) );
 
     // TODO: NX_LOG
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register ping processor" );
@@ -29,7 +29,7 @@ void MediaserverApiIf::ping( stun::ServerConnection* connection,
         const auto endpointsAttr = message.getAttribute< attrs::PublicEndpointList >();
         if( !endpointsAttr )
         {
-            errorResponse( connection, message.header, stun::error::BAD_REQUEST,
+            errorResponse( connection, message.header, stun::error::badRequest,
                            "Attribute PublicEndpointList is required" );
             return;
         }
