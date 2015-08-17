@@ -46,6 +46,6 @@
         </object>
     </div>
 
-    <div class="videoplayer" ng-if="native" ng-class="{'invisible':loading && !debugMode}">
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading && !debugMode}">
     </div>
 </div>
