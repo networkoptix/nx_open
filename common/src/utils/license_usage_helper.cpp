@@ -5,7 +5,6 @@
 
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/algorithm/fill.hpp>
-#include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
 #include <core/resource/resource.h>
@@ -355,9 +354,20 @@ QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceLi
     propose(proposedCameras, proposedEnable);
 }
 
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable, QObject *parent):
+    base_type(parent)
+{
+    init();
+    propose(proposedCamera, proposedEnable);
+}
+
 void QnCamLicenseUsageHelper::init() {
     QnCamLicenseUsageWatcher* usageWatcher = new QnCamLicenseUsageWatcher(this);
     connect(usageWatcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, &QnLicenseUsageHelper::invalidate);
+}
+
+void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable) {
+    return propose(QnVirtualCameraResourceList() << proposedCamera, proposedEnable);
 }
 
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable) {

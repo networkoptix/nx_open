@@ -2,8 +2,6 @@
 
 #include <cassert>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-
 #include <QtCore/QProcess>
 
 #include <QtWidgets/QApplication>
