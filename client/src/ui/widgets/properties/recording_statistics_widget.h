@@ -1,47 +1,39 @@
-#ifndef QN_RECORDING_STATISTICS_DIALOG_H
-#define QN_RECORDING_STATISTICS_DIALOG_H
+#pragma once
 
-#include <QtWidgets/QDialog>
+#include <QtWidgets/QWidget>
 #include <QtGui/QStandardItem>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
 
+#include <api/model/recording_stats_reply.h>
+#include <api/model/storage_space_reply.h>
+
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
-#include "api/model/recording_stats_reply.h"
-#include "api/model/storage_space_reply.h"
+#include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
+
+#include <utils/common/connective.h>
 
 class QnRecordingStatsModel;
 
 namespace Ui {
-    class RecordingStatsDialog;
+    class RecordingStatisticsWidget;
 }
 
-class QnRecordingStatsItemDelegate: public QStyledItemDelegate 
-{
-    typedef QStyledItemDelegate base_type;
-
-public:
-    explicit QnRecordingStatsItemDelegate(QObject *parent = NULL): base_type(parent) {}
-    virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override;
-};
-
-class QnRecordingStatsDialog: public QnWorkbenchStateDependentButtonBoxDialog
-{
+class QnRecordingStatisticsWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
-
+    typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
-    explicit QnRecordingStatsDialog(QWidget *parent);
-    virtual ~QnRecordingStatsDialog();
+    QnRecordingStatisticsWidget(const QnMediaServerResourcePtr &server, QWidget* parent = 0);
+    virtual ~QnRecordingStatisticsWidget();
 
-    void disableUpdateData();
-    void enableUpdateData();
-    void setServer(QnMediaServerResourcePtr mserver);
-private slots:
+    virtual void updateFromSettings() override;
+private:
     void updateData();
+
+private slots:
     void at_gotStatiscits(int httpStatus, const QnRecordingStatsReply& data, int requestNum);
     void at_gotStorageSpace(int httpStatus, const QnStorageSpaceReply& data, int requestNum);
     void at_eventsGrid_clicked(const QModelIndex & index);
@@ -51,9 +43,9 @@ private slots:
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
     void at_forecastParamsChanged();
     void at_updateColors();
+
 private:
     void requestFinished();
-    QList<QnMediaServerResourcePtr> getServerList() const;
     QnRecordingStatsReply getForecastData(qint64 extraSizeBytes);
 
     /**
@@ -66,10 +58,13 @@ private:
     qint64 sliderPositionToBytes(int value) const;
     int bytesToSliderPosition (qint64 value) const;
     void updateColumnWidth();
-private:
-    QScopedPointer<Ui::RecordingStatsDialog> ui;
-    QnRecordingStatsModel *m_model;
 
+private:
+    QScopedPointer<Ui::RecordingStatisticsWidget> ui;
+
+    QnMediaServerResourcePtr m_server;
+
+    QnRecordingStatsModel *m_model;
     QMap<int, QnUuid> m_requests;
 
     bool m_updateDisabled;
@@ -80,16 +75,16 @@ private:
     QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
     QnRecordingStatsReply m_allData;
-    QnRecordingStatsReply m_hidenCameras;
+    QnRecordingStatsReply m_hiddenCameras;
 
     QVector<QnStorageSpaceData> m_availStorages;
-    QnMediaServerResourcePtr m_mserver;
+
 private:
     // forecast related data
     struct ForecastDataPerCamera
     {
         ForecastDataPerCamera(): expand(false), maxDays(0), bytesPerStep(0), usageCoeff(0.0) {}
-        
+
         QnCamRecordingStatsData stats;         // forecasted statistics
         bool expand;                           // do expand archive for that camera in the forecast
         int maxDays;                           // cached camera 'maxDays' value
@@ -104,10 +99,6 @@ private:
         QVector<ForecastDataPerCamera> cameras; // camera list by server
     };
 
-
 private:
     QnRecordingStatsReply doForecastMainStep(ForecastData& forecastData, qint64 forecastStep);
-
 };
-
-#endif // QN_RECORDING_STATISTICS_DIALOG_H

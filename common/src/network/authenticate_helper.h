@@ -16,6 +16,9 @@
 #include "utils/network/http/httptypes.h"
 #include "utils/common/uuid.h"
 
+#include "ldap/ldap_manager.h"
+
+struct QnLdapDigestAuthContext;
 
 namespace AuthMethod
 {
@@ -111,7 +114,6 @@ public:
     virtual ~QnAuthHelper();
 
     static void initStaticInstance(QnAuthHelper* instance);
-    static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter);
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side
@@ -196,9 +198,25 @@ private:
         TempAuthenticationKeyCtx& operator=( const TempAuthenticationKeyCtx& );
     };
 
+    class UserDigestData
+    {
+    public:
+        nx_http::StringType ha1Digest;
+        nx_http::StringType realm;
+        nx_http::StringType cryptSha512Hash;
+        nx_http::StringType nxUserName;
+
+        void parse( const nx_http::Request& request );
+        bool empty() const;
+    };
+
+
+    /*!
+        \param userRes Can be NULL
+    */
     void addAuthHeader(
         nx_http::Response& responseHeaders,
-        const QString& realm,
+        const QnUserResourcePtr& userRes,
         bool isProxy );
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
@@ -229,6 +247,9 @@ private:
     */
     AuthResult authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId, std::function<bool(const QByteArray&)> checkNonceFunc) const;
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
+    void applyClientCalculatedPasswordHashToResource(
+        const QnUserResourcePtr& userResource,
+        const UserDigestData& userDigestData );
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

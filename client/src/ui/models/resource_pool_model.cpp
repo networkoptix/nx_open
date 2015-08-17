@@ -264,11 +264,14 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
             return m_rootNodes[Qn::BastardNode];
 
         //TODO: #GDM non-admin scope?
-        if(!accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission)) {
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission))
             return m_rootNodes[Qn::RootNode];
-        } else {
-            return m_rootNodes[Qn::UsersNode];
-        }
+
+        QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>();
+        if (user && !user->isEnabled())
+            return m_rootNodes[Qn::BastardNode];
+
+        return m_rootNodes[Qn::UsersNode];
     }
 
     /* In UsersScope all other nodes should be hidden. */
@@ -604,6 +607,11 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
             connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
     }
 
+    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+    if (user) {
+        connect(user, &QnUserResource::enabledChanged, this, &QnResourcePoolModel::at_user_enabledChanged);
+    }
+
     QnResourcePoolModelNode *node = this->node(resource);
     node->setResource(resource);
 
@@ -812,6 +820,11 @@ void QnResourcePoolModel::at_server_redundancyChanged(const QnResourcePtr &resou
 
 void QnResourcePoolModel::at_commonModule_systemNameChanged() {
     m_rootNodes[Qn::ServersNode]->update();
+}
+
+void QnResourcePoolModel::at_user_enabledChanged(const QnResourcePtr &resource) {
+    QnResourcePoolModelNode *node = this->node(resource);
+    node->setParent(expectedParent(node));
 }
 
 void QnResourcePoolModel::at_serverAutoDiscoveryEnabledChanged() {

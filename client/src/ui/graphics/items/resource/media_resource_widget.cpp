@@ -183,12 +183,18 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         fisheyeController.reset(m_homePtzController);
     }
 
-    if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
-        serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
-        m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
-    } else {
+    if (m_camera) {
+        if (QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
+            serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
+            m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
+        } else {
+            m_ptzController = fisheyeController; 
+        }
+    } 
+    else {
         m_ptzController = fisheyeController;
     }
+
     connect(m_ptzController, &QnAbstractPtzController::changed, this, &QnMediaResourceWidget::at_ptzController_changed);
 
     /* Set up info updates. */
@@ -196,12 +202,14 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateInfoText();
 
     /* Set up overlays */
-    if (m_camera->hasFlags(Qn::io_module)) {
+    if (m_camera && m_camera->hasFlags(Qn::io_module)) 
+    {
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
         m_ioModuleOverlayWidget->setCamera(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
-        m_ioModuleOverlayWidget->setOpacity(0.0);
-        addOverlayWidget(m_ioModuleOverlayWidget, Invisible, true, true);
+        if (m_resource->hasVideo(m_display->mediaProvider()))
+            m_ioModuleOverlayWidget->setOpacity(0.0);
+        addOverlayWidget(m_ioModuleOverlayWidget, Visible, true, true);
 
         QnCamLicenseUsageWatcher *watcher = new QnCamLicenseUsageWatcher(m_camera, this);
         connect(watcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, &QnMediaResourceWidget::updateIoModuleVisibility);
@@ -283,6 +291,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         QnImageButtonWidget *ioModuleButton = new QnImageButtonWidget();
         ioModuleButton->setIcon(qnSkin->icon("item/io.png"));
         ioModuleButton->setCheckable(true);
+        ioModuleButton->setChecked(false);
         ioModuleButton->setProperty(Qn::NoBlockMotionSelection, true);
         ioModuleButton->setToolTip(tr("IO Module"));
         connect(ioModuleButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ioModuleButton_toggled);
@@ -1117,8 +1126,8 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         return Qn::OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == Qn::Unauthorized) {
         return Qn::UnauthorizedOverlay;
-    } else if (m_camera && m_camera->hasFlags(Qn::io_module) && cameraLicenseStatus(m_camera) != LicenseUsed) {
-        return Qn::IoModuleDisabledOverlay;
+    } else if (m_camera && m_camera->hasFlags(Qn::io_module)) {
+        return (cameraLicenseStatus(m_camera) != LicenseUsed ? Qn::IoModuleDisabledOverlay : Qn::EmptyOverlay);
     } else if (m_camera && m_camera->isDtsBased() && !m_camera->isLicenseUsed()) {
         return Qn::AnalogWithoutLicenseOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivity)) {

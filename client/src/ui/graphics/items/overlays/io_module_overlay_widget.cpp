@@ -148,6 +148,7 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlay
     mainLayout->setStretchFactor(rightLayout, 1);
     mainLayout->setContentsMargins(24, 48, 24, 24);
     mainLayout->setSpacing(8);
+    mainLayout->addStretch();
 
     widget->setLayout(mainLayout);
 
@@ -279,7 +280,7 @@ void QnIoModuleOverlayWidgetPrivate::at_connectionClosed() {
     for (auto it = model.begin(); it != model.end(); ++it)
         it->buttonPressTime.invalidate();
 
-    executeDelayed([this](){ openConnection(); }, reconnectDelay);
+    executeDelayedParented([this](){ openConnection(); }, reconnectDelay, this);
 }
 
 void QnIoModuleOverlayWidgetPrivate::at_ioStateChanged(const QnIOStateData &value) {

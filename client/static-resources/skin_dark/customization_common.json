@@ -225,7 +225,7 @@
     "QnIoModuleOverlayWidget": {
         "palette": {
             "default": {
-                "window": "#222222",
+                "window": "#222222d0",
                 "windowText": "#ffffff",
                 "buttonText": "#ffffff"
             }

@@ -9,6 +9,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/email.h>
+#include <utils/common/ldap.h>
 
 #include <nx_ec/data/api_resource_data.h>
 
@@ -46,7 +47,12 @@ namespace {
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
-    
+
+    const QString ldapUri(lit("ldapUri"));
+    const QString ldapAdminDn(lit("ldapAdminDn"));
+    const QString ldapAdminPassword(lit("ldapAdminPassword"));
+    const QString ldapSearchBase(lit("ldapSearchBase"));
+    const QString ldapSearchFilter(lit("ldapSearchFilter"));
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent): 
@@ -70,6 +76,12 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmailSettings::defaultTimeoutSec(), this);
     m_simpleAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameSimple, true, this);
 
+    m_ldapUriAdaptor = new QnLexicalResourcePropertyAdaptor<QUrl>(ldapUri, QUrl(), this);
+    m_ldapAdminDnAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapAdminDn, QString(), this);
+    m_ldapAdminPasswordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapAdminPassword, QString(), this);
+    m_ldapSearchBaseAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapSearchBase, QString(), this);
+    m_ldapSearchFilterAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapSearchFilter, QString(), this);
+
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
         << m_serverAdaptor
@@ -84,12 +96,22 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << m_simpleAdaptor
         ;
 
+    QList<QnAbstractResourcePropertyAdaptor*> ldapAdaptors;
+    ldapAdaptors
+        << m_ldapUriAdaptor
+        << m_ldapAdminDnAdaptor
+        << m_ldapAdminPasswordAdaptor
+        << m_ldapSearchBaseAdaptor
+        << m_ldapSearchFilterAdaptor
+        ;
+
     m_allAdaptors 
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_serverAutoDiscoveryEnabledAdaptor
         << m_updateNotificationsEnabledAdaptor
         << emailAdaptors
+        << ldapAdaptors
         << m_auditTrailEnabledAdaptor
         ;
 
@@ -100,6 +122,9 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
 
     for(QnAbstractResourcePropertyAdaptor* adaptor: emailAdaptors)
         connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::emailSettingsChanged, Qt::QueuedConnection);
+
+    for(QnAbstractResourcePropertyAdaptor* adaptor: ldapAdaptors)
+        connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::ldapSettingsChanged, Qt::QueuedConnection);
 
     connect(qnResPool,                              &QnResourcePool::resourceAdded,                     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
     connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
@@ -185,6 +210,24 @@ ec2::ApiResourceParamDataList QnGlobalSettings::allSettings() const {
         return ec2::ApiResourceParamDataList();
 
     return m_admin->getProperties();
+}
+
+QnLdapSettings QnGlobalSettings::ldapSettings() const {
+    QnLdapSettings result;
+    result.uri = m_ldapUriAdaptor->value();
+    result.adminDn = m_ldapAdminDnAdaptor->value();
+    result.adminPassword = m_ldapAdminPasswordAdaptor->value();
+    result.searchBase = m_ldapSearchBaseAdaptor->value();
+    result.searchFilter = m_ldapSearchFilterAdaptor->value();
+    return result;
+}
+
+void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings) {
+    m_ldapUriAdaptor->setValue(settings.uri);
+    m_ldapAdminDnAdaptor->setValue(settings.adminDn);
+    m_ldapAdminPasswordAdaptor->setValue(settings.adminPassword);
+    m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
+    m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
 }
 
 QnEmailSettings QnGlobalSettings::emailSettings() const {

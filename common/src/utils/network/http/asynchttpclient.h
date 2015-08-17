@@ -226,6 +226,7 @@ namespace nx_http
         QString m_userName;
         QString m_userPassword;
         bool m_authorizationTried;
+        bool m_ha1RecalcTried;
         bool m_terminated;
         mutable QMutex m_mutex;
         quint64 m_totalBytesRead;
