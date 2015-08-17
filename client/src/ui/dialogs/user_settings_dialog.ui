@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>327</width>
-    <height>354</height>
+    <height>355</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,157 +23,168 @@
    <property name="sizeConstraint">
     <enum>QLayout::SetMinAndMaxSize</enum>
    </property>
+   <property name="leftMargin">
+    <number>16</number>
+   </property>
+   <property name="topMargin">
+    <number>16</number>
+   </property>
+   <property name="rightMargin">
+    <number>16</number>
+   </property>
+   <property name="bottomMargin">
+    <number>16</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QWidget" name="widget" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="title">
-      <string>User Properties</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QWidget" name="widget" native="true">
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="6" column="1">
+       <widget class="QComboBox" name="accessRightsComboBox"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="passwordEdit">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0" colspan="2">
+       <widget class="QGroupBox" name="accessRightsGroupbox">
+        <property name="title">
+         <string>Access rights</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3"/>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="loginLabel">
+        <property name="text">
+         <string>&amp;Login:</string>
+        </property>
+        <property name="buddy">
+         <cstring>loginEdit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="currentPasswordLabel">
+        <property name="text">
+         <string>C&amp;urrent Password:</string>
+        </property>
+        <property name="buddy">
+         <cstring>currentPasswordEdit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="emailEdit"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="emailLabel">
+        <property name="text">
+         <string>E&amp;mail:</string>
+        </property>
+        <property name="buddy">
+         <cstring>emailEdit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="loginEdit"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="passwordLabel">
+        <property name="text">
+         <string>&amp;Password:</string>
+        </property>
+        <property name="buddy">
+         <cstring>passwordEdit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QPushButton" name="advancedButton">
+        <property name="text">
+         <string>Advanced...</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="confirmPasswordEdit">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item row="6" column="1">
-          <widget class="QPushButton" name="advancedButton">
-           <property name="text">
-            <string>Advanced...</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="currentPasswordLabel">
-           <property name="text">
-            <string>C&amp;urrent Password:</string>
-           </property>
-           <property name="buddy">
-            <cstring>currentPasswordEdit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="loginEdit"/>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="confirmPasswordLabel">
-           <property name="text">
-            <string>&amp;Confirm Password:</string>
-           </property>
-           <property name="buddy">
-            <cstring>confirmPasswordEdit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="accessRightsLabel">
-           <property name="text">
-            <string>&amp;Access Rights:</string>
-           </property>
-           <property name="buddy">
-            <cstring>accessRightsComboBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="currentPasswordEdit">
-           <property name="echoMode">
-            <enum>QLineEdit::Password</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="passwordLabel">
-           <property name="text">
-            <string>&amp;Password:</string>
-           </property>
-           <property name="buddy">
-            <cstring>passwordEdit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0" colspan="2">
-          <widget class="QGroupBox" name="accessRightsGroupbox">
-           <property name="title">
-            <string>Access rights</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_3"/>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="passwordEdit">
-           <property name="echoMode">
-            <enum>QLineEdit::Password</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="loginLabel">
-           <property name="text">
-            <string>&amp;Login:</string>
-           </property>
-           <property name="buddy">
-            <cstring>loginEdit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QComboBox" name="accessRightsComboBox"/>
-         </item>
-         <item row="3" column="1">
-          <widget class="QLineEdit" name="confirmPasswordEdit">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="echoMode">
-            <enum>QLineEdit::Password</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="emailLabel">
-           <property name="text">
-            <string>&amp;Email:</string>
-           </property>
-           <property name="buddy">
-            <cstring>emailEdit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QLineEdit" name="emailEdit"/>
-         </item>
-        </layout>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="accessRightsLabel">
+        <property name="text">
+         <string>&amp;Access Rights:</string>
+        </property>
+        <property name="buddy">
+         <cstring>accessRightsComboBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="confirmPasswordLabel">
+        <property name="text">
+         <string>&amp;Confirm Password:</string>
+        </property>
+        <property name="buddy">
+         <cstring>confirmPasswordEdit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="currentPasswordEdit">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QCheckBox" name="enabledCheckBox">
+        <property name="text">
+         <string notr="true"/>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="enabledLabel">
+        <property name="text">
+         <string>Enabled:</string>
+        </property>
        </widget>
       </item>
      </layout>

@@ -2,9 +2,6 @@
 
 #include "ec2_connection.h"
 
-#include <boost/range/algorithm/count_if.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
-
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/synctime.h>

@@ -215,12 +215,7 @@
             "window": "#00000080",
             "windowText": "#801010c0"
         }},
-        "#diagnosticsButton": { 
-            "windowColor": "#801010c0",
-            "frameColor": "#801010ff",
-            "textColor": "#ffffffff"
-        },
-        "#ioEnableButton": {
+        "#statusOverlayButton": {
             "windowColor": "#801010c0",
             "frameColor": "#801010ff",
             "textColor": "#ffffffff"
@@ -230,7 +225,7 @@
     "QnIoModuleOverlayWidget": {
         "palette": {
             "default": {
-                "window": "#222222",
+                "window": "#222222d0",
                 "windowText": "#ffffff",
                 "buttonText": "#ffffff"
             }

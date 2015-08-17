@@ -442,7 +442,8 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     reconnectInfoDialog->setServers(reconnectHelper->servers());
 
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QDialog::hide);
-    reconnectInfoDialog->show();
+
+    QnDialog::show(reconnectInfoDialog);
 
     bool success = false;
 

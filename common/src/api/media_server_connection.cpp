@@ -24,6 +24,7 @@
 #include <utils/common/request_param.h>
 #include <utils/common/model_functions.h>
 
+#include <api/app_server_connection.h>
 #include <api/serializer/serializer.h>
 #include <event_log/events_serializer.h>
 
@@ -91,7 +92,9 @@ namespace {
         (AuditLogObject,           "auditLog")
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
+        (TestLdapSettingsObject,   "testLdapSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
+        (MergeLdapUsersObject,     "mergeLdapUsers")
     );
 #if 0
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -298,6 +301,12 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
         break;
+    case TestLdapSettingsObject:
+        processJsonReply(this, response, handle);
+        break;
+    case MergeLdapUsersObject:
+        processJsonReply(this, response, handle);
+        break;
     default:
         assert(false); /* We should never get here. */
         break;
@@ -331,7 +340,8 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     if (!videowallGuid.isNull())
         extraHeaders.insert(QString::fromLatin1(Qn::VIDEOWALL_GUID_HEADER_NAME), videowallGuid.toString());
     extraHeaders.insert(QString::fromLatin1(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
-    extraHeaders.insert(QString::fromLatin1("User-Agent"), QString::fromLatin1(nx_http::userAgentString()));
+    extraHeaders.insert(QString::fromLatin1(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
+	extraHeaders.insert(QString::fromLatin1("User-Agent"), QString::fromLatin1(nx_http::userAgentString()));
     setExtraHeaders(extraHeaders);
 }
 
@@ -680,6 +690,10 @@ int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QnTimeReply), target, slot);
 }
 
+int QnMediaServerConnection::mergeLdapUsersAsync(QObject *target, const char *slot) {
+    return sendAsyncGetRequest(MergeLdapUsersObject, QnRequestParamList(), nullptr, target, slot);
+}
+
 int QnMediaServerConnection::getSystemNameAsync( QObject* target, const char* slot )
 {
     return sendAsyncGetRequest(GetSystemNameObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QString), target, slot);
@@ -692,6 +706,15 @@ int QnMediaServerConnection::testEmailSettingsAsync(const QnEmailSettings &setti
     ec2::ApiEmailSettingsData data;
     ec2::fromResourceToApi(settings, data);
     return sendAsyncPostRequest(TestEmailSettingsObject, headers, QnRequestParamList(), QJson::serialized(data), QN_STRINGIZE_TYPE(QnTestEmailSettingsReply), target, slot);
+}
+
+int QnMediaServerConnection::testLdapSettingsAsync(const QnLdapSettings &settings, QObject *target, const char *slot) 
+{
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+    ec2::ApiLdapSettingsData data;
+    ec2::fromResourceToApi(settings, data);
+    return sendAsyncPostRequest(TestLdapSettingsObject, headers, QnRequestParamList(), QJson::serialized(data), nullptr, target, slot);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
