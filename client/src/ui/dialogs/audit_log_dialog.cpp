@@ -1053,8 +1053,8 @@ void QnAuditLogDialog::makeSessionData()
     for (auto& value: processedLogins)
         m_sessionData.push_back(std::move(value));
     for (QnAuditRecord& record: m_sessionData) {
-        record.addParam("childCnt", QByteArray::number(activityPerSession.value(record.authSession.id)));
-        record.addParam("checked", "1");
+        record.addParam(QnAuditLogModel::ChildCntParamName, QByteArray::number(activityPerSession.value(record.authSession.id)));
+        record.addParam(QnAuditLogModel::CheckedParamName, "1");
     }
 }
 
@@ -1072,8 +1072,8 @@ void QnAuditLogDialog::makeCameraData()
     for (auto itr = activityPerCamera.begin(); itr != activityPerCamera.end(); ++itr) {
         QnAuditRecord cameraRecord;
         cameraRecord.resources.push_back(itr.key());
-        cameraRecord.addParam("childCnt", QByteArray::number(itr.value())); // used for "user activity" column
-        cameraRecord.addParam("checked", "1");
+        cameraRecord.addParam(QnAuditLogModel::ChildCntParamName, QByteArray::number(itr.value())); // used for "user activity" column
+        cameraRecord.addParam(QnAuditLogModel::CheckedParamName, "1");
         m_cameraData.push_back(cameraRecord);
     }
 }

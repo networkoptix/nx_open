@@ -1297,7 +1297,7 @@
                     </params>
                     <result>
                         <caption>Chunks data in requested format. Chunks are merged for all requested
-                        cameras. Time and duration defined in UTC milliseconds.</caption>
+                        cameras. Time and duration defined in UTC milliseconds. Response contains pairs [begin,duration]. Duration=-1 means last chunk is recording now.</caption>
                     </result>
                 </function>
                 <function>
@@ -1683,13 +1683,8 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>startDatetime</name>
-                            <description>Date format: YYYY-MM-DDTHH:MM:SSTZD (e.g., 1997-07-16T19:20:30+01:00). If present, camera archive is opened on specified position</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>startTimestamp</name>
-                            <description>Same as &lt;startDatetime&gt;, but contains number of micro seconds from epoch (1970-01-01 00:00 UTC)</description>
+                            <name>pos</name>
+                            <description>Camera archive position to open. Can be: date/time in ISO format, server time zone (example: 2015-02-20T19:00), milliseconds since epoch (1970-01-01 00:00, UTC) or microseconds since epoch</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1720,13 +1715,8 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>startDatetime</name>
-                            <description>Fragment start time in ISO format, server time zone. Example: 2015-02-05T19:00 (2015, 2 Feb 19:00)</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>startTimestamp</name>
-                            <description>Specifies archive stream start positions in microseconds from epoch (1970-01-01 00:00, UTC)</description>
+                            <name>pos</name>
+                            <description>Fragment start time. Can be: date/time in ISO format, server time zone (example: 2015-02-20T19:00), milliseconds since epoch (1970-01-01 00:00, UTC) or microseconds since epoch</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1776,47 +1766,68 @@
         </group>
         <group>
             <groupName>Authentication</groupName>
-            <groupDescription>Request authentication methods supported by server</groupDescription>
+            <urlPrefix></urlPrefix>
+            <groupDescription>
+                Request authentication methods supported by server
+            </groupDescription>
             <functions>
                 <function>
                     <name>HTTP Basic / Digest Authentication</name>
                     <description>
                         Server is fully conformant with authentication defined in rfc2617 (https://tools.ietf.org/html/rfc2617)
                     </description>
+                    <method/>
+                    <params/>
+                    <result/>
                 </function>
                 <function>
                     <name>Cookie-based Authentication</name>
                     <description>
-                        Cookie authorisation scheme allows to avoid standard login/password dialog in web-applications. 
-                        It provides you a way to replace it with your own. 
-                        It works mostly like sessions, but a bit more secure because it doesn't send user's password over HTTP.
+                        Cookie authorisation scheme allows to avoid standard login/password dialog in web-applications.<br/>
+                        It provides you a way to replace it with your own. <br/>
+                        It works mostly like sessions, but a bit more secure because it doesn't send user's password over HTTP.<br/>
+
                         <ul>
-                            <li>In the first request to server you must send cookie Authorization=Digest (path: '/')
+                            <li>In the first request to server you must send cookie <i>Authorization=Digest (path: '/')</i>
                                 You can request any anonymous request like '/api/moduleInformation'</li>
-                            <li>In response you'll get cookies 'realm' and 'nonce' (nonce is a session key for this user)</li>
-                            <li>Calculate digest signature:
-                                (login must be in lower case)
-                                digest = MD5(login + ':' + realm + ':' + password)
-                                method = MD5("GET:")
-                                auth = MD5(digest + ':' + nonce + ':' + method);</li>
-                            <li>Set cookies: response=auth and username=login (path: '/')
-                                Every following request to server must contain cookies: username, nonce, response, Authorization</li>
+                            <li>In response you'll get cookies <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
+                            <li>Calculate authentification hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
+                            <li>Set authentification hash to cookie: <i>auth=auth_digest (path: '/')</i>
+                                Every following request to server must contain cookies: <i>Authorization</i> and <i>auth</i></li>
                         </ul>
                     </description>
+
                 </function>
                 <function>
-                    <name>Providing Authentication Hash In Request Url</name>
+                    <name>URL-based Authentication</name>
                     <description>
                         You can add "auth" field to url query section. E.g., http://127.0.0.1:7001/ec2/getMediaServersEx?auth=auth_digest
-                        "auth_digest" is calculated in a following way:
-                        auth_digest    = base64(username:nonce:simplified_ha2)
-                        simplified_ha2 = MD5(ha1:nonce:MD5(method:))
-                        ha1            = MD5(usename:realm:password)
 
-                        Current server time MUST be used as a nonce value.
-                        So, to get realm and nonce call /gettime.
-                        Such nonce value is valid for 5 minutes.
+                        <ul>
+                            <li>Call <i>/gettime</i> request to get <i>realm</i> and <i>nonce</i> from server (current server time MUST be used as a nonce value, nonce is valid for about 5 minutes)</li>
+                            <li>Calculate authentification hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
+                            <li>Set authentification hash to url-parameter: http://127.0.0.1:7001/ec2/method?...&amp;auth=<i>auth_digest</i></li>
+                        </ul>
                     </description>
+
+                </function>
+
+
+                <function>
+                    <name>Calculating authentification hash</name>
+                    <description>
+                            For url-based authentification and cookie-based authentification you need to calculate hash manually, using the following algorythm:
+                            <ul>
+                                <li>Get <i>nonce</i> and <i>realm</i> from server</li>
+                                <li>Translate user's <i>username</i> to lower case</li>
+                                <li>Check required <i>method</i> ('GET' for http-requests, 'PLAY' for rtsp)</li>
+                                <li><i>ha1 = MD5(usename:realm:password)</i></li>
+                                <li><i>simplified_ha2 = MD5(ha1:nonce:MD5(method:))</i></li>
+                                <li><i>auth = base64(username:nonce:simplified_ha2)</i></li>
+                                <li><i>auth</i> is required authentification hash</li>
+                            </ul>
+                    </description>
+
                 </function>
             </functions>
         </group>

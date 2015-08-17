@@ -1683,13 +1683,8 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>startDatetime</name>
-                            <description>Date format: YYYY-MM-DDTHH:MM:SSTZD (e.g., 1997-07-16T19:20:30+01:00). If present, camera archive is opened on specified position</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>startTimestamp</name>
-                            <description>Same as &lt;startDatetime&gt;, but contains number of micro seconds from epoch (1970-01-01 00:00 UTC)</description>
+                            <name>pos</name>
+                            <description>Camera archive position to open. Can be: date/time in ISO format, server time zone (example: 2015-02-20T19:00), milliseconds since epoch (1970-01-01 00:00, UTC) or microseconds since epoch</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1720,13 +1715,8 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>startDatetime</name>
-                            <description>Fragment start time in ISO format, server time zone. Example: 2015-02-05T19:00 (2015, 2 Feb 19:00)</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>startTimestamp</name>
-                            <description>Specifies archive stream start positions in microseconds from epoch (1970-01-01 00:00, UTC)</description>
+                            <name>pos</name>
+                            <description>Fragment start time. Can be: date/time in ISO format, server time zone (example: 2015-02-20T19:00), milliseconds since epoch (1970-01-01 00:00, UTC) or microseconds since epoch</description>
                             <optional>true</optional>
                         </param>
                         <param>

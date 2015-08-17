@@ -751,9 +751,6 @@ angular.module('webadminApp')
                     if(debug){
                         top += (1+levelIndex)/RulerModel.levels.length * height;
                         height /= RulerModel.levels.length;
-                        if(height>5) {
-                            console.log(height);
-                        }
                     }
 
                     context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
@@ -978,7 +975,6 @@ angular.module('webadminApp')
                 scope.click = function(event){
                     updateMouseCoordinate(event);
                     if(preventClick){
-                        console.log("click prevented");
                         return;
                     }
 
@@ -998,7 +994,6 @@ angular.module('webadminApp')
 
                 scope.mouseUp = function(event){
 
-                    console.log("mouseUp");
                     //updateMouseCoordinate(event);
                     //TODO: "set timer for dblclick here";
                     //TODO: "move playing position";
@@ -1017,12 +1012,9 @@ angular.module('webadminApp')
                     // updateMouseCoordinate(event);
                     // catchScrollBar = mouseInScrollbar;
 
-                    console.log("mouseDown");
                 };
 
                 scope.draginit = function(event){
-
-                    console.log("draginit");
                     updateMouseCoordinate(event);
                     catchScrollBar = mouseInScrollbar;
                     catchTimeline = mouseInTimeline;
