@@ -20,6 +20,7 @@
 #include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>
+#include <http/custom_headers.h>
 #include <transaction/transaction_message_bus.h>
 
 #include <nx_ec/data/api_runtime_data.h>
@@ -705,7 +706,7 @@ namespace ec2
         targetUrl.setScheme( lit("http") );
         targetUrl.setHost( peerIter->second.peerAddress.address.toString() );
         targetUrl.setPort( peerIter->second.peerAddress.port );
-        targetUrl.setPath( QnTimeSyncRestHandler::PATH );
+        targetUrl.setPath( lit("/") + QnTimeSyncRestHandler::PATH );
 
         Q_ASSERT( !peerIter->second.httpClient );
         clientPtr = nx_http::AsyncHttpClient::create();
@@ -715,8 +716,10 @@ namespace ec2
             this,
             [this, peerID]( nx_http::AsyncHttpClientPtr clientPtr ) {
                 timeSyncRequestDone(peerID, std::move(clientPtr));
-            } );
+            },
+            Qt::DirectConnection );
         clientPtr->addAdditionalHeader( QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME, timeSyncInfo.toString() );
+        clientPtr->addAdditionalHeader( Qn::PEER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray() );
         QnTransactionTransport::fillAuthInfo( clientPtr, true );
         if( !clientPtr->doGet( targetUrl ) )
         {
@@ -750,13 +753,14 @@ namespace ec2
         }
 
         QMutexLocker lk( &m_mutex );
-        if( m_terminated )
-            return;
         auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
         if( peerIter == m_peersToSendTimeSyncTo.end() )
             return;
         Q_ASSERT( !peerIter->second.syncTimerID );
+        peerIter->second.httpClient.reset();
         //scheduling next synchronization
+        if( m_terminated )
+            return;
         peerIter->second.syncTimerID = TimerManager::instance()->addTimer(
             std::bind( &TimeSynchronizationManager::synchronizeWithPeer, this, peerID ),
             TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC );

@@ -14,7 +14,7 @@
 
 namespace ec2 {
 
-const QString QnTimeSyncRestHandler::PATH = QString::fromLatin1( "/ec2/timeSync" );
+const QString QnTimeSyncRestHandler::PATH = QString::fromLatin1( "ec2/timeSync" );
 const QByteArray QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME( "NX-TIME-SYNC-DATA" );
 
 int QnTimeSyncRestHandler::executeGet(
@@ -27,7 +27,7 @@ int QnTimeSyncRestHandler::executeGet(
     auto timeSyncHeaderIter = connection->request().headers.find( TIME_SYNC_HEADER_NAME );
     if( timeSyncHeaderIter == connection->request().headers.end() )
         return nx_http::StatusCode::badRequest;
-    auto peerGuid = connection->request().headers.find( Qn::SERVER_GUID_HEADER_NAME );
+    auto peerGuid = connection->request().headers.find( Qn::PEER_GUID_HEADER_NAME );
     if( peerGuid == connection->request().headers.end() )
         return nx_http::StatusCode::badRequest;
 
