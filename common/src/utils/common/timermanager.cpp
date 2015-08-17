@@ -66,12 +66,8 @@ public:
         if( it == taskToTime.end() )
             return;
 
-        /*size_t ret =*/ timeToTask.erase( make_pair( it->second, it->first ) );
-        //ASSERT2( ret == 1, "deleteTimer", "ret = "<<ret<<", task time (UTC) "<<it->second<<", current UTC time "<<QDateTime::currentMSecsSinceEpoch() );
-
-        /*map<quint64, qint64>::size_type s1 =*/ taskToTime.size();
+        timeToTask.erase( make_pair( it->second, it->first ) );
         taskToTime.erase( it );
-        //ASSERT2( taskToTime.size() == s1-1, "s1 = "<<s1<<", taskToTime.size() = "<<taskToTime.size() );
     }
 };
 
@@ -139,7 +135,7 @@ bool TimerManager::modifyTimerDelay(
     if( taskIter == m_impl->taskToTime.end() )
         return false;   //no timer with requested id
     auto handlerIter = m_impl->timeToTask.find( std::make_pair( taskIter->second, timerID ) );
-    assert( handlerIter != m_impl->timeToTask.end() );
+    Q_ASSERT( handlerIter != m_impl->timeToTask.end() );
     auto taskHandler = std::move(handlerIter->second);
 
     m_impl->deleteTaskNonSafe( timerID );

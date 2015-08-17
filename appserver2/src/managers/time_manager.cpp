@@ -537,12 +537,12 @@ namespace ec2
         if( !remotePeerTimeSyncInfo.fromString( serializedTimeSync ) )
             return;
 
-        assert( remotePeerTimeSyncInfo.timePriorityKey.seed > 0 );
+        Q_ASSERT( remotePeerTimeSyncInfo.timePriorityKey.seed > 0 );
 
         //TODO #ak following condition should be removed. Placed for debug purpose only
         if( rttMillis > MAX_RTT_TIME_MS )
         {
-            NX_LOG( lit( "TimeSynchronizationManager::onRecevingHttpChunkExtensions. Received rtt of %1 ms" ).arg( rttMillis ), cl_logWARNING );
+            NX_LOG( lit( "%1. Received rtt of %2 ms" ).arg( Q_FUNC_INFO ).arg( rttMillis ), cl_logWARNING );
             rttMillis = MAX_DESIRED_TIME_DRIFT_MS;
         }
 
@@ -564,7 +564,7 @@ namespace ec2
         const TimePriorityKey& remotePeerTimePriorityKey,
         const qint64 timeErrorEstimation )
     {
-        assert( remotePeerTimePriorityKey.seed > 0 );
+        Q_ASSERT( remotePeerTimePriorityKey.seed > 0 );
 
         NX_LOG( QString::fromLatin1("TimeSynchronizationManager. Received sync time update from peer %1, "
             "peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5").
@@ -575,7 +575,7 @@ namespace ec2
         //time difference between this server and remote one is not that great
         const auto timeDifference = remotePeerSyncTime - getSyncTimeNonSafe();
         const bool maxTimeDriftExceeded =
-            (abs( timeDifference ) >= std::max<qint64>( timeErrorEstimation * 2, MIN_GET_TIME_ERROR_MS ));
+            (std::abs( timeDifference ) >= std::max<qint64>( timeErrorEstimation * 2, MIN_GET_TIME_ERROR_MS ));
         const bool needAdjustClockDueToLargeDrift = maxTimeDriftExceeded && (remotePeerID > qnCommon->moduleGUID());
         //if there is new maximum remotePeerTimePriorityKey than updating delta and emitting timeChanged
         if( (remotePeerTimePriorityKey <= m_usedTimeSyncInfo.timePriorityKey) &&
