@@ -30,16 +30,19 @@ class BaseFiniteMsgBodyHttpHandler
 public:
     BaseFiniteMsgBodyHttpHandler(
         EntityType entityType,
-        DataActionType actionType )
+        DataActionType actionType,
+        const AuthorizationManager& authorizationManager )
     :
         m_entityType( entityType ),
-        m_actionType( actionType )
+        m_actionType( actionType ),
+        m_authorizationManager( authorizationManager )
     {
     }
 
 protected:
     const EntityType m_entityType;
     const DataActionType m_actionType;
+    const AuthorizationManager& m_authorizationManager;
 
     bool authorize(
         const stree::AbstractResourceReader& dataToAuthorize,
@@ -48,7 +51,7 @@ protected:
         //performing authorization
         //  authorization is performed here since it can depend on input data which 
         //  needs to be deserialized depending on request type
-        if( !AuthorizationManager::instance()->authorize(
+        if( !m_authorizationManager.authorize(
                 dataToAuthorize,
                 this->m_entityType,
                 this->m_actionType,
@@ -73,11 +76,13 @@ class AbstractFiniteMsgBodyHttpHandler
 public:
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
-        DataActionType actionType )
+        DataActionType actionType,
+        const AuthorizationManager& authorizationManager )
     :
         detail::BaseFiniteMsgBodyHttpHandler<Input, Output>(
             entityType,
-            actionType )
+            actionType,
+            authorizationManager )
     {
     }
 
@@ -125,11 +130,13 @@ class AbstractFiniteMsgBodyHttpHandler<Input, void>
 public:
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
-        DataActionType actionType )
+        DataActionType actionType,
+        const AuthorizationManager& authorizationManager )
     :
         detail::BaseFiniteMsgBodyHttpHandler<Input, void>(
             entityType,
-            actionType )
+            actionType,
+            authorizationManager )
     {
     }
 
@@ -176,11 +183,13 @@ class AbstractFiniteMsgBodyHttpHandler<void, Output>
 public:
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
-        DataActionType actionType )
+        DataActionType actionType,
+        const AuthorizationManager& authorizationManager )
     :
         detail::BaseFiniteMsgBodyHttpHandler<void, Output>(
             entityType,
-            actionType )
+            actionType,
+            authorizationManager )
     {
     }
 
@@ -221,11 +230,13 @@ class AbstractFiniteMsgBodyHttpHandler<void, void>
 public:
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
-        DataActionType actionType )
+        DataActionType actionType,
+        const AuthorizationManager& authorizationManager )
     :
         detail::BaseFiniteMsgBodyHttpHandler<void, void>(
             entityType,
-            actionType )
+            actionType,
+            authorizationManager )
     {
     }
 

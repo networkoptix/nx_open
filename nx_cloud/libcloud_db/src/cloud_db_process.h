@@ -29,6 +29,7 @@ namespace nx_http
 namespace nx {
 namespace cdb {
 
+class AuthorizationManager;
 class AccountManager;
 class SystemManager;
 
@@ -56,6 +57,7 @@ private:
     void initializeLogging( const conf::Settings& settings );
     void registerApiHandlers(
         nx_http::MessageDispatcher* const msgDispatcher,
+        const AuthorizationManager& authorizationManager,
         AccountManager* const accountManager,
         SystemManager* const systemManager );
     bool updateDB( nx::db::DBManager* const dbManager );

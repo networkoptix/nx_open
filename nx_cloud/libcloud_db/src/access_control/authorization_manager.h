@@ -22,8 +22,6 @@ namespace cdb {
     \note Probably, only access role has to be checked, not user credentials
  */
 class AuthorizationManager
-:
-    public Singleton<AuthorizationManager>
 {
 public:
     /*!

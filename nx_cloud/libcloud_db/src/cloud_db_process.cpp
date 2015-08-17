@@ -86,6 +86,8 @@ int CloudDBProcess::executeApplication()
         return 2;
     }
 
+    AuthorizationManager authorizationManager;
+
     EMailManager emailManager( settings );
 
     //creating data managers
@@ -108,6 +110,7 @@ int CloudDBProcess::executeApplication()
     //registering HTTP handlers
     registerApiHandlers(
         &httpMessageDispatcher,
+        authorizationManager,
         &accountManager,
         &systemManager );
 
@@ -177,13 +180,14 @@ void CloudDBProcess::initializeLogging( const conf::Settings& settings )
 
 void CloudDBProcess::registerApiHandlers(
     nx_http::MessageDispatcher* const msgDispatcher,
+    const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
     SystemManager* const /*systemManager*/ )
 {
     msgDispatcher->registerRequestProcessor<cdb::AddAccountHttpHandler>(
         cdb::AddAccountHttpHandler::HANDLER_PATH,
-        [accountManager]() -> cdb::AddAccountHttpHandler* {
-            return new cdb::AddAccountHttpHandler( accountManager );
+        [accountManager, &authorizationManager]() -> cdb::AddAccountHttpHandler* {
+            return new cdb::AddAccountHttpHandler( accountManager, authorizationManager );
         } );
 }
 

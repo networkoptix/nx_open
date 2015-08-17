@@ -28,7 +28,9 @@ class AddAccountHttpHandler
 public:
     static const QString HANDLER_PATH;
 
-    AddAccountHttpHandler( AccountManager* const accountManager );
+    AddAccountHttpHandler(
+        AccountManager* const accountManager,
+        const AuthorizationManager& authorizationManager );
     virtual ~AddAccountHttpHandler();
 
 protected:

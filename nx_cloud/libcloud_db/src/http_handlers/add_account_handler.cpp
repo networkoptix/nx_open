@@ -18,11 +18,14 @@ namespace cdb {
 
 const QString AddAccountHttpHandler::HANDLER_PATH = QLatin1String("/add_account");
 
-AddAccountHttpHandler::AddAccountHttpHandler( AccountManager* const accountManager )
+AddAccountHttpHandler::AddAccountHttpHandler(
+    AccountManager* const accountManager,
+    const AuthorizationManager& authorizationManager )
 :
     AbstractFiniteMsgBodyHttpHandler<data::AccountData>(
         EntityType::account,
-        DataActionType::insert ),
+        DataActionType::insert,
+        authorizationManager ),
     m_accountManager( accountManager )
 {
 }
