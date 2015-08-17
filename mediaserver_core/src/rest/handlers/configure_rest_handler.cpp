@@ -51,6 +51,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     }
 
     /* set system name */
+    QString oldSystemName = qnCommon->localSystemName();
     int changeSystemNameResult = changeSystemName(systemName, sysIdTime, wholeSystem, tranLogTime);
     if (changeSystemNameResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
@@ -59,6 +60,8 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     /* reset connections if systemName is changed */
     if (changeSystemNameResult == ResultOk) {
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemNameChanged);
+        QString description = lit("%1 -> %2").arg(oldSystemName).arg(systemName);
+        auditRecord.addParam("description", description.toUtf8());
         qnAuditManager->addAuditRecord(auditRecord);
         
         if (!wholeSystem)

@@ -17,7 +17,8 @@ public:
         VersionError,
         AuthentificationError,
         BackupError,
-        NotFoundError
+        NotFoundError,
+        StarterLicenseError
     };
 
     explicit QnMergeSystemsTool(QObject *parent = 0);

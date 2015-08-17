@@ -115,13 +115,13 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="camerasGroupBox">
+    <widget class="QGroupBox" name="systemSettingsGroupBox">
      <property name="title">
       <string>System Settings</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QnCameraManagementWidget" name="cameraWidget" native="true"/>
+       <widget class="QnSystemSettingsWidget" name="systemSettingsWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -155,9 +155,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnCameraManagementWidget</class>
+   <class>QnSystemSettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/settings/camera_management_widget.h</header>
+   <header location="global">ui/widgets/settings/system_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

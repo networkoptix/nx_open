@@ -124,7 +124,11 @@ class QnCamLicenseUsageWatcher: public QnLicenseUsageWatcher {
 
     typedef QnLicenseUsageWatcher base_type;
 public:
-    QnCamLicenseUsageWatcher(QObject* parent = NULL);
+    QnCamLicenseUsageWatcher(QObject *parent = nullptr);
+    QnCamLicenseUsageWatcher(const QnVirtualCameraResourcePtr &camera, QObject *parent = nullptr);
+
+private:
+    void init(const QnVirtualCameraResourcePtr &camera);
 };
 
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {

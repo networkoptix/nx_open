@@ -14,11 +14,8 @@ protected:
     virtual int addAuditRecordInternal(const QnAuditRecord& record) override;
     virtual int updateAuditRecordInternal(int internalId, const QnAuditRecord& record) override;
 private:
-    void cleanupExpiredSessions();
-private:
-    QHash<QnUuid, qint64> m_knownSessions;
+    //QHash<QnUuid, qint64> m_knownSessions;
     mutable QMutex m_mutex;
-    QElapsedTimer m_sessionCleanupTimer;
 };
 
 #endif // __MSERVER_AUDIT_MANAGER_H__

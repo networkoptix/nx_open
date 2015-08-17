@@ -49,7 +49,8 @@ namespace {
 QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     m_statusOverlay(Qn::EmptyOverlay),
-    m_diagnosticsVisible(false)
+    m_diagnosticsVisible(false),
+    m_ioEnableButtonVisible(false)
 {
     setAcceptedMouseButtons(0);
 
@@ -66,6 +67,8 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
     m_staticTexts[LoadingText] = tr("Loading...");
     m_staticTexts[NoVideoStreamText] = tr("No video stream");
+    m_staticTexts[IoModuleDisabledText] = tr("IO module is disabled");
+    m_staticTexts[IoModuleLicenseRequiredText] = tr("Activate more licenses");
     
     for(size_t i = 0; i < m_staticTexts.size(); i++) {
         m_staticTexts[i].setPerformanceHint(QStaticText::AggressiveCaching);
@@ -87,8 +90,20 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
 
     connect(m_diagnosticsButton, SIGNAL(clicked()), this, SIGNAL(diagnosticsRequested()));
 
+    m_ioEnableButton = new QnTextButtonWidget(this);
+    m_ioEnableButton->setObjectName(lit("ioEnableButton"));
+    m_ioEnableButton->setText(tr("Enable..."));
+    m_ioEnableButton->setFrameShape(Qn::RectangularFrame);
+    m_ioEnableButton->setRelativeFrameWidth(1.0 / 16.0);
+    m_ioEnableButton->setStateOpacity(0, 0.4);
+    m_ioEnableButton->setStateOpacity(QnImageButtonWidget::Hovered, 0.7);
+    m_ioEnableButton->setStateOpacity(QnImageButtonWidget::Pressed, 1.0);
+    m_ioEnableButton->setFont(m_staticFont);
+
+    connect(m_ioEnableButton, &QnTextButtonWidget::clicked, this, &QnStatusOverlayWidget::ioEnableRequested);
+
     updateLayout();
-    updateDiagnosticsButtonOpacity(false);
+    updateButtonsOpacity(false);
 }
 
 QnStatusOverlayWidget::~QnStatusOverlayWidget() {
@@ -105,7 +120,7 @@ void QnStatusOverlayWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOve
 
     m_statusOverlay = statusOverlay;
 
-    updateDiagnosticsButtonOpacity();
+    updateButtonsOpacity();
 
     emit statusOverlayChanged();
 }
@@ -120,7 +135,20 @@ void QnStatusOverlayWidget::setDiagnosticsVisible(bool diagnosticsVisible) {
 
     m_diagnosticsVisible = diagnosticsVisible;
 
-    updateDiagnosticsButtonOpacity(false);
+    updateButtonsOpacity(false);
+}
+
+bool QnStatusOverlayWidget::isIoEnableButtonVisible() const {
+    return m_ioEnableButtonVisible;
+}
+
+void QnStatusOverlayWidget::setEnableButtonVisible(bool visible) {
+    if (m_ioEnableButtonVisible == visible)
+        return;
+
+    m_ioEnableButtonVisible = visible;
+
+    updateButtonsOpacity(false);
 }
 
 void QnStatusOverlayWidget::updateLayout() {
@@ -130,15 +158,25 @@ void QnStatusOverlayWidget::updateLayout() {
     QSizeF size(point * 6.0, point * 1.5);
 
     m_diagnosticsButton->setGeometry(QRectF(rect.center() - toPoint(size) / 2.0 + QPointF(0.0, point * 4.0), size));
+    m_ioEnableButton->setGeometry(QRectF(rect.center() - toPoint(size) / 2.0 + QPointF(0.0, point * 4.0), size));
 }
 
-void QnStatusOverlayWidget::updateDiagnosticsButtonOpacity(bool animate) {
-    qreal opacity = (m_diagnosticsVisible && m_statusOverlay == Qn::OfflineOverlay) ? 1.0 : 0.0;
+void QnStatusOverlayWidget::updateButtonsOpacity(bool animate) {
+    qreal diagnosticsButtonOpacity = (m_diagnosticsVisible && m_statusOverlay == Qn::OfflineOverlay) ? 1.0 : 0.0;
 
-    if(animate) {
-        opacityAnimator(m_diagnosticsButton)->animateTo(opacity);
-    } else {
-        m_diagnosticsButton->setOpacity(opacity);
+    if (!qFuzzyEquals(diagnosticsButtonOpacity, m_diagnosticsButton->opacity())) {
+        if (animate)
+            opacityAnimator(m_diagnosticsButton)->animateTo(diagnosticsButtonOpacity);
+        else
+            m_diagnosticsButton->setOpacity(diagnosticsButtonOpacity);
+    }
+
+    qreal ioEnableButtonOpacity = (m_ioEnableButtonVisible && m_statusOverlay == Qn::IoModuleDisabledOverlay) ? 1.0 : 0.0;
+    if (!qFuzzyEquals(ioEnableButtonOpacity, m_ioEnableButton->opacity())) {
+        if (animate)
+            opacityAnimator(m_ioEnableButton)->animateTo(ioEnableButtonOpacity);
+        else
+            m_ioEnableButton->setOpacity(ioEnableButtonOpacity);
     }
 }
 
@@ -253,6 +291,11 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         if (!m_ioSpeakerPixmap)
             m_ioSpeakerPixmap.reset(new QPixmap(qnSkin->pixmap("item/io_speaker.png")));
         paintPixmap(painter, *m_ioSpeakerPixmap, 0.125);
+        break;
+    case Qn::IoModuleDisabledOverlay:
+        paintFlashingText(painter, m_staticTexts[IoModuleDisabledText], 0.125);
+        if (!m_ioEnableButtonVisible)
+            paintFlashingText(painter, m_staticTexts[IoModuleLicenseRequiredText], 0.05, QPointF(0.0, 0.25));
         break;
     default:
         break;

@@ -2,10 +2,6 @@
 #include "api/model/audit/auth_session.h"
 #include "utils/network/http/qnbytearrayref.h"
 
-namespace {
-    char DELIMITER = '$';
-}
-
 void serialize_field(const std::vector<QnUuid>&value, QVariant *target) 
 {
     QByteArray result;
@@ -27,33 +23,12 @@ void deserialize_field(const QVariant &value, std::vector<QnUuid> *target)
 
 void serialize_field(const QnAuthSession&authData, QVariant *target) 
 {
-    auto encoded = [](QByteArray value) { 
-        return value.replace(DELIMITER, char('_')); 
-    };
-
-    QByteArray result;
-    result.append(authData.id.toByteArray());
-    result.append(DELIMITER);
-    result.append(encoded(authData.userName.toUtf8()));
-    result.append(DELIMITER);
-    result.append(encoded(authData.userHost.toUtf8()));
-    result.append(DELIMITER);
-    result.append(encoded(authData.userAgent.toUtf8()));
-    serialize_field(result, target);
+    serialize_field(authData.toByteArray(), target);
 }
 
 void deserialize_field(const QVariant &value, QnAuthSession *target)
 {
     QByteArray tmp;
     deserialize_field(value, &tmp);
-    QnByteArrayConstRef ref(tmp);
-    QList<QnByteArrayConstRef> params = ref.split(DELIMITER);
-    if (params.size() > 0)
-        target->id = QnUuid(params[0]);
-    if (params.size() > 1)
-        target->userName = QString::fromUtf8(params[1]);
-    if (params.size() > 2)
-        target->userHost = QString::fromUtf8(params[2]);
-    if (params.size() > 3)
-        target->userAgent = QString::fromUtf8(params[3]);
+    target->fromByteArray(tmp);
 }

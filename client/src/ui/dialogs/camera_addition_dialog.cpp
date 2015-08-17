@@ -100,6 +100,26 @@ void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
         setCheckState(Qt::Unchecked);
 }
 
+void QnCheckBoxedHeaderView::mouseReleaseEvent(QMouseEvent *e)
+{
+    int pos = orientation() == Qt::Horizontal ? e->x() : e->y();
+    int section = logicalIndexAt(pos);
+    if (section == 0) {
+        emit sectionClicked(section);
+    }
+    else {
+        base_type::mouseReleaseEvent(e);
+    }
+}
+
+void QnCheckBoxedHeaderView::mousePressEvent(QMouseEvent *e)
+{
+    int pos = orientation() == Qt::Horizontal ? e->x() : e->y();
+    int section = logicalIndexAt(pos);
+    if (section != 0)
+        base_type::mousePressEvent(e);
+}
+
 // -------------------------------------------------------------------------- //
 // QnCameraAdditionDialog
 // -------------------------------------------------------------------------- //

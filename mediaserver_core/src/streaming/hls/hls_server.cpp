@@ -180,6 +180,8 @@ namespace nx_hls
                     response.headers.find("Content-Length") != response.headers.end() ? "identity" : "chunked") );
             response.headers.emplace( "Connection", "close" ); //no persistent connections support
         }
+        if( response.statusLine.statusCode == nx_http::StatusCode::notFound )
+            nx_http::insertOrReplaceHeader( &response.headers, nx_http::HttpHeader( "Content-Length", "0" ) );
 
         sendResponse( response );
     }
@@ -698,12 +700,21 @@ namespace nx_hls
         }
         else
         {
-            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(QLatin1String(StreamingParams::START_POS_PARAM_NAME));
+            std::multimap<QString, QString>::const_iterator startDatetimeIter =
+                requestParams.find(QLatin1String(StreamingParams::START_POS_PARAM_NAME));
             if( startDatetimeIter != requestParams.end() )
             {
                 //converting startDatetime to startTimestamp
                     //this is secondary functionality, not used by this HLS implementation (since all chunks are referenced by npt timestamps)
                 startTimestamp = parseDateTime( startDatetimeIter->second );
+            }
+            else
+            {
+                //trying compatibility parameter "startDatetime"
+                std::multimap<QString, QString>::const_iterator startDatetimeIter =
+                    requestParams.find( QLatin1String( StreamingParams::START_DATETIME_PARAM_NAME ) );
+                if( startDatetimeIter != requestParams.end() )
+                    startTimestamp = parseDateTime( startDatetimeIter->second );
             }
         }
         quint64 chunkDuration = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
@@ -846,7 +857,17 @@ namespace nx_hls
         {
             std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_POS_PARAM_NAME);
             if( startDatetimeIter != requestParams.end() )
+            {
                 startTimestamp = parseDateTime( startDatetimeIter->second );
+            }
+            else
+            {
+                //trying compatibility parameter "startDatetime"
+                std::multimap<QString, QString>::const_iterator startDatetimeIter =
+                    requestParams.find( StreamingParams::START_DATETIME_PARAM_NAME );
+                if( startDatetimeIter != requestParams.end() )
+                    startTimestamp = parseDateTime( startDatetimeIter->second );
+            }
         }
 
         std::unique_ptr<HLSSession> newHlsSession(
