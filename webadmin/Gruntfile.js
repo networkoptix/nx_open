@@ -126,7 +126,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/', host: '192.168.56.101',port: 9000}/**/
 
                 // Masha
-                {context: '/api/',      host: '10.0.2.186', port: 7011},
+                /*{context: '/api/',      host: '10.0.2.186', port: 7011},
                 {context: '/ec2/',      host: '10.0.2.186', port: 7011},
                 {context: '/hls/',      host: '10.0.2.186', port: 7011},
                 {context: '/media/',    host: '10.0.2.186', port: 7011},
@@ -134,7 +134,7 @@ module.exports = function (grunt) {
 
 
                 // Olya
-                /*{context: '/api/',      host: '10.0.2.169', port: 7011},
+                {context: '/api/',      host: '10.0.2.169', port: 7011},
                 {context: '/ec2/',      host: '10.0.2.169', port: 7011},
                 {context: '/hls/',      host: '10.0.2.169', port: 7011},
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
