@@ -175,6 +175,7 @@ table.webclient-window>tbody>tr>td.alert{
 
 .webclient-button.disabled{
   opacity:0.1;
+  cursor:default;
 }
 
 .webclient-button.active{

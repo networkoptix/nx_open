@@ -3,7 +3,7 @@
 
 #include <memory>
 
-typedef std::shared_ptr<int> AuditHandle;
+typedef std::shared_ptr<const int> AuditHandle;
 
 
 #endif // __AUDIT_MANAGER_FWD_H_

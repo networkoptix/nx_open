@@ -28,6 +28,6 @@
         </nav>
     </div>
 </header>
-<div class="container" ng-if="alertVisible && !isActive('/view')">
+<div class="container" ng-if="alertVisible && !isActive('/view') && !session.serverInfoAlertHidden">
     <alert type="info" close="closeAlert()">You are currently connected to the system '{{settings.systemName}}' through '{{settings.name}}' server</alert>
 </div>

@@ -577,6 +577,9 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
         userResource ? userResource->getRealm() : QnAppInfo::realm(),
         isProxy );
 
+    if (errCode == Auth_WrongLogin && !QUuid(userName).isNull())
+        errCode = Auth_WrongInternalLogin;
+
     return errCode;
 }
 

@@ -10,6 +10,9 @@ struct QnAuthSession
     QString userName;
     QString userHost;
     QString userAgent;
+
+    QByteArray toByteArray() const;
+    void fromByteArray(const QByteArray& data);
 };
 
 #define QnAuthSession_Fields (id)(userName)(userHost)(userAgent)

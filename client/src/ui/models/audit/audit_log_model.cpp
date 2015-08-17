@@ -375,6 +375,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
     case Qn::AR_BEventRemove:
     case Qn::AR_BEventUpdate:
     case Qn::AR_UserRemove:
+    case Qn::AR_SystemNameChanged:
         result = QString::fromUtf8(data->extractParam("description"));
         break;
     case Qn::AR_UnauthorizedLogin:

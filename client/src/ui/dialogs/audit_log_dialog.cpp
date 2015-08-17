@@ -347,13 +347,16 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
 
 QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRecordRefList& checkedRows)
 {
-    QSet<QnUuid> selectedSessions;
+    QMap<QnUuid, int> selectedSessions;
     for (const QnAuditRecord* record: checkedRows) 
-        selectedSessions << record->authSession.id;
+        selectedSessions.insert(record->authSession.id, record->rangeStartSec);
 
     QnAuditRecordRefList result;
     auto filter = [&selectedSessions] (const QnAuditRecord* record) {
-        return selectedSessions.contains(record->authSession.id);
+        if (record->eventType == Qn::AR_Login)
+            return selectedSessions.value(record->authSession.id) == record->rangeStartSec; // hide duplicate login from difference servers
+        else
+            return selectedSessions.contains(record->authSession.id);
     };
     std::copy_if(m_filteredData.begin(), m_filteredData.end(), std::back_inserter(result), filter);
     return result;
@@ -760,18 +763,9 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_currentTabChanged);
-    /*
-    connect(ui->tabWidget, &QTabWidget::currentChanged, 
-        this, [this](int index) {
-            if (index == SessionTab)
-                ui->gridMaster->adjustSize();
-            else
-                ui->gridCameras->adjustSize();
-            at_filterChanged();
-        }
-    );
-    */
-    
+
+    ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
+    ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 }
 
 QnAuditLogDialog::~QnAuditLogDialog() {
@@ -1051,15 +1045,30 @@ void QnAuditLogDialog::makeSessionData()
 {
     m_sessionData.clear();
     QMap<QnUuid, int> activityPerSession;
+    QMap<QnUuid, QnAuditRecord> processedLogins;
     for (const QnAuditRecord& record: m_allData)
     {
-        if (record.isLoginType())
-            m_sessionData << record;
+        if (record.isLoginType()) 
+        {
+            auto itr = processedLogins.find(record.authSession.id);
+            if (itr == processedLogins.end())
+                processedLogins.insert(record.authSession.id, record);
+            else {
+                // group sessions because of different servers may have same session
+                QnAuditRecord& existRecord = itr.value();
+                existRecord.rangeStartSec = qMin(existRecord.rangeStartSec, record.rangeStartSec);
+                existRecord.rangeEndSec = qMax(existRecord.rangeEndSec, record.rangeEndSec);
+            }
+        }
         activityPerSession[record.authSession.id]++;
     }
-
-    for (QnAuditRecord& record: m_sessionData)
+    m_sessionData.reserve(processedLogins.size());
+    for (auto& value: processedLogins)
+        m_sessionData.push_back(std::move(value));
+    for (QnAuditRecord& record: m_sessionData) {
         record.addParam("childCnt", QByteArray::number(activityPerSession.value(record.authSession.id)));
+        record.addParam("checked", "1");
+    }
 }
 
 void QnAuditLogDialog::makeCameraData()
@@ -1077,6 +1086,7 @@ void QnAuditLogDialog::makeCameraData()
         QnAuditRecord cameraRecord;
         cameraRecord.resources.push_back(itr.key());
         cameraRecord.addParam("childCnt", QByteArray::number(itr.value())); // used for "user activity" column
+        cameraRecord.addParam("checked", "1");
         m_cameraData.push_back(cameraRecord);
     }
 }
@@ -1087,6 +1097,8 @@ void QnAuditLogDialog::requestFinished()
     setGridGeneralCheckState(ui->gridCameras, Qt::Unchecked);
     makeSessionData();
     makeCameraData();
+    static_cast<QnCheckBoxedHeaderView*>(ui->gridMaster->horizontalHeader())->setCheckState(Qt::Checked);
+    static_cast<QnCheckBoxedHeaderView*>(ui->gridCameras->horizontalHeader())->setCheckState(Qt::Checked);
     at_filterChanged();
 
     ui->gridMaster->setDisabled(false);

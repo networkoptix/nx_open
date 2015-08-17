@@ -495,6 +495,13 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
 {
     Q_D(const QnTCPConnectionProcessor);
     QnAuthSession result;
+
+    QByteArray existSession = nx_http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
+    if (!existSession.isEmpty()) {
+        result.fromByteArray(existSession);
+        return result;
+    }
+
     if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
         result.userName = userRes->getName();
     else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
