@@ -3,16 +3,17 @@
 
 #include <QtWidgets/QDialog>
 
+#include <ui/dialogs/dialog_base.h>
 #include <core/resource/resource_fwd.h>
 
 namespace Ui {
     class ReconnectInfoDialog;
 }
 
-class QnReconnectInfoDialog: public QDialog {
+class QnReconnectInfoDialog: public QnDialogBase {
     Q_OBJECT
 
-    typedef QDialog base_type;
+    typedef QnDialogBase base_type;
 public:
     explicit QnReconnectInfoDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     virtual ~QnReconnectInfoDialog();

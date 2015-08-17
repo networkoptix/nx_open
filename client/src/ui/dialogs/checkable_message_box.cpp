@@ -74,7 +74,7 @@ public:
 };
 
 QnCheckableMessageBox::QnCheckableMessageBox(QWidget *parent):
-    QDialog(parent),
+    QnDialogBase(parent),
     d(new QnCheckableMessageBoxPrivate(this))
 {
     setModal(true);

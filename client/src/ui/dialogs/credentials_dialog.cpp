@@ -2,7 +2,7 @@
 #include "ui_credentials_dialog.h"
 
 QnCredentialsDialog::QnCredentialsDialog(QWidget *parent) :
-    QDialog(parent),
+    QnDialogBase(parent),
     ui(new Ui::QnCredentialsDialog)
 {
     ui->setupUi(this);

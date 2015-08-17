@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include "api/model/api_ioport_data.h"
+#include <ui/dialogs/dialog_base.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include "ui_iostate_display_widget.h"
 
@@ -14,10 +15,10 @@
 class QnIOModuleMonitor;
 typedef QSharedPointer<QnIOModuleMonitor> QnIOModuleMonitorPtr;
 
-class QnIOStateDisplayWidget: public Connective<QDialog>, public QnWorkbenchContextAware
+class QnIOStateDisplayWidget: public Connective<QnDialogBase>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QDialog> base_type;
+    typedef Connective<QnDialogBase> base_type;
 
 public: 
     QnIOStateDisplayWidget(QWidget *parent = NULL);

@@ -11,6 +11,7 @@
 #include <utils/common/software_version.h>
 #include <utils/common/connective.h>
 #include <update/updates_common.h>
+#include <ui/dialogs/dialog_base.h>
 
 class QnCompatibilityVersionInstallationTool;
 class QnMediaServerUpdateTool;
@@ -20,10 +21,10 @@ namespace Ui {
 }
 
 //TODO: #dklychkov rename class in 2.4
-class CompatibilityVersionInstallationDialog : public Connective<QDialog> {
+class CompatibilityVersionInstallationDialog : public Connective<QnDialogBase> {
     Q_OBJECT
 
-    typedef Connective<QDialog> base_type;
+    typedef Connective<QnDialogBase> base_type;
 public:
     CompatibilityVersionInstallationDialog(const QnSoftwareVersion &version, QWidget *parent = 0);
     virtual ~CompatibilityVersionInstallationDialog();

@@ -4,7 +4,7 @@
 #include <utils/threaded_image_loader.h>
 
 QnImagePreviewDialog::QnImagePreviewDialog(QWidget *parent) :
-    QDialog(parent),
+    QnDialogBase(parent),
     ui(new Ui::ImagePreviewDialog)
 {
     ui->setupUi(this);

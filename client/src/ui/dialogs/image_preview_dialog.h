@@ -3,11 +3,13 @@
 
 #include <QtWidgets/QDialog>
 
+#include <ui/dialogs/dialog_base.h>
+
 namespace Ui {
     class ImagePreviewDialog;
 }
 
-class QnImagePreviewDialog : public QDialog
+class QnImagePreviewDialog : public QnDialogBase
 {
     Q_OBJECT
     

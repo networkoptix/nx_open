@@ -305,7 +305,7 @@ void QnProgressDialogPrivate::showInfiniteProgress(bool enable)
 */
 
 QnProgressDialog::QnProgressDialog(QWidget *parent, Qt::WindowFlags f): 
-    QDialog(parent, f),
+    base_type(parent, f),
     d_ptr(new QnProgressDialogPrivate())
 {
     Q_D(QnProgressDialog);
@@ -340,7 +340,7 @@ QnProgressDialog::QnProgressDialog(const QString &labelText,
                                  const QString &cancelButtonText,
                                  int minimum, int maximum,
                                  QWidget *parent, Qt::WindowFlags f): 
-    QDialog(parent, f),
+    base_type(parent, f),
     d_ptr(new QnProgressDialogPrivate())
 {
     Q_D(QnProgressDialog);
