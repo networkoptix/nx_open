@@ -8,6 +8,7 @@
 #include <business/business_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/email_fwd.h>
+#include <utils/common/ldap_fwd.h>
 
 namespace ec2 {
 
@@ -43,6 +44,9 @@ namespace ec2 {
 
     void fromResourceToApi(const QnEmailSettings &src, ApiEmailSettingsData &dst);
     void fromApiToResource(const ApiEmailSettingsData &src, QnEmailSettings &dst);
+
+    void fromResourceToApi(const QnLdapSettings &src, ApiLdapSettingsData &dst);
+    void fromApiToResource(const ApiLdapSettingsData &src, QnLdapSettings &dst);
 
     void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, const ResourceContext &ctx);
 

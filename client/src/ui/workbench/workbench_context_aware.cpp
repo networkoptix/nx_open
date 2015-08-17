@@ -84,7 +84,8 @@ void QnWorkbenchContextAware::init(QObject *parent, bool lazyInitialization) {
 }
 
 void QnWorkbenchContextAware::init(QnWorkbenchContext *context) {
-    Q_ASSERT_X(!m_context, Q_FUNC_INFO, "Invalid context");
+    Q_ASSERT_X(context, Q_FUNC_INFO, "Invalid context");
+	Q_ASSERT_X(!m_context, Q_FUNC_INFO, "Double context initialization");
     m_context = context;
     m_initialized = true;
     afterContextInitialized();
