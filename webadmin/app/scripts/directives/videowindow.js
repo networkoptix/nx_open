@@ -40,7 +40,7 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
-                scope.debugMode = false;
+                scope.debugMode = true;
 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
@@ -190,32 +190,33 @@ angular.module('webadminApp')
                 // TODO: move supported info to config
                 // TODO: Support new players
 
-                function initNativePlayer(nativeFormat){
+                function initNativePlayer(nativeFormat) {
 
                     scope.native = true;
                     scope.flashls = false;
+
                     nativePlayer.init(element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
 
-                            $timeout(function(){
+                            $timeout(function () {
                                 scope.loading = !!format;
                             });
-                            scope.vgApi.load(getFormatSrc(nativeFormat),mimeTypes[nativeFormat]);
+                            scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
 
-                            scope.vgApi.addEventListener("timeupdate",function(event,arg2,arg3){
+                            scope.vgApi.addEventListener("timeupdate", function (event, arg2, arg3) {
                                 var video = event.srcElement || event.originalTarget;
-                                scope.vgUpdateTime({$currentTime:video.currentTime, $duration: video.duration});
-                                if(scope.loading) {
-                                    $timeout(function(){
+                                scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                if (scope.loading) {
+                                    $timeout(function () {
                                         scope.loading = false;
                                     });
                                 }
                             });
                         }
 
-                        scope.vgPlayerReady({$API:scope.vgApi});
+                        scope.vgPlayerReady({$API: scope.vgApi});
                     }, function (api) {
                         console.error("some error");
                     });
@@ -227,33 +228,41 @@ angular.module('webadminApp')
                     scope.flashSource = "components/flashlsChromeless.swf";
                     scope.flashParam = flashlsAPI.flashParams();
 
-                    if(!flashlsAPI.ready()) {
-                        flashlsAPI.init("videowindow", function (api) {
-                            scope.vgApi = api;
+                    $timeout(function() {// Force DOM to refresh here
+                        if (!flashlsAPI.ready()) {
+                            flashlsAPI.init("videowindow", function (api) {
+                                scope.vgApi = api;
 
-                            if (scope.vgSrc) {
-                                $timeout(function(){
-                                    scope.loading = !!format;
+                                if (scope.vgSrc) {
+                                    $timeout(function () {
+                                        scope.loading = !!format;
+                                    });
+
+                                    scope.vgApi.load(getFormatSrc('hls'));
+                                }
+
+                                scope.vgPlayerReady({$API: api});
+                            }, function (error) {
+                                $timeout(function () {
+                                    scope.errorLoading = true;
+                                    scope.loading = false;
+                                    scope.flashls = false;// Kill flashls with his error
+                                    scope.native = false;
                                 });
-                                scope.vgApi.load(getFormatSrc('hls'));
-                            }
-
-                            scope.vgPlayerReady({$API: api});
-                        }, function (error) {
-                            $timeout(function(){
-                                scope.errorLoading = true;
-                                scope.loading = false;
-                                scope.flashls = false;// Kill flashls!
-                                scope.native = false;
+                                console.error(error);
+                            }, function (position, duration) {
+                                if(position!=0) {
+                                    scope.loading = false;
+                                    scope.vgUpdateTime({$currentTime: position, $duration: duration});
+                                }
                             });
-                            console.error(error);
-                        }, function (position, duration) {
-                            scope.loading = false;
-                            scope.vgUpdateTime({$currentTime: position, $duration: duration});
-                        });
-                    }else{
-                        flashlsAPI.load(getFormatSrc('hls'));
-                    }
+                        } else {
+                            $timeout(function () {
+                                scope.loading = !!format;
+                            });
+                            flashlsAPI.load(getFormatSrc('hls'));
+                        }
+                    });
                 }
 
                 function initJsHls(){
@@ -320,7 +329,7 @@ angular.module('webadminApp')
                     scope.loading = false;
                     scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {
-                        var format = detectBestFormat();
+                        format = detectBestFormat();
 
                         recyclePlayer(format);// Remove or recycle old player.
 
@@ -340,9 +349,6 @@ angular.module('webadminApp')
                             case "native-hls":
                                 initNativePlayer("hls");
                                 break;
-
-                            case null: //Do nothing
-                                return;
 
                             case "webm":
                             default:
