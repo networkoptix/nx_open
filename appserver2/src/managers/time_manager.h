@@ -200,7 +200,7 @@ namespace ec2
             nx_http::AsyncHttpClientPtr httpClient;
 
             PeerContext( SocketAddress _peerAddress )
-                : peerAddress( std::move(peerAddress) )
+                : peerAddress( std::move( _peerAddress ) )
             {}
 
             PeerContext( PeerContext&& right )
