@@ -668,6 +668,12 @@ private:
     int m_count;
 };
 
+class QnIoModuleActionCondition: public QnActionCondition {
+public:
+    QnIoModuleActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
 class QnFakeServerActionCondition: public QnActionCondition {
 public:
     QnFakeServerActionCondition(bool allResources = false, QObject *parent = NULL):
