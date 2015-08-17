@@ -180,6 +180,8 @@ namespace nx_hls
                     response.headers.find("Content-Length") != response.headers.end() ? "identity" : "chunked") );
             response.headers.emplace( "Connection", "close" ); //no persistent connections support
         }
+        if( response.statusLine.statusCode == nx_http::StatusCode::notFound )
+            nx_http::insertOrReplaceHeader( &response.headers, nx_http::HttpHeader( "Content-Length", "0" ) );
 
         sendResponse( response );
     }
