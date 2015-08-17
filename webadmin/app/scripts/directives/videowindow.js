@@ -47,6 +47,7 @@ angular.module('webadminApp')
 
                 function detectBestFormat(){
                     scope.flashRequired = false;
+                    scope.flashOrWebmRequired = false;
                     scope.noArmSupport = false;
                     scope.noFormat = false;
 
@@ -113,13 +114,19 @@ angular.module('webadminApp')
                                 scope.ieNoWebm = true;
                             }
 
-                            if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
+                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
                                 return "flashls";
                             }
 
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
+
+                            if(weHaveHls && weHaveWebm){
+
+                                scope.flashOrWebmRequired = true;
+                                return false;
+                            }
                             if(weHaveHls) {
                                 scope.flashRequired = true;
                                 return false;
@@ -145,13 +152,13 @@ angular.module('webadminApp')
                         case "Opera":
                         case "Webkit":
                         default:
-                            if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
+                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
                                 return "flashls";
                             }
                             /*if(weHaveHls) {
                                 return "jshls";// We are hoping that we have some good browser
                             }*/
-                            if(weHaveRtsp && window.jscd.flashVersion != '-'){
+                            if(weHaveRtsp && window.jscd.flashVersion){
                                 return "rtsp";
                             }
                             if(weHaveHls) {
@@ -288,6 +295,7 @@ angular.module('webadminApp')
                     scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         var format = detectBestFormat();
+
                         scope.loading = !!format;
                         recyclePlayer(format);// Remove old player. TODO: recycle it later
 

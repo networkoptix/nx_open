@@ -50,7 +50,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             };
         });
 
-        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm')){
+        if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm',false)){
             $scope.ieNoWebm = true;
         }
 
@@ -73,14 +73,21 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
 
-        function browserSupports(type){
+        function browserSupports(type,maybe){
             var v = document.createElement('video');
             if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
                 return true;//Native support
             }
-
+            if(maybe){
+                if(type=='hls' && window.jscd.os != "Android" ){
+                    return true; // Requires flash, but may be played
+                }
+                if(type=='webm' && window.jscd.browser == 'Microsoft Internet Explorer' ){
+                    return true; // Requires plugin, but may be played
+                }
+            }
             if(type=='hls'){
-                return window.jscd.flashVersion != '-'; // flash hls support
+                return !!window.jscd.flashVersion ; // flash hls support
             }
 
             return false;
@@ -95,7 +102,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
         function formatSupported(type){
-            return cameraSupports(type) && browserSupports(type);
+            return cameraSupports(type) && browserSupports(type,true);
         }
         function updateAvailableResolutions() {
             if(!$scope.activeCamera){

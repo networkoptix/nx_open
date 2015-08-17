@@ -423,7 +423,7 @@ CameraRecordsProvider.prototype.debug = function(currentNode){
 /**
  * Add chunk to tree - find or create good position for it
  * @param chunk
- * @param parent - parent for recursive call
+ * @param parent - parent for recursive callрп
  */
 CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
     if(this.chunksTree === null || chunk.level === 0){
