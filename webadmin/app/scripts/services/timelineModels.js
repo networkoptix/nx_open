@@ -343,7 +343,13 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                     chunk.startTimeMs = parseInt(chunk.startTimeMs);
                 });
 
-                for (var i = 0; i < chunks.length; i++) {
+                var chunksToIterate = chunks.length;
+                //If level == 0 - we want only first chunk
+                if(!level && chunks.length>0){ // Special hack
+                    chunks[0].durationMs = -1; // Make it 'live'
+                    chunksToIterate = 1;
+                }
+                for (var i = 0; i < chunksToIterate; i++) {
                     var endChunk = chunks[i].startTimeMs + chunks[i].durationMs;
                     if (chunks[i].durationMs < 0) {
                         endChunk = (new Date()).getTime() + 100000;// some date in future

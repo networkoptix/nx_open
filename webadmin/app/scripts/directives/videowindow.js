@@ -40,6 +40,8 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
+                scope.debugMode = false;
+
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
                     return src?src.src:null;
@@ -199,8 +201,8 @@ angular.module('webadminApp')
                             scope.vgApi.load(getFormatSrc(format),mimeTypes[format]);
 
                             scope.vgApi.addEventListener("timeupdate",function(event,arg2,arg3){
-                                //console.log("timeupdate",event,arg2,arg3,scope.vgApi, scope.vgApi.currentTime);
-                                scope.vgUpdateTime({$currentTime:event.srcElement.currentTime, $duration: event.srcElement.duration});
+                                var video = event.srcElement || event.originalTarget;
+                                scope.vgUpdateTime({$currentTime:video.currentTime, $duration: video.duration});
                                 if(scope.loading) {
                                     scope.loading = false;
                                     //scope.$digest();
@@ -292,7 +294,7 @@ angular.module('webadminApp')
                     });
                 }
 
-                element.bind('contextmenu',function() { return false; }); // Kill context menu
+                element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
 
 
                 scope.$watch("vgSrc",function(){

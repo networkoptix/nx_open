@@ -1,6 +1,6 @@
 <div class="videowindow">
 
-    <div class="camera-view-informer camera-loading" ng-if="loading">
+    <div class="camera-view-informer camera-loading" ng-if="loading && !debugMode">
         <div class="camera-view-preloader camera-view-message-icon"></div>
     </div>
 
@@ -36,7 +36,7 @@
     </div>
 
 
-    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}">
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading && !debugMode}">
         <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
                 width="100%" height="100%"
                 id="flashvideo"
@@ -46,6 +46,6 @@
         </object>
     </div>
 
-    <div class="videoplayer" ng-if="native" ng-class="{'invisible':loading}">
+    <div class="videoplayer" ng-if="native" ng-class="{'invisible':loading && !debugMode}">
     </div>
 </div>
