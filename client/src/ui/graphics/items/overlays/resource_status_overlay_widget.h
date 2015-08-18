@@ -59,6 +59,7 @@ private:
         AnalogLicenseText,
         VideowallLicenseText,
         IoModuleDisabledText,
+        IoModuleDisabledSubText,
         TextCount
     };
 
