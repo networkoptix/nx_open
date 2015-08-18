@@ -192,7 +192,7 @@ private:
     Q_SLOT void updateFisheye();
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
-    Q_SLOT void updateIoModuleVisibility();
+    Q_SLOT void updateIoModuleVisibility(bool animate);
     Q_SLOT void updateOverlayButton();
 
 private:

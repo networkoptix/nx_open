@@ -1004,7 +1004,7 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     m_filteredData.clear();
 
 
-    auto mediaServerList = qnResPool->getAllServers();
+    const auto mediaServerList = qnResPool->getAllServers();
     foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
     {
         if (mserver->getStatus() == Qn::Online)

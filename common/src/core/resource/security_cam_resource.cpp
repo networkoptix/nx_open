@@ -698,6 +698,9 @@ bool QnSecurityCamResource::isScheduleDisabled() const {
 }
 
 void QnSecurityCamResource::setLicenseUsed(bool value) {
+
+    /// TODO: #gdm Refactor licence management
+    /*
     switch (licenseType()) {
     case Qn::LC_IO:
         {
@@ -709,13 +712,15 @@ void QnSecurityCamResource::setLicenseUsed(bool value) {
     default:
         break;
     }
-
+    */
     setScheduleDisabled(!value);  
     emit licenseUsedChanged(::toSharedPointer(this));
 }
 
 
 bool QnSecurityCamResource::isLicenseUsed() const {
+    /// TODO: #gdm Refactor licence management
+    /*
     switch (licenseType()) {
     case Qn::LC_IO:
         {
@@ -725,7 +730,7 @@ bool QnSecurityCamResource::isLicenseUsed() const {
     default:
         break;
     }
-
+    */
     /* By default camera requires license when recording is enabled. */
     return !isScheduleDisabled();
 }

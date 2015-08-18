@@ -67,7 +67,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
     m_staticTexts[LoadingText] = tr("Loading...");
     m_staticTexts[NoVideoStreamText] = tr("No video stream");
-    m_staticTexts[IoModuleDisabledText] = tr("IO module is disabled");
+    m_staticTexts[IoModuleDisabledText] = tr("Module is disabled");
     
     for (QStaticText &staticText : m_staticTexts) {
         staticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -300,7 +300,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         paintPixmap(painter, *m_ioSpeakerPixmap, 0.064);
         break;
     case Qn::IoModuleDisabledOverlay:
-        paintFlashingText(painter, m_staticTexts[IoModuleDisabledText], 0.125);
+        paintFlashingText(painter, m_staticTexts[IoModuleDisabledText], 0.112);
         break;
     default:
         break;
