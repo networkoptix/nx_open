@@ -259,10 +259,6 @@
         <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>สิ้นสุด เซิร์ฟเวอร์.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>เซิร์ฟเวอร์เริ่มต้นหลังจากที่ผิดพลาด.</translation>
     </message>
@@ -304,6 +300,10 @@
     </message>
     <message>
         <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

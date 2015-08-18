@@ -77,10 +77,6 @@
 <context>
     <name>AuditLogDialog</name>
     <message>
-        <source>Event log</source>
-        <translation type="unfinished">事件日志</translation>
-    </message>
-    <message>
         <source>From</source>
         <translation type="unfinished"></translation>
     </message>
@@ -150,6 +146,10 @@
     </message>
     <message>
         <source>All Servers are offline.  Audit data are not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit trail</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -477,29 +477,6 @@
     <message>
         <source>Filter:</source>
         <translation>过滤器:</translation>
-    </message>
-</context>
-<context>
-    <name>CameraManagementWidget</name>
-    <message>
-        <source>Allow system to optimize camera settings (Recommended)</source>
-        <translation>允许系统更改摄像机配置（不推荐）</translation>
-    </message>
-    <message>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>提示！录像计划中更改每秒帧数/画质的设置将无法生效!</translation>
-    </message>
-    <message>
-        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation>发送匿名使用和异常统计至开发者（推荐）</translation>
-    </message>
-    <message>
-        <source>Enable cameras and servers auto discovery</source>
-        <translation>允许自动扫描在线摄像机和服务器</translation>
-    </message>
-    <message>
-        <source>Enable audit trail</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -942,13 +919,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>IOStateDisplayWidget</name>
-    <message>
-        <source>IO monitor</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ImageControlWidget</name>
     <message>
         <source>Image Control</source>
@@ -1043,6 +1013,41 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Keep aspect ratio</source>
         <translation>保存宽高比不变</translation>
+    </message>
+</context>
+<context>
+    <name>LdapSettingsDialog</name>
+    <message>
+        <source>Server UR&amp;L:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ldap(s)://host:port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ad&amp;min DN:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation type="unfinished">&amp;密码:</translation>
+    </message>
+    <message>
+        <source>Search Base:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Testing...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2655,15 +2660,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO monitor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>IO Module Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording statistics...</source>
+        <source>User management...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2758,6 +2759,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Export selected records to a file</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Audit log replay</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
@@ -2823,10 +2828,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Business rule updated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>E-mail updated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2927,6 +2928,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Red mark means that an archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E-mail settings changed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4340,25 +4349,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnIOStateDisplayWidget</name>
-    <message>
-        <source>IO port error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to %1 IO port &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>turn on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>turn off</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnImageControlWidget</name>
     <message>
         <source>4:3</source>
@@ -4374,6 +4364,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnIoModuleOverlayWidgetPrivate</name>
+    <message>
+        <source>Failed to turn on IO port &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to turn off IO port &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO port error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4429,6 +4434,44 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;图片 无法加载&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapSettingsDialog</name>
+    <message>
+        <source>Failed</source>
+        <translation type="unfinished">失败</translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished">成功</translation>
+    </message>
+    <message>
+        <source>Error!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The provided settings are not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapSettingsDialogPrivate</name>
+    <message>
+        <source>The provided settings are not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None of your servers is connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed out</source>
+        <translation type="unfinished">超时</translation>
     </message>
 </context>
 <context>
@@ -4906,6 +4949,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Screenshot</source>
         <translation>截屏</translation>
     </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
@@ -5008,6 +5055,13 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Check</source>
         <translation>检查</translation>
+    </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.
+As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
+If you understand this and would like to proceed please click Merge to continue.
+</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5546,7 +5600,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnRecordingStatsDialog</name>
+    <name>QnRecordingStatisticsWidget</name>
     <message>
         <source>Copy Selection to Clipboard</source>
         <translation type="unfinished">复制选择到剪贴板</translation>
@@ -5620,6 +5674,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Calendar Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>less than an hour</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5841,76 +5899,87 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
-        <source>Remove Storage</source>
-        <translation>移除存储</translation>
-    </message>
-    <message>
         <source>Open Web Page...</source>
         <translation>打开web页面...</translation>
     </message>
     <message>
-        <source>Not available</source>
-        <translation>不可用</translation>
+        <source>General</source>
+        <translation type="unfinished">一般</translation>
+    </message>
+    <message>
+        <source>Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnServerSettingsWidget</name>
+    <message>
+        <source>Remove Storage</source>
+        <translation type="unfinished">移除存储</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>加载中...</translation>
+        <translation type="unfinished">加载中...</translation>
     </message>
     <message>
-        <source>Finished</source>
-        <translation>完成</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation>重建录像索引完成.</translation>
-    </message>
-    <message>
-        <source>At least two servers are required for this feature.</source>
-        <translation>此功能需要两个服务器才开启.</translation>
-    </message>
-    <message>
-        <source>This server already has more than max cameras</source>
-        <translation>服务器摄像机数量已超出限定范围</translation>
-    </message>
-    <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>为避免故障请调整最大允许的摄像机数量</translation>
-    </message>
-    <message>
-        <source>Could not load storages from server.</source>
-        <translation>无法从服务器加载存储资源。</translation>
-    </message>
-    <message>
-        <source>Add external Storage...</source>
-        <translation>添加外部存储...</translation>
+        <source>Not available</source>
+        <translation type="unfinished">不可用</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>注意</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation>即将启动日常录像再同步.</translation>
+        <translation type="unfinished">即将启动日常录像再同步.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation>注意:在进行录像再同步时将会增加硬盘使用!根据录像文件大小可能需要几个小时.</translation>
+        <translation type="unfinished">注意:在进行录像再同步时将会增加硬盘使用!根据录像文件大小可能需要几个小时.</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation>当前操作只需要在录像文件夹被移动,重命名或者覆盖时使用.您可以在重建的过程中取消操作,而不丢失数据.</translation>
+        <translation type="unfinished">当前操作只需要在录像文件夹被移动,重命名或者覆盖时使用.您可以在重建的过程中取消操作,而不丢失数据.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation>请确定是否继续?</translation>
+        <translation type="unfinished">请确定是否继续?</translation>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation>正在重建录像索引&apos;%1&apos;</translation>
+        <translation type="unfinished">正在重建录像索引&apos;%1&apos;</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation>正在快速扫描录像&apos;%1&apos;</translation>
+        <translation type="unfinished">正在快速扫描录像&apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation type="unfinished">完成</translation>
+    </message>
+    <message>
+        <source>Rebuilding archive index is completed.</source>
+        <translation type="unfinished">重建录像索引完成.</translation>
+    </message>
+    <message>
+        <source>At least two servers are required for this feature.</source>
+        <translation type="unfinished">此功能需要两个服务器才开启.</translation>
+    </message>
+    <message>
+        <source>This server already has more than max cameras</source>
+        <translation type="unfinished">服务器摄像机数量已超出限定范围</translation>
+    </message>
+    <message>
+        <source>To avoid malfunction adjust max number of cameras</source>
+        <translation type="unfinished">为避免故障请调整最大允许的摄像机数量</translation>
+    </message>
+    <message>
+        <source>Could not load storages from server.</source>
+        <translation type="unfinished">无法从服务器加载存储资源。</translation>
+    </message>
+    <message>
+        <source>Add external Storage...</source>
+        <translation type="unfinished">添加外部存储...</translation>
     </message>
 </context>
 <context>
@@ -6244,6 +6313,38 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Do not record motion</source>
         <translation>选择在摄像机上启用移动侦测</translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm motion regions reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to reset motion regions to the defaults?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation type="unfinished">事件动作无法执行!</translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -6350,10 +6451,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>激活模拟许可来删除此信息</translation>
     </message>
     <message>
-        <source>Diagnose...</source>
-        <translation>诊断...</translation>
-    </message>
-    <message>
         <source>Server offline</source>
         <translation>服务器离线</translation>
     </message>
@@ -6363,6 +6460,22 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No video stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module is disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate license...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6384,12 +6497,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>提供的存储路径无法定义可用的外部存储空间。</translation>
     </message>
     <message>
-        <source>Windows Network Shared Resource</source>
-        <translation>Windows网络共享资源</translation>
-    </message>
-    <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
         <translation>\\&lt;Computer 名称&gt;\&lt;文件夹&gt;</translation>
+    </message>
+    <message>
+        <source>Network Shared Resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add storage</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6437,6 +6562,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Update is in process now.</source>
         <translation>升级正在进行.</translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished">用户</translation>
     </message>
 </context>
 <context>
@@ -6674,6 +6803,91 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>User %1 has invalid email address</source>
         <translation>用户 %1 拥有无效的邮件地址</translation>
+    </message>
+</context>
+<context>
+    <name>QnUserListModel</name>
+    <message>
+        <source>LDAP user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normal user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">名称</translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserListModelPrivate</name>
+    <message>
+        <source>Owner</source>
+        <translation type="unfinished">拥有者</translation>
+    </message>
+    <message>
+        <source>Administrator</source>
+        <translation type="unfinished">管理员</translation>
+    </message>
+    <message>
+        <source>View live video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust camera settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use PTZ controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View video archives</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Video Walls</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserManagementWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import from LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7427,6 +7641,21 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>You can try to update the servers again in the System Administration.</source>
         <translation>正在更新服务器系统管理.</translation>
     </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.
+As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
+If you understand this and would like to proceed please click Merge to continue.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merge</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchLayoutsHandler</name>
@@ -7959,11 +8188,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
 </context>
 <context>
-    <name>RecordingStatsDialog</name>
-    <message>
-        <source>Recording statistics</source>
-        <translation type="unfinished"></translation>
-    </message>
+    <name>RecordingStatisticsWidget</name>
     <message>
         <source>Refresh</source>
         <translation type="unfinished">刷新</translation>
@@ -8075,86 +8300,89 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Server settings</source>
         <translation>服务器设置</translation>
     </message>
-    <message>
-        <source>IP Address:</source>
-        <translation>IP地址:</translation>
-    </message>
-    <message>
-        <source>9000</source>
-        <translation>9000</translation>
-    </message>
+</context>
+<context>
+    <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
-        <translation>名称:</translation>
+        <translation type="unfinished">名称:</translation>
     </message>
     <message>
-        <source>Storages</source>
-        <translation>存储空间</translation>
-    </message>
-    <message>
-        <source>Path</source>
-        <translation>路径</translation>
-    </message>
-    <message>
-        <source>Port:</source>
-        <translation>端口:</translation>
-    </message>
-    <message>
-        <source>In Use</source>
-        <translation>使用中</translation>
-    </message>
-    <message>
-        <source>Capacity</source>
-        <translation>容量</translation>
+        <source>IP Address:</source>
+        <translation type="unfinished">IP地址:</translation>
     </message>
     <message>
         <source>Ping</source>
-        <translation>Ping</translation>
+        <translation type="unfinished">Ping</translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation type="unfinished">端口:</translation>
+    </message>
+    <message>
+        <source>9000</source>
+        <translation type="unfinished">9000</translation>
     </message>
     <message>
         <source>Failover</source>
-        <translation>服务器冗余</translation>
+        <translation type="unfinished">服务器冗余</translation>
     </message>
     <message>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation>使用冗余（将从离线服务器上自动接管摄像机）</translation>
+        <translation type="unfinished">使用冗余（将从离线服务器上自动接管摄像机）</translation>
     </message>
     <message>
         <source>Max. cameras on this server:</source>
-        <translation>允许管理的最大摄像机数量:</translation>
+        <translation type="unfinished">允许管理的最大摄像机数量:</translation>
     </message>
     <message>
-        <source>Login</source>
-        <translation>登录</translation>
+        <source>Storages</source>
+        <translation type="unfinished">存储空间</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>密码</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>空格</translation>
-    </message>
-    <message>
-        <source>Rebuild archive index</source>
-        <translation>重建录像索引</translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation>开始</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>取消</translation>
+        <source>In Use</source>
+        <translation type="unfinished">使用中</translation>
     </message>
     <message>
         <source>Protocol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Path</source>
+        <translation type="unfinished">路径</translation>
+    </message>
+    <message>
+        <source>Capacity</source>
+        <translation type="unfinished">容量</translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished">登录</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished">密码</translation>
+    </message>
+    <message>
+        <source>Space</source>
+        <translation type="unfinished">空格</translation>
+    </message>
+    <message>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuild archive index</source>
+        <translation type="unfinished">重建录像索引</translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished">开始</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
     </message>
 </context>
 <context>
@@ -8437,6 +8665,33 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
 </context>
 <context>
+    <name>SystemSettingsWidget</name>
+    <message>
+        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
+        <translation type="unfinished">(推荐)</translation>
+    </message>
+    <message>
+        <source>Enable audit trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation type="unfinished">允许自动扫描在线摄像机和服务器</translation>
+    </message>
+    <message>
+        <source>Allow system to optimize camera settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TimeServerSelectionWidget</name>
     <message>
         <source>Current system time:</source>
@@ -8456,10 +8711,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>Create New User</source>
         <translation>创建新用户</translation>
-    </message>
-    <message>
-        <source>User Properties</source>
-        <translation>用户属性</translation>
     </message>
     <message>
         <source>Access rights</source>
@@ -8490,8 +8741,12 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <translation>&amp;登录:</translation>
     </message>
     <message>
-        <source>&amp;Email:</source>
-        <translation>&amp;邮箱:</translation>
+        <source>E&amp;mail:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
