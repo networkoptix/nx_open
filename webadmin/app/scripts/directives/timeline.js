@@ -1174,17 +1174,12 @@ angular.module('webadminApp')
 
 
 
-                scope.goToLive = function(){
-                    if(scope.positionProvider.liveMode){
-                        scope.scaleManager.watchPlaying();
-                        return;
-                    }
+                scope.goToLive = function(force){
                     var moveDate = scope.scaleManager.screenCoordinateToDate(1);
                     animateScope.progress(scope, "goingToLive" ).then(
                         function(){
                             var activeDate = (new Date()).getTime();
                             scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
-
                             scope.scaleManager.watchPlaying();
                         },
                         function(){},
@@ -1192,7 +1187,8 @@ angular.module('webadminApp')
                             var activeDate = moveDate + val * ((new Date()).getTime() - moveDate);
                             scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
                         });
-                    if(! scope.scaleManager.liveMode) {
+
+                    if(!scope.positionProvider.liveMode || force) {
                         scope.positionHandler(false);
                     }
                 };
@@ -1208,6 +1204,13 @@ angular.module('webadminApp')
                 // !!! Subscribe for different events which affect timeline
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
 
+                scope.$watch("positionProvider.liveMode",function(mode){
+                    if(scope.positionProvider) {
+                        if (scope.positionProvider.liveMode) {
+                            scope.goToLive(true);
+                        }
+                    }
+                });
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here

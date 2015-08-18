@@ -167,8 +167,8 @@ var RulerModel = {
             topW: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
-        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 360,      width: 3600 },
-        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 1800,     width: 9000 },
+        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 360, width: 3600 },
+        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 1800, width: 9000 },
         { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 100000,   width: 600 , topW: 170, topFormat:'mmmm yyyy'},
         { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , marksW:5,  smallW: 20, middleW: 100,      width: 200 , topW: 170, topFormat:'d mmmm yyyy' ,contained:1},
         { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 200,      width: 1200},
@@ -655,6 +655,8 @@ ShortCache.prototype.update = function(requestPosition,position){
                     self.checkPoints[lastCheckPointPosition] = lastCheckPointDate; // Too many checkpoints at this point
                 }
             }
+
+            self.setPlayingPosition(self.played);
         });
 };
 
