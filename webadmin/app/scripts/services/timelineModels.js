@@ -241,7 +241,6 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width) {
         if(!self.chunksTree){
             return; //No chunks for this camera
         }
-        self.chunksTree.start = 0;// TODO: REMOVE DEBUG
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
         var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,self.width);
         if(nextLevel<RulerModel.levels.length-1) {
