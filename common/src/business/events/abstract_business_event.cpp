@@ -59,7 +59,8 @@ namespace QnBusiness
             break;
         case AnyBusinessEvent:
             result << CameraMotionEvent << CameraInputEvent <<
-                      AnyCameraEvent << AnyServerEvent;
+                      AnyCameraEvent << AnyServerEvent <<
+                      CustomProlongedEvent << CustomInstantEvent;
             break;
         default:
             break;
@@ -80,7 +81,9 @@ namespace QnBusiness
             << ServerFailureEvent 
             << ServerConflictEvent 
             << ServerStartEvent 
-            << LicenseIssueEvent;
+            << LicenseIssueEvent
+            << CustomProlongedEvent
+            << CustomInstantEvent;
         return result;
     }
 
@@ -94,6 +97,7 @@ namespace QnBusiness
         case AnyBusinessEvent:
         case CameraMotionEvent:
         case CameraInputEvent:
+        case CustomProlongedEvent:
             return true;
         default:
             return false;

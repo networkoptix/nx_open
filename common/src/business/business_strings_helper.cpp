@@ -76,6 +76,8 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     case ServerConflictEvent:   return tr("Server Conflict");
     case ServerStartEvent:      return tr("Server Started");
     case LicenseIssueEvent:     return tr("License Issue");
+    case CustomProlongedEvent:  return tr("Custom event (prolonged)");
+    case CustomInstantEvent:    return tr("Custom event (instant)");
     case AnyCameraEvent:        return tr("Any Camera Issue");
     case AnyServerEvent:        return tr("Any Server Issue");
     case AnyBusinessEvent:      return tr("Any Event");

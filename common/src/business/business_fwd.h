@@ -104,6 +104,11 @@ public:
         /** Not enough licenses */
         LicenseIssueEvent = 10,
 
+        /** Custom prolonged event */
+        CustomProlongedEvent = 11,
+        /** Custom prolonged event */
+        CustomInstantEvent = 12,
+
         /** System health message. */
         SystemHealthEvent = 500,
 
