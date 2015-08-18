@@ -67,6 +67,9 @@ protected:
 }   //detail
 
 
+nx_http::StatusCode::Value resultCodeToHttpStatusCode( ResultCode resultCode );
+
+
 //!Contains logic common for all cloud_db HTTP request handlers
 template<typename Input = void, typename Output = void>
 class AbstractFiniteMsgBodyHttpHandler
@@ -74,15 +77,22 @@ class AbstractFiniteMsgBodyHttpHandler
     public detail::BaseFiniteMsgBodyHttpHandler<Input, Output>
 {
 public:
+    typedef std::function<void(
+        const AuthorizationInfo& authzInfo,
+        Input inputData,
+        std::function<void( ResultCode resultCode, Output outData )>&& completionHandler )> ExecuteRequestFunc;
+
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager )
+        const AuthorizationManager& authorizationManager,
+        ExecuteRequestFunc&& requestFunc )
     :
         detail::BaseFiniteMsgBodyHttpHandler<Input, Output>(
             entityType,
             actionType,
-            authorizationManager )
+            authorizationManager ),
+        m_requestFunc( std::move( requestFunc ) )
     {
     }
 
@@ -97,25 +107,16 @@ public:
                 &authInfo ) )
             return;
 
-        processRequest(
+        m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
             std::move( inputData ),
-            std::bind(
-                static_cast<void (nx_http::AbstractFusionRequestHandler<Input, Output>::*)(nx_http::StatusCode::Value, Output)>
-                    (&nx_http::AbstractFusionRequestHandler<Input, Output>::requestCompleted),
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2 ) );
+            [this]( ResultCode resultCode, Output outData ) {
+                requestCompleted( resultCodeToHttpStatusCode( resultCode ), std::move(outData) );
+            } );
     }
 
-protected:
-    //!Implement request-specific logic in this function
-    virtual void processRequest(
-        AuthorizationInfo&& authzInfo,
-        Input&& inputData,
-        std::function<void(
-            nx_http::StatusCode::Value statusCode,
-            const Output& outputData )>&& completionHandler ) = 0;
+private:
+    ExecuteRequestFunc m_requestFunc;
 };
 
 
@@ -128,15 +129,22 @@ class AbstractFiniteMsgBodyHttpHandler<Input, void>
     public detail::BaseFiniteMsgBodyHttpHandler<Input, void>
 {
 public:
+    typedef std::function<void(
+        const AuthorizationInfo& authzInfo,
+        Input inputData,
+        std::function<void( ResultCode resultCode )>&& completionHandler )> ExecuteRequestFunc;
+
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager )
+        const AuthorizationManager& authorizationManager,
+        ExecuteRequestFunc&& requestFunc )
     :
         detail::BaseFiniteMsgBodyHttpHandler<Input, void>(
             entityType,
             actionType,
-            authorizationManager )
+            authorizationManager ),
+        m_requestFunc( std::move(requestFunc) )
     {
     }
 
@@ -154,21 +162,16 @@ public:
                 &authInfo ) )
             return;
 
-        processRequest(
+        m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
             std::move( inputData ),
-            std::bind(
-                &nx_http::AbstractFusionRequestHandler<Input, void>::requestCompleted,
-                this,
-                std::placeholders::_1 ) );
+            [this]( ResultCode resultCode ) {
+                requestCompleted( resultCodeToHttpStatusCode( resultCode ) );
+            } );
     }
 
-protected:
-    //!Implement request-specific logic in this function
-    virtual void processRequest(
-        AuthorizationInfo&& authzInfo,
-        Input&& inputData,
-        std::function<void( nx_http::StatusCode::Value statusCode )>&& completionHandler ) = 0;
+private:
+    ExecuteRequestFunc m_requestFunc;
 };
 
 
@@ -181,15 +184,21 @@ class AbstractFiniteMsgBodyHttpHandler<void, Output>
     public detail::BaseFiniteMsgBodyHttpHandler<void, Output>
 {
 public:
+    typedef std::function<void(
+        const AuthorizationInfo& authzInfo,
+        std::function<void( ResultCode resultCode, Output outData )>&& completionHandler )> ExecuteRequestFunc;
+
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager )
+        const AuthorizationManager& authorizationManager,
+        ExecuteRequestFunc&& requestFunc )
     :
         detail::BaseFiniteMsgBodyHttpHandler<void, Output>(
             entityType,
             actionType,
-            authorizationManager )
+            authorizationManager ),
+        m_requestFunc( std::move( requestFunc ) )
     {
     }
 
@@ -201,21 +210,15 @@ public:
         if( !this->authorize( authInfo, &authInfo ) )
             return;
 
-        processRequest(
+        m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
-            std::bind(
-                static_cast<void (nx_http::AbstractFusionRequestHandler<void, Output>::*)(nx_http::StatusCode::Value, Output)>
-                    (&nx_http::AbstractFusionRequestHandler<void, Output>::requestCompleted),
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2 ) );
+            [this]( ResultCode resultCode, Output outData ) {
+                requestCompleted( resultCodeToHttpStatusCode( resultCode ), std::move( outData ) );
+            } );
     }
 
-protected:
-    //!Implement request-specific logic in this function
-    virtual void processRequest(
-        AuthorizationInfo&& authzInfo,
-        std::function<void( nx_http::StatusCode::Value, const Output& )>&& completionHandler ) = 0;
+private:
+    ExecuteRequestFunc m_requestFunc;
 };
 
 
@@ -228,15 +231,21 @@ class AbstractFiniteMsgBodyHttpHandler<void, void>
     public detail::BaseFiniteMsgBodyHttpHandler<void, void>
 {
 public:
+    typedef std::function<void(
+        const AuthorizationInfo& authzInfo,
+        std::function<void( ResultCode resultCode )>&& completionHandler )> ExecuteRequestFunc;
+
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager )
+        const AuthorizationManager& authorizationManager,
+        ExecuteRequestFunc&& requestFunc )
     :
         detail::BaseFiniteMsgBodyHttpHandler<void, void>(
             entityType,
             actionType,
-            authorizationManager )
+            authorizationManager ),
+        m_requestFunc( std::move( requestFunc ) )
     {
     }
 
@@ -248,25 +257,16 @@ public:
         if( !this->authorize( authInfo, &authInfo ) )
             return;
 
-        processRequest(
+        m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
-            std::bind(
-                static_cast<void (AbstractFusionRequestHandler<void, void>::*)(nx_http::StatusCode::Value)>
-                    (&nx_http::AbstractFusionRequestHandler<void, void>::requestCompleted),
-                this,
-                std::placeholders::_1 ) );
+            [this]( ResultCode resultCode ) {
+                requestCompleted( resultCodeToHttpStatusCode( resultCode ) );
+            } );
     }
 
-protected:
-    //!Implement request-specific logic in this function
-    virtual void processRequest(
-        AuthorizationInfo&& authzInfo,
-        std::function<void( nx_http::StatusCode::Value statusCode )>&& completionHandler ) = 0;
+private:
+    ExecuteRequestFunc m_requestFunc;
 };
-
-
-
-nx_http::StatusCode::Value resultCodeToHttpStatusCode( ResultCode resultCode );
 
 
 }   //cdb

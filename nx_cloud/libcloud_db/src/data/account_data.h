@@ -60,17 +60,8 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData
 #define AccountData_Fields (id)(email)(passwordHa1)(fullName)(statusCode)
 
 
-class EmailVerificationCode
-{
-public:
-    std::string code;
-};
-
-#define EmailVerificationCode_Fields (code)
-
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (AccountData)(EmailVerificationCode),
+    (AccountData),
     (json)(sql_record) )
 
 

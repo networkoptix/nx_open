@@ -43,8 +43,8 @@ AccountManager::AccountManager(
 }
 
 void AccountManager::addAccount(
-    const AuthorizationInfo& authzInfo,
-    data::AccountData&& accountData,
+    const AuthorizationInfo& /*authzInfo*/,
+    data::AccountData accountData,
     std::function<void(ResultCode)> completionHandler )
 {
     using namespace std::placeholders;
@@ -55,8 +55,8 @@ void AccountManager::addAccount(
 }
 
 void AccountManager::verifyAccountEmailAddress(
-    const AuthorizationInfo& authzInfo,
-    data::EmailVerificationCode&& emailVerificationCode,
+    const AuthorizationInfo& /*authzInfo*/,
+    data::EmailVerificationCode emailVerificationCode,
     std::function<void(ResultCode)> completionHandler )
 {
     using namespace std::placeholders;

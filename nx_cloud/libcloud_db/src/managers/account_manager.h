@@ -14,6 +14,7 @@
 
 #include "access_control/types.h"
 #include "data/account_data.h"
+#include "data/email_verification_code.h"
 #include "types.h"
 
 
@@ -31,12 +32,12 @@ template<class KeyType, class CachedType>
 class Cache
 {
 public:
-    void add( KeyType key, CachedType value )
+    void add( KeyType /*key*/, CachedType /*value*/ )
     {
         //TODO #ak
     }
 
-    bool get( KeyType key, CachedType* const value )
+    bool get( KeyType /*key*/, CachedType* const /*value*/ )
     {
         //TODO #ak
         return false;
@@ -57,12 +58,12 @@ public:
     //!Adds account in "not activated" state and sends verification email to the email address provided
     void addAccount(
         const AuthorizationInfo& authzInfo,
-        data::AccountData&& accountData,
+        data::AccountData accountData,
         std::function<void(ResultCode)> completionHandler );
     //!On success, account moved to "activated" state
     void verifyAccountEmailAddress(
         const AuthorizationInfo& authzInfo,
-        data::EmailVerificationCode&& emailVerificationCode,
+        data::EmailVerificationCode emailVerificationCode,
         std::function<void(ResultCode)> completionHandler );
     
     //!Retrieves account corresponding to authorization data \a authzInfo

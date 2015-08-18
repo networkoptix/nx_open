@@ -13,11 +13,13 @@
 #include "access_control/types.h"
 #include "base_http_handler.h"
 #include "data/account_data.h"
+#include "managers/account_manager.h"
 #include "managers/types.h"
 
 
 namespace nx {
 namespace cdb {
+
 
 class AccountManager;
 
@@ -30,22 +32,19 @@ public:
 
     AddAccountHttpHandler(
         AccountManager* const accountManager,
-        const AuthorizationManager& authorizationManager );
-    virtual ~AddAccountHttpHandler();
-
-protected:
-    //!Implementation of \a AbstractFiniteMsgBodyHttpHandler::processRequest
-    virtual void processRequest(
-        AuthorizationInfo&& authzInfo,
-        data::AccountData&& accountData,
-        std::function<void( nx_http::StatusCode::Value )>&& completionHandler ) override;
-
-private:
-    std::function<void( nx_http::StatusCode::Value )> m_completionHandler;
-    AccountManager* const m_accountManager;
-
-    void addAccountDone( ResultCode resultCode );
+        const AuthorizationManager& authorizationManager )
+    :
+        AbstractFiniteMsgBodyHttpHandler<data::AccountData>(
+            EntityType::account,
+            DataActionType::insert,
+            authorizationManager,
+            std::bind(
+                &AccountManager::addAccount, accountManager,
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) )
+    {
+    }
 };
+
 
 }   //cdb
 }   //nx

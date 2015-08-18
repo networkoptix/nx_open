@@ -24,6 +24,7 @@
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
 #include "http_handlers/add_account_handler.h"
+#include "http_handlers/verify_email_address_handler.h"
 #include "managers/account_manager.h"
 #include "managers/email_manager.h"
 #include "managers/system_manager.h"
@@ -184,10 +185,16 @@ void CloudDBProcess::registerApiHandlers(
     AccountManager* const accountManager,
     SystemManager* const /*systemManager*/ )
 {
-    msgDispatcher->registerRequestProcessor<cdb::AddAccountHttpHandler>(
-        cdb::AddAccountHttpHandler::HANDLER_PATH,
-        [accountManager, &authorizationManager]() -> cdb::AddAccountHttpHandler* {
-            return new cdb::AddAccountHttpHandler( accountManager, authorizationManager );
+    msgDispatcher->registerRequestProcessor<AddAccountHttpHandler>(
+        AddAccountHttpHandler::HANDLER_PATH,
+        [accountManager, &authorizationManager]() -> AddAccountHttpHandler* {
+            return new AddAccountHttpHandler( accountManager, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<VerifyEmailAddressHandler>(
+        VerifyEmailAddressHandler::HANDLER_PATH,
+        [accountManager, &authorizationManager]() -> VerifyEmailAddressHandler* {
+            return new VerifyEmailAddressHandler( accountManager, authorizationManager );
         } );
 }
 

@@ -58,41 +58,6 @@ namespace nx_http
                 std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) = 0;
 
     private:
-        //class RequestContext
-        //{
-        //public:
-
-        //    RequestContext(
-        //        nx_http::Message&& _requestMsg,
-        //        nx_http::Message&& _responseMsg,
-        //        std::function<void(
-        //            nx_http::Message&&,
-        //            std::unique_ptr<nx_http::AbstractMsgBodySource>)> _completionHandler )
-        //    :
-        //        requestMsg( std::move( _requestMsg ) ),
-        //        responseMsg( std::move( _responseMsg ) ),
-        //        completionHandler( std::move(_completionHandler) )
-        //    {
-        //    }
-
-        //    RequestContext( RequestContext&& right )
-        //    :
-        //        requestMsg( std::move( right.requestMsg ) ),
-        //        responseMsg( std::move( right.responseMsg ) ),
-        //        completionHandler( std::move( right.completionHandler ) )
-        //    {
-        //    }
-
-        //private:
-        //    RequestContext& operator=( const RequestContext& );
-        //    RequestContext( const RequestContext& );
-        //};
-
-        //size_t m_prevReqSeq;
-        //std::map<size_t, RequestContext> m_idToReqCtx;
-        //std::mutex m_mutex;
-
-
         nx_http::Message m_requestMsg;
         nx_http::Message m_responseMsg;
         std::function<void(

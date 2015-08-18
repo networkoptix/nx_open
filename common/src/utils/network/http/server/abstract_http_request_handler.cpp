@@ -12,8 +12,6 @@
 namespace nx_http
 {
     AbstractHttpRequestHandler::AbstractHttpRequestHandler()
-    //:
-    //    m_prevReqSeq( 0 )
     {
     }
 
@@ -41,18 +39,6 @@ namespace nx_http
         const auto& request = *requestMsg.request;
         auto response = responseMsg.response;
 
-        //size_t reqID = 0;
-        //{
-        //    std::lock_guard<std::mutex> lk( m_mutex );
-        //    reqID = ++m_prevReqSeq;
-        //    m_idToReqCtx.emplace(
-        //        reqID,
-        //        RequestContext(
-        //            std::move( requestMsg ),
-        //            std::move( responseMsg ),
-        //            std::move( completionHandler ) ) );
-        //}
-
         m_requestMsg = std::move( requestMsg );
         m_responseMsg = std::move( responseMsg );
         m_completionHandler = std::move( completionHandler );
@@ -78,22 +64,6 @@ namespace nx_http
         const nx_http::StatusCode::Value statusCode,
         std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
     {
-        //Message responseMsg;
-        //std::function<
-        //    void(
-        //        nx_http::Message&&,
-        //        std::unique_ptr<nx_http::AbstractMsgBodySource> )
-        //> completionHandler;
-
-        //{
-        //    std::lock_guard<std::mutex> lk( m_mutex );
-        //    auto it = m_idToReqCtx.find( reqID );
-        //    assert( it != m_idToReqCtx.end() );
-        //    responseMsg = std::move( it->second.responseMsg );
-        //    completionHandler = std::move( it->second.completionHandler );
-        //    m_idToReqCtx.erase( it );
-        //}
-
         m_responseMsg.response->statusLine.statusCode = statusCode;
         m_responseMsg.response->statusLine.reasonPhrase = StatusCode::toString( statusCode );
         if( dataSource )

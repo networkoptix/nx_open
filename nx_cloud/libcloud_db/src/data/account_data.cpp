@@ -32,15 +32,16 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData
     accountData->email = urlQuery.queryItemValue( lit("email") ).toStdString();
     accountData->passwordHa1 = urlQuery.queryItemValue( lit("passwordHa1") ).toStdString();
     accountData->fullName = urlQuery.queryItemValue( lit("fullName") ).toStdString();
-    bool success = false;
-    accountData->statusCode =
-        QnLexical::deserialized<AccountStatus>( lit( "statusCode" ), asInvalid, &success );
+    bool success = true;
+    accountData->statusCode = urlQuery.hasQueryItem( lit( "statusCode" ) )
+        ? QnLexical::deserialized<AccountStatus>( lit( "statusCode" ), asInvalid, &success )
+        : asInvalid;
     return success;
 }
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AccountData)(EmailVerificationCode),
+    (AccountData),
     (json)(sql_record),
     _Fields )
 
