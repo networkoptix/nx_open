@@ -181,10 +181,10 @@ var RulerModel = {
         { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 , topW: 170, topFormat:'d mmmm yyyy HH:MM'},
         { name:'30 seconds' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 300,      width: 1500},
         { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
-        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 250,      width: 500 },
-        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 100,      width: 500 , topW: 200, topFormat:'d mmmm yyyy HH:MM:ss'},
-        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 250,      width: 100000},
-        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 }
+        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 250,      width: 100000 },
+        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 , topW: 200, topFormat:'d mmmm yyyy HH:MM:ss'}
+        //{ name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 250,      width: 100000},
+        //{ name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 }
     ],
 
     getLevelIndex: function(searchdetailization,width){

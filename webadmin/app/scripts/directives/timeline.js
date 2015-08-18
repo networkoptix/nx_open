@@ -19,7 +19,7 @@ angular.module('webadminApp')
                     initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
                     stickToLiveMs: 1000, // Value to stick viewpoert to Live - 1 second
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
-                    minMsPerPixel: 1, // Minimum level for zooming:
+                    minMsPerPixel: 10, // Minimum level for zooming:
 
                     zoomSpeed: 0.025, // Zoom speed for dblclick
                     zoomAccuracy: 0.00001,
