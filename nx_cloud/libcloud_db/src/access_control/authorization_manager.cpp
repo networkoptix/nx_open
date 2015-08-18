@@ -11,10 +11,10 @@ namespace cdb {
 
 
 bool AuthorizationManager::authorize(
-    const stree::AbstractResourceReader& dataToAuthorize,
-    EntityType requestedEntity,
-    DataActionType requestedAction,
-    stree::AbstractResourceWriter* const authzInfo ) const
+    const stree::AbstractResourceReader& /*dataToAuthorize*/,
+    EntityType /*requestedEntity*/,
+    DataActionType /*requestedAction*/,
+    stree::AbstractResourceWriter* const /*authzInfo*/ ) const
 {
     //TODO #ak
     return true;

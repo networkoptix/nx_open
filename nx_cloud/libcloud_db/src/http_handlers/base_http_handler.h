@@ -111,7 +111,7 @@ public:
             AuthorizationInfo( std::move( authInfo ) ),
             std::move( inputData ),
             [this]( ResultCode resultCode, Output outData ) {
-                requestCompleted( resultCodeToHttpStatusCode( resultCode ), std::move(outData) );
+                this->requestCompleted( resultCodeToHttpStatusCode( resultCode ), std::move(outData) );
             } );
     }
 
@@ -166,7 +166,7 @@ public:
             AuthorizationInfo( std::move( authInfo ) ),
             std::move( inputData ),
             [this]( ResultCode resultCode ) {
-                requestCompleted( resultCodeToHttpStatusCode( resultCode ) );
+                this->requestCompleted( resultCodeToHttpStatusCode( resultCode ) );
             } );
     }
 
@@ -213,7 +213,7 @@ public:
         m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
             [this]( ResultCode resultCode, Output outData ) {
-                requestCompleted( resultCodeToHttpStatusCode( resultCode ), std::move( outData ) );
+                this->requestCompleted( resultCodeToHttpStatusCode( resultCode ), std::move( outData ) );
             } );
     }
 
@@ -260,7 +260,7 @@ public:
         m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
             [this]( ResultCode resultCode ) {
-                requestCompleted( resultCodeToHttpStatusCode( resultCode ) );
+                this->requestCompleted( resultCodeToHttpStatusCode( resultCode ) );
             } );
     }
 
