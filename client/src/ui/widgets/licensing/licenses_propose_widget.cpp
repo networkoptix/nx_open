@@ -1,10 +1,6 @@
 #include "licenses_propose_widget.h"
 #include "ui_licenses_propose_widget.h"
 
-#include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/range/algorithm/count_if.hpp>
-
 #include <core/resource/camera_resource.h>
 
 #include <ui/actions/action_manager.h>

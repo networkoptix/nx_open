@@ -10,6 +10,7 @@
 #include <ui/widgets/settings/database_management_widget.h>
 #include <ui/widgets/settings/time_server_selection_widget.h>
 #include <ui/widgets/settings/general_system_administration_widget.h>
+#include <ui/widgets/user_management_widget.h>
 #include <ui/widgets/server_updates_widget.h>
 #include <ui/widgets/routing_management_widget.h>
 #include <ui/help/help_topics.h>
@@ -35,6 +36,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     addPage(UpdatesPage, m_updatesWidget, tr("Updates"));
     addPage(RoutingManagement, new QnRoutingManagementWidget(this), tr("Routing Management"));
     addPage(TimeServerSelection, new QnTimeServerSelectionWidget(this), tr("Time Synchronization"));
+    addPage(UserManagement, new QnUserManagementWidget(this), tr("Users"));
 
     loadData();
 }

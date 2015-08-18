@@ -25,7 +25,7 @@ public:
     bool checkPassword(const QString &password);
 
     QByteArray getDigest() const;
-    void setDigest(const QByteArray& digest);
+    void setDigest(const QByteArray& digest, bool isValidated = false);
 
     QByteArray getCryptSha512Hash() const;
     void setCryptSha512Hash(const QByteArray& hash);
@@ -39,9 +39,25 @@ public:
     bool isAdmin() const;
     void setAdmin(bool isAdmin);
 
+    bool isLdap() const;
+    void setLdap(bool isLdap);
+
+    bool isEnabled() const;
+    void setEnabled(bool isEnabled);
+
     QString getEmail() const;
     void setEmail(const QString &email);
     virtual Qn::ResourceStatus getStatus() const override;
+
+    //!Millis since epoch (1970-01-01, UTC)
+    qint64 passwordExpirationTimestamp() const;
+    bool passwordExpired() const;
+    /*!
+        \return \a true if password expiration timestamp has been increased
+    */
+    bool doPasswordProlongation();
+    //!Check \a digest validity with external authentication service (LDAP currently)
+    bool checkDigestValidity( const QByteArray& digest );
 
 signals:
     void hashChanged(const QnResourcePtr &resource);
@@ -51,7 +67,9 @@ signals:
     void permissionsChanged(const QnResourcePtr &user);
     void adminChanged(const QnResourcePtr &resource);
     void emailChanged(const QnResourcePtr &user);
-    void realmChanged(const QnResourcePtr &user);
+	void realmChanged(const QnResourcePtr &user);
+    void enabledChanged(const QnResourcePtr &user);
+    void ldapChanged(const QnResourcePtr &user);
 
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
@@ -64,7 +82,10 @@ private:
     QString m_realm;
     quint64 m_permissions;
     bool m_isAdmin;
+	bool m_isLdap;
+	bool m_isEnabled;
     QString m_email;
+    qint64 m_passwordExpirationTimestamp;
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr)

@@ -16,7 +16,10 @@
 #include "common/common_module.h"
 #include "core/resource/media_server_resource.h"
 #include "http/custom_headers.h"
+#include "ldap/ldap_manager.h"
+#include "network/authutil.h"
 #include <nx_ec/dummy_handler.h>
+#include <ldap/ldap_manager.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -63,12 +66,30 @@ void QnAuthMethodRestrictionList::deny( const QString& pathMask, AuthMethod::Val
 }
 
 
+
 ////////////////////////////////////////////////////////////
 //// class QnAuthHelper
 ////////////////////////////////////////////////////////////
+
+void QnAuthHelper::UserDigestData::parse( const nx_http::Request& request )
+{
+    ha1Digest = nx_http::getHeaderValue( request.headers, Qn::HA1_DIGEST_HEADER_NAME );
+    realm = nx_http::getHeaderValue( request.headers, Qn::REALM_HEADER_NAME );
+    cryptSha512Hash = nx_http::getHeaderValue( request.headers, Qn::CRYPT_SHA512_HASH_HEADER_NAME );
+    nxUserName = nx_http::getHeaderValue( request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME );
+}
+
+bool QnAuthHelper::UserDigestData::empty() const
+{
+    return ha1Digest.isEmpty() || realm.isEmpty() || nxUserName.isEmpty() || cryptSha512Hash.isEmpty();
+}
+
+
+
 QnAuthHelper* QnAuthHelper::m_instance;
 
 static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
+static const qint64 LDAP_TIMEOUT = 1000000ll * 60 * 5;
 static const qint64 COOKIE_EXPERATION_PERIOD = 3600;
 static const QString COOKIE_DIGEST_AUTH( lit( "Authorization=Digest" ) );
 static const QString TEMP_AUTH_KEY_NAME = lit( "authKey" );
@@ -185,31 +206,68 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
                 userResource = findUserByName( nxUserName );
                 if( userResource )
                 {
-                    if( userResource->getDigest().isEmpty() )
+                    const QString desiredRealm = userResource->isLdap()
+                        ? QnLdapManager::instance()->realm()
+                        : QnAppInfo::realm();
+                    if( userResource->getRealm() != desiredRealm ||
+                        userResource->getDigest().isEmpty() )   //in case of ldap digest is initially empty
                     {
-                        //using basic authentication to allow fill user's digest
+                        //requesting client to re-calculate digest after upgrade to 2.4
                         nx_http::insertOrReplaceHeader(
                             &response.headers,
-                            nx_http::HttpHeader(
-                                isProxy ? "Proxy-Authenticate" : "WWW-Authenticate",
-                                lit("Basic realm=%1").arg(QnAppInfo::realm()).toLatin1() ) );
-                        return Auth_WrongDigest;
+                            nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
                     }
-                    if( userResource->getRealm() != QnAppInfo::realm() )
+                    else if( userResource->isLdap() &&
+                        userResource->passwordExpired() &&
+                        !userResource->doPasswordProlongation() )
                     {
-                        //requesting client to recalculate user digest
+                        //requesting password update from client
                         nx_http::insertOrReplaceHeader(
                             &response.headers,
-                            nx_http::HttpHeader( Qn::REALM_HEADER_NAME, QnAppInfo::realm().toLatin1() ) );
+                            nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
                     }
                 }
             }
 
             addAuthHeader(
                 response,
-                userResource ? userResource->getRealm() : QnAppInfo::realm(),
+                userResource,
                 isProxy);
             return Auth_WrongDigest;
+        }
+
+        nx_http::header::Authorization authorizationHeader;
+        if( !authorizationHeader.parse( authorization ) )
+            return Auth_Forbidden;
+        QnUserResourcePtr userResource = findUserByName( authorizationHeader.userid() );
+
+        const QString desiredRealm = (userResource && userResource->isLdap())
+            ? QnLdapManager::instance()->realm()
+            : QnAppInfo::realm();
+
+        UserDigestData userDigestData;
+        userDigestData.parse( request );
+
+        if( userResource )
+        {
+            if (!userResource->isEnabled())
+                return Auth_WrongLogin;
+
+            if( userResource->isLdap() && !userDigestData.empty() )
+            {
+                //this block is supposed to be executed after changing password on LDAP server
+                //checking for digest in received request
+
+                //checking received credentials for validity
+                if( userResource->checkDigestValidity( userDigestData.ha1Digest ) )
+                {
+                    //changing stored user's password
+                    applyClientCalculatedPasswordHashToResource( userResource, userDigestData );
+                }
+            }
+
+            if( userResource->getDigest().isEmpty() )
+                return Auth_WrongDigest;   //user has no password yet
         }
 
         nx_http::StringType authType;
@@ -243,26 +301,20 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
         if( authResult  == Auth_OK)
         {
             //checking whether client re-calculated ha1 digest
-            const auto newHa1Digest = nx_http::getHeaderValue( request.headers, Qn::HA1_DIGEST_HEADER_NAME );
-            const auto realm = nx_http::getHeaderValue( request.headers, Qn::REALM_HEADER_NAME );
-            const auto cryptSha512Hash = nx_http::getHeaderValue( request.headers, Qn::CRYPT_SHA512_HASH_HEADER_NAME );
-            if( newHa1Digest.isEmpty() || realm.isEmpty() || nxUserName.isEmpty() || cryptSha512Hash.isEmpty() )
+            if( userDigestData.empty() )
                 return authResult;
 
-            QnUserResourcePtr userResource = findUserByName( nxUserName );
-            if( !userResource || (userResource->getRealm() == QString::fromUtf8(realm)) )
+            if( !userResource || (userResource->getRealm() == QString::fromUtf8(userDigestData.realm)) )
                 return authResult;
             //saving new user's digest
-            //TODO #ak set following properties atomically
-            userResource->setRealm( QString::fromUtf8(realm) );
-            userResource->setDigest( newHa1Digest );
-            userResource->setCryptSha512Hash( cryptSha512Hash );
-            userResource->setHash( QByteArray() );
-            //saving user to DB. NOTE this code is server-side only!
-            QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(
-                userResource,
-                ec2::DummyHandler::instance(),
-                &ec2::DummyHandler::onRequestDone );
+            applyClientCalculatedPasswordHashToResource( userResource, userDigestData );
+        }
+        else if( userResource && userResource->isLdap() )
+        {
+            //password has been changed in active directory? Requesting new digest...
+            nx_http::insertOrReplaceHeader(
+                &response.headers,
+                nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
         }
         return authResult;
     }
@@ -421,56 +473,13 @@ QByteArray QnAuthHelper::createHttpQueryAuthParam(
     return (userName.toUtf8() + ":" + nonce + ":" + authDigest).toBase64();
 }
 
-//!Splits \a data by \a delimiter not closed within quotes
-/*!
-    E.g.: 
-    \code
-    one, two, "three, four"
-    \endcode
-
-    will be splitted to 
-    \code
-    one
-    two
-    "three, four"
-    \endcode
-*/
-QList<QByteArray> QnAuthHelper::smartSplit(const QByteArray& data, const char delimiter)
-{
-    bool quoted = false;
-    QList<QByteArray> rez;
-    if (data.isEmpty())
-        return rez;
-
-    int lastPos = 0;
-    for (int i = 0; i < data.size(); ++i)
-    {
-        if (data[i] == '\"')
-            quoted = !quoted;
-        else if (data[i] == delimiter && !quoted)
-        {
-            rez << QByteArray(data.constData() + lastPos, i - lastPos);
-            lastPos = i + 1;
-        }
-    }
-    rez << QByteArray(data.constData() + lastPos, data.size() - lastPos);
-
-    return rez;
-}
-
-static QByteArray unquoteStr(const QByteArray& v)
-{
-    QByteArray value = v.trimmed();
-    int pos1 = value.startsWith('\"') ? 1 : 0;
-    int pos2 = value.endsWith('\"') ? 1 : 0;
-    return value.mid(pos1, value.length()-pos1-pos2);
-}
-
 AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, 
                                 bool isProxy, QnUuid* authUserId, char delimiter, std::function<bool(const QByteArray&)> checkNonceFunc,
                                 QnUserResourcePtr* const outUserResource)
 {
-    const QList<QByteArray>& authParams = smartSplit(authData, delimiter);
+    const QMap<QByteArray, QByteArray> authParams = parseAuthData(authData, delimiter);
+    if (authParams.isEmpty())
+        return Auth_Forbidden;
 
     QByteArray userName;
     QByteArray response;
@@ -478,14 +487,10 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
     QByteArray realm;
     QByteArray uri;
 
-    for (int i = 0; i < authParams.size(); ++i)
+    for (QByteArray key : authParams.keys())
     {
-        QByteArray data = authParams[i].trimmed();
-        int pos = data.indexOf('=');
-        if (pos == -1)
-            return Auth_WrongDigest;
-        QByteArray key = data.left(pos);
-        QByteArray value = unquoteStr(data.mid(pos+1));
+        QByteArray value = authParams[key];
+
         if (key == "username")
             userName = value.toLower();
         else if (key == "response")
@@ -513,33 +518,36 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
     if (checkNonceFunc(nonce))
     {
         errCode = Auth_WrongLogin;
-        QMutexLocker lock(&m_mutex);
-        for(const QnUserResourcePtr& user: m_users)
+        userResource = findUserByName(userName);
+        if( userResource )
         {
-            if (user->getName().toUtf8().toLower() == userName)
+            if( outUserResource )
+                *outUserResource = userResource;
+
+            if( userResource->passwordExpired() )
             {
-                errCode = Auth_WrongPassword;
-                if( outUserResource )
-                    *outUserResource = user;
-
-                userResource = user;
-                QByteArray dbHash = user->getDigest();
-
-                QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-                md5Hash.addData(dbHash);
-                md5Hash.addData(":");
-                md5Hash.addData(nonce);
-                md5Hash.addData(":");
-                md5Hash.addData(ha2);
-                QByteArray calcResponse = md5Hash.result().toHex();
-
-                if (authUserId)
-                    *authUserId = user->getId();
-
-                if (calcResponse == response)
-                    return Auth_OK;
+                //user password has expired, validating password
+                if( !userResource->doPasswordProlongation() )
+                    return Auth_WrongPassword;
             }
+
+            QByteArray dbHash = userResource->getDigest();
+
+            QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+            md5Hash.addData(dbHash);
+            md5Hash.addData(":");
+            md5Hash.addData(nonce);
+            md5Hash.addData(":");
+            md5Hash.addData(ha2);
+            QByteArray calcResponse = md5Hash.result().toHex();
+
+            if( authUserId )
+                *authUserId = userResource->getId();
+            if (calcResponse == response)
+                return Auth_OK;
         }
+
+        QMutexLocker lock( &m_mutex );
 
         // authenticate by media server auth_key
         for(const QnMediaServerResourcePtr& server: m_servers)
@@ -574,7 +582,7 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
     }
     addAuthHeader(
         responseHeaders,
-        userResource ? userResource->getRealm() : QnAppInfo::realm(),
+        userResource,
         isProxy );
 
     if (errCode == Auth_WrongLogin && !QUuid(userName).isNull())
@@ -599,6 +607,17 @@ AuthResult QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Respon
             errCode = Auth_WrongPassword;
             if (authUserId)
                 *authUserId = user->getId();
+
+            if (!user->isEnabled())
+                continue;
+
+            if( user->passwordExpired() )
+            {
+                //user password has expired, validating password
+                if( !user->doPasswordProlongation() )
+                    return Auth_WrongDigest;
+            }
+
             if (user->checkPassword(password))
             {
                 if (user->getDigest().isEmpty())
@@ -704,15 +723,21 @@ AuthResult QnAuthHelper::doCookieAuthorization(const QByteArray& method, const Q
 
 void QnAuthHelper::addAuthHeader(
     nx_http::Response& response,
-    const QString& realm,
+    const QnUserResourcePtr& userResource,
     bool isProxy)
 {
-    QString auth(lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5"));
+    QString realm;
+    if( userResource )
+        realm = userResource->isLdap() ? QnLdapManager::instance()->realm() : userResource->getRealm();
+    else
+        realm = QnAppInfo::realm();
+
+    const QString auth(lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5"));
     //QString auth(lit("Digest realm=\"%1\",nonce=\"%2\",algorithm=MD5,qop=\"auth\""));
-	QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
-    nx_http::insertOrReplaceHeader(
-        &response.headers,
-        nx_http::HttpHeader(headerName, auth.arg(realm).arg(QLatin1String(getNonce())).toLatin1() ) );
+    const QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
+    nx_http::insertOrReplaceHeader( &response.headers, nx_http::HttpHeader(
+        headerName,
+        auth.arg(realm).arg(QLatin1String(getNonce())).toLatin1() ) );
 }
 
 bool QnAuthHelper::isNonceValid(const QByteArray& nonce) const
@@ -824,4 +849,19 @@ QnUserResourcePtr QnAuthHelper::findUserByName( const QByteArray& nxUserName ) c
             return user;
     }
     return QnUserResourcePtr();
+}
+
+void QnAuthHelper::applyClientCalculatedPasswordHashToResource(
+    const QnUserResourcePtr& userResource,
+    const QnAuthHelper::UserDigestData& userDigestData )
+{
+    //TODO #ak set following properties atomically
+    userResource->setRealm( QString::fromUtf8( userDigestData.realm ) );
+    userResource->setDigest( userDigestData.ha1Digest, true );
+    userResource->setCryptSha512Hash( userDigestData.cryptSha512Hash );
+    userResource->setHash( QByteArray() );
+    QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(
+        userResource,
+        ec2::DummyHandler::instance(),
+        &ec2::DummyHandler::onRequestDone );
 }

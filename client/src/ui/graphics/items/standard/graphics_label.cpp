@@ -18,7 +18,7 @@ void GraphicsLabelPrivate::init() {
     performanceHint = GraphicsLabel::NoCaching;
     alignment = Qt::AlignTop | Qt::AlignLeft;
 
-    pixmap = QPixmap(lit(":/skin_dark/buttons/add.png"));
+    pixmap = QPixmap();
 
     q->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred, QSizePolicy::Label));
 }

@@ -84,7 +84,6 @@ private slots:
     void at_updateCheckboxes();
     void at_masterGridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 private:
-    QList<QnMediaServerResourcePtr> getServerList() const;
     void requestFinished();
 
     /**

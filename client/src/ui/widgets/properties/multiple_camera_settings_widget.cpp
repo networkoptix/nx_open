@@ -3,9 +3,6 @@
 
 #include <limits>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/algorithm/cxx11/all_of.hpp>
-
 #include <QtWidgets/QMessageBox>
 
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module

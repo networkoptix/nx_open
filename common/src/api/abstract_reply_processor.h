@@ -33,7 +33,6 @@ public slots:
     virtual void processReply(const QnHTTPRawResponse &response, int handle);
 
 signals:
-    void finished(int status, int handle);
     void finished(int status, int handle, const QString &errorString);
     void finished(int status, const QVariant &reply, int handle, const QString &errorString);
 
@@ -49,7 +48,6 @@ protected:
         emit derived->finished(status, reply, handle, errorString);
         emit finished(status, m_reply, handle, errorString);
         emit finished(status, handle, errorString);
-        emit finished(status, handle);
     }
 
     template<class Derived>
@@ -62,7 +60,6 @@ protected:
 
         emit finished(status, m_reply, handle, errorString);
         emit finished(status, handle, errorString);
-        emit finished(status, handle);
     }
 
     template<class T, class Derived>
@@ -89,6 +86,30 @@ protected:
         }
 
         emitFinished(derived, status, reply, handle, errorString);
+    }
+
+    template<class Derived>
+    void processJsonReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
+        int status = response.status;
+        QString errorString = QString::fromUtf8(response.errorString);
+
+        if (status == 0) {
+            QnJsonRestResult result;
+            if (QJson::deserialize(response.data, &result)) {
+                errorString = result.errorString;
+            } else {
+#ifdef JSON_REPLY_DEBUG
+                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+#endif
+                status = 1;
+            }
+        } else {
+#ifdef JSON_REPLY_DEBUG
+            qnWarning("Error processing request: %1.", response.errorString);
+#endif
+        }
+
+        emitFinished(derived, status, handle, errorString);
     }
 
     template<class T, class Derived>

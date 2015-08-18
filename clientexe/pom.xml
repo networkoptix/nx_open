@@ -29,7 +29,7 @@
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
         <global.libs>-lcommon -lappserver2 -lclient -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar Wldap32.lib</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>

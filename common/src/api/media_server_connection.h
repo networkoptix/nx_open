@@ -179,6 +179,7 @@ public:
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 
     int getTimeAsync(QObject *target, const char *slot);
+    int mergeLdapUsersAsync(QObject *target, const char *slot);
 
     //!Requests name of system, mediaserver is currently connected to
     /*!
@@ -220,6 +221,7 @@ public:
     int mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot);
 
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
+    int testLdapSettingsAsync(const QnLdapSettings &settings, QObject *target, const char *slot);
 
     int modulesInformation(QObject *target, const char *slot);
 protected:
