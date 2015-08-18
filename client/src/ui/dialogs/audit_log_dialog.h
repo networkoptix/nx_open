@@ -13,7 +13,6 @@
 
 class QnAuditLogMasterModel;
 class QnAuditLogDetailModel;
-class QnCheckBoxedHeaderView;
 class QnAuditItemDelegate;
 class QnTableView;
 class QnAuditLogModel;
@@ -126,8 +125,6 @@ private:
     QAction *m_selectAllAction;
     QAction *m_exportAction;
     QAction *m_clipboardAction;
-    //QnCheckBoxedHeaderView* m_masterHeaders;
-    //QnCheckBoxedHeaderView* m_cameraHeaders;
     QList<QCheckBox*> m_filterCheckboxes;
     QModelIndex m_hoveredIndex;
     

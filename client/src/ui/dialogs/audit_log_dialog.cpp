@@ -6,12 +6,13 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
-#include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
-
-
 #include <client/client_globals.h>
 #include <client/client_settings.h>
+
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include "core/resource/media_resource.h"
 
 #include <ui/actions/action_manager.h>
 
@@ -30,18 +31,17 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include "ui/actions/actions.h"
 #include "utils/math/color_transformations.h"
-#include "camera_addition_dialog.h"
 #include <ui/models/audit/audit_log_session_model.h>
 #include <ui/models/audit/audit_log_detail_model.h>
 #include <QMouseEvent>
 #include "core/resource/layout_resource.h"
 #include "ui/common/geometry.h"
 #include "ui/style/globals.h"
+#include <ui/widgets/views/checkboxed_header_view.h>
 #include "ui/workbench/workbench_context_aware.h"
 #include <ui/workbench/workbench_display.h>
 #include "ui/workbench/extensions/workbench_stream_synchronizer.h"
-#include <core/resource/user_resource.h>
-#include "core/resource/media_resource.h"
+
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -626,7 +626,7 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
 
     gridMaster->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
-    QnCheckBoxedHeaderView* headers = new QnCheckBoxedHeaderView(this);
+    QnCheckBoxedHeaderView* headers = new QnCheckBoxedHeaderView(QnAuditLogModel::SelectRowColumn, this);
     headers->setVisible(true);
     headers->setSectionsClickable(true);
     headers->setSectionResizeMode(QHeaderView::ResizeToContents);

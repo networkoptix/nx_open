@@ -10,14 +10,6 @@
 #include <utils/common/singleton.h>
 #include <utils/common/ldap.h>
 
-struct QnLdapUser {
-    QString dn;
-    QString login;
-    QString fullName;
-    QString email;
-};
-
-typedef QList<QnLdapUser> QnLdapUsers;
 
 class QnLdapException : std::exception {
 public:

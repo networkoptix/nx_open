@@ -89,7 +89,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     timeoutTimer->setInterval(testLdapTimeoutMSec / q->ui->testProgressBar->maximum());
     timeoutTimer->start();
 
-    testHandle = serverConnection->testLdapSettingsAsync(settings, q, SLOT(at_testLdapSettingsFinished(int,int,QString)));
+    testHandle = serverConnection->testLdapSettingsAsync(settings, q, SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
 }
 
 void QnLdapSettingsDialogPrivate::showTestResult(const QString &text) {
@@ -226,13 +226,22 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
 
 QnLdapSettingsDialog::~QnLdapSettingsDialog() {}
 
-void QnLdapSettingsDialog::at_testLdapSettingsFinished(int status, int handle, const QString &errorString) {
+void QnLdapSettingsDialog::at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString) {
     Q_D(QnLdapSettingsDialog);
 
     if (handle != d->testHandle)
         return;
 
-    d->stopTesting(status != 0 || !errorString.isEmpty() ? tr("Failed") : tr("Success"));
+    QString result;
+    if (status != 0 || !errorString.isEmpty()) {
+        result = tr("Test failed");
+#if _DEBUG
+        result += lit(" (%1)").arg(errorString);
+#endif
+    } else {
+        result = tr("Test completed successfully: %n users found.", 0, users.size());
+    }
+    d->stopTesting(result);
 }
 
 void QnLdapSettingsDialog::accept() {

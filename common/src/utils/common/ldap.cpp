@@ -1,13 +1,9 @@
 #include "ldap.h"
 
-bool QnLdapSettings::equals(const QnLdapSettings &other) const {
-    if (uri != other.uri)                           return false;
-    if (adminDn != other.adminDn)                     return false;
-    if (adminPassword != other.adminPassword)         return false;
-    if (searchBase != other.searchBase)               return false;
-    if (searchFilter != other.searchFilter)           return false;
-    
-    return true;
+#include <utils/common/model_functions.h>
+
+namespace {
+    const int defaultLdapPort = 389;
 }
 
 bool QnLdapSettings::isValid() const {
@@ -15,3 +11,9 @@ bool QnLdapSettings::isValid() const {
             && !adminDn.isEmpty()
             && !adminPassword.isEmpty();
 }
+
+int QnLdapSettings::defaultPort() {
+    return defaultLdapPort;
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLdapSettings)(QnLdapUser), (json)(eq), _Fields)
