@@ -18,6 +18,8 @@
 #include <nx_ec/data/api_peer_system_time_data.h>
 #include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
+#include <utils/common/timermanager.h>
+#include <utils/common/singleton.h>
 #include <utils/network/time/abstract_accurate_time_fetcher.h>
 #include <utils/network/http/httptypes.h>
 
@@ -106,7 +108,8 @@ namespace ec2
     :
         public QObject,
         public QnStoppable,
-        public EnableMultiThreadDirectConnection<TimeSynchronizationManager>
+        public EnableMultiThreadDirectConnection<TimeSynchronizationManager>,
+        public Singleton<TimeSynchronizationManager>
     {
         Q_OBJECT
 
@@ -124,8 +127,6 @@ namespace ec2
         TimeSynchronizationManager( Qn::PeerType peerType );
         virtual ~TimeSynchronizationManager();
 
-        static TimeSynchronizationManager* instance();
-
         //!Implemenattion of QnStoppable::pleaseStop
         virtual void pleaseStop() override;
 
@@ -136,7 +137,7 @@ namespace ec2
         */
         void start();
         
-        //!Returns synchronized time
+        //!Returns synchronized time (millis from epoch, UTC)
         qint64 getSyncTime() const;
         //!Called when primary time server has been changed by user
         void primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran );
@@ -150,6 +151,10 @@ namespace ec2
         void forgetSynchronizedTime();
         QnPeerTimeInfoList getPeerTimeInfoList() const;
         ApiPeerSystemTimeDataList getKnownPeersSystemTime() const;
+        void processTimeSyncInfoHeader(
+            const QnUuid& peerID,
+            const nx_http::StringType& serializedTimeSync,
+            AbstractStreamSocket* sock );
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically
@@ -188,6 +193,32 @@ namespace ec2
             }
         };
 
+        struct PeerContext
+        {
+            SocketAddress peerAddress;
+            TimerManager::TimerGuard syncTimerID;
+            nx_http::AsyncHttpClientPtr httpClient;
+
+            PeerContext( SocketAddress _peerAddress )
+                : peerAddress( std::move( _peerAddress ) )
+            {}
+
+            PeerContext( PeerContext&& right )
+            :
+                peerAddress( std::move(right.peerAddress) ),
+                syncTimerID( std::move(right.syncTimerID) ),
+                httpClient( std::move(right.httpClient) )
+            {}
+
+            PeerContext& operator=( PeerContext&& right )
+            {
+                peerAddress = std::move(right.peerAddress);
+                syncTimerID = std::move(right.syncTimerID);
+                httpClient = std::move(right.httpClient);
+                return *this;
+            }
+        };
+
         //!Delta (millis) from \a m_monotonicClock to local time, synchronized with internet
         qint64 m_localSystemTimeDelta;
         //!Using monotonic clock to be proof to local system time change
@@ -209,6 +240,7 @@ namespace ec2
         size_t m_internetTimeSynchronizationPeriod;
         bool m_timeSynchronized;
         int m_internetSynchronizationFailureCount;
+        std::map<QnUuid, PeerContext> m_peersToSendTimeSyncTo;
 
         /*!
             \param lock Locked \a m_mutex. This method will unlock it to emit \a TimeSynchronizationManager::timeChanged signal
@@ -224,13 +256,8 @@ namespace ec2
             const QnUuid& remotePeerID,
             qint64 localMonotonicClock,
             qint64 remotePeerSyncTime,
-            const TimePriorityKey& remotePeerTimePriorityKey );
-        void onBeforeSendingTransaction(
-            QnTransactionTransport* transport,
-            nx_http::HttpHeaders* const headers );
-        void onTransactionReceived(
-            QnTransactionTransport* transport,
-            const nx_http::HttpHeaders& headers );
+            const TimePriorityKey& remotePeerTimePriorityKey,
+            qint64 timeErrorEstimation );
         void broadcastLocalSystemTime( quint64 taskID );
         void checkIfManualTimeServerSelectionIsRequired( quint64 taskID );
         //!Periodically synchronizing time with internet (if possible)
@@ -243,6 +270,14 @@ namespace ec2
         void updateRuntimeInfoPriority(quint64 priority);
         void peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& tran );
         qint64 getSyncTimeNonSafe() const;
+        void startSynchronizingTimeWithPeer(
+            const QnUuid& peerID,
+            SocketAddress peerAddress );
+        void stopSynchronizingTimeWithPeer( const QnUuid& peerID );
+        void synchronizeWithPeer( const QnUuid& peerID );
+        void timeSyncRequestDone(
+            const QnUuid& peerID,
+            nx_http::AsyncHttpClientPtr clientPtr );
 
     private slots:
         void onNewConnectionEstablished(QnTransactionTransport* transport );
