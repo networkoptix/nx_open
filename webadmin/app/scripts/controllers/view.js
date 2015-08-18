@@ -10,7 +10,12 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.playerApi = false;
         $scope.cameras = {};
         $scope.liveOnly = true;
-        $scope.storage.cameraId   = $scope.storage.cameraId   || $routeParams.cameraId || null;
+        $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
+
+        if(!$routeParams.cameraId &&  $scope.storage.cameraId){
+            $location.path('/view/' + $scope.storage.cameraId, false);
+        }
+
         $scope.activeCamera = null;
 
         var isAdmin = false;
@@ -164,6 +169,8 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.positionProvider.init(playing);
             if(live){
                 playing = (new Date()).getTime();
+            }else{
+                playing = Math.round(playing);
             }
             var cameraId = $scope.activeCamera.physicalId;
             var serverUrl = '';
