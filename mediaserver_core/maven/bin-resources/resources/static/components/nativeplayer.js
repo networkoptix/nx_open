@@ -12,6 +12,7 @@ var nativePlayer = new (function () {
 
         this.readyHandler = readyHandler;
         this.errorHandler = readyHandler;
+
         this.readyHandler(this);
     };
 
