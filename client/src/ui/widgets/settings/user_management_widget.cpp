@@ -38,11 +38,15 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
 
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::ldapSettingsChanged, this, updateFetchButton);
     
-
     connect(ui->usersTable,             &QTableView::activated,                     d,  &QnUserManagementWidgetPrivate::at_usersTable_activated);
     connect(ui->usersTable,             &QTableView::clicked,                       d,  &QnUserManagementWidgetPrivate::at_usersTable_clicked);
     connect(ui->ldapSettingsButton,     &QPushButton::clicked,                      d,  &QnUserManagementWidgetPrivate::openLdapSettings);
     connect(ui->fetchButton,            &QPushButton::clicked,                      d,  &QnUserManagementWidgetPrivate::fetchUsers);
+    connect(ui->createUserButton,       &QPushButton::clicked,                      d,  &QnUserManagementWidgetPrivate::createUser);
+    connect(ui->clearSelectionButton,   &QPushButton::clicked,                      d,  &QnUserManagementWidgetPrivate::clearSelection);
+    connect(ui->enableSelectedButton,   &QPushButton::clicked,                      d,  &QnUserManagementWidgetPrivate::enableSelected);
+    connect(ui->disableSelectedButton,  &QPushButton::clicked,                      d,  &QnUserManagementWidgetPrivate::disableSelected);
+    connect(ui->deleteSelectedButton,   &QPushButton::clicked,                      d,  &QnUserManagementWidgetPrivate::deleteSelected);
 
     updateFetchButton();
 }

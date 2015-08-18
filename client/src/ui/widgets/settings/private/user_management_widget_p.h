@@ -2,12 +2,14 @@
 
 #include <QtWidgets/QWidget>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 class QnUserManagementWidget;
 class QnUserListModel;
 class QnSortedUserListModel;
 class QnCheckBoxedHeaderView;
 
-class QnUserManagementWidgetPrivate : public QObject {
+class QnUserManagementWidgetPrivate : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 
     Q_DECLARE_PUBLIC(QnUserManagementWidget)
@@ -23,9 +25,16 @@ private:
     
     Q_SLOT void at_mergeLdapUsersAsync_finished(int status, int handle, const QString &errorString);
     
+    void createUser();
     void fetchUsers();
     void openLdapSettings();
-    void updateHeaderState();
+    void updateSelection();
+
+    void clearSelection();
+    void setSelectedEnabled(bool enabled);
+    void enableSelected();
+    void disableSelected();
+    void deleteSelected();
 private:
     QnUserManagementWidget *q_ptr;
     QnUserListModel *m_usersModel;

@@ -1,10 +1,11 @@
 #include "user_management_widget_p.h"
-
+#include "ui_user_management_widget.h"
 #include <ui/widgets/settings/user_management_widget.h>
 
 #include <QtCore/QSortFilterProxyModel>
 
 #include <api/global_settings.h>
+#include <api/app_server_connection.h>
 
 #include <common/common_module.h>
 
@@ -16,11 +17,14 @@
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/ldap.h>
 
 
-QnUserManagementWidgetPrivate::QnUserManagementWidgetPrivate(QnUserManagementWidget *parent) : QObject(parent)
+QnUserManagementWidgetPrivate::QnUserManagementWidgetPrivate(QnUserManagementWidget *parent) 
+    : QObject(parent)
+    , QnWorkbenchContextAware(parent)
     , q_ptr(parent)
     , m_usersModel(new QnUserListModel(parent))
     , m_sortModel(new QnSortedUserListModel(parent))
@@ -39,8 +43,14 @@ QHeaderView* QnUserManagementWidgetPrivate::header() const {
     return m_header;
 }
 
-void QnUserManagementWidgetPrivate::updateHeaderState() {
+void QnUserManagementWidgetPrivate::updateSelection() {
     m_header->setCheckState(m_usersModel->checkState());
+
+    Q_Q(QnUserManagementWidget);
+    q->ui->actionsWidget->setCurrentWidget(m_usersModel->checkState() == Qt::Unchecked
+        ? q->ui->defaultPage
+        : q->ui->selectionPage
+        );
 }
 
 void QnUserManagementWidgetPrivate::openLdapSettings() {
@@ -49,6 +59,10 @@ void QnUserManagementWidgetPrivate::openLdapSettings() {
     QScopedPointer<QnLdapSettingsDialog> dialog(new QnLdapSettingsDialog(q));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+}
+
+void QnUserManagementWidgetPrivate::createUser() {
+    menu()->trigger(Qn::NewUserAction); //TODO: #GDM correctly set parent widget
 }
 
 void QnUserManagementWidgetPrivate::fetchUsers() {
@@ -74,16 +88,15 @@ void QnUserManagementWidgetPrivate::at_mergeLdapUsersAsync_finished(int status, 
 
 void QnUserManagementWidgetPrivate::at_headerCheckStateChanged(Qt::CheckState state) {
     m_usersModel->setCheckState(state);
+    updateSelection();
 }
 
 void QnUserManagementWidgetPrivate::at_usersTable_activated(const QModelIndex &index) {
-    Q_Q(QnUserManagementWidget);
-
     QnUserResourcePtr user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
     if (!user)
         return;
 
-    q->menu()->trigger(Qn::UserSettingsAction, QnActionParameters(user));
+    menu()->trigger(Qn::UserSettingsAction, QnActionParameters(user));
 }
 
 void QnUserManagementWidgetPrivate::at_usersTable_clicked(const QModelIndex &index) {
@@ -96,6 +109,46 @@ void QnUserManagementWidgetPrivate::at_usersTable_clicked(const QModelIndex &ind
     }
     else if (index.column() == QnUserListModel::CheckBoxColumn) /* Invert current state */ {
         m_usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, user);
-        updateHeaderState();
+        updateSelection(); //TODO: #GDM it should be automatically updated by signals from model
     }
+}
+
+void QnUserManagementWidgetPrivate::clearSelection() {
+    m_usersModel->setCheckState(Qt::Unchecked);
+    updateSelection(); //TODO: #GDM it should be automatically updated by signals from model
+}
+
+void QnUserManagementWidgetPrivate::setSelectedEnabled(bool enabled) {
+    for (QnUserResourcePtr user : m_usersModel->selectedUsers()) {
+        if (user->isAdmin())
+            continue;
+        if (!accessController()->hasPermissions(user, Qn::WritePermission))
+            continue;
+        user->setEnabled(enabled);
+        QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, []{} );
+    }    
+}
+
+void QnUserManagementWidgetPrivate::enableSelected() {
+    setSelectedEnabled(true);
+}
+
+void QnUserManagementWidgetPrivate::disableSelected() {
+    setSelectedEnabled(false);
+}
+
+void QnUserManagementWidgetPrivate::deleteSelected() {
+    QnUserResourceList usersToDelete;
+    for (QnUserResourcePtr user : m_usersModel->selectedUsers()) {
+        if (user->isAdmin())
+            continue;
+        if (!accessController()->hasPermissions(user, Qn::RemovePermission))
+            continue;
+        usersToDelete << user;
+    }
+
+    if (usersToDelete.isEmpty())
+        return;
+
+    menu()->trigger(Qn::RemoveFromServerAction, usersToDelete);
 }

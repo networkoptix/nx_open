@@ -323,6 +323,10 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
         
 }
 
+QnUserResourceList QnUserListModel::selectedUsers() const {
+    return d->checkedUsers.toList();
+}
+
 
 QnSortedUserListModel::QnSortedUserListModel(QObject *parent)
     : base_type(parent)
