@@ -138,7 +138,9 @@ bool TimerManager::modifyTimerDelay(
     Q_ASSERT( handlerIter != m_impl->timeToTask.end() );
     auto taskHandler = std::move(handlerIter->second);
 
-    m_impl->deleteTaskNonSafe( timerID );
+    m_impl->taskToTime.erase( taskIter );
+    m_impl->timeToTask.erase( handlerIter );
+
     m_impl->addTaskNonSafe( timerID, taskHandler, newDelayMillis );
     return true;
 }
