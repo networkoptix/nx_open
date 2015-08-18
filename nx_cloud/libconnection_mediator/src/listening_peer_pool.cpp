@@ -11,9 +11,15 @@ ListeningPeerPool::ListeningPeerPool( stun::MessageDispatcher* dispatcher )
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
-            methods::listen, std::bind( &ListeningPeerPool::listen, this, _1, _2 ) ) &&
+            methods::listen,
+            [this]( stun::ServerConnection* connection, stun::Message message ) {
+                listen( connection, std::move( message ) );
+            } ) &&
         dispatcher->registerRequestProcessor(
-            methods::connect, std::bind( &ListeningPeerPool::connect, this, _1, _2 ) );
+            methods::connect,
+            [this]( stun::ServerConnection* connection, stun::Message message ) {
+                connect( connection, std::move( message ) );
+            } );
 
     // TODO: NX_LOG
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register one of processors" );

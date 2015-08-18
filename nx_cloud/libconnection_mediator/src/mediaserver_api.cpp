@@ -15,7 +15,10 @@ MediaserverApiIf::MediaserverApiIf( stun::MessageDispatcher* dispatcher )
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
-            methods::ping, std::bind( &MediaserverApiIf::ping, this, _1, _2 ) );
+            methods::ping, 
+            [this]( stun::ServerConnection* connection, stun::Message message ) {
+                ping( connection, std::move( message ) );
+        } );
 
     // TODO: NX_LOG
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register ping processor" );
