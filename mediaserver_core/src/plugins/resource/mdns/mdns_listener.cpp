@@ -150,7 +150,7 @@ void QnMdnsListener::updateSocketList()
         }
     }
 
-    m_receiveSocket = SocketFactory::createDatagramSocket();
+    m_receiveSocket = SocketFactory::createDatagramSocket().release();
     m_receiveSocket->setReuseAddrFlag(true);
     m_receiveSocket->bind( SocketAddress( HostAddress::anyHost, MDNS_PORT ) );
 

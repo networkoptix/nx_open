@@ -35,13 +35,12 @@ bool QnFlexWatchResourceSearcher::updateSocketList()
         clearSocketList();
         for (QnInterfaceAndAddr iface: getAllIPv4Interfaces())
         {
-            AbstractDatagramSocket* sock = SocketFactory::createDatagramSocket();
+            auto sock = SocketFactory::createDatagramSocket();
             //if (!bindToInterface(*sock, iface, 51001)) {
             if (!sock->bind(iface.address.toString(), 51001)) {
-                delete sock;
                 continue;
             }
-            m_sockList << sock;
+            m_sockList << sock.release();
         }
         m_sockUpdateTime = curretTime;
         return true;

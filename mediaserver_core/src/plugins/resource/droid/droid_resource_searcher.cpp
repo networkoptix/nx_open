@@ -27,7 +27,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
         QList<QnInterfaceAndAddr> ipaddrs = getAllIPv4Interfaces();
         for (int i = 0; i < ipaddrs.size();++i)
         {
-            QSharedPointer<AbstractDatagramSocket> sock(SocketFactory::createDatagramSocket());
+            QSharedPointer<AbstractDatagramSocket> sock(SocketFactory::createDatagramSocket().release());
             if (sock->bind(ipaddrs.at(i).address.toString(), androidRecvPort))
                 m_socketList << sock;
             m_lastReadSocketTime = time;

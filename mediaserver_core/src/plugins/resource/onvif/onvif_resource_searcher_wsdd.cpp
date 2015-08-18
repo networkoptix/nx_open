@@ -828,7 +828,7 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
     if( p.second )
     {
         ctx = new ProbeContext();
-        ctx->sock.reset( SocketFactory::createDatagramSocket() );
+        ctx->sock = SocketFactory::createDatagramSocket();
         //if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
         if( !ctx->sock->bind(iface.address.toString(), 0) || !ctx->sock->setNonBlockingMode( true ) )
         {

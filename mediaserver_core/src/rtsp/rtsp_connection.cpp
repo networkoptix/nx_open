@@ -63,7 +63,7 @@ QnMutex RtspServerTrackInfo::m_createSocketMutex;
 bool updatePort(AbstractDatagramSocket* &socket, int port)
 {
     delete socket;
-    socket = SocketFactory::createDatagramSocket();
+    socket = SocketFactory::createDatagramSocket().release();
     return socket->bind( SocketAddress( HostAddress::anyHost, port ) );
 }
 
@@ -71,8 +71,8 @@ bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
     // try to find a couple of port, even for RTP, odd for RTCP
     QnMutexLocker lock( &m_createSocketMutex );
-    mediaSocket = SocketFactory::createDatagramSocket();
-    rtcpSocket = SocketFactory::createDatagramSocket();
+    mediaSocket = SocketFactory::createDatagramSocket().release();
+    rtcpSocket = SocketFactory::createDatagramSocket().release();
 
     bool opened = mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
     if (!opened)

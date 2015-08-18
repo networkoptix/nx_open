@@ -33,7 +33,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
         clearSocketList();
         for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
         {
-            DiscoveryInfo info(SocketFactory::createDatagramSocket(), iface.address);
+            DiscoveryInfo info(SocketFactory::createDatagramSocket().release(), iface.address);
             if (info.sock->bind(iface.address.toString(), 0))
                 m_sockList << info;
             else

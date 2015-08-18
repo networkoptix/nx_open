@@ -142,7 +142,7 @@ public:
 
         //NOTE not locking mutex because all public method calls are synchronized
             //by caller and no request interleaving is allowed
-        m_socket.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
+        m_socket = SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled );
 
         m_syncWrapper->getProxy()->soap->user = this;
         m_syncWrapper->getProxy()->soap->fconnect = [](struct soap*, const char*, const char*, int) -> int { return SOAP_OK; };

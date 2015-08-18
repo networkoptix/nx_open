@@ -132,7 +132,9 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             return QString();
 #endif
 
-        d->dstSocket = QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket(url.scheme() == lit("https")));
+        d->dstSocket = QSharedPointer<AbstractStreamSocket>(
+            SocketFactory::createStreamSocket(url.scheme() == lit("https"))
+            .release());
         d->dstSocket->setRecvTimeout(CONNECT_TIMEOUT);
         d->dstSocket->setSendTimeout(CONNECT_TIMEOUT);
         if (!d->dstSocket->connect(url.host().toLatin1().data(), url.port())) {

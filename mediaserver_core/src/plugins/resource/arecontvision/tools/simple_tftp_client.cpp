@@ -18,7 +18,7 @@ CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& host, unsigned int timeout
     m_timeout(timeout),
     m_resolvedAddress(resolveAddress(host).toString())
 {
-    m_sock.reset( SocketFactory::createDatagramSocket() );
+    m_sock.reset( SocketFactory::createDatagramSocket().release() );
 
     //m_wish_blk_size = double_blk_size;
     m_wish_blk_size  = blk_size;
