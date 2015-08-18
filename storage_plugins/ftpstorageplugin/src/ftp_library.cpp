@@ -322,7 +322,6 @@ namespace nx_spl
         std::string getRandomFileName()
         {
             std::stringstream randomStringStream;
-            std::srand(std::time(0));
             randomStringStream << std::hex << std::rand() << std::rand();
 
             return randomStringStream.str();
@@ -971,6 +970,11 @@ namespace nx_spl
 
 
     // FtpStorageFactory
+    FtpStorageFactory::FtpStorageFactory()
+    {
+        std::srand(time(0));
+    }
+
     void* FtpStorageFactory::queryInterface(const nxpl::NX_GUID& interfaceID)
     {
         if (std::memcmp(&interfaceID, 

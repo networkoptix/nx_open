@@ -217,7 +217,6 @@ int QnFileStorageResource::mountTmpDrive(const QString &remoteUrl)
     auto randomString = []
     {
         std::stringstream randomStringStream;
-        std::srand(std::time(0));
         randomStringStream << std::hex << std::rand() << std::rand();
 
         return randomStringStream.str();
@@ -310,7 +309,9 @@ QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
     m_capabilities |= QnAbstractStorageResource::cap::ReadFile;
-};
+
+    std::srand(std::time(0));
+}
 
 QnFileStorageResource::~QnFileStorageResource()
 {
