@@ -244,21 +244,12 @@
         <translation>&amp;đầu IP:</translation>
     </message>
     <message>
-        <source>S&amp;ubnet scan</source>
-        <translation>子&amp;quét mạng</translation>
-    </message>
-    <message>
         <source>&amp;Login:</source>
         <translation>&amp;Đăng nhập:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;mật khẩu:</translation>
-    </message>
-    <message>
-        <source>auto</source>
-        <translatorcomment>tự động</translatorcomment>
-        <translation>tự động</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -282,29 +273,12 @@
         <translation>quét…</translation>
     </message>
     <message>
-        <source>Manuf.</source>
-        <translation>nhà chế tạo.</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>tên</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation>địa chỉ</translation>
     </message>
     <message>
         <source>Server is offline</source>
         <translation>máy chủ đang ẩn</translation>
-    </message>
-    <message>
-        <source>Add cameras...</source>
-        <translatorcomment>Máy ảnh mới…</translatorcomment>
-        <translation>Máy ảnh mới…</translation>
-    </message>
-    <message>
-        <source>Selected server:</source>
-        <translation>Máy chủ đã chọn:</translation>
     </message>
     <message>
         <source>Ca&amp;mera Address:</source>
@@ -316,12 +290,32 @@
         <translation>&amp;Thêm lựa chọn</translation>
     </message>
     <message>
-        <source>New scan...</source>
-        <translation>quét…</translation>
-    </message>
-    <message>
         <source>Discovered Cameras:</source>
         <translation>Phát hiện Máy ảnh:</translation>
+    </message>
+    <message>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished">kiểu mẫu</translation>
+    </message>
+    <message>
+        <source>New Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2756,18 +2750,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>user(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>server(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4451,20 +4433,18 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnLdapSettingsDialog</name>
     <message>
-        <source>Failed</source>
-        <translation type="unfinished">thất bại</translation>
+        <source>Test</source>
+        <translation type="unfinished">thử</translation>
     </message>
     <message>
-        <source>Success</source>
-        <translation type="unfinished">sự thành công</translation>
-    </message>
-    <message>
-        <source>Error!</source>
+        <source>Test failed</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>Test completed successfully: %n users found.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5682,7 +5662,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spacebar</translation>
     </message>
     <message>
         <source>Calendar Days</source>
@@ -6475,10 +6455,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO module is disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6488,6 +6464,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Activate license...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Module is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8321,7 +8301,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>IP Address:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IP :</translation>
     </message>
     <message>
         <source>Ping</source>
@@ -8377,7 +8357,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spacebar</translation>
     </message>
     <message>
         <source>Unchecking the storage will cause nothing but writing stop.

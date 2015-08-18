@@ -232,14 +232,6 @@
 <context>
     <name>CameraAdditionDialog</name>
     <message>
-        <source>Add cameras...</source>
-        <translation>Kameras hinzufügen...</translation>
-    </message>
-    <message>
-        <source>Selected server:</source>
-        <translation>Ausgewählter Server:</translation>
-    </message>
-    <message>
         <source>Server is offline</source>
         <translation>Server ist offline</translation>
     </message>
@@ -260,20 +252,12 @@
         <translation>&amp;End IP:</translation>
     </message>
     <message>
-        <source>S&amp;ubnet scan</source>
-        <translation>S&amp;ubnet scan</translation>
-    </message>
-    <message>
         <source>&amp;Login:</source>
         <translation>&amp;Login:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Passwort:</translation>
-    </message>
-    <message>
-        <source>auto</source>
-        <translation>auto</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -283,15 +267,6 @@
         <source>&amp;Discovery Port:</source>
         <translatorcomment>no idea how to translate that‽</translatorcomment>
         <translation>&amp;Discovery Port:</translation>
-    </message>
-    <message>
-        <source>Manuf.</source>
-        <translatorcomment>manufacturer = Hersteller</translatorcomment>
-        <translation>Herst.</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Name</translation>
     </message>
     <message>
         <source>Address</source>
@@ -314,12 +289,32 @@
         <translation>&amp;Ausgewählte hinzufügen</translation>
     </message>
     <message>
-        <source>New scan...</source>
-        <translation>Scanne erneut...</translation>
-    </message>
-    <message>
         <source>Discovered Cameras:</source>
         <translation>Gefundenen Kameras:</translation>
+    </message>
+    <message>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished">Modell</translation>
+    </message>
+    <message>
+        <source>New Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2769,18 +2764,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>user(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>server(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4493,20 +4476,19 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnLdapSettingsDialog</name>
     <message>
-        <source>Failed</source>
-        <translation type="unfinished">Fehlschlag</translation>
+        <source>Test</source>
+        <translation type="unfinished">Test</translation>
     </message>
     <message>
-        <source>Success</source>
-        <translation type="unfinished">Aktion erfolgreich</translation>
-    </message>
-    <message>
-        <source>Error!</source>
+        <source>Test failed</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>Test completed successfully: %n users found.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5740,7 +5722,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Leerzeichen</translation>
     </message>
     <message>
         <source>Calendar Days</source>
@@ -6026,7 +6008,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Beendet</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed.</source>
@@ -6538,10 +6520,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO module is disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6551,6 +6529,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Activate license...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Module is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8438,7 +8420,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>In Use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Derzeit verwendet</translation>
     </message>
     <message>
         <source>Protocol</source>
@@ -8462,7 +8444,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Leerzeichen</translation>
     </message>
     <message>
         <source>Unchecking the storage will cause nothing but writing stop.
@@ -8765,7 +8747,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Achtung: Die Einstellungen FPS und Aufnahmequalität funktionieren nicht im Aufnahmeplan!</translation>
     </message>
     <message>
         <source>(recommended)</source>

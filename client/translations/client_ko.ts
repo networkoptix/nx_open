@@ -238,20 +238,12 @@
         <translation>종료 IP(&amp;E):</translation>
     </message>
     <message>
-        <source>S&amp;ubnet scan</source>
-        <translation>서브넷 검색 (&amp;u)</translation>
-    </message>
-    <message>
         <source>&amp;Login:</source>
         <translation>로그인(&amp;L):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>비밀번호(&amp;P):</translation>
-    </message>
-    <message>
-        <source>auto</source>
-        <translation>자동</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -274,28 +266,12 @@
         <translation>찾는중...</translation>
     </message>
     <message>
-        <source>Manuf.</source>
-        <translation>제조사.</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>이름</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation>주소</translation>
     </message>
     <message>
         <source>Server is offline</source>
         <translation>오프라인</translation>
-    </message>
-    <message>
-        <source>Add cameras...</source>
-        <translation>카메라 추가...</translation>
-    </message>
-    <message>
-        <source>Selected server:</source>
-        <translation>선택된 서버:</translation>
     </message>
     <message>
         <source>Ca&amp;mera Address:</source>
@@ -306,12 +282,32 @@
         <translation>추가 선택(&amp;A)</translation>
     </message>
     <message>
-        <source>New scan...</source>
-        <translation>새로 찾기...</translation>
-    </message>
-    <message>
         <source>Discovered Cameras:</source>
         <translation>찾은 카메라:</translation>
+    </message>
+    <message>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished">모델</translation>
+    </message>
+    <message>
+        <source>New Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2743,18 +2739,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>user(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>server(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4438,20 +4422,18 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnLdapSettingsDialog</name>
     <message>
-        <source>Failed</source>
-        <translation type="unfinished">실패</translation>
+        <source>Test</source>
+        <translation type="unfinished">테스트</translation>
     </message>
     <message>
-        <source>Success</source>
-        <translation type="unfinished">성공</translation>
-    </message>
-    <message>
-        <source>Error!</source>
+        <source>Test failed</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>Test completed successfully: %n users found.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -6462,10 +6444,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO module is disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6475,6 +6453,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Activate license...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Module is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

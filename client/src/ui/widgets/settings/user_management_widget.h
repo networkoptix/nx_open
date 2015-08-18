@@ -24,7 +24,4 @@ private:
     QScopedPointer<QnUserManagementWidgetPrivate> const d_ptr;
     Q_DECLARE_PRIVATE(QnUserManagementWidget)
 
-private slots:
-    void at_refreshButton_clicked();
-    void at_mergeLdapUsersAsync_finished(int status, int handle, const QString &errorString);
 };
