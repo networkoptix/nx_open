@@ -359,6 +359,11 @@ namespace nx_http
         bool operator==( const AsyncHttpClientPtr& right ) const { return m_obj == right.m_obj; }
         bool operator!=( const AsyncHttpClientPtr& right ) const { return m_obj != right.m_obj; }
 
+        void swap( AsyncHttpClientPtr& right )
+        {
+            std::swap( m_obj, right.m_obj );
+        }
+
     private:
         std::shared_ptr<AsyncHttpClient> m_obj;
     };
