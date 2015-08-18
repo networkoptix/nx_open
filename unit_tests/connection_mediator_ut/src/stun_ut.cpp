@@ -64,7 +64,9 @@ TEST_F( StunCustomTest, Ping )
     request.newAttribute< hpm::attrs::ServerId >( SERVER_ID );
     request.newAttribute< hpm::attrs::Authorization >( "some_auth_data" );
 
-    const std::list< SocketAddress > allEndpoints { GOOD_ADDRESS, BAD_ADDRESS };
+    std::list< SocketAddress > allEndpoints;
+    allEndpoints.push_back( GOOD_ADDRESS );
+    allEndpoints.push_back( BAD_ADDRESS );
     request.newAttribute< hpm::attrs::PublicEndpointList >( allEndpoints );
 
     // Suppose only one address is pingable

@@ -74,7 +74,7 @@ bool EMailManager::renderAndSendEmailAsync(
     }
     return sendEmailAsync(
         std::move(to),
-        templateFileName, //TODO
+        templateFileName, //TODO #ak correct (and customizable) subject
         std::move( emailToSend ),
         std::move( completionHandler ) );
 }
