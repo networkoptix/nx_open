@@ -89,7 +89,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     timeoutTimer->setInterval(testLdapTimeoutMSec / q->ui->testProgressBar->maximum());
     timeoutTimer->start();
 
-    testHandle = serverConnection->testLdapSettingsAsync(settings, q, SLOT(at_testLdapSettingsFinished(int,int,QString)));
+    testHandle = serverConnection->testLdapSettingsAsync(settings, q, SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
 }
 
 void QnLdapSettingsDialogPrivate::showTestResult(const QString &text) {
@@ -120,13 +120,12 @@ QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
     QnLdapSettings result;
 
     QUrl url = QUrl::fromUserInput(q->ui->serverLineEdit->text());
-    if (!url.isValid())
-        return result;
-
-    if (url.port() == -1)
-        url.setPort(defaultLdapPort(url.scheme() == lit("ldaps")));
-
-    result.uri = url;
+    if (url.isValid()) {
+        if (url.port() == -1)
+            url.setPort(defaultLdapPort(url.scheme() == lit("ldaps")));
+        result.uri = url;
+    }
+    
     result.adminDn = q->ui->adminDnLineEdit->text();
     result.adminPassword = q->ui->passwordLineEdit->text();
     result.searchBase = q->ui->searchBaseLineEdit->text();
@@ -189,17 +188,27 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
 
     ui->setupUi(this);
 
-    d->testButton = ui->buttonBox->addButton(lit("Test"), QDialogButtonBox::ActionRole);
+    d->testButton = ui->buttonBox->addButton(tr("Test"), QDialogButtonBox::HelpRole);
     connect(d->testButton, &QPushButton::clicked, d, &QnLdapSettingsDialogPrivate::testSettings);
 
+    auto updateTestButton = [this] {
+        Q_D(QnLdapSettingsDialog);
+        /* Check if testing in progress. */
+        if (d->testHandle >= 0)
+            return;
+        QnLdapSettings settings = d->settings();
+        d->testButton->setEnabled(settings.isValid());
+    };
+
     /* Mark some fields as mandatory, so field label will turn red if the field is empty. */
-    auto declareMandatoryField = [this](QLabel* label, QLineEdit* lineEdit) {
+    auto declareMandatoryField = [this, updateTestButton](QLabel* label, QLineEdit* lineEdit) {
         /* On every field text change we should check its contents and repaint label with corresponding color. */
-        connect(lineEdit, &QLineEdit::textChanged, this, [this, label](const QString &text) {
+        connect(lineEdit, &QLineEdit::textChanged, this, [this, label, updateTestButton](const QString &text) {
             QPalette palette = this->palette();
             if (text.isEmpty())
                 setWarningStyle(&palette);
             label->setPalette(palette);
+            updateTestButton();
         });
         /* Default field value is empty, so the label should be red by default. */
         setWarningStyle(label);
@@ -212,17 +221,27 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
     connect(ui->serverLineEdit, &QLineEdit::editingFinished, d, &QnLdapSettingsDialogPrivate::at_serverLineEdit_editingFinished);
 
     d->updateFromSettings();
+    updateTestButton();
 }
 
 QnLdapSettingsDialog::~QnLdapSettingsDialog() {}
 
-void QnLdapSettingsDialog::at_testLdapSettingsFinished(int status, int handle, const QString &errorString) {
+void QnLdapSettingsDialog::at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString) {
     Q_D(QnLdapSettingsDialog);
 
     if (handle != d->testHandle)
         return;
 
-    d->stopTesting(status != 0 || !errorString.isEmpty() ? tr("Failed") : tr("Success"));
+    QString result;
+    if (status != 0 || !errorString.isEmpty()) {
+        result = tr("Test failed");
+#if _DEBUG
+        result += lit(" (%1)").arg(errorString);
+#endif
+    } else {
+        result = tr("Test completed successfully: %n users found.", 0, users.size());
+    }
+    d->stopTesting(result);
 }
 
 void QnLdapSettingsDialog::accept() {
@@ -231,13 +250,8 @@ void QnLdapSettingsDialog::accept() {
     d->stopTesting();
 
     QnLdapSettings settings = d->settings();
-
-    if (!settings.isValid()) {
-        QMessageBox::critical(this, tr("Error!"), tr("The provided settings are not valid."));
-        return;
-    }
-
     QnGlobalSettings::instance()->setLdapSettings(settings);
+
     base_type::accept();
 }
 

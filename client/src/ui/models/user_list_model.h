@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QtCore/QSortFilterProxyModel>
+
+#include <core/resource/resource_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnUserListModelPrivate;
@@ -10,6 +13,7 @@ class QnUserListModel : public QAbstractListModel, public QnWorkbenchContextAwar
 
 public:
     enum Columns {
+        CheckBoxColumn,
         NameColumn,
         PermissionsColumn,
         LdapColumn,
@@ -28,6 +32,10 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
+    Qt::CheckState checkState() const;
+    void setCheckState(Qt::CheckState state, const QnUserResourcePtr &user = QnUserResourcePtr());
+
+    QnUserResourceList selectedUsers() const;
 private:
     QnUserListModelPrivate *d;
     friend class QnUserListModelPrivate;
