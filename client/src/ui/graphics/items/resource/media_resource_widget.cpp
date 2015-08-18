@@ -1121,7 +1121,8 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
         const bool buttonIsVisible = (buttonBar()->visibleButtons() & IoModuleButton);
         const bool licenceError = (!button || button->isChecked() || !buttonIsVisible); /// Io is invisble in this case if licence error
-        if (licenceError)
+        const bool isNotZoomWindow = zoomRect().isNull();
+        if (licenceError && isNotZoomWindow)
             return Qn::IoModuleDisabledOverlay;
     } 
 
