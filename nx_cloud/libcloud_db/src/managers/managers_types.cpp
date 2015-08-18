@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "types.h"
+#include "managers_types.h"
 
 
 namespace nx {

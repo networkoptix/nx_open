@@ -12,10 +12,10 @@
 
 #include <utils/db/db_manager.h>
 
-#include "access_control/types.h"
+#include "access_control/auth_types.h"
 #include "data/account_data.h"
 #include "data/email_verification_code.h"
-#include "types.h"
+#include "managers_types.h"
 
 
 namespace nx {

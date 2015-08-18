@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "types.h"
+#include "auth_types.h"
 
 
 namespace nx {

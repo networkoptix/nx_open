@@ -13,8 +13,8 @@
 #include <utils/network/http/server/http_server_connection.h>
 
 #include "access_control/authorization_manager.h"
-#include "access_control/types.h"
-#include "managers/types.h"
+#include "access_control/auth_types.h"
+#include "managers/managers_types.h"
 
 
 namespace nx {

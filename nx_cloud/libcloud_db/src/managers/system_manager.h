@@ -13,10 +13,10 @@
 
 #include <utils/db/db_manager.h>
 
-#include "access_control/types.h"
+#include "access_control/auth_types.h"
 #include "data/system_data.h"
 #include "data_event.h"
-#include "types.h"
+#include "managers_types.h"
 
 
 namespace nx {

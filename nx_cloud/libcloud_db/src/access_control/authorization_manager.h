@@ -9,8 +9,8 @@
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <utils/common/singleton.h>
 
-#include "managers/types.h"
-#include "types.h"
+#include "managers/managers_types.h"
+#include "auth_types.h"
 
 
 namespace nx {

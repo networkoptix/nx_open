@@ -9,7 +9,7 @@
 #include <utils/common/singleton.h>
 #include <utils/network/http/server/abstract_authentication_manager.h>
 
-#include "types.h"
+#include "auth_types.h"
 
 
 namespace nx {

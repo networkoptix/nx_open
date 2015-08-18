@@ -10,11 +10,11 @@
 
 #include <QString>
 
-#include "access_control/types.h"
+#include "access_control/auth_types.h"
 #include "base_http_handler.h"
 #include "data/account_data.h"
 #include "managers/account_manager.h"
-#include "managers/types.h"
+#include "managers/managers_types.h"
 
 
 namespace nx {
