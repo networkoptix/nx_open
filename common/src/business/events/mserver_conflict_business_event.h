@@ -13,8 +13,8 @@ struct QnCameraConflictList {
     QString sourceServer;
     QHash<QString, QStringList> camerasByServer;
 
-    QStringList encode() const;
-    void decode(const QStringList &encoded);
+    QString encode() const;
+    void decode(const QString &encoded);
 };
 
 class QnMServerConflictBusinessEvent: public QnConflictBusinessEvent

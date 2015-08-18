@@ -44,6 +44,7 @@
 #include <business/actions/common_business_action.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
+#include "business/events/conflict_business_event.h"
 
 namespace {
     const qreal widgetHeight = 24;
@@ -642,7 +643,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                 conflicts << lit("50:e5:49:43:b2:62");
                 conflicts << lit("50:e5:49:43:b2:63");
                 conflicts << lit("50:e5:49:43:b2:64");
-                params.setConflicts(conflicts);
+                params.setDescription(QnConflictBusinessEvent::encodeList(conflicts));
                 break;
             }
         case QnBusiness::ServerFailureEvent: {
@@ -670,7 +671,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                 conflicts << lit("50:e5:49:43:b2:62");
                 conflicts << lit("50:e5:49:43:b2:63");
                 conflicts << lit("50:e5:49:43:b2:64");
-                params.setConflicts(conflicts);
+                params.setDescription(QnConflictBusinessEvent::encodeList(conflicts));
                 break;
             }
         default:

@@ -25,7 +25,7 @@ public:
         ReasonParamsEncodedParam,
         
         CaptionParam,
-        ConflictsParam,
+        DescriptionParam,
 
         ParamCount
     };
@@ -53,8 +53,8 @@ public:
     QString getCaption() const;
     void setCaption(const QString& value);
 
-    QStringList getConflicts() const;
-    void setConflicts(const QStringList& value);
+    QString getDescription() const;
+    void setDescription(const QString& value);
 
     QString getInputPortId() const;
     void setInputPortId(const QString &value);
@@ -86,8 +86,10 @@ private:
     QString m_inputPort;
     QnBusiness::EventReason m_reasonCode;
     QString m_reasonParamsEncoded;
-    QString m_caption;          // short event description
-    QStringList m_conflicts;
+    // short event description. Used for camera/server conflict as resource name which cause error. Used in custom events as short description
+    QString m_caption;    
+    // long event description. Used for camera/server conflict as long description (conflict list). Used in custom events as long description
+    QString m_description;
 };
 
 #endif // BUSINESS_EVENT_PARAMETERS_H

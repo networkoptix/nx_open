@@ -1,19 +1,32 @@
 #include "conflict_business_event.h"
 
+const QChar QnConflictBusinessEvent::Delimiter(L'\n');
+
 QnConflictBusinessEvent::QnConflictBusinessEvent(const QnBusiness::EventType eventType,
                                                  const QnResourcePtr& resource,
                                                  const qint64 timeStamp,
                                                  const QString& caption,
-                                                 const QStringList& conflicts):
+                                                 const QString& description):
     base_type(eventType, resource, timeStamp),
     m_caption(caption),
-    m_conflicts(conflicts)
+    m_description(description)
 {
 }
 
 QnBusinessEventParameters QnConflictBusinessEvent::getRuntimeParams() const {
     QnBusinessEventParameters params = base_type::getRuntimeParams();
     params.setCaption(m_caption);
-    params.setConflicts(m_conflicts);
+    params.setDescription(m_description);
     return params;
+}
+
+QString QnConflictBusinessEvent::encodeList(const QStringList& values)
+{
+    QString result;
+    for (const auto& value: values) {
+        if (!result.isEmpty())
+            result.append(Delimiter);
+        result.append(value);
+    }
+    return result;
 }

@@ -19,6 +19,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include "business/business_event_rule.h"
+#include "events/ip_conflict_business_event.h"
 
 namespace {
     static const QString plainTextDelimiter(lit("\n"));
@@ -200,19 +201,19 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     }
     case CameraIpConflictEvent: {
         result += tr("Conflict address: %1").arg(params.getCaption());
-
+        result += delimiter;
         int n = 0;
-        for (const QString& mac: params.getConflicts()) {
+        for (const QString& mac: params.getDescription().split(QnIPConflictBusinessEvent::Delimiter)) {
             result += delimiter;
-            result += tr("Camera #%1 MAC: %2").arg(++n).arg(mac);
+            result += tr("MAC #%1: %2 ").arg(++n).arg(mac);
         }
         break;
     }
     case ServerConflictEvent: {
-        if (!params.getConflicts().isEmpty()) {
+        if (!params.getDescription().isEmpty()) {
             QnCameraConflictList conflicts;
             conflicts.sourceServer = params.getCaption();
-            conflicts.decode(params.getConflicts());
+            conflicts.decode(params.getDescription());
             int n = 0;
             for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
                 const QString &server = itr.key();
@@ -221,7 +222,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
                 int m = 0;
                 for (const QString &camera: conflicts.camerasByServer[server]) {
                     result += delimiter;
-                    result += tr("Camera #%1 MAC: %2").arg(++m).arg(camera);
+                    result += tr("MAC #%1: %2 ").arg(++n).arg(camera);
                 }
 
             }
@@ -283,7 +284,7 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
         detailsMap[lit("cameraConflictAddress")] = params.getCaption();
         QVariantList conflicts;
         int n = 0;
-        foreach (const QString& mac, params.getConflicts()) {
+        foreach (const QString& mac, params.getDescription().split(QnConflictBusinessEvent::Delimiter)) {
             QVariantHash conflict;
             conflict[lit("number")] = ++n;
             conflict[lit("mac")] = mac;
@@ -296,7 +297,7 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
     case ServerConflictEvent: {
         QnCameraConflictList conflicts;
         conflicts.sourceServer = params.getCaption();
-        conflicts.decode(params.getConflicts());
+        conflicts.decode(params.getDescription());
 
         QVariantList conflictsList;
         int n = 0;

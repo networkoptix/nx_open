@@ -3,18 +3,23 @@
 #include "core/resource/resource.h"
 #include "utils/network/module_information.h"
 
-QStringList QnCameraConflictList::encode() const {
-    QStringList result;
+QString QnCameraConflictList::encode() const {
+    QString result;
     for(const QString &server: camerasByServer.keys()) {
         result.append(server);
+        result.append(QnConflictBusinessEvent::Delimiter);
         QStringList cameras = camerasByServer[server];
         result.append(QString::number(cameras.size()));
-        result.append(cameras);
+        result.append(QnConflictBusinessEvent::Delimiter);
+        for (const auto& camera: cameras) {
+            result.append(camera);
+            result.append(QnConflictBusinessEvent::Delimiter);
+        }
     }
-    return result;
+    return result.left(result.size()-1);
 }
 
-void QnCameraConflictList::decode(const QStringList &encoded) {
+void QnCameraConflictList::decode(const QString &encoded) {
     enum encodeState {
         Server,
         Size,
@@ -25,7 +30,7 @@ void QnCameraConflictList::decode(const QStringList &encoded) {
     int counter = 0;
     QString curServer;
 
-    for (const QString &value: encoded) {
+    for (const QString &value: encoded.split(QnConflictBusinessEvent::Delimiter)) {
         switch(state) {
         case Server:
             curServer = value;
@@ -58,7 +63,7 @@ QnMServerConflictBusinessEvent::QnMServerConflictBusinessEvent(
     m_cameraConflicts = conflictList;
 
     m_caption = m_cameraConflicts.sourceServer;
-    m_conflicts = m_cameraConflicts.encode();
+    m_description = m_cameraConflicts.encode();
 }
 
 QnMServerConflictBusinessEvent::QnMServerConflictBusinessEvent(
