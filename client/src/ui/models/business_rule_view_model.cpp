@@ -25,7 +25,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 #include <utils/media/audio_player.h>
 #include "core/resource_management/resource_pool.h"
 

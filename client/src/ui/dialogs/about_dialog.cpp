@@ -27,7 +27,7 @@
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/style/globals.h>
 
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 #include <utils/common/string.h>
 
 #include "openal/qtvaudiodevice.h"

@@ -19,7 +19,7 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 #include <utils/common/scoped_value_rollback.h>
 
 #include "core/resource_management/resource_pool.h"

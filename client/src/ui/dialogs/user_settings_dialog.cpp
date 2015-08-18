@@ -9,7 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/warnings.h>
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 
 #include <ui/common/read_only.h>
 #include <ui/help/help_topics.h>

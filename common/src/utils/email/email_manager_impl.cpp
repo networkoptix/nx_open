@@ -10,7 +10,7 @@
 #include <utils/common/log.h>
 
 #include "nx_ec/data/api_email_data.h"
-#include <utils/common/email.h>
+#include "email.h"
 
 namespace {
     SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct) {
@@ -55,7 +55,7 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
         sender = settings.email;
     else if (settings.user.contains(L'@'))
         sender = settings.user;
-    else if (settings.server.startsWith("smtp."))
+    else if (settings.server.startsWith(lit("smtp.")))
         sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server.mid(5));
     else
         sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server);
