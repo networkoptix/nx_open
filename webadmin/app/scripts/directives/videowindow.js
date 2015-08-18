@@ -41,6 +41,7 @@ angular.module('webadminApp')
                 };
 
                 scope.debugMode = false;
+                scope.debugFormat = "flashls";
 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
@@ -53,7 +54,9 @@ angular.module('webadminApp')
                     scope.noArmSupport = false;
                     scope.noFormat = false;
 
-                    //return "flashls";
+                    if(scope.debugMode && scope.debugFormat){
+                        return scope.debugFormat;
+                    }
 
                     //This function gets available sources for camera and chooses the best player for this browser
 
@@ -61,7 +64,7 @@ angular.module('webadminApp')
 
                     //We have options:
                     // webm - for good desktop browsers
-                    // webm-codec - for IE. Detect
+                    // webm-codec - for IE. Detectf
                     // native-hls - for mobile browsers
                     // flv - for desktop browsers - not supported yet
                     // rtsp - for desktop browsers
@@ -227,9 +230,12 @@ angular.module('webadminApp')
                     scope.native = false;
                     scope.flashSource = "components/flashlsChromeless.swf";
                     scope.flashParam = flashlsAPI.flashParams();
-
-                    $timeout(function() {// Force DOM to refresh here
-                        if (!flashlsAPI.ready()) {
+                    if(flashlsAPI.ready()){
+                        flashlsAPI.kill();
+                        scope.flashls = false; // Destroy it!
+                        $timeout(initFlashls);
+                    }else {
+                        $timeout(function () {// Force DOM to refresh here
                             flashlsAPI.init("videowindow", function (api) {
                                 scope.vgApi = api;
 
@@ -237,7 +243,6 @@ angular.module('webadminApp')
                                     $timeout(function () {
                                         scope.loading = !!format;
                                     });
-
                                     scope.vgApi.load(getFormatSrc('hls'));
                                 }
 
@@ -251,18 +256,13 @@ angular.module('webadminApp')
                                 });
                                 console.error(error);
                             }, function (position, duration) {
-                                if(position!=0) {
+                                if (position != 0) {
                                     scope.loading = false;
-                                    scope.vgUpdateTime({$currentTime: position, $duration: duration});
+                                    scope.vgUpdateTime({$currentTime: position/1000, $duration: duration});
                                 }
                             });
-                        } else {
-                            $timeout(function () {
-                                scope.loading = !!format;
-                            });
-                            flashlsAPI.load(getFormatSrc('hls'));
-                        }
-                    });
+                        });
+                    }
                 }
 
                 function initJsHls(){

@@ -123,7 +123,9 @@ var flashlsAPI = new (function(){
             class:""*/
         }
     };
-
+    this.kill = function(){
+        this.flashObject = null;
+    };
     this.ready = function(){
         return !!this.flashObject;
     };
