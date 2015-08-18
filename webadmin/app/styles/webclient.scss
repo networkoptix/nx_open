@@ -181,7 +181,11 @@ table.webclient-window>tbody>tr>td.alert{
 
 .webclient-button.active{
   background-color: white;
-  color:black;
+  color:#121517 !important;
+}
+.webclient-button.active:hover{
+  background-color: white !important;
+  opacity:0.9;
 }
 
 .webclient-button .glyphicon{
