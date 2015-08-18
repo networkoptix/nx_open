@@ -60,10 +60,10 @@ void AccountManager::verifyAccountEmailAddress(
     std::function<void(ResultCode)> completionHandler )
 {
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::EmailVerificationCode>(
-        std::bind( &AccountManager::verifyAccount, this, _1, _2 ),
+    m_dbManager->executeUpdate<data::EmailVerificationCode, QnUuid>(
+        std::bind( &AccountManager::verifyAccount, this, _1, _2, _3 ),
         std::move( emailVerificationCode ),
-        std::bind( &AccountManager::accountVerified, this, _1, _2, std::move( completionHandler ) ) );
+        std::bind( &AccountManager::accountVerified, this, _1, _2, _3, std::move( completionHandler ) ) );
 }
 
 void AccountManager::getAccount(
@@ -147,26 +147,59 @@ void AccountManager::accountAdded(
 
 
 nx::db::DBResult AccountManager::verifyAccount(
-    QSqlDatabase* const tran,
-    const data::EmailVerificationCode& verificationCode )
+    QSqlDatabase* const connection,
+    const data::EmailVerificationCode& verificationCode,
+    QnUuid* const resultAccountID )
 {
-    //TODO #ak
-    return db::DBResult::ioError;
+    QSqlQuery getAccountByVerificationCode( *connection );
+    getAccountByVerificationCode.prepare(
+        "SELECT account_id FROM email_verification WHERE verification_code LIKE :code" );
+    QnSql::bind( verificationCode, &getAccountByVerificationCode );
+    if( !getAccountByVerificationCode.exec() )
+        return db::DBResult::ioError;
+    if( !getAccountByVerificationCode.next() )
+    {
+        NX_LOG( lit("Email verification code %1 was not found in the database").
+            arg( QString::fromStdString(verificationCode.code) ), cl_logDEBUG1 );
+        return db::DBResult::notFound;
+    }
+    QnUuid accountID = QnSql::deserialized_field<QnUuid>( getAccountByVerificationCode.value( 0 ) );
+
+    QSqlQuery removeVerificationCode( *connection );
+    removeVerificationCode.prepare( 
+        "DELETE FROM email_verification WHERE verification_code LIKE :code" );
+    QnSql::bind( verificationCode, &removeVerificationCode );
+    if( !removeVerificationCode.exec() )
+        return db::DBResult::ioError;
+
+    QSqlQuery updateAccountStatus( *connection );
+    updateAccountStatus.prepare( 
+        "UPDATE account SET status_code = ? WHERE id = ?" );
+    updateAccountStatus.bindValue( 0, data::asActivated );
+    updateAccountStatus.bindValue( 1, QnSql::serialized_field(accountID) );
+    if( !updateAccountStatus.exec() )
+        return db::DBResult::ioError;
+
+    *resultAccountID = std::move( accountID );
+
+    return db::DBResult::ok;
 }
 
 void AccountManager::accountVerified(
     nx::db::DBResult resultCode,
     data::EmailVerificationCode verificationCode,
+    const QnUuid accountID,
     std::function<void( ResultCode )> completionHandler )
 {
     if( resultCode == db::DBResult::ok )
     {
         //TODO #ak updating cache
-        //m_cache.add( accountData.id, std::move( accountData ) );
+        m_cache.atomicUpdate(
+            accountID, 
+            []( data::AccountData& account ){ account.statusCode = data::AccountStatus::asActivated; } );
     }
 
-    completionHandler( resultCode == db::DBResult::ok ? ResultCode::ok : ResultCode::dbError );
-    //TODO #ak
+    completionHandler( fromDbResultCode( resultCode ) );
 }
 
 

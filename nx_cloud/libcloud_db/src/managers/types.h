@@ -3,13 +3,15 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef cloud_db_types_h
-#define cloud_db_types_h
+#ifndef CLOUD_DB_MANAGERS_TYPES_H
+#define CLOUD_DB_MANAGERS_TYPES_H
 
 #include <map>
 #include <string>
 
 #include <QtCore/QVariant>  //TODO #ak maybe boost::variant?
+
+#include <utils/db/types.h>
 
 
 namespace nx {
@@ -23,6 +25,8 @@ enum class ResultCode
     alreadyExists,
     dbError
 };
+
+ResultCode fromDbResultCode( nx::db::DBResult );
 
 enum class EntityType
 {
@@ -57,4 +61,4 @@ private:
 }   //cdb
 }   //nx
 
-#endif
+#endif  //CLOUD_DB_MANAGERS_TYPES_H

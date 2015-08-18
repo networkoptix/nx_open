@@ -37,9 +37,22 @@ public:
         //TODO #ak
     }
 
-    bool get( KeyType /*key*/, CachedType* const /*value*/ )
+    bool get( const KeyType& /*key*/, CachedType* const /*value*/ )
     {
         //TODO #ak
+        return false;
+    }
+
+    //!Executes \a updateFunc on item with \a key
+    /*!
+        \warning \a updateFunc is executed with internal mutex locked, so it MUST NOT BLOCK!
+    */
+    template<class Func>
+    bool atomicUpdate(
+        const KeyType& /*key*/,
+        const Func& /*updateFunc*/ )
+    {
+        //TODO
         return false;
     }
 };
@@ -91,10 +104,12 @@ private:
     //verify_account DB operations
     nx::db::DBResult verifyAccount(
         QSqlDatabase* const tran,
-        const data::EmailVerificationCode& verificationCode );
+        const data::EmailVerificationCode& verificationCode,
+        QnUuid* const accountID );
     void accountVerified(
         nx::db::DBResult resultCode,
-        data::EmailVerificationCode resultData,
+        data::EmailVerificationCode verificationCode,
+        const QnUuid accountID,
         std::function<void( ResultCode )> completionHandler );
 };
 

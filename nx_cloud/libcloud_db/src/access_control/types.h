@@ -3,8 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef cloud_db_access_role_h
-#define cloud_db_access_role_h
+#ifndef CLOUD_DB_AUTH_TYPES_H
+#define CLOUD_DB_AUTH_TYPES_H
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 
@@ -54,4 +54,4 @@ public:
 }   //cdb
 }   //nx
 
-#endif
+#endif  //CLOUD_DB_AUTH_TYPES_H

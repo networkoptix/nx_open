@@ -16,7 +16,8 @@ namespace db {
 enum class DBResult
 {
     ok,
-    ioError
+    ioError,
+    notFound
 };
 
 
