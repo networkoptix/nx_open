@@ -10,7 +10,7 @@
 #include <ui/widgets/settings/database_management_widget.h>
 #include <ui/widgets/settings/time_server_selection_widget.h>
 #include <ui/widgets/settings/general_system_administration_widget.h>
-#include <ui/widgets/user_management_widget.h>
+#include <ui/widgets/settings/user_management_widget.h>
 #include <ui/widgets/server_updates_widget.h>
 #include <ui/widgets/routing_management_widget.h>
 #include <ui/help/help_topics.h>

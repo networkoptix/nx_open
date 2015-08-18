@@ -10,9 +10,6 @@
     <height>300</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Form</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTableView" name="usersTable">
@@ -30,16 +27,9 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="refreshButton">
+      <widget class="QPushButton" name="fetchButton">
        <property name="text">
-        <string>Import from LDAP</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="ldapSettingsButton">
-       <property name="text">
-        <string>LDAP Settings...</string>
+        <string>Fetch Users from LDAP...</string>
        </property>
       </widget>
      </item>
@@ -55,6 +45,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="ldapSettingsButton">
+       <property name="text">
+        <string>LDAP Settings...</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
