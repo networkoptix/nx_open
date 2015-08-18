@@ -21,7 +21,8 @@ EMailManager::EMailManager( const conf::Settings& settings )
 
 void EMailManager::sendEmailAsync(
     const QString& /*emailAddress*/,
-    const QString& /*emailBody*/ )
+    const QString& /*emailBody*/,
+    std::function<void( bool )> completionHandler )
 {
     //TODO #ak
 }
@@ -29,7 +30,8 @@ void EMailManager::sendEmailAsync(
 void EMailManager::renderAndSendEmailAsync(
     const QString& emailAddress,
     const QString& templateFileName,
-    const QVariantHash& emailParams )
+    const QVariantHash& emailParams,
+    std::function<void( bool )> completionHandler )
 {
     //TODO #ak rendering should also happen in different thread
 
@@ -45,7 +47,8 @@ void EMailManager::renderAndSendEmailAsync(
     }
     sendEmailAsync(
         emailAddress,
-        emailToSend );
+        emailToSend,
+        std::move( completionHandler ) );
 }
 
 
