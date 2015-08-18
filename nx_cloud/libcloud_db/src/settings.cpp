@@ -11,11 +11,14 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
+#include <utils/serialization/lexical.h>
+
 #include "version.h"
 
 
 namespace
 {
+    //log settings
     static const QLatin1String LOG_LEVEL( "logLevel" );
 #ifdef _DEBUG
     static const QLatin1String DEFAULT_LOG_LEVEL( "DEBUG" );
@@ -54,8 +57,21 @@ namespace
     static const QLatin1String DB_MAX_CONNECTIONS( "db/maxConnections" );
     static const QLatin1String DEFAULT_DB_MAX_CONNECTIONS( "1" );
 
-    static const QLatin1String CLOUD_DB_URL( "db/maxConnections" );
+    static const QLatin1String CLOUD_DB_URL( "cloudDbUrl" );
     static const QLatin1String DEFAULT_CLOUD_DB_URL( "http://nowhere.com:3346/" );
+
+    //email settings
+    static const QLatin1String EMAIL_FROM_ADDRESS( "email/fromAddress" );
+    static const QLatin1String EMAIL_SMTP_CONNECTION_TYPE( "email/smtpConnectionType" );
+    static const QnEmail::ConnectionType DEFAULT_EMAIL_SMTP_CONNECTION_TYPE = QnEmail::ConnectionType::Tls;
+    static const QLatin1String EMAIL_SMTP_SERVER( "email/smtpServer" );
+    static const QLatin1String EMAIL_SMTP_PORT( "email/smtpPort" );
+    static const QLatin1String EMAIL_SMTP_USER( "email/smtpUser" );
+    static const QLatin1String EMAIL_SMTP_PASSWORD( "email/smtpPassword" );
+    static const QLatin1String EMAIL_SMTP_TIMEOUT( "email/smtpTimeout" );
+    static const int DEFAULT_EMAIL_SMTP_TIMEOUT = 300;
+    static const QLatin1String EMAIL_SIGNATURE( "email/signature" );
+    static const QLatin1String EMAIL_SUPPORT_ADDRESS( "email/supportAddress" );
 }
 
 
@@ -93,6 +109,11 @@ const Logging& Settings::logging() const
 const db::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
+}
+
+const QnEmailSettings& Settings::email() const
+{
+    return m_email;
 }
 
 const QString& Settings::cloudBackendUrl() const
@@ -173,6 +194,23 @@ void Settings::loadConfiguration()
         m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
 
     m_cloudBackendUrl = m_settings.value( CLOUD_DB_URL, DEFAULT_CLOUD_DB_URL ).toString();
+
+    //email
+    m_email.email = m_settings.value( EMAIL_FROM_ADDRESS ).toString();
+    m_email.server = m_settings.value( EMAIL_SMTP_SERVER ).toString();
+    m_email.port = m_settings.value( EMAIL_SMTP_PORT ).toInt();
+    m_email.user = m_settings.value( EMAIL_SMTP_USER ).toString();
+    m_email.password = m_settings.value( EMAIL_SMTP_PASSWORD ).toString();
+    m_email.timeout = m_settings.value( EMAIL_SMTP_TIMEOUT, DEFAULT_EMAIL_SMTP_TIMEOUT ).toInt();
+    m_email.signature = m_settings.value( EMAIL_SIGNATURE ).toString();
+    m_email.supportEmail = m_settings.value( EMAIL_SUPPORT_ADDRESS ).toString();
+
+    bool success = false;
+    m_email.connectionType = QnLexical::deserialized<QnEmail::ConnectionType>(
+        m_settings.value( EMAIL_SMTP_CONNECTION_TYPE, DEFAULT_EMAIL_SMTP_CONNECTION_TYPE ).toString(),
+        QnEmail::ConnectionType::Tls, &success );
+    if( !success )
+        m_email.connectionType = DEFAULT_EMAIL_SMTP_CONNECTION_TYPE;
 }
 
 }   //conf

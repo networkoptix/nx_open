@@ -1,9 +1,9 @@
 <div class="content">
     <div class="callout">
-        <h4>Follow <a href="{{cloudUrl}}/verify_email?code={{confirmationCode}}">this</a> link to confirm your email address or link copy below and paste into your browser's address line</h4>
+        <h4>Follow <a href="{{confirmationUrl}}">this</a> link to confirm your email address or copy link below and paste into your browser's address line</h4>
         <br/>
         <br/>
         <br/>
-        {{cloudUrl}}/verify_email?code={{confirmationCode}}
+        {{confirmationUrl}}
     </div>
 </div>

@@ -13,6 +13,7 @@
 
 #include <QtCore/QDir>
 
+#include <api/global_settings.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
@@ -44,6 +45,8 @@ CloudDBProcess::CloudDBProcess( int argc, char **argv )
     m_argv( argv )
 {
     setServiceDescription(QN_APPLICATION_NAME);
+
+    Q_INIT_RESOURCE( libcloud_db );
 }
 
 void CloudDBProcess::pleaseStop()

@@ -34,7 +34,8 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData
     accountData->fullName = urlQuery.queryItemValue( lit("fullName") ).toStdString();
     bool success = true;
     accountData->statusCode = urlQuery.hasQueryItem( lit( "statusCode" ) )
-        ? QnLexical::deserialized<AccountStatus>( lit( "statusCode" ), asInvalid, &success )
+        ? QnLexical::deserialized<AccountStatus>(
+            urlQuery.queryItemValue( lit( "statusCode" ) ), asInvalid, &success )
         : asInvalid;
     return success;
 }

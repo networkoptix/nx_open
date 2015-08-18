@@ -12,6 +12,7 @@
 
 #include <utils/common/command_line_parser.h>
 #include <utils/db/types.h>
+#include <utils/email/email.h>
 #include <utils/network/socket_common.h>
 
 
@@ -42,6 +43,7 @@ public:
     
     const Logging& logging() const;
     const db::ConnectionOptions& dbConnectionOptions() const;
+    const QnEmailSettings& email() const;
     const QString& cloudBackendUrl() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
@@ -57,6 +59,7 @@ private:
 
     Logging m_logging;
     db::ConnectionOptions m_dbConnectionOptions;
+    QnEmailSettings m_email;
     QString m_cloudBackendUrl;
 
     void fillSupportedCmdParameters();

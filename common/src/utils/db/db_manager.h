@@ -12,6 +12,7 @@
 #include <memory>
 
 #include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlError>
 
 #include <utils/common/cpp14.h>
 #include <utils/thread/mutex.h>

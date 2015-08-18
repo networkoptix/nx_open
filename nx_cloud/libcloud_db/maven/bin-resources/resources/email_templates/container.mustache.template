@@ -36,30 +36,6 @@
         <td></td>
         <td class="container" align="" > <!-- bgcolor="#FFFFFF" -->
             
-            <!-- content -->
-            <div class="content">
-                <table>
-                    <tr>
-                        <td>
-                            
-                            <h3>Dear {{productName}} user,</h3>
-                            <p class="lead">Some events occurred with your system{{#systemName}}: <i>{{systemName}}</i>{{/systemName}}{{^systemName}}.{{/systemName}}
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </div><!-- /content -->
-            <!-- content -->
-            <div class="content">
-                <table > <!-- bgcolor="#FFFFFF" -->
-                    <tr>
-                        <td class="small" width="20%" style="vertical-align: top; padding-right:10px;"><img src="{{eventLogoFilename}}" height="75"/></td>
-                        <td>
-                            <h5>{{event}}: {{source}}</h5>
-                        </td>
-                    </tr>
-                </table>
-            </div>
 
             {{>body}}
 

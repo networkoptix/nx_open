@@ -17,6 +17,7 @@
 
 #include "data/cdb_ns.h"
 #include "email_manager.h"
+#include "http_handlers/verify_email_address_handler.h"
 #include "settings.h"
 #include "version.h"
 
@@ -26,7 +27,7 @@ namespace cdb {
 
 static const QString CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME =
     lit( ":/email_templates/account_confirmation.mustache" );
-static const QString CLOUD_BACKEND_URL_PARAM = lit( "cloudUrl" );
+static const QString CONFIRMATION_URL_PARAM = lit( "confirmationUrl" );
 static const QString CONFIRMATION_CODE_PARAM = lit( "confirmationCode" );
 static const int UNCONFIRMED_ACCOUNT_EXPIRATION_SEC = 3*24*60*60;
 
@@ -93,6 +94,8 @@ db::DBResult AccountManager::insertAccount(
     const data::AccountData& accountData,
     data::EmailVerificationCode* const resultData )
 {
+    //TODO #ak should return specific error if email address already used for account
+
     //inserting account
     const QnUuid accountID = QnUuid::createUuid();
     QSqlQuery insertAccountQuery( *connection );
@@ -103,7 +106,11 @@ db::DBResult AccountManager::insertAccount(
     insertAccountQuery.bindValue( ":id", QnSql::serialized_field(accountID) );
     insertAccountQuery.bindValue( ":statusCode", data::asAwaitingEmailConfirmation );
     if( !insertAccountQuery.exec() )
+    {
+        NX_LOG( lit( "Could not insert account into DB. %1" ).
+            arg( connection->lastError().text() ), cl_logDEBUG1 );
         return db::DBResult::ioError;
+    }
 
     //inserting email verification code
     const auto emailVerificationCode = QnUuid::createUuid().toByteArray().toHex();
@@ -115,17 +122,29 @@ db::DBResult AccountManager::insertAccount(
     insertEmailVerificationQuery.bindValue( 1, emailVerificationCode );
     insertEmailVerificationQuery.bindValue( 2, QDateTime::currentDateTimeUtc().addSecs(UNCONFIRMED_ACCOUNT_EXPIRATION_SEC) );
     if( !insertEmailVerificationQuery.exec() )
+    {
+        NX_LOG( lit( "Could not insert account verification code into DB. %1" ).
+            arg( connection->lastError().text() ), cl_logDEBUG1 );
         return db::DBResult::ioError;
+    }
     resultData->code.assign( emailVerificationCode.constData(), emailVerificationCode.size() );
 
     //sending confirmation email
     QVariantHash emailParams;
-    emailParams[CLOUD_BACKEND_URL_PARAM] = m_settings.cloudBackendUrl(); //TODO #ak use something like QN_CLOUD_BACKEND_URL;
+    QUrl confirmationUrl( m_settings.cloudBackendUrl() );   //TODO #ak use something like QN_CLOUD_BACKEND_URL;
+    confirmationUrl.setPath( VerifyEmailAddressHandler::HANDLER_PATH );
+    confirmationUrl.setQuery( lit("code=%1").arg(QLatin1String(emailVerificationCode)) );  //TODO #ak replace with fusion::QnUrlQuery::serialized(*resultData)
+    emailParams[CONFIRMATION_URL_PARAM] = confirmationUrl.toString();
     emailParams[CONFIRMATION_CODE_PARAM] = QString::fromStdString( resultData->code );
-    m_emailManager->renderAndSendEmailAsync(
-        QString::fromStdString( accountData.email ),
-        CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME,
-        emailParams );
+    if( !m_emailManager->renderAndSendEmailAsync(
+            QString::fromStdString( accountData.email ),
+            CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME,
+            emailParams,
+            std::function<void(bool)>() ) )
+    {
+        NX_LOG( lit( "Failed to issue async account confirmation email send" ), cl_logDEBUG1 );
+        return db::DBResult::ioError;
+    }
 
     return db::DBResult::ok;
 }
@@ -144,7 +163,6 @@ void AccountManager::accountAdded(
     
     completionHandler( resultCode == db::DBResult::ok ? ResultCode::ok : ResultCode::dbError );
 }
-
 
 nx::db::DBResult AccountManager::verifyAccount(
     QSqlDatabase* const connection,
@@ -170,7 +188,12 @@ nx::db::DBResult AccountManager::verifyAccount(
         "DELETE FROM email_verification WHERE verification_code LIKE :code" );
     QnSql::bind( verificationCode, &removeVerificationCode );
     if( !removeVerificationCode.exec() )
+    {
+        NX_LOG( lit( "Failed to remove account verification code %1 from DB. %2" ).
+            arg( QString::fromStdString(verificationCode.code) ).arg( connection->lastError().text() ),
+            cl_logDEBUG1 );
         return db::DBResult::ioError;
+    }
 
     QSqlQuery updateAccountStatus( *connection );
     updateAccountStatus.prepare( 
@@ -178,7 +201,12 @@ nx::db::DBResult AccountManager::verifyAccount(
     updateAccountStatus.bindValue( 0, data::asActivated );
     updateAccountStatus.bindValue( 1, QnSql::serialized_field(accountID) );
     if( !updateAccountStatus.exec() )
+    {
+        NX_LOG( lit( "Failed to update account %1 status. %2" ).
+            arg( accountID.toString() ).arg( connection->lastError().text() ),
+            cl_logDEBUG1 );
         return db::DBResult::ioError;
+    }
 
     *resultAccountID = std::move( accountID );
 
@@ -193,7 +221,6 @@ void AccountManager::accountVerified(
 {
     if( resultCode == db::DBResult::ok )
     {
-        //TODO #ak updating cache
         m_cache.atomicUpdate(
             accountID, 
             []( data::AccountData& account ){ account.statusCode = data::AccountStatus::asActivated; } );
