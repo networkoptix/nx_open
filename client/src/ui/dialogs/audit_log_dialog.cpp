@@ -261,7 +261,6 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
         QVariant data = index.data(Qn::AuditRecordDataRole);
         if (!data.canConvert<QnAuditRecord*>())
             return base_type::paint(painter, option, index);
-        const QnAuditRecord* record = data.value<QnAuditRecord*>();
 
         QStyleOptionButton button;
         button.text = index.data(Qt::DisplayRole).toString();
@@ -381,7 +380,7 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRec
     return result;
 }
 
-QSize QnAuditLogDialog::calcButtonSize(const QFont& font) const
+QSize QnAuditLogDialog::calcButtonSize() const
 {
     std::unique_ptr<QPushButton> button(new QPushButton());
     button->setText(tr("Play this"));
@@ -564,7 +563,6 @@ void QnAuditLogDialog::at_updateCheckboxes()
 void setGridGeneralCheckState(QTableView* gridMaster, Qt::CheckState checkState)
 {
     QnCheckBoxedHeaderView* headers = (QnCheckBoxedHeaderView*) gridMaster->horizontalHeader();
-    QnAuditLogModel* model = (QnAuditLogModel*) gridMaster->model();
     headers->blockSignals(true);
     headers->setCheckState(checkState);
     headers->blockSignals(false);
@@ -572,6 +570,8 @@ void setGridGeneralCheckState(QTableView* gridMaster, Qt::CheckState checkState)
 
 void QnAuditLogDialog::at_masterGridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
+    QN_UNUSED(selected, deselected);
+
     QnTableView* gridMaster = (QnTableView*) sender()->parent();
     QModelIndex mouseIdx = gridMaster->mouseIndex();
     QnAuditLogModel* model = (QnAuditLogModel*) gridMaster->model();
@@ -641,7 +641,6 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
     connect (headers,           &QnCheckBoxedHeaderView::checkStateChanged, this, &QnAuditLogDialog::at_headerCheckStateChanged);
     connect(gridMaster->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QnAuditLogDialog::at_masterGridSelectionChanged);
     connect(gridMaster,         &QTableView::pressed, this, &QnAuditLogDialog::at_masterItemPressed); // put selection changed before item pressed
-    connect(gridMaster,         &QTableView::clicked,               this,   &QnAuditLogDialog::at_sessionsGrid_clicked);
 
     setupContextMenu(gridMaster);
 }
@@ -691,7 +690,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
 
     m_itemDelegate = new QnAuditItemDelegate(this);
-    m_itemDelegate->setPlayButtonSize(calcButtonSize(ui->gridMaster->font()));
+    m_itemDelegate->setPlayButtonSize(calcButtonSize());
     m_itemDelegate->setDefaultSectionHeight(ui->gridDetails->verticalHeader()->defaultSectionSize());
 
     setupSessionsGrid();
@@ -723,6 +722,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     connect (ui->gridDetails->horizontalHeader(), &QHeaderView::sectionResized, this, 
         [this] (int logicalIndex, int oldSize, int newSize) 
         {
+            QN_UNUSED(logicalIndex, oldSize, newSize);
+
             int w = 0;
             const QHeaderView* headers = ui->gridDetails->horizontalHeader();
             for (int i = 0; i < headers->count() - 1; ++i)
@@ -919,7 +920,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId, const QString& objectName)
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId)
 {
     QnResourceList resList;
     for (const auto& id: record->resources) {
@@ -949,11 +950,11 @@ void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
     if (record->isPlaybackType())
         processPlaybackAction(record);
     else if (record->eventType == Qn::AR_UserUpdate)
-        triggerAction(record, Qn::UserSettingsAction,   tr("user(s)"));
+        triggerAction(record, Qn::UserSettingsAction);
     else if (record->eventType == Qn::AR_ServerUpdate)
-        triggerAction(record, Qn::ServerSettingsAction, tr("server(s)"));
+        triggerAction(record, Qn::ServerSettingsAction);
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
-        triggerAction(record, Qn::CameraSettingsAction,   tr("camera(s)"));
+        triggerAction(record, Qn::CameraSettingsAction);
 
     if (isMaximized())
         showNormal();
@@ -1101,10 +1102,6 @@ void QnAuditLogDialog::requestFinished()
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
     */
     ui->loadingProgressBar->hide();
-}
-
-void QnAuditLogDialog::at_sessionsGrid_clicked(const QModelIndex& idx)
-{
 }
 
 void QnAuditLogDialog::setDateRange(const QDate& from, const QDate& to)
