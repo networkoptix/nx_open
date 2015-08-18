@@ -41,7 +41,7 @@
 #include "api_peer_data.h"
 #include "api_runtime_data.h"
 
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 
 namespace ec2 {
 

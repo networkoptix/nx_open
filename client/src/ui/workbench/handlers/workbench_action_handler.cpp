@@ -129,10 +129,10 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/string.h>
 #include <utils/common/time.h>
-#include <utils/common/email.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/url.h>
+#include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>

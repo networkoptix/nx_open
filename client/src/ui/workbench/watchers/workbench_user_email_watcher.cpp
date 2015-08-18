@@ -3,7 +3,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 
 #include <ui/workbench/workbench_context.h>
 

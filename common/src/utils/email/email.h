@@ -5,8 +5,9 @@
 #include <QtCore/QStringList>
 #include <QtCore/QMetaType>
 
-#include <utils/common/email_fwd.h>
 #include <utils/common/model_functions_fwd.h>
+#include "email_fwd.h"
+
 
 struct QnEmailSmtpServerPreset {
     QnEmailSmtpServerPreset();
