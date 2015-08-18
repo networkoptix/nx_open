@@ -263,7 +263,6 @@ void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::M
         createButton(data) : createLabel(data));
 
     layout->addItem(thirdItem, row, 2);
-    outputsLayout->setColumnMaximumWidth(2, 0);
 }
 
 void QnIoModuleOverlayWidgetPrivate::updateControls() {
