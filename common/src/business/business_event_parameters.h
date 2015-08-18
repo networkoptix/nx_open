@@ -24,7 +24,7 @@ public:
         ReasonCodeParam,
         ReasonParamsEncodedParam,
         
-        SourceParam,
+        CaptionParam,
         ConflictsParam,
 
         ParamCount
@@ -50,8 +50,8 @@ public:
     QString getReasonParamsEncoded() const;
     void setReasonParamsEncoded(const QString& value);
 
-    QString getSource() const;
-    void setSource(const QString& value);
+    QString getCaption() const;
+    void setCaption(const QString& value);
 
     QStringList getConflicts() const;
     void setConflicts(const QStringList& value);
@@ -86,7 +86,7 @@ private:
     QString m_inputPort;
     QnBusiness::EventReason m_reasonCode;
     QString m_reasonParamsEncoded;
-    QString m_source;
+    QString m_caption;          // short event description
     QStringList m_conflicts;
 };
 

@@ -11,12 +11,12 @@ public:
     explicit QnConflictBusinessEvent(const QnBusiness::EventType eventType,
                                      const QnResourcePtr& resource,
                                      const qint64 timeStamp,
-                                     const QString& source = QString(),
+                                     const QString& caption = QString(),
                                      const QStringList& conflicts = QStringList());
     
     virtual QnBusinessEventParameters getRuntimeParams() const override;
 protected:
-    QString m_source;
+    QString m_caption;
     QStringList m_conflicts;
 };
 

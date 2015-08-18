@@ -83,12 +83,12 @@ void QnBusinessEventParameters::setReasonParamsEncoded(const QString& value) {
     m_reasonParamsEncoded = value;
 }
 
-QString QnBusinessEventParameters::getSource() const {
-    return m_source;
+QString QnBusinessEventParameters::getCaption() const {
+    return m_caption;
 }
 
-void QnBusinessEventParameters::setSource(const QString& value) {
-    m_source = value;
+void QnBusinessEventParameters::setCaption(const QString& value) {
+    m_caption = value;
 }
 
 QStringList QnBusinessEventParameters::getConflicts() const {
@@ -181,8 +181,8 @@ QnBusinessEventParameters QnBusinessEventParameters::unpack(const QByteArray& va
                     result.m_reasonParamsEncoded = QString::fromUtf8(field.data(), field.size());
                     break;
 
-                case SourceParam:
-                    result.m_source = QString::fromUtf8(field.data(), field.size());
+                case CaptionParam:
+                    result.m_caption = QString::fromUtf8(field.data(), field.size());
                     break;
                 case ConflictsParam:
                     result.m_conflicts = QString::fromLatin1(field.data(), field.size()).split(QLatin1Char(STRING_LIST_DELIM)); // optimization. mac address list here. UTF is not required
@@ -248,7 +248,7 @@ QByteArray QnBusinessEventParameters::pack() const
     serializeStringParam(result, m_inputPort, m_defaultParams.m_inputPort);
     serializeIntParam(result, m_reasonCode, m_defaultParams.m_reasonCode);
     serializeStringParam(result, m_reasonParamsEncoded, m_defaultParams.m_reasonParamsEncoded);
-    serializeStringParam(result, m_source, m_defaultParams.m_source);
+    serializeStringParam(result, m_caption, m_defaultParams.m_caption);
     serializeStringListParam(result, m_conflicts);
 
     int resLen = result.size();
@@ -283,8 +283,8 @@ QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
     if (m_reasonParamsEncoded != m_defaultParams.m_reasonParamsEncoded)
         result.insert(PARAM_NAMES[ReasonParamsEncodedParam], m_reasonParamsEncoded);
 
-    if (m_source != m_defaultParams.m_source)
-        result.insert(PARAM_NAMES[SourceParam], m_source);
+    if (m_caption != m_defaultParams.m_caption)
+        result.insert(PARAM_NAMES[CaptionParam], m_caption);
 
     if (m_conflicts != m_defaultParams.m_conflicts)
         result.insert(PARAM_NAMES[ConflictsParam], m_conflicts);
@@ -339,8 +339,8 @@ QnBusinessEventParameters QnBusinessEventParameters::fromBusinessParams(const Qn
                 result.m_reasonParamsEncoded = itr.value().toString();
                 break;
 
-            case SourceParam:
-                result.m_source = itr.value().toString();
+            case CaptionParam:
+                result.m_caption = itr.value().toString();
                 break;
             case ConflictsParam:
                 result.m_conflicts = itr.value().toStringList();
@@ -372,7 +372,7 @@ bool QnBusinessEventParameters::operator==(const QnBusinessEventParameters& othe
         return false;
     if (m_reasonParamsEncoded != other.m_reasonParamsEncoded)
         return false;
-    if (m_source != other.m_source)
+    if (m_caption != other.m_caption)
         return false;
     if (m_conflicts != other.m_conflicts)
         return false;

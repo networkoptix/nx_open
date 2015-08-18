@@ -57,7 +57,7 @@ QnMServerConflictBusinessEvent::QnMServerConflictBusinessEvent(
 {
     m_cameraConflicts = conflictList;
 
-    m_source = m_cameraConflicts.sourceServer;
+    m_caption = m_cameraConflicts.sourceServer;
     m_conflicts = m_cameraConflicts.encode();
 }
 
@@ -71,5 +71,5 @@ QnMServerConflictBusinessEvent::QnMServerConflictBusinessEvent(
               timeStamp)
 {
     Q_UNUSED(conflictModule)
-    m_source = lit("%1:%2").arg(conflictUrl.host()).arg(conflictUrl.port());
+    m_caption = lit("%1:%2").arg(conflictUrl.host()).arg(conflictUrl.port());
 }

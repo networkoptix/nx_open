@@ -339,7 +339,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case QnBusiness::CameraIpConflictEvent: {
-        QString webPageAddress = params.getSource();
+        QString webPageAddress = params.getCaption();
 
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
@@ -633,7 +633,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                 if (!sampleServer)
                     continue;
                 params.setEventResourceId(sampleServer->getId());
-                params.setSource(lit("192.168.0.5"));
+                params.setCaption(lit("192.168.0.5"));
 
                 QStringList conflicts;
                 conflicts << lit("50:e5:49:43:b2:59");
@@ -657,7 +657,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                 if (!sampleServer)
                     continue;
                 params.setEventResourceId(sampleServer->getId());
-                params.setSource(lit("10.0.2.187"));
+                params.setCaption(lit("10.0.2.187"));
 
                 QStringList conflicts;
                 conflicts << lit("10.0.2.108");

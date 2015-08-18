@@ -199,7 +199,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case CameraIpConflictEvent: {
-        result += tr("Conflict address: %1").arg(params.getSource());
+        result += tr("Conflict address: %1").arg(params.getCaption());
 
         int n = 0;
         for (const QString& mac: params.getConflicts()) {
@@ -211,7 +211,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     case ServerConflictEvent: {
         if (!params.getConflicts().isEmpty()) {
             QnCameraConflictList conflicts;
-            conflicts.sourceServer = params.getSource();
+            conflicts.sourceServer = params.getCaption();
             conflicts.decode(params.getConflicts());
             int n = 0;
             for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
@@ -226,7 +226,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
 
             }
         } else {
-            result += tr("Conflicting Server: %1").arg(params.getSource());
+            result += tr("Conflicting Server: %1").arg(params.getCaption());
         }
         break;
     }
@@ -280,7 +280,7 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
         break;
     }
     case CameraIpConflictEvent: {
-        detailsMap[lit("cameraConflictAddress")] = params.getSource();
+        detailsMap[lit("cameraConflictAddress")] = params.getCaption();
         QVariantList conflicts;
         int n = 0;
         foreach (const QString& mac, params.getConflicts()) {
@@ -295,7 +295,7 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
     }
     case ServerConflictEvent: {
         QnCameraConflictList conflicts;
-        conflicts.sourceServer = params.getSource();
+        conflicts.sourceServer = params.getCaption();
         conflicts.decode(params.getConflicts());
 
         QVariantList conflictsList;
