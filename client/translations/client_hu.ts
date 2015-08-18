@@ -226,14 +226,6 @@
 <context>
     <name>CameraAdditionDialog</name>
     <message>
-        <source>Add cameras...</source>
-        <translation>Kamerák hozzáadása...</translation>
-    </message>
-    <message>
-        <source>Selected server:</source>
-        <translation>Kiválasztott szerver:</translation>
-    </message>
-    <message>
         <source>Server is offline</source>
         <translation>A szerver offline</translation>
     </message>
@@ -254,20 +246,12 @@
         <translation>Ut&amp;olsó IP:</translation>
     </message>
     <message>
-        <source>S&amp;ubnet scan</source>
-        <translation>A&amp;lhálózat szkennelése</translation>
-    </message>
-    <message>
         <source>&amp;Login:</source>
         <translation>&amp;Belépés:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Jelszó:</translation>
-    </message>
-    <message>
-        <source>auto</source>
-        <translation>auto</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -280,14 +264,6 @@
     <message>
         <source>Discovered Cameras:</source>
         <translation>Megtalált kamerák:</translation>
-    </message>
-    <message>
-        <source>Manuf.</source>
-        <translation>Gyártó</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Név</translation>
     </message>
     <message>
         <source>Address</source>
@@ -310,8 +286,28 @@
         <translation>A kiválasztott hozzá&amp;adása</translation>
     </message>
     <message>
-        <source>New scan...</source>
-        <translation>Új keresés...</translation>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished">Model</translation>
+    </message>
+    <message>
+        <source>New Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1166,7 +1162,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">További licencek beszerzése...</translation>
     </message>
 </context>
 <context>
@@ -2746,18 +2742,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This resources already removed from the system</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>user(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>server(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4441,20 +4425,18 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnLdapSettingsDialog</name>
     <message>
-        <source>Failed</source>
-        <translation type="unfinished"></translation>
+        <source>Test</source>
+        <translation type="unfinished">Teszt</translation>
     </message>
     <message>
-        <source>Success</source>
+        <source>Test failed</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Error!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>Test completed successfully: %n users found.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -6465,10 +6447,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO module is disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6478,6 +6456,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Activate license...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Module is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8670,7 +8652,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Figyelem! Az FPS és minőség beállítások a Felvétel Ütemzésnél nem fog működni!</translation>
     </message>
     <message>
         <source>(recommended)</source>

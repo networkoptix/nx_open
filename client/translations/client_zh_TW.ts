@@ -244,21 +244,12 @@
         <translation>&amp;結束 IP:</translation>
     </message>
     <message>
-        <source>S&amp;ubnet scan</source>
-        <translation>&amp;子網路掃描</translation>
-    </message>
-    <message>
         <source>&amp;Login:</source>
         <translation>&amp;登入:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;密碼:</translation>
-    </message>
-    <message>
-        <source>auto</source>
-        <translatorcomment>自動</translatorcomment>
-        <translation>自動</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -282,29 +273,12 @@
         <translation>掃描中…</translation>
     </message>
     <message>
-        <source>Manuf.</source>
-        <translation>廠牌.</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>名稱</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation>位址</translation>
     </message>
     <message>
         <source>Server is offline</source>
         <translation>伺服器離線</translation>
-    </message>
-    <message>
-        <source>Add cameras...</source>
-        <translatorcomment>新增攝影機…</translatorcomment>
-        <translation>新增攝影機…</translation>
-    </message>
-    <message>
-        <source>Selected server:</source>
-        <translation>選擇伺服器:</translation>
     </message>
     <message>
         <source>Ca&amp;mera Address:</source>
@@ -316,12 +290,32 @@
         <translation>&amp;新增已選擇的</translation>
     </message>
     <message>
-        <source>New scan...</source>
-        <translation>掃描…</translation>
-    </message>
-    <message>
         <source>Discovered Cameras:</source>
         <translation>搜尋到的攝影機:</translation>
+    </message>
+    <message>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished">型號</translation>
+    </message>
+    <message>
+        <source>New Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2756,18 +2750,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>user(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>server(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4451,20 +4433,18 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnLdapSettingsDialog</name>
     <message>
-        <source>Failed</source>
-        <translation type="unfinished">失敗</translation>
+        <source>Test</source>
+        <translation type="unfinished">測試</translation>
     </message>
     <message>
-        <source>Success</source>
-        <translation type="unfinished">成功</translation>
-    </message>
-    <message>
-        <source>Error!</source>
+        <source>Test failed</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>Test completed successfully: %n users found.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -6475,10 +6455,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO module is disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6488,6 +6464,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Activate license...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Module is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8321,7 +8301,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>IP Address:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IP 位址:</translation>
     </message>
     <message>
         <source>Ping</source>
@@ -8353,7 +8333,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>In Use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">已被使用</translation>
     </message>
     <message>
         <source>Protocol</source>

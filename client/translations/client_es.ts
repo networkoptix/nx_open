@@ -238,20 +238,12 @@
         <translation>&amp;Extremo IP:</translation>
     </message>
     <message>
-        <source>S&amp;ubnet scan</source>
-        <translation>&amp;Máscara de subred</translation>
-    </message>
-    <message>
         <source>&amp;Login:</source>
         <translation>&amp;Conexion:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Contraseña:</translation>
-    </message>
-    <message>
-        <source>auto</source>
-        <translation>auto</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -274,28 +266,12 @@
         <translation>Detectando...</translation>
     </message>
     <message>
-        <source>Manuf.</source>
-        <translation>Manuf.</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Nombre</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation> Dirección </translation>
     </message>
     <message>
         <source>Server is offline</source>
         <translation>Servidor está desconectado</translation>
-    </message>
-    <message>
-        <source>Add cameras...</source>
-        <translation>Añadir cámaras...</translation>
-    </message>
-    <message>
-        <source>Selected server:</source>
-        <translation>Servidor seleccionado:</translation>
     </message>
     <message>
         <source>Ca&amp;mera Address:</source>
@@ -306,12 +282,32 @@
         <translation>&amp;Añadir seleccionados</translation>
     </message>
     <message>
-        <source>New scan...</source>
-        <translation>Nueva adquisición...</translation>
-    </message>
-    <message>
         <source>Discovered Cameras:</source>
         <translation>Cámaras descubiertas:</translation>
+    </message>
+    <message>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished">Modelo</translation>
+    </message>
+    <message>
+        <source>New Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2751,18 +2747,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>user(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>server(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4472,20 +4456,19 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnLdapSettingsDialog</name>
     <message>
-        <source>Failed</source>
-        <translation type="unfinished">Fallado</translation>
+        <source>Test</source>
+        <translation type="unfinished">Prueba</translation>
     </message>
     <message>
-        <source>Success</source>
+        <source>Test failed</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Error!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>Test completed successfully: %n users found.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5967,7 +5950,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cargando ...</translation>
     </message>
     <message>
         <source>Not available</source>
@@ -6515,10 +6498,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO module is disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6528,6 +6507,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Activate license...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Module is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8739,7 +8722,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">¡ ADVERTENCIA! Configuración de FPS y calidad en horario de grabación no funcionará!</translation>
     </message>
     <message>
         <source>(recommended)</source>

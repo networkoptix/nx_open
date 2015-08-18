@@ -226,14 +226,6 @@
 <context>
     <name>CameraAdditionDialog</name>
     <message>
-        <source>Add cameras...</source>
-        <translation>เพิ่มกล้อง...</translation>
-    </message>
-    <message>
-        <source>Selected server:</source>
-        <translation>เลือกเซิร์ฟเวอร์:</translation>
-    </message>
-    <message>
         <source>Server is offline</source>
         <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
@@ -254,10 +246,6 @@
         <translation>&amp;สิ้นสุด IP:</translation>
     </message>
     <message>
-        <source>S&amp;ubnet scan</source>
-        <translation>&amp;สแกน Subnet </translation>
-    </message>
-    <message>
         <source>&amp;Login:</source>
         <translation>&amp;เข้าสู่ระบบ:</translation>
     </message>
@@ -266,24 +254,12 @@
         <translation>&amp;รหัสผ่าน:</translation>
     </message>
     <message>
-        <source>auto</source>
-        <translation>อัตโนมัติ</translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation>อัตโนมัติ</translation>
     </message>
     <message>
         <source>&amp;Discovery Port:</source>
         <translation>&amp;พอร์ตเชื่อมต่อ:</translation>
-    </message>
-    <message>
-        <source>Manuf.</source>
-        <translation>รายการ.</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>ชื่อ</translation>
     </message>
     <message>
         <source>Address</source>
@@ -306,12 +282,32 @@
         <translation>&amp;เลือก</translation>
     </message>
     <message>
-        <source>New scan...</source>
-        <translation>เริ่มตรวจสอบใหม่...</translation>
-    </message>
-    <message>
         <source>Discovered Cameras:</source>
         <translation>กล้องที่ตรวจพบ:</translation>
+    </message>
+    <message>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished">รุ่น</translation>
+    </message>
+    <message>
+        <source>New Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2745,18 +2741,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>user(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>server(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4441,20 +4425,18 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnLdapSettingsDialog</name>
     <message>
-        <source>Failed</source>
-        <translation type="unfinished">ล้มเหลว</translation>
+        <source>Test</source>
+        <translation type="unfinished">ทดสอบ</translation>
     </message>
     <message>
-        <source>Success</source>
-        <translation type="unfinished">สำเร็จ</translation>
-    </message>
-    <message>
-        <source>Error!</source>
+        <source>Test failed</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>The provided settings are not valid.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>Test completed successfully: %n users found.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5672,7 +5654,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ช่องว่าง</translation>
     </message>
     <message>
         <source>Calendar Days</source>
@@ -6465,10 +6447,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO module is disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6478,6 +6456,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Activate license...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Module is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8343,7 +8325,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>In Use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ผู้ใช้งาน</translation>
     </message>
     <message>
         <source>Protocol</source>
@@ -8367,7 +8349,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ช่องว่าง</translation>
     </message>
     <message>
         <source>Unchecking the storage will cause nothing but writing stop.
@@ -8670,7 +8652,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">คำเตือน! FPS และคุณภาพใน การตั้งค่าการบันทึก จะไม่ทำงาน!</translation>
     </message>
     <message>
         <source>(recommended)</source>
