@@ -21,9 +21,10 @@ ResultCode fromDbResultCode( nx::db::DBResult dbResult )
             return ResultCode::notFound;
 
         case nx::db::DBResult::ioError:
-        default:
             return ResultCode::dbError;
     }
+
+    return ResultCode::dbError;
 }
 
 }   //cdb
