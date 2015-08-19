@@ -45,8 +45,8 @@ private:
 private:
     Q_DISABLE_COPY(QnServerSettingsDialog)
 
-    const AcceptCallback m_onAcceptClickedCallback;
     QScopedPointer<Ui::ServerSettingsDialog> ui;
+    const AcceptCallback m_onAcceptClickedCallback;
     QnMediaServerResourcePtr m_server;
 
     QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;

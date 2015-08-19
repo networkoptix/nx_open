@@ -14,7 +14,7 @@
 
 namespace
 {
-    typedef QVector<QnServerSettingsDialog *> DialogsContainer;
+    typedef QHash<QnUuid, QnServerSettingsDialog *> DialogsContainer;
 
     DialogsContainer g_currentShowingDialogs;
 }
@@ -31,23 +31,18 @@ void QnServerSettingsDialog::showNonModal(const QnMediaServerResourcePtr &server
 
     QnServerSettingsDialog *dlg = nullptr;
     if (it == g_currentShowingDialogs.end())
-    {
-        dlg = new QnServerSettingsDialog(server, callback, parent);
-        g_currentShowingDialogs.push_back(dlg);
-    }
-    else
-        dlg = (*it);
+        it = g_currentShowingDialogs.insert(server->getId(), new QnServerSettingsDialog(server, callback, parent));
 
-    QnShowDialogHelper::showNonModalDialog(dlg);
+    QnShowDialogHelper::showNonModalDialog(it.value());
 }
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server
     , const AcceptCallback &callback
     , QWidget *parent)
     : base_type(parent)
-    , m_onAcceptClickedCallback(callback)
     , QnWorkbenchContextAware(parent)
     , ui(new Ui::ServerSettingsDialog)
+    , m_onAcceptClickedCallback(callback)
     , m_server(server)
     , m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnServerSettingsDialog>(this))
 {
@@ -77,24 +72,18 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
 QnServerSettingsDialog::~QnServerSettingsDialog() 
 {
-    const auto it = std::find_if(g_currentShowingDialogs.begin(), g_currentShowingDialogs.end()
-        , [this](QnServerSettingsDialog *dialog)
-    {
-        return (dialog == this);
-    });
-
-    if (it != g_currentShowingDialogs.end())
-        g_currentShowingDialogs.erase(it);
 }
 
 void QnServerSettingsDialog::reject()
 {
+    g_currentShowingDialogs.remove(m_server->getId());
     base_type::reject();
     deleteLater();
 }
 
 void QnServerSettingsDialog::accept()
 {
+    g_currentShowingDialogs.remove(m_server->getId());
     base_type::accept();
 
     if (m_onAcceptClickedCallback)
