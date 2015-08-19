@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QWidget>
 
+#include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnUserManagementWidget;
@@ -34,6 +35,9 @@ private:
     void enableSelected();
     void disableSelected();
     void deleteSelected();
+
+    QnUserResourceList visibleUsers() const;
+    QnUserResourceList visibleSelectedUsers() const;
 private:
     QnUserManagementWidget *q_ptr;
     QnUserListModel *m_usersModel;
