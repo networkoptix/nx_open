@@ -76,6 +76,86 @@ namespace detail{
 // Udt library initialization and tear down routine.
 // =========================================================
 
+SystemError::ErrorCode convertToSystemError( int udtErrorCode )
+{
+    if( udtErrorCode == CUDTException::SUCCESS )
+        return SystemError::noError;
+    else if( udtErrorCode == CUDTException::ECONNSETUP )
+        return SystemError::connectionReset;
+    else if( udtErrorCode == CUDTException::ENOSERVER )
+        return SystemError::hostUnreach;
+    else if( udtErrorCode == CUDTException::ECONNREJ )
+        return SystemError::connectionRefused;
+    else if( udtErrorCode == CUDTException::ECONNFAIL )
+        return SystemError::connectionAbort;
+    else if( udtErrorCode == CUDTException::ECONNLOST )
+        return SystemError::connectionReset;
+    else if( udtErrorCode == CUDTException::ENOCONN )
+        return SystemError::notConnected;
+    else if( udtErrorCode == CUDTException::ERESOURCE )
+        return SystemError::nomem;
+    else if( udtErrorCode == CUDTException::ETHREAD )
+        return SystemError::nomem;
+    else if( udtErrorCode == CUDTException::ELARGEMSG )
+        return SystemError::msgTooLarge;
+    else if( udtErrorCode == CUDTException::ENOBUF )
+        return SystemError::noBufferSpace;
+    else if( udtErrorCode == CUDTException::ERDPERM ||
+             udtErrorCode == CUDTException::EWRPERM )
+        return SystemError::noPermission;
+    else if( udtErrorCode == CUDTException::EINVPARAM )
+        return SystemError::invalidData;
+    else if( udtErrorCode == CUDTException::EINVSOCK )
+        return SystemError::badDescriptor;
+    else if( udtErrorCode == CUDTException::ETIMEOUT )
+        return SystemError::timedOut;
+    else if( udtErrorCode == CUDTException::EINVOP )
+        return SystemError::notSupported;
+    else if( udtErrorCode == CUDTException::ESOCKFAIL )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::ESECFAIL )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EFILE )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EINVRDOFF )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EINVWROFF )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EBOUNDSOCK )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::ECONNSOCK )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EUNBOUNDSOCK )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::ENOLISTEN )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::ERDVNOSERV )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::ERDVUNBOUND )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::ESTREAMILL )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EDGRAMILL )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EDUPLISTEN )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EINVPOLLID )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EASYNCFAIL )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EASYNCSND )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EASYNCRCV )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EPEERERR )
+        return SystemError::ioError;
+    else if( udtErrorCode == CUDTException::EUNKNOWN )
+        return SystemError::ioError;
+    else
+        return SystemError::ioError;
+}
+
+
 class UdtLibrary {
 public:
     static void Initialize() {
@@ -181,7 +261,7 @@ bool UdtSocketImpl::Open() {
         state_ = OPEN;
         return true;
     } else {
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
     }
 }
@@ -192,7 +272,7 @@ bool UdtSocketImpl::Bind( const SocketAddress& localAddress ) {
     int ret = UDT::bind(handler_,ADDR_(&addr),sizeof(addr));
     DEBUG_(if(ret !=0) TRACE_("UDT::bind",handler_));
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -201,7 +281,7 @@ SocketAddress UdtSocketImpl::GetLocalAddress() const {
     int len = sizeof(addr);
     if(UDT::getsockname(handler_,ADDR_(&addr),&len) != 0) {
         DEBUG_(TRACE_("UDT::getsockname",handler_));
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return SocketAddress();
     } else {
         return SocketAddress(
@@ -215,7 +295,7 @@ SocketAddress UdtSocketImpl::GetPeerAddress() const {
     int len = sizeof(addr);
     if(UDT::getpeername(handler_,ADDR_(&addr),&len) !=0) {
         DEBUG_(TRACE_("UDT::getsockname",handler_));
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return SocketAddress();
     } else {
         return SocketAddress(
@@ -241,7 +321,7 @@ bool UdtSocketImpl::SetReuseAddrFlag( bool reuseAddr ) {
     int ret = UDT::setsockopt(handler_,0,UDT_REUSEADDR,&reuseAddr,sizeof(reuseAddr));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -251,7 +331,7 @@ bool UdtSocketImpl::GetReuseAddrFlag( bool* val ) const {
     int ret = UDT::getsockopt(handler_,0,UDT_REUSEADDR,val,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -262,13 +342,13 @@ bool UdtSocketImpl::SetNonBlockingMode( bool val ) {
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
     if( ret != 0 )
     {
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
     }
     ret = UDT::setsockopt(handler_,0,UDT_RCVSYN,&value,sizeof(value));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -283,7 +363,7 @@ bool UdtSocketImpl::GetNonBlockingMode( bool* val ) const {
         VERIFY_(OK_(ret) && *val == bval,"UDT::getsockopt",handler_));
 
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     *val = !*val;
     return ret == 0;
 }
@@ -314,7 +394,7 @@ bool UdtSocketImpl::SetSendBufferSize( unsigned int buffSize ) {
         handler_,0,UDT_SNDBUF,&buff_size,sizeof(buff_size));
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -327,7 +407,7 @@ bool UdtSocketImpl::GetSendBufferSize( unsigned int* buffSize ) const{
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     *buffSize = static_cast<unsigned int>(buff_size);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -339,7 +419,7 @@ bool UdtSocketImpl::SetRecvBufferSize( unsigned int buffSize ){
         handler_,0,UDT_RCVBUF,&buff_size,sizeof(buff_size));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -352,7 +432,7 @@ bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const{
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     *buffSize = static_cast<unsigned int>(buff_size);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -364,7 +444,7 @@ bool UdtSocketImpl::SetRecvTimeout( unsigned int millis ) {
         handler_,0,UDT_RCVTIMEO,&time,sizeof(time));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -377,7 +457,7 @@ bool UdtSocketImpl::GetRecvTimeout( unsigned int* millis ) const {
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     *millis = static_cast<int>(time);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -389,7 +469,7 @@ bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
         handler_,0,UDT_SNDTIMEO,&time,sizeof(time));
     VERIFY_(OK_(ret),"UDT::setsockopt",handler_);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -402,7 +482,7 @@ bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
     VERIFY_(OK_(ret),"UDT::getsockopt",handler_);
     *millis = static_cast<unsigned int>(time);
     if( ret != 0 )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
@@ -438,7 +518,7 @@ int UdtSocketImpl::Recv( void* buffer, unsigned int bufferLen, int flags ) {
         } else {
             DEBUG_(TRACE_("UDT::recv",handler_));
         }
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     }
     return sz;
 }
@@ -449,7 +529,7 @@ int UdtSocketImpl::Send( const void* buffer, unsigned int bufferLen ) {
     DEBUG_(
         if(sz == UDT::ERROR ) TRACE_("UDT::send",handler_));
     if( sz == UDT::ERROR )
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return sz;
 }
 
@@ -517,7 +597,7 @@ bool UdtConnector::Connect( const SocketAddress& remoteAddress, int timeouts )
     if( ret != 0 ) {
         // Error happened
         DEBUG_(TRACE_("UDT::connect",impl_->udt_handler()));
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
     } else {
         if( nbk_sock ) {
@@ -537,7 +617,7 @@ bool UdtConnector::Connect( const SocketAddress& remoteAddress, int timeouts )
     
     if( ret < 0 ) {
         DEBUG_(TRACE_("UDT::epoll_wait",impl_->udt_handler()));
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
     } else {
         if( ret == 0 )  {
@@ -565,7 +645,7 @@ UdtSocketImpl* UdtAcceptor::Accept() {
     UDTSOCKET ret = UDT::accept(impl_->udt_handler(),NULL,NULL);
     if( ret == UDT::INVALID_SOCK ) {
         DEBUG_(TRACE_("UDT::accept",impl_->udt_handler()));
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return NULL;
     } else {
         return new UdtSocketImpl( ret , UdtSocketImpl::ESTABLISHED );
@@ -578,7 +658,8 @@ bool UdtAcceptor::Listen( int backlog ) {
     int ret = UDT::listen(impl_->udt_handler(),backlog);
     if( ret != 0 ) {
         DEBUG_(TRACE_("UDT::listen",impl_->udt_handler()));
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        const auto udtError = UDT::getlasterror();
+        SystemError::setLastErrorCode(convertToSystemError(udtError.getErrorCode()));
         return false;
     } else {
         impl_->state_ = UdtSocketImpl::ESTABLISHED;
@@ -998,7 +1079,7 @@ void UdtPollSetImpl::RemoveFromEpoll( UDTSOCKET udt_handler , int event_type ) {
         ret = UDT::epoll_add_usock(epoll_fd_,udt_handler,&event_type);
         VERIFY_(ret ==0,"UDT::epoll_remove_usock",udt_handler);
          if( ret != 0 )
-            SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+            SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     }
 }
 
@@ -1072,7 +1153,7 @@ bool UdtPollSetImpl::Add( UdtSocket* socket , UdtSocketImpl* imp , aio::EventTyp
     DEBUG_(if(ret <0) TRACE_("UDT::epoll_add_usock",imp->udt_handler()));
     if( ret <0 )
     {
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
     }
     SocketUserData& ref = socket_user_data_[imp->udt_handler()];
@@ -1113,7 +1194,7 @@ int UdtPollSetImpl::Poll( int milliseconds ) {
             return 0; // Translate this error code
         } 
         TRACE_("UDT::epoll_wait",UDT::INVALID_SOCK);
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return -1;
     } else {
         // Remove control sockets
@@ -1134,7 +1215,7 @@ bool UdtPollSetImpl::Initialize() {
     epoll_fd_ = UDT::epoll_create();
     if( epoll_fd_ <0 ) {
         DEBUG_(TRACE_("UDT::epoll_create",UDT::INVALID_SOCK));
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
     }
     return InitializeInterruptSocket();
@@ -1153,7 +1234,7 @@ bool UdtPollSetImpl::InitializeInterruptSocket() {
     int ret = UDT::epoll_add_ssock(epoll_fd_,interrupt_socket_.handle());
     if( ret <0 ) {
         DEBUG_(TRACE_("UDT::epoll_add_ssock",UDT::INVALID_SOCK));
-        SystemError::setLastErrorCode(UDT::getlasterror().getErrno());
+        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
     } 
     return true;

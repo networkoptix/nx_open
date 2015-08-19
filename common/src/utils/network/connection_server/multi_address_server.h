@@ -66,7 +66,8 @@ public:
         {
             if( !(*it)->listen() )
             {
-                NX_LOG( QString::fromLatin1("Failed to listen address %1. %2").arg((*it)->address().toString()).arg(SystemError::getLastOSErrorText()), cl_logERROR );
+                const auto& errorText = SystemError::getLastOSErrorText();
+                NX_LOG( QString::fromLatin1("Failed to listen address %1. %2").arg((*it)->address().toString()).arg(errorText), cl_logERROR );
                 return false;
             }
             else

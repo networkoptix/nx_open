@@ -68,7 +68,6 @@ public:
     :
         m_socket( SocketFactory::createStreamServerSocket( sslRequired, natTraversalRequired ) )
     {
-        m_socket->setRecvTimeout( 0 );
     }
 
     ~StreamSocketServer()
@@ -82,7 +81,10 @@ public:
     */
     bool bind( const SocketAddress& socketAddress )
     {
-        return m_socket->bind( socketAddress );
+        return 
+            m_socket->setRecvTimeout( 0 ) &&
+            m_socket->setReuseAddrFlag( true ) &&
+            m_socket->bind( socketAddress );
     }
 
     //!Calls \a AbstractStreamServerSocket::listen
@@ -123,7 +125,10 @@ public:
 
 private:
     //TODO #ak do we really need shared_ptr here?
-    std::shared_ptr<AbstractStreamServerSocket> m_socket;
+    std::unique_ptr<AbstractStreamServerSocket> m_socket;
+
+    StreamSocketServer( StreamSocketServer& );
+    StreamSocketServer& operator=( const StreamSocketServer& );
 };
 
 #endif  //STREAM_SOCKET_SERVER_H

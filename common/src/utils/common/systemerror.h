@@ -42,6 +42,12 @@ namespace SystemError
     static const ErrorCode notImplemented = ERROR_CALL_NOT_IMPLEMENTED;
     static const ErrorCode invalidData = ERROR_INVALID_DATA;
     static const ErrorCode addrInUse = WSAEADDRINUSE;
+    static const ErrorCode noBufferSpace = WSAENOBUFS;
+    static const ErrorCode noPermission = WSAEACCES;
+    static const ErrorCode badDescriptor = WSAEBADF;
+    static const ErrorCode ioError = ERROR_GEN_FAILURE;
+    static const ErrorCode notSupported = WSAEOPNOTSUPP;
+    static const ErrorCode msgTooLarge = WSAEMSGSIZE;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
@@ -59,6 +65,12 @@ namespace SystemError
     static const ErrorCode notImplemented = ENOSYS;
     static const ErrorCode invalidData = EINVAL;
     static const ErrorCode addrInUse = EADDRINUSE;
+    static const ErrorCode noBufferSpace = ENOBUFS;
+    static const ErrorCode noPermission = EPERM;
+    static const ErrorCode badDescriptor = EBADF;
+    static const ErrorCode ioError = EIO;
+    static const ErrorCode notSupported = EOPNOTSUPP;
+    static const ErrorCode msgTooLarge = EMSGSIZE;
 #endif
 
     //!Returns error code of previous system call
