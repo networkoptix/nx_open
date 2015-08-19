@@ -15,6 +15,7 @@
 #include "health/system_health.h"
 #include "business/actions/system_health_business_action.h"
 #include "core/resource/camera_resource.h"
+#include "business/events/custom_business_event.h"
 
 
 //#define REDUCE_NET_ISSUE_HACK
@@ -114,6 +115,11 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
     );
 }
 
+void QnBusinessEventConnector::at_customEvent(const QString &resourceName, const QString& caption, const QString& description, QnBusiness::EventState eventState, qint64 timeStamp)
+{
+    QnCustomBusinessEvent* customEvent = new QnCustomBusinessEvent(eventState, timeStamp * 1000, resourceName, caption, description);
+    qnBusinessRuleProcessor->processBusinessEvent(QnCustomBusinessEventPtr(customEvent));
+}
 
 void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QnCameraConflictList& conflicts)
 {
