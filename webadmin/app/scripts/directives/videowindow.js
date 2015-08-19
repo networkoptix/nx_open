@@ -45,14 +45,21 @@ angular.module('webadminApp')
 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
+                    if( scope.debugMode){
+                        console.log("playing",src?src.src:null);
+                    }
                     return src?src.src:null;
                 }
 
                 function detectBestFormat(){
+                    //1. Hide all informers
                     scope.flashRequired = false;
                     scope.flashOrWebmRequired = false;
                     scope.noArmSupport = false;
                     scope.noFormat = false;
+                    scope.errorLoading = false;
+                    scope.ieNoWebm = false;
+                    scope.loading = false;
 
                     if(scope.debugMode && scope.debugFormat){
                         return scope.debugFormat;
@@ -86,7 +93,13 @@ angular.module('webadminApp')
 
                     // Test native support. Native is always better choice
                     if(weHaveWebm && canPlayNatively("webm")){ // webm is our best format for now
-                        return "webm";
+                        if(! (window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.osVersion >= 10)) {
+                            // This is hack to prevent using webm codec in Windows 10.
+                            // Pretend we do not support webm in Windows 10
+                            // TODO: remove this hack in happy future
+                        }else{
+                            return "webm";
+                        }
                     }
 
                     if(weHaveHls && canPlayNatively("hls")){ // webm is our best format for now
@@ -114,10 +127,7 @@ angular.module('webadminApp')
                     switch(window.jscd.browser){
                         case 'Microsoft Internet Explorer':
                             // Check version here
-                            if(weHaveWebm)
-                            {
-                                scope.ieNoWebm = true;
-                            }
+
 
                             if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
                                 return "flashls";
@@ -127,19 +137,18 @@ angular.module('webadminApp')
                                 return "jshls";
                             }*/
 
-                            if(weHaveHls && weHaveWebm){
-
+                            if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
                                 scope.flashOrWebmRequired = true;
                                 return false;
                             }
-                            if(weHaveHls) {
-                                scope.flashRequired = true;
-                                return false;
+
+                            if(weHaveWebm && (window.jscd.osVersion < 10))
+                            {
+                                scope.ieNoWebm = true;
                             }
 
-                            if(weHaveWebm)
-                            {
-                                scope.edgeNoWebm = true;
+                            if(weHaveHls) {
+                                scope.flashRequired = true;
                                 return false;
                             }
 
@@ -332,6 +341,12 @@ angular.module('webadminApp')
                         format = detectBestFormat();
 
                         recyclePlayer(format);// Remove or recycle old player.
+
+                        if(!format){
+                            scope.native = false;
+                            scope.flashls = false;
+                            return;
+                        }
 
                         switch(format){
                             case "flashls":

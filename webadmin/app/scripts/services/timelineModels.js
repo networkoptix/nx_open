@@ -223,14 +223,14 @@ var RulerModel = {
 };
 
 //Provider for records from mediaserver
-function CameraRecordsProvider(cameras,mediaserver,$q,width) {
+function CameraRecordsProvider(cameras,mediaserver,$q,width,timeCorrection) {
 
     this.cameras = cameras;
     this.mediaserver = mediaserver;
     this.$q = $q;
     this.chunksTree = null;
     this.requestedCache = [];
-    this.width = width;
+    this.timeCorrection = timeCorrection || 0;
     var self = this;
     //1. request first detailization to get initial bounds
 
@@ -242,7 +242,7 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width) {
             return; //No chunks for this camera
         }
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,self.width);
+        var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,width);
         if(nextLevel<RulerModel.levels.length-1) {
             self.requestInterval(self.chunksTree.start, self.now(), nextLevel + 1);
         }
@@ -334,7 +334,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
     if(!self.lockRequests) {
         self.lockRequests = true; // We may lock requests here if we have no tree yet
-        this.mediaserver.getRecords('/', this.cameras[0], start, end, detailization)
+        this.mediaserver.getRecords('/', this.cameras[0], Math.max(start - this.timeCorrection,0), end - this.timeCorrection, detailization)
             .then(function (data) {
 
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
@@ -343,7 +343,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
                 _.forEach(chunks,function(chunk){
                     chunk.durationMs = parseInt(chunk.durationMs);
-                    chunk.startTimeMs = parseInt(chunk.startTimeMs);
+                    chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeCorrection;
                 });
 
                 var chunksToIterate = chunks.length;

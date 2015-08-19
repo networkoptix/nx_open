@@ -59,6 +59,10 @@ angular.module('webadminApp', [
             templateUrl: 'views/sdkeula.html',
             controller: 'SdkeulaCtrl'
         })
+        .when('/sdkeula/:sdkFile', {
+            templateUrl: 'views/sdkeula.html',
+            controller: 'SdkeulaCtrl'
+        })
         .when('/log', {
             templateUrl: 'views/log.html',
             controller: 'LogCtrl'
