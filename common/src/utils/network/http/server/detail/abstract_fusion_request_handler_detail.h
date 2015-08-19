@@ -37,7 +37,8 @@ protected:
     //!Call this method after request has been processed
     void requestCompleted(
         nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody )
+        std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody =
+            std::unique_ptr<nx_http::AbstractMsgBodySource>() )
     {
         auto completionHandler = std::move( m_completionHandler );
         completionHandler(
@@ -159,7 +160,7 @@ public:
     */
     void requestCompleted(
         nx_http::StatusCode::Value statusCode,
-        Output outputData )
+        Output outputData = Output() )
     {
         std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody;
 
@@ -186,11 +187,6 @@ public:
             statusCode,
             std::move(outputMsgBody) );
     }
-
-    void requestCompleted( const nx_http::StatusCode::Value statusCode )
-    {
-        requestCompleted( statusCode, Output() );
-    }
 };
 
 
@@ -200,16 +196,6 @@ class BaseFusionRequestHandlerWithOutput<void>
     public BaseFusionRequestHandler
 {
 public:
-    //!Call this method after request has been processed
-    /*!
-        \note This overload is for requests that return nothing
-    */
-    void requestCompleted( const nx_http::StatusCode::Value statusCode )
-    {
-        BaseFusionRequestHandler::requestCompleted(
-            statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource>() );
-    }
 };
 
 /*!
