@@ -168,6 +168,9 @@ angular.module('webadminApp')
                 }
                 return cacheCurrentUser;
             },
+            getTime:function(){
+                return wrapRequest($http.get(proxy + '/api/gettime'));
+            },
             getRecords:function(serverUrl,physicalId,startTime,endTime,detail,limit,periodsType){
 
                 //console.log("getRecords",serverUrl,physicalId,startTime,endTime,detail,periodsType);
