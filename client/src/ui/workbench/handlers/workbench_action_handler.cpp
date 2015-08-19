@@ -1801,6 +1801,10 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     /* User cannot delete himself. */
     resources.removeOne(context()->user());
+
+    /* No one can delete Administrator. */
+    resources.removeOne(qnResPool->getAdministrator());
+
     if(resources.isEmpty())
         return;
 

@@ -91,6 +91,7 @@ public:
     static void setEventPort(int eventPort);
     static int eventPort();
 
+    virtual bool allowRtspVideoLayout() const override { return false; }
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

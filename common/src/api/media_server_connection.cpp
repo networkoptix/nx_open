@@ -20,6 +20,7 @@
 #include <core/ptz/ptz_data.h>
 
 #include <utils/common/util.h>
+#include <utils/common/ldap.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
 #include <utils/common/model_functions.h>
@@ -302,7 +303,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnModuleInformation>(this, response, handle);
         break;
     case TestLdapSettingsObject:
-        processJsonReply(this, response, handle);
+        processJsonReply<QnLdapUsers>(this, response, handle);
         break;
     case MergeLdapUsersObject:
         processJsonReply(this, response, handle);
@@ -712,9 +713,7 @@ int QnMediaServerConnection::testLdapSettingsAsync(const QnLdapSettings &setting
 {
     QnRequestHeaderList headers;
     headers << QnRequestParam("content-type",   "application/json");
-    ec2::ApiLdapSettingsData data;
-    ec2::fromResourceToApi(settings, data);
-    return sendAsyncPostRequest(TestLdapSettingsObject, headers, QnRequestParamList(), QJson::serialized(data), nullptr, target, slot);
+    return sendAsyncPostRequest(TestLdapSettingsObject, headers, QnRequestParamList(), QJson::serialized(settings), QN_STRINGIZE_TYPE(QnLdapUsers), target, slot);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(

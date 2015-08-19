@@ -10,31 +10,6 @@
 #include <utils/common/singleton.h>
 #include <utils/common/ldap.h>
 
-struct QnLdapUser {
-    QString dn;
-    QString login;
-    QString fullName;
-    QString email;
-};
-
-typedef QList<QnLdapUser> QnLdapUsers;
-
-class QnLdapException : std::exception {
-public:
-    QnLdapException(const char *msg)
-        : _msg(msg) {
-    }
-
-    const char* what() const
-#ifdef __GNUC__
-    noexcept (true)
-#endif
- {
-        return _msg.c_str();
-    }
-private:
-    std::string _msg;
-};
 
 class QnLdapManagerPrivate;
 
@@ -43,6 +18,7 @@ public:
     QnLdapManager();
     ~QnLdapManager();
 
+    bool fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings);
     bool fetchUsers(QnLdapUsers &users);
 
     QString realm() const;

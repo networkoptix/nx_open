@@ -6,6 +6,7 @@
 #include <utils/network/socket_common.h>
 #include <utils/common/request_param.h>
 #include <utils/common/uuid.h>
+#include <utils/common/ldap.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
@@ -225,6 +226,9 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();
+
+    qRegisterMetaType<QnLdapUser>();
+    qRegisterMetaType<QnLdapUsers>();
 
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );

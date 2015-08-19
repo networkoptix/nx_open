@@ -2,7 +2,7 @@
 
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 
-#include <utils/common/ldap_fwd.h>
+#include <utils/common/ldap.h>
 
 namespace Ui {
     class LdapSettingsDialog;
@@ -21,7 +21,7 @@ public:
     virtual void reject() override;
 
 private slots:
-    void at_testLdapSettingsFinished(int status, int handle, const QString &errorString);
+    void at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString);
 
 private:
     QScopedPointer<Ui::LdapSettingsDialog> ui;

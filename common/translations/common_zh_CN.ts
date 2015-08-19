@@ -278,10 +278,6 @@
         <translation>HDD / SSD磁盘%1已满.磁盘包含太多不是由VMS管理的数据.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>服务器停止.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>服务器停止后启动.</translation>
     </message>
@@ -307,6 +303,10 @@
     </message>
     <message>
         <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
