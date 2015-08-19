@@ -10,6 +10,9 @@
     <height>347</height>
    </rect>
   </property>
+  <property name="windowTitle">
+   <string>Fetch Users from LDAP...</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
