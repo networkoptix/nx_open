@@ -610,9 +610,26 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>filterLineEdit</tabstop>
   <tabstop>dateEditFrom</tabstop>
   <tabstop>dateEditTo</tabstop>
   <tabstop>refreshButton</tabstop>
+  <tabstop>checkBoxLogin</tabstop>
+  <tabstop>checkBoxLive</tabstop>
+  <tabstop>checkBoxExport</tabstop>
+  <tabstop>checkBoxSystem</tabstop>
+  <tabstop>checkBoxBRules</tabstop>
+  <tabstop>selectAllCheckBox</tabstop>
+  <tabstop>checkBoxUsers</tabstop>
+  <tabstop>checkBoxArchive</tabstop>
+  <tabstop>checkBoxCameras</tabstop>
+  <tabstop>checkBoxServers</tabstop>
+  <tabstop>checkBoxEmail</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>gridMaster</tabstop>
+  <tabstop>tabWidget_2</tabstop>
+  <tabstop>gridDetails</tabstop>
+  <tabstop>gridCameras</tabstop>
  </tabstops>
  <resources/>
  <connections/>
