@@ -226,6 +226,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
     dst->name = src.cameraName;
     dst->groupName = src.userDefinedGroupName;
     dst->scheduleDisabled = !src.scheduleEnabled;
+    dst->licenseUsed = src.licenseUsed;
     dst->motionType = src.motionType;
 
     QList<QnMotionRegion> regions;
@@ -256,6 +257,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.cameraName = src->name;
     dst.userDefinedGroupName = src->groupName;
     dst.scheduleEnabled = !src->scheduleDisabled;
+    dst.licenseUsed = src->licenseUsed;
     dst.motionType = src->motionType;
 
     QList<QnMotionRegion> regions;
@@ -309,7 +311,7 @@ void fromApiToResource(const ApiCameraDataEx& src, QnVirtualCameraResourcePtr& d
     fromApiToResource( static_cast<const ApiCameraAttributesData&>(src), *userAttributesLock );
 
     for(const ApiResourceParamData &srcParam: src.addParams)
-        dst->setProperty(srcParam.name, srcParam.value, false);
+        dst->setProperty(srcParam.name, srcParam.value, QnResource::NO_MARK_DIRTY);
 }
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraDataEx& dst)
@@ -729,6 +731,7 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
     dst->setPermissions(src.permissions);
     dst->setDigest(src.digest);
     dst->setCryptSha512Hash(src.cryptSha512Hash);
+    dst->setRealm(src.realm);
 }
 
 void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
@@ -739,6 +742,7 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     dst.permissions = src->getPermissions();
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();
+    dst.realm = src->getRealm();
 }
 
 template<class List>

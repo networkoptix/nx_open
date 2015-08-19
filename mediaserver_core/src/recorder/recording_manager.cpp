@@ -341,6 +341,9 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
         }
     }
 
+    //doing anyway to stop internal cache, etc...
+    camera->stopIfNoActivity();
+
     return someRecordingIsPresent;
 }
 

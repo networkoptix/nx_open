@@ -11,6 +11,7 @@
 #include "common/common_module.h"
 #include "http/custom_headers.h"
 #include "utils/network/flash_socket/types.h"
+#include "audit/audit_manager.h"
 
 
 static const int AUTH_TIMEOUT = 60 * 1000;
@@ -64,14 +65,31 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
     Q_D(QnUniversalRequestProcessor);
 
     int retryCount = 0;
+    bool logReported = false;
     if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
-        const bool isProxy = d->owner->isProxy(d->request);
+        //not asking Proxy authentication because we proxy requests in a custom way
+        const bool isProxy = false;
         QElapsedTimer t;
         t.restart();
-        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId))
+        AuthMethod::Value usedMethod = AuthMethod::noAuth;
+        AuthResult authResult;
+        while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &usedMethod)) != Auth_OK)
         {
+            int retryThreshold = 0;
+            if (authResult == Auth_WrongDigest)
+                retryThreshold = MAX_AUTH_RETRY_COUNT;
+            else if (d->authenticatedOnce)
+                retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
+            if (retryCount >= retryThreshold && !logReported)
+            {   
+                logReported = true;
+                auto session = authSession();
+                session.id = QnUuid::createUuid();
+                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
+            }
+
             if( !d->socket->isConnected() )
                 return false;   //connection has been closed
 
@@ -120,8 +138,9 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if (t.elapsed() >= AUTH_TIMEOUT)
                 return false; // close connection
         }
+        if (usedMethod != AuthMethod::noAuth)
+            d->authenticatedOnce = true;
     }
-
     return true;
 }
 

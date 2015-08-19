@@ -183,6 +183,26 @@ namespace ec2
         bool isPersistent( Value val );
     }
 
+    //!Contains information on how transaction has been delivered
+    class QnTranDeliveryInformation
+    {
+    public:
+        enum TranOriginatorType
+        {
+            localServer,
+            remoteServer,
+            client
+        };
+
+        TranOriginatorType originatorType;
+
+        QnTranDeliveryInformation()
+        :
+            originatorType( TranOriginatorType::localServer )
+        {
+        }
+    };
+
     class QnAbstractTransaction
     {
     public:
@@ -212,6 +232,7 @@ namespace ec2
         ApiCommand::Value command;
         QnUuid peerID;
         PersistentInfo persistentInfo;
+        QnTranDeliveryInformation deliveryInfo;
         
         bool isLocal; // do not propagate transactions to other server peers
 

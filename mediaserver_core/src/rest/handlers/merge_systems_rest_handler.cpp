@@ -22,6 +22,8 @@
 #include "utils/common/app_info.h"
 #include "utils/common/model_functions.h"
 #include "api/model/ping_reply.h"
+#include "audit/audit_manager.h"
+#include "rest/server/rest_connection_processor.h"
 
 namespace {
     const int requestTimeout = 60000;
@@ -31,7 +33,6 @@ namespace {
 int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
 {
     Q_UNUSED(path)
-    Q_UNUSED(owner)
 
     QUrl url = params.value(lit("url"));
     QString user = params.value(lit("user"), lit("admin"));
@@ -45,26 +46,22 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         takeRemoteSettings = false;
 
     if (url.isEmpty()) {
-        result.setError(QnJsonRestResult::MissingParameter);
-        result.setErrorString(lit("url"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("url"));
         return nx_http::StatusCode::ok;
     }
 
     if (!url.isValid()) {
-        result.setError(QnJsonRestResult::InvalidParameter);
-        result.setErrorString(lit("url"));
+        result.setError(QnJsonRestResult::InvalidParameter, lit("url"));
         return nx_http::StatusCode::ok;
     }
 
     if (password.isEmpty()) {
-        result.setError(QnJsonRestResult::MissingParameter);
-        result.setErrorString(lit("password"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("password"));
         return nx_http::StatusCode::ok;
     }
 
     if (currentPassword.isEmpty()) {
-        result.setError(QnJsonRestResult::MissingParameter);
-        result.setErrorString(lit("currentPassword"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("currentPassword"));
         return nx_http::StatusCode::ok;
     }
 
@@ -74,8 +71,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         return nx_http::StatusCode::internalServerError;
 
     if (!admin->checkPassword(currentPassword)) {
-        result.setError(QnJsonRestResult::InvalidParameter);
-        result.setErrorString(lit("currentPassword"));
+        result.setError(QnJsonRestResult::InvalidParameter, lit("currentPassword"));
         return nx_http::StatusCode::ok;
     }
 
@@ -101,10 +97,8 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     client.readAll(data);
     client.close();
 
-    QnJsonRestResult json;
-    QJson::deserialize(data, &json);
-    QnModuleInformationWithAddresses moduleInformation;
-    QJson::deserialize(json.reply(), &moduleInformation);
+    QnJsonRestResult json = QJson::deserialized<QnJsonRestResult>(data);
+    QnModuleInformationWithAddresses moduleInformation = json.deserialized<QnModuleInformationWithAddresses>();
 
     if (moduleInformation.systemName.isEmpty()) {
         /* Hmm there's no system name. It would be wrong system. Reject it. */
@@ -165,6 +159,10 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         QnServerConnector::instance()->addConnection(moduleInformation, SocketAddress(url.host(), moduleInformation.port));
 
     result.setReply(moduleInformation);
+
+    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge);
+    qnAuditManager->addAuditRecord(auditRecord);
+
 
     return nx_http::StatusCode::ok;
 }
@@ -250,7 +248,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
 
             QnJsonRestResult result;
             QnPingReply reply;
-            if (QJson::deserialize(data, &result) && QJson::deserialize(result.reply(), &reply)) {
+            if (QJson::deserialize(data, &result) && QJson::deserialize(result.reply, &reply)) {
                 remoteSysTime = reply.sysIdTime;
                 remoteTranLogTime = reply.tranLogTime;
             }

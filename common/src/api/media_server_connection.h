@@ -17,6 +17,7 @@
 #include <business/business_fwd.h>
 
 #include "abstract_connection.h"
+#include "model/manual_camera_seach_reply.h"
 
 // TODO: #MSAPI move to api/model or even to common_globals, 
 // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
@@ -146,7 +147,7 @@ public:
     int searchCameraAsyncStatus(const QnUuid &processUuid, QObject *target, const char *slot);
     int searchCameraAsyncStop(const QnUuid &processUuid, QObject *target = NULL, const char *slot = NULL);
 
-    int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot);
+    int addCameraAsync(const QnManualCameraSearchCameraList& cameras, const QString &username, const QString &password, QObject *target, const char *slot);
 
     int ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QnUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzContinuousFocusAsync(const QnNetworkResourcePtr &camera, qreal speed, QObject *target, const char *slot);
@@ -215,6 +216,7 @@ public:
 
     int pingSystemAsync(const QUrl &url, const QString &user, const QString &password, QObject *target, const char *slot);
     int getRecordingStatisticsAsync(qint64 bitrateAnalizePeriodMs, QObject *target, const char *slot);
+    int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject *target, const char *slot);
     int mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot);
 
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);

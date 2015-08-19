@@ -215,6 +215,7 @@ static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
         if( tranFormat == Qn::UbjsonFormat )
         {
             QnAbstractTransaction transaction;
+            transaction.deliveryInfo.originatorType = QnTranDeliveryInformation::remoteServer;
             QnUbjsonReader<QByteArray> stream(&serializedTransaction);
             if (!QnUbjson::deserialize(&stream, &transaction)) {
                 qnWarning("Ignore bad transaction data. size=%1.", serializedTransaction.size());
@@ -231,6 +232,7 @@ static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
         else if( tranFormat == Qn::JsonFormat )
         {
             QnAbstractTransaction transaction;
+            transaction.deliveryInfo.originatorType = QnTranDeliveryInformation::remoteServer;
             QJsonObject tranObject;
             //TODO #ak take tranObject from cache
             if( !QJson::deserialize(serializedTransaction, &tranObject) )
@@ -1418,7 +1420,8 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         const ApiPeerData& remotePeer,
         qint64 remoteSystemIdentityTime,
         const nx_http::Request& request,
-        const QByteArray& contentEncoding )
+        const QByteArray& contentEncoding,
+        std::function<void ()> ttFinishCallbac )
     {
         if (!dbManager)
         {
@@ -1438,6 +1441,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             request,
             contentEncoding );
         transport->setRemoteIdentityTime(remoteSystemIdentityTime);
+        transport->setBeforeDestroyCallback(ttFinishCallback);
         connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
         connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
         connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection );
@@ -1445,15 +1449,30 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         QnMutexLocker lock(&m_mutex);
         transport->moveToThread(thread());
         m_connectingConnections << transport;
-        transport->setState(QnTransactionTransport::Connected);
         Q_ASSERT(!m_connections.contains(remotePeer.id));
+    }
+
+    bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& connectionGuid)
+    {
+        QMutexLocker lock(&m_mutex);
+
+        for(auto connection: m_connectingConnections)
+        {
+            if(connection->connectionGuid() == connectionGuid)
+            {
+                connection->setState(QnTransactionTransport::Connected);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
         const QSharedPointer<AbstractStreamSocket>& socket,
-    const ApiPeerData &/*remotePeer*/,
-    qint64 /*remoteSystemIdentityTime*/,
+        const ApiPeerData &/*remotePeer*/,
+        qint64 /*remoteSystemIdentityTime*/,
         const nx_http::Request& request,
         const QByteArray& requestBuf )
     {

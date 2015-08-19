@@ -93,7 +93,7 @@ public:
     /** Mark data as invalid and needs to be recalculated. */
     void invalidate();
 protected:
-    virtual void calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const = 0;
+    virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const = 0;
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
 
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
@@ -139,7 +139,7 @@ public:
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual void calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
+    virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 
 private:
     void init();
@@ -168,7 +168,7 @@ public:
     static int licensesForScreens(int screens);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual void calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
+    virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 private:
     int m_proposed;
 };

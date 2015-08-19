@@ -5,7 +5,8 @@
 #include "hls_session_pool.h"
 
 #include "camera/video_camera.h"
-
+#include "audit/audit_manager.h"
+#include "core/resource/resource.h"
 
 namespace nx_hls
 {
@@ -14,25 +15,37 @@ namespace nx_hls
         unsigned int targetDurationMS,
         bool _isLive,
         MediaQuality streamQuality,
-        QnVideoCamera* const videoCamera )
+        QnVideoCamera* const videoCamera,
+        const QnAuthSession& authSession)
     :
         m_id( id ),
         m_targetDurationMS( targetDurationMS ),
         m_live( _isLive ),
         m_streamQuality( streamQuality ),
-        m_videoCamera( videoCamera )
+        m_videoCamera( videoCamera ),
+        m_authSession(authSession)
     {
         //verifying m_playlistManagers will not take much memory
         static_assert(
             ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
             "MediaQuality enum suddenly contains too large values: consider changing HLSSession::m_playlistManagers type" );  
         m_playlistManagers.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
-        m_videoCamera->inUse( this );
+        if( m_live )
+            m_videoCamera->inUse( this );
+    }
+        
+    void HLSSession::updateAuditInfo(qint64 timeUsec)
+    {
+        if (!m_auditHandle)
+            m_auditHandle = qnAuditManager->notifyPlaybackStarted(m_authSession, m_videoCamera->resource()->getId(), m_live ? DATETIME_NOW : timeUsec);
+        if (m_auditHandle)
+            qnAuditManager->notifyPlaybackInProgress(m_auditHandle, timeUsec);
     }
 
     HLSSession::~HLSSession()
     {
-        m_videoCamera->notInUse( this );
+        if( m_live )
+            m_videoCamera->notInUse( this );
     }
 
     const QString& HLSSession::id() const

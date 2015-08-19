@@ -18,6 +18,8 @@
 #ifndef Q_OS_WIN
 #   include <netinet/tcp.h>
 #endif
+#include "core/resource_management/resource_pool.h"
+#include "http/custom_headers.h"
 
 // we need enough size for updates
 #ifdef __arm__
@@ -487,4 +489,43 @@ bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
         return nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
     else    //e.g., RTSP
         return false;
+}
+
+QnAuthSession QnTCPConnectionProcessor::authSession() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    QnAuthSession result;
+    if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
+        result.userName = userRes->getName();
+    else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
+        result.userName = lit("Video wall");
+
+    result.id = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (result.id.isNull()) {
+        QByteArray nonce = d->request.getCookieValue("auth");
+        if (!nonce.isEmpty()) {
+            QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+            md5Hash.addData( nonce );
+            result.id = QnUuid::fromRfc4122(md5Hash.result());
+        }
+    }
+    if (result.id.isNull())
+        result.id = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    if (result.id.isNull()) {
+        QUrlQuery query(d->request.requestLine.url.query());
+        result.id = query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
+    }
+    if (result.id.isNull())
+        result.id = QnUuid::createUuid();
+
+    result.userHost = d->socket->getForeignAddress().address.toString();
+    result.userAgent = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, "User-Agent"));
+
+    int trimmedPos = result.userAgent.indexOf(lit("/"));
+    if (trimmedPos != -1) {
+        trimmedPos = result.userAgent.indexOf(lit(" "), trimmedPos);
+        result.userAgent = result.userAgent.left(trimmedPos);
+    }
+
+    return result;
 }

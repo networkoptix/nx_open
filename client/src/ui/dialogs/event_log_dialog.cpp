@@ -8,6 +8,7 @@
 
 #include <utils/common/event_processors.h>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -16,8 +17,6 @@
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
-
-#include <plugins/resource/server_camera/server_camera.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>

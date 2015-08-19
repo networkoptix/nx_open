@@ -381,6 +381,7 @@ bool DeviceFileCatalog::needRebuildPause()
 
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
+//    qDebug() << "folder being scanned: " << folder;
     QnAbstractStorageResource::FileInfoList files;
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
     {
@@ -776,6 +777,22 @@ bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
     return itr->distanceToTime(timeMs) <= eps;
 }
 
+bool DeviceFileCatalog::containTime(const QnTimePeriod& period) const
+{
+    QMutexLocker lk( &m_mutex );
+
+    if (m_chunks.empty())
+        return false;
+
+    ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin(), m_chunks.end(), period.startTimeMs);
+    if (itr != m_chunks.end() && itr->startTimeMs < period.endTimeMs())
+        return true;
+    if (itr == m_chunks.begin())
+        return false;
+    --itr;
+    return itr->endTimeMs() >= period.startTimeMs;
+}
+
 bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
 {
     QnMutexLocker lock( &m_mutex );
@@ -968,7 +985,8 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePerio
             }
         }
     }
-    result.recordedSecs /= 1000;
+    result.recordedSecs /= 1000;       // msec to sec
+    bitrateStats.recordedSecs /= 1000; // msec to sec
     if (bitrateStats.recordedBytes > 0 && bitrateStats.recordedSecs > 0)
         result.averageBitrate = bitrateStats.recordedBytes / (qreal) bitrateStats.recordedSecs;
     Q_ASSERT(result.averageBitrate >= 0);

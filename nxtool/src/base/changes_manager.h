@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-class QString;
+#include <base/types.h>
 
 namespace rtu
 {
@@ -71,6 +71,10 @@ namespace rtu
         
         void serverDiscovered(const rtu::BaseServerInfo &info);
         
+        void serversDisappeared(const IDsVector &ids);
+
+        void unknownAdded(const QString &ip);
+
     signals:
         void totalChangesCountChanged();
         

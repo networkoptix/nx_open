@@ -26,6 +26,7 @@
 #include "transaction/transaction.h"
 #include "utils/serialization/ubjson.h"
 #include "http/custom_headers.h"
+#include "api/model/audit/auth_session.h"
 
 
 namespace ec2
@@ -71,6 +72,7 @@ namespace ec2
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
+            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
@@ -122,6 +124,7 @@ namespace ec2
             //TODO #ak videowall looks strange here
             if (!QnAppServerConnectionFactory::videowallGuid().isNull())
                 httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;

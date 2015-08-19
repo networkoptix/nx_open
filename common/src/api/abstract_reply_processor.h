@@ -76,14 +76,45 @@ protected:
         if(status == 0) {
             QnJsonRestResult result;
             bool jsonDeserialized = QJson::deserialize(response.data, &result);
-            if (!jsonDeserialized || (!result.reply().isNull() && !QJson::deserialize(result.reply(), &reply))) {
+            if (!jsonDeserialized || (!result.reply.isNull() && !QJson::deserialize(result.reply, &reply))) {
 #ifdef JSON_REPLY_DEBUG
                 qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
 #endif
                 status = 1;
             }
             if (jsonDeserialized)
-                errorString = result.errorString();
+                errorString = result.errorString;
+        } else {
+#ifdef JSON_REPLY_DEBUG
+            qnWarning("Error processing request: %1.", response.errorString);
+#endif
+        }
+
+        emitFinished(derived, status, reply, handle, errorString);
+    }
+
+    template<class T, class Derived>
+    void processUbjsonReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
+        int status = response.status;
+        QString errorString = QString::fromUtf8(response.errorString);
+
+        T reply;
+        if(status == 0) {
+            QnUbjsonRestResult result;
+            bool deserialized = false;
+            result = QnUbjson::deserialized<QnUbjsonRestResult>(response.data, QnUbjsonRestResult(), &deserialized);
+
+            if (deserialized && !result.reply.isNull())
+                reply = QnUbjson::deserialized<T>(result.reply, T(), &deserialized);
+
+            if (!deserialized) {
+#ifdef JSON_REPLY_DEBUG
+                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+#endif
+                status = 1;
+            }
+            if (deserialized)
+                errorString = result.errorString;
         } else {
 #ifdef JSON_REPLY_DEBUG
             qnWarning("Error processing request: %1.", response.errorString);

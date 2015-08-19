@@ -12,6 +12,7 @@
 #include <utils/thread/mutex.h>
 
 #include <http/custom_headers.h>
+#include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/common/log.h>
 #include <utils/common/util.h>
 #include <utils/network/socket_factory.h>
@@ -1028,8 +1029,40 @@ namespace nx_http
             return false;
         }
 
+        doSomeCustomLogic( response, &m_request );
+
         m_authorizationTried = true;
         return initiateHttpMessageDelivery( m_url );
+    }
+
+    void AsyncHttpClient::doSomeCustomLogic(
+        const nx_http::Response& response,
+        Request* const request )
+    {
+        //TODO #ak this method is not part of http, so it should not be in this class
+
+        if( m_authType == authDigestWithPasswordHash )
+            return;
+
+        auto realmIter = response.headers.find( Qn::REALM_HEADER_NAME );
+        if( realmIter == response.headers.end() )
+            return;
+
+        //calculating user's digest with new realm
+        const auto newRealmDigest = calcHa1( m_userName.toUtf8(), realmIter->second, m_userPassword.toUtf8() );
+        const auto cryptSha512Hash = linuxCryptSha512(
+            m_userPassword.toUtf8(),
+            generateSalt( LINUX_CRYPT_SALT_LENGTH ) );
+
+        nx_http::insertOrReplaceHeader(
+            &request->headers,
+            HttpHeader( Qn::HA1_DIGEST_HEADER_NAME, newRealmDigest ) );
+        nx_http::insertOrReplaceHeader(
+            &request->headers,
+            HttpHeader( Qn::CRYPT_SHA512_HASH_HEADER_NAME, cryptSha512Hash ) );
+        nx_http::insertOrReplaceHeader(
+            &request->headers,
+            HttpHeader( Qn::REALM_HEADER_NAME, realmIter->second ) );
     }
 
     const char* AsyncHttpClient::toString( State state )
@@ -1076,15 +1109,11 @@ namespace nx_http
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders,
-        const QAuthenticator &auth)
+        AsyncHttpClient::AuthType authType )
     {
         nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
-        httpClientCaptured->addRequestHeaders(extraHeaders);
-        if (!auth.isNull()) {
-            httpClientCaptured->setUserName(auth.user());
-            httpClientCaptured->setUserPassword(auth.password());
-            httpClientCaptured->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
-        }
+        httpClientCaptured->setAdditionalHeaders(extraHeaders);
+        httpClientCaptured->setAuthType(authType);
 
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
             ( nx_http::AsyncHttpClientPtr httpClient ) mutable

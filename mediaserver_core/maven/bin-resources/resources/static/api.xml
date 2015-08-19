@@ -1337,7 +1337,7 @@
                 </function>
                 <function>
                     <name>gettime</name>
-                    <description>Returns server UTC time and time zone</description>
+                    <description>Returns server UTC time, time zone and authentication realm (realm is added for convenience)</description>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1569,7 +1569,8 @@
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>By default server opens camera from live position. This parameter defines position in an archive in microseconds in a UTC format.
+                            <description>By default server opens camera from live position. This parameter defines position in an archive in 
+                                                        milliseconds since epoch, microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
                                                         Position can be passed via standard RTSP attribute as well as via URL parameter</description>
                             <optional>true</optional>
                         </param>
@@ -1651,7 +1652,9 @@
                         </param>
                         <param>
                             <name>pos</name>
-                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions in milliseconds from epoch (1970-01-01 00:00, UTC). Otherwise, LIVE stream is provided</description>
+                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions 
+                                         milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
+                                         Otherwise, LIVE stream is provided</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1768,6 +1771,52 @@
                     <result>
                         <caption>Return result of the target api request.</caption>
                     </result>
+                </function>
+            </functions>
+        </group>
+        <group>
+            <groupName>Authentication</groupName>
+            <groupDescription>Request authentication methods supported by server</groupDescription>
+            <functions>
+                <function>
+                    <name>HTTP Basic / Digest Authentication</name>
+                    <description>
+                        Server is fully conformant with authentication defined in rfc2617 (https://tools.ietf.org/html/rfc2617)
+                    </description>
+                </function>
+                <function>
+                    <name>Cookie-based Authentication</name>
+                    <description>
+                        Cookie authorisation scheme allows to avoid standard login/password dialog in web-applications. 
+                        It provides you a way to replace it with your own. 
+                        It works mostly like sessions, but a bit more secure because it doesn't send user's password over HTTP.
+                        <ul>
+                            <li>In the first request to server you must send cookie Authorization=Digest (path: '/')
+                                You can request any anonymous request like '/api/moduleInformation'</li>
+                            <li>In response you'll get cookies 'realm' and 'nonce' (nonce is a session key for this user)</li>
+                            <li>Calculate digest signature:
+                                (login must be in lower case)
+                                digest = MD5(login + ':' + realm + ':' + password)
+                                method = MD5("GET:")
+                                auth = MD5(digest + ':' + nonce + ':' + method);</li>
+                            <li>Set cookies: response=auth and username=login (path: '/')
+                                Every following request to server must contain cookies: username, nonce, response, Authorization</li>
+                        </ul>
+                    </description>
+                </function>
+                <function>
+                    <name>Providing Authentication Hash In Request Url</name>
+                    <description>
+                        You can add "auth" field to url query section. E.g., http://127.0.0.1:7001/ec2/getMediaServersEx?auth=auth_digest
+                        "auth_digest" is calculated in a following way:
+                        auth_digest    = base64(username:nonce:simplified_ha2)
+                        simplified_ha2 = MD5(ha1:nonce:MD5(method:))
+                        ha1            = MD5(usename:realm:password)
+
+                        Current server time MUST be used as a nonce value.
+                        So, to get realm and nonce call /gettime.
+                        Such nonce value is valid for 5 minutes.
+                    </description>
                 </function>
             </functions>
         </group>

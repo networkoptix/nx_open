@@ -25,6 +25,7 @@
 #include <ui/dialogs/recording_stats_dialog.h>
 #include <ui/dialogs/camera_list_dialog.h>
 #include <ui/dialogs/search_bookmarks_dialog.h>
+#include "ui/dialogs/audit_log_dialog.h"
 
 #include <utils/color_space/image_correction.h>
 #include "api/model/camera_list_reply.h"
@@ -214,6 +215,7 @@ protected slots:
     void at_openBusinessRulesAction_triggered();
     void at_openBookmarksSearchAction_triggered();
     void at_openBusinessLogAction_triggered();
+    void at_openAuditLogAction_triggered();
     void at_openRecordingStatsAction_triggered();
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
@@ -317,6 +319,7 @@ private:
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
 	QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
+    QPointer<QnAuditLogDialog> m_auditLogDialog;
     QPointer<QnRecordingStatsDialog> m_recordingStatsDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;

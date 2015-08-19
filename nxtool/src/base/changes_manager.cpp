@@ -18,6 +18,8 @@
 
 namespace
 {
+    enum { kSingleInterfaceChangeCount = 1 };
+
     enum 
     {
         kIfListRequestsPeriod = 2 * 1000
@@ -125,7 +127,15 @@ public:
     
     void serverDiscovered(const rtu::BaseServerInfo &info);
     
+    void serversDisappeared(const IDsVector &ids);
+
+    bool unknownAdded(const QString &ip);
+
 private:
+    typedef QHash<QUuid, ItfChangeRequest> ItfChangesContainer;
+
+    void itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it);
+
     void onChangesetApplied(int changesCount);
 
     void sendRequests();
@@ -153,7 +163,6 @@ private:
         , AffectedEntities affected);
     
 private:
-    typedef QHash<QUuid, ItfChangeRequest> ItfChangesContainer;
     typedef QScopedPointer<Changeset> ChangesetPointer;
     typedef QVector<rtu::ServerInfo> ServerInfoValueContainer;
     
@@ -349,6 +358,9 @@ bool changesApplied(const rtu::InterfaceInfoList &itf
 
 void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &baseInfo)
 {
+    if (unknownAdded(baseInfo.hostAddress))
+        return;
+
     const auto &it = m_itfChanges.find(baseInfo.id);
     if (it == m_itfChanges.end())
         return;
@@ -412,7 +424,7 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
     };
 
     const auto &failed = 
-        [processCallback, baseInfo](const QString &, int)
+        [processCallback, baseInfo](const int, const QString &, int)
     {
         processCallback(false, baseInfo.id, ExtraServerInfo());
     };
@@ -423,6 +435,82 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
         , request.info->extraInfo().password, successful, failed, kIfListRequestsPeriod);
 }
 
+void rtu::ChangesManager::Impl::serversDisappeared(const rtu::IDsVector &ids)
+{
+    for (const QUuid &id: ids)
+    {
+        const auto &it = m_itfChanges.find(id);
+        if (it == m_itfChanges.end())
+            continue;
+
+        ItfChangeRequest &request = it.value();
+    
+        /// TODO: extend logic for several interface changes
+        if (request.itfUpdateInfo.size() != kSingleInterfaceChangeCount)
+            continue;
+
+
+        bool isDHCPTurnOnChange = true;
+        for (const auto &change: request.itfUpdateInfo)
+        {
+            isDHCPTurnOnChange &= (change.useDHCP && *change.useDHCP);
+        }
+    
+        if (!isDHCPTurnOnChange)
+            continue;
+
+        //// If server is disappeared and all changes are dhcp "on"
+        itfRequestSuccessfullyApplied(it);
+    }
+}
+
+bool rtu::ChangesManager::Impl::unknownAdded(const QString &ip)
+{
+    /// Searches for the change request
+    const auto &it = std::find_if(m_itfChanges.begin(), m_itfChanges.end()
+        , [ip](const ItfChangeRequest &request)
+    {
+        /// Currently it is supposed to be only one-interface-change action
+        /// TODO: extend logic for several interface changes
+        if (request.itfUpdateInfo.size() != kSingleInterfaceChangeCount)
+            return false;
+
+        const auto &it = std::find_if(request.itfUpdateInfo.begin(), request.itfUpdateInfo.end()
+            , [ip](const ItfUpdateInfo &updateInfo) 
+        {
+            return ((!updateInfo.useDHCP || !*updateInfo.useDHCP) && updateInfo.ip && *updateInfo.ip == ip);
+        });
+
+        return (it != request.itfUpdateInfo.end());
+    });
+
+    if (it == m_itfChanges.end())
+    {
+        return false;
+    }
+
+    /// We've found change request with dhcp "off" state, ip that is 
+    /// equals to ip of found unknown entity and ip is from another network.
+    /// So, we suppose that request to change ip is successfully aplied
+
+    itfRequestSuccessfullyApplied(it);
+    return true;
+}
+
+void rtu::ChangesManager::Impl::itfRequestSuccessfullyApplied(const ItfChangesContainer::iterator it)
+{
+    const ItfChangeRequest &request = *it;
+    for(const auto &change: request.itfUpdateInfo)
+    {
+        static const QString kSuccessfulReason = QString();
+        addUpdateInfoSummaryItem(*request.info
+            , kSuccessfulReason, change, kAllEntitiesAffected);
+    }
+
+    const int changesCount = request.changesCount;
+    m_itfChanges.erase(it);
+    onChangesetApplied(changesCount);
+}
 
 Changeset &rtu::ChangesManager::Impl::getChangeset()
 {
@@ -482,7 +570,7 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
         const auto request = [this, info, change, timestampMs]()
         {
             const auto &callback = 
-                [this, info, change, timestampMs](const QString &errorReason, AffectedEntities affected)
+                [this, info, change, timestampMs](const int, const QString &errorReason, AffectedEntities affected)
             {
                 static const QString kDateTimeDescription = "date / time";
                 static const QString kTimeZoneDescription = "time zone";
@@ -490,7 +578,8 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
 
                 QString timeZoneName = timeZoneNameWithOffset(QTimeZone(change.timeZoneId), QDateTime::currentDateTime());
 
-                const QString &value= convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId)).toString();
+                QDateTime timeValue = convertUtcToTimeZone(change.utcDateTimeMs, QTimeZone(change.timeZoneId));
+                const QString &value = timeValue.toString(Qt::SystemLocaleLongDate);
                 const bool dateTimeOk = addSummaryItem(*info, kDateTimeDescription
                     , value, errorReason, kDateTimeAffected, affected);
                 const bool timeZoneOk = addSummaryItem(*info, kTimeZoneDescription
@@ -530,7 +619,7 @@ void rtu::ChangesManager::Impl::addSystemNameChangeRequests()
         const auto request = [this, info, systemName]()
         {
             const auto &callback = 
-                [this, info, systemName](const QString &errorReason, AffectedEntities affected)
+                [this, info, systemName](const int, const QString &errorReason, AffectedEntities affected)
             {
                 static const QString &kSystemNameDescription = "system name";
 
@@ -564,7 +653,7 @@ void rtu::ChangesManager::Impl::addPortChangeRequests()
         const auto request = [this, info, port]()
         {
             const auto &callback = 
-                [this, info, port](const QString &errorReason, AffectedEntities affected)
+                [this, info, port](const int, const QString &errorReason, AffectedEntities affected)
             {
                 static const QString kPortDescription = "port";
                 
@@ -601,7 +690,7 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
             [this, info, changes, changeRequest]()
         {
             const auto &failedCallback = 
-                [this, info, changes](const QString &errorReason, AffectedEntities affected)
+                [this, info, changes](const int, const QString &errorReason, AffectedEntities affected)
             {
                 const auto &it = m_itfChanges.find(info->baseInfo().id);
                 if (it == m_itfChanges.end())
@@ -616,11 +705,11 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
             };
 
             const auto &callback = 
-                [this, failedCallback](const QString &errorReason, AffectedEntities affected)
+                [this, failedCallback](const int errorCode, const QString &errorReason, AffectedEntities affected)
             {
                 if (!errorReason.isEmpty())
                 {
-                    failedCallback(errorReason, affected);
+                    failedCallback(errorCode, errorReason, affected);
                 }
                 else
                 {
@@ -628,7 +717,7 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
                     QTimer::singleShot(kTotalIfConfigTimeout
                         , [this, failedCallback, affected]() 
                     {
-                        failedCallback(tr("Request timeout"), affected);
+                        failedCallback(kUnspecifiedError, ("Request timeout"), affected);
                     });
                 }
                 
@@ -683,7 +772,7 @@ void rtu::ChangesManager::Impl::addPasswordChangeRequests()
         const auto request = [this, info, password]()
         {
             const auto finalCallback = 
-                [this, info, password](const QString &errorReason, AffectedEntities affected)
+                [this, info, password](const int, const QString &errorReason, AffectedEntities affected)
             {
                 static const QString kPasswordDescription = "password";
 
@@ -698,11 +787,12 @@ void rtu::ChangesManager::Impl::addPasswordChangeRequests()
             };
             
             const auto &callback = 
-                [this, info, password, finalCallback](const QString &errorReason, AffectedEntities affected)
+                [this, info, password, finalCallback](const int errorCode
+                    , const QString &errorReason, AffectedEntities affected)
             {
                 if (errorReason.isEmpty())
                 {
-                    finalCallback(errorReason, affected);
+                    finalCallback(errorCode, errorReason, affected);
                 }
                 else
                 {
@@ -891,4 +981,14 @@ int rtu::ChangesManager::appliedChangesCount() const
 void rtu::ChangesManager::serverDiscovered(const rtu::BaseServerInfo &info)
 {
     m_impl->serverDiscovered(info);
+}
+
+void rtu::ChangesManager::serversDisappeared(const IDsVector &ids)
+{
+    m_impl->serversDisappeared(ids);
+}
+
+void rtu::ChangesManager::unknownAdded(const QString &ip)
+{
+    m_impl->unknownAdded(ip);
 }

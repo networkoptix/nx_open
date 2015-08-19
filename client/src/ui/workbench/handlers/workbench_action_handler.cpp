@@ -233,6 +233,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenBookmarksSearchAction),              SIGNAL(triggered()),    this,   SLOT(at_openBookmarksSearchAction_triggered()));
     connect(action(Qn::RecordingStatisticsAction),              SIGNAL(triggered()),    this,   SLOT(at_openRecordingStatsAction_triggered()));
     connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
+    connect(action(Qn::OpenAuditLogAction),                     SIGNAL(triggered()),    this,   SLOT(at_openAuditLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
@@ -810,7 +811,7 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
 void QnWorkbenchActionHandler::at_openIOMonitorAction_triggered() 
 {
     foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
-        QnServerCameraPtr cameraResource = resource.dynamicCast<QnServerCamera>();
+        QnVirtualCameraResourcePtr cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
         if(cameraResource) {
             QnIOStateDisplayWidget* ioStateDisplay = new QnIOStateDisplayWidget(mainWindow());
             ioStateDisplay->setCamera(cameraResource);
@@ -1206,6 +1207,11 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
         businessEventsLogDialog()->setCameraList(cameras);
         businessEventsLogDialog()->enableUpdateData();
     }
+}
+
+void QnWorkbenchActionHandler::at_openAuditLogAction_triggered() {
+    QnNonModalDialogConstructor<QnAuditLogDialog> dialogConstructor(m_auditLogDialog, mainWindow());
+    QnActionParameters parameters = menu()->currentParameters(sender());
 }
 
 void QnWorkbenchActionHandler::at_openRecordingStatsAction_triggered() 

@@ -44,6 +44,7 @@
 #include "model/upload_update_reply.h"
 #include "http/custom_headers.h"
 #include "model/recording_stats_reply.h"
+#include "common/common_module.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -92,6 +93,7 @@ namespace {
         (ConfigureObject,          "configure")
         (PingSystemObject,         "pingSystem")
         (RecordingStatsObject,     "recStats")
+        (AuditLogObject,           "auditLog")
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
@@ -260,6 +262,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case RecordingStatsObject:
         processJsonReply<QnRecordingStatsReply>(this, response, handle);
         break;
+    case AuditLogObject:
+        processUbjsonReply<QnAuditRecordList>(this, response, handle);
+        break;
     case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
         break;
@@ -304,6 +309,7 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
 
     if (!videowallGuid.isNull())
         extraHeaders.insert(QString::fromLatin1(Qn::VIDEOWALL_GUID_HEADER_NAME), videowallGuid.toString());
+    extraHeaders.insert(QString::fromLatin1(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
     setExtraHeaders(extraHeaders);
 }
 
@@ -372,7 +378,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnVirtualCameraResourcePt
 {
     QnRequestParamList params;
 
-    params << QnRequestParam("physicalId", camera->getPhysicalId());
+    params << QnRequestParam(Qn::CAMERA_UNIQUE_ID_HEADER_NAME, camera->getPhysicalId());
     params << QnRequestParam("startTime", QString::number(startTimeMs));
     params << QnRequestParam("endTime", QString::number(endTimeMs));
     params << QnRequestParam("detail", QString::number(detail));
@@ -439,11 +445,12 @@ int QnMediaServerConnection::searchCameraAsyncStop(const QnUuid &processUuid, QO
     return sendAsyncGetRequest(CameraSearchStopObject, params, QN_STRINGIZE_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
-int QnMediaServerConnection::addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot) {
+int QnMediaServerConnection::addCameraAsync(const QnManualCameraSearchCameraList& cameras, const QString &username, const QString &password, QObject *target, const char *slot) {
     QnRequestParamList params;
-    for (int i = 0; i < qMin(urls.count(), manufacturers.count()); i++){
-        params << QnRequestParam(lit("url") + QString::number(i), urls[i]);
-        params << QnRequestParam(lit("manufacturer") + QString::number(i), manufacturers[i]);
+    for (int i = 0; i < cameras.size(); i++){
+        params << QnRequestParam(lit("url") + QString::number(i), cameras[i].url);
+        params << QnRequestParam(lit("manufacturer") + QString::number(i), cameras[i].manufacturer);
+        params << QnRequestParam(lit("uniqueId") + QString::number(i), cameras[i].uniqueId);
     }
     params << QnRequestParam("user", username);
     params << QnRequestParam("password", password);
@@ -809,6 +816,14 @@ int QnMediaServerConnection::getRecordingStatisticsAsync(qint64 bitrateAnalizePe
     QnRequestParamList params;
     params << QnRequestParam("bitrateAnalizePeriodMs", bitrateAnalizePeriodMs);
     return sendAsyncGetRequest(RecordingStatsObject, params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
+}
+
+int QnMediaServerConnection::getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("startTimeMs", startTimeMs);
+    params << QnRequestParam("endTimeMs", endTimeMs);
+    params << QnRequestParam("format", "ubjson");
+    return sendAsyncGetRequest(AuditLogObject, params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
 
 int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {

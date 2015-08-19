@@ -262,6 +262,9 @@ namespace nx_http
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
         bool resendRequestWithAuthorization( const nx_http::Response& response );
+        void doSomeCustomLogic(
+            const nx_http::Response& response,
+            Request* const request );
 
         AsyncHttpClient( const AsyncHttpClient& );
         AsyncHttpClient& operator=( const AsyncHttpClient& );
@@ -383,7 +386,7 @@ namespace nx_http
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-        const QAuthenticator &auth = QAuthenticator());
+        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
     //!Calls previous function and waits for completion
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,

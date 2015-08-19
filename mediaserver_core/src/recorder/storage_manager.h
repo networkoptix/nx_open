@@ -84,6 +84,7 @@ public:
     QnStorageResourceList getStoragesInLexicalOrder() const;
 
     void clearSpace();
+    void removeEmptyDirs(const QnStorageResourcePtr &storage);
     
     void clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
     void clearMaxDaysData();
@@ -95,6 +96,7 @@ public:
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
     bool isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs);
+    bool isArchiveTimeExists(const QString& cameraUniqueId, const QnTimePeriod period);
     void stopAsyncTasks();
 
     QnStorageScanData rebuildCatalogAsync();
@@ -108,6 +110,12 @@ public:
     * Return full path list from storage_index.csv (include absent in DB storages)
     */
     QStringList getAllStoragePathes() const;
+
+    // Manage local paths list used as smb mount points
+    // in order not to autodiscover them
+    void removeFromLocalPathInUse(const QString &path);
+    void addLocalPathInUse(const QString &path);
+    void getCurrentlyUsedLocalPathes(QList<QString> *pathList) const;
 
     bool addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark, bool forced = false);
     bool updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
@@ -203,6 +211,9 @@ private:
     mutable QnMutex m_csvMigrationMutex;
     bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
+    QElapsedTimer m_removeEmtyDirTimer;
+
+    QStringList m_localPathsInUse;
 };
 
 #define qnStorageMan QnStorageManager::instance()

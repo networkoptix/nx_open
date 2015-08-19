@@ -22,6 +22,7 @@
 
 #include "media_server_connection.h"
 #include "model/recording_stats_reply.h"
+#include "api/model/audit/audit_record.h"
 
 class QnTimePeriodList;
 
@@ -63,7 +64,7 @@ signals:
     void finished(int status, const ec2::ApiCameraHistoryDataList &reply, int handle, const QString &errorString);
     void finished(int status, const MultiServerPeriodDataList &reply, int handle, const QString &errorString);
 	void finished(int status, const QnRecordingStatsReply &reply, int handle, const QString &errorString);
-
+    void finished(int status, const QnAuditRecordList&reply, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

@@ -4,14 +4,10 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
-#include <utils/serialization/json.h>
-#include <utils/common/model_functions_fwd.h>
+#include <utils/common/model_functions.h>
 
-// TODO: #MSAPI rename to QnRestResult.
-// 
+// TODO: #MSAPI rename module to rest_result
 // Add format field (Qn::SerializationFormat) that will be set in QnJsonRestHandler (to be renamed).
-// In setReply do QByteArray serialization right away, don't store in an 
-// intermediate QVariant/QJsonValue.
 // 
 // And it also might make sense to get rid of "error" in reply. Looks like it 
 // was a bad idea in the first place. This way we'll send a reply if there was
@@ -19,7 +15,7 @@
 // description of the error.
 // 
 
-class QnJsonRestResult {
+struct QnRestResult {
 public:
     enum Error {
         NoError = 0,
@@ -28,35 +24,67 @@ public:
         CantProcessRequest = 3,
     };
 
+    Error error;
+    QString errorString;
+
+    QnRestResult();
+    void setError(Error errorValue, const QString &errorStringValue = QString());
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnRestResult::Error)
+
+#define QnRestResult_Fields (error)(errorString)
+
+
+struct QnJsonRestResult: public QnRestResult {
+public:
     QnJsonRestResult();
+    QnJsonRestResult(const QnRestResult& base);
 
-    const QString &errorString() const;
-    void setErrorString(const QString &errorString);
-    Error error() const;
-    void setError(Error error);
-    void setError(Error error, const QString &errorString);
-
-    const QJsonValue &reply() const;
+    QJsonValue reply;
 
     template<class T>
-    void setReply(const T &reply) {
-        QJson::serialize(reply, &m_reply);
+    void setReply(const T &replyStruct) {
+        QJson::serialize(replyStruct, &reply);
     }
 
-    void setReply(const QJsonValue &reply) {
-        m_reply = reply;
+    template<class T>
+    T deserialized() {
+        T result;
+        QJson::deserialize(reply, &result);
+        return result;
     }
-
-    QN_FUSION_DECLARE_FUNCTIONS(QnJsonRestResult, (json), friend)
-
-private:
-    QN_FUSION_ENABLE_PRIVATE();
-
-    QString m_errorString;
-    Error m_error;
-    QJsonValue m_reply;
 };
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnJsonRestResult::Error)
+#define QnJsonRestResult_Fields QnRestResult_Fields (reply)
+
+class QnUbjsonRestResult: public QnRestResult {
+public:
+    QnUbjsonRestResult();
+    QnUbjsonRestResult(const QnRestResult& base);
+
+    QByteArray reply;
+
+    template<class T>
+    void setReply(const T &replyStruct) {
+        QnUbjson::serialize(replyStruct, &reply);
+    }
+
+    template<class T>
+    T deserialized() {
+        return QnUbjson::deserialized<T>(reply);
+    }
+};
+
+#define QnUbjsonRestResult_Fields QnRestResult_Fields (reply)
+
+#define QN_REST_RESULT_TYPES \
+    (QnRestResult) \
+    (QnJsonRestResult) \
+    (QnUbjsonRestResult)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    QN_REST_RESULT_TYPES,
+    (ubjson)(json)
+    );
 
 #endif // QN_JSON_REST_RESULT_H

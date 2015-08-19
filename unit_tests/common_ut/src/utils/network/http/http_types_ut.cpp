@@ -458,7 +458,7 @@ TEST( HttpRequestTest, Request_parse )
 
 
 //////////////////////////////////////////////
-//   Via header tests
+//   WWWAuthenticate header tests
 //////////////////////////////////////////////
 
 TEST( HttpHeaderTest, WWWAuthenticate_parse )
@@ -496,4 +496,74 @@ TEST( HttpHeaderTest, WWWAuthenticate_parse )
     //    nx_http::header::WWWAuthenticate auth;
     //    ASSERT_FALSE( auth.parse( QByteArray::fromRawData(testData, sizeof(testData)-1) ) );
     //}
+}
+
+TEST( HttpHeaderTest, Authorization_parse )
+{
+    {
+        static const char testData[] =
+            "Digest username=\"Mufasa\","
+                "realm=\"testrealm@host.com\","
+                "nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\","
+                "uri=\"/dir/index.html\","
+                "qop=auth,"
+                "nc=00000001,"
+                "cnonce=\"0a4f113b\","
+                "response=\"6629fae49393a05397450978507c4ef1\","
+                "opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"";
+        nx_http::header::Authorization auth;
+        ASSERT_TRUE( auth.parse( QByteArray::fromRawData( testData, sizeof( testData ) - 1 ) ) );
+        ASSERT_EQ( auth.authScheme, nx_http::header::AuthScheme::digest );
+        ASSERT_EQ( auth.userid(), "Mufasa" );
+        ASSERT_EQ( auth.digest->params["username"], "Mufasa" );
+        ASSERT_EQ( auth.digest->params["realm"], "testrealm@host.com" );
+        ASSERT_EQ( auth.digest->params["nonce"], "dcd98b7102dd2f0e8b11d0f600bfb0c093" );
+        ASSERT_EQ( auth.digest->params["uri"], "/dir/index.html" );
+        ASSERT_EQ( auth.digest->params["qop"], "auth" );
+        ASSERT_EQ( auth.digest->params["nc"], "00000001" );
+        ASSERT_EQ( auth.digest->params["cnonce"], "0a4f113b" );
+        ASSERT_EQ( auth.digest->params["response"], "6629fae49393a05397450978507c4ef1" );
+        ASSERT_EQ( auth.digest->params["opaque"], "5ccc069c403ebaf9f0171e9517f40e41" );
+    }
+
+    {
+        static const char testData[] = "Digest realm=AXIS_ACCC8E338EDF, nonce=\"p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad\", algorithm=MD5, qop=auth";
+
+        nx_http::header::Authorization auth;
+        ASSERT_TRUE( auth.parse( QByteArray::fromRawData( testData, sizeof( testData ) - 1 ) ) );
+        ASSERT_EQ( auth.authScheme, nx_http::header::AuthScheme::digest );
+        ASSERT_EQ( auth.digest->params.size(), 4 );
+        ASSERT_EQ( auth.digest->params["realm"], "AXIS_ACCC8E338EDF" );
+        ASSERT_EQ( auth.digest->params["algorithm"], "MD5" );
+        ASSERT_EQ( auth.digest->params["qop"], "auth" );
+        ASSERT_EQ( auth.digest->params["nonce"], "p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad" );
+    }
+
+    {
+        static const char testData[] = "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==";
+
+        nx_http::header::Authorization auth;
+        ASSERT_TRUE( auth.parse( QByteArray::fromRawData( testData, sizeof( testData ) - 1 ) ) );
+        ASSERT_EQ( auth.authScheme, nx_http::header::AuthScheme::basic );
+        ASSERT_EQ( auth.basic->userid, "Aladdin" );
+        ASSERT_EQ( auth.basic->password, "open sesame" );
+    }
+}
+
+TEST( HttpHeaderTest, parseDigestAuthParams )
+{
+    {
+        static const char testData[] =
+            "X-runtime-guid={9968ed68-0a83-47f6-adb6-af50cd9bcad2}; csrftoken=JWGZ9bRtEBNoa7kELHWx0ZJdpqqMgbVp; "
+            "X-runtime-guid={d189fb72-54d7-4e7a-b2aa-90712e5f3a55}; Authorization=Digest; nonce=51d1c3e51d750; "
+            "realm=networkoptix; auth=YWRtaW46NTFkMWMzZTUxZDc1MDo2YjA5YmJhYjFmMGY4NDE3ZmI1ZmYwNzcyZGE0MmJjNA%3D%3D; "
+            "auth_rtsp=YWRtaW46NTFkMWMzZTUxZDc1MDo3M2I1MDVhYTMzNjcyNDZmNDEzYWQ2ZThkZjg1MDRkZQ%3D%3D; "
+            "response=6b09bbab1f0f8417fb5ff0772da42bc4; username=admin";
+        QMap<nx_http::BufferType, nx_http::BufferType> params;
+        nx_http::header::parseDigestAuthParams(
+            QByteArray::fromRawData( testData, sizeof( testData ) - 1 ),
+            &params,
+            ';' );
+        ASSERT_EQ( params["auth"], "YWRtaW46NTFkMWMzZTUxZDc1MDo2YjA5YmJhYjFmMGY4NDE3ZmI1ZmYwNzcyZGE0MmJjNA%3D%3D" );
+    }
 }

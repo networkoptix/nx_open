@@ -24,7 +24,7 @@ public:
         MultiMode
     };
 
-    QnCameraSettingsWidget(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
+    QnCameraSettingsWidget(QWidget *parent = NULL);
     virtual ~QnCameraSettingsWidget();
 
     QnVirtualCameraResourceList cameras() const;
@@ -73,12 +73,8 @@ public:
 signals:
     void hasChangesChanged();
     void modeChanged();
-    void moreLicensesRequested();
     void scheduleExported(const QnVirtualCameraResourceList &);
     void resourcesChanged();
-
-protected slots:
-    void at_moreLicensesRequested();
 
 private:
     void setMode(Mode mode);

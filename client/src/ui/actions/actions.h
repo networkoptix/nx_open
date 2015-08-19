@@ -1031,6 +1031,11 @@ namespace Qn {
          */
         OpenIOMonitorAction,
 
+        /**
+         * Opens the Audit Log dialog.
+         */
+        OpenAuditLogAction,
+
         ActionCount,
 
         NoAction = -1

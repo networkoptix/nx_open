@@ -19,6 +19,7 @@
 
 #include <network/authenticate_helper.h>
 #include <utils/common/log.h>
+#include <utils/common/string.h>
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/media_stream_cache.h>
@@ -697,12 +698,12 @@ namespace nx_hls
         }
         else
         {
-            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(QLatin1String(StreamingParams::START_DATETIME_PARAM_NAME));
+            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(QLatin1String(StreamingParams::START_POS_PARAM_NAME));
             if( startDatetimeIter != requestParams.end() )
             {
                 //converting startDatetime to startTimestamp
                     //this is secondary functionality, not used by this HLS implementation (since all chunks are referenced by npt timestamps)
-                startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
+                startTimestamp = parseDateTime( startDatetimeIter->second );
             }
         }
         quint64 chunkDuration = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
@@ -719,8 +720,10 @@ namespace nx_hls
                 : HLSSessionPool::generateUniqueID();
             HLSSessionPool::ScopedSessionIDLock lk( HLSSessionPool::instance(), sessionID );
             HLSSession* session = HLSSessionPool::instance()->find( sessionID );
-            if( session )
+            if( session ) {
+                session->updateAuditInfo(startTimestamp);
                 session->getChunkByAlias( streamQuality, aliasIter->second, &startTimestamp, &chunkDuration );
+            }
         }
 
         StreamingChunkCacheKey currentChunkKey(
@@ -841,9 +844,9 @@ namespace nx_hls
         }
         else
         {
-            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_DATETIME_PARAM_NAME);
+            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_POS_PARAM_NAME);
             if( startDatetimeIter != requestParams.end() )
-                startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
+                startTimestamp = parseDateTime( startDatetimeIter->second );
         }
 
         std::unique_ptr<HLSSession> newHlsSession(
@@ -852,7 +855,8 @@ namespace nx_hls
                 MSSettings::roSettings()->value( nx_ms_conf::HLS_TARGET_DURATION_MS, nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt(),
                 !startTimestamp,   //if no start date specified, providing live stream
                 streamQuality,
-                videoCamera ) );
+                videoCamera,
+                authSession()) );
         if( newHlsSession->isLive() )
         {
             //LIVE session

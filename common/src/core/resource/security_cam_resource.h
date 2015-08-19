@@ -157,6 +157,10 @@ public:
     void setScheduleDisabled(bool value);
     bool isScheduleDisabled() const;
 
+    /** Check if a license is used for the current camera. */
+    bool isLicenseUsed() const;
+    void setLicenseUsed(bool value);
+
     bool isAudioEnabled() const;
     bool isAudioForced() const;
     void setAudioEnabled(bool value);
@@ -262,6 +266,7 @@ signals:
     void groupNameChanged(const QnResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
+    void licenseUsedChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 

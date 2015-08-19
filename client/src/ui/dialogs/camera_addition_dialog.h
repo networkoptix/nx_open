@@ -30,7 +30,6 @@ public:
 signals:
     void checkStateChanged(Qt::CheckState state);
 protected:
-    virtual void paintEvent(QPaintEvent *e) override;
     virtual void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override;
     virtual QSize sectionSizeFromContents(int logicalIndex) const override;
 private slots:

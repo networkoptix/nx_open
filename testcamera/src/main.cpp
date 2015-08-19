@@ -13,6 +13,7 @@
 #include "core/resource/camera_user_attribute_pool.h"
 #include "api/global_settings.h"
 #include "core/resource_management/resource_properties.h"
+#include "core/resource/storage_plugin_factory.h"
 
 
 QString doUnquote(const QString& fileName)
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
     // Each user may have it's own traytool running.
     QCoreApplication app(argc, argv);
 
-    QnCommonModule common;
+    QnCommonModule common();
     QnSyncTime syncTime;
 
     new QnLongRunnablePool();

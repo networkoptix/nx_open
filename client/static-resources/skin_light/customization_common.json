@@ -107,6 +107,35 @@
         }}
     },
 
+    "QnAuditLogModel": {
+        "colors": {
+			"_": "Audit trail colors.",
+		
+            "httpLink": "#000000",
+            "unsucessLoginAction": "#666666",
+            "loginAction": "#147700",
+            "updUsers": "#7d2f7c",
+            "watchingLive": "#007c8b",
+            "watchingArchive": "#007c8b",
+            "exportVideo": "#17437f",
+            "updCamera": "#ba5555",
+            "systemActions": "#bc290b",
+            "updServer": "#c5780a",
+            "eventRules": "#7c4b30",
+            "emailSettings": "#2b2b2b",
+            "chartColor": "#39b2ef"
+        }
+    },
+
+    "QnRecordingStatsModel": {
+        "colors": {
+            "_": "Recording statistics.",
+		
+            "chartMainColor": "#39b2ef",
+            "chartForecastColor": "#89d7ff"
+        }
+    },
+	
     "QnTimeSlider": {
         "colors": {
             "_": "Time slider colors.",

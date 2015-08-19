@@ -55,6 +55,7 @@
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <utils/common/app_info.h>
 #include <utils/common/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
@@ -273,8 +274,9 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
         else if (skin == Qn::LightSkin) clientData.skin = lit("Light");
         else clientData.skin = lit("Unknown");
 
-        const auto systemInfo = QnSystemInformation::currentSystemInformation();
-        clientData.systemInfo = systemInfo.toString();
+        clientData.fullVersion = QnAppInfo::applicationFullVersion();
+        clientData.systemInfo = QnSystemInformation::currentSystemInformation().toString();
+        clientData.systemRuntime = QnSystemInformation::currentSystemRuntime();
 
         const auto& hw = HardwareInformation::instance();
         clientData.phisicalMemory = hw.phisicalMemory;

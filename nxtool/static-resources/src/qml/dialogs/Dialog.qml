@@ -15,9 +15,10 @@ Window
 
     property Component areaDelegate;
     property alias area: loader.item;
-
+    property alias dontShowText: dontShowNextTimeControl.text;
 
     signal buttonClicked(int id);
+    signal dontShowNextTimeChanged(bool dontShow);
 
     title: "";
     flags: Qt.WindowTitleHint | Qt.MSWindowsFixedSizeDialogHint;
@@ -48,5 +49,23 @@ Window
             thisComponent.close();
             thisComponent.buttonClicked(id);
         }
+
+    }
+
+    Base.CheckBox
+    {
+        id: dontShowNextTimeControl;
+
+        anchors
+        {
+            verticalCenter: buttonsPanel.verticalCenter;
+            left: parent.left;
+            leftMargin: Common.SizeManager.spacing.base;
+        }
+
+        visible: text.length;
+
+        initialCheckedState: Qt.Unchecked;
+        onCheckedChanged: { thisComponent.dontShowNextTimeChanged(dontShowNextTimeControl.checked); }
     }
 }

@@ -2,6 +2,8 @@
 #include "user_resource.h"
 #include "network/authenticate_helper.h"
 #include <utils/crypt/linux_passwd_crypt.h>
+#include <utils/common/app_info.h>
+#include <utils/network/http/auth_tools.h>
 
 
 QnUserResource::QnUserResource():
@@ -57,23 +59,38 @@ void QnUserResource::generateHash() {
     hash.append("$");
     hash.append(md5.result().toHex());
 
-    QByteArray digest = QnAuthHelper::createUserPasswordDigest(getName().toLower(), password, QnAuthHelper::REALM);
+    QByteArray digest = nx_http::calcHa1(
+        getName().toLower(),
+        QnAppInfo::realm(),
+        password );
 
+    setRealm(QnAppInfo::realm());
     setHash(hash);
     setDigest(digest);
     setCryptSha512Hash( linuxCryptSha512( password.toUtf8(), generateSalt( LINUX_CRYPT_SALT_LENGTH ) ) );
 }
 
 bool QnUserResource::checkPassword(const QString &password) {
-    QList<QByteArray> values =  getHash().split(L'$');
-    if (values.size() != 3)
-        return false;
+    QMutexLocker locker( &m_mutex );
+    
+    if( !m_digest.isEmpty() )
+    {
+        return nx_http::calcHa1( m_name.toLower(), m_realm, password ) == m_digest;
+    }
+    else
+    {
+        //hash is obsolete. Cannot remove it to maintain update from version < 2.3
+        //  hash becomes empty after changing user's realm
+        QList<QByteArray> values = m_hash.split(L'$');
+        if (values.size() != 3)
+            return false;
 
-    QByteArray salt = values[1];
-    QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(salt);
-    md5.addData(password.toUtf8());
-    return md5.result().toHex() == values[2];
+        QByteArray salt = values[1];
+        QCryptographicHash md5(QCryptographicHash::Md5);
+        md5.addData(salt);
+        md5.addData(password.toUtf8());
+        return md5.result().toHex() == values[2];
+    }
 }
 
 void QnUserResource::setDigest(const QByteArray& digest)
@@ -108,6 +125,18 @@ QByteArray QnUserResource::getCryptSha512Hash() const
 {
     QnMutexLocker locker( &m_mutex );
     return m_cryptSha512Hash;
+}
+
+QString QnUserResource::getRealm() const
+{
+    QMutexLocker locker( &m_mutex );
+    return m_realm;
+}
+
+void QnUserResource::setRealm( const QString& realm )
+{
+    QMutexLocker locker( &m_mutex );
+    m_realm = realm;
 }
 
 quint64 QnUserResource::getPermissions() const

@@ -21,3 +21,12 @@ int QnFusionRestHandler::executePost(const QString& path, const QnRequestParamLi
     Q_UNUSED(processor);
     return nx_http::StatusCode::notImplemented;
 }
+
+int QnFusionRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+{
+    Q_UNUSED(path);
+    Q_UNUSED(params);
+    Q_UNUSED(result);
+    Q_UNUSED(contentType);
+    return nx_http::StatusCode::notImplemented;
+}

@@ -823,6 +823,11 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::PreferencesRole).
         autoRepeat(false);
 
+    factory(Qn::OpenAuditLogAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        text(tr("Audit trail..."));
+
     factory().
         flags(Qn::Main).
         separator();
@@ -1402,7 +1407,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::RecordingStatisticsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Recording statistics...")).
+        text(tr("Recording Statistics...")).
         condition(new QnConjunctionActionCondition(
         new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
         new QnEdgeServerCondition(false, this),

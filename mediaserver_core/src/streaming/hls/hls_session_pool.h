@@ -18,6 +18,8 @@
 #include <utils/common/timermanager.h>
 
 #include "hls_playlist_manager.h"
+#include "api/model/audit/auth_session.h"
+#include "audit/audit_manager_fwd.h"
 
 
 class QnVideoCamera;
@@ -37,7 +39,8 @@ namespace nx_hls
             unsigned int targetDurationMS,
             bool _isLive,
             MediaQuality streamQuality,
-            QnVideoCamera* const videoCamera );
+            QnVideoCamera* const videoCamera,
+            const QnAuthSession& authSession);
         ~HLSSession();
 
         const QString& id() const;
@@ -55,7 +58,7 @@ namespace nx_hls
         QPair<QString, QString> playlistAuthenticationQueryItem() const;
         void setChunkAuthenticationQueryItem( const QPair<QString, QString>& authenticationQueryItem );
         QPair<QString, QString> chunkAuthenticationQueryItem() const;
-
+        void updateAuditInfo(qint64 timeUsec);
     private:
         const QString m_id;
         const unsigned int m_targetDurationMS;
@@ -68,6 +71,8 @@ namespace nx_hls
         QPair<QString, QString> m_playlistAuthenticationQueryItem;
         QPair<QString, QString> m_chunkAuthenticationQueryItem;
         mutable QnMutex m_mutex;
+        AuditHandle m_auditHandle;
+        QnAuthSession m_authSession;
     };
 
     /*!

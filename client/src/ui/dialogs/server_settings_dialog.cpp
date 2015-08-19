@@ -63,7 +63,6 @@ namespace {
         PathColumn,
         CapacityColumn,
         LoginColumn,
-        PasswordColumn,
         ArchiveSpaceColumn,
         ColumnCount
     };
@@ -125,7 +124,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(PathColumn, QHeaderView::Stretch);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(LoginColumn, QHeaderView::ResizeToContents);
-    ui->storagesTable->horizontalHeader()->setSectionResizeMode(PasswordColumn, QHeaderView::ResizeToContents);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     ui->storagesTable->horizontalHeader()->setSectionResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
@@ -198,15 +196,30 @@ void QnServerSettingsDialog::accept() {
     setEnabled(false);
     setCursor(Qt::WaitCursor);
 
-    bool valid = true;//m_hasStorageChanges ? validateStorages(tableStorages()) : true;
-    if (valid) {
+    if (hasChanges()) {
         submitToResources();
 
         base_type::accept();
     }
+    else
+        base_type::reject();
 
     unsetCursor();
     setEnabled(true);
+}
+
+bool QnServerSettingsDialog::hasChanges() const
+{
+    if (m_hasStorageChanges)
+        return true;
+    if (m_server->getName() != ui->nameLineEdit->text())
+        return true;
+    if (m_server->getMaxCameras() != ui->maxCamerasSpinBox->value())
+        return true;
+    if (m_server->isRedundancy() != ui->failoverCheckBox->isChecked())
+        return true;
+
+    return false;
 }
 
 void QnServerSettingsDialog::reject() {
@@ -239,8 +252,8 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     pathItem->setData(Qn::StorageUrlRole, item.url);
 
     QUrl url(item.url);
-    if (item.storageType == lit("file"))
-        pathItem->setData(Qt::DisplayRole, url.path().mid(1));
+    if (item.storageType == lit("smb"))
+        pathItem->setData(Qt::DisplayRole, url.host() + url.path());
     else if (item.storageType == lit("local"))
         pathItem->setData(Qt::DisplayRole, item.url);
     else 
@@ -257,10 +270,6 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     loginItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     loginItem->setData(Qt::DisplayRole, url.userName());
 
-    QTableWidgetItem *passwordItem = new QTableWidgetItem();
-    passwordItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    passwordItem->setData(Qt::DisplayRole, url.password());
-
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     QTableWidgetItem *archiveSpaceItem = new QTableWidgetItem();
     archiveSpaceItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
@@ -276,7 +285,6 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     ui->storagesTable->setItem(row, PathColumn, pathItem);
     ui->storagesTable->setItem(row, CapacityColumn, capacityItem);
     ui->storagesTable->setItem(row, LoginColumn, loginItem);
-    ui->storagesTable->setItem(row, PasswordColumn, passwordItem);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     ui->storagesTable->setItem(row, ArchiveSpaceColumn, archiveSpaceItem);
     ui->storagesTable->openPersistentEditor(archiveSpaceItem);
@@ -315,8 +323,6 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
     result.storageId = checkBoxItem->data(StorageIdRole).value<QnUuid>();
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
-    QString login = ui->storagesTable->item(row, LoginColumn)->text();
-    QString password = ui->storagesTable->item(row, PasswordColumn)->text();
     result.url = qvariant_cast<QString>(pathItem->data(Qn::StorageUrlRole));
 
     result.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();

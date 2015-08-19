@@ -145,7 +145,7 @@ void QnCommonModule::updateModuleInformation() {
     QnUserResourcePtr admin = qnResPool->getAdministrator();
     if (admin) {
         QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(admin->getHash());
+        md5.addData(admin->getDigest());
         md5.addData(moduleInformationCopy.systemName.toUtf8());
         moduleInformationCopy.authHash = md5.result();
     }
@@ -184,4 +184,16 @@ void QnCommonModule::setUseLowPriorityAdminPasswordHach(bool value)
 bool QnCommonModule::useLowPriorityAdminPasswordHach() const
 {
     return m_lowPriorityAdminPassword;
+}
+
+QnUuid QnCommonModule::runningInstanceGUID() const
+{ 
+    QMutexLocker lock(&m_mutex);
+    return m_runUuid; 
+}
+
+void QnCommonModule::updateRunningInstanceGuid()
+{
+    QMutexLocker lock(&m_mutex);
+    m_runUuid = QnUuid::createUuid();
 }
