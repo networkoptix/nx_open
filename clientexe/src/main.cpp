@@ -707,6 +707,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->stop();
 
     QnAppServerConnectionFactory::setEc2Connection(NULL);
+
+    ec2ConnectionFactory.reset();
+
     QnAppServerConnectionFactory::setUrl(QUrl());
 
     /* Write out settings. */
