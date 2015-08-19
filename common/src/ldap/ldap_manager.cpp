@@ -61,6 +61,7 @@ enum LdapVendor {
 struct DirectoryType {
     virtual const QString& UidAttr() const = 0;
     virtual const QString& Filter() const = 0;
+    virtual const QString& FullNameAttr() const = 0;
 };
 
 struct ActiveDirectoryType : DirectoryType {
@@ -72,6 +73,11 @@ struct ActiveDirectoryType : DirectoryType {
         static QString attr(lit("(&(objectCategory=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"));
         return attr;
     }
+
+    const QString& FullNameAttr() const {
+        static QString attr(lit("displayName"));
+        return attr;
+    }
 };
 
 struct OpenLdapType : DirectoryType {
@@ -81,6 +87,10 @@ struct OpenLdapType : DirectoryType {
     };
     const QString& Filter() const override {
         static QString attr(lit(""));
+        return attr;
+    }
+    const QString& FullNameAttr() const {
+        static QString attr(lit("gecos"));
         return attr;
     }
 };
@@ -277,6 +287,7 @@ bool LdapSession::fetchUsers(QnLdapUsers &users)
 
             user.login = GetFirstValue(m_ld, e, m_dType->UidAttr());
             user.email = GetFirstValue(m_ld, e, MAIL);
+            user.fullName = GetFirstValue(m_ld, e, m_dType->FullNameAttr());
 
             if (!user.login.isEmpty())
                 users.append(user);
