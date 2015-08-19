@@ -24,12 +24,26 @@ public:
         PageCount
     };
 
-    explicit QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent = NULL);
+    typedef std::function<void()> OkCallback;
+    
+    /// @brief Prevents wrong using of dialog
+    static void showNonModal(const QnMediaServerResourcePtr &server
+        , const OkCallback &callback
+        , QWidget *parent = nullptr);
+
+private:
+    QnServerSettingsDialog(const QnMediaServerResourcePtr &server
+        , const OkCallback &callback
+        , QWidget *parent);
+
     virtual ~QnServerSettingsDialog();
+
+    void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
 
 private:
     Q_DISABLE_COPY(QnServerSettingsDialog)
 
+    const OkCallback m_onOkClickedCallback;
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
 

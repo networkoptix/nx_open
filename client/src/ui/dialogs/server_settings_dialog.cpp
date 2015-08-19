@@ -11,12 +11,23 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
 
-QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    ui(new Ui::ServerSettingsDialog),
-    m_server(server),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnServerSettingsDialog>(this))
+void QnServerSettingsDialog::showNonModal(const QnMediaServerResourcePtr &server
+    , const OkCallback &callback
+    , QWidget *parent)
+{
+    QnServerSettingsDialog * const dlg = new QnServerSettingsDialog(server, callback, parent);
+    dlg->show();
+}
+
+QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server
+    , const OkCallback &callback
+    , QWidget *parent)
+    : base_type(parent)
+    , m_onOkClickedCallback(callback)
+    , QnWorkbenchContextAware(parent)
+    , ui(new Ui::ServerSettingsDialog)
+    , m_server(server)
+    , m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnServerSettingsDialog>(this))
 {
     ui->setupUi(this);
   
@@ -44,3 +55,14 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
 QnServerSettingsDialog::~QnServerSettingsDialog() 
 {}
+
+void QnServerSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
+{
+    if ((button == QDialogButtonBox::Ok) && m_onOkClickedCallback)
+        m_onOkClickedCallback();
+
+    if (!parent())
+        deleteLater();
+}
+
+

@@ -1505,19 +1505,18 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 
     QnMediaServerResourcePtr server = servers.first();
 
-    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    if(!dialog->exec())
-        return;
+    const auto okCallback = [this, server]()
+    {
+        // TODO: #Elric move submitToResources here.
+        const auto serverAttrs = (QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(server->getId()));
+        const auto handler = [this, server]( int reqID, ec2::ErrorCode errorCode ) 
+            { at_resources_saved( reqID, errorCode, QnResourceList() << server ); };
 
-    // TODO: #Elric move submitToResources here.
-    connection2()->getMediaServerManager()->saveUserAttributes(
-        QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(server->getId()),
-        this,
-        [this, server]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << server );
-        } );
-    server->saveUpdatedStorages();
+        connection2()->getMediaServerManager()->saveUserAttributes(serverAttrs, this, handler);
+        server->saveUpdatedStorages();
+    };
+
+    QnServerSettingsDialog::showNonModal(server, okCallback, mainWindow());
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
