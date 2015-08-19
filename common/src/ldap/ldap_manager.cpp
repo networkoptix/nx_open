@@ -466,7 +466,7 @@ bool LdapSession::detectLdapVendor(LdapVendor &vendor)
 }
 
 bool QnLdapManager::fetchUsers(QnLdapUsers &users) {
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+	QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
 
     LdapSession session(settings);
     if (!session.connect())
