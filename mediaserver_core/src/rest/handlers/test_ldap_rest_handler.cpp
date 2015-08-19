@@ -18,7 +18,7 @@ int QnTestLdapSettingsHandler::executePost(const QString &path, const QnRequestP
     }
 
     QnLdapUsers ldapUsers;
-    if (!ldapManager->fetchUsers(ldapUsers)) {
+    if (!ldapManager->fetchUsers(ldapUsers, settings)) {
         result.setError(QnRestResult::CantProcessRequest, lit("Can't authenticate"));
         return nx_http::StatusCode::ok;
     }
