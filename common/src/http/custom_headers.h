@@ -22,6 +22,8 @@ namespace Qn
     static const QByteArray REALM_HEADER_NAME = "X-Nx-Realm";
     static const QByteArray HA1_DIGEST_HEADER_NAME = "X-Nx-Digest";
     static const QByteArray CRYPT_SHA512_HASH_HEADER_NAME = "X-Nx-Crypt-Sha512";
+    //!Guid of peer which initiated request
+    static const QByteArray PEER_GUID_HEADER_NAME = "X-Nx-Peer-Guid";
 
     static const QByteArray EC2_SYSTEM_NAME_HEADER_NAME = "X-Nx-EC-SYSTEM-NAME";
     static const QByteArray EC2_CONNECTION_STATE_HEADER_NAME = "X-Nx-EC-CONNECTION-STATE";

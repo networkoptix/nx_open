@@ -465,9 +465,7 @@ bool LdapSession::detectLdapVendor(LdapVendor &vendor)
     return true;
 }
 
-bool QnLdapManager::fetchUsers(QnLdapUsers &users) {
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
-
+bool QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings) {
     LdapSession session(settings);
     if (!session.connect())
     {
@@ -482,6 +480,11 @@ bool QnLdapManager::fetchUsers(QnLdapUsers &users) {
     }
 
     return true;
+}
+
+bool QnLdapManager::fetchUsers(QnLdapUsers &users) {
+    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+    return fetchUsers(users, settings);
 }
 
 bool QnLdapManager::testSettings(const QnLdapSettings& settings) {
