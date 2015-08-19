@@ -32,8 +32,8 @@ class StunCustomTest : public testing::Test
 {
 protected:
     StunCustomTest()
-        : address( lit( "127.0.0.1"), 3345 + qrand() / 100 )
-        , server( std::list< SocketAddress >( 1, address ), false, SocketFactory::nttAuto )
+        : address( lit( "127.0.0.1"), 10001 + (qrand() % 50000) )
+        , server( std::list< SocketAddress >( 1, address ), false, SocketFactory::nttDisabled )
         , mediaserverApi( &stunMessageDispatcher )
         , listeningPeerPool( &stunMessageDispatcher )
         , client( address )
