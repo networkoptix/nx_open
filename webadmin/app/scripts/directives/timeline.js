@@ -201,7 +201,7 @@ angular.module('webadminApp')
                     topLabelMarkerAttach:"top", // top, bottom
                     topLabelBgColor: [33,42,47],
                     topLabelBgOddColor: [43,56,63],
-                    topLabelPositionFix:0, //Vertical fix for position
+                    topLabelPositionFix:-2, //Vertical fix for position
                     topLabelFixed: true,
 
 
@@ -211,10 +211,10 @@ angular.module('webadminApp')
                         size:15,
                         weight:400,
                         face:"Roboto",
-                        color: [105,135,150] // Color for text for top labels
+                        color: [145,167,178] // Color for text for top labels
                     },
                     labelMarkerAttach:"top", // top, bottom
-                    labelMarkerColor:[83,112,127,0.6],//false
+                    labelMarkerColor:[105,135,150],//false
                     labelBgColor: [28,35,39],
                     labelPositionFix:5, //Vertical fix for position
                     labelMarkerHeight:20/110,
