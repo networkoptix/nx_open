@@ -63,7 +63,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
 
     //setRole(Qn::CR_SecondaryLiveVideo);
 
-    //==== init if needed
+    // ==== init if needed
     Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
     QnPlAxisResourcePtr res = getResource().dynamicCast<QnPlAxisResource>();
@@ -105,7 +105,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         }
 
 
-        //================ profile setup ======================== 
+        // ================ profile setup ======================== 
     
         // -------------- check if profile already exists
 

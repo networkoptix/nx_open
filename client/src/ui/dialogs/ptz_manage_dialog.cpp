@@ -677,7 +677,7 @@ bool QnPtzManageDialog::tryClose(bool force) {
     return askToSaveChanges();
 }
 
-bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /*= true*/) {
+bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /* = true*/) {
 
     QMessageBox::StandardButtons allowedButtons = QnMessageBox::Yes | QnMessageBox::No;
     if (cancelIsAllowed)

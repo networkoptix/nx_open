@@ -31,7 +31,7 @@ namespace {
 
 }
 
-QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /*= 0*/):
+QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /* = 0*/):
     base_type(parent),
     ui(new Ui::CameraAdvancedSettingsWidget),
     m_page(Page::Empty),

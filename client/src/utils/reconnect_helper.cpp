@@ -46,7 +46,7 @@ QnReconnectHelper::InterfaceInfo::InterfaceInfo():
     count(0)
 {}
 
-QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
+QnReconnectHelper::QnReconnectHelper(QObject *parent /* = NULL*/):
     QObject(parent),
     m_currentServer(qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID())),
     m_currentUrl(QnAppServerConnectionFactory::url())

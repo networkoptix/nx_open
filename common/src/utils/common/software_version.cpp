@@ -23,7 +23,7 @@ QnSoftwareVersion::QnSoftwareVersion() {
     std::fill(m_data.begin(), m_data.end(), 0);
 }
 
-QnSoftwareVersion::QnSoftwareVersion(int major, int minor, int bugfix /*= 0*/, int build /*= 0*/) {
+QnSoftwareVersion::QnSoftwareVersion(int major, int minor, int bugfix /* = 0*/, int build /* = 0*/) {
     m_data[0] = major;
     m_data[1] = minor;
     m_data[2] = bugfix;

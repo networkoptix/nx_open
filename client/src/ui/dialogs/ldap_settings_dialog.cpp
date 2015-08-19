@@ -24,6 +24,8 @@ namespace {
 
 class QnLdapSettingsDialogPrivate: public QObject {
     Q_DECLARE_PUBLIC(QnLdapSettingsDialog)
+    Q_DECLARE_TR_FUNCTIONS(QnLdapSettingsDialogPrivate)
+
 public:
     QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *parent);
 

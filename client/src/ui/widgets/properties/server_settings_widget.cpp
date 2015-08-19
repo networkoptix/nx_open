@@ -112,14 +112,15 @@ namespace {
 } // anonymous namespace
 
 
-QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /*= 0*/):
+QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /* = 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::ServerSettingsWidget),
     m_server(server),
     m_hasStorageChanges(false),
     m_maxCamerasAdjusted(false),
-    m_rebuildWasCanceled(false)
+    m_rebuildWasCanceled(false),
+    m_initServerName()
 {
     ui->setupUi(this);
 
@@ -180,6 +181,14 @@ QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &s
         updateFailoverLabel();
     });
 
+    connect(m_server, &QnResource::nameChanged, this, [this](const QnResourcePtr &resource)
+    {
+        if (ui->nameLineEdit->text() != m_initServerName)   /// Field was changed
+            return;
+
+        m_initServerName = resource->getName();
+        ui->nameLineEdit->setText(m_initServerName);
+    });
 }
 
 QnServerSettingsWidget::~QnServerSettingsWidget()
@@ -213,7 +222,8 @@ void QnServerSettingsWidget::updateFromSettings() {
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
-    ui->nameLineEdit->setText(m_server->getName());
+    m_initServerName = m_server->getName();
+    ui->nameLineEdit->setText(m_initServerName);
     int currentMaxCamerasValue = m_server->getMaxCameras();
     if( currentMaxCamerasValue == 0 )
     {

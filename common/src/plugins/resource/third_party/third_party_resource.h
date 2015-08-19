@@ -10,6 +10,7 @@
 
 #include <memory>
 
+#include <QCoreApplication>
 #include <QSharedPointer>
 
 #include <plugins/resource/camera_settings/camera_settings.h>
@@ -24,6 +25,8 @@ class QnThirdPartyResource
     public QnPhysicalCameraResource,
     public nxcip::CameraInputEventHandler
 {
+    Q_DECLARE_TR_FUNCTIONS(QnThirdPartyResource)
+
     typedef QnPhysicalCameraResource base_type;
 
 public:

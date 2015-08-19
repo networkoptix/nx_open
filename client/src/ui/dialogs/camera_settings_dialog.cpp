@@ -144,7 +144,7 @@ void QnCameraSettingsDialog::updateReadOnly() {
     m_settingsWidget->setReadOnly(!(permissions & Qn::WritePermission));
 }
 
-void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &cameras, bool force /*= false*/) {
+void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &cameras, bool force /* = false*/) {
 
     bool askConfirmation = 
            !force
@@ -168,7 +168,7 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
     m_settingsWidget->setCameras(cameras);
 }
 
-void QnCameraSettingsDialog::submitToResources(bool checkControls /*= false*/) {
+void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) {
     bool hasDbChanges = m_settingsWidget->hasDbChanges();
 
     if (checkControls && m_settingsWidget->hasScheduleControlsChanges()){

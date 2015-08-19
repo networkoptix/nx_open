@@ -134,7 +134,7 @@ qint64 QnTimePeriodList::duration() const {
     return result;
 }
 
-QnTimePeriod QnTimePeriodList::boundingPeriod(qint64 truncateInfinite /*= QnTimePeriod::infiniteDuration()*/) const {
+QnTimePeriod QnTimePeriodList::boundingPeriod(qint64 truncateInfinite /* = QnTimePeriod::infiniteDuration()*/) const {
     if (isEmpty())
         return QnTimePeriod();
 
