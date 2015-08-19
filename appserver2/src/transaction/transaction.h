@@ -168,6 +168,9 @@ namespace ec2
 
             getTransactionLog           = 10000,  /*< QnAbstractTransactionList*/
 
+            /* Ldap */
+            testLdapSettings            = 11001, /*< QnLdapSettings */
+
             maxTransactionValue         = 65535
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)

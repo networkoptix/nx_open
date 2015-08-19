@@ -126,19 +126,26 @@ module.exports = function (grunt) {
                 {context: '/proxy/', host: '192.168.56.101',port: 9000}/**/
 
                 // Masha
-                /*{context: '/api/',      host: '10.0.2.186', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.186', port: 7001},
-                {context: '/hls/',      host: '10.0.2.186', port: 7001},
-                {context: '/media/',    host: '10.0.2.186', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.186', port: 7001}/**/
+                /*{context: '/api/',      host: '10.0.2.186', port: 7011},
+                {context: '/ec2/',      host: '10.0.2.186', port: 7011},
+                {context: '/hls/',      host: '10.0.2.186', port: 7011},
+                {context: '/media/',    host: '10.0.2.186', port: 7011},
+                {context: '/proxy/',    host: '10.0.2.186', port: 7011}/**/
 
 
                 // Olya
-                {context: '/api/',      host: '10.0.2.169', port: 7011},
+                /*{context: '/api/',      host: '10.0.2.169', port: 7011},
                 {context: '/ec2/',      host: '10.0.2.169', port: 7011},
                 {context: '/hls/',      host: '10.0.2.169', port: 7011},
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
                 {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
+
+                // Sasha
+                {context: '/api/',      host: '10.0.2.119', port: 7042},
+                 {context: '/ec2/',      host: '10.0.2.119', port: 7042},
+                 {context: '/hls/',      host: '10.0.2.119', port: 7042},
+                 {context: '/media/',    host: '10.0.2.119', port: 7042},
+                 {context: '/proxy/',    host: '10.0.2.119', port: 7042}/**/
 
                 // Andrey
                 /*{context: '/api/',      host: '10.0.2.95', port: 7001},
@@ -280,7 +287,7 @@ module.exports = function (grunt) {
                 files:[
                     {
                         dot: true,
-                        src: '<%= yeoman.dist %>/../../mediaserver/maven/bin-resources/resources/static/*'
+                        src: '<%= yeoman.dist %>/../../mediaserver_core/maven/bin-resources/resources/static/*'
                     }
                 ],
                 options: {
@@ -501,7 +508,7 @@ module.exports = function (grunt) {
                 expand: true,
                 nonull:true,
                 cwd: '<%= yeoman.app %>/../dist',
-                dest: '../mediaserver/maven/bin-resources/resources/static/',
+                dest: '../mediaserver_core/maven/bin-resources/resources/static/',
                 src: '**'
             }
         },

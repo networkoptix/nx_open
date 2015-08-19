@@ -28,6 +28,7 @@ class QnServerMessageProcessor;
 struct QnModuleInformation;
 class QnModuleFinder;
 struct QnPeerRuntimeInfo;
+class QnLdapManager;
 
 class MediaServerProcess : public QnLongRunnable
 {

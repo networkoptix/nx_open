@@ -353,11 +353,6 @@ namespace Qn {
         OpenBookmarksSearchAction,
 
         /**
-         * Opens recording statistics dialog.
-         */
-        RecordingStatisticsAction,
-
-        /**
          * Opens camera list dialog.
          */
         CameraListAction,
@@ -371,6 +366,11 @@ namespace Qn {
          * System administration dialog - updates page.
          */
         SystemUpdateAction,
+
+        /**
+         * System administration dialog - users page.
+         */
+        UserManagementAction,
 
         /* Tab bar actions. */
 
@@ -1025,11 +1025,6 @@ namespace Qn {
          * Opens up debug control panel.
          */
         DebugControlPanelAction,
-
-        /**
-         * open IO monitor for IO module
-         */
-        OpenIOMonitorAction,
 
         /**
          * Opens the Audit Log dialog.

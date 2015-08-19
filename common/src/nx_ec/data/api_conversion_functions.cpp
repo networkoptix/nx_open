@@ -42,6 +42,7 @@
 #include "api_runtime_data.h"
 
 #include <utils/email/email.h>
+#include <utils/common/ldap.h>
 
 namespace ec2 {
 
@@ -351,7 +352,6 @@ void fromApiToResource(const ApiEmailSettingsData &src, QnEmailSettings &dst) {
     dst.password = src.password;
     dst.connectionType = src.connectionType;
 }
-
 
 void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, const ResourceContext &ctx) {
     fromApiToResourceList(src.resourceTypes, dst.resTypes);
@@ -725,6 +725,8 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
     fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
     dst->setAdmin(src.isAdmin);
+	dst->setLdap(src.isLdap);
+	dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
     dst->setHash(src.hash);
 
@@ -739,6 +741,8 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     dst.hash = src->getHash();
     dst.digest = src->getDigest();
     dst.isAdmin = src->isAdmin();
+	dst.isLdap = src->isLdap();
+	dst.isEnabled = src->isEnabled();
     dst.permissions = src->getPermissions();
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();

@@ -38,6 +38,9 @@ public:
         ColumnCount
     };
 
+    static const QByteArray ChildCntParamName;
+    static const QByteArray CheckedParamName;
+
     QnAuditLogModel(QObject *parent = NULL);
     virtual ~QnAuditLogModel();
 
@@ -68,7 +71,7 @@ public:
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override  { return m_columns.size(); }
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
     QnAuditLogColors colors() const;
     void setColors(const QnAuditLogColors &colors);

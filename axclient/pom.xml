@@ -29,7 +29,7 @@
         <!--Global libs-->
         <global.libs>-lcommon -lappserver2 -lclient -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar -lWldap32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
 

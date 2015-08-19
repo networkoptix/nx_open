@@ -664,16 +664,6 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     return Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnOpenIOMonitorActionCondition::check(const QnResourceList &resources) {
-    foreach (const QnResourcePtr &resource, resources) 
-    {
-        QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
-        if (!camRes || !camRes->hasCameraCapabilities(Qn::IOModuleCapability))
-            return Qn::InvisibleAction;
-    }
-    return resources.isEmpty() ? Qn::InvisibleAction : Qn::EnabledAction;
-}
-
 Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources) {
         if (resource->hasFlags(Qn::desktop_camera))
@@ -1073,6 +1063,17 @@ Qn::ActionVisibility QnItemsCountActionCondition::check(const QnActionParameters
     return (m_count == MultipleItems && count > 1) || (m_count == count) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnIoModuleActionCondition::check(const QnResourceList &resources) {
+    bool pureIoModules = boost::algorithm::all_of(resources, [](const QnResourcePtr &resource) {
+        if (!resource->hasFlags(Qn::io_module))
+            return false; //quick check
+
+        QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
+        return mediaResource && !mediaResource->hasVideo(0);
+    });
+
+    return pureIoModules ? Qn::EnabledAction : Qn::InvisibleAction;
+}
 
 Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources) {
     bool found = false;

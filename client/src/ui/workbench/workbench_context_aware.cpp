@@ -9,20 +9,23 @@
 
 #include "workbench_context.h"
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent, bool lazyInitialization):
-    m_initialized(false)
+QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent, bool lazyInitialization)
+    : m_context(nullptr)
+    , m_initialized(false)
 {
     init(parent, lazyInitialization);
 }
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext *context):
-    m_initialized(false)
+QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext *context)
+    : m_context(nullptr)
+    , m_initialized(false)
 {
     init(context);
 }
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent, QnWorkbenchContext *context):
-    m_initialized(false)
+QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent, QnWorkbenchContext *context)
+    : m_context(nullptr)
+    , m_initialized(false)
 {
     if(context) {
         init(context);
@@ -81,7 +84,8 @@ void QnWorkbenchContextAware::init(QObject *parent, bool lazyInitialization) {
 }
 
 void QnWorkbenchContextAware::init(QnWorkbenchContext *context) {
-    Q_ASSERT_X(m_context, Q_FUNC_INFO, "Invalid context");
+    Q_ASSERT_X(context, Q_FUNC_INFO, "Invalid context");
+	Q_ASSERT_X(!m_context, Q_FUNC_INFO, "Double context initialization");
     m_context = context;
     m_initialized = true;
     afterContextInitialized();

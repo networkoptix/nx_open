@@ -3,7 +3,7 @@
 
 #include <QtCore/QEventLoop>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QHeaderView>
+
 
 #include <api/model/manual_camera_seach_reply.h>
 
@@ -17,27 +17,7 @@ namespace Ui {
     class CameraAdditionDialog;
 }
 
-
-class QnCheckBoxedHeaderView: public QHeaderView {
-    Q_OBJECT
-    typedef QHeaderView base_type;
-public:
-    explicit QnCheckBoxedHeaderView(QWidget *parent = 0);
-
-    Qt::CheckState checkState() const;
-    void setCheckState(Qt::CheckState state);
-
-signals:
-    void checkStateChanged(Qt::CheckState state);
-protected:
-    virtual void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override;
-    virtual QSize sectionSizeFromContents(int logicalIndex) const override;
-private slots:
-    void at_sectionClicked(int logicalIndex);
-private:
-    Qt::CheckState m_checkState;
-};
-
+class QnCheckBoxedHeaderView;
 
 class QnCameraAdditionDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT

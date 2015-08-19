@@ -1,16 +1,18 @@
-
 #include "storage_url_dialog.h"
+#include "ui_storage_url_dialog.h"
 
 #include <QtWidgets/QMessageBox>
 
-#include "ui_storage_url_dialog.h"
+#include <api/media_server_connection.h>
+#include <api/runtime_info_manager.h>
+
+#include "common/common_module.h"
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/abstract_storage_resource.h>
+#include <core/resource_management/resource_pool.h>
 
-#include <api/media_server_connection.h>
-#include "common/common_module.h"
-#include "api/runtime_info_manager.h"
+#include <ui/dialogs/message_box.h>
 
 QnStorageUrlDialog::QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -145,6 +147,19 @@ void QnStorageUrlDialog::accept()
         return;
     }
 
+    if (storageAlreadyUsed(m_storage.url)) {
+        QString message = tr("System has other server(s) using the same network storage path. "\
+                             "Recording data by multiple servers to exactly same place is not recommended.");
+
+        QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning"), message, QnMessageBox::Cancel);
+        messageBox.addButton(tr("Add storage"), QnMessageBox::AcceptRole);
+
+        if (messageBox.exec() == QnMessageBox::Cancel)
+            return;
+
+    }
+
+
     base_type::accept();
 }
 
@@ -185,4 +200,14 @@ void QnStorageUrlDialog::at_protocolComboBox_currentIndexChanged() {
 #else
     ui->browseButton->setVisible(false);
 #endif
+}
+
+bool QnStorageUrlDialog::storageAlreadyUsed(const QString &path) const {
+    QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+
+    return boost::algorithm::any_of(servers, [path](const QnMediaServerResourcePtr &server) {
+        //TODO: #GDM very weak comparison, also storage already added to dialog but not saved is not counted
+        return !server->getStorageByUrl(path).isNull();
+    });
+
 }

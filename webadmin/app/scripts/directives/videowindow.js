@@ -40,17 +40,28 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
+                scope.debugMode = false;
+                scope.debugFormat = "flashls";
+
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
                     return src?src.src:null;
                 }
 
                 function detectBestFormat(){
+                    //1. Hide all informers
                     scope.flashRequired = false;
+                    scope.flashOrWebmRequired = false;
                     scope.noArmSupport = false;
                     scope.noFormat = false;
+                    scope.errorLoading = false;
+                    scope.edgeNoWebm = false;
+                    scope.loading = false;
 
-                    //return "flashls";
+
+                    if(scope.debugMode && scope.debugFormat){
+                        return scope.debugFormat;
+                    }
 
                     //This function gets available sources for camera and chooses the best player for this browser
 
@@ -58,7 +69,7 @@ angular.module('webadminApp')
 
                     //We have options:
                     // webm - for good desktop browsers
-                    // webm-codec - for IE. Detect
+                    // webm-codec - for IE. Detectf
                     // native-hls - for mobile browsers
                     // flv - for desktop browsers - not supported yet
                     // rtsp - for desktop browsers
@@ -113,13 +124,19 @@ angular.module('webadminApp')
                                 scope.ieNoWebm = true;
                             }
 
-                            if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
+                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
                                 return "flashls";
                             }
 
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
+
+                            if(weHaveHls && weHaveWebm){
+
+                                scope.flashOrWebmRequired = true;
+                                return false;
+                            }
                             if(weHaveHls) {
                                 scope.flashRequired = true;
                                 return false;
@@ -145,13 +162,13 @@ angular.module('webadminApp')
                         case "Opera":
                         case "Webkit":
                         default:
-                            if(weHaveHls && window.jscd.flashVersion != '-'){ // We have flash - try to play using flash
+                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
                                 return "flashls";
                             }
                             /*if(weHaveHls) {
                                 return "jshls";// We are hoping that we have some good browser
                             }*/
-                            if(weHaveRtsp && window.jscd.flashVersion != '-'){
+                            if(weHaveRtsp && window.jscd.flashVersion){
                                 return "rtsp";
                             }
                             if(weHaveHls) {
@@ -181,24 +198,33 @@ angular.module('webadminApp')
                 // TODO: move supported info to config
                 // TODO: Support new players
 
-                function initNativePlayer(format){
+                function initNativePlayer(nativeFormat) {
+
+                    scope.native = true;
+                    scope.flashls = false;
+
                     nativePlayer.init(element.find(".videoplayer"), function (api) {
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
-                            scope.vgApi.load(getFormatSrc(format),mimeTypes[format]);
 
-                            scope.vgApi.addEventListener("timeupdate",function(event,arg2,arg3){
-                                //console.log("timeupdate",event,arg2,arg3,scope.vgApi, scope.vgApi.currentTime);
-                                scope.vgUpdateTime({$currentTime:event.srcElement.currentTime, $duration: event.srcElement.duration});
-                                if(scope.loading) {
-                                    scope.loading = false;
-                                    //scope.$digest();
+                            $timeout(function () {
+                                scope.loading = !!format;
+                            });
+                            scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
+
+                            scope.vgApi.addEventListener("timeupdate", function (event, arg2, arg3) {
+                                var video = event.srcElement || event.originalTarget;
+                                scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                if (scope.loading) {
+                                    $timeout(function () {
+                                        scope.loading = false;
+                                    });
                                 }
                             });
                         }
 
-                        scope.vgPlayerReady({$API:scope.vgApi});
+                        scope.vgPlayerReady({$API: scope.vgApi});
                     }, function (api) {
                         console.error("some error");
                     });
@@ -206,30 +232,41 @@ angular.module('webadminApp')
 
                 function initFlashls() {
                     scope.flashls = true;
+                    scope.native = false;
                     scope.flashSource = "components/flashlsChromeless.swf";
                     scope.flashParam = flashlsAPI.flashParams();
+                    if(flashlsAPI.ready()){
+                        flashlsAPI.kill();
+                        scope.flashls = false; // Destroy it!
+                        $timeout(initFlashls);
+                    }else {
+                        $timeout(function () {// Force DOM to refresh here
+                            flashlsAPI.init("videowindow", function (api) {
+                                scope.vgApi = api;
 
-                    if(!flashlsAPI.ready()) {
-                        flashlsAPI.init("videowindow", function (api) {
-                            scope.vgApi = api;
+                                if (scope.vgSrc) {
+                                    $timeout(function () {
+                                        scope.loading = !!format;
+                                    });
+                                    scope.vgApi.load(getFormatSrc('hls'));
+                                }
 
-                            if (scope.vgSrc) {
-                                scope.vgApi.load(getFormatSrc('hls'));
-                            }
-
-                            scope.vgPlayerReady({$API: api});
-                        }, function (error) {
-                            scope.errorLoading = true;
-                            scope.loading = false;
-                            scope.flashls = false;// Kill flashls!
-                            scope.$digest();
-                            console.error(error);
-                        }, function (position, duration) {
-                            scope.loading = false;
-                            scope.vgUpdateTime({$currentTime: position, $duration: duration});
+                                scope.vgPlayerReady({$API: api});
+                            }, function (error) {
+                                $timeout(function () {
+                                    scope.errorLoading = true;
+                                    scope.loading = false;
+                                    scope.flashls = false;// Kill flashls with his error
+                                    scope.native = false;
+                                });
+                                console.error(error);
+                            }, function (position, duration) {
+                                if (position != 0) {
+                                    scope.loading = false;
+                                    scope.vgUpdateTime({$currentTime: position/1000, $duration: duration});
+                                }
+                            });
                         });
-                    }else{
-                        flashlsAPI.load(getFormatSrc('hls'));
                     }
                 }
 
@@ -238,6 +275,10 @@ angular.module('webadminApp')
                         scope.vgApi = api;
 
                         if (scope.vgSrc) {
+
+                            $timeout(function(){
+                                scope.loading = !!format;
+                            });
                             scope.vgApi.load(getFormatSrc('hls'));
                         }
 
@@ -255,6 +296,11 @@ angular.module('webadminApp')
 
                         /* Tell Locomote to play the specified media */
                         if(!scope.vgApi.load ) {
+
+                            $timeout(function(){
+                                scope.loading = !!format;
+                            });
+
                             scope.vgApi.load = scope.vgApi.play;
                             scope.vgApi.play = function(){
                                 scope.vgApi.load(getFormatSrc('rtsp'));
@@ -280,16 +326,23 @@ angular.module('webadminApp')
                     });
                 }
 
-                element.bind('contextmenu',function() { return false; }); // Kill context menu
-
+                element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
+                var format = null;
 
                 scope.$watch("vgSrc",function(){
 
+                    scope.loading = false;
                     scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {
-                        var format = detectBestFormat();
-                        scope.loading = !!format;
-                        recyclePlayer(format);// Remove old player. TODO: recycle it later
+                        format = detectBestFormat();
+
+                        recyclePlayer(format);// Remove or recycle old player.
+
+                        if(!format){
+                            scope.native = false;
+                            scope.flashls = false;
+                            return;
+                        }
 
                         switch(format){
                             case "flashls":

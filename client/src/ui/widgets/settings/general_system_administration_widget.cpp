@@ -52,18 +52,16 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 }
 
 void QnGeneralSystemAdministrationWidget::updateFromSettings() {
-    ui->cameraWidget->updateFromSettings();
-    ui->backupWidget->updateFromSettings();
+    ui->systemSettingsWidget->updateFromSettings();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
 }
 
 void QnGeneralSystemAdministrationWidget::submitToSettings() {
-    ui->cameraWidget->submitToSettings();
-    ui->backupWidget->submitToSettings();
+    ui->systemSettingsWidget->submitToSettings();
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const  {
-    return ui->cameraWidget->hasChanges();
+    return ui->systemSettingsWidget->hasChanges();
 }
 
 void QnGeneralSystemAdministrationWidget::resizeEvent(QResizeEvent *event) {

@@ -470,7 +470,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
 
-    m_numberOfVideoChannels = m_RtpSession.getTrackCount(RTPSession::TT_VIDEO);
+    m_numberOfVideoChannels = camera && camera->allowRtspVideoLayout() ?  m_RtpSession.getTrackCount(RTPSession::TT_VIDEO) : 1;
     {
         QnMutexLocker lock( &m_layoutMutex );
         m_customVideoLayout.clear();

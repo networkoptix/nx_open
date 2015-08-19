@@ -190,7 +190,6 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 #endif // DEBUG
         
     controlsLayout->addItem(newButton(Qn::OpenBusinessLogAction, Qn::MainWindow_Notifications_EventLog_Help));
-    controlsLayout->addItem(newButton(Qn::RecordingStatisticsAction, Qn::MainWindow_Notifications_EventLog_Help));
     controlsLayout->addItem(newButton(Qn::BusinessEventsAction, -1));
     controlsLayout->addItem(newButton(Qn::PreferencesNotificationTabAction, -1));
     m_headerWidget->setLayout(controlsLayout);

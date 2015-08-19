@@ -438,6 +438,34 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             ) + DeviceFileCatalog::prefixByCatalog(catalog)
         );
 
+    FileCatalogMap& catalogMap = m_devFileCatalog[catalog];
+    for (auto it = catalogMap.cbegin(); it != catalogMap.cend(); ++it)
+    {
+        QString cameraDir =
+            closeDirPath(
+                closeDirPath(storage->getUrl()) +
+                DeviceFileCatalog::prefixByCatalog(catalog)
+            ) + it.key();
+
+        if (!storage->isDirExists(cameraDir))
+        {
+            DeviceFileCatalogPtr newCatalog(
+                new DeviceFileCatalog(
+                    it.key(), 
+                    catalog
+                )
+            );
+            
+            replaceChunks(
+                QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()), 
+                storage, 
+                newCatalog, 
+                it.key(), 
+                catalog
+            );
+        }
+    }
+
     for(const QnAbstractStorageResource::FileInfo& fi: list)
     {
         if (m_rebuildCancelled)
@@ -455,7 +483,6 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
             newCatalog->doRebuildArchive(storage, rebuildPeriod);
         
-            DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
             if (!m_rebuildCancelled)
                 replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
         }

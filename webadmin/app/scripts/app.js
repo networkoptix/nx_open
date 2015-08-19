@@ -7,7 +7,8 @@ angular.module('webadminApp', [
     'ngRoute',
     //'ngTouch',
     'ui.bootstrap',
-    'tc.chartjs'
+    'tc.chartjs',
+    'ngStorage'
 ]).config(function ($routeProvider) {
     $routeProvider
         .when('/settings', {
@@ -55,6 +56,10 @@ angular.module('webadminApp', [
             reloadOnSearch: false
         })
         .when('/sdkeula', {
+            templateUrl: 'views/sdkeula.html',
+            controller: 'SdkeulaCtrl'
+        })
+        .when('/sdkeula/:sdkFile', {
             templateUrl: 'views/sdkeula.html',
             controller: 'SdkeulaCtrl'
         })

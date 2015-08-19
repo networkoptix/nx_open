@@ -16,6 +16,8 @@ namespace StreamingParams
     static const QLatin1String START_TIMESTAMP_PARAM_NAME( "startTimestamp" );
     //!Start calendar time
     static const QLatin1String START_POS_PARAM_NAME( "pos" );
+    //!Deprecated. Same as \a START_POS_PARAM_NAME
+    static const QLatin1String START_DATETIME_PARAM_NAME( "startDatetime" );
     //static const QLatin1String STOP_TIMESTAMP_PARAM_NAME( "endTimestamp" );
     static const QLatin1String PICTURE_SIZE_PIXELS_PARAM_NAME( "pictureSizePixels" );
     static const QLatin1String CONTAINER_FORMAT_PARAM_NAME( "containerFormat" );

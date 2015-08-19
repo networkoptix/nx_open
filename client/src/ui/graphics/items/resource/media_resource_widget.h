@@ -23,6 +23,7 @@ class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnCachingCameraDataLoader;
+class QnIoModuleOverlayWidget;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -36,13 +37,7 @@ public:
     static const Button ZoomWindowButton    = static_cast<Button>(0x080);
     static const Button EnhancementButton   = static_cast<Button>(0x100);
     static const Button DbgScreenshotButton = static_cast<Button>(0x200);
-#define ScreenshotButton ScreenshotButton
-#define MotionSearchButton MotionSearchButton
-#define PtzButton PtzButton
-#define FishEyeButton FishEyeButton
-#define ZoomWindowButton ZoomWindowButton
-#define EnhancementButton EnhancementButton
-#define DbgScreenshotButton DbgScreenshotButton
+    static const Button IoModuleButton      = static_cast<Button>(0x400);
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
@@ -179,8 +174,11 @@ private slots:
     void at_fishEyeButton_toggled(bool checked);
     void at_zoomWindowButton_toggled(bool checked);
     void at_histogramButton_toggled(bool checked);
+    void at_ioModuleButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
     void at_statusOverlayWidget_diagnosticsRequested();
+    void at_statusOverlayWidget_ioEnableRequested();
+    void at_statusOverlayWidget_moreLicensesRequested();
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
@@ -198,6 +196,8 @@ private:
     Q_SLOT void updateFisheye();
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
+    Q_SLOT void updateIoModuleVisibility(bool animate);
+    Q_SLOT void updateOverlayButton();
 
     void updateBookmarks();
 
@@ -250,6 +250,7 @@ private:
     QnCameraBookmarkList m_bookmarks;
     QnCameraBookmarkList::const_iterator m_bookmarksBeginPosition;
     QnCachingCameraDataLoader *m_dataLoader;
+    QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

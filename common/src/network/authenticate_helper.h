@@ -17,6 +17,9 @@
 #include "utils/network/http/httptypes.h"
 #include "utils/thread/mutex.h"
 
+#include "ldap/ldap_manager.h"
+
+struct QnLdapDigestAuthContext;
 
 namespace AuthMethod
 {
@@ -94,6 +97,7 @@ enum AuthResult
 {
     Auth_OK,            // OK
     Auth_WrongLogin,    // invalid login
+    Auth_WrongInternalLogin, // invalid login used for internal auth scheme
     Auth_WrongDigest,   // invalid or empty digest
     Auth_WrongPassword, // invalid password
     Auth_Forbidden      // no auth mehod found or custom auth scheme without login/password is failed
@@ -111,7 +115,6 @@ public:
     virtual ~QnAuthHelper();
 
     static void initStaticInstance(QnAuthHelper* instance);
-    static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter);
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side
@@ -196,9 +199,25 @@ private:
         TempAuthenticationKeyCtx& operator=( const TempAuthenticationKeyCtx& );
     };
 
+    class UserDigestData
+    {
+    public:
+        nx_http::StringType ha1Digest;
+        nx_http::StringType realm;
+        nx_http::StringType cryptSha512Hash;
+        nx_http::StringType nxUserName;
+
+        void parse( const nx_http::Request& request );
+        bool empty() const;
+    };
+
+
+    /*!
+        \param userRes Can be NULL
+    */
     void addAuthHeader(
         nx_http::Response& responseHeaders,
-        const QString& realm,
+        const QnUserResourcePtr& userRes,
         bool isProxy );
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
@@ -229,6 +248,9 @@ private:
     */
     AuthResult authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId, std::function<bool(const QByteArray&)> checkNonceFunc) const;
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
+    void applyClientCalculatedPasswordHashToResource(
+        const QnUserResourcePtr& userResource,
+        const UserDigestData& userDigestData );
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

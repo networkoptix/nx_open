@@ -7,6 +7,9 @@
 #include "acti_resource.h"
 #include "../mdns/mdns_listener.h"
 #include "utils/network/http/asynchttpclient.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 
 extern QString getValueFromString(const QString& line);
@@ -169,6 +172,11 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         if (devInfo.info.modelName.isEmpty() || devInfo.info.serialNumber.isEmpty())
             return result;
 
+        QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), QLatin1String(model));
+        if (resourceData.value<bool>(QLatin1String("forceONVIF")))
+            return result; // model forced by ONVIF
+
+
         devInfo.timer.restart();
         m_cashedDevInfo[devUrl] = devInfo;
     }
@@ -229,6 +237,11 @@ void QnActiResourceSearcher::createResource(
 {
     if (m_resTypeId.isNull())
         return;
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), devInfo.modelName);
+    if (resourceData.value<bool>(lit("forceONVIF")))
+        return; // model forced by ONVIF
+
 
     QnActiResourcePtr resource( new QnActiResource() );
 

@@ -30,6 +30,8 @@ CONFIG(debug, debug|release) {
   }
   win* {
     LIBS = ${windows.oslibs.debug}
+  } else {
+    DEFINES += _DEBUG
   }
   DEFINES += USE_OWN_MUTEX
   #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance

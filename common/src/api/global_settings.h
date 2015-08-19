@@ -9,6 +9,7 @@
 #include <utils/common/singleton.h>
 #include <utils/common/connective.h>
 #include <utils/email/email_fwd.h>
+#include <utils/common/ldap_fwd.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -43,6 +44,9 @@ public:
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings &settings);
 
+    QnLdapSettings ldapSettings() const;
+    void setLdapSettings(const QnLdapSettings &settings);
+
     void synchronizeNow();
     QnUserResourcePtr getAdminUser();
 
@@ -55,6 +59,7 @@ signals:
     void cameraSettingsOptimizationChanged();
     void serverAutoDiscoveryChanged();
     void emailSettingsChanged();
+    void ldapSettingsChanged();
 
 private:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -79,6 +84,14 @@ private:
     QnResourcePropertyAdaptor<int> *m_timeoutAdaptor;
     /** Flag that we are using simple smtp settings set */
     QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;   //TODO: #GDM #Common think where else we can store it
+
+    // set of ldap settings adaptors
+    QnResourcePropertyAdaptor<QUrl> *m_ldapUriAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_ldapAdminDnAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_ldapAdminPasswordAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_ldapSearchBaseAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_ldapSearchFilterAdaptor;
+
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 

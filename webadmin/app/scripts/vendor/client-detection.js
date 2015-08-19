@@ -36,8 +36,11 @@
             }
         }
         // MSIE
-        else if ((verOffset = nAgt.indexOf('MSIE')) != -1 || (verOffset = nAgt.indexOf('Edge')) != -1) {
+        else if ((verOffset = nAgt.indexOf('MSIE')) != -1 ) {
             browser = 'Microsoft Internet Explorer';
+            version = nAgt.substring(verOffset + 5);
+        }else if((verOffset = nAgt.indexOf('Edge')) != -1){
+            browser = 'Microsoft Edge';
             version = nAgt.substring(verOffset + 5);
         }
         // Chrome
@@ -161,14 +164,14 @@
 
         // flash (you'll need to include swfobject)
         /* script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js" */
-        var flashVersion = 'no check';
+        var flashVersion = null;
         if (typeof swfobject != 'undefined') {
             var fv = swfobject.getFlashPlayerVersion();
             if (fv.major > 0) {
                 flashVersion = fv.major + '.' + fv.minor + ' r' + fv.release;
             }
             else  {
-                flashVersion = unknown;
+                flashVersion = null;
             }
         }
     }

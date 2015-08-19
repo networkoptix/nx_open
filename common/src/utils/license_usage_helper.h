@@ -124,7 +124,11 @@ class QnCamLicenseUsageWatcher: public QnLicenseUsageWatcher {
 
     typedef QnLicenseUsageWatcher base_type;
 public:
-    QnCamLicenseUsageWatcher(QObject* parent = NULL);
+    QnCamLicenseUsageWatcher(QObject *parent = nullptr);
+    QnCamLicenseUsageWatcher(const QnVirtualCameraResourcePtr &camera, QObject *parent = nullptr);
+
+private:
+    void init(const QnVirtualCameraResourcePtr &camera);
 };
 
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
@@ -134,7 +138,9 @@ class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
 public:
     QnCamLicenseUsageHelper(QObject *parent = NULL);
     QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent = NULL);
+    QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable, QObject *parent = NULL);
 
+    void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
 protected:

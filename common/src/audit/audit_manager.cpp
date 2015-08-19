@@ -8,6 +8,8 @@ static QnAuditManager* m_globalInstance = 0;
 namespace
 {
     const qint64 GROUP_TIME_THRESHOLD = 1000ll * 30;
+    static const qint64 SESSION_KEEP_PERIOD_SECS      = 3600ll * 24;
+    static const qint64 SESSION_CLEANUP_INTERVAL_MS = 1000;
 }
 
 QnAuditRecord QnAuditManager::CameraPlaybackInfo::toAuditRecord() const
@@ -46,6 +48,7 @@ QnAuditManager* QnAuditManager::instance()
 
 QnAuditManager::QnAuditManager()
 {
+    m_sessionCleanupTimer.restart();
     m_enabled = QnGlobalSettings::instance()->isAuditTrailEnabled();
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::auditTrailEnableChanged, this,
         [this]() {
@@ -68,18 +71,48 @@ QnAuditRecord QnAuditManager::prepareRecord(const QnAuthSession& authInfo, Qn::A
     return result;
 }
 
-void QnAuditManager::at_connectionOpened(const QnAuthSession& authInfo)
+void QnAuditManager::cleanupExpiredSessions()
 {
-    if (!enabled())
-        return;
-
-    AuditConnection connection;
-    connection.record = prepareRecord(authInfo, Qn::AR_Login);
-    connection.internalId = addAuditRecord(connection.record);
-    if (connection.internalId > 0) {
-        QMutexLocker lock(&m_mutex);
-        m_openedConnections[authInfo.id] = connection;
+    qint64 currentTimeSec = qnSyncTime->currentMSecsSinceEpoch() / 1000;
+    for (auto itr = m_openedConnections.begin(); itr != m_openedConnections.end();)
+    {
+        AuditConnection& connection = itr.value();
+        if (currentTimeSec - connection.record.rangeEndSec > SESSION_KEEP_PERIOD_SECS)
+            itr = m_openedConnections.erase(itr);
+        else
+            ++itr;
     }
+}
+
+int QnAuditManager::registerNewConnection(const QnAuthSession& authInfo, bool explicitCall)
+{
+    cleanupExpiredSessions();
+    if (!enabled())
+        return 0;
+
+    auto itr = m_openedConnections.find(authInfo.id);
+    if (itr == m_openedConnections.end()) {
+        AuditConnection connection;
+        connection.record = prepareRecord(authInfo, Qn::AR_Login);
+        connection.record.rangeStartSec = connection.record.createdTimeSec;
+        connection.internalId = addAuditRecordInternal(connection.record);
+        itr = m_openedConnections.insert(authInfo.id, connection);
+    }
+
+    AuditConnection& connection = itr.value();
+    if (explicitCall && connection.record.rangeEndSec) {
+        connection.record.rangeEndSec = 0;
+        updateAuditRecord(connection.internalId, connection.record); // make database record opened again
+    }
+
+    int endTime = explicitCall ? INT_MAX : qnSyncTime->currentMSecsSinceEpoch() / 1000; // do not auto delete if explicit login (logout is expected);
+    connection.record.rangeEndSec = qMax(endTime, connection.record.rangeEndSec);
+    return connection.internalId;
+}
+
+void QnAuditManager::at_connectionOpened(const QnAuthSession &session)
+{
+    addAuditRecord(prepareRecord(session, Qn::AR_Login));
 }
 
 void QnAuditManager::at_connectionClosed(const QnAuthSession &data)
@@ -91,11 +124,9 @@ void QnAuditManager::at_connectionClosed(const QnAuthSession &data)
     auto itr = m_openedConnections.find(data.id);
     if (itr != m_openedConnections.end()) {
         AuditConnection& connection = itr.value();
-        connection.record.rangeStartSec = connection.record.createdTimeSec;
         connection.record.rangeEndSec = qnSyncTime->currentMSecsSinceEpoch() / 1000;
         updateAuditRecord(connection.internalId, connection.record);
     }
-    m_openedConnections.remove(data.id);
 }
 
 AuditHandle QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, const QnUuid& cameraId, qint64 timestampUsec, bool isExport)
@@ -269,8 +300,23 @@ int QnAuditManager::addAuditRecord(const QnAuditRecord& record)
 {
     if (!enabled())
         return -1;
-    else
+
+    QMutexLocker lock(&m_mutex);
+    if (m_sessionCleanupTimer.elapsed() > SESSION_CLEANUP_INTERVAL_MS)
+    {
+        m_sessionCleanupTimer.restart();
+        cleanupExpiredSessions();
+    }
+
+    if (record.eventType == Qn::AR_UnauthorizedLogin)
         return addAuditRecordInternal(record);
+    else {
+        int internalId = registerNewConnection(record.authSession, record.eventType == Qn::AR_Login);
+        if (record.eventType == Qn::AR_Login)
+            return internalId;
+        else
+            return addAuditRecordInternal(record);
+    }
 }
 
 int QnAuditManager::updateAuditRecord(int internalId, const QnAuditRecord& record)

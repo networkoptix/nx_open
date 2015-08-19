@@ -23,6 +23,7 @@ public:
         UpdatesPage,
         RoutingManagement,
         TimeServerSelection,
+        UserManagement,
 
         PageCount
     };

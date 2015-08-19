@@ -268,10 +268,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -309,6 +305,10 @@
     </message>
     <message>
         <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

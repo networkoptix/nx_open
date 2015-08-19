@@ -1,14 +1,14 @@
 <div class="container-fluid dark-theme row">
    <table style="width:100%" class="webclient-window">
         <tbody>
-            <tr class="alerts-row" ng-if="hasMobileApp && !mobileAppNotified || ieNoWebm && !ieNoWebmNotified ">
+            <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified || ieNoWebm && !session.ieNoWebmNotified ">
                 <td colspan="2" class="alert">
-                    <div class="webclient-panel mobile-alert" ng-if="hasMobileApp && !mobileAppNotified">
+                    <div class="webclient-panel mobile-alert" ng-if="hasMobileApp && !session.mobileAppNotified">
                         <div class="pull-right" >
                             <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
                                 Install
                             </a>
-                            <span class="webclient-button caption-row" ng-click="mobileAppAlertClose()"><span class="glyphicon glyphicon-remove"></span></span>
+                            <span class="webclient-button caption-row hidden-xs" ng-click="mobileAppAlertClose()"><span class="glyphicon glyphicon-remove"></span></span>
                         </div>
                         <div>
                             <span class="caption-row ">
@@ -17,7 +17,7 @@
                         </div>
                     </div>
 
-                    <div class="webclient-panel mobile-alert" ng-if="ieNoWebm && !ieNoWebmNotified">
+                    <div class="webclient-panel mobile-alert" ng-if="ieNoWebm && !session.ieNoWebmNotified">
                         <div class="pull-right" >
                             <a ng-href="https://tools.google.com/dlpage/webmmf/" class="btn webclient-button caption-row" >
                                 Install
@@ -40,7 +40,7 @@
                                 <li ng-repeat="server in mediaServers">
                                     <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
                                        title="{{server.url}}"
-                                       ng-click="server.collapsed = !server.collapsed"
+                                       ng-click="toggleServerCollapsed(server)"
                                        class="webclint-panel server-link collapse-group"
                                        ng-class="{offline:server.status!='Online'}">
                                         <div class="pull-right caption-row">
@@ -126,16 +126,16 @@
                             </div>
 
                             <div class="float-size hidden-xs">
-                                <div class="camera-view-informer" ng-if="activeCamera.status == 'Offline' && positionProvider.liveMode ">
+                                <div class="camera-view-informer" ng-if="!positionSelected && activeCamera.status == 'Offline' ">
                                     <div class="camera-view-offline camera-view-message-icon"></div><br/><div class="camera-view-message">OFFLINE</div>
                                 </div>
-                                <div class="camera-view-informer" ng-if="activeCamera.status == 'Unauthorized' && positionProvider.liveMode " >
+                                <div class="camera-view-informer" ng-if="!positionSelected && activeCamera.status == 'Unauthorized'" >
                                     <div class="camera-view-unauthorized camera-view-message-icon"></div>
                                     <br/>
                                     <div class="camera-view-message">UNAUTHORIZED</div>
                                 </div>
 
-                                <videowindow ng-class="{invisible: positionProvider.liveMode && (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
+                                <videowindow ng-class="{invisible: !positionSelected && (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
                                              vg-update-time="updateTime($currentTime, $duration)"
                                              vg-player-ready="playerReady($API)"
                                              vg-src="acitveVideoSource">

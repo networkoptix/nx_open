@@ -5,7 +5,6 @@
 
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/algorithm/fill.hpp>
-#include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
 #include <core/resource/resource.h>
@@ -292,6 +291,29 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
 QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /*= NULL*/):
     base_type(parent)
 {
+    init(QnVirtualCameraResourcePtr());
+}
+
+QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(const QnVirtualCameraResourcePtr &camera, QObject *parent)
+    : base_type(parent)
+{
+    init(camera);
+}
+
+void QnCamLicenseUsageWatcher::init(const QnVirtualCameraResourcePtr &camera) {
+    /* Listening to all changes that can affect licenses usage. */
+    auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
+        connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged,  this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged,       this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(camera, &QnVirtualCameraResource::groupNameChanged,         this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(camera, &QnVirtualCameraResource::groupIdChanged,           this, &QnLicenseUsageWatcher::licenseUsageChanged);
+    };
+
+    if (camera) {
+        connectToCamera(camera);
+        return;
+    }
+
     /* Call update if camera was added or removed. */
     auto updateIfNeeded = [this](const QnResourcePtr &resource) {
         if (resource.dynamicCast<QnVirtualCameraResource>())
@@ -300,14 +322,6 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /*= NULL*/):
 
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
-
-    /* Listening to all changes that can affect licenses usage. */
-    auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
-        connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged,  this, &QnLicenseUsageWatcher::licenseUsageChanged);
-        connect(camera, &QnVirtualCameraResource::licenseUsedChanged,       this, &QnLicenseUsageWatcher::licenseUsageChanged);
-        connect(camera, &QnVirtualCameraResource::groupNameChanged,         this, &QnLicenseUsageWatcher::licenseUsageChanged);
-        connect(camera, &QnVirtualCameraResource::groupIdChanged,           this, &QnLicenseUsageWatcher::licenseUsageChanged);
-    };
 
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   [this, connectToCamera](const QnResourcePtr &resource) {
         if (const QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())
@@ -340,9 +354,20 @@ QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceLi
     propose(proposedCameras, proposedEnable);
 }
 
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable, QObject *parent):
+    base_type(parent)
+{
+    init();
+    propose(proposedCamera, proposedEnable);
+}
+
 void QnCamLicenseUsageHelper::init() {
     QnCamLicenseUsageWatcher* usageWatcher = new QnCamLicenseUsageWatcher(this);
     connect(usageWatcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, &QnLicenseUsageHelper::invalidate);
+}
+
+void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable) {
+    return propose(QnVirtualCameraResourceList() << proposedCamera, proposedEnable);
 }
 
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable) {
@@ -357,7 +382,10 @@ void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &propose
 }
 
 bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera) {
-    return camera->isLicenseUsed() && !isValid(camera->licenseType());
+    bool requiresLicense = camera->isLicenseUsed();
+    requiresLicense &= !m_proposedToDisable.contains(camera);
+    requiresLicense |= m_proposedToEnable.contains(camera);
+    return requiresLicense && !isValid(camera->licenseType());
 }
 
 QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {

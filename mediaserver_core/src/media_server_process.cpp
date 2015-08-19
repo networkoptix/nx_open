@@ -17,6 +17,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
 #include <utils/common/uuid.h>
+#include <utils/common/ldap.h>
 #include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
@@ -119,6 +120,7 @@
 #include <rest/handlers/time_rest_handler.h>
 #include <rest/handlers/activate_license_rest_handler.h>
 #include <rest/handlers/test_email_rest_handler.h>
+#include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
@@ -197,7 +199,9 @@
 #include "core/resource/camera_history.h"
 #include "utils/network/nettools.h"
 #include "http/iomonitor_tcp_server.h"
+#include "ldap/ldap_manager.h"
 #include "rest/handlers/multiserver_chunks_rest_handler.h"
+#include "rest/handlers/merge_ldap_users_rest_handler.h"
 #include "audit/mserver_audit_manager.h"
 #include "utils/common/waiting_for_qthread_to_empty_event_queue.h"
 
@@ -1376,6 +1380,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
@@ -1404,6 +1409,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
     QnRestProcessorPool::instance()->registerHandler("ec2/cameraHistory", new QnCameraHistoryRestHandler());
     QnRestProcessorPool::instance()->registerHandler("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
+    QnRestProcessorPool::instance()->registerHandler("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
@@ -2106,6 +2112,8 @@ void MediaServerProcess::run()
     updateAllowCameraCHangesIfNeed();
     //QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
 #endif
+
+    std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager());
 
     //QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
 

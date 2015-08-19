@@ -251,6 +251,8 @@ public:
     
     virtual Qn::BitratePerGopType bitratePerGopType() const;
 
+    // Allow getting multi video layout directly from a RTSP SDP info
+    virtual bool allowRtspVideoLayout() const { return true; }
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

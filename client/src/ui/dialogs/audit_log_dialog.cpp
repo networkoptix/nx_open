@@ -6,12 +6,13 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
-#include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
-
-
 #include <client/client_globals.h>
 #include <client/client_settings.h>
+
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include "core/resource/media_resource.h"
 
 #include <ui/actions/action_manager.h>
 
@@ -30,18 +31,17 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include "ui/actions/actions.h"
 #include "utils/math/color_transformations.h"
-#include "camera_addition_dialog.h"
 #include <ui/models/audit/audit_log_session_model.h>
 #include <ui/models/audit/audit_log_detail_model.h>
 #include <QMouseEvent>
 #include "core/resource/layout_resource.h"
 #include "ui/common/geometry.h"
 #include "ui/style/globals.h"
+#include <ui/widgets/views/checkboxed_header_view.h>
 #include "ui/workbench/workbench_context_aware.h"
 #include <ui/workbench/workbench_display.h>
 #include "ui/workbench/extensions/workbench_stream_synchronizer.h"
-#include <core/resource/user_resource.h>
-#include "core/resource/media_resource.h"
+
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -261,7 +261,6 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
         QVariant data = index.data(Qn::AuditRecordDataRole);
         if (!data.canConvert<QnAuditRecord*>())
             return base_type::paint(painter, option, index);
-        const QnAuditRecord* record = data.value<QnAuditRecord*>();
 
         QStyleOptionButton button;
         button.text = index.data(Qt::DisplayRole).toString();
@@ -347,13 +346,16 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
 
 QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRecordRefList& checkedRows)
 {
-    QSet<QnUuid> selectedSessions;
+    QMap<QnUuid, int> selectedSessions;
     for (const QnAuditRecord* record: checkedRows) 
-        selectedSessions << record->authSession.id;
+        selectedSessions.insert(record->authSession.id, record->rangeStartSec);
 
     QnAuditRecordRefList result;
     auto filter = [&selectedSessions] (const QnAuditRecord* record) {
-        return selectedSessions.contains(record->authSession.id);
+        if (record->eventType == Qn::AR_Login)
+            return selectedSessions.value(record->authSession.id) == record->rangeStartSec; // hide duplicate login from difference servers
+        else
+            return selectedSessions.contains(record->authSession.id);
     };
     std::copy_if(m_filteredData.begin(), m_filteredData.end(), std::back_inserter(result), filter);
     return result;
@@ -378,7 +380,7 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRec
     return result;
 }
 
-QSize QnAuditLogDialog::calcButtonSize(const QFont& font) const
+QSize QnAuditLogDialog::calcButtonSize() const
 {
     std::unique_ptr<QPushButton> button(new QPushButton());
     button->setText(tr("Play this"));
@@ -561,7 +563,6 @@ void QnAuditLogDialog::at_updateCheckboxes()
 void setGridGeneralCheckState(QTableView* gridMaster, Qt::CheckState checkState)
 {
     QnCheckBoxedHeaderView* headers = (QnCheckBoxedHeaderView*) gridMaster->horizontalHeader();
-    QnAuditLogModel* model = (QnAuditLogModel*) gridMaster->model();
     headers->blockSignals(true);
     headers->setCheckState(checkState);
     headers->blockSignals(false);
@@ -569,6 +570,8 @@ void setGridGeneralCheckState(QTableView* gridMaster, Qt::CheckState checkState)
 
 void QnAuditLogDialog::at_masterGridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
+    QN_UNUSED(selected, deselected);
+
     QnTableView* gridMaster = (QnTableView*) sender()->parent();
     QModelIndex mouseIdx = gridMaster->mouseIndex();
     QnAuditLogModel* model = (QnAuditLogModel*) gridMaster->model();
@@ -623,7 +626,7 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
 
     gridMaster->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
-    QnCheckBoxedHeaderView* headers = new QnCheckBoxedHeaderView(this);
+    QnCheckBoxedHeaderView* headers = new QnCheckBoxedHeaderView(QnAuditLogModel::SelectRowColumn, this);
     headers->setVisible(true);
     headers->setSectionsClickable(true);
     headers->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -638,7 +641,6 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
     connect (headers,           &QnCheckBoxedHeaderView::checkStateChanged, this, &QnAuditLogDialog::at_headerCheckStateChanged);
     connect(gridMaster->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QnAuditLogDialog::at_masterGridSelectionChanged);
     connect(gridMaster,         &QTableView::pressed, this, &QnAuditLogDialog::at_masterItemPressed); // put selection changed before item pressed
-    connect(gridMaster,         &QTableView::clicked,               this,   &QnAuditLogDialog::at_sessionsGrid_clicked);
 
     setupContextMenu(gridMaster);
 }
@@ -688,7 +690,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
 
     m_itemDelegate = new QnAuditItemDelegate(this);
-    m_itemDelegate->setPlayButtonSize(calcButtonSize(ui->gridMaster->font()));
+    m_itemDelegate->setPlayButtonSize(calcButtonSize());
     m_itemDelegate->setDefaultSectionHeight(ui->gridDetails->verticalHeader()->defaultSectionSize());
 
     setupSessionsGrid();
@@ -720,6 +722,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     connect (ui->gridDetails->horizontalHeader(), &QHeaderView::sectionResized, this, 
         [this] (int logicalIndex, int oldSize, int newSize) 
         {
+            QN_UNUSED(logicalIndex, oldSize, newSize);
+
             int w = 0;
             const QHeaderView* headers = ui->gridDetails->horizontalHeader();
             for (int i = 0; i < headers->count() - 1; ++i)
@@ -760,18 +764,9 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_currentTabChanged);
-    /*
-    connect(ui->tabWidget, &QTabWidget::currentChanged, 
-        this, [this](int index) {
-            if (index == SessionTab)
-                ui->gridMaster->adjustSize();
-            else
-                ui->gridCameras->adjustSize();
-            at_filterChanged();
-        }
-    );
-    */
-    
+
+    ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
+    ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
 }
 
 QnAuditLogDialog::~QnAuditLogDialog() {
@@ -925,7 +920,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId, const QString& objectName)
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId)
 {
     QnResourceList resList;
     for (const auto& id: record->resources) {
@@ -955,11 +950,11 @@ void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
     if (record->isPlaybackType())
         processPlaybackAction(record);
     else if (record->eventType == Qn::AR_UserUpdate)
-        triggerAction(record, Qn::UserSettingsAction,   tr("user(s)"));
+        triggerAction(record, Qn::UserSettingsAction);
     else if (record->eventType == Qn::AR_ServerUpdate)
-        triggerAction(record, Qn::ServerSettingsAction, tr("server(s)"));
+        triggerAction(record, Qn::ServerSettingsAction);
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
-        triggerAction(record, Qn::CameraSettingsAction,   tr("camera(s)"));
+        triggerAction(record, Qn::CameraSettingsAction);
 
     if (isMaximized())
         showNormal();
@@ -997,19 +992,6 @@ void QnAuditLogDialog::updateData()
     m_dirty = false;
 }
 
-QList<QnMediaServerResourcePtr> QnAuditLogDialog::getServerList() const
-{
-    QList<QnMediaServerResourcePtr> result;
-    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
-    foreach(const QnResourcePtr& r, resList) {
-        QnMediaServerResourcePtr mServer = r.dynamicCast<QnMediaServerResource>();
-        if (mServer)
-            result << mServer;
-    }
-
-    return result;
-}
-
 void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
 {
     m_sessionModel->clearData();
@@ -1023,7 +1005,7 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     m_filteredData.clear();
 
 
-    QList<QnMediaServerResourcePtr> mediaServerList = getServerList();
+    const auto mediaServerList = qnResPool->getAllServers();
     foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
     {
         if (mserver->getStatus() == Qn::Online)
@@ -1051,15 +1033,30 @@ void QnAuditLogDialog::makeSessionData()
 {
     m_sessionData.clear();
     QMap<QnUuid, int> activityPerSession;
+    QMap<QnUuid, QnAuditRecord> processedLogins;
     for (const QnAuditRecord& record: m_allData)
     {
-        if (record.isLoginType())
-            m_sessionData << record;
+        if (record.isLoginType()) 
+        {
+            auto itr = processedLogins.find(record.authSession.id);
+            if (itr == processedLogins.end())
+                processedLogins.insert(record.authSession.id, record);
+            else {
+                // group sessions because of different servers may have same session
+                QnAuditRecord& existRecord = itr.value();
+                existRecord.rangeStartSec = qMin(existRecord.rangeStartSec, record.rangeStartSec);
+                existRecord.rangeEndSec = qMax(existRecord.rangeEndSec, record.rangeEndSec);
+            }
+        }
         activityPerSession[record.authSession.id]++;
     }
-
-    for (QnAuditRecord& record: m_sessionData)
-        record.addParam("childCnt", QByteArray::number(activityPerSession.value(record.authSession.id)));
+    m_sessionData.reserve(processedLogins.size());
+    for (auto& value: processedLogins)
+        m_sessionData.push_back(std::move(value));
+    for (QnAuditRecord& record: m_sessionData) {
+        record.addParam(QnAuditLogModel::ChildCntParamName, QByteArray::number(activityPerSession.value(record.authSession.id)));
+        record.addParam(QnAuditLogModel::CheckedParamName, "1");
+    }
 }
 
 void QnAuditLogDialog::makeCameraData()
@@ -1076,7 +1073,8 @@ void QnAuditLogDialog::makeCameraData()
     for (auto itr = activityPerCamera.begin(); itr != activityPerCamera.end(); ++itr) {
         QnAuditRecord cameraRecord;
         cameraRecord.resources.push_back(itr.key());
-        cameraRecord.addParam("childCnt", QByteArray::number(itr.value())); // used for "user activity" column
+        cameraRecord.addParam(QnAuditLogModel::ChildCntParamName, QByteArray::number(itr.value())); // used for "user activity" column
+        cameraRecord.addParam(QnAuditLogModel::CheckedParamName, "1");
         m_cameraData.push_back(cameraRecord);
     }
 }
@@ -1087,6 +1085,8 @@ void QnAuditLogDialog::requestFinished()
     setGridGeneralCheckState(ui->gridCameras, Qt::Unchecked);
     makeSessionData();
     makeCameraData();
+    static_cast<QnCheckBoxedHeaderView*>(ui->gridMaster->horizontalHeader())->setCheckState(Qt::Checked);
+    static_cast<QnCheckBoxedHeaderView*>(ui->gridCameras->horizontalHeader())->setCheckState(Qt::Checked);
     at_filterChanged();
 
     ui->gridMaster->setDisabled(false);
@@ -1102,10 +1102,6 @@ void QnAuditLogDialog::requestFinished()
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
     */
     ui->loadingProgressBar->hide();
-}
-
-void QnAuditLogDialog::at_sessionsGrid_clicked(const QModelIndex& idx)
-{
 }
 
 void QnAuditLogDialog::setDateRange(const QDate& from, const QDate& to)
