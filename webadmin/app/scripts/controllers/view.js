@@ -58,7 +58,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm',false)){
-            $scope.ieNoWebm = true;
+            if(window.jscd.osVersion < 10) { //For 10th version webm codec doesn't work
+                $scope.ieNoWebm = true;
+            }
         }
 
         if(window.jscd.mobile) {
