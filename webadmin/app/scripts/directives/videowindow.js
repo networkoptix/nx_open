@@ -49,10 +49,14 @@ angular.module('webadminApp')
                 }
 
                 function detectBestFormat(){
+                    //1. Hide all informers
                     scope.flashRequired = false;
                     scope.flashOrWebmRequired = false;
                     scope.noArmSupport = false;
                     scope.noFormat = false;
+                    scope.errorLoading = false;
+                    scope.edgeNoWebm = false;
+                    scope.loading = false;
 
                     if(scope.debugMode && scope.debugFormat){
                         return scope.debugFormat;
