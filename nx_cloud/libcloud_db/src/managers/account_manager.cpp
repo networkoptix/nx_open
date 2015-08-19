@@ -43,6 +43,11 @@ AccountManager::AccountManager(
 {
 }
 
+bool AccountManager::init()
+{
+    return fillCache() == db::DBResult::ok;
+}
+
 void AccountManager::addAccount(
     const AuthorizationInfo& /*authzInfo*/,
     data::AccountData accountData,
@@ -86,7 +91,56 @@ void AccountManager::getAccount(
         return;
     }
 
+    //not returning password digest due to security reason
+    resultData.passwordHa1.clear();
     completionHandler( ResultCode::ok, std::move(resultData) );
+}
+
+db::DBResult AccountManager::fillCache()
+{
+    std::promise<db::DBResult> cacheFilledPromise;
+    auto future = cacheFilledPromise.get_future();
+
+    //starting async operation
+    using namespace std::placeholders;
+    m_dbManager->executeSelect<int>(
+        std::bind( &AccountManager::fetchAccounts, this, _1, _2 ),
+        [&cacheFilledPromise]( db::DBResult dbResult, int /*dummy*/ ) {
+            cacheFilledPromise.set_value( dbResult );
+        } );
+
+    //waiting for completion
+    future.wait();
+    return future.get();
+}
+
+db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const /*dummy*/ )
+{
+    QSqlQuery readAccountsQuery( *connection );
+    readAccountsQuery.prepare(
+        "SELECT id, email, password_ha1 as passwordHa1, "
+               "full_name as fullName, status_code as statusCode "
+        "FROM account" );
+    if( !readAccountsQuery.exec() )
+    {
+        NX_LOG( lit( "Failed to read account list from DB. %1" ).
+            arg( connection->lastError().text() ), cl_logWARNING );
+        return db::DBResult::ioError;
+    }
+
+    std::vector<data::AccountData> accounts;
+    QnSql::fetch_many( readAccountsQuery, &accounts );
+
+    for( auto& account: accounts )
+    {
+        auto idCopy = account.id;
+        if( !m_cache.add( std::move(idCopy), std::move(account) ) )
+        {
+            Q_ASSERT( false );
+        }
+    }
+
+    return db::DBResult::ok;
 }
 
 db::DBResult AccountManager::insertAccount(

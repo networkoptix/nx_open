@@ -186,7 +186,7 @@ class SelectExecutor
 {
 public:
     SelectExecutor(
-        std::function<DBResult( OutputData* const )> dbSelectFunc,
+        std::function<DBResult( QSqlDatabase*, OutputData* const )> dbSelectFunc,
         std::function<void( DBResult, OutputData )> completionHandler )
     :
         m_dbSelectFunc( std::move( dbSelectFunc ) ),
@@ -204,7 +204,7 @@ public:
     }
 
 private:
-    std::function<DBResult( OutputData* const )> m_dbSelectFunc;
+    std::function<DBResult( QSqlDatabase*, OutputData* const )> m_dbSelectFunc;
     std::function<void( DBResult, OutputData )> m_completionHandler;
 };
 

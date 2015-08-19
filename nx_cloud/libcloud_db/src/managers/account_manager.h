@@ -32,29 +32,48 @@ template<class KeyType, class CachedType>
 class Cache
 {
 public:
-    void add( KeyType /*key*/, CachedType /*value*/ )
+    /*!
+        \return false if already exists
+    */
+    bool add( KeyType key, CachedType value )
     {
-        //TODO #ak
+        QnMutexLocker lk( &m_mutex );
+        return m_data.emplace( std::move(key), std::move(value) ).second;
     }
 
-    bool get( const KeyType& /*key*/, CachedType* const /*value*/ )
+    bool get( const KeyType& key, CachedType* const value ) const
     {
-        //TODO #ak
-        return false;
+        QnMutexLocker lk( &m_mutex );
+
+        auto it = m_data.find( key );
+        if( it == m_data.end() )
+            return false;
+        *value = it->second;
+        return true;
     }
 
     //!Executes \a updateFunc on item with \a key
     /*!
         \warning \a updateFunc is executed with internal mutex locked, so it MUST NOT BLOCK!
+        \return \a true if item found and updated. \a false otherwise
     */
     template<class Func>
     bool atomicUpdate(
-        const KeyType& /*key*/,
-        const Func& /*updateFunc*/ )
+        const KeyType& key,
+        const Func& updateFunc )
     {
-        //TODO
-        return false;
+        QnMutexLocker lk( &m_mutex );
+
+        auto it = m_data.find( key );
+        if( it == m_data.end() )
+            return false;
+        updateFunc( it->second );
+        return true;
     }
+    std::map<KeyType, CachedType> m_data;
+
+private:
+    mutable QnMutex m_mutex;
 };
 
 /*!
@@ -67,6 +86,12 @@ public:
         const conf::Settings& settings,
         nx::db::DBManager* const dbManager,
         EMailManager* const emailManager );
+
+    //!MUST be called before any other methods
+    /*!
+        \return If \a false object cannot be used futher
+    */
+    bool init();
 
     //!Adds account in "not activated" state and sends verification email to the email address provided
     void addAccount(
@@ -89,6 +114,9 @@ private:
     nx::db::DBManager* const m_dbManager;
     EMailManager* const m_emailManager;
     Cache<QnUuid, data::AccountData> m_cache;
+
+    nx::db::DBResult fillCache();
+    nx::db::DBResult fetchAccounts( QSqlDatabase* connection, int* const dummy );
 
     //add_account DB operations
     nx::db::DBResult insertAccount(

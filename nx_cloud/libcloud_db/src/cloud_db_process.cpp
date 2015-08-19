@@ -25,6 +25,7 @@
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
 #include "http_handlers/add_account_handler.h"
+#include "http_handlers/get_account_handler.h"
 #include "http_handlers/verify_email_address_handler.h"
 #include "managers/account_manager.h"
 #include "managers/email_manager.h"
@@ -106,6 +107,11 @@ int CloudDBProcess::executeApplication()
         settings,
         &dbManager,
         &emailManager );
+    if( !accountManager.init() )
+    {
+        NX_LOG( "Could not initialize account manager", cl_logALWAYS );
+        return 3;
+    }
 
     SystemManager systemManager( &dbManager );
 
@@ -205,6 +211,12 @@ void CloudDBProcess::registerApiHandlers(
         VerifyEmailAddressHandler::HANDLER_PATH,
         [accountManager, &authorizationManager]() -> VerifyEmailAddressHandler* {
             return new VerifyEmailAddressHandler( accountManager, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<GetAccountHttpHandler>(
+        GetAccountHttpHandler::HANDLER_PATH,
+        [accountManager, &authorizationManager]() -> GetAccountHttpHandler* {
+            return new GetAccountHttpHandler( accountManager, authorizationManager );
         } );
 }
 
