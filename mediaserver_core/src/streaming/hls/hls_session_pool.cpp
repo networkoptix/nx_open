@@ -6,9 +6,13 @@
 
 #include <QMutexLocker>
 
-#include "camera/video_camera.h"
+#include <core/resource_management/resource_pool.h>
+
 #include "audit/audit_manager.h"
+#include "camera/camera_pool.h"
+#include "camera/video_camera.h"
 #include "core/resource/resource.h"
+
 
 namespace nx_hls
 {
@@ -24,8 +28,8 @@ namespace nx_hls
         m_targetDurationMS( targetDurationMS ),
         m_live( _isLive ),
         m_streamQuality( streamQuality ),
-        m_videoCamera( videoCamera ),
-        m_authSession(authSession)
+        m_cameraID( videoCamera->resource()->getId() ),
+        m_authSession( authSession )
     {
         //verifying m_playlistManagers will not take much memory
         static_assert(
@@ -33,13 +37,13 @@ namespace nx_hls
             "MediaQuality enum suddenly contains too large values: consider changing HLSSession::m_playlistManagers type" );  
         m_playlistManagers.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
         if( m_live )
-            m_videoCamera->inUse( this );
+            videoCamera->inUse( this );
     }
         
     void HLSSession::updateAuditInfo(qint64 timeUsec)
     {
         if (!m_auditHandle)
-            m_auditHandle = qnAuditManager->notifyPlaybackStarted(m_authSession, m_videoCamera->resource()->getId(), m_live ? DATETIME_NOW : timeUsec);
+            m_auditHandle = qnAuditManager->notifyPlaybackStarted(m_authSession, m_cameraID, m_live ? DATETIME_NOW : timeUsec);
         if (m_auditHandle)
             qnAuditManager->notifyPlaybackInProgress(m_auditHandle, timeUsec);
     }
@@ -47,7 +51,16 @@ namespace nx_hls
     HLSSession::~HLSSession()
     {
         if( m_live )
-            m_videoCamera->notInUse( this );
+        {
+            QnResourcePtr resource = QnResourcePool::instance()->getResourceById( m_cameraID );
+            if( resource )
+            {
+                //checking resource stream type. Only h.264 is OK for HLS
+                QnVideoCamera* camera = qnCameraPool->getVideoCamera( resource );
+                if( camera )
+                    camera->notInUse( this );
+            }
+        }
     }
 
     const QString& HLSSession::id() const
