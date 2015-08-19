@@ -58,6 +58,7 @@ angular.module('webadminApp')
                     scope.edgeNoWebm = false;
                     scope.loading = false;
 
+
                     if(scope.debugMode && scope.debugFormat){
                         return scope.debugFormat;
                     }
@@ -336,6 +337,12 @@ angular.module('webadminApp')
                         format = detectBestFormat();
 
                         recyclePlayer(format);// Remove or recycle old player.
+
+                        if(!format){
+                            scope.native = false;
+                            scope.flashls = false;
+                            return;
+                        }
 
                         switch(format){
                             case "flashls":
