@@ -16,8 +16,7 @@ class QnUserManagementWidgetPrivate : public QObject, public QnWorkbenchContextA
 public:
     QnUserManagementWidgetPrivate(QnUserManagementWidget *parent);
 
-    QnSortedUserListModel* sortModel() const;
-    QHeaderView* header() const;
+    void setupUi();
 private:
     void at_usersTable_activated(const QModelIndex &index);
     void at_usersTable_clicked(const QModelIndex &index);

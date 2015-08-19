@@ -35,12 +35,39 @@ QnUserManagementWidgetPrivate::QnUserManagementWidgetPrivate(QnUserManagementWid
     connect(m_header, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnUserManagementWidgetPrivate::at_headerCheckStateChanged);
 }
 
-QnSortedUserListModel* QnUserManagementWidgetPrivate::sortModel() const {
-    return m_sortModel;
-}
 
-QHeaderView* QnUserManagementWidgetPrivate::header() const {
-    return m_header;
+void QnUserManagementWidgetPrivate::setupUi() {
+    Q_Q(QnUserManagementWidget);
+
+    q->ui->usersTable->setModel(m_sortModel);  
+    q->ui->usersTable->setHorizontalHeader(m_header);
+
+    m_header->setVisible(true);
+    m_header->setSectionResizeMode(QHeaderView::ResizeToContents);
+    m_header->setSectionResizeMode(QnUserListModel::PermissionsColumn, QHeaderView::Stretch);
+    m_header->setSectionsClickable(true);
+
+    q->ui->usersTable->sortByColumn(QnUserListModel::NameColumn, Qt::AscendingOrder);
+
+    auto updateFetchButton = [this] {
+        Q_Q(QnUserManagementWidget);
+        q->ui->fetchButton->setEnabled(QnGlobalSettings::instance()->ldapSettings().isValid());
+    };
+
+
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::ldapSettingsChanged, this, updateFetchButton);
+
+    connect(q->ui->usersTable,              &QTableView::activated, this,  &QnUserManagementWidgetPrivate::at_usersTable_activated);
+    connect(q->ui->usersTable,              &QTableView::clicked,   this,  &QnUserManagementWidgetPrivate::at_usersTable_clicked);
+    connect(q->ui->ldapSettingsButton,      &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::openLdapSettings);
+    connect(q->ui->fetchButton,             &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::fetchUsers);
+    connect(q->ui->createUserButton,        &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::createUser);
+    connect(q->ui->clearSelectionButton,    &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::clearSelection);
+    connect(q->ui->enableSelectedButton,    &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::enableSelected);
+    connect(q->ui->disableSelectedButton,   &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::disableSelected);
+    connect(q->ui->deleteSelectedButton,    &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::deleteSelected);
+
+    updateFetchButton();
 }
 
 void QnUserManagementWidgetPrivate::updateSelection() {
@@ -126,7 +153,7 @@ void QnUserManagementWidgetPrivate::setSelectedEnabled(bool enabled) {
             continue;
         user->setEnabled(enabled);
         QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, []{} );
-    }    
+    }
 }
 
 void QnUserManagementWidgetPrivate::enableSelected() {

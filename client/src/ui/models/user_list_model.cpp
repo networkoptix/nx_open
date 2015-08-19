@@ -89,7 +89,7 @@ void QnUserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr
         return;
 
     QModelIndex index = model->index(row);
-    model->dataChanged(index, index.sibling(row, QnUserListModel::ColumnCount));
+    emit model->dataChanged(index, index.sibling(row, QnUserListModel::ColumnCount - 1));
 }
 
 int QnUserListModelPrivate::userIndex(const QnUuid &id) const {
