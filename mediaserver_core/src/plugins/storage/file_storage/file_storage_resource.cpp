@@ -34,7 +34,8 @@
 #endif
 
 #include <sstream>
-#include <random>
+#include <cstdlib>
+#include <ctime>
 
 #ifndef Q_OS_WIN
     const QString QnFileStorageResource::FROM_SEP = lit("\\");
@@ -215,13 +216,8 @@ int QnFileStorageResource::mountTmpDrive(const QString &remoteUrl)
 
     auto randomString = []
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> nameDistribution(0, 15);
         std::stringstream randomStringStream;
-
-        for (size_t i = 0; i < 16; ++i)
-            randomStringStream << std::hex << nameDistribution(gen);
+        randomStringStream << std::hex << std::rand() << std::rand();
 
         return randomStringStream.str();
     };
@@ -313,7 +309,9 @@ QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
     m_capabilities |= QnAbstractStorageResource::cap::ReadFile;
-};
+
+    std::srand(std::time(0));
+}
 
 QnFileStorageResource::~QnFileStorageResource()
 {
