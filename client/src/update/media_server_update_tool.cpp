@@ -202,7 +202,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName, std::func
 }
 
 
-void QnMediaServerUpdateTool::startUpdate(const QnSoftwareVersion &version /*= QnSoftwareVersion()*/, bool denyMajorUpdates /*= false*/) {
+void QnMediaServerUpdateTool::startUpdate(const QnSoftwareVersion &version /* = QnSoftwareVersion()*/, bool denyMajorUpdates /* = false*/) {
     QnUpdateTarget target(actualTargetIds(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled(), denyMajorUpdates);
     startUpdate(target);
 }

@@ -62,7 +62,7 @@ public:
     QDateTime firstOccurred(QnStatisticsEvent event) const;
     QDateTime lastOccurred(QnStatisticsEvent event) const;
 
-    //========
+    // ========
 
 private:
     mutable QMutex m_mutex;

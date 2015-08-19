@@ -104,7 +104,7 @@ namespace {
 
 }
 
-QnWindowsShortcuts::QnWindowsShortcuts(QObject *parent /*= NULL*/):
+QnWindowsShortcuts::QnWindowsShortcuts(QObject *parent /* = NULL*/):
     QnPlatformShortcuts(parent)
 {
 

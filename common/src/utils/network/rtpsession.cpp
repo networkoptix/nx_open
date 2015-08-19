@@ -758,7 +758,7 @@ const QByteArray& RTPSession::getSdp() const
     return m_sdp;
 }
 
-//===================================================================
+// ===================================================================
 
 QByteArray RTPSession::calcDefaultNonce() const
 {

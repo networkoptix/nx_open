@@ -8,7 +8,6 @@
 
 #include "binary_stream.h"
 #include "ubjson_fwd.h"
-#include "ubjson_writer.h"
 #include "ubjson_detail.h"
 
 template<class Output>

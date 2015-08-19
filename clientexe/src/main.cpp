@@ -525,7 +525,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
 
-    //===========================================================================
+    // ===========================================================================
 
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
 
@@ -633,7 +633,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     resourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
 
-    //============================
+    // ============================
     //QnResourceDirectoryBrowser
     if(!skipMediaFolderScan) {
         QnResourceDirectoryBrowser::instance().setLocal(true);

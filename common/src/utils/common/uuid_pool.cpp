@@ -7,7 +7,7 @@ namespace {
     const size_t defaultPoolSize = 256;
 }
 
-QnUuidPool::QnUuidPool(const QnUuid &baseId, offset_type size /*= std::numeric_limits<uint>::max()*/):
+QnUuidPool::QnUuidPool(const QnUuid &baseId, offset_type size /* = std::numeric_limits<uint>::max()*/):
     m_baseid(baseId.getQUuid()),
     m_size(size)
 {

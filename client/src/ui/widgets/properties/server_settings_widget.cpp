@@ -112,7 +112,7 @@ namespace {
 } // anonymous namespace
 
 
-QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /*= 0*/):
+QnServerSettingsWidget::QnServerSettingsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /* = 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::ServerSettingsWidget),

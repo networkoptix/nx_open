@@ -73,7 +73,7 @@ namespace {
     const int maxVideowallReconnectTimeout = 96*60*60*1000; // 4 days
 }
 
-QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
+QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_connectingMessageBox(NULL),
