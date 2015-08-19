@@ -1,5 +1,7 @@
 #include "business_action_factory.h"
 
+#include <common/common_module.h>
+
 #include <business/actions/camera_output_business_action.h>
 #include <business/actions/panic_business_action.h>
 #include <business/actions/recording_business_action.h>
@@ -21,10 +23,11 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
 QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
     QnResourceList resList = qnResPool->getResources<QnResource>(rule->actionResources());
     if (QnBusiness::requiresCameraResource(rule->actionType()) && resList.isEmpty())
-        return QnAbstractBusinessActionPtr(); //camera is not exists anymore
+        return QnAbstractBusinessActionPtr(); //camera does not exist anymore
     //TODO: #GDM #Business check resource type?
 
     QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
+    runtimeParams.sourceServerId = qnCommon->moduleGUID();
 
     QnAbstractBusinessActionPtr result = createAction(rule->actionType(), runtimeParams);
 

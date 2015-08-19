@@ -538,10 +538,9 @@ namespace ec2
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
-        bool applyUpdates();
 
-        bool beforeInstallUpdate(const QString& updateName);
-        bool afterInstallUpdate(const QString& updateName);
+        virtual bool beforeInstallUpdate(const QString& updateName) override;
+        virtual bool afterInstallUpdate(const QString& updateName) override;
         ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode getScheduleTasks(const QnUuid& serverId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);

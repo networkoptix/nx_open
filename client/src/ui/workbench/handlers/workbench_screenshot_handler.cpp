@@ -56,17 +56,24 @@ namespace {
 }
 
 QnScreenshotParameters::QnScreenshotParameters():
-    time(0),
+    timestampMsec(0),
     isUtc(false),
+    adjustedTimeMsec(0),
+    filename(),
+    timestampPosition(Qn::BottomRightCorner),
+    itemDewarpingParams(),
+    mediaDewarpingParams(),
+    imageCorrectionParams(),
+    zoomRect(),
     customAspectRatio(0.0),
     rotationAngle(0.0)
 {}
 
 QString QnScreenshotParameters::timeString() const {
-    if (time == latestScreenshotTime)
+    if (timestampMsec == latestScreenshotTime)
         return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
 
-    qint64 timeMSecs = adjustedTime / 1000;
+    qint64 timeMSecs = adjustedTimeMsec;
     if (isUtc)
         return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
     return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
@@ -148,14 +155,14 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMedi
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
     bool anyQuality = layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
 
-    const QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(display->mediaResource()->toResource()->getParentId());
+    const QnMediaServerResourcePtr server = display->resource()->getParentResource().dynamicCast<QnMediaServerResource>();
     if (!server || (server->getServerFlags() & Qn::SF_Edge))
         anyQuality = true; // local file or edge cameras will be done locally
 
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
 
     QnImageFilterHelper imageProcessingParams;
-    QnMediaResourcePtr mediaRes = display->resource().dynamicCast<QnMediaResource>();
+    QnMediaResourcePtr mediaRes = display->mediaResource();
     if (mediaRes)
         imageProcessingParams.setVideoLayout(layout);
     imageProcessingParams.setSrcRect(parameters.zoomRect);
@@ -171,23 +178,24 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMedi
     return new QnBasicImageProvider(screenshot);
 }
 
-qint64 QnWorkbenchScreenshotHandler::screenshotTime(QnMediaResourceWidget *widget, bool adjust) {
+qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *widget, bool adjust) {
     QnResourceDisplayPtr display = widget->display();
 
-    qint64 time = display->camDisplay()->getCurrentTime();
-    if (time == qint64(AV_NOPTS_VALUE))
+    qint64 timeUsec = display->camDisplay()->getCurrentTime();
+    if (timeUsec == qint64(AV_NOPTS_VALUE))
         return latestScreenshotTime;
 
+    qint64 timeMSec = timeUsec / 1000;
     if (!adjust)
-        return time;
+        return timeMSec;
 
     bool isUtc = widget->resource()->toResource()->flags() & Qn::utc;
     qint64 localOffset = 0;
     if(qnSettings->timeMode() == Qn::ServerTimeMode && isUtc)
         localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
 
-    time += localOffset*1000;
-    return time;
+    timeMSec += localOffset;
+    return timeMSec;
 }
 
 void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget *widget) {
@@ -269,9 +277,9 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     QnScreenshotParameters parameters;
     {       
-        parameters.time = screenshotTime(widget);
+        parameters.timestampMsec = screenshotTimeMSec(widget);
         parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-        parameters.adjustedTime = screenshotTime(widget, true);
+        parameters.adjustedTimeMsec = screenshotTimeMSec(widget, true);
         Key timeKey(keyStack, lit("_") + parameters.timeString());
        
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -341,9 +349,9 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     }
 
     QnScreenshotParameters parameters;
-    parameters.time = screenshotTime(widget);
+    parameters.timestampMsec = screenshotTimeMSec(widget);
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-    parameters.adjustedTime = screenshotTime(widget, true);
+    parameters.adjustedTimeMsec = screenshotTimeMSec(widget, true);
     parameters.filename = filename;
     parameters.timestampPosition = qnSettings->timestampCorner();
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -352,7 +360,6 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
     parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
     parameters.rotationAngle = widget->rotation();
-
     takeScreenshot(widget, parameters);
 }
 
@@ -400,6 +407,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     setHelpTopic(dialog.data(), Qn::MainWindow_MediaItem_Screenshot_Help);
 
     QString fileName;
+
 
     forever {
         if (!dialog->exec())
@@ -478,9 +486,9 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QImage result = image;
 
     if (!result.isNull()) {
-        qint64 timeMsec = parameters.time == latestScreenshotTime 
+        qint64 timeMsec = parameters.timestampMsec == latestScreenshotTime 
             ? QDateTime::currentMSecsSinceEpoch()
-            : parameters.adjustedTime / 1000;
+            : parameters.adjustedTimeMsec;
 
         QnImageFilterHelper transcodeParams;
         // Doing heavy filters only. This filters doesn't supported on server side for screenshots
@@ -493,7 +501,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
         if (!filters.isEmpty()) {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
-            frame->pts = parameters.time;
+            frame->pts = parameters.timestampMsec * 1000;
             for(auto filter: filters)
                 frame = filter->updateImage(frame);
             result = frame->toImage();
@@ -587,7 +595,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.rotationAngle = 0;
     } else {
         QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        imageProvider = QnSingleThumbnailLoader::newInstance(camera, localParameters.time, 0);
+        imageProvider = new QnSingleThumbnailLoader(camera, camera->getParentResource().dynamicCast<QnMediaServerResource>(), localParameters.timestampMsec, 0);
     }
 
     QnScreenshotLoader* loader = new QnScreenshotLoader(localParameters, this);

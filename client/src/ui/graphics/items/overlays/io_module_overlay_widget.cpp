@@ -303,7 +303,7 @@ void QnIoModuleOverlayWidgetPrivate::at_buttonClicked() {
         return;
 
     QnBusinessEventParameters eventParams;
-    eventParams.setEventTimestamp(qnSyncTime->currentMSecsSinceEpoch());
+    eventParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
 
     QnBusinessActionParameters params;
     params.relayOutputId = it->ioConfigData.id;

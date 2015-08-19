@@ -4,92 +4,55 @@
 #include <QtCore/QStringList>
 
 #include <business/business_fwd.h>
-#include <utils/common/id.h>
 
+#include <utils/common/model_functions_fwd.h>
+#include <utils/common/uuid.h>
 
-class QnBusinessEventParameters
-{
-public:
-    enum Param 
-    {
-        // base for any event type
-        EventTypeParam,
-        EventTimestampParam,
-        EventResourceParam,
-        ActionResourceParam,
-        
-        // event specific params.
-        InputPortIdParam,
-
-        ReasonCodeParam,
-        ReasonParamsEncodedParam,
-        
-        CaptionParam,
-        DescriptionParam,
-
-        ParamCount
-    };
+struct QnBusinessEventParameters {
 
     QnBusinessEventParameters();
 
-    QnBusiness::EventType getEventType() const;
-    void setEventType(QnBusiness::EventType value);
+    QnBusiness::EventType eventType;
 
-    qint64 getEventTimestamp() const;
-    void setEventTimestamp(qint64 value);
+    /** When did the event occur - in usecs. */
+    qint64 eventTimestampUsec;
 
-    QnUuid getEventResourceId() const;
-    void setEventResourceId(const QnUuid& value);
+    /** Event source - camera or server. */
+    QnUuid eventResourceId;
+    
+    /* Resource name with cause a event. 
+    /* resourceName is used if no resource actually registered in our system.
+    /* External custom event can provide some resource name with doesn't match resourceId in our system. At this case resourceName is filled and resourceId stay empty
+    */
+    QString resourceName;
 
-    QnUuid getActionResourceId() const;
-    void setActionResourceId(const QnUuid& value);
+    //! Resource with was used for action
+    QnUuid actionResourceId;
 
-    QnBusiness::EventReason getReasonCode() const;
-    void setReasonCode(QnBusiness::EventReason value);
+    /** Server that generated the event. */
+    QnUuid sourceServerId;
 
-    QString getReasonParamsEncoded() const;
-    void setReasonParamsEncoded(const QString& value);
+    //! Used for QnReasonedBusinessEvent business events as reason code.
+    QnBusiness::EventReason reasonCode;
 
-    QString getCaption() const;
-    void setCaption(const QString& value);
+    //! Used for Input events only
+    QString inputPortId;
 
-    QString getDescription() const;
-    void setDescription(const QString& value);
+    //! short event description. Used for camera/server conflict as resource name which cause error. Used in custom events as short description
+    QString caption;    
 
-    QString getInputPortId() const;
-    void setInputPortId(const QString &value);
+    //! long event description. Used for camera/server conflict as long description (conflict list). Used in ReasonedEvents as reason description. Used in custom events as long description
+    QString description;
 
 
-    // convert/serialize/deserialize functions
-
-    static QnBusinessEventParameters unpack(const QByteArray& value);
-    QByteArray pack() const;
-
-    QnBusinessParams toBusinessParams() const;
-    static QnBusinessEventParameters fromBusinessParams(const QnBusinessParams& bParams);
-
-    //QVariant& operator[](int index);
-    //const QVariant& operator[](int index) const;
-    bool operator==(const QnBusinessEventParameters& other) const;
-
-    QString getParamsKey() const;
-
-private:
-    static int getParamIndex(const QString& key);
-
-private:
-    QnBusiness::EventType m_eventType;
-    qint64 m_timestamp;
-    QnUuid m_resourceId;
-    QnUuid m_actionResourceId;
-
-    QString m_inputPort;
-    QnBusiness::EventReason m_reasonCode;
-    QString m_reasonParamsEncoded;
-    // short event description. Used for camera/server conflict as resource name which cause error. Used in custom events as short description
-    QString m_caption;    
-    // long event description. Used for camera/server conflict as long description (conflict list). Used in custom events as long description
-    QString m_description;
+    /** Hash for events aggregation. */
+    QnUuid getParamsHash() const;
 };
+
+#define QnBusinessEventParameters_Fields (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(actionResourceId)(sourceServerId)\
+    (reasonCode)(inputPortId)(caption)(description)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq));
+
 
 #endif // BUSINESS_EVENT_PARAMETERS_H
