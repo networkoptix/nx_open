@@ -18,7 +18,7 @@ public:
 
 private:
     void stopTesting(const QString &text = QString());
-    void importUsers();
+    void importUsers(const QnLdapUsers &users);
 
     QnLdapUsers filterExistingUsers(const QnLdapUsers &users) const;
 

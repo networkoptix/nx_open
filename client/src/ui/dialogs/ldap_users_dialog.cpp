@@ -60,9 +60,8 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
 
     m_importButton = new QPushButton(this);
     m_importButton->setText(tr("Import users"));
-    m_importButton->setVisible(false);
     ui->buttonBox->addButton(m_importButton, QnDialogButtonBox::HelpRole);
-    connect(m_importButton, &QPushButton::clicked, this, &QnLdapUsersDialog::importUsers);
+    m_importButton->setVisible(false);
 
     ui->buttonBox->showProgress();
     m_timeoutTimer->setInterval(testLdapTimeoutMSec);
@@ -80,7 +79,6 @@ QnLdapUsersDialog::~QnLdapUsersDialog() {}
 void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString) {
     if (!m_loading)
         return;
-    m_loading = false;
 
     if (status != 0 || !errorString.isEmpty()) {
         QString result;
@@ -98,9 +96,10 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
         return;
     }
 
+    m_loading = false;
+
     ui->stackedWidget->setCurrentWidget(ui->usersPage);
     ui->buttonBox->hideProgress();
-    m_importButton->setVisible(true);
 
     auto usersModel = new QnLdapUserListModel(this);
     usersModel->setUsers(filteredUsers);
@@ -135,6 +134,20 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
         usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, user.login);
         header->setCheckState(usersModel->checkState());
     });
+
+    m_importButton->setVisible(true);
+    connect(m_importButton, &QPushButton::clicked, this, [this, usersModel] {
+        importUsers(usersModel->selectedUsers());
+        accept();
+    });
+
+    auto updateButton = [this, header] {
+        m_importButton->setEnabled(header->checkState() != Qt::Unchecked);
+    };
+
+    //TODO: #GDM model should notify about its check state changes
+    connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, updateButton);
+    updateButton();
 }
 
 void QnLdapUsersDialog::stopTesting(const QString &text /*= QString()*/) {
@@ -150,8 +163,27 @@ void QnLdapUsersDialog::stopTesting(const QString &text /*= QString()*/) {
     ui->errorLabel->setVisible(true);
 }
 
-void QnLdapUsersDialog::importUsers() {
+void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
 
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    /* Safety check */
+    auto filteredUsers = filterExistingUsers(users);
+
+    for (const QnLdapUser &ldapUser: filteredUsers) {
+        QnUserResourcePtr user(new QnUserResource());
+        user->setId(QnUuid::createUuid());
+        user->setTypeByName(lit("User"));
+        user->setPermissions(Qn::GlobalLiveViewerPermissions);
+        user->setLdap(true);
+        user->setEnabled(false);
+        user->setName(ldapUser.login);
+        user->setEmail(ldapUser.email);
+        user->generateHash();
+        connection->getUserManager()->save(user, this,[] {} );
+    }
 }
 
 QnLdapUsers QnLdapUsersDialog::filterExistingUsers(const QnLdapUsers &users) const {
