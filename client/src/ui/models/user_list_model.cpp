@@ -183,13 +183,15 @@ QnUserListModel::QnUserListModel(QObject *parent)
 QnUserListModel::~QnUserListModel() {}
 
 int QnUserListModel::rowCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent)
-    return d->userList.size();
+    if (!parent.isValid())
+        return d->userList.size();
+    return 0;
 }
 
 int QnUserListModel::columnCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent)
-    return ColumnCount;
+    if (!parent.isValid())
+        return ColumnCount;
+    return 0;
 }
 
 QVariant QnUserListModel::data(const QModelIndex &index, int role) const {

@@ -16,6 +16,7 @@
 #include <ui/models/user_list_model.h>
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
+#include <ui/dialogs/ldap_users_dialog.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -96,12 +97,17 @@ void QnUserManagementWidgetPrivate::fetchUsers() {
     if (!QnGlobalSettings::instance()->ldapSettings().isValid()) 
         return;
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
-    Q_ASSERT(server);
-    if (!server)
-        return;
+    Q_Q(QnUserManagementWidget);
+    QScopedPointer<QnLdapUsersDialog> dialog(new QnLdapUsersDialog(q));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
 
-    server->apiConnection()->mergeLdapUsersAsync(this, SLOT(at_mergeLdapUsersAsync_finished(int,int,QString)));
+//     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+//     Q_ASSERT(server);
+//     if (!server)
+//         return;
+// 
+//     server->apiConnection()->mergeLdapUsersAsync(this, SLOT(at_mergeLdapUsersAsync_finished(int,int,QString)));
 }
 
 void QnUserManagementWidgetPrivate::at_mergeLdapUsersAsync_finished(int status, int handle, const QString &errorString) {
