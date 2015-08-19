@@ -33,6 +33,12 @@
 #include "version.h"
 
 
+static int registerQtResources()
+{
+    Q_INIT_RESOURCE( libcloud_db );
+    return 0;
+}
+
 namespace nx {
 namespace cdb {
 
@@ -46,7 +52,8 @@ CloudDBProcess::CloudDBProcess( int argc, char **argv )
 {
     setServiceDescription(QN_APPLICATION_NAME);
 
-    Q_INIT_RESOURCE( libcloud_db );
+    //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
+    registerQtResources();
 }
 
 void CloudDBProcess::pleaseStop()

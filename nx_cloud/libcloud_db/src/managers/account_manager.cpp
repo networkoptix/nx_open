@@ -152,7 +152,7 @@ db::DBResult AccountManager::insertAccount(
 void AccountManager::accountAdded(
     db::DBResult resultCode,
     data::AccountData accountData,
-    data::EmailVerificationCode resultData,
+    data::EmailVerificationCode /*resultData*/,
     std::function<void(ResultCode)> completionHandler )
 {
     if( resultCode == db::DBResult::ok )
@@ -215,7 +215,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 
 void AccountManager::accountVerified(
     nx::db::DBResult resultCode,
-    data::EmailVerificationCode verificationCode,
+    data::EmailVerificationCode /*verificationCode*/,
     const QnUuid accountID,
     std::function<void( ResultCode )> completionHandler )
 {
