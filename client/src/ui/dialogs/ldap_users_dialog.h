@@ -18,7 +18,9 @@ public:
 
 private:
     void stopTesting(const QString &text = QString());
-    void syncUsers();
+    void importUsers();
+
+    QnLdapUsers filterExistingUsers(const QnLdapUsers &users) const;
 
 private slots:
     void at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString);

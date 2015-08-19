@@ -6,6 +6,8 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
@@ -58,11 +60,11 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
 
     m_importButton = new QPushButton(this);
     m_importButton->setText(tr("Import users"));
-    m_importButton->setEnabled(false);
+    m_importButton->setVisible(false);
     ui->buttonBox->addButton(m_importButton, QnDialogButtonBox::HelpRole);
-    connect(m_importButton, &QPushButton::clicked, this, &QnLdapUsersDialog::syncUsers);
+    connect(m_importButton, &QPushButton::clicked, this, &QnLdapUsersDialog::importUsers);
 
-    ui->buttonBox->showProgress(tr("Loading users..."));
+    ui->buttonBox->showProgress();
     m_timeoutTimer->setInterval(testLdapTimeoutMSec);
     connect(m_timeoutTimer, &QTimer::timeout, this, [this]{
         stopTesting(tr("Timed out"));
@@ -90,12 +92,18 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
         return;
     } 
 
+    QnLdapUsers filteredUsers = filterExistingUsers(users);
+    if (filteredUsers.isEmpty()) {
+        stopTesting(tr("No new users found."));
+        return;
+    }
+
     ui->stackedWidget->setCurrentWidget(ui->usersPage);
     ui->buttonBox->hideProgress();
-    m_importButton->setEnabled(true);
+    m_importButton->setVisible(true);
 
     auto usersModel = new QnLdapUserListModel(this);
-    usersModel->setUsers(users);
+    usersModel->setUsers(filteredUsers);
 
     auto sortModel = new QSortFilterProxyModel(this);
     auto header = new QnCheckBoxedHeaderView(QnLdapUserListModel::CheckBoxColumn, this);
@@ -142,6 +150,21 @@ void QnLdapUsersDialog::stopTesting(const QString &text /*= QString()*/) {
     ui->errorLabel->setVisible(true);
 }
 
-void QnLdapUsersDialog::syncUsers() {
+void QnLdapUsersDialog::importUsers() {
 
+}
+
+QnLdapUsers QnLdapUsersDialog::filterExistingUsers(const QnLdapUsers &users) const {
+    QSet<QString> logins;
+    for (const auto &user: qnResPool->getResources<QnUserResource>())
+        logins.insert(user->getName().toLower());
+
+    QnLdapUsers result;
+    for (const auto user: users) {
+        if (logins.contains(user.login.toLower()))
+            continue;
+        result << user;
+    }
+
+    return result;
 }
