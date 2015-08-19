@@ -10,20 +10,42 @@
 #include <ui/widgets/properties/recording_statistics_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/dialogs/non_modal_dialog_constructor.h>
+
+namespace
+{
+    typedef QVector<QnServerSettingsDialog *> DialogsContainer;
+
+    DialogsContainer g_currentShowingDialogs;
+}
 
 void QnServerSettingsDialog::showNonModal(const QnMediaServerResourcePtr &server
-    , const OkCallback &callback
+    , const AcceptCallback &callback
     , QWidget *parent)
 {
-    QnServerSettingsDialog * const dlg = new QnServerSettingsDialog(server, callback, parent);
-    dlg->show();
+    auto it = std::find_if(g_currentShowingDialogs.begin(), g_currentShowingDialogs.end()
+        , [server](QnServerSettingsDialog *dialog)
+    {
+        return (dialog->m_server->getId() == server->getId());
+    });
+
+    QnServerSettingsDialog *dlg = nullptr;
+    if (it == g_currentShowingDialogs.end())
+    {
+        dlg = new QnServerSettingsDialog(server, callback, parent);
+        g_currentShowingDialogs.push_back(dlg);
+    }
+    else
+        dlg = (*it);
+
+    QnShowDialogHelper::showNonModalDialog(dlg);
 }
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server
-    , const OkCallback &callback
+    , const AcceptCallback &callback
     , QWidget *parent)
     : base_type(parent)
-    , m_onOkClickedCallback(callback)
+    , m_onAcceptClickedCallback(callback)
     , QnWorkbenchContextAware(parent)
     , ui(new Ui::ServerSettingsDialog)
     , m_server(server)
@@ -54,15 +76,30 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog() 
-{}
-
-void QnServerSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
 {
-    if ((button == QDialogButtonBox::Ok) && m_onOkClickedCallback)
-        m_onOkClickedCallback();
+    const auto it = std::find_if(g_currentShowingDialogs.begin(), g_currentShowingDialogs.end()
+        , [this](QnServerSettingsDialog *dialog)
+    {
+        return (dialog == this);
+    });
 
-    if (!parent())
-        deleteLater();
+    if (it != g_currentShowingDialogs.end())
+        g_currentShowingDialogs.erase(it);
 }
 
+void QnServerSettingsDialog::reject()
+{
+    base_type::reject();
+    deleteLater();
+}
+
+void QnServerSettingsDialog::accept()
+{
+    base_type::accept();
+
+    if (m_onAcceptClickedCallback)
+        m_onAcceptClickedCallback();
+
+    deleteLater();
+}
 

@@ -1505,8 +1505,11 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 
     QnMediaServerResourcePtr server = servers.first();
 
-    const auto okCallback = [this, server]()
+    const auto acceptCallback = [this, server]()
     {
+        if (!server->resourcePool())    /// Wrong server status - it could be deleted from the system, for example
+            return;
+
         // TODO: #Elric move submitToResources here.
         const auto serverAttrs = (QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(server->getId()));
         const auto handler = [this, server]( int reqID, ec2::ErrorCode errorCode ) 
@@ -1516,7 +1519,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         server->saveUpdatedStorages();
     };
 
-    QnServerSettingsDialog::showNonModal(server, okCallback, mainWindow());
+    QnServerSettingsDialog::showNonModal(server, acceptCallback, mainWindow());
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
