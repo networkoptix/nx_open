@@ -207,15 +207,18 @@ class BaseFusionRequestHandlerWithInput
     public BaseFusionRequestHandlerWithOutput<Output>
 {
 private:
+    typedef std::function<void(
+        const nx_http::StatusCode::Value statusCode,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
+    > RequestCompletionHandlerType;
+
     //!Implementation of \a AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         const nx_http::HttpServerConnection& connection,
         stree::ResourceContainer&& authInfo,
         const nx_http::Request& request,
         nx_http::Response* const /*response*/,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) override
+        RequestCompletionHandlerType&& completionHandler ) override
     {
         this->m_completionHandler = std::move( completionHandler );
         this->m_requestMethod = request.requestLine.method;
