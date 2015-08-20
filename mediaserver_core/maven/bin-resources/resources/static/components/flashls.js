@@ -109,7 +109,7 @@ var flashlsAPI = new (function(){
             swliveconnect:true,
             allowScriptAccess:"always",
             bgcolor:"#1C2327",
-            allowFullScreen:true,
+            allowFullScreen:false,
             wmode:"window",
             FlashVars:"callback=flashlsCallback"
         },
