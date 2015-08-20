@@ -40,7 +40,7 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
-                scope.debugMode = true;
+                scope.debugMode = false;
                 scope.debugFormat = "flashls";
 
                 function getFormatSrc(mediaformat) {
@@ -60,6 +60,7 @@ angular.module('webadminApp')
                     scope.errorLoading = false;
                     scope.ieNoWebm = false;
                     scope.loading = false;
+                    scope.ieWin10 = false;
 
                     if(scope.debugMode && scope.debugFormat){
                         return scope.debugFormat;
@@ -147,8 +148,15 @@ angular.module('webadminApp')
                                 scope.ieNoWebm = true;
                             }
 
+                            //
+
                             if(weHaveHls) {
                                 scope.flashRequired = true;
+                                return false;
+                            }
+
+                            if(weHaveWebm && (window.jscd.osVersion >= 10)){
+                                scope.ieWin10 = true; // Not supported browser
                                 return false;
                             }
 

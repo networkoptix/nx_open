@@ -75,7 +75,7 @@ angular.module('webadminApp')
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
-                    loadingChunkColor: [0,255,0,0.3],
+                    loadingChunkColor: [0,255,255,0.3],
                     blindChunkColor:  [255,0,0,0.3],
                     highlighChunkColor: [255,255,0,1],
 
@@ -753,25 +753,28 @@ angular.module('webadminApp')
 
                     context.fillStyle = blurColor(timelineConfig.exactChunkColor,blur);
 
-                    if(debug){
-                        if(levelIndex == chunk.level) { // not exact chunk
-                            context.fillStyle = blurColor(timelineConfig.loadingChunkColor,blur);
-                        }
-                        if(!chunk.level){ //blind spot!
-                            context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
-                        }
-                        if(targetLevelIndex == levelIndex) {
-                            context.fillStyle = blurColor(timelineConfig.highlighChunkColor, 1);
-                        }
-                    }
 
 
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
                     var height = timelineConfig.chunkHeight * scope.viewportHeight;
 
                     if(debug){
-                        top += (1+levelIndex)/RulerModel.levels.length * height;
+                        if(targetLevelIndex == levelIndex) {
+                            context.fillStyle = blurColor(timelineConfig.highlighChunkColor, 1);
+                        }
+
+                        if(levelIndex == chunk.level) { // not exact chunk
+                            context.fillStyle = blurColor(timelineConfig.loadingChunkColor,blur);
+                        }
+                        if(!chunk.level){ //blind spot!
+                            context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
+                        }
+
+                        top += (1+levelIndex) / RulerModel.levels.length * height;
                         height /= RulerModel.levels.length;
+
+                        top = Math.floor(top);
+                        height = Math.ceil(height);
                     }
 
                     context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
