@@ -17,6 +17,7 @@ void QnCheckBoxedHeaderView::setCheckState(Qt::CheckState state) {
         return;
     m_checkState = state;
     emit checkStateChanged(state);
+    update();
 }
 
 void QnCheckBoxedHeaderView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const {
