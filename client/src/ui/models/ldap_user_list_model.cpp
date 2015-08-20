@@ -50,6 +50,8 @@ QVariant QnLdapUserListModel::data(const QModelIndex &index, int role) const {
         if (index.column() == CheckBoxColumn)
             return m_checkedUserLogins.contains(user.login);
         break;
+    case LoginRole:
+        return user.login;
     default:
         break;
     } // switch (role)
@@ -84,7 +86,10 @@ QVariant QnLdapUserListModel::headerData(int section, Qt::Orientation orientatio
 Qt::ItemFlags QnLdapUserListModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags flags = Qt::NoItemFlags;
 
-    QnLdapUser user = getUser(index);
+    if (!hasIndex(index.row(), index.column(), index.parent()))
+        return flags;
+
+    QnLdapUser user = m_userList[index.row()];
     if (user.login.isEmpty())
         return flags;
 
@@ -162,11 +167,4 @@ void QnLdapUserListModel::setUsers(const QnLdapUsers &users) {
     beginResetModel();
     m_userList = users;
     endResetModel();
-}
-
-QnLdapUser QnLdapUserListModel::getUser(const QModelIndex &index) const {
-    if (index.row() >= m_userList.size())
-        return QnLdapUser();
-
-    return m_userList[index.row()];
 }

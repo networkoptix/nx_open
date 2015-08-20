@@ -126,12 +126,12 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
         if (index.column() != QnLdapUserListModel::CheckBoxColumn) 
             return;
 
-        QnLdapUser user = usersModel->getUser(index);
-        if (user.login.isEmpty())
+        QString login = index.data(QnLdapUserListModel::LoginRole).toString();
+        if (login.isEmpty())
             return;
 
         /* Invert current state */
-        usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, user.login);
+        usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, login);
         header->setCheckState(usersModel->checkState());
     });
 

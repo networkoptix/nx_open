@@ -19,6 +19,10 @@ public:
         ColumnCount
     };
 
+    enum DataRole {
+        LoginRole = Qt::UserRole + 1
+    };
+
     QnLdapUserListModel(QObject *parent = 0);
     ~QnLdapUserListModel();
 
@@ -35,10 +39,10 @@ public:
     void setUsers(const QnLdapUsers &users);
 
     QnLdapUsers selectedUsers() const;
-    QnLdapUser getUser(const QModelIndex &index) const;
-
-    int userIndex(const QString &login) const;
+    
 private:
+    int userIndex(const QString &login) const;
+
     QnLdapUsers m_userList;
     QSet<QString> m_checkedUserLogins;
 };
