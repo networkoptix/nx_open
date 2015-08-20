@@ -135,7 +135,7 @@ namespace {
         return result;
     }
 
-    QnBusinessEventParameters convertOldEventParameters(const QByteArray& value) {
+    QnBusinessEventParameters convertOldEventParameters(const QByteArray& value, QnUuid* actionResourceId) {
         enum Param {
             EventTypeParam,
             EventTimestampParam,
@@ -177,7 +177,7 @@ namespace {
                     result.eventResourceId = QnUuid(field);
                     break;
                 case ActionResourceParam:
-                    result.actionResourceId = QnUuid(field);
+                    *actionResourceId = QnUuid(field);
                     break;
                 case InputPortIdParam:
                     result.inputPortId = QString::fromUtf8(field.data(), field.size());
@@ -417,19 +417,20 @@ bool QnEventsDB::migrateBusinessParams() {
         QByteArray runtimeParams;
     };
 
-    auto convertAction = [](const QByteArray &packed) -> QByteArray {
+    auto convertAction = [](const QByteArray &packed, const QnUuid& actionResourceId) -> QByteArray {
         /* Check if data is in Ubjson already. */
         if (!packed.isEmpty() && packed[0] == L'[')
             return packed;
         QnBusinessActionParameters ap = convertOldActionParameters(packed);
+        ap.actionResourceId = actionResourceId;
         return QnUbjson::serialized(ap);
     };
 
-    auto convertRuntime = [](const QByteArray &packed)-> QByteArray {
+    auto convertRuntime = [](const QByteArray &packed, QnUuid* actionResourceId)-> QByteArray {
         /* Check if data is in Ubjson already. */
         if (!packed.isEmpty() && packed[0] == L'[')
             return packed;
-        QnBusinessEventParameters rp = convertOldEventParameters(packed);
+        QnBusinessEventParameters rp = convertOldEventParameters(packed, actionResourceId);
         return QnUbjson::serialized(rp);
     };
 
@@ -450,8 +451,9 @@ bool QnEventsDB::migrateBusinessParams() {
             QByteArray runtimeData = query.value(2).toByteArray();
 
             RowParams remappedData;
-            remappedData.actionParams = convertAction(actionData);
-            remappedData.runtimeParams = convertRuntime(runtimeData);
+            QnUuid actionResourceId;
+            remappedData.runtimeParams = convertRuntime(runtimeData, &actionResourceId); // move actionResourceId from runtimeParams to actionParams
+            remappedData.actionParams = convertAction(actionData, actionResourceId);
             remapData[id] = remappedData;
         }
     }
@@ -521,20 +523,19 @@ bool QnEventsDB::saveActionToDB(const QnAbstractBusinessActionPtr& action, const
     qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
     
-    QnBusinessEventParameters actionRuntime = action->getRuntimeParams();
+    QnBusinessActionParameters actionParams = action->getParams();
     if (actionRes)
-        actionRuntime.actionResourceId = actionRes->getId();
-    int eventType = (int) actionRuntime.eventType;
+        actionParams.actionResourceId = actionRes->getId();
 
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());
-    insQuery.bindValue(":action_params", QnUbjson::serialized(action->getParams()));
-    insQuery.bindValue(":runtime_params", QnUbjson::serialized(actionRuntime));
+    insQuery.bindValue(":action_params", QnUbjson::serialized(actionParams));
+    insQuery.bindValue(":runtime_params", QnUbjson::serialized(action->getRuntimeParams()));
     insQuery.bindValue(":business_rule_guid", action->getBusinessRuleId().toRfc4122());
     insQuery.bindValue(":toggle_state", (int) action->getToggleState());
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
 
-    insQuery.bindValue(":event_type", eventType);
+    insQuery.bindValue(":event_type", (int) action->getRuntimeParams().eventType);
     insQuery.bindValue(":event_resource_guid", eventResId.toRfc4122());
     insQuery.bindValue(":action_resource_guid", actionRes ? actionRes->getId().toRfc4122() : QByteArray());
 

@@ -27,7 +27,7 @@ struct QnBusinessEventParameters {
     QString resourceName;
 
     //! Resource with was used for action
-    QnUuid actionResourceId;
+    //QnUuid actionResourceId;
 
     /** Server that generated the event. */
     QnUuid sourceServerId;
@@ -49,7 +49,7 @@ struct QnBusinessEventParameters {
     QnUuid getParamsHash() const;
 };
 
-#define QnBusinessEventParameters_Fields (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(actionResourceId)(sourceServerId)\
+#define QnBusinessEventParameters_Fields (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId)\
     (reasonCode)(inputPortId)(caption)(description)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq)(xml)(csv_record));

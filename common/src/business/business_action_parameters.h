@@ -7,6 +7,8 @@
 struct QnBusinessActionParameters {
     QnBusinessActionParameters();
 
+    QnUuid actionResourceId;
+
     // Play Sound
     QString soundUrl;
 
@@ -36,7 +38,7 @@ struct QnBusinessActionParameters {
     bool isDefault() const;
 };
 
-#define QnBusinessActionParameters_Fields (soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
+#define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
     (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));

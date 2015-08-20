@@ -306,7 +306,7 @@ QnResourcePtr QnEventLogModel::getResource(const Column &column, const QnBusines
     case EventCameraColumn: 
         return getResourceById(action.eventParams.eventResourceId);
     case ActionCameraColumn: 
-        return getResourceById(action.eventParams.actionResourceId);
+        return getResourceById(action.actionParams.actionResourceId);
     default:
         break;
     }
@@ -355,7 +355,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
                     return qnResIconCache->icon(QnResourceIconCache::Users);
             }
         }
-        resId = action.eventParams.actionResourceId;
+        resId = action.actionParams.actionResourceId;
     default:
         break;
     }
@@ -404,7 +404,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
         else if (actionType == QnBusiness::ShowPopupAction)
             return getUserGroupString(action.actionParams.userGroup);
         else
-            return getResourceNameString(action.eventParams.actionResourceId);
+            return getResourceNameString(action.actionParams.actionResourceId);
     }
     case DescriptionColumn: {
         QnBusiness::EventType eventType = action.eventParams.eventType;
