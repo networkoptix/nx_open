@@ -3,9 +3,8 @@
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <stdexcept>
-#include <vector>
-#include <map>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 
 #include <utils/common/singleton.h>
 #include <utils/common/ldap.h>
@@ -25,6 +24,10 @@ public:
 
     bool authenticateWithDigest(const QString &login, const QString &ha1);
     bool testSettings(const QnLdapSettings& settings);
+
+private:
+    mutable QMap<QString, QString> m_realmCache;
+    mutable QMutex m_realmCacheMutex;
 };
 
 #endif // LDAP_MANAGER_H_
