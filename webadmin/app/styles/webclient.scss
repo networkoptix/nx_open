@@ -170,6 +170,15 @@ table.webclient-window>tbody>tr>td.alert{
   cursor:pointer;
 }
 
+
+.webclient-button.dropdown{
+  width:90px;
+}
+
+.webclient-button.dropdown.open{
+  background-color: rgba(0,0,0,0.1);
+}
+
 .webclient-button:hover{
   background-color: rgba(198,234,255,0.05);
 }
@@ -220,7 +229,6 @@ table.webclient-window>tbody>tr>td.alert{
   padding:0;
 }
 
-
 .webclient-window .cameras-panel{
   height: 100%;
   width: 350px;
@@ -240,6 +248,10 @@ table.webclient-window>tbody>tr>td.alert{
 
 .webclient-window .tree li>.collapse-group{
   padding:10px;
+}
+
+.webclient-window .tree li>ul{
+  margin-bottom: 20px;
 }
 
 .server-underline{
@@ -269,14 +281,17 @@ table.webclient-window>tbody>tr>td.alert{
 
 .webclient-panel .dropdown-menu > li > a.active{
   background-color: #00AEEF;
+  color:white;
 }
 
 .webclient-panel .dropdown-menu > li > a:hover{
   background-color: #F5F7F8;
+  color: #333333;
 }
 
 .caption-row {
   line-height: 40px;
+  vertical-align: top;
 }
 
 .camera-preview{
@@ -389,7 +404,7 @@ table.webclient-window>tbody>tr>td.alert{
 .dark-theme .nav > li.active > a{
   text-decoration: none;
   background-color: rgba(53,70,79,0.4);
-  border-left: 3px solid lightblue;
+  border-left: 3px solid #2FA2DB;
   padding-left:92px;
 }
 
@@ -400,6 +415,11 @@ table.webclient-window>tbody>tr>td.alert{
   font-size: 75%
 }
 
+@media only screen and (max-device-width:640px) {
+  .invisible-xs{
+    display:none;
+  }
+}
 
 @media only screen and (min-device-width: 641px) and (max-device-width:961px) {
   /* For general iPad layouts */
@@ -415,7 +435,6 @@ table.webclient-window>tbody>tr>td.alert{
   .dark-theme .nav > li.active > a {
     padding-left: 72px;
   }
-
 
   .webclient-window .cameras-panel {
     height: 100%;
@@ -469,5 +488,5 @@ table.webclient-window>tbody>tr>td.alert{
   vertical-align: middle;
 }
 .server-link .glyphicon{
-  top:8px;
+  top: 5px;
 }

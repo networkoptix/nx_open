@@ -223,14 +223,14 @@ var RulerModel = {
 };
 
 //Provider for records from mediaserver
-function CameraRecordsProvider(cameras,mediaserver,$q,width) {
+function CameraRecordsProvider(cameras,mediaserver,$q,width,timeCorrection) {
 
     this.cameras = cameras;
     this.mediaserver = mediaserver;
     this.$q = $q;
     this.chunksTree = null;
     this.requestedCache = [];
-    this.width = width;
+    this.timeCorrection = timeCorrection || 0;
     var self = this;
     //1. request first detailization to get initial bounds
 
@@ -242,7 +242,7 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width) {
             return; //No chunks for this camera
         }
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,self.width);
+        var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,width);
         if(nextLevel<RulerModel.levels.length-1) {
             self.requestInterval(self.chunksTree.start, self.now(), nextLevel + 1);
         }
@@ -334,7 +334,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
     if(!self.lockRequests) {
         self.lockRequests = true; // We may lock requests here if we have no tree yet
-        this.mediaserver.getRecords('/', this.cameras[0], start, end, detailization)
+        this.mediaserver.getRecords('/', this.cameras[0], Math.max(start - this.timeCorrection,0), end - this.timeCorrection, detailization)
             .then(function (data) {
 
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
@@ -343,7 +343,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
                 _.forEach(chunks,function(chunk){
                     chunk.durationMs = parseInt(chunk.durationMs);
-                    chunk.startTimeMs = parseInt(chunk.startTimeMs);
+                    chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeCorrection;
                 });
 
                 var chunksToIterate = chunks.length;
@@ -511,7 +511,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
  * @param parent - parent for recursive call
  * @param result - heap for recursive call
  */
-CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent,debugLevel){
+CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent, debugLevel){
     parent = parent || this.chunksTree;
 
     if(!parent){
@@ -528,10 +528,10 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     if(parent.children.length == 0){
-        if(!debugLevel) {
+        //if(!debugLevel) {
             result.push(parent); // Bad chunk, but no choice
             return;
-        }
+        //}
     }
 
     // Iterate children:
@@ -554,7 +554,7 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
  * ShortCache - special collection for short chunks with best detailization for calculating playing position and date
  * @constructor
  */
-function ShortCache(cameras,mediaserver,$q){
+function ShortCache(cameras,mediaserver,$q,timeCorrection){
 
     this.$q = $q;
 
@@ -576,6 +576,8 @@ function ShortCache(cameras,mediaserver,$q){
     this.requestDetailization = 1;//the deepest detailization possible
     this.limitChunks = 100; // limit for number of chunks
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
+
+    this.timeCorrection = timeCorrection;
 }
 ShortCache.prototype.init = function(start){
     this.liveMode = false;
@@ -615,8 +617,8 @@ ShortCache.prototype.update = function(requestPosition,position){
     // Get next {{limitChunks}} chunks
     this.mediaserver.getRecords('/',
             this.cameras[0],
-            requestPosition,
-            (new Date()).getTime()+1000,
+            Math.max(requestPosition - this.timeCorrection,0),
+            (new Date()).getTime() + 100000 - this.timeCorrection,
             this.requestDetailization,
             this.limitChunks).
         then(function(data){
@@ -626,7 +628,7 @@ ShortCache.prototype.update = function(requestPosition,position){
 
             _.forEach(chunks,function(chunk){
                 chunk.durationMs = parseInt(chunk.durationMs);
-                chunk.startTimeMs = parseInt(chunk.startTimeMs);
+                chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeCorrection;
 
                 if(chunk.durationMs == -1){
                     chunk.durationMs = (new Date()).getTime() - chunk.startTimeMs;//in future

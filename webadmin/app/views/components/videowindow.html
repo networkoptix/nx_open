@@ -25,9 +25,14 @@
     </div>
 
 
-    <div class="camera-view-informer" ng-if="edgeNoWebm">
+    <div class="camera-view-informer" ng-if="ieNoWebm">
         Video cannot be played.<br>
         Please, install <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a> for Internet Explorer.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        Video cannot be played.<br>
+        Please, use Microsoft Edge or Google Chrome browsers.<br>
     </div>
 
     <div class="camera-view-informer" ng-if="errorLoading">

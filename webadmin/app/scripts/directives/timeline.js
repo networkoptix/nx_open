@@ -15,11 +15,15 @@ angular.module('webadminApp')
             },
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
+
+                var debugEventsMode = false;
+
                 var timelineConfig = {
                     initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
                     stickToLiveMs: 1000, // Value to stick viewpoert to Live - 1 second
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
                     minMsPerPixel: 10, // Minimum level for zooming:
+                    minMarkWidth: 1, // Minimum width for visible mark
 
                     zoomSpeed: 0.025, // Zoom speed for dblclick
                     zoomAccuracy: 0.00001,
@@ -71,9 +75,8 @@ angular.module('webadminApp')
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
-                    loadingChunkColor: [58,145,30,0.5],
-
-                    blindChunkColor:  [255,128,128,0.5],
+                    loadingChunkColor: [0,255,255,0.3],
+                    blindChunkColor:  [255,0,0,0.3],
                     highlighChunkColor: [255,255,0,1],
 
                     scrollBarSpeed: 0.1, // By default - scroll by 10%
@@ -201,7 +204,7 @@ angular.module('webadminApp')
                     topLabelMarkerAttach:"top", // top, bottom
                     topLabelBgColor: [33,42,47],
                     topLabelBgOddColor: [43,56,63],
-                    topLabelPositionFix:0, //Vertical fix for position
+                    topLabelPositionFix:-2, //Vertical fix for position
                     topLabelFixed: true,
 
 
@@ -211,10 +214,10 @@ angular.module('webadminApp')
                         size:15,
                         weight:400,
                         face:"Roboto",
-                        color: [105,135,150] // Color for text for top labels
+                        color: [145,167,178] // Color for text for top labels
                     },
                     labelMarkerAttach:"top", // top, bottom
-                    labelMarkerColor:[83,112,127,0.6],//false
+                    labelMarkerColor:[105,135,150],//false
                     labelBgColor: [28,35,39],
                     labelPositionFix:5, //Vertical fix for position
                     labelMarkerHeight:20/110,
@@ -302,12 +305,16 @@ angular.module('webadminApp')
 
                     drawLabels(context);
 
-                    drawOrCheckEvents(context);
+                    if(!debugEventsMode) {
+                        drawOrCheckEvents(context);
+                    }else{
+                        debugEvents(context);
+                    }
                     drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
                     drawPointerMarker(context);
 
-                    //debugEvents(context);
+                    //
                 }
 
                 function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
@@ -508,7 +515,16 @@ angular.module('webadminApp')
 
 
                     var levelIndex = Math.max(scope.scaleManager.levels.marks.index, targetLevels.marks.index); // Target level is lowest of visible
+
+                    // If it this point levelIndex is invisible (less than one pixel per mark) - skip it!
                     var level = RulerModel.levels[levelIndex]; // Actual calculating level
+                    var levelDetailizaion = level.interval.getMilliseconds();
+                    while( levelDetailizaion < timelineConfig.minMarkWidth * scope.scaleManager.msPerPixel)
+                    {
+                        levelIndex --;
+                        level = RulerModel.levels[levelIndex];
+                        levelDetailizaion = level.interval.getMilliseconds();
+                    }
 
                     var start = scope.scaleManager.alignStart(RulerModel.levels[levelIndex>0?(levelIndex-1):0]); // Align start by upper level!
                     var point = start;
@@ -517,7 +533,7 @@ angular.module('webadminApp')
                     var counter = 0;// Protection from neverending cycles.
 
                     while(point <= end && counter++ < 3000){
-                        var odd = bgColor!= bgOddColor || Math.round((point.getTime() / level.interval.getMilliseconds())) % 2 === 1; // add or even for zebra coloring
+                        var odd = bgColor!= bgOddColor || Math.round((point.getTime() / levelDetailizaion)) % 2 === 1; // add or even for zebra coloring
 
                         var pointLevelIndex = RulerModel.findBestLevelIndex(point, levelIndex);
 
@@ -561,11 +577,12 @@ angular.module('webadminApp')
                     var start1 = scope.scaleManager.alignStart(level);
                     var start = scope.scaleManager.alignStart(level);
                     var end = scope.scaleManager.alignEnd(level);
+                    var levelDetailizaion = level.interval.getMilliseconds();
 
 
                     var counter = 1000;
                     while(start <= end && counter-- > 0){
-                        var odd = Math.round((start.getTime() / level.interval.getMilliseconds())) % 2 === 1;
+                        var odd = Math.round((start.getTime() / levelDetailizaion)) % 2 === 1;
                         var pointLevelIndex = RulerModel.findBestLevelIndex(start);
                         var alpha = 1;
                         if(pointLevelIndex > taretLevelIndex){ //fade out
@@ -734,23 +751,30 @@ angular.module('webadminApp')
                     var exactChunk = levelIndex == chunk.level;
                     var blur = 1;//chunk.level/(RulerModel.levels.length - 1);
 
-                    context.fillStyle = exactChunk? blurColor(timelineConfig.exactChunkColor,blur):blurColor(timelineConfig.loadingChunkColor,blur);
+                    context.fillStyle = blurColor(timelineConfig.exactChunkColor,blur);
 
-                    if(debug && targetLevelIndex == levelIndex){
-                        context.fillStyle = blurColor(timelineConfig.highlighChunkColor,1);
-                    }
-                    // TODO: uncomment debug here, we may very well have blind spots, we just need to test them
-                    if(/*debug &&*/ !chunk.level){ //blind spot!
-                        context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
-                    }
 
 
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
                     var height = timelineConfig.chunkHeight * scope.viewportHeight;
 
                     if(debug){
-                        top += (1+levelIndex)/RulerModel.levels.length * height;
+                        if(targetLevelIndex == levelIndex) {
+                            context.fillStyle = blurColor(timelineConfig.highlighChunkColor, 1);
+                        }
+
+                        if(levelIndex == chunk.level) { // not exact chunk
+                            context.fillStyle = blurColor(timelineConfig.loadingChunkColor,blur);
+                        }
+                        if(!chunk.level){ //blind spot!
+                            context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
+                        }
+
+                        top += (1+levelIndex) / RulerModel.levels.length * height;
                         height /= RulerModel.levels.length;
+
+                        top = Math.floor(top);
+                        height = Math.ceil(height);
                     }
 
                     context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,

@@ -23,6 +23,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         var canViewArchive = false;
         var availableCameras = null;
 
+        var timeCorrection = 0;
+        var minTimeLag = 2000;// Two seconds
 
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
@@ -56,7 +58,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm',false)){
-            $scope.ieNoWebm = true;
+            if(window.jscd.osVersion < 10) { //For 10th version webm codec doesn't work
+                $scope.ieNoWebm = true;
+            }
         }
 
         if(window.jscd.mobile) {
@@ -227,7 +231,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.activeCamera = getCamera ($scope.storage.cameraId  );
             if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
-                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
 
                 $scope.liveOnly = true;
                 if(canViewArchive) {
@@ -564,6 +568,15 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.positionSelected = false;
             }
         });
+
+        mediaserver.getTime().then(function(result){
+            var serverTime = parseInt(result.data.reply.utcTime);
+            var clientTime = (new Date()).getTime();
+            if(Math.abs(clientTime - serverTime) > minTimeLag){
+                timeCorrection = clientTime - serverTime;
+            }
+        });
+
         mediaserver.getCurrentUser().then(function(result){
             isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
             canViewLive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewLivePermission);
