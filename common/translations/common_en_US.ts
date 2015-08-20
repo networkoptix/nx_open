@@ -4,14 +4,14 @@
 <context>
     <name>Language</name>
     <message>
-        <source>Language Name</source>
+        <source>English (US)</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>English (US)</translation>
+        <translation></translation>
     </message>
     <message>
-        <source>Locale Code</source>
+        <source>en_US</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>en_US</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -172,12 +172,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>Server &apos;%1&apos; has a license problem</translation>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Unknown event has occurred</source>
-        <translation>An unknown event has occurred</translation>
+        <source>An unknown event has occurred</source>
+        <translation></translation>
     </message>
     <message>
         <source>Event: %1</source>
@@ -192,16 +192,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>Input Port: %1</translation>
+        <source>Input Port: %1</source>
+        <translation></translation>
     </message>
     <message>
         <source>Reason: %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Conflict address: %1</source>
-        <translation>Conflict Address: %1</translation>
+        <source>Conflict Address: %1</source>
+        <translation></translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -316,8 +316,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Not authorised. Url %1.</translation>
+        <source>Not authorised. Url %1.</source>
+        <translation></translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -454,12 +454,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>Launching file explorer failed.</translation>
+        <source>Launching file explorer failed.</source>
+        <translation></translation>
     </message>
     <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation>Could not find explorer.exe in path to launch Windows Explorer.</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -473,12 +473,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>Could not initialise audio encoder.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>Could not initialise audio decoder.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -515,8 +515,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>Could not initialise video encoder.</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -542,68 +542,68 @@
         <translation></translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>Analog Encoder</translation>
+        <source>Analog Encoder</source>
+        <translation></translation>
     </message>
     <message>
         <source>Video Wall</source>
         <translation></translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>Trial Licenses</translation>
+        <source>Trial Licenses</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Analog licenses</source>
-        <translation>Analog Licenses</translation>
+        <source>Analog Licenses</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Professional licenses</source>
-        <translation>Professional Licenses</translation>
+        <source>Professional Licenses</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Edge licenses</source>
-        <translation>Edge Licenses</translation>
+        <source>Edge Licenses</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Vmax licenses</source>
-        <translation>Vmax Licenses</translation>
+        <source>Vmax Licenses</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Analog encoder licenses</source>
-        <translation>Analog Encoder Licenses</translation>
+        <source>Analog Encoder Licenses</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Video Wall licenses</source>
-        <translation>Video Wall Licenses</translation>
+        <source>Video Wall Licenses</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Invalid signature</source>
-        <translation>Invalide Signature</translation>
+        <source>Invalide Signature</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>Server with matching hardware ID not found</translation>
+        <source>Server with matching hardware ID not found</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Invalid customization</source>
-        <translation>Invalid Customization</translation>
+        <source>Invalid Customization</source>
+        <translation></translation>
     </message>
     <message>
         <source>Expired</source>
         <translation></translation>
     </message>
     <message>
-        <source>Invalid type</source>
-        <translation>Invalid Type</translation>
+        <source>Invalid Type</source>
+        <translation></translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
-        <translation>Only single license is allowed for this device</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown error</source>
-        <translation>Unknown error</translation>
+        <translation></translation>
     </message>
     <message>
         <source>I/O Module</source>
@@ -653,24 +653,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>There was a problem activating your license key. A database error has occurred.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation></translation>
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation></translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation></translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation></translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</translation>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -715,24 +715,24 @@
         <translation></translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>Trial License</translation>
+        <source>Trial License</source>
+        <translation></translation>
     </message>
     <message>
         <source>Hardware ID: </source>
         <translation></translation>
     </message>
     <message>
-        <source>Licensed to: </source>
-        <translation>Licensed To:</translation>
+        <source>Licensed To: </source>
+        <translation></translation>
     </message>
     <message>
         <source>Watermark: </source>
         <translation></translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>FREE License</translation>
+        <source>FREE License</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -859,20 +859,20 @@
         <translation></translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>Storage is full</translation>
+        <source>Storage is full</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Storages are not configured</source>
-        <translation>Storage is not configured</translation>
+        <source>Storage is not configured</source>
+        <translation></translation>
     </message>
     <message>
         <source>Email address is not set for user %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>Server times are not synchronised and a common time could not be detected automatically.</translation>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <translation></translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -972,12 +972,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>OpenCLTranscode is not implemented.</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>Unknown transcode method</translation>
+        <source>Unknown transcode method</source>
+        <translation></translation>
     </message>
 </context>
 <context>

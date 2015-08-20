@@ -215,8 +215,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Filter by cameras...</source>
-        <translation>filter by camera...</translation>
+        <source>filter by camera...</source>
+        <translation></translation>
     </message>
     <message>
         <source>X</source>
@@ -317,12 +317,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>This camera has no advanced settings</source>
-        <translation>Advanced settings not available for this camera. Check the camera web page directly for more options.</translation>
+        <source>Advanced settings not available for this camera. Check the camera web page directly for more options.</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Warning: all changes are applied instantly</source>
-        <translation>Note: Any changes made will be applied instantly!</translation>
+        <source>Note: Any changes made will be applied instantly!</source>
+        <translation></translation>
     </message>
     <message>
         <source>Category</source>
@@ -347,15 +347,15 @@
         <translation></translation>
     </message>
     <message>
-        <source>Diagnostics for camera</source>
-        <translation>Camera:</translation>
+        <source>Camera:</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
-        <source>Event will be raised when any camera goes offline</source>
-        <translation>Event will be triggered when a camera becomes offline</translation>
+        <source>Event will be triggered when a camera becomes offline</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -373,8 +373,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation></translation>
     </message>
     <message>
         <source>Secondary Stream Control</source>
@@ -385,8 +385,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Don&apos;t use</source>
-        <translation>Do not use</translation>
+        <source>Do not use</source>
+        <translation></translation>
     </message>
     <message>
         <source>Low quality</source>
@@ -401,8 +401,8 @@
         <translation></translation>
     </message>
     <message utf8="true">
-        <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
-        <translation>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</translation>
+        <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
+        <translation></translation>
     </message>
     <message>
         <source>Archive control</source>
@@ -437,8 +437,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Warning! Please read documentation before changing these settings!</source>
-        <translation>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+        <translation></translation>
     </message>
     <message>
         <source>Restore Defaults</source>
@@ -501,20 +501,20 @@
         <translation></translation>
     </message>
     <message>
-        <source>Schedule Grid</source>
-        <translation>Recording Schedule</translation>
+        <source>Recording Schedule</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Display Quality on Grid</source>
-        <translation>Show Quality on Schedule</translation>
+        <source>Show Quality on Schedule</source>
+        <translation></translation>
     </message>
     <message>
         <source>Panic Mode: </source>
         <translation></translation>
     </message>
     <message>
-        <source>Display FPS on Grid</source>
-        <translation>Show FPS on Schedule</translation>
+        <source>Show FPS on Schedule</source>
+        <translation></translation>
     </message>
     <message>
         <source>Note: Recording Schedule is based on Server Time</source>
@@ -541,11 +541,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Motion+ Lo-Res Always</source>
-        <translation>Motion + Low-Res </translation>
+        <source>Motion + Low-Res </source>
+        <translation></translation>
     </message>
     <message>
-        <source>Do not Record</source>
+        <source>Do Not Record</source>
         <translation>Do Not Record</translation>
     </message>
     <message>
@@ -557,16 +557,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>Warning! High value may prevent other cameras from recording!</source>
-        <translation>Warning! High minimum value could decrease other cameras&apos; recording durations.</translation>
+        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Min days:</source>
-        <translation>Min. Days</translation>
+        <source>Min. Days</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Max days:</source>
-        <translation>Max. Days</translation>
+        <source>Max. Days</source>
+        <translation></translation>
     </message>
     <message>
         <source>Motion Recording</source>

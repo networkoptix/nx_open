@@ -29,7 +29,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Event will be raised when any camera goes offline</string>
+      <string>Event will be triggered when a camera becomes offline</string>
      </property>
     </widget>
    </item>

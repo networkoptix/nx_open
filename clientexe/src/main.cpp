@@ -266,6 +266,23 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #ifndef API_TEST_MAIN
 //#define ENABLE_DYNAMIC_CUSTOMIZATION
 
+void loadTranslation(const QString &translationPath)
+{
+	QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
+	QnTranslation translation;
+	if(!translationPath.isEmpty()) /* From command line. */
+		translation = translationManager->loadTranslation(translationPath);
+
+	if(translation.isEmpty()) /* By path. */
+		translation = translationManager->loadTranslation(qnSettings->translationPath());
+
+	/* Check if qnSettings value is invalid. */
+	if (translation.isEmpty()) 
+		translation = translationManager->defaultTranslation();
+
+	translationManager->installTranslation(translation);
+}
+
 int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // these functions should be called in every thread that wants to use rand() and qrand()
     srand(::time(NULL));
@@ -528,21 +545,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // ===========================================================================
 
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
-
-    /* Load translation. */
-    QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
-    QnTranslation translation;
-    if(!translationPath.isEmpty()) /* From command line. */
-        translation = translationManager->loadTranslation(translationPath);
-
-    if(translation.isEmpty()) /* By path. */
-        translation = translationManager->loadTranslation(qnSettings->translationPath());
-
-    /* Check if qnSettings value is invalid. */
-    if (translation.isEmpty()) 
-        translation = translationManager->defaultTranslation();
-
-    translationManager->installTranslation(translation);
+	
+	/* Load translation. */
+	loadTranslation(translationPath);
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));

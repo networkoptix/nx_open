@@ -121,7 +121,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = tr("Could not initialize video encoder.");
+        m_lastErrMessage = tr("Could not initialise video encoder.");
         return false;
     }
 
