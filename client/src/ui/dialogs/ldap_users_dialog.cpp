@@ -20,7 +20,8 @@
 #include <utils/common/ldap.h>
 
 namespace {
-    const int testLdapTimeoutMSec = 20 * 1000;
+    //TODO: #GDM move timeout constant to more common module
+    const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
 }
 
 QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
