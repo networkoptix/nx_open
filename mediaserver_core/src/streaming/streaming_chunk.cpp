@@ -139,7 +139,8 @@ size_t StreamingChunk::sizeInBytes() const
 void StreamingChunk::waitForChunkReady()
 {
     QMutexLocker lk( &m_mutex );
-    while( (m_data.size() == 0) && (m_modificationState < State::closed) )
+    //waiting while chunk is modified
+    while( m_modificationState < State::closed )
         m_cond.wait( lk.mutex() );
 }
 
