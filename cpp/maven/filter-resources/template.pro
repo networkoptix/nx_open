@@ -29,6 +29,8 @@ CONFIG(debug, debug|release) {
   }
   win* {
     LIBS = ${windows.oslibs.debug}
+  } else {
+    DEFINES += _DEBUG
   }
 }
 else {

@@ -221,6 +221,7 @@ public:
     void connectionFailure();
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
+    static void fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey );
 
 private:
     struct DataToSend
@@ -315,7 +316,6 @@ private:
     void serializeAndSendNextDataBuffer();
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
-    void fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey );
     /*!
         \note MUST be called with \a m_mutex locked
     */

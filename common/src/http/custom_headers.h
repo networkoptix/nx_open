@@ -17,6 +17,8 @@ namespace Qn
     static const QByteArray VIDEOWALL_GUID_HEADER_NAME = "X-NetworkOptix-VideoWall";
     static const QByteArray PROXY_TTL_HEADER_NAME = "X-proxy-ttl";
     static const QByteArray CUSTOM_USERNAME_HEADER_NAME = "X-Nx-User-Name";
+    //!Guid of peer which initiated request
+    static const QByteArray PEER_GUID_HEADER_NAME = "X-Nx-Peer-Guid";
 
     static const QByteArray EC2_SYSTEM_NAME_HEADER_NAME = "X-Nx-EC-SYSTEM-NAME";
     static const QByteArray EC2_CONNECTION_STATE_HEADER_NAME = "X-Nx-EC-CONNECTION-STATE";
