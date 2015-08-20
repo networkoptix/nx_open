@@ -54,7 +54,7 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(c
     return result;
 }
 
-int QnCameraHistoryRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnCameraHistoryRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
     QnChunksRequestData request = QnChunksRequestData::fromParams(params);
     if (!request.isValid())
@@ -66,7 +66,7 @@ int QnCameraHistoryRestHandler::executeGet(const QString& path, const QnRequestP
         QnChunksRequestData updatedRequest = request;
         updatedRequest.resList.clear();
         updatedRequest.resList.push_back(camera);
-        MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest);
+        MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
         ec2::ApiCameraHistoryData outputRecord;
         outputRecord.cameraId = request.resList.first()->getId();
         outputRecord.items = buildHistoryData(chunks);
