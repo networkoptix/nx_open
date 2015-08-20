@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QWidget>
 
+#include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnUserManagementWidget;
@@ -16,8 +17,7 @@ class QnUserManagementWidgetPrivate : public QObject, public QnWorkbenchContextA
 public:
     QnUserManagementWidgetPrivate(QnUserManagementWidget *parent);
 
-    QnSortedUserListModel* sortModel() const;
-    QHeaderView* header() const;
+    void setupUi();
 private:
     void at_usersTable_activated(const QModelIndex &index);
     void at_usersTable_clicked(const QModelIndex &index);
@@ -35,6 +35,9 @@ private:
     void enableSelected();
     void disableSelected();
     void deleteSelected();
+
+    QnUserResourceList visibleUsers() const;
+    QnUserResourceList visibleSelectedUsers() const;
 private:
     QnUserManagementWidget *q_ptr;
     QnUserListModel *m_usersModel;

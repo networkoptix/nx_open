@@ -3,7 +3,7 @@
 #include "ui/models/ioports_actual_model.h"
 #include "ui/delegates/ioport_item_delegate.h"
 
-QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent /*= 0*/):
+QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent /* = 0*/):
     base_type(parent),
     ui(new Ui::QnIOPortSettingsWidget)
 {

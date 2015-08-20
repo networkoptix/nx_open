@@ -121,6 +121,8 @@ namespace {
 
     class CustomHorizontalHeader: public QHeaderView
     {
+        Q_DECLARE_TR_FUNCTIONS(CustomHorizontalHeader)
+
     private:
         QComboBox* m_comboBox;
 
@@ -183,7 +185,7 @@ namespace {
 
 }
 
-QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /*= 0*/):
+QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /* = 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::RecordingStatisticsWidget),

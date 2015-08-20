@@ -76,7 +76,7 @@ static std::array<LicenseCompatibility, 19> compatibleLicenseType =
 /************************************************************************/
 /* QnLicenseUsageHelper                                                 */
 /************************************************************************/
-QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /*= NULL*/):
+QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /* = NULL*/):
     base_type(parent)
 {
 
@@ -288,7 +288,7 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
 /* QnCamLicenseUsageWatcher                                             */
 /************************************************************************/
 
-QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /*= NULL*/):
+QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /* = NULL*/):
     base_type(parent)
 {
     init(QnVirtualCameraResourcePtr());
@@ -427,7 +427,7 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
 /************************************************************************/
 /* QnVideoWallLicenseUsageWatcher                                       */
 /************************************************************************/
-QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent /*= NULL*/):
+QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent /* = NULL*/):
     base_type(parent)
 {
     auto updateIfNeeded = [this](const QnResourcePtr &resource) {

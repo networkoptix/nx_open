@@ -31,7 +31,7 @@ QnEmailSmtpServerPreset::QnEmailSmtpServerPreset():
     port(0)
 {}
 
-QnEmailSmtpServerPreset::QnEmailSmtpServerPreset(const QString &server, QnEmail::ConnectionType connectionType /*= Tls*/, int port /*= 0*/):
+QnEmailSmtpServerPreset::QnEmailSmtpServerPreset(const QString &server, QnEmail::ConnectionType connectionType /* = Tls*/, int port /* = 0*/):
     server(server),
     connectionType(connectionType), 
     port(port) 
@@ -65,7 +65,7 @@ bool QnEmailSettings::isValid() const {
         !password.isEmpty();
 }
 
-bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /*= false*/) const {
+bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /* = false*/) const {
     if (email != other.email)                   return false;
     if (server != other.server)                 return false;
     if (user != other.user)                     return false;

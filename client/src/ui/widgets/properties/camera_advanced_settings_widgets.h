@@ -20,7 +20,7 @@ public:
     void addWidget(QWidget *widget);
 };
 
-//==============================================
+// ==============================================
 class QnSettingsSlider : public QSlider
 {
     Q_OBJECT
@@ -35,7 +35,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *event);
 };
 
-//==============================================
+// ==============================================
 
 class QnAbstractSettingsWidget : public QWidget
 {
@@ -62,7 +62,7 @@ protected:
     QHBoxLayout *m_layout;
     QString m_hint;
 };
-//==============================================
+// ==============================================
 class QnSettingsOnOffWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
@@ -80,7 +80,7 @@ public slots:
 private:
     QCheckBox * m_checkBox;
 };
-//==============================================
+// ==============================================
 class QnSettingsMinMaxStepWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
@@ -100,7 +100,7 @@ private:
     QnSettingsSlider* m_slider;
     QGroupBox* m_groupBox;
 };
-//==============================================
+// ==============================================
 class QnSettingsEnumerationWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
@@ -121,7 +121,7 @@ private:
     QList<QRadioButton*> m_radioBtns;
 };
 
-//==============================================
+// ==============================================
 class QnSettingsButtonWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
@@ -137,7 +137,7 @@ private slots:
     void onClicked();
 };
 
-//==============================================
+// ==============================================
 class QnSettingsTextFieldWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
@@ -156,7 +156,7 @@ private:
     QLineEdit* m_lineEdit;
 };
 
-//==============================================
+// ==============================================
 class QnSettingsControlButtonsPairWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
