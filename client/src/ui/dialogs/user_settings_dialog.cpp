@@ -151,6 +151,11 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
         ui->emailLabel->setVisible(visible);
         ui->emailEdit->setReadOnly(!editable);
         break;
+    case Enabled:
+        ui->enabledCheckBox->setVisible(visible);
+        ui->enabledLabel->setVisible(visible);
+        setReadOnly(ui->enabledCheckBox, !editable);
+        break;
     default:
         break;
     }
@@ -216,30 +221,19 @@ void QnUserSettingsDialog::updateFromResource() {
     if(m_mode == Mode::NewUser) {
         ui->loginEdit->clear();
         ui->emailEdit->clear();
+        ui->enabledCheckBox->setChecked(true);
 
         loadAccessRightsToUi(Qn::GlobalLiveViewerPermissions);
     } else {
         ui->loginEdit->setText(m_user->getName());
         ui->emailEdit->setText(m_user->getEmail());
+        ui->enabledCheckBox->setChecked(m_user->isEnabled());
 
         loadAccessRightsToUi(accessController()->globalPermissions(m_user));
     }
     updatePlaceholders();
     updateLogin();
     updatePassword();
-
-    ui->enabledCheckBox->setChecked(m_user->isEnabled());
-
-    ui->enabledCheckBox->setEnabled(m_user->getName() != lit("admin"));
-
-    bool ldap = m_user->isLdap();
-
-    ui->loginEdit->setReadOnly(ldap);
-    ui->emailEdit->setReadOnly(ldap);
-    ui->passwordEdit->setVisible(!ldap);
-    ui->passwordLabel->setVisible(!ldap);
-    ui->confirmPasswordEdit->setVisible(!ldap);
-    ui->confirmPasswordLabel->setVisible(!ldap);
 
     setHasChanges(false);
 }

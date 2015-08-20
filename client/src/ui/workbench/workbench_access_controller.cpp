@@ -148,6 +148,14 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
         if ((m_userPermissions & Qn::GlobalEditProtectedUserPermission) || !(globalPermissions(user) & Qn::GlobalProtectedPermission))
             result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
     }
+
+    if (user->isLdap()) {
+        result &= ~Qn::WriteNamePermission;
+        result &= ~Qn::WritePasswordPermission;
+        result &= ~Qn::WriteEmailPermission;
+
+    }
+
     return result;
 }
 
