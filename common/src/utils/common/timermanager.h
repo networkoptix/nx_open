@@ -12,6 +12,7 @@
 
 #include <utils/common/singleton.h>
 
+
 //!Interface of receiver of timer events
 class TimerEventHandler
 {
@@ -43,6 +44,7 @@ public:
     //!This class is to simplify timer id usage
     /*!
         \note Not thread-safe
+        \warning This class calls \a TimerManager::joinAndDeleteTimer, so watch out for deadlock!
     */
     class TimerGuard
     {
@@ -62,6 +64,9 @@ public:
 
         //!Cancels timer and blocks until running handler returns
         void reset();
+        quint64 get() const;
+        //!Returns timer without deleting it
+        quint64 release();
 
         operator bool_type() const;
         bool operator==( const TimerGuard& right ) const;
@@ -87,11 +92,18 @@ public:
     */
     quint64 addTimer(
         TimerEventHandler* const taskHandler,
-        const unsigned int delay );
+        const unsigned int delayMillis );
     //!Same as above but accepts handler of \a std::function type
     quint64 addTimer(
         std::function<void(quint64)> taskHandler,
-        const unsigned int delay );
+        const unsigned int delayMillis );
+    //!Modifies delay on existing timer
+    /*!
+        If timer is being executed currently, nothing is done.
+        Otherwise, timer will be called in \a newDelayMillis from now
+        \return \a true, if timer delay has been changed
+    */
+    bool modifyTimerDelay( quint64 timerID, const unsigned int newDelayMillis );
     /*!
         If task is already running, it can be still running after method return
         If timer handler is being executed at the moment, it can still be executed after return of this method

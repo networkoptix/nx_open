@@ -77,10 +77,6 @@
 <context>
     <name>AuditLogDialog</name>
     <message>
-        <source>Event log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>From</source>
         <translation type="unfinished"></translation>
     </message>
@@ -150,6 +146,10 @@
     </message>
     <message>
         <source>All Servers are offline.  Audit data are not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit trail</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -238,20 +238,12 @@
         <translation>&amp;Extremo IP:</translation>
     </message>
     <message>
-        <source>S&amp;ubnet scan</source>
-        <translation>&amp;Máscara de subred</translation>
-    </message>
-    <message>
         <source>&amp;Login:</source>
         <translation>&amp;Conexion:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Contraseña:</translation>
-    </message>
-    <message>
-        <source>auto</source>
-        <translation>auto</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -274,28 +266,12 @@
         <translation>Detectando...</translation>
     </message>
     <message>
-        <source>Manuf.</source>
-        <translation>Manuf.</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Nombre</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation> Dirección </translation>
     </message>
     <message>
         <source>Server is offline</source>
         <translation>Servidor está desconectado</translation>
-    </message>
-    <message>
-        <source>Add cameras...</source>
-        <translation>Añadir cámaras...</translation>
-    </message>
-    <message>
-        <source>Selected server:</source>
-        <translation>Servidor seleccionado:</translation>
     </message>
     <message>
         <source>Ca&amp;mera Address:</source>
@@ -306,12 +282,32 @@
         <translation>&amp;Añadir seleccionados</translation>
     </message>
     <message>
-        <source>New scan...</source>
-        <translation>Nueva adquisición...</translation>
-    </message>
-    <message>
         <source>Discovered Cameras:</source>
         <translation>Cámaras descubiertas:</translation>
+    </message>
+    <message>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished">Modelo</translation>
+    </message>
+    <message>
+        <source>New Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -477,29 +473,6 @@
     <message>
         <source>Filter:</source>
         <translation>Filtro:</translation>
-    </message>
-</context>
-<context>
-    <name>CameraManagementWidget</name>
-    <message>
-        <source>Allow system to optimize camera settings (Recommended)</source>
-        <translation>Permite el sistema optimizar la configuración de la cámara (Recomendado)</translation>
-    </message>
-    <message>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>ADVERTENCIA! Configuración de FPS y calidad en horario de grabación no funcionará!</translation>
-    </message>
-    <message>
-        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation>Enviar uso anónimo y accidente estadísticas a los desarrolladores de software (recomendado)</translation>
-    </message>
-    <message>
-        <source>Enable cameras and servers auto discovery</source>
-        <translation>Permita el descubrimiento automático de servidores y cámaras</translation>
-    </message>
-    <message>
-        <source>Enable audit trail</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -942,13 +915,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>IOStateDisplayWidget</name>
-    <message>
-        <source>IO monitor</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ImageControlWidget</name>
     <message>
         <source>Image Control</source>
@@ -1043,6 +1009,41 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Keep aspect ratio</source>
         <translation>Mantener la relación de aspecto</translation>
+    </message>
+</context>
+<context>
+    <name>LdapSettingsDialog</name>
+    <message>
+        <source>Server UR&amp;L:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ldap(s)://host:port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ad&amp;min DN:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation type="unfinished">&amp;Contraseña:</translation>
+    </message>
+    <message>
+        <source>Search Base:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Testing...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2662,15 +2663,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO monitor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>IO Module Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording statistics...</source>
+        <source>User management...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2750,19 +2747,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>user(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>server(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit log replay</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2830,10 +2819,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Business rule updated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>E-mail updated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2936,6 +2921,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Red mark means that an archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E-mail settings changed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4373,25 +4366,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnIOStateDisplayWidget</name>
-    <message>
-        <source>IO port error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to %1 IO port &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>turn on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>turn off</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnImageControlWidget</name>
     <message>
         <source>4:3</source>
@@ -4407,6 +4381,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnIoModuleOverlayWidgetPrivate</name>
+    <message>
+        <source>Failed to turn on IO port &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to turn off IO port &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO port error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4462,6 +4451,43 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;Imagen no puede ser cargada&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapSettingsDialog</name>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished">Prueba</translation>
+    </message>
+    <message>
+        <source>Test failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Test completed successfully: %n users found.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapSettingsDialogPrivate</name>
+    <message>
+        <source>The provided settings are not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None of your servers is connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed out</source>
+        <translation type="unfinished">Tiempo agotado</translation>
     </message>
 </context>
 <context>
@@ -4944,6 +4970,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
         <translation>%1 (Gira &quot;%2&quot; está activa)</translation>
     </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
@@ -5046,6 +5076,13 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Check</source>
         <translation>Compruebe</translation>
+    </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.
+As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
+If you understand this and would like to proceed please click Merge to continue.
+</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5589,7 +5626,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnRecordingStatsDialog</name>
+    <name>QnRecordingStatisticsWidget</name>
     <message>
         <source>Copy Selection to Clipboard</source>
         <translation type="unfinished"></translation>
@@ -5667,6 +5704,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Calendar Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>less than an hour</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5889,76 +5930,87 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
-        <source>Remove Storage</source>
-        <translation>Retire Almacenamiento</translation>
-    </message>
-    <message>
         <source>Open Web Page...</source>
         <translation>Abra la Página Web...</translation>
     </message>
     <message>
-        <source>Not available</source>
-        <translation>No disponible</translation>
+        <source>General</source>
+        <translation type="unfinished">General</translation>
+    </message>
+    <message>
+        <source>Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnServerSettingsWidget</name>
+    <message>
+        <source>Remove Storage</source>
+        <translation type="unfinished">Retire Almacenamiento</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>Cargando...</translation>
+        <translation type="unfinished">Cargando ...</translation>
+    </message>
+    <message>
+        <source>Not available</source>
+        <translation type="unfinished">No disponible</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Advertencia</translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation>Terminado</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation>Reconstruir índice de archivo se ha completado.</translation>
-    </message>
-    <message>
-        <source>At least two servers are required for this feature.</source>
-        <translation>Por lo menos dos servidores son necesarios para esta función.</translation>
-    </message>
-    <message>
-        <source>This server already has more than max cameras</source>
-        <translation>Este servidor ya cuenta con más de cámaras máx</translation>
-    </message>
-    <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>Para evitar mal funcionamiento ajuste máximo número de cámaras</translation>
-    </message>
-    <message>
-        <source>Could not load storages from server.</source>
-        <translation>No se ha podido cargar almacenamiento del servidor.</translation>
-    </message>
-    <message>
-        <source>Add external Storage...</source>
-        <translation>Añadir Almacenamiento externo ...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation>Está a punto de lanzar la rutina de la resincronización del archivo.</translation>
+        <translation type="unfinished">Está a punto de lanzar la rutina de la resincronización del archivo.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation>¡ ATENCIÓN! El uso del disco duro se incrementará durante el proceso de resincronización. Dependiendo del tamaño total del archivo puede tomar varias horas.</translation>
+        <translation type="unfinished">¡ ATENCIÓN! El uso del disco duro se incrementará durante el proceso de resincronización. Dependiendo del tamaño total del archivo puede tomar varias horas.</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation>Este proceso sólo es necesario si las carpetas de archivo han sido movidas, renombradas o reemplazado. Usted puede cancelar la operación de reconstrucción en cualquier momento sin perder datos.</translation>
+        <translation type="unfinished">Este proceso sólo es necesario si las carpetas de archivo han sido movidas, renombradas o reemplazado. Usted puede cancelar la operación de reconstrucción en cualquier momento sin perder datos.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation>¿Está seguro de que desea continuar?</translation>
+        <translation type="unfinished">¿Está seguro de que desea continuar?</translation>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation>Reconstrucción de índice de archivo para el almacenamiento de &apos;%1&apos; está en marcha</translation>
+        <translation type="unfinished">Reconstrucción de índice de archivo para el almacenamiento de &apos;%1&apos; está en marcha</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation>Escaneo rápido archivo de almacenamiento &apos;%1&apos; está en marcha</translation>
+        <translation type="unfinished">Escaneo rápido archivo de almacenamiento &apos;%1&apos; está en marcha</translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation type="unfinished">Terminado</translation>
+    </message>
+    <message>
+        <source>Rebuilding archive index is completed.</source>
+        <translation type="unfinished">Reconstruir índice de archivo se ha completado.</translation>
+    </message>
+    <message>
+        <source>At least two servers are required for this feature.</source>
+        <translation type="unfinished">Por lo menos dos servidores son necesarios para esta función.</translation>
+    </message>
+    <message>
+        <source>This server already has more than max cameras</source>
+        <translation type="unfinished">Este servidor ya cuenta con más de cámaras máx</translation>
+    </message>
+    <message>
+        <source>To avoid malfunction adjust max number of cameras</source>
+        <translation type="unfinished">Para evitar mal funcionamiento ajuste máximo número de cámaras</translation>
+    </message>
+    <message>
+        <source>Could not load storages from server.</source>
+        <translation type="unfinished">No se ha podido cargar almacenamiento del servidor.</translation>
+    </message>
+    <message>
+        <source>Add external Storage...</source>
+        <translation type="unfinished">Añadir Almacenamiento externo ...</translation>
     </message>
 </context>
 <context>
@@ -6296,6 +6348,38 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Do not record motion</source>
         <translation>No registre movimiento</translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid schedule</source>
+        <translation type="unfinished">Horario válido</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished">Segunda secuencia está desactivado en esta cámara. Movimiento LQ opción no tiene ningún efecto.Pulse &quot;Sí&quot; para cambiar tipo de grabación que &quot;siempre&quot; o &quot;No&quot; para volver a habilitar segundo stream.</translation>
+    </message>
+    <message>
+        <source>Confirm motion regions reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to reset motion regions to the defaults?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation type="unfinished">¡Esta acción NO PUEDE ser deshecha!</translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -6406,15 +6490,27 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Activar licencia analógica para eliminar este mensaje</translation>
     </message>
     <message>
-        <source>Diagnose...</source>
-        <translation>diagnostico...</translation>
-    </message>
-    <message>
         <source>Please check authentication information in camera settings</source>
         <translation>Por favor comprueba la información de autenticación en ajustes de la cámara</translation>
     </message>
     <message>
         <source>No video stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate license...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Module is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6436,12 +6532,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ruta de almacenamiento no define un válido almacenamiento externo.</translation>
     </message>
     <message>
-        <source>Windows Network Shared Resource</source>
-        <translation>Recursos compartidos de la red Windows</translation>
-    </message>
-    <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
         <translation>\\&lt;Nombre del ordenador&gt; \&lt;Carpeta&gt;</translation>
+    </message>
+    <message>
+        <source>Network Shared Resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add storage</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6489,6 +6597,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Update is in process now.</source>
         <translation>Actualización está en proceso en este momento.</translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished">Usuarios</translation>
     </message>
 </context>
 <context>
@@ -6730,6 +6842,91 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>%1, %n adicional</numerusform>
             <numerusform>%1, %n adicional</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnUserListModel</name>
+    <message>
+        <source>LDAP user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normal user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">Nombre</translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserListModelPrivate</name>
+    <message>
+        <source>Owner</source>
+        <translation type="unfinished">Propietaria</translation>
+    </message>
+    <message>
+        <source>Administrator</source>
+        <translation type="unfinished">Administradores</translation>
+    </message>
+    <message>
+        <source>View live video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust camera settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use PTZ controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View video archives</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Video Walls</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserManagementWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import from LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7491,6 +7688,21 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>You can try to update the servers again in the System Administration.</source>
         <translation>Puede tratar de actualizar los servidores de nuevo en la administración del sistema.</translation>
     </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.
+As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
+If you understand this and would like to proceed please click Merge to continue.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merge</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchLayoutsHandler</name>
@@ -8030,11 +8242,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
 </context>
 <context>
-    <name>RecordingStatsDialog</name>
-    <message>
-        <source>Recording statistics</source>
-        <translation type="unfinished"></translation>
-    </message>
+    <name>RecordingStatisticsWidget</name>
     <message>
         <source>Refresh</source>
         <translation type="unfinished">Refrescar</translation>
@@ -8146,86 +8354,89 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Server settings</source>
         <translation>Configuración del servidor</translation>
     </message>
+</context>
+<context>
+    <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
-        <translation>Nombre:</translation>
+        <translation type="unfinished">Nombre:</translation>
     </message>
     <message>
         <source>IP Address:</source>
-        <translation>Dirección IP:</translation>
-    </message>
-    <message>
-        <source>Port:</source>
-        <translation>Puerto:</translation>
-    </message>
-    <message>
-        <source>9000</source>
-        <translation>9000</translation>
+        <translation type="unfinished">Dirección IP:</translation>
     </message>
     <message>
         <source>Ping</source>
-        <translation>Ping</translation>
+        <translation type="unfinished">Ping</translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation type="unfinished">Puerto:</translation>
+    </message>
+    <message>
+        <source>9000</source>
+        <translation type="unfinished">9000</translation>
     </message>
     <message>
         <source>Failover</source>
-        <translation>Conmutación por error</translation>
+        <translation type="unfinished">Conmutación por error</translation>
     </message>
     <message>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation>Habilitar la conmutación por error (servidor tomará cámaras directamente desde los servidores fuera de línea)</translation>
+        <translation type="unfinished">Habilitar la conmutación por error (servidor tomará cámaras directamente desde los servidores fuera de línea)</translation>
     </message>
     <message>
         <source>Max. cameras on this server:</source>
-        <translation>Max. cámaras en este servidor:</translation>
+        <translation type="unfinished">Max. cámaras en este servidor:</translation>
     </message>
     <message>
         <source>Storages</source>
-        <translation>Almacenes informáticos</translation>
+        <translation type="unfinished">Almacenes informáticos</translation>
     </message>
     <message>
         <source>In Use</source>
-        <translation>En uso</translation>
-    </message>
-    <message>
-        <source>Path</source>
-        <translation>Trayectoria</translation>
-    </message>
-    <message>
-        <source>Capacity</source>
-        <translation>Capacidad</translation>
-    </message>
-    <message>
-        <source>Login</source>
-        <translation>Iniciar Sesión</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation>Contraseña</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>Espacio</translation>
-    </message>
-    <message>
-        <source>Rebuild archive index</source>
-        <translation>Reconstruir índice archivo</translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation>Comienzo</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="unfinished">En uso</translation>
     </message>
     <message>
         <source>Protocol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Path</source>
+        <translation type="unfinished">Trayectoria</translation>
+    </message>
+    <message>
+        <source>Capacity</source>
+        <translation type="unfinished">Capacidad</translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished">Iniciar Sesión</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished">Contraseña</translation>
+    </message>
+    <message>
+        <source>Space</source>
+        <translation type="unfinished">Espacio</translation>
+    </message>
+    <message>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuild archive index</source>
+        <translation type="unfinished">Reconstruir índice archivo</translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished">Comienzo</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
     </message>
 </context>
 <context>
@@ -8508,6 +8719,33 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
 </context>
 <context>
+    <name>SystemSettingsWidget</name>
+    <message>
+        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
+        <translation type="unfinished">¡ ADVERTENCIA! Configuración de FPS y calidad en horario de grabación no funcionará!</translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
+        <translation type="unfinished">(recomendado)</translation>
+    </message>
+    <message>
+        <source>Enable audit trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation type="unfinished">Permita el descubrimiento automático de servidores y cámaras</translation>
+    </message>
+    <message>
+        <source>Allow system to optimize camera settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TimeServerSelectionWidget</name>
     <message>
         <source>Current system time:</source>
@@ -8527,10 +8765,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>Create New User</source>
         <translation>Crear nuevo usuario</translation>
-    </message>
-    <message>
-        <source>User Properties</source>
-        <translation>Propiedades de usuario</translation>
     </message>
     <message>
         <source>Advanced...</source>
@@ -8561,8 +8795,12 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <translation>&amp;Iniciar Sesión:</translation>
     </message>
     <message>
-        <source>&amp;Email:</source>
-        <translation>&amp;Correo electrónico:</translation>
+        <source>E&amp;mail:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

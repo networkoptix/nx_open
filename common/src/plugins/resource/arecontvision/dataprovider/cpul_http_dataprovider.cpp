@@ -62,7 +62,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
                 return QnAbstractMediaDataPtr(0);
             }
 
-            //=========
+            // =========
             left = m_streamParam.value("image_left").toInt();
             top = m_streamParam.value("image_top").toInt();
             right = m_streamParam.value("image_right").toInt();
@@ -82,7 +82,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
                 //bitrate = m_streamParam.get("Bitrate").value.value;
                 bitrate = getBitrateMbps();
             }
-            //=========
+            // =========
 
             if (h264)
                 quality=37-quality; // for H.264 it's not quality; it's qp

@@ -2,12 +2,13 @@
 #include <atomic>
 #include <algorithm>
 #include <stdexcept>
-#include <random>
 #include <sstream>
 #include <cctype>
 #include <cstdio>
 #include <fstream>
 #include <cassert>
+#include <ctime>
+#include <cstdlib>
 
 #ifdef __linux__
 #   include <sys/stat.h>
@@ -320,15 +321,10 @@ namespace nx_spl
         // Strictly speaking, the uniquness is not guaranteed, so delete files as soon as possible.
         std::string getRandomFileName()
         {
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<> dis(0, 15);
-            std::stringstream ss;
+            std::stringstream randomStringStream;
+            randomStringStream << std::hex << std::rand() << std::rand();
 
-            for (int i = 0; i < 16; ++i)
-                ss << std::hex << dis(gen);
-        
-            return ss.str();
+            return randomStringStream.str();
         }
 
         // Cut dir name from file name and return both.
@@ -974,6 +970,11 @@ namespace nx_spl
 
 
     // FtpStorageFactory
+    FtpStorageFactory::FtpStorageFactory()
+    {
+        std::srand(time(0));
+    }
+
     void* FtpStorageFactory::queryInterface(const nxpl::NX_GUID& interfaceID)
     {
         if (std::memcmp(&interfaceID, 

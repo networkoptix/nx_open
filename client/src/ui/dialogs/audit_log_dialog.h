@@ -13,7 +13,6 @@
 
 class QnAuditLogMasterModel;
 class QnAuditLogDetailModel;
-class QnCheckBoxedHeaderView;
 class QnAuditItemDelegate;
 class QnTableView;
 class QnAuditLogModel;
@@ -66,7 +65,6 @@ protected:
 private slots:
     void updateData();
     void at_gotdata(int httpStatus, const QnAuditRecordList& data, int requestNum);
-    void at_sessionsGrid_clicked(const QModelIndex & index);
     void at_sessionsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
@@ -98,9 +96,9 @@ private:
     QnAuditRecordRefList filterChildDataByCameras(const QnAuditRecordRefList& checkedRows);
     void setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes);
     void processPlaybackAction(const QnAuditRecord* record);
-    void triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId, const QString& objectName);
+    void triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId);
     QnAuditRecordRefList applyFilter();
-    QSize calcButtonSize(const QFont& font) const;
+    QSize calcButtonSize() const;
     void setupSessionsGrid();
     void setupCamerasGrid();
     void setupMasterGridCommon(QnTableView* gridMaster);
@@ -126,8 +124,6 @@ private:
     QAction *m_selectAllAction;
     QAction *m_exportAction;
     QAction *m_clipboardAction;
-    //QnCheckBoxedHeaderView* m_masterHeaders;
-    //QnCheckBoxedHeaderView* m_cameraHeaders;
     QList<QCheckBox*> m_filterCheckboxes;
     QModelIndex m_hoveredIndex;
     

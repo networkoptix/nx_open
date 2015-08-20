@@ -9,11 +9,14 @@
 #include <utils/common/string.h>
 
 class QnUserListModelPrivate : public Connective<QObject> {
+    Q_DECLARE_TR_FUNCTIONS(QnUserListModelPrivate);
+
     typedef Connective<QObject> base_type;
 public:
     QnUserListModel *model;
 
     QnUserResourceList userList;
+    QSet<QnUserResourcePtr> checkedUsers;
 
     QnUserListModelPrivate(QnUserListModel *parent)
         : base_type(parent)
@@ -34,6 +37,9 @@ public:
     QnUserResourcePtr user(const QModelIndex &index) const;
     QString permissionsString(const QnUserResourcePtr &user) const;
     bool isUnique(const QnUserResourcePtr &user) const;
+
+    Qt::CheckState checkState() const;
+    void setCheckState(Qt::CheckState state, const QnUserResourcePtr &user = QnUserResourcePtr());
 };
 
 
@@ -69,6 +75,7 @@ void QnUserListModelPrivate::at_resourcePool_resourceRemoved(const QnResourcePtr
 
     model->beginRemoveRows(QModelIndex(), row, row);
     userList.removeAt(row);
+    checkedUsers.remove(user);
     model->endRemoveRows();
 }
 
@@ -82,7 +89,7 @@ void QnUserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr
         return;
 
     QModelIndex index = model->index(row);
-    model->dataChanged(index, index.sibling(row, QnUserListModel::ColumnCount));
+    emit model->dataChanged(index, index.sibling(row, QnUserListModel::ColumnCount - 1));
 }
 
 int QnUserListModelPrivate::userIndex(const QnUuid &id) const {
@@ -142,6 +149,30 @@ bool QnUserListModelPrivate::isUnique(const QnUserResourcePtr &user) const {
     return true;
 }
 
+Qt::CheckState QnUserListModelPrivate::checkState() const {
+    if (checkedUsers.isEmpty())
+        return Qt::Unchecked;
+
+    if (checkedUsers.size() == userList.size())
+        return Qt::Checked;
+    
+    return Qt::PartiallyChecked;
+}
+
+void QnUserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserResourcePtr &user) {
+    if (!user) {
+        if (state == Qt::Checked)
+            checkedUsers = userList.toSet();
+        else if (state == Qt::Unchecked)
+            checkedUsers.clear();
+    } else {
+        if (state == Qt::Checked)
+            checkedUsers.insert(user);
+        else if (state == Qt::Unchecked)
+            checkedUsers.remove(user);
+    }
+}
+
 QnUserListModel::QnUserListModel(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
@@ -152,13 +183,15 @@ QnUserListModel::QnUserListModel(QObject *parent)
 QnUserListModel::~QnUserListModel() {}
 
 int QnUserListModel::rowCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent)
-    return d->userList.size();
+    if (!parent.isValid())
+        return d->userList.size();
+    return 0;
 }
 
 int QnUserListModel::columnCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent)
-    return ColumnCount;
+    if (!parent.isValid())
+        return ColumnCount;
+    return 0;
 }
 
 QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
@@ -222,6 +255,10 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
         if (index.column() == LdapColumn)
             return Qt::AlignCenter;
         break;
+    case Qt::CheckStateRole:
+        if (index.column() == CheckBoxColumn)
+            return d->checkedUsers.contains(user);
+        break;
     default:
         break;
     } // switch (role)
@@ -262,15 +299,38 @@ Qt::ItemFlags QnUserListModel::flags(const QModelIndex &index) const {
 
     flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
+    if (index.column() == CheckBoxColumn)
+        flags |= Qt::ItemIsUserCheckable;
+
     return flags;
 }
 
+Qt::CheckState QnUserListModel::checkState() const {
+    return d->checkState();
+}
+
+void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePtr &user) {
+    if (state == Qt::PartiallyChecked)
+        return;
+
+    d->setCheckState(state, user);  
+    if (!user) {
+        emit dataChanged(index(0, CheckBoxColumn), index(d->userList.size() - 1, CheckBoxColumn), QVector<int>() << Qt::CheckStateRole);
+    }
+    else {
+        auto row = d->userIndex(user->getId());
+        if (row >= 0)
+            emit dataChanged(index(row, CheckBoxColumn), index(row, CheckBoxColumn), QVector<int>() << Qt::CheckStateRole);
+    }
+        
+}
 
 QnSortedUserListModel::QnSortedUserListModel(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 {
 }
+
 
 bool QnSortedUserListModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
     QnUserResourcePtr leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
@@ -307,6 +367,7 @@ bool QnSortedUserListModel::lessThan(const QModelIndex &left, const QModelIndex 
         return leftLdap;
     }
     default:
+        /* We should never sort by CheckBoxColumn. */
         break;
     }
 

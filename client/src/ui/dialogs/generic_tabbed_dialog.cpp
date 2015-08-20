@@ -6,7 +6,7 @@
 
 #include <utils/common/warnings.h>
 
-QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /*= 0*/) :
+QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /* = 0 */) :
     base_type(parent)
 {
 

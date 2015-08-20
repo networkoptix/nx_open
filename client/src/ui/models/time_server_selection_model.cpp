@@ -44,7 +44,7 @@ namespace {
 #define PRINT_DEBUG(MSG) 
 #endif 
 
-QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*/):
+QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_sameTimezone(false),
@@ -265,7 +265,7 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
     return QVariant();
 }
 
-bool QnTimeServerSelectionModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/) {
+bool QnTimeServerSelectionModel::setData(const QModelIndex &index, const QVariant &value, int role /* = Qt::EditRole*/) {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return 0;
 

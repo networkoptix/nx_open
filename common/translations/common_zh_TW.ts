@@ -262,10 +262,6 @@
         <translation>RTP 封包遺失偵測.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>伺服器中斷.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>伺服器崩潰後啟動.</translation>
     </message>
@@ -303,6 +299,10 @@
     </message>
     <message>
         <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

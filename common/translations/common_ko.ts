@@ -262,10 +262,6 @@
         <translation>RTP 패킷 손실이 발생함.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>서버 종료 됨.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>서버 비정상 종료 후 시작.</translation>
     </message>
@@ -303,6 +299,10 @@
     </message>
     <message>
         <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -75,4 +75,5 @@ private:
     QnStorageScanData m_rebuildState;
     ec2::ApiIdDataList m_storagesToRemove;
     bool m_rebuildWasCanceled;
+    QString m_initServerName;
 };

@@ -1505,19 +1505,21 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 
     QnMediaServerResourcePtr server = servers.first();
 
-    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    if(!dialog->exec())
-        return;
+    const auto acceptCallback = [this, server]()
+    {
+        if (!server->resourcePool())    /// Wrong server status - it could be deleted from the system, for example
+            return;
 
-    // TODO: #Elric move submitToResources here.
-    connection2()->getMediaServerManager()->saveUserAttributes(
-        QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(server->getId()),
-        this,
-        [this, server]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << server );
-        } );
-    server->saveUpdatedStorages();
+        // TODO: #Elric move submitToResources here.
+        const auto serverAttrs = (QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(server->getId()));
+        const auto handler = [this, server]( int reqID, ec2::ErrorCode errorCode ) 
+            { at_resources_saved( reqID, errorCode, QnResourceList() << server ); };
+
+        connection2()->getMediaServerManager()->saveUserAttributes(serverAttrs, this, handler);
+        server->saveUpdatedStorages();
+    };
+
+    QnServerSettingsDialog::showNonModal(server, acceptCallback, mainWindow());
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
@@ -1801,6 +1803,10 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     /* User cannot delete himself. */
     resources.removeOne(context()->user());
+
+    /* No one can delete Administrator. */
+    resources.removeOne(qnResPool->getAdministrator());
+
     if(resources.isEmpty())
         return;
 

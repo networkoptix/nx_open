@@ -3,7 +3,7 @@
 
 #include <licensing/license.h>
 
-QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /*= NULL*/):
+QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /* = NULL*/):
     base_type(parent),
     ui(new Ui::LicenseDetailsDialog())
 {

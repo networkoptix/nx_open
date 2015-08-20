@@ -38,13 +38,19 @@ namespace {
     const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
     const qint64 SECS_PER_DAY = 3600 * 24;
     const qint64 SECS_PER_WEEK = SECS_PER_DAY * 7;
-    static const qint64 BYTES_IN_GB = 1000000000ll;
-    static const qint64 BYTES_IN_TB = 1000ll * BYTES_IN_GB;
+    const qint64 BYTES_IN_GB = 1000000000ll;
+    const qint64 BYTES_IN_TB = 1000ll * BYTES_IN_GB;
 
-    static const qint64 EXTRA_DATA_BASE[] = {10 * BYTES_IN_GB, 1 * BYTES_IN_TB, 10 * BYTES_IN_TB, 100 * BYTES_IN_TB, 1000 * BYTES_IN_TB};
-    static const int EXTRA_DATA_ARRAY_SIZE = sizeof(EXTRA_DATA_BASE) / sizeof(EXTRA_DATA_BASE[0]);
-    static const int TICKS_PER_INTERVAL = 100;
-    static const int SPACE_INTERVAL = 4;
+    //TODO: #rvasilenko refactor all algorithms working with EXTRA_DATA_BASE to STL
+    const std::array<qint64, 5> EXTRA_DATA_BASE = { 
+        10 * BYTES_IN_GB, 
+        1 * BYTES_IN_TB, 
+        10 * BYTES_IN_TB, 
+        100 * BYTES_IN_TB, 
+        1000 * BYTES_IN_TB
+    };
+    const int TICKS_PER_INTERVAL = 100;
+    const int SPACE_INTERVAL = 4;
 
     class QnRecordingStatsItemDelegate: public QStyledItemDelegate 
     {
@@ -115,6 +121,8 @@ namespace {
 
     class CustomHorizontalHeader: public QHeaderView
     {
+        Q_DECLARE_TR_FUNCTIONS(CustomHorizontalHeader)
+
     private:
         QComboBox* m_comboBox;
 
@@ -177,7 +185,7 @@ namespace {
 
 }
 
-QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /*= 0*/):
+QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(const QnMediaServerResourcePtr &server, QWidget* parent /* = 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::RecordingStatisticsWidget),
@@ -328,13 +336,13 @@ void QnRecordingStatisticsWidget::query(qint64 bitrateAnalizePeriodMs)
     }
 }
 
-void QnRecordingStatisticsWidget::at_gotStatiscits(int httpStatus, const QnRecordingStatsReply& data, int requestNum)
+void QnRecordingStatisticsWidget::at_gotStatiscits(int status, const QnRecordingStatsReply& data, int requestNum)
 {
     if (!m_requests.contains(requestNum))
         return;
     QnUuid serverId = m_requests.value(requestNum);
     m_requests.remove(requestNum);
-    if (httpStatus == 0 && !data.isEmpty()) {
+    if (status == 0 && !data.isEmpty()) {
         for (const auto& value: data)
             m_allData << value;
     }
@@ -343,12 +351,12 @@ void QnRecordingStatisticsWidget::at_gotStatiscits(int httpStatus, const QnRecor
     }
 }
 
-void QnRecordingStatisticsWidget::at_gotStorageSpace(int httpStatus, const QnStorageSpaceReply& data, int requestNum)
+void QnRecordingStatisticsWidget::at_gotStorageSpace(int status, const QnStorageSpaceReply& data, int requestNum)
 {
     if (!m_requests.contains(requestNum))
         return;
     m_requests.remove(requestNum);
-    if (httpStatus == 0) {
+    if (status == 0) {
         for (const auto& storage: data.storages) 
             m_availStorages << storage;
     }
@@ -435,8 +443,8 @@ qint64 QnRecordingStatisticsWidget::sliderPositionToBytes(int value) const
         return 0;
 
     int idx = value / TICKS_PER_INTERVAL;
-    if (idx == EXTRA_DATA_ARRAY_SIZE - 1)
-        return EXTRA_DATA_BASE[EXTRA_DATA_ARRAY_SIZE  -1];
+    if (idx >= EXTRA_DATA_BASE.size() - 1)
+        return EXTRA_DATA_BASE.back();
 
     qint64 k1 = EXTRA_DATA_BASE[idx];
     qint64 k2 = EXTRA_DATA_BASE[idx+1];
@@ -449,7 +457,7 @@ qint64 QnRecordingStatisticsWidget::sliderPositionToBytes(int value) const
 int QnRecordingStatisticsWidget::bytesToSliderPosition (qint64 value) const
 {
     int idx = 0;
-    for (; idx < EXTRA_DATA_ARRAY_SIZE-1; ++idx)
+    for (; idx < EXTRA_DATA_BASE.size() - 1; ++idx)
     {
         if (EXTRA_DATA_BASE[idx+1] >= value)
             break;

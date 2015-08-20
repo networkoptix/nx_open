@@ -10,13 +10,41 @@
 #include <ui/widgets/properties/recording_statistics_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/dialogs/non_modal_dialog_constructor.h>
 
-QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    ui(new Ui::ServerSettingsDialog),
-    m_server(server),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnServerSettingsDialog>(this))
+namespace
+{
+    typedef QHash<QnUuid, QnServerSettingsDialog *> DialogsContainer;
+
+    DialogsContainer g_currentShowingDialogs;
+}
+
+void QnServerSettingsDialog::showNonModal(const QnMediaServerResourcePtr &server
+    , const AcceptCallback &callback
+    , QWidget *parent)
+{
+    auto it = std::find_if(g_currentShowingDialogs.begin(), g_currentShowingDialogs.end()
+        , [server](QnServerSettingsDialog *dialog)
+    {
+        return (dialog->m_server->getId() == server->getId());
+    });
+
+    QnServerSettingsDialog *dlg = nullptr;
+    if (it == g_currentShowingDialogs.end())
+        it = g_currentShowingDialogs.insert(server->getId(), new QnServerSettingsDialog(server, callback, parent));
+
+    QnShowDialogHelper::showNonModalDialog(it.value());
+}
+
+QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server
+    , const AcceptCallback &callback
+    , QWidget *parent)
+    : base_type(parent)
+    , QnWorkbenchContextAware(parent)
+    , ui(new Ui::ServerSettingsDialog)
+    , m_onAcceptClickedCallback(callback)
+    , m_server(server)
+    , m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnServerSettingsDialog>(this))
 {
     ui->setupUi(this);
   
@@ -43,4 +71,24 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog() 
-{}
+{
+}
+
+void QnServerSettingsDialog::reject()
+{
+    g_currentShowingDialogs.remove(m_server->getId());
+    base_type::reject();
+    deleteLater();
+}
+
+void QnServerSettingsDialog::accept()
+{
+    g_currentShowingDialogs.remove(m_server->getId());
+    base_type::accept();
+
+    if (m_onAcceptClickedCallback)
+        m_onAcceptClickedCallback();
+
+    deleteLater();
+}
+

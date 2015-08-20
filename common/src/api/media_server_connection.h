@@ -12,6 +12,7 @@
 
 #include <api/api_fwd.h>
 #include <core/ptz/ptz_fwd.h>
+#include <utils/common/ldap_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
