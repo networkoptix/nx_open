@@ -16,7 +16,8 @@ angular.module('webadminApp')
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
 
-                var debugEventsMode = false;
+                var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
+
 
                 var timelineConfig = {
                     initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
@@ -285,7 +286,7 @@ angular.module('webadminApp')
                 }
                 function initTimeline(){
                     var now = (new Date()).getTime();
-                    scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.start : (now - timelineConfig.initialInterval));
+                    scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd(now);
 
                     scope.zoomTo(1); // Animate full zoom out
@@ -733,6 +734,7 @@ angular.module('webadminApp')
                     var levelIndex = scope.scaleManager.levels.events.index;
                     var start = scope.scaleManager.alignStart(level);
                     var end = scope.scaleManager.alignEnd(level);
+
 
                     if(scope.recordsProvider && scope.recordsProvider.chunksTree) {
                         // 1. Splice events

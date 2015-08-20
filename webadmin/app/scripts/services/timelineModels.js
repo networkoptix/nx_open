@@ -241,6 +241,7 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width,timeCorrection) {
         if(!self.chunksTree){
             return; //No chunks for this camera
         }
+
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
         var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,width);
         if(nextLevel<RulerModel.levels.length-1) {
@@ -323,8 +324,8 @@ CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start,en
 
 CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     var deferred = this.$q.defer();
-    this.start = start;
-    this.end = end;
+    //this.start = start;
+    //this.end = end;
     this.level = level;
     var detailization = RulerModel.levels[level].interval.getMilliseconds();
 
@@ -821,6 +822,7 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.msPerPixel = this.bound(this.minMsPerPixel, this.msPerPixel, this.maxMsPerPixel);
     this.anchorPoint = this.bound(0, this.anchorPoint, 1);
     this.anchorDate = this.bound(this.start, Math.round(this.anchorDate), this.end);
+
 
     this.visibleStart = Math.round(this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint);
     this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));

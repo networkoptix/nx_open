@@ -40,8 +40,8 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
-                scope.debugMode = false;
-                scope.debugFormat = "flashls";
+                scope.debugMode = Config.debug.video && Config.allowDebugMode;
+                scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
