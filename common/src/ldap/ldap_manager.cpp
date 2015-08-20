@@ -536,18 +536,25 @@ bool QnLdapManager::authenticateWithDigest(const QString &login, const QString &
 QString QnLdapManager::realm() const
 {
     QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
-    LdapSession session(settings);
-    if (!session.connect())
-    {
-        NX_LOG( QString::fromLatin1("QnLdapManager::realm: connect(): %1").arg(session.lastError()), cl_logWARNING );
-        return lit("");
+    QString uriString = settings.uri.toString();
+
+    QMutexLocker _lock(&m_realmCacheMutex);
+    if (m_realmCache.find(uriString) == m_realmCache.end() ) {
+        LdapSession session(settings);
+        if (!session.connect())
+        {
+            NX_LOG( QString::fromLatin1("QnLdapManager::realm: connect(): %1").arg(session.lastError()), cl_logWARNING );
+            return lit("");
+        }
+
+        QString realm = session.getRealm();
+        if (realm.isEmpty())
+        {
+            NX_LOG( QString::fromLatin1("QnLdapManager::realm: realm(): %1").arg(session.lastError()), cl_logWARNING );
+        }
+
+        m_realmCache.insert(uriString, realm);
     }
 
-    QString realm = session.getRealm();
-    if (realm.isEmpty())
-    {
-        NX_LOG( QString::fromLatin1("QnLdapManager::realm: realm(): %1").arg(session.lastError()), cl_logWARNING );
-    }
-
-    return realm;
+    return m_realmCache[uriString];
 }
