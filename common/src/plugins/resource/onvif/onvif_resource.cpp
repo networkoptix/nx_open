@@ -955,7 +955,7 @@ void QnPlOnvifResource::notificationReceived(
             toSharedPointer(),
             portSourceIter->value,
             newPortState,
-            qnSyncTime->currentMSecsSinceEpoch() );   //it is not absolutely correct, but better than de-synchronized timestamp from camera
+            qnSyncTime->currentUSecsSinceEpoch() );   //it is not absolutely correct, but better than de-synchronized timestamp from camera
     }
 }
 

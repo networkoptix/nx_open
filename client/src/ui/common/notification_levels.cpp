@@ -9,6 +9,8 @@ Qn::NotificationLevel QnNotificationLevels::notificationLevel(QnBusiness::EventT
     case QnBusiness::CameraMotionEvent:
     case QnBusiness::CameraInputEvent:
     case QnBusiness::ServerStartEvent:
+    case QnBusiness::CustomInstantEvent:
+    case QnBusiness::CustomProlongedEvent:
         return Qn::CommonNotification;      
     case QnBusiness::CameraDisconnectEvent:
     case QnBusiness::StorageFailureEvent:

@@ -7,6 +7,7 @@
 #include <core/datapacket/abstract_data_packet.h>
 
 #include <business/business_fwd.h>
+#include "business/business_event_parameters.h"
 
 struct QnModuleInformation;
 
@@ -39,6 +40,7 @@ public slots:
     /*! Some problem with storage
     */
     void at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QnResourcePtr &storageRes);
+    void at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &storageUrl);
 
 
     /*! Some problem with network
@@ -49,7 +51,7 @@ public slots:
         \param inputPortID device-specific ID of input port
         \param value true, if input activated. false, if deactivated
     */
-    void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp);
+    void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStampUsec);
 
     void at_customEvent(const QString &resourceName, const QString& caption, const QString& description, QnBusiness::EventState eventState, qint64 timeStamp);
 
@@ -71,6 +73,8 @@ public slots:
     void at_NoStorages(const QnResourcePtr& resource);
 
     void at_archiveRebuildFinished(const QnResourcePtr& resource);
+
+    bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState);
 private slots:
     void onNewResource(const QnResourcePtr &resource);
 };

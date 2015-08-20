@@ -16,10 +16,6 @@ private:
     const QString m_resourceName;
     const QString m_caption;
     const QString m_description;
-
-    QStringList m_resourceNameKeywords;
-    QStringList m_captionKeywords;
-    QStringList m_descriptionKeywords;
 };
 
 typedef QSharedPointer<QnCustomBusinessEvent> QnCustomBusinessEventPtr;

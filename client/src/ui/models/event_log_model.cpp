@@ -389,7 +389,12 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
     case EventColumn:
         return QnBusinessStringsHelper::eventName(action.getRuntimeParams().eventType);
     case EventCameraColumn:
-        return getResourceNameString(action.getRuntimeParams().eventResourceId);
+    {
+        QString result = getResourceNameString(action.getRuntimeParams().eventResourceId);
+        if (result.isEmpty())
+            result = action.getRuntimeParams().resourceName;
+        return result;
+    }
     case ActionColumn:
         return QnBusinessStringsHelper::actionName(action.actionType());
     case ActionCameraColumn: {

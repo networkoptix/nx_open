@@ -268,7 +268,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnUuid resourceId = params.eventResourceId;
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
-    if (!resource)
+    if (!resource && params.resourceName.isEmpty())
         return;
 
     QnMediaServerResourcePtr source = qnResPool->getResourceById(params.sourceServerId).dynamicCast<QnMediaServerResource>();

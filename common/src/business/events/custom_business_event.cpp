@@ -6,15 +6,16 @@ QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState,
     m_caption(caption),
     m_description(description)
 {
-    m_resourceNameKeywords = m_resourceName.split(L' ', QString::SkipEmptyParts);
-    m_captionKeywords      = m_caption.split(L' ', QString::SkipEmptyParts);
-    m_descriptionKeywords  = m_description.split(L' ', QString::SkipEmptyParts);
 }
 
 bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params) const {
     bool stateOK =  state == QnBusiness::UndefinedState || state == getToggleState();
     if (!stateOK)
         return false;
+
+    QStringList resourceNameKeywords = params.resourceName.split(L' ', QString::SkipEmptyParts);
+    QStringList captionKeywords      = params.caption.split(L' ', QString::SkipEmptyParts);
+    QStringList descriptionKeywords  = params.description.split(L' ', QString::SkipEmptyParts);
 
     auto mathKeywords = [](const QStringList& keywords, const QString& pattern) 
     {
@@ -28,9 +29,9 @@ bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const Q
         return false;
     };
 
-    return mathKeywords(m_resourceNameKeywords, params.resourceName) &&
-           mathKeywords(m_captionKeywords, params.caption) &&
-           mathKeywords(m_descriptionKeywords, params.description);
+    return mathKeywords(resourceNameKeywords, params.resourceName) &&
+           mathKeywords(captionKeywords, params.caption) &&
+           mathKeywords(descriptionKeywords, params.description);
 }
 
 QnBusinessEventParameters QnCustomBusinessEvent::getRuntimeParams() const {

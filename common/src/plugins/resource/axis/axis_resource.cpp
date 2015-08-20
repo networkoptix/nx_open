@@ -878,8 +878,8 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClien
             if (params.size() == 2) {
                 int portIndex = portDisplayNameToIndex(QString::fromLatin1(params[0]));
                 QString portId = portIndexToId(portIndex);
-                qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-                updateIOState(portId, params[1] == "active", timestamp, false);
+                qint64 timestampMs = qnSyncTime->currentMSecsSinceEpoch();
+                updateIOState(portId, params[1] == "active", timestampMs, false);
             }
         }
     }
@@ -1131,10 +1131,10 @@ bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     //startInputPortMonitoring();
 }
 
-void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist)
+void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint64 timestampMs, bool overrideIfExist)
 {
     QMutexLocker lock(&m_mutex);
-    QnIOStateData newValue(portId, isActive, timestamp);
+    QnIOStateData newValue(portId, isActive, timestampMs);
     bool found = false;
     for (auto& ioState: m_ioStates) {
         if (ioState.id == portId) 
@@ -1158,7 +1158,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
                     toSharedPointer(),
                     portId,
                     isActive,
-                    timestamp );
+                    timestampMs * 1000ll);
             }
             else if (port.portType == Qn::PT_Output) {
                 lock.unlock();
@@ -1166,7 +1166,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
                     toSharedPointer(),
                     portId,
                     isActive,
-                    timestamp );
+                    timestampMs * 1000ll );
             }
             break;
         }
@@ -1217,8 +1217,8 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
         return; // skip unknown event
 
     bool isOnState = (eventType == '/') || (eventType == 'H');
-    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    updateIOState(portId, isOnState, timestamp, true);
+    qint64 timestampMs = qnSyncTime->currentMSecsSinceEpoch();
+    updateIOState(portId, isOnState, timestampMs, true);
 }
 
 QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {

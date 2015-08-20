@@ -10,73 +10,52 @@
 #include "api/serializer/serializer.h"
 #include "utils/common/synctime.h"
 #include <business/business_event_connector.h>
+#include <business/business_event_parameters.h>
+#include <utils/common/model_functions.h>
+#include "common/common_module.h"
 
 QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
 {
-    QnBusinessEventConnector* connector = qnBusinessRuleConnector;
-    connect(this, &QnExternalBusinessEventRestHandler::mserverFailure, connector, &QnBusinessEventConnector::at_mserverFailure);
 }
 
-int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
-    Q_UNUSED(contentType)
-    QString eventType;
-    QString resourceId;
+    
+    QnBusinessEventParameters businessParams;
     QString errStr;
-    QnResourcePtr resource;
+    QnBusiness::EventState eventState = QnBusiness::UndefinedState;
 
-    for (int i = 0; i < params.size(); ++i)
-    {
-        if (params[i].first == QLatin1String("res_id") || params[i].first == QLatin1String("guid"))
-            resourceId = params[i].second;
-        else if (params[i].first == QLatin1String("event_type"))
-            eventType = params[i].second;
-    }
-    if (resourceId.isEmpty())
-        errStr = tr("Parameter 'res_id' is absent or empty. \n");
-    else if (eventType.isEmpty())
-        errStr = tr("Parameter 'event_type' is absent or empty. \n");
-    else {
-        resource= qnResPool->getResourceByUniqueId(resourceId);
-        if (!resource) {
-            resource= qnResPool->getResourceById(QnUuid(resourceId));
-            if (!resource)
-                errStr = tr("Resource with id '%1' not found \n").arg(resourceId);
-        }
-    }
+    if (params.contains("event_type"))
+        businessParams.eventType = QnLexical::deserialized<QnBusiness::EventType>(params["event_type"]);
+    if (params.contains("eventTimestamp"))
+        businessParams.eventTimestampUsec = parseDateTime(params["eventTimestamp"]);
+    if (params.contains("eventResourceId"))
+        businessParams.eventResourceId = params["eventResourceId"];
+    if (params.contains("state"))
+        eventState = QnLexical::deserialized<QnBusiness::EventState>(params["state"]);
+    if (params.contains("reasonCode"))
+        businessParams.reasonCode = QnLexical::deserialized<QnBusiness::EventReason>(params["reasonCode"]);
+    if (params.contains("inputPortId"))
+        businessParams.inputPortId = params["inputPortId"];
+    if (params.contains("deviceName"))
+        businessParams.resourceName = params["deviceName"];
+    if (params.contains("caption"))
+        businessParams.caption = params["caption"];
+    if (params.contains("description"))
+        businessParams.description = params["description"];
+    
+    if (businessParams.eventTimestampUsec == 0)
+        businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
+    businessParams.sourceServerId = qnCommon->moduleGUID();
 
-    if (errStr.isEmpty()) {
-        if (eventType == QLatin1String("MServerFailure")) 
-        {
-            emit mserverFailure(resource,
-                 qnSyncTime->currentUSecsSinceEpoch(),
-                 QnBusiness::ServerTerminatedReason,
-                 QString());
-        }
-        //else if (eventType == "UserEvent")
-        //    bEvent = new QnUserDefinedBusinessEvent(); // todo: not implemented
-        else if (errStr.isEmpty())
-            errStr = QString(QLatin1String("Unknown business event type '%1' \n")).arg(eventType);
+    // default value for type is 'CustomEvent'
+    if (businessParams.eventType == QnBusiness::UndefinedEvent) {
+        businessParams.eventType = eventState == QnBusiness::UndefinedState ? QnBusiness::CustomInstantEvent : QnBusiness::CustomProlongedEvent;
     }
 
-    if (!errStr.isEmpty())
-    {
-        result.append("<root>\n");
-        result.append(errStr);
-        result.append("</root>\n");
-        return CODE_INVALID_PARAMETER;
-    }
-
-    result.append("<root>\n");
-    result.append("OK\n");
-    result.append("</root>\n");
+    if (!qnBusinessRuleConnector->createEventFromParams(businessParams, eventState))
+        result.setError(QnRestResult::InvalidParameter, "Invalid event parameters");
 
     return CODE_OK;
-}
-
-int QnExternalBusinessEventRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
-                                                    QByteArray& contentType, const QnRestConnectionProcessor* owner)
-{
-    return executeGet(path, params, result, contentType, owner);
 }

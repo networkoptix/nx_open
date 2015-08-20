@@ -16,6 +16,7 @@
 #include "business/actions/system_health_business_action.h"
 #include "core/resource/camera_resource.h"
 #include "business/events/custom_business_event.h"
+#include "business/events/conflict_business_event.h"
 
 
 //#define REDUCE_NET_ISSUE_HACK
@@ -66,7 +67,13 @@ void QnBusinessEventConnector::at_cameraDisconnected(const QnResourcePtr &resour
 
 void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QnResourcePtr &storageRes)
 {
-    QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(mServerRes, timeStamp, reasonCode, storageRes));
+    QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(mServerRes, timeStamp, reasonCode, storageRes->getUrl()));
+    qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
+}
+
+void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &storageUrl)
+{
+    QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(mServerRes, timeStamp, reasonCode, storageUrl));
     qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
 }
 
@@ -105,19 +112,19 @@ void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qi
     qnBusinessRuleProcessor->processBusinessEvent(networkEvent);
 }
 
-void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp)
+void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStampUsec)
 {
     if( !resource )
         return;
 
     qnBusinessRuleProcessor->processBusinessEvent(
-        QnCameraInputEventPtr(new QnCameraInputEvent(resource->toSharedPointer(), value ? QnBusiness::ActiveState : QnBusiness::InactiveState, timeStamp * 1000, inputPortID))
+        QnCameraInputEventPtr(new QnCameraInputEvent(resource->toSharedPointer(), value ? QnBusiness::ActiveState : QnBusiness::InactiveState, timeStampUsec, inputPortID))
     );
 }
 
-void QnBusinessEventConnector::at_customEvent(const QString &resourceName, const QString& caption, const QString& description, QnBusiness::EventState eventState, qint64 timeStamp)
+void QnBusinessEventConnector::at_customEvent(const QString &resourceName, const QString& caption, const QString& description, QnBusiness::EventState eventState, qint64 timeStampUsec)
 {
-    QnCustomBusinessEvent* customEvent = new QnCustomBusinessEvent(eventState, timeStamp * 1000, resourceName, caption, description);
+    QnCustomBusinessEvent* customEvent = new QnCustomBusinessEvent(eventState, timeStampUsec, resourceName, caption, description);
     qnBusinessRuleProcessor->processBusinessEvent(QnCustomBusinessEventPtr(customEvent));
 }
 
@@ -142,4 +149,76 @@ void QnBusinessEventConnector::at_NoStorages(const QnResourcePtr& resource)
 void QnBusinessEventConnector::at_archiveRebuildFinished(const QnResourcePtr &resource) {
     QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::ArchiveRebuildFinished, resource->getId()));
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
+}
+
+bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState)
+{
+    QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
+    bool isOnState = eventState == QnBusiness::ActiveState;
+    switch (params.eventType)
+    {
+        case QnBusiness::CameraMotionEvent:
+            if (!resource)
+                return false;
+            at_motionDetected(resource, isOnState, params.eventTimestampUsec, QnConstAbstractDataPacketPtr());
+            break;
+        case QnBusiness::CameraInputEvent:
+            if (!resource)
+                return false;
+            at_cameraInput(resource, params.inputPortId, isOnState, params.eventTimestampUsec);
+            break;
+        case QnBusiness::CameraDisconnectEvent:
+            if (!resource)
+                return false;
+            at_cameraDisconnected(resource, params.eventTimestampUsec);
+            break;
+        case QnBusiness::StorageFailureEvent:
+            if (!resource)
+                resource = qnResPool->getResourceById(params.sourceServerId);
+            at_storageFailure(resource, params.eventTimestampUsec, params.reasonCode, params.description);
+            break;
+        case QnBusiness::NetworkIssueEvent:
+            if (!resource)
+                return false;
+            at_networkIssue(resource, params.eventTimestampUsec, params.reasonCode, params.description);
+            break;
+        case QnBusiness::CameraIpConflictEvent:
+            if (!resource)
+                resource = qnResPool->getResourceById(params.sourceServerId);
+            at_cameraIPConflict(resource, QHostAddress(params.caption), params.description.split(QnConflictBusinessEvent::Delimiter), params.eventTimestampUsec);
+            break;
+        case QnBusiness::ServerFailureEvent:
+            if (!resource)
+                resource = qnResPool->getResourceById(params.sourceServerId);
+            at_mserverFailure(resource, params.eventTimestampUsec, params.reasonCode, params.description);
+            break;
+        case QnBusiness::ServerConflictEvent:
+        {
+            if (!resource)
+                resource = qnResPool->getResourceById(params.sourceServerId);
+            QnCameraConflictList conflicts;
+            conflicts.decode(params.description);
+            at_mediaServerConflict(resource, params.eventTimestampUsec, conflicts);
+            break;
+        }
+        case QnBusiness::ServerStartEvent:
+            if (!resource)
+                resource = qnResPool->getResourceById(params.sourceServerId);
+            at_mserverStarted(resource, params.eventTimestampUsec);
+            break;
+        case QnBusiness::LicenseIssueEvent:
+            if (!resource)
+                resource = qnResPool->getResourceById(params.sourceServerId);
+            at_licenseIssueEvent(resource, params.eventTimestampUsec, params.reasonCode, params.description);
+            break;
+        case QnBusiness::CustomProlongedEvent:
+        case QnBusiness::CustomInstantEvent:
+            if (params.resourceName.isEmpty() && params.caption.isEmpty() &&  params.description.isEmpty())
+                return false;
+            at_customEvent(params.resourceName, params.caption, params.description, eventState, params.eventTimestampUsec);
+            break;
+        default:
+            return false;
+    }
+    return true;
 }

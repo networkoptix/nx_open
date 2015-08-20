@@ -79,8 +79,8 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     case ServerConflictEvent:   return tr("Server Conflict");
     case ServerStartEvent:      return tr("Server Started");
     case LicenseIssueEvent:     return tr("License Issue");
-    case CustomProlongedEvent:  return tr("Custom event (prolonged)");
-    case CustomInstantEvent:    return tr("Custom event (instant)");
+    case CustomProlongedEvent:  return tr("User defined event (prolonged)");
+    case CustomInstantEvent:    return tr("User defined event (instant)");
     case AnyCameraEvent:        return tr("Any Camera Issue");
     case AnyServerEvent:        return tr("Any Server Issue");
     case AnyBusinessEvent:      return tr("Any Event");
@@ -125,7 +125,10 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Server \"%1\" Started").arg(resourceName);
     case LicenseIssueEvent:
         return tr("Server \"%1\" had license issue").arg(resourceName);
-
+    case CustomInstantEvent:
+    case CustomProlongedEvent:
+        return !params.caption.isEmpty() ? params.caption :
+               !params.description.isEmpty() ? params.description : resourceName;
     default:
         break;
     }
@@ -151,6 +154,17 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
 
     result += delimiter;
     result += tr("Source: %1").arg(eventSource(params, useIp));
+
+    if (eventType == QnBusiness::CustomInstantEvent || eventType == QnBusiness::CustomProlongedEvent) {
+        if (!params.caption.isEmpty()) {
+            result += delimiter;
+            result += tr("Caption: %1").arg(params.caption);
+        }
+        if (!params.description.isEmpty()) {
+            result += delimiter;
+            result += tr("Description: %1").arg(params.description);
+        }
+    }
 
     if (useHtml && eventType == QnBusiness::CameraMotionEvent) {
         result += delimiter;
@@ -237,6 +251,10 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case ServerStartEvent: 
+        break;
+    case CustomProlongedEvent:
+    case CustomInstantEvent:
+        result += params.description.isEmpty() ? params.caption : params.description;
         break;
     default:
         break;
