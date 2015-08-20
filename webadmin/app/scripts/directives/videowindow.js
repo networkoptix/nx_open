@@ -40,7 +40,7 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
-                scope.debugMode = false;
+                scope.debugMode = true;
                 scope.debugFormat = "flashls";
 
                 function getFormatSrc(mediaformat) {
@@ -93,7 +93,7 @@ angular.module('webadminApp')
 
                     // Test native support. Native is always better choice
                     if(weHaveWebm && canPlayNatively("webm")){ // webm is our best format for now
-                        if(! (window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.osVersion >= 10)) {
+                        if(window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.osVersion >= 10) {
                             // This is hack to prevent using webm codec in Windows 10.
                             // Pretend we do not support webm in Windows 10
                             // TODO: remove this hack in happy future
@@ -102,7 +102,7 @@ angular.module('webadminApp')
                         }
                     }
 
-                    if(weHaveHls && canPlayNatively("hls")){ // webm is our best format for now
+                    if(weHaveHls && canPlayNatively("hls")){
                         return "native-hls";
                     }
 

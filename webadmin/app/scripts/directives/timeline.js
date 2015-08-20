@@ -15,6 +15,9 @@ angular.module('webadminApp')
             },
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
+
+                var debugEventsMode = false;
+
                 var timelineConfig = {
                     initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
                     stickToLiveMs: 1000, // Value to stick viewpoert to Live - 1 second
@@ -72,9 +75,8 @@ angular.module('webadminApp')
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
-                    loadingChunkColor: [58,145,30,0.5],
-
-                    blindChunkColor:  [255,128,128,0.5],
+                    loadingChunkColor: [0,255,0,0.3],
+                    blindChunkColor:  [255,0,0,0.3],
                     highlighChunkColor: [255,255,0,1],
 
                     scrollBarSpeed: 0.1, // By default - scroll by 10%
@@ -303,12 +305,16 @@ angular.module('webadminApp')
 
                     drawLabels(context);
 
-                    drawOrCheckEvents(context);
+                    if(!debugEventsMode) {
+                        drawOrCheckEvents(context);
+                    }else{
+                        debugEvents(context);
+                    }
                     drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
                     drawPointerMarker(context);
 
-                    //debugEvents(context);
+                    //
                 }
 
                 function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
@@ -745,14 +751,18 @@ angular.module('webadminApp')
                     var exactChunk = levelIndex == chunk.level;
                     var blur = 1;//chunk.level/(RulerModel.levels.length - 1);
 
-                    context.fillStyle = exactChunk? blurColor(timelineConfig.exactChunkColor,blur):blurColor(timelineConfig.loadingChunkColor,blur);
+                    context.fillStyle = blurColor(timelineConfig.exactChunkColor,blur);
 
-                    if(debug && targetLevelIndex == levelIndex){
-                        context.fillStyle = blurColor(timelineConfig.highlighChunkColor,1);
-                    }
-                    // TODO: uncomment debug here, we may very well have blind spots, we just need to test them
-                    if(/*debug &&*/ !chunk.level){ //blind spot!
-                        context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
+                    if(debug){
+                        if(levelIndex == chunk.level) { // not exact chunk
+                            context.fillStyle = blurColor(timelineConfig.loadingChunkColor,blur);
+                        }
+                        if(!chunk.level){ //blind spot!
+                            context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
+                        }
+                        if(targetLevelIndex == levelIndex) {
+                            context.fillStyle = blurColor(timelineConfig.highlighChunkColor, 1);
+                        }
                     }
 
 
