@@ -13,7 +13,7 @@ struct QnLdapSettings {
 
     bool isValid() const;
 
-    static int defaultPort();
+    static int defaultPort(bool ssl = false);
 };
 
 #define QnLdapSettings_Fields (uri)(adminDn)(adminPassword)(searchBase)(searchFilter)

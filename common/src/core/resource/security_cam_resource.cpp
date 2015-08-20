@@ -256,6 +256,8 @@ void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int chan
 
     if (motionType != Qn::MT_SoftwareGrid)
         setMotionMaskPhysical(channel);
+
+    emit motionRegionChanged(::toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList) {
@@ -273,6 +275,8 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
         for (int i = 0; i < getVideoLayout()->channelCount(); ++i)
             setMotionMaskPhysical(i);
     }
+
+    emit motionRegionChanged(::toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks) {
