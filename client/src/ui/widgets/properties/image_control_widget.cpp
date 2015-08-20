@@ -19,7 +19,7 @@ namespace {
     const int rotationDegreesMax = 359;
 }
 
-QnImageControlWidget::QnImageControlWidget(QWidget* parent /*= 0*/):
+QnImageControlWidget::QnImageControlWidget(QWidget* parent /* = 0*/):
     QWidget(parent),
     ui(new Ui::ImageControlWidget)
 {

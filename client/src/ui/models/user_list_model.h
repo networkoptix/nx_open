@@ -34,8 +34,6 @@ public:
 
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state, const QnUserResourcePtr &user = QnUserResourcePtr());
-
-    QnUserResourceList selectedUsers() const;
 private:
     QnUserListModelPrivate *d;
     friend class QnUserListModelPrivate;

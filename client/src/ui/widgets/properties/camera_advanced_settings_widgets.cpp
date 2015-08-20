@@ -29,7 +29,7 @@ void QnSettingsScrollArea::addWidget(QWidget *widgetToAdd)
     static_cast<QVBoxLayout*>(widget()->layout())->addStretch(1);
 }
 
-//==============================================
+// ==============================================
 
 QnSettingsSlider::QnSettingsSlider(Qt::Orientation orientation, QWidget *parent)
 : QSlider(orientation, parent)
@@ -43,7 +43,7 @@ void QnSettingsSlider::keyReleaseEvent(QKeyEvent *event)
 
     emit onKeyReleased();
 }
-//==============================================
+// ==============================================
 
 QnAbstractSettingsWidget::QnAbstractSettingsWidget(const CameraSetting &obj, QnSettingsScrollArea *parent, const QString& hint)
     : QWidget(0),
@@ -73,7 +73,7 @@ void QnAbstractSettingsWidget::setParam(const CameraSettingValue& val)
     emit advancedParamChanged(m_param);
 }
 
-//==============================================
+// ==============================================
 QnSettingsOnOffWidget::QnSettingsOnOffWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
     QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
@@ -111,7 +111,7 @@ void QnSettingsOnOffWidget::updateParam(QString val)
     m_checkBox->setChecked(val == m_param.getMax()); // emits stateChanged
 }
 
-//==============================================
+// ==============================================
 QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
     QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
@@ -166,7 +166,7 @@ void QnSettingsMinMaxStepWidget::updateParam(QString val)
     m_slider->setValue(cv);
 }
 
-//==============================================
+// ==============================================
 QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
     QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
@@ -244,7 +244,7 @@ QRadioButton* QnSettingsEnumerationWidget::getBtnByname(const QString& name)
     return 0;
 }
 
-//==================================================
+// ==================================================
 QnSettingsButtonWidget::QnSettingsButtonWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
     QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
@@ -274,7 +274,7 @@ void QnSettingsButtonWidget::updateParam(QString /*val*/)
     
 }
 
-//==============================================
+// ==============================================
 QnSettingsTextFieldWidget::QnSettingsTextFieldWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
     QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {
@@ -310,7 +310,7 @@ void QnSettingsTextFieldWidget::updateParam(QString val)
     Q_UNUSED(val)
 }
 
-//==============================================
+// ==============================================
 QnSettingsControlButtonsPairWidget::QnSettingsControlButtonsPairWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
     QnAbstractSettingsWidget(obj, parent, obj.getDescription())
 {

@@ -9,7 +9,7 @@
 
 #include <utils/media/frame_info.h>
 
-QnFfmpegImageProvider::QnFfmpegImageProvider(const QnResourcePtr &resource, QObject* parent /*= NULL*/) :
+QnFfmpegImageProvider::QnFfmpegImageProvider(const QnResourcePtr &resource, QObject* parent /* = NULL*/) :
     base_type(parent),
     m_resource(resource),
     m_image(QImage())

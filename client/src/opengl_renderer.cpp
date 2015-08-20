@@ -192,7 +192,7 @@ void QnOpenGLRenderer::popModelViewMatrix() {
     m_modelViewMatrix = m_modelViewMatrixStack.pop();
 }
 
-//=================================================================================================
+// =================================================================================================
 
 Q_GLOBAL_STATIC(QnOpenGLRendererManager, qn_openGlRenderManager_instance)
 
@@ -209,7 +209,7 @@ QnOpenGLRenderer* QnOpenGLRendererManager::instance(const QGLContext* a_context)
     return *(manager->m_container.find(a_context));
 }
 
-QnOpenGLRendererManager::QnOpenGLRendererManager(QObject* parent /*= NULL*/):
+QnOpenGLRendererManager::QnOpenGLRendererManager(QObject* parent /* = NULL*/):
     QObject(parent)
 {
 }
