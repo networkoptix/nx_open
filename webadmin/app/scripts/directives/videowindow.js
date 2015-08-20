@@ -40,8 +40,8 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
-                scope.debugMode = false;
-                scope.debugFormat = "flashls";
+                scope.debugMode = Config.debug.video && Config.allowDebugMode;
+                scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
@@ -143,15 +143,14 @@ angular.module('webadminApp')
                                 return false;
                             }
 
+                            if(weHaveHls) {
+                                scope.flashRequired = true;
+                                return false;
+                            }
+
                             if(weHaveWebm && (window.jscd.osVersion < 10))
                             {
                                 scope.ieNoWebm = true;
-                            }
-
-                            //
-
-                            if(weHaveHls) {
-                                scope.flashRequired = true;
                                 return false;
                             }
 
@@ -246,6 +245,12 @@ angular.module('webadminApp')
                     scope.flashls = true;
                     scope.native = false;
                     scope.flashSource = "components/flashlsChromeless.swf";
+
+                    if(scope.debugMode && scope.debugFormat){
+                        scope.flashSource = "components/flashlsChromeless_debug.swf";
+                    }
+
+
                     scope.flashParam = flashlsAPI.flashParams();
                     if(flashlsAPI.ready()){
                         flashlsAPI.kill();

@@ -230,7 +230,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             $scope.activeCamera = getCamera ($scope.storage.cameraId  );
             if (!silent && $scope.activeCamera) {
-                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
 
                 $scope.liveOnly = true;
