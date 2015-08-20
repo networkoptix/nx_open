@@ -16,7 +16,7 @@ angular.module('webadminApp')
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
 
-                var debugEventsMode = false;
+                var debugEventsMode = true;
 
                 var timelineConfig = {
                     initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
