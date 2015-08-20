@@ -15,6 +15,8 @@
 
 #include <api/model/storage_space_reply.h>
 
+#include <camera/camera_data_manager.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -33,7 +35,6 @@
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
 
 #include <utils/common/uuid.h>
 #include <utils/common/counter.h>
@@ -564,7 +565,7 @@ void QnServerSettingsWidget::updateRebuildUi(const QnStorageScanData& reply) {
      ui->rebuildStopButton->setEnabled(reply.state == Qn::RebuildState_FullScan);
 
      if (oldState.state == Qn::RebuildState_FullScan && reply.state == Qn::RebuildState_None && !m_rebuildWasCanceled) {
-         context()->navigator()->clearLoaderCache();
+         context()->instance<QnCameraDataManager>()->clearCache();
          QMessageBox::information(this,
          tr("Finished"),
          tr("Rebuilding archive index is completed."));

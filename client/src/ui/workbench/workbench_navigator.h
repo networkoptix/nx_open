@@ -103,8 +103,6 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
-    void clearLoaderCache();
-
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();
