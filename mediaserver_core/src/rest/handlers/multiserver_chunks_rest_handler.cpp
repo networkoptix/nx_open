@@ -29,10 +29,6 @@ namespace {
     static QString urlPath;
 }
 
-typedef QMutexLocker QnMutexLocker;
-typedef QMutex QnMutex;
-typedef QWaitCondition QnWaitCondition;
-
 struct QnMultiserverChunksRestHandler::InternalContext
 {
     InternalContext(const QnChunksRequestData& request, const QnRestConnectionProcessor* owner): request(request), requestsInProgress(0), owner(owner) {}
@@ -159,9 +155,9 @@ int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequ
     outputData = loadDataSync(request, owner);
 
     if (request.flat) {
-        QVector<QnTimePeriodList> periodsList;
+        std::vector<QnTimePeriodList> periodsList;
         for (const MultiServerPeriodData& value: outputData)
-            periodsList << value.periods;
+            periodsList.push_back( value.periods );
         QnTimePeriodList timePeriodList = QnTimePeriodList::mergeTimePeriods(periodsList);
 
         if (request.format == Qn::CompressedPeriodsFormat)

@@ -103,6 +103,8 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
+    void clearLoaderCache();
+
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();
@@ -137,8 +139,8 @@ protected:
 
     QnThumbnailsLoader *thumbnailLoader(const QnMediaResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoaderByWidget(QnMediaResourceWidget *widget);
-    void clearLoaderCache();
-protected slots:
+
+    protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
     void updateSliderFromReader(bool keepInWindow = true);

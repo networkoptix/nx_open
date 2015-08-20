@@ -84,7 +84,7 @@ void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
 
 void QnMediaServerResource::beforeDestroy()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_firstCamera.clear();
 }
 

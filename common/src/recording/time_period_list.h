@@ -159,15 +159,6 @@ struct MultiServerPeriodData
 QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData, (json)(metatype)(ubjson)(xml)(csv_record)(compressed_time)(eq));
 
 
-struct MultiServerPeriodData
-{
-    /** Guid of the server, owning this periods. */
-    QnUuid guid;
-    QnTimePeriodList periods;
-};
-
-QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData, (json)(metatype)(ubjson)(xml)(csv_record)(compressed_time)(eq));
-
 
 Q_DECLARE_METATYPE(QnTimePeriodList);
 Q_DECLARE_METATYPE(MultiServerPeriodDataList);

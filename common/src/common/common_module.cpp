@@ -188,12 +188,12 @@ bool QnCommonModule::useLowPriorityAdminPasswordHach() const
 
 QnUuid QnCommonModule::runningInstanceGUID() const
 { 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_runUuid; 
 }
 
 void QnCommonModule::updateRunningInstanceGuid()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_runUuid = QnUuid::createUuid();
 }

@@ -126,7 +126,7 @@ bool TimerManager::modifyTimerDelay(
     quint64 timerID,
     const unsigned int newDelayMillis )
 {
-    QMutexLocker lk( &m_impl->mtx );
+    QnMutexLocker lk( &m_impl->mtx );
     if( m_impl->runningTaskID == timerID )
         return false; //timer being executed at the moment
 

@@ -1421,7 +1421,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         qint64 remoteSystemIdentityTime,
         const nx_http::Request& request,
         const QByteArray& contentEncoding,
-        std::function<void ()> ttFinishCallbac )
+        std::function<void ()> ttFinishCallback )
     {
         if (!dbManager)
         {
@@ -1454,7 +1454,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
 
     bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& connectionGuid)
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
 
         for(auto connection: m_connectingConnections)
         {

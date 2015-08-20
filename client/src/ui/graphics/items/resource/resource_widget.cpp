@@ -244,6 +244,7 @@ void QnResourceWidget::createHeaderOverlay() {
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
     addOverlayWidget(m_headerOverlayWidget, AutoVisible, true, true, HudLayer);
+}
 
 void QnResourceWidget::createFooterOverlay() {
     /* Footer overlay. */

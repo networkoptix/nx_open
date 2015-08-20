@@ -547,7 +547,7 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
                 return Auth_OK;
         }
 
-        QMutexLocker lock( &m_mutex );
+        QnMutexLocker lock( &m_mutex );
 
         // authenticate by media server auth_key
         for(const QnMediaServerResourcePtr& server: m_servers)
@@ -842,7 +842,7 @@ AuthResult QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, 
 
 QnUserResourcePtr QnAuthHelper::findUserByName( const QByteArray& nxUserName ) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     for( const QnUserResourcePtr& user: m_users )
     {
         if( user->getName().toUtf8().toLower() == nxUserName )

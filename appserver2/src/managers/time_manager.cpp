@@ -546,7 +546,7 @@ namespace ec2
             rttMillis = MAX_DESIRED_TIME_DRIFT_MS;
         }
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         remotePeerTimeSyncUpdate(
             &lk,
             peerID,
@@ -649,7 +649,7 @@ namespace ec2
     {
         stopSynchronizingTimeWithPeer( data.peer.id );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_systemTimeByPeer.erase( data.peer.id );
     }
 
@@ -657,7 +657,7 @@ namespace ec2
         const QnUuid& peerID,
         SocketAddress peerAddress )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         auto iterResultPair = m_peersToSendTimeSyncTo.emplace(
             peerID,
             PeerContext( std::move(peerAddress) ) );
@@ -675,7 +675,7 @@ namespace ec2
         TimerManager::TimerGuard timerID;
         nx_http::AsyncHttpClientPtr httpClient;
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
         if( peerIter == m_peersToSendTimeSyncTo.end() )
             return;
@@ -691,7 +691,7 @@ namespace ec2
         const auto timeSyncInfo = getTimeSyncInfo();
         nx_http::AsyncHttpClientPtr clientPtr;
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
         auto peerIter = m_peersToSendTimeSyncTo.find( peerID );

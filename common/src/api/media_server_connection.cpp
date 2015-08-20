@@ -390,7 +390,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnVirtualCameraResourcePt
 {
     QnRequestParamList params;
 
-    params << QnRequestParam(Qn::CAMERA_UNIQUE_ID_HEADER_NAME, camera->getPhysicalId());
+    params << QnRequestParam(QLatin1String(Qn::CAMERA_UNIQUE_ID_HEADER_NAME), camera->getPhysicalId());
     params << QnRequestParam("startTime", QString::number(startTimeMs));
     params << QnRequestParam("endTime", QString::number(endTimeMs));
     params << QnRequestParam("detail", QString::number(detail));

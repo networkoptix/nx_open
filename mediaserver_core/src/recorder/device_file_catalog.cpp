@@ -779,7 +779,7 @@ bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
 
 bool DeviceFileCatalog::containTime(const QnTimePeriod& period) const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if (m_chunks.empty())
         return false;
