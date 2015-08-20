@@ -52,7 +52,7 @@ struct QnBusinessEventParameters {
 #define QnBusinessEventParameters_Fields (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(actionResourceId)(sourceServerId)\
     (reasonCode)(inputPortId)(caption)(description)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq));
+QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
 
 #endif // BUSINESS_EVENT_PARAMETERS_H

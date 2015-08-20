@@ -600,7 +600,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
     return request;
 }
 
-QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
+QnBusinessActionDataList QnEventsDB::getActions(
     const QnTimePeriod& period,
     const QnResourceList& resList, 
     const QnBusiness::EventType& eventType, 
@@ -611,7 +611,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     QElapsedTimer t;
     t.restart();
 
-    QList<QnAbstractBusinessActionPtr> result;
+    QnBusinessActionDataList result;
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
     QWriteLocker lock(&m_mutex);
@@ -631,16 +631,16 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
 
     while (query.next()) 
     {
-        QnBusiness::ActionType actionType = (QnBusiness::ActionType) query.value(actionTypeIdx).toInt();
-        QnBusinessActionParameters actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(query.value(actionParamIdx).toByteArray());
-        QnBusinessEventParameters runtimeParams = QnUbjson::deserialized<QnBusinessEventParameters>(query.value(runtimeParamIdx).toByteArray());
-        QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
-        action->setParams(actionParams);
-        action->setBusinessRuleId(QnUuid(query.value(businessRuleIdx).toByteArray()));
-        action->setToggleState( (QnBusiness::EventState) query.value(toggleStateIdx).toInt());
-        action->setAggregationCount(query.value(aggregationCntIdx).toInt());
+        QnBusinessActionData actionData;
 
-        result << action;
+        actionData.actionType = (QnBusiness::ActionType) query.value(actionTypeIdx).toInt();
+        actionData.actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(query.value(actionParamIdx).toByteArray());
+        actionData.eventParams = QnUbjson::deserialized<QnBusinessEventParameters>(query.value(runtimeParamIdx).toByteArray());
+        actionData.businessRuleId = QnUuid::fromRfc4122(query.value(businessRuleIdx).toByteArray());
+        //actionData.toggleState = (QnBusiness::EventState) query.value(toggleStateIdx).toInt();
+        actionData.aggregationCount = query.value(aggregationCntIdx).toInt();
+
+        result.push_back(std::move(actionData));
     }
 
     qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";

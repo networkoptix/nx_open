@@ -24,6 +24,7 @@ typedef QList<QnPanicBusinessAction> QnPanicBusinessActionList;
 
 class QnBusinessActionData;
 typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
+typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
 typedef QSharedPointer<QnBusinessActionDataList> QnBusinessActionDataListPtr;
 
 typedef QMap<QString, QVariant> QnBusinessParams;

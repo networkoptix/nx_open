@@ -41,4 +41,4 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
     return guidFromArbitraryData(paramKey);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq), QnBusinessEventParameters_Fields, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq)(xml)(csv_record), QnBusinessEventParameters_Fields, (optional, true) )

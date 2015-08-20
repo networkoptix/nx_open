@@ -96,6 +96,7 @@
 
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/business_event_log_rest_handler.h>
+#include "rest/handlers/business_log2_rest_handler.h"
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
@@ -1386,7 +1387,8 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler()); // deprecated
+    QnRestProcessorPool::instance()->registerHandler("api/businessEvents", new QnBusinessLog2RestHandler()); // new version
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/getSystemName", new QnGetSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
