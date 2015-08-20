@@ -86,10 +86,11 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
         defaultUrl.setUserName(m_userName);
         defaultUrl.setPassword(m_password);
 
-        for (const QHostAddress &addr: server->getNetAddrList()) {
+        for (const auto &addr: server->getNetAddrList()) {
             InterfaceInfo info;
             info.url = defaultUrl;
-            info.url.setHost(addr.toString());
+            info.url.setHost(addr.address.toString());
+            info.url.setPort(addr.port);
             addInterfaceIfNotExists(interfaces, info);
         }
 

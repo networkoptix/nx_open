@@ -14,10 +14,13 @@ namespace {
         for (const QUrl &url: server->getIgnoredUrls())
             ignoredHosts.insert(url.host());
 
-        for (const QHostAddress &address: server->getNetAddrList()) {
-            QString addressString = address.toString();
-            if (!ignoredHosts.contains(addressString))
-                addresses.insert(addressString);
+        const auto port = server->getPort();
+        for (const auto& address: server->getNetAddrList()) {
+            if (address.port == port) {
+                QString addressString = address.address.toString();
+                if (!ignoredHosts.contains(addressString))
+                    addresses.insert(addressString);
+            }
         }
         for (const QUrl &url: server->getAdditionalUrls()) {
             if (!ignoredHosts.contains(url.host()))

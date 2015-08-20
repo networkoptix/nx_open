@@ -39,8 +39,8 @@ public:
     void setApiUrl(const QString& apiUrl);
     QString getApiUrl() const;
 
-    void setNetAddrList(const QList<QHostAddress>&);
-    QList<QHostAddress> getNetAddrList() const;
+    void setNetAddrList(const QList<SocketAddress>&);
+    QList<SocketAddress> getNetAddrList() const;
 
     void setAdditionalUrls(const QList<QUrl> &urls);
     QList<QUrl> getAdditionalUrls() const;
@@ -128,8 +128,7 @@ signals:
 private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
-    QList<QHostAddress> m_netAddrList;
-    QList<QHostAddress> m_prevNetAddrList;
+    QList<SocketAddress> m_netAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
     //QnAbstractStorageResourceList m_storages;

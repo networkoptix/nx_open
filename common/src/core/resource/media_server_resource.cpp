@@ -146,14 +146,14 @@ QString QnMediaServerResource::getApiUrl() const
     return m_apiUrl;
 }
 
-void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
+void QnMediaServerResource::setNetAddrList(const QList<SocketAddress>& netAddrList)
 {
     QnMutexLocker lock( &m_mutex );
     m_netAddrList = netAddrList;
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
-QList<QHostAddress> QnMediaServerResource::getNetAddrList() const
+QList<SocketAddress> QnMediaServerResource::getNetAddrList() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_netAddrList;

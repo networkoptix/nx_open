@@ -184,12 +184,12 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
         return true;
     if( !m_mServer )
         m_mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    if (m_mServer) 
+    if (m_mServer)
     {
-        QHostAddress hostAddr(addr);
-        for(const QHostAddress& serverAddr: m_mServer->getNetAddrList())
+        HostAddress hostAddr(addr);
+        for(const auto& serverAddr: m_mServer->getNetAddrList())
         {
-            if (hostAddr == serverAddr)
+            if (hostAddr == serverAddr.address)
                 return true;
         }
     }

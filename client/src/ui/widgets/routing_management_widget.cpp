@@ -35,10 +35,11 @@ namespace {
     };
 
     static void getAddresses(const QnMediaServerResourcePtr &server, QSet<QUrl> &autoUrls, QSet<QUrl> &additionalUrls, QSet<QUrl> &ignoredUrls) {
-        for (const QHostAddress &address: server->getNetAddrList()) {
+        for (const SocketAddress &address: server->getNetAddrList()) {
             QUrl url;
             url.setScheme(lit("http"));
-            url.setHost(address.toString());
+            url.setHost(address.address.toString());
+            url.setPort(address.port);
             autoUrls.insert(url);
         }
 
@@ -63,20 +64,20 @@ public:
     void simplify(const QSet<QUrl> &autoUrls, const QSet<QUrl> &additionalUrls, const QSet<QUrl> &ignoredUrls, int port) {
         for (auto it = addresses.begin(); it != addresses.end(); /* no inc */) {
             QUrl url = it.key();
-            QUrl explicitUrl = url;
-            explicitUrl.setPort(port);
+            QUrl defaultUrl = url;
+            defaultUrl.setPort(port);
 
-            if (autoUrls.contains(url) || it.value() == (additionalUrls.contains(url) || additionalUrls.contains(explicitUrl)))
+            if (autoUrls.contains(url) || it.value() == (additionalUrls.contains(url) || additionalUrls.contains(defaultUrl)))
                 it = addresses.erase(it);
             else
                 ++it;
         }
         for (auto it = ignoredAddresses.begin(); it != ignoredAddresses.end(); /* no inc */) {
             QUrl url = it.key();
-            QUrl explicitUrl = url;
-            explicitUrl.setPort(port);
+            QUrl defaultUrl = url;
+            defaultUrl.setPort(port);
 
-            if (it.value() == (ignoredUrls.contains(url) || ignoredUrls.contains(explicitUrl)))
+            if (it.value() == (ignoredUrls.contains(url) || ignoredUrls.contains(defaultUrl)))
                 it = ignoredAddresses.erase(it);
             else
                 ++it;
