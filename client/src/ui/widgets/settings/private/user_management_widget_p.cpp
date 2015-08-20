@@ -78,6 +78,8 @@ void QnUserManagementWidgetPrivate::setupUi() {
         updateSelection();
     });
 
+    connect(m_sortModel, &QAbstractItemModel::rowsInserted, this, &QnUserManagementWidgetPrivate::updateSelection);
+    connect(m_sortModel, &QAbstractItemModel::rowsRemoved, this, &QnUserManagementWidgetPrivate::updateSelection);
 }
 
 void QnUserManagementWidgetPrivate::updateSelection() {
@@ -100,6 +102,25 @@ void QnUserManagementWidgetPrivate::updateSelection() {
         ? q->ui->defaultPage
         : q->ui->selectionPage
         );
+
+    using boost::algorithm::any_of;
+
+    q->ui->enableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
+        return accessController()->hasPermissions(user, Qn::WritePermission) 
+            && !user->isEnabled();
+    }));
+
+    q->ui->disableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
+        return accessController()->hasPermissions(user, Qn::WritePermission) 
+            && user->isEnabled()
+            && !user->isAdmin();
+    }));
+
+    q->ui->deleteSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
+        return accessController()->hasPermissions(user, Qn::RemovePermission) 
+            && !user->isAdmin();
+    }));
+
 }
 
 void QnUserManagementWidgetPrivate::openLdapSettings() {
@@ -175,6 +196,7 @@ void QnUserManagementWidgetPrivate::setSelectedEnabled(bool enabled) {
         user->setEnabled(enabled);
         QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, []{} );
     }
+    updateSelection();
 }
 
 void QnUserManagementWidgetPrivate::enableSelected() {
@@ -199,6 +221,7 @@ void QnUserManagementWidgetPrivate::deleteSelected() {
         return;
 
     menu()->trigger(Qn::RemoveFromServerAction, usersToDelete);
+    updateSelection();
 }
 
 
