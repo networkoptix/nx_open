@@ -578,7 +578,7 @@ function ShortCache(cameras,mediaserver,$q,timeCorrection){
     this.limitChunks = 100; // limit for number of chunks
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
 
-    this.timeCorrection = timeCorrection;
+    this.timeCorrection = timeCorrection || 0;
 }
 ShortCache.prototype.init = function(start){
     this.liveMode = false;

@@ -148,8 +148,7 @@ angular.module('webadminApp')
                                 return false;
                             }
 
-                            if(weHaveWebm && (wрп at
-                            indow.jscd.osVersion < 10))
+                            if(weHaveWebm && (window.jscd.osVersion < 10))
                             {
                                 scope.ieNoWebm = true;
                                 return false;
