@@ -143,15 +143,14 @@ angular.module('webadminApp')
                                 return false;
                             }
 
+                            if(weHaveHls) {
+                                scope.flashRequired = true;
+                                return false;
+                            }
+
                             if(weHaveWebm && (window.jscd.osVersion < 10))
                             {
                                 scope.ieNoWebm = true;
-                            }
-
-                            //
-
-                            if(weHaveHls) {
-                                scope.flashRequired = true;
                                 return false;
                             }
 
