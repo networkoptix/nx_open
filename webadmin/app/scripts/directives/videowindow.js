@@ -130,23 +130,24 @@ angular.module('webadminApp')
                             // Check version here
 
 
-                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
-                                return "flashls";
-                            }
+                            /*if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
+                                return "flashls"; //TODO: support flashls for IE!
+                            }*/
+
 
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
 
-                            if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
+                            /*if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
                                 scope.flashOrWebmRequired = true;
-                                return false;
+                                return false; //TODO: support flashls for IE!
                             }
 
                             if(weHaveHls) {
                                 scope.flashRequired = true;
-                                return false;
-                            }
+                                return false;//TODO: support flashls for IE!
+                            }*/
 
                             if(weHaveWebm && (window.jscd.osVersion < 10))
                             {
