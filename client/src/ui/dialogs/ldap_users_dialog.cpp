@@ -88,7 +88,9 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
 #endif
         stopTesting(result);
         return;
-    } 
+    }
+
+    updateExistingUsers(users);
 
     QnLdapUsers filteredUsers = filterExistingUsers(users);
     if (filteredUsers.isEmpty()) {
@@ -187,6 +189,34 @@ void QnLdapUsersDialog::stopTesting(const QString &text /*= QString()*/) {
     ui->errorLabel->setText(text);
     ui->errorLabel->setVisible(true);
 }
+
+void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users) {
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    auto importedUsers = qnResPool->getResources<QnUserResource>().filtered([](const QnUserResourcePtr &user) {
+        return user->isLdap();
+    });  
+
+    for (const QnLdapUser &ldapUser: users) {
+        auto it = std::find_if(importedUsers.cbegin(), importedUsers.cend(), [ldapUser](const QnUserResourcePtr &user) {
+            return QString::compare(ldapUser.login, user->getName(), Qt::CaseInsensitive) == 0;
+        });
+
+        if (it == importedUsers.cend())
+            continue;
+
+        QnUserResourcePtr existingUser = *it;
+        if (existingUser->getEmail() == ldapUser.email)
+            continue;
+
+        existingUser->setEmail(ldapUser.email);
+
+        connection->getUserManager()->save(existingUser, this,[] {} );
+    }
+}
+
 
 void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
 
