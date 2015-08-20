@@ -21,6 +21,9 @@ private:
     void importUsers(const QnLdapUsers &users);
 
     QnLdapUsers filterExistingUsers(const QnLdapUsers &users) const;
+    QnLdapUsers visibleUsers() const;
+    QnLdapUsers visibleSelectedUsers() const;
+
 
 private slots:
     void at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString);

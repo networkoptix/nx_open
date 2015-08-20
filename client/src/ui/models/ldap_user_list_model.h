@@ -20,7 +20,8 @@ public:
     };
 
     enum DataRole {
-        LoginRole = Qt::UserRole + 1
+        LoginRole = Qt::UserRole + 1,
+        LdapUserRole
     };
 
     QnLdapUserListModel(QObject *parent = 0);
@@ -36,10 +37,7 @@ public:
     void setCheckState(Qt::CheckState state, const QString &login = QString());
 
     QnLdapUsers users() const;
-    void setUsers(const QnLdapUsers &users);
-
-    QnLdapUsers selectedUsers() const;
-    
+    void setUsers(const QnLdapUsers &users);    
 private:
     int userIndex(const QString &login) const;
 

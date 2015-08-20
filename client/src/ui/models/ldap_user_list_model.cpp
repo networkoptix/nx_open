@@ -52,6 +52,8 @@ QVariant QnLdapUserListModel::data(const QModelIndex &index, int role) const {
         break;
     case LoginRole:
         return user.login;
+    case LdapUserRole:
+        return qVariantFromValue<QnLdapUser>(user);
     default:
         break;
     } // switch (role)
@@ -149,14 +151,6 @@ void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QString &log
             emit dataChanged(index(row, CheckBoxColumn), index(row, CheckBoxColumn), QVector<int>() << Qt::CheckStateRole);
     }
         
-}
-
-QnLdapUsers QnLdapUserListModel::selectedUsers() const {
-    QnLdapUsers result;
-    for (const QnLdapUser &user: m_userList)
-        if (m_checkedUserLogins.contains(user.login))
-            result << user;
-    return result;
 }
 
 QnLdapUsers QnLdapUserListModel::users() const {
