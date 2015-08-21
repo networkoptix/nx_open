@@ -234,32 +234,36 @@ QnIOPortDataList QnIOPortsViewModel::modelData() const
 }
 
 QString QnIOPortsViewModel::portTypeToString(Qn::IOPortType portType) const {
+    const auto disambiguation = "IO Port Type";
+
     switch (portType) {
     case Qn::PT_Unknown:
-        return tr("Unknown", "IO Port Type");
+        return tr("Unknown", disambiguation);
     case Qn::PT_Disabled:
-        return tr("Disabled", "IO Port Type");
+        return tr("Disabled", disambiguation);
     case Qn::PT_Input:
-        return tr("Input", "IO Port Type");
+        return tr("Input", disambiguation);
     case Qn::PT_Output:
-        return tr("Output", "IO Port Type");
+        return tr("Output", disambiguation);
     default:
         Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
-    return tr("Invalid", "IO Port Type");
+    return tr("Invalid", disambiguation);
 
 }
 
 QString QnIOPortsViewModel::stateToString(Qn::IODefaultState state) const {
+    const auto disambiguation = "IO Port State";
+
     switch (state) {
     case Qn::IO_OpenCircuit:
-        return tr("Open Circuit", "IO Port State");
+        return tr("Open Circuit", disambiguation);
     case Qn::IO_GroundedCircuit:
-        return tr("Grounded circuit", "IO Port State");
+        return tr("Grounded circuit", disambiguation);
     default:
         Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
-    return tr("Invalid state", "IO Port State");
+    return tr("Invalid state", disambiguation);
 }
