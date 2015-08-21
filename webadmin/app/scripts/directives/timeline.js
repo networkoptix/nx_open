@@ -283,6 +283,7 @@ angular.module('webadminApp')
                     scope.viewportWidth = element.find(".viewport").width();
                     canvas.width  = scope.viewportWidth;
                     scope.scaleManager.setViewportWidth(scope.viewportWidth);
+                    $timeout(checkZoomButtons);
                 }
                 function initTimeline(){
                     var now = (new Date()).getTime();
@@ -1231,10 +1232,8 @@ angular.module('webadminApp')
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
 
                 scope.$watch("positionProvider.liveMode",function(mode){
-                    if(scope.positionProvider) {
-                        if (scope.positionProvider.liveMode) {
-                            scope.goToLive(true);
-                        }
+                    if(scope.positionProvider && scope.positionProvider.liveMode) {
+                        scope.goToLive(true);
                     }
                 });
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
