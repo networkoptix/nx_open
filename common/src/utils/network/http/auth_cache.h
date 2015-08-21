@@ -75,6 +75,53 @@ namespace nx_http
                 authorizationHeader( std::move(right.authorizationHeader ) )
             {
             }
+
+            //AuthorizationCacheItem( const AuthorizationCacheItem& right ) = default;
+            AuthorizationCacheItem( const AuthorizationCacheItem& right )
+            :
+                url( right.url ),
+                method( right.method ),
+                userName( right.userName ),
+                password( right.password ),
+                ha1( right.ha1 ),
+                wwwAuthenticateHeader( right.wwwAuthenticateHeader ),
+                authorizationHeader( right.authorizationHeader )
+            {
+            }
+
+            //AuthorizationCacheItem& operator=( const AuthorizationCacheItem& ) = default;
+            AuthorizationCacheItem& operator=( const AuthorizationCacheItem& right )
+            {
+                if( &right == this )
+                    return *this;
+
+                url = right.url;
+                method = right.method;
+                userName = right.userName;
+                password = right.password;
+                ha1 = right.ha1;
+                wwwAuthenticateHeader = right.wwwAuthenticateHeader;
+                authorizationHeader = right.authorizationHeader;
+
+                return *this;
+            }
+            
+            //AuthorizationCacheItem& operator=( AuthorizationCacheItem&& ) = default;
+            AuthorizationCacheItem& operator=( AuthorizationCacheItem&& right )
+            {
+                if( &right == this )
+                    return *this;
+
+                url = std::move(right.url);
+                method = std::move(right.method);
+                userName = std::move(right.userName);
+                password = std::move(right.password);
+                ha1 = std::move(right.ha1);
+                wwwAuthenticateHeader = std::move(right.wwwAuthenticateHeader);
+                authorizationHeader = std::move(right.authorizationHeader);
+
+                return *this;
+            }
         };
 
 
