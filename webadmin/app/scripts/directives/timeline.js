@@ -27,7 +27,7 @@ angular.module('webadminApp')
                     minMarkWidth: 1, // Minimum width for visible mark
 
                     zoomSpeed: 0.025, // Zoom speed for dblclick
-                    zoomAccuracy: 0.00001,
+                    zoomAccuracy: 0.01,
                     slowZoomSpeed: 0.01, // Zoom speed for holding buttons
                     maxVerticalScrollForZoom: 250, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
@@ -1141,9 +1141,8 @@ angular.module('webadminApp')
                     return false;
                 }
                 function checkZoomButtons(){
-                    var zoom = scope.scaleManager.zoom();
-                    scope.disableZoomOut = zoom >= scope.scaleManager.fullZoomOutValue() - timelineConfig.zoomAccuracy;
-                    scope.disableZoomIn = zoom <= scope.scaleManager.fullZoomInValue() + timelineConfig.zoomAccuracy;
+                    scope.disableZoomOut = !scope.scaleManager.çheckZoomOut();
+                    scope.disableZoomIn =  !scope.scaleManager.çheckZoomIn();
                 }
                 scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 

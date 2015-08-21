@@ -799,8 +799,8 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
+    var needZoomOut = !this.çheckZoomOut();
     this.end = end;
-    var needZoomOut =  this.fullZoomOutValue() - this.zoom() < this.zoomAccuracy;
     this.updateTotalInterval();
     if(needZoomOut){
         this.zoom(1);
@@ -1101,6 +1101,12 @@ ScaleManager.prototype.targetLevels = function(zoomTarget){
     return this.calcLevels(msPerPixel);
 };
 
+ScaleManager.prototype.çheckZoomOut = function(){
+    return this.zoom() < this.fullZoomOutValue() - this.zoomAccuracy;
+};
+ScaleManager.prototype.çheckZoomIn = function(){
+    return this.zoom() > this.fullZoomInValue() + this.zoomAccuracy;
+};
 ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
     if(typeof(zoomValue)=="undefined"){
         return this.msToZoom(this.msPerPixel);
