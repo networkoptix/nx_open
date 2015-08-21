@@ -379,6 +379,12 @@ SocketAddress QnTransactionTransport::remoteSocketAddr() const
     return addr;
 }
 
+nx_http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransport::authData() const
+{
+    QMutexLocker lock( &m_mutex );
+    return m_httpAuthCacheItem;
+}
+
 QnTransactionTransport::State QnTransactionTransport::getState() const
 {
     QMutexLocker lock(&m_mutex);
@@ -1228,7 +1234,6 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                 m_httpClient->response()->headers,
                 Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
         {
-
             //inserting base64 decoder before the last filter
             m_incomingTransactionStreamParser = nx_bsf::insert(
                 m_incomingTransactionStreamParser,
@@ -1260,6 +1265,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
             setExtraDataBuffer(data);
             m_peerRole = prOriginating;
+            m_httpAuthCacheItem = client->authCacheItem();
             setState(QnTransactionTransport::Connected);
         }
         else {
