@@ -17,6 +17,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
 #include <utils/common/uuid.h>
+#include <utils/common/ldap.h>
 #include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
@@ -106,6 +107,7 @@
 #include <rest/handlers/log_rest_handler.h>
 #include <rest/handlers/manual_camera_addition_rest_handler.h>
 #include <rest/handlers/ping_rest_handler.h>
+#include <rest/handlers/audit_log_rest_handler.h>
 #include <rest/handlers/recording_stats_rest_handler.h>
 #include <rest/handlers/ping_system_rest_handler.h>
 #include <rest/handlers/ptz_rest_handler.h>
@@ -118,6 +120,7 @@
 #include <rest/handlers/time_rest_handler.h>
 #include <rest/handlers/activate_license_rest_handler.h>
 #include <rest/handlers/test_email_rest_handler.h>
+#include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
@@ -196,6 +199,11 @@
 #include "core/resource/camera_history.h"
 #include "utils/network/nettools.h"
 #include "http/iomonitor_tcp_server.h"
+#include "ldap/ldap_manager.h"
+#include "rest/handlers/multiserver_chunks_rest_handler.h"
+#include "rest/handlers/merge_ldap_users_rest_handler.h"
+#include "audit/mserver_audit_manager.h"
+#include "utils/common/waiting_for_qthread_to_empty_event_queue.h"
 
 
 // This constant is used while checking for compatibility.
@@ -654,12 +662,8 @@ void MediaServerProcess::dumpSystemUsageStats()
                                                      .arg(iface.bytesPerSecMax));
 
     const auto networkIfInfo = networkIfList.join(lit(", "));
-    if (!networkIfInfo.isEmpty() &&
-        m_mediaServer->getProperty(Qn::NETWORK_INTERFACES) != networkIfInfo)
-    {
-        m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo);
+    if (m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo))
         propertyDictionary->saveParams(m_mediaServer->getId());
-    }
 
     QnMutexLocker lk( &m_mutex );
     if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
@@ -1240,11 +1244,8 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
             ec2Connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         }
 
-        const auto publicIp = m_publicAddress.toString();
-        if (server->getProperty(Qn::PUBLIC_IP) != publicIp) {
-            server->setProperty(Qn::PUBLIC_IP, publicIp);
+        if (server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString(), QnResource::NO_ALLOW_EMPTY))
             propertyDictionary->saveParams(server->getId());
-        }
     }
 }
 
@@ -1358,6 +1359,11 @@ bool MediaServerProcess::initTcpListener()
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
     m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
+    m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
+    m_httpModManager->addCustomRequestMod( std::bind(
+        &QnAutoRequestForwarder::processRequest,
+        m_autoRequestForwarder.get(),
+        std::placeholders::_1 ) );
 
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
@@ -1374,7 +1380,9 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
@@ -1401,6 +1409,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
     QnRestProcessorPool::instance()->registerHandler("ec2/cameraHistory", new QnCameraHistoryRestHandler());
     QnRestProcessorPool::instance()->registerHandler("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
+    QnRestProcessorPool::instance()->registerHandler("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
@@ -1511,7 +1520,6 @@ void MediaServerProcess::run()
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
-
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     std::unique_ptr<QnResourcePropertyDictionary> dictionary(new QnResourcePropertyDictionary());
@@ -1522,6 +1530,7 @@ void MediaServerProcess::run()
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
 
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
+    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
@@ -1535,6 +1544,8 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/gettime"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
+    //by following delegating hls authentication to target server
+    QnAuthHelper::instance()->restrictionList()->allow( lit("/proxy/*/hls/*"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
     QnEventsDB::init();
@@ -1642,6 +1653,14 @@ void MediaServerProcess::run()
         QnResourceDiscoveryManager::instance(),
         qnResPool,
         qnResTypePool );
+    //passing settings
+    std::map<QString, QVariant> confParams;
+    for( const auto& paramName: MSSettings::roSettings()->allKeys() )
+    {
+        if( paramName.startsWith( lit("ec") ) )
+            confParams.emplace( paramName, MSSettings::roSettings()->value( paramName ) );
+    }
+    ec2ConnectionFactory->setConfParams(std::move(confParams));
     ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
@@ -1726,6 +1745,12 @@ void MediaServerProcess::run()
             false
         );                    
     }
+
+    QnStoragePluginFactory::instance()->registerStoragePlugin(
+        "smb",
+        QnFileStorageResource::instance,
+        false
+    );
 
     if (needToStop())
         return;
@@ -1861,35 +1886,19 @@ void MediaServerProcess::run()
             m_mediaServer = server;
 
         const auto hwInfo = HardwareInformation::instance();
-        if (server->getProperty(Qn::CPU_ARCHITECTURE) != hwInfo.cpuArchitecture)
-            server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+        server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+        server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
+        server->setProperty(Qn::PHISICAL_MEMORY, QString::number(hwInfo.phisicalMemory));
 
-        if (server->getProperty(Qn::CPU_MODEL_NAME) != hwInfo.cpuModelName)
-            server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
-
-        const auto phisicalMemory = QString::number(hwInfo.phisicalMemory);
-        if (server->getProperty(Qn::PHISICAL_MEMORY) != phisicalMemory)
-            server->setProperty(Qn::PHISICAL_MEMORY, QVariant(hwInfo.phisicalMemory));
-
-        const auto isBeta = QString::number(QnAppInfo::beta() ? 1 : 0);
-        if (server->getProperty(Qn::BETA) != isBeta)
-            server->setProperty(Qn::BETA, isBeta);
-
-        if (!m_publicAddress.isNull())
-        {
-            const auto publicIp = m_publicAddress.toString();
-            if (server->getProperty(Qn::PUBLIC_IP) != publicIp)
-                server->setProperty(Qn::PUBLIC_IP, publicIp);
-        }
+        server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
+        server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
+        server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
+        server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
         const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
         if (!confStats.isNull()) // if present
         {
-            const auto normStats = QnLexical::serialized(confStats.toBool());
-            const auto msStats = server->getProperty(Qn::STATISTICS_REPORT_ALLOWED);
-            if (normStats != msStats)
-                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, normStats);
-
+            server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(confStats.toBool()));
             MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
             MSSettings::roSettings()->sync();
         }
@@ -1933,6 +1942,7 @@ void MediaServerProcess::run()
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
     selfInformation.flags = m_mediaServer->getServerFlags();
+    selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
     qnCommon->setModuleInformation(selfInformation);
     qnCommon->bindModuleinformation(m_mediaServer);
@@ -2058,36 +2068,35 @@ void MediaServerProcess::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
-    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-    if (adminUser) {
+    if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
+    {
         qnCommon->bindModuleinformation(adminUser);
         qnCommon->updateModuleInformation();
 
         hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
-    }
 
-    typedef ec2::Ec2StaticticsReporter stats;
-    bool adminParamsChanged = false;
+        typedef ec2::Ec2StaticticsReporter stats;
+        bool adminParamsChanged = false;
 
-    // TODO: fix, when VS supports init lists:
-    //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
-    const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
-    for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
-    {
-        const QString& param = **it;
-        const QString val = MSSettings::roSettings()->value(param, lit("")).toString();
-        if (!val.isEmpty() && val != adminUser->getProperty(param))
+        // TODO: fix, when VS supports init lists:
+        //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
+        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
+        for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
         {
-            adminUser->setProperty(param, val);
-            MSSettings::roSettings()->remove(param);
-            adminParamsChanged = true;
+            const QString& param = **it;
+            const QString val = MSSettings::roSettings()->value(param, lit("")).toString();
+            if (adminUser->setProperty(param, val, QnResource::NO_ALLOW_EMPTY))
+            {
+                MSSettings::roSettings()->remove(param);
+                adminParamsChanged = true;
+            }
         }
-    }
 
-    if (adminParamsChanged)
-    {
-        propertyDictionary->saveParams(adminUser->getId());
-        MSSettings::roSettings()->sync();
+        if (adminParamsChanged)
+        {
+            propertyDictionary->saveParams(adminUser->getId());
+            MSSettings::roSettings()->sync();
+        }
     }
 
     QnStorageResourceList storages = m_mediaServer->getStorages();
@@ -2103,6 +2112,8 @@ void MediaServerProcess::run()
     updateAllowCameraCHangesIfNeed();
     //QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
 #endif
+
+    std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager());
 
     //QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
 
@@ -2162,6 +2173,9 @@ void MediaServerProcess::run()
 #endif
 
     exec();
+    disconnect(0,0, this, 0);
+    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( QThread::currentThread(), 3 );
+    waitingForObjectsToBeFreed.join();
 
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
 
@@ -2257,7 +2271,8 @@ void MediaServerProcess::run()
 
     fileDeletor.reset();
     storageManager.reset();
-
+    if (m_mediaServer)
+        m_mediaServer->beforeDestroy();
     m_mediaServer.clear();
 }
 
@@ -2478,8 +2493,6 @@ bool changePort(quint16 port)
 }
 */
 
-static void printVersion();
-
 #ifdef __linux__
 void SIGUSR1_handler(int)
 {
@@ -2560,7 +2573,7 @@ int MediaServerProcess::main(int argc, char* argv[])
 
     if( showVersion )
     {
-        printVersion();
+        std::cout << QnAppInfo::applicationFullVersion().toStdString() << std::endl;
         return 0;
     }
 
@@ -2590,11 +2603,4 @@ int MediaServerProcess::main(int argc, char* argv[])
     if (restartFlag && res == 0)
         return 1;
     return 0;
-}
-
-static void printVersion()
-{
-    std::cout
-        << QN_ENGINE_VERSION << "-" << QN_APPLICATION_REVISION
-        << (strcmp(QN_BETA, "true") ? "" : "-beta") << std::endl;
 }

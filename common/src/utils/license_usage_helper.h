@@ -93,7 +93,7 @@ public:
     /** Mark data as invalid and needs to be recalculated. */
     void invalidate();
 protected:
-    virtual void calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const = 0;
+    virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const = 0;
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
 
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
@@ -124,7 +124,11 @@ class QnCamLicenseUsageWatcher: public QnLicenseUsageWatcher {
 
     typedef QnLicenseUsageWatcher base_type;
 public:
-    QnCamLicenseUsageWatcher(QObject* parent = NULL);
+    QnCamLicenseUsageWatcher(QObject *parent = nullptr);
+    QnCamLicenseUsageWatcher(const QnVirtualCameraResourcePtr &camera, QObject *parent = nullptr);
+
+private:
+    void init(const QnVirtualCameraResourcePtr &camera);
 };
 
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
@@ -134,12 +138,14 @@ class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
 public:
     QnCamLicenseUsageHelper(QObject *parent = NULL);
     QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent = NULL);
+    QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable, QObject *parent = NULL);
 
+    void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual void calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
+    virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 
 private:
     void init();
@@ -168,7 +174,7 @@ public:
     static int licensesForScreens(int screens);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual void calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
+    virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 private:
     int m_proposed;
 };

@@ -20,7 +20,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include "core/resource/camera_history.h"
-
+#include "business/business_event_rule.h"
 
 namespace {
     static const QString plainTextDelimiter(lit("\n"));
@@ -387,7 +387,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         break;
     }
     case ServerTerminatedReason: {
-        result = tr("Server terminated.");
+        result = tr("Connection to server is lost.");
         break;
     }
     case ServerStartedReason: {
@@ -493,3 +493,30 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     return result;
 }
 
+QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState state) {
+    switch (state) {
+    case QnBusiness::ActiveState:
+        return tr("start");
+    case QnBusiness::InactiveState:
+        return tr("stop");
+    default:
+        break;
+    }
+    return QString();
+}
+
+QString QnBusinessStringsHelper::eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType) 
+{
+    QString typeStr = QnBusinessStringsHelper::eventName(eventType);
+    if (QnBusiness::hasToggleState(actionType))
+        return tr("While %1").arg(typeStr);
+    else
+        return tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
+}
+
+
+QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRulePtr& bRule)
+{
+    QString eventString = eventTypeString(bRule->eventType(), bRule->eventState(), bRule->actionType());
+    return tr("%1 --> %2").arg(eventString).arg(actionName(bRule->actionType()));
+}

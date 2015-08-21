@@ -36,7 +36,8 @@
             "keys": [
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04",
-                "Avigilon|ENC-*"
+                "Avigilon|ENC-*",
+                "ACTI|V32"
             ],
             "analogEncoder": true
         },
@@ -102,6 +103,12 @@
                 "*|DW-CP04"
             ],
             "ptzTraits": "EightWayPtz"
+        },
+        {
+            "keys": [
+                "ACTI|V32"
+            ],
+            "forceONVIF": true
         },
         {
             "keys": [

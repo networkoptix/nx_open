@@ -616,9 +616,7 @@ QString QnBusinessRuleViewModel::getText(const int column, const bool detailed) 
     case QnBusiness::ModifiedColumn:
         return (m_modified ? QLatin1String("*") : QString());
     case QnBusiness::EventColumn:
-        return eventTypeString(m_eventType,
-                               m_eventState,
-                               m_actionType);
+        return QnBusinessStringsHelper::eventTypeString(m_eventType, m_eventState, m_actionType);
     case QnBusiness::SourceColumn:
         return getSourceText(detailed);
     case QnBusiness::SpacerColumn:
@@ -931,24 +929,4 @@ QString QnBusinessRuleViewModel::toggleStateToModelString(QnBusiness::EventState
         return tr("Starts/Stops");
     }
     return QString();
-}
-
-QString QnBusinessRuleViewModel::toggleStateToString(QnBusiness::EventState state) {
-    switch (state) {
-    case QnBusiness::ActiveState:
-        return tr("start");
-    case QnBusiness::InactiveState:
-        return tr("stop");
-    default:
-        break;
-    }
-    return QString();
-}
-
-QString QnBusinessRuleViewModel::eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType) {
-    QString typeStr = QnBusinessStringsHelper::eventName(eventType);
-    if (QnBusiness::hasToggleState(actionType))
-        return tr("While %1").arg(typeStr);
-    else
-        return tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
 }

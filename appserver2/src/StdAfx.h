@@ -15,3 +15,10 @@
 #   endif
 
 #endif
+
+/* Boost headers. */
+#include <boost/foreach.hpp>
+#include <boost/array.hpp>
+#include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
+#include <boost/range/algorithm/count_if.hpp>

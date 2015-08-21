@@ -17,6 +17,7 @@
 
 #include <media_server/settings.h>
 
+#include "utils/serialization/sql_functions.h"
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/common/model_functions.h>
@@ -207,12 +208,13 @@ namespace {
     }
 }
 
-static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
+static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
 static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; // 30 days
 QnEventsDB* QnEventsDB::m_instance = 0;
 
 QnEventsDB::QnEventsDB():
     m_lastCleanuptime(0),
+    m_auditCleanuptime(0),
     m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD),
     m_tran(m_sdb, m_mutex)
 {
@@ -275,7 +277,114 @@ bool QnEventsDB::createDatabase()
     if (!applyUpdates(":/mserver_updates"))
         return false;
 
+    if (!isObjectExists(lit("table"), lit("audit_log"), m_sdb))
+    {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(
+            "CREATE TABLE \"audit_log\" ("
+            "id INTEGER NOT NULL PRIMARY KEY autoincrement,"
+            "createdTimeSec INTEGER NOT NULL,"
+            "rangeStartSec INTEGER NOT NULL,"
+            "rangeEndSec INTEGER NOT NULL,"
+            "eventType SMALLINT NOT NULL,"
+            "resources BLOB,"
+            "params TEXT,"
+            "authSession TEXT)"
+        );
+        if (!ddlQuery.exec())
+            return false;
+    }
+
+    if (!isObjectExists(lit("index"), lit("auditTimeIdx"), m_sdb)) {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(
+            "CREATE INDEX \"auditTimeIdx\" ON \"audit_log\" (createdTimeSec)"
+            );
+        if (!ddlQuery.exec())
+            return false;
+    }
+
+
     return true;
+}
+
+int QnEventsDB::addAuditRecord(const QnAuditRecord& data)
+{
+    QWriteLocker lock(&m_mutex);
+
+    Q_ASSERT(data.eventType != Qn::AR_NotDefined);
+    Q_ASSERT((data.eventType & (data.eventType-1)) == 0);
+
+    if (!m_sdb.isOpen())
+        return false;
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO audit_log"
+        "(createdTimeSec, rangeStartSec, rangeEndSec, eventType, resources, params, authSession)"
+        "VALUES"
+        "(:createdTimeSec, :rangeStartSec, :rangeEndSec, :eventType, :resources, :params, :authSession)"
+        );
+    QnSql::bind(data, &insQuery);
+
+    if (!insQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return -1;
+    }
+    int result = insQuery.lastInsertId().toInt();
+    cleanupAuditLog();
+    return result;
+}
+
+int QnEventsDB::updateAuditRecord(int internalId, const QnAuditRecord& data)
+{
+    QWriteLocker lock(&m_mutex);
+
+    if (!m_sdb.isOpen())
+        return false;
+    Q_ASSERT(data.eventType != Qn::AR_NotDefined);
+    Q_ASSERT((data.eventType & (data.eventType-1)) == 0);
+
+    QSqlQuery updQuery(m_sdb);
+    updQuery.prepare("UPDATE audit_log SET "
+        "createdTimeSec = :createdTimeSec, rangeStartSec = :rangeStartSec, rangeEndSec = :rangeEndSec, eventType = :eventType, resources = :resources, "
+        "params = :params, authSession = :authSession WHERE id = :id"
+        );
+    QnSql::bind(data, &updQuery);
+    updQuery.bindValue(":id", internalId);
+
+    if (!updQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << updQuery.lastError().text();
+        return -1;
+    }
+    return internalId;
+}
+
+QnAuditRecordList QnEventsDB::getAuditData(const QnTimePeriod& period, const QnUuid& sessionId)
+{
+    QnAuditRecordList result;
+    QString request = QString::fromLatin1(
+        "SELECT * "
+        "FROM audit_log "
+        "WHERE createdTimeSec BETWEEN ? and ? ");
+    if (!sessionId.isNull())
+        request += lit("AND authSession like '%1%'").arg(sessionId.toString());
+    request += lit("ORDER BY createdTimeSec");
+
+        
+
+    QWriteLocker lock(&m_mutex);
+    QSqlQuery query(m_sdb);
+    query.prepare(request);
+    query.addBindValue(period.startTimeMs / 1000);
+    query.addBindValue(period.endTimeMs() == DATETIME_NOW ? INT_MAX : period.endTimeMs() / 1000);
+    
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return result;
+    }
+    QnSql::fetch_many(query, &result);
+
+    return result;
 }
 
 bool QnEventsDB::cleanupEvents()
@@ -283,11 +392,11 @@ bool QnEventsDB::cleanupEvents()
     bool rez = true;
 
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-    if (currentTime - m_lastCleanuptime > EVENTS_CLEANUP_INTERVAL)
+    if (currentTime - m_lastCleanuptime > CLEANUP_INTERVAL)
     {
         m_lastCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
-        delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp;");
+        delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp");
         int utc = (currentTime - m_eventKeepPeriod)/1000000ll;
         delQuery.bindValue(":timestamp", utc);
         rez = delQuery.exec();
@@ -356,6 +465,23 @@ bool QnEventsDB::migrateBusinessParams() {
     return true;
 }
 
+
+bool QnEventsDB::cleanupAuditLog()
+{
+    bool rez = true;
+
+    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
+    if (currentTime - m_auditCleanuptime > CLEANUP_INTERVAL)
+    {
+        m_auditCleanuptime = currentTime;
+        QSqlQuery delQuery(m_sdb);
+        delQuery.prepare("DELETE FROM audit_log where createdTimeSec < :createdTimeSec");
+        int utc = (currentTime - m_eventKeepPeriod)/1000000ll;
+        delQuery.bindValue(":timestamp", utc);
+        rez = delQuery.exec();
+    }
+    return rez;
+}
 
 bool QnEventsDB::removeLogForRes(QnUuid resId)
 {
@@ -482,7 +608,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     QList<QnAbstractBusinessActionPtr> result;
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QReadLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
     query.prepare(request);
@@ -541,7 +667,7 @@ void QnEventsDB::getAndSerializeActions(
 
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QReadLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     QSqlQuery actionsQuery(m_sdb);
     actionsQuery.prepare(request);

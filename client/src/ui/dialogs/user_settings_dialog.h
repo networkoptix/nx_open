@@ -32,6 +32,7 @@ public:
         Password,
         AccessRights,
         Email,
+        Enabled,
         ElementCount
     };
 
@@ -75,6 +76,7 @@ protected slots:
     void updatePassword() { updateElement(CurrentPassword); updateElement(Password); }
     void updateAccessRights() { updateElement(AccessRights); }
     void updateEmail() { updateElement(Email); }
+    void updateEnabled() { updateElement(Enabled); }
     void loadAccessRightsToUi(quint64 rights);
 
     void updateDependantPermissions();
@@ -133,6 +135,7 @@ private:
     /** Status variable to avoid unneeded checks. */
     bool m_inUpdateDependensies;
 
+    bool m_enabledModified;
     bool m_userNameModified;
     bool m_passwordModified;
     bool m_emailModified;

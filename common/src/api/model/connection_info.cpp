@@ -11,6 +11,7 @@
 QnConnectionInfo::QnConnectionInfo()
 :
     allowSslConnections( false ),
-    nxClusterProtoVersion( nx_ec::INITIAL_EC2_PROTO_VERSION )
+    nxClusterProtoVersion( nx_ec::INITIAL_EC2_PROTO_VERSION ),
+    ecDbReadOnly( false )
 {
 }

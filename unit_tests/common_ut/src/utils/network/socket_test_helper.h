@@ -56,11 +56,12 @@ private:
     std::mutex m_mutex;
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
+    int m_id;
 
-    void onConnected( SystemError::ErrorCode );
+    void onConnected( int id, SystemError::ErrorCode );
     bool startIO();
-    void onDataReceived( SystemError::ErrorCode errorCode, size_t bytesRead );
-    void onDataSent( SystemError::ErrorCode errorCode, size_t bytesWritten );
+    void onDataReceived( int id, SystemError::ErrorCode errorCode, size_t bytesRead );
+    void onDataSent( int id, SystemError::ErrorCode errorCode, size_t bytesWritten );
 };
 
 //!Server that listenes randome tcp-port, accepts connections, reads every connection and sends specified bytes number through every connection

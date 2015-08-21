@@ -66,7 +66,10 @@ Item
                     left: parent.left;
                     verticalCenter: parent.verticalCenter;
                 }
-                
+
+                activeFocusOnPress: false;
+                activeFocusOnTab: false;
+
                 Binding
                 {
                     target: selectionCheckbox;

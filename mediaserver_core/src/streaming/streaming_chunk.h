@@ -57,14 +57,6 @@ public:
         int m_currentOffset;
     };
 
-    enum State
-    {
-        //!chunk is being filled by data (e.g., from transcoder)
-        opened,
-        //!chunk contains ready-to-download data
-        closed
-    };
-
     enum ResultCode
     {
         rcEndOfData,
@@ -126,10 +118,20 @@ signals:
     void newDataIsAvailable( StreamingChunkPtr chunk, quint64 newSizeBytes );
 
 private:
+    enum class State
+    {
+        //!Chunk has not been opened for modification yet
+        init,
+        //!chunk is being filled by data (e.g., from transcoder)
+        opened,
+        //!chunk contains ready-to-download data
+        closed
+    };
+
     StreamingChunkCacheKey m_params;
     mutable QnMutex m_mutex;
     nx::Buffer m_data;
-    bool m_isOpenedForModification;
+    State m_modificationState;
     mutable QnMutex m_signalEmitMutex;
     QnWaitCondition m_cond;
 #ifdef DUMP_CHUNK_TO_FILE

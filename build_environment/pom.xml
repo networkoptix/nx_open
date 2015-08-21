@@ -406,6 +406,13 @@
 
             <dependencies>
                 <dependency>
+                    <groupId>org.openldap</groupId>
+                    <artifactId>openldap</artifactId>
+                    <version>${openldap.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>              
+                <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
                     <version>${openssl.version}</version>
@@ -451,6 +458,13 @@
             </activation>
            <dependencies>
                 <dependency>
+                    <groupId>org.openldap</groupId>
+                    <artifactId>openldap</artifactId>
+                    <version>${openldap.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>             
+                <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
                     <version>${openssl.version}</version>
@@ -490,6 +504,13 @@
 
             <dependencies>
                 <dependency>
+                    <groupId>org.openldap</groupId>
+                    <artifactId>openldap</artifactId>
+                    <version>${openldap.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+                <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
                     <version>${ffmpeg.version}</version>
@@ -528,6 +549,13 @@
             </activation>
 
             <dependencies>
+                <dependency>
+                    <groupId>org.openldap</groupId>
+                    <artifactId>openldap</artifactId>
+                    <version>${openldap.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>            
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>

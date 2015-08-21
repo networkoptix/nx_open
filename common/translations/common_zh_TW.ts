@@ -15,6 +15,17 @@
     </message>
 </context>
 <context>
+    <name>QnActiResource</name>
+    <message>
+        <source>Output %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>User Defined (%1)</source>
@@ -251,10 +262,6 @@
         <translation>RTP 封包遺失偵測.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>伺服器中斷.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>伺服器崩潰後啟動.</translation>
     </message>
@@ -273,6 +280,30 @@
     <message>
         <source>Conflicting Server: %1</source>
         <translation>衝突伺服器: %1</translation>
+    </message>
+    <message>
+        <source>start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -571,6 +602,22 @@
         <source>Unknown error</source>
         <translation>未知的錯誤</translation>
     </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseUsageHelper</name>
@@ -631,6 +678,20 @@
     <message>
         <source>Preset #</source>
         <translation>預設點 #</translation>
+    </message>
+</context>
+<context>
+    <name>QnPlAxisResource</name>
+    <message>
+        <source>Can&apos;t initialize IO port settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPlOnvifResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -880,6 +941,17 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>無效參數</translation>
+    </message>
+</context>
+<context>
+    <name>QnThirdPartyResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

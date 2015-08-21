@@ -28,7 +28,7 @@ void QnWorkbenchUserEmailWatcher::forceCheck(const QnUserResourcePtr &user) {
     if (!context()->user())
         return;
 
-    emit userEmailValidityChanged(user, m_emailValidByUser.value(user, QnEmailAddress::isValid(user->getEmail())));
+    emit userEmailValidityChanged(user, m_emailValidByUser.value(user, isUserEmailValid(user)));
 }
 
 void QnWorkbenchUserEmailWatcher::forceCheckAll() {
@@ -42,13 +42,31 @@ void QnWorkbenchUserEmailWatcher::forceCheckAll() {
     }
 }
 
+bool QnWorkbenchUserEmailWatcher::isUserEmailValid(const QnUserResourcePtr &user) const {
+    Q_ASSERT_X(user, Q_FUNC_INFO, "User must exist here");
+    if (!user)
+        return true;
+
+    /* Suppress errors for disabled users. */
+    return !user->isEnabled() || QnEmailAddress::isValid(user->getEmail());
+}
+
+
 void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if(!user)
         return;
 
-    connect(user, &QnUserResource::emailChanged, this, &QnWorkbenchUserEmailWatcher::at_user_emailChanged);
-    at_user_emailChanged(user);
+    auto safeCheck = [this](const QnResourcePtr &resource) {
+        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+        if (!user)
+            return;
+        checkUser(user);
+    };
+
+    connect(user, &QnUserResource::emailChanged, this, safeCheck);
+    connect(user, &QnUserResource::enabledChanged, this, safeCheck);
+    checkUser(user);
 }
 
 void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -64,12 +82,8 @@ void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceRemoved(const QnResour
     m_emailValidByUser.remove(user);
 }
 
-void QnWorkbenchUserEmailWatcher::at_user_emailChanged(const QnResourcePtr &resource) {
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if (!user)
-        return;
-
-    bool valid = QnEmailAddress::isValid(user->getEmail());
+void QnWorkbenchUserEmailWatcher::checkUser(const QnUserResourcePtr &user) {
+    bool valid = isUserEmailValid(user);
     if (m_emailValidByUser.contains(user) && m_emailValidByUser[user] == valid)
         return;
 

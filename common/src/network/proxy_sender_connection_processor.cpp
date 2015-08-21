@@ -103,7 +103,7 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
     nx_http::header::WWWAuthenticate authHeader;
     authHeader.authScheme = nx_http::header::AuthScheme::digest;
     authHeader.params["nonce"] = QString::number(time, 16).toLatin1();
-    authHeader.params["realm"] = H_REALM;
+    authHeader.params["realm"] = QnAppInfo::realm().toLatin1();
 
     nx_http::header::DigestAuthorization digestHeader;
     if (!nx_http::calcDigestResponse(

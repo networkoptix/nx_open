@@ -22,6 +22,7 @@ public:
     bool tryClose(bool force);
 protected:
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
+    void setPageEnabled(int key, bool enabled);
 
     virtual void loadData();
     virtual void submitData();

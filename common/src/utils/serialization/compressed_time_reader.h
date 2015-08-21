@@ -5,7 +5,6 @@
 
 #include <algorithm> /* For std::min. */
 
-#include <QtCore/QtEndian>
 #include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
 #include <QtEndian>

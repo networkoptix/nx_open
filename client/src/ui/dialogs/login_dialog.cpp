@@ -206,6 +206,7 @@ void QnLoginDialog::accept() {
 
     QString name = ui->connectionsComboBox->currentText();
 
+    qnCommon->updateRunningInstanceGuid();
     m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url,
         this,

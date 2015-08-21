@@ -7,6 +7,7 @@
 #include <business/business_fwd.h>
 
 #include "utils/db/db_helper.h"
+#include "api/model/audit/audit_record.h"
 
 #include <utils/common/uuid.h>
 
@@ -39,6 +40,10 @@ public:
         const QnUuid& businessRuleId) const;
 
 
+    QnAuditRecordList getAuditData(const QnTimePeriod& period, const QnUuid& sessionId = QnUuid());
+    int addAuditRecord(const QnAuditRecord& data);
+    int updateAuditRecord(int internalId, const QnAuditRecord& data);
+
     static QnEventsDB* instance();
     static void init();
     static void fini();
@@ -53,6 +58,7 @@ protected:
 private:
     bool cleanupEvents();
     bool migrateBusinessParams();
+    bool cleanupAuditLog();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,
@@ -61,6 +67,7 @@ private:
         const QnUuid& businessRuleId) const;
 private:
     qint64 m_lastCleanuptime;
+    qint64 m_auditCleanuptime;
     qint64 m_eventKeepPeriod;
     static QnEventsDB* m_instance;
     QnDbTransaction m_tran;

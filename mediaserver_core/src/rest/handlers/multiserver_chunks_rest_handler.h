@@ -10,7 +10,7 @@ public:
     QnMultiserverChunksRestHandler(const QString& path);
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
 
-    static MultiServerPeriodDataList loadDataSync(const QnChunksRequestData& request);
+    static MultiServerPeriodDataList loadDataSync(const QnChunksRequestData& request, const QnRestConnectionProcessor* owner);
 private:
     struct InternalContext;
     static void waitForDone(InternalContext* ctx);

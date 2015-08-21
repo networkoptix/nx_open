@@ -75,6 +75,85 @@
     </message>
 </context>
 <context>
+    <name>AuditLogDialog</name>
+    <message>
+        <source>From</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>till</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation type="unfinished">重新整理</translation>
+    </message>
+    <message>
+        <source>User actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watching archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exporting video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watching live</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login/logout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E-mail settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sessions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">詳細</translation>
+    </message>
+    <message>
+        <source>All Servers are offline.  Audit data are not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BusinessRuleWidget</name>
     <message>
         <source>Event</source>
@@ -165,21 +244,12 @@
         <translation>&amp;結束 IP:</translation>
     </message>
     <message>
-        <source>S&amp;ubnet scan</source>
-        <translation>&amp;子網路掃描</translation>
-    </message>
-    <message>
         <source>&amp;Login:</source>
         <translation>&amp;登入:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;密碼:</translation>
-    </message>
-    <message>
-        <source>auto</source>
-        <translatorcomment>自動</translatorcomment>
-        <translation>自動</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -203,29 +273,12 @@
         <translation>掃描中…</translation>
     </message>
     <message>
-        <source>Manuf.</source>
-        <translation>廠牌.</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>名稱</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation>位址</translation>
     </message>
     <message>
         <source>Server is offline</source>
         <translation>伺服器離線</translation>
-    </message>
-    <message>
-        <source>Add cameras...</source>
-        <translatorcomment>新增攝影機…</translatorcomment>
-        <translation>新增攝影機…</translation>
-    </message>
-    <message>
-        <source>Selected server:</source>
-        <translation>選擇伺服器:</translation>
     </message>
     <message>
         <source>Ca&amp;mera Address:</source>
@@ -237,12 +290,32 @@
         <translation>&amp;新增已選擇的</translation>
     </message>
     <message>
-        <source>New scan...</source>
-        <translation>掃描…</translation>
-    </message>
-    <message>
         <source>Discovered Cameras:</source>
         <translation>搜尋到的攝影機:</translation>
+    </message>
+    <message>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation type="unfinished">型號</translation>
+    </message>
+    <message>
+        <source>New Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -414,25 +487,6 @@
     </message>
 </context>
 <context>
-    <name>CameraManagementWidget</name>
-    <message>
-        <source>Allow system to optimize camera settings (Recommended)</source>
-        <translation>允許系統自動優化攝影機設定(建議)</translation>
-    </message>
-    <message>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>警告! 錄影排程的 FPS 及 畫質設定將無作用!</translation>
-    </message>
-    <message>
-        <source>Send anonymous usage and crash statistics to software developers (Recommended)</source>
-        <translation>匿名寄送使用狀況和故障狀況給軟體開發商(建議)</translation>
-    </message>
-    <message>
-        <source>Enable cameras and servers auto discovery</source>
-        <translation>開啟攝影機與伺服器自動搜尋功能</translation>
-    </message>
-</context>
-<context>
     <name>CameraOutputBusinessActionWidget</name>
     <message>
         <source>&amp;Output ID:</source>
@@ -600,6 +654,37 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Testing connection...</source>
         <translation>測試連線中…</translation>
+    </message>
+</context>
+<context>
+    <name>CustomHorizontalHeader</name>
+    <message>
+        <source>5 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bitrate for the last recorded:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -776,6 +861,14 @@ Short for &quot;seconds&quot;</extracomment>
         <source>System Settings</source>
         <translation>系統設定</translation>
     </message>
+    <message>
+        <source>Audit trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open audit trail log</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
@@ -830,6 +923,25 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Scroll down</source>
         <translation>向下滾動</translation>
+    </message>
+</context>
+<context>
+    <name>ImageControlWidget</name>
+    <message>
+        <source>Image Control</source>
+        <translation type="unfinished">影像控制</translation>
+    </message>
+    <message>
+        <source>Force aspect ratio to:</source>
+        <translation type="unfinished">強制顯示比例為:</translation>
+    </message>
+    <message>
+        <source>Default rotation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens camera</source>
+        <translation type="unfinished">這是魚眼 (360度) 攝影機</translation>
     </message>
 </context>
 <context>
@@ -908,6 +1020,41 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Keep aspect ratio</source>
         <translation>維持長寬比</translation>
+    </message>
+</context>
+<context>
+    <name>LdapSettingsDialog</name>
+    <message>
+        <source>Server UR&amp;L:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ldap(s)://host:port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ad&amp;min DN:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation type="unfinished">&amp;密碼:</translation>
+    </message>
+    <message>
+        <source>Search Base:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Testing...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1016,6 +1163,17 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Activate License</source>
         <translation>啟動授權 </translation>
+    </message>
+</context>
+<context>
+    <name>LicensesProposeWidget</name>
+    <message>
+        <source>Licensing</source>
+        <translation type="unfinished">授權</translation>
+    </message>
+    <message>
+        <source>Get More Licenses...</source>
+        <translation type="unfinished">取得更多的授權(License)…</translation>
     </message>
 </context>
 <context>
@@ -1152,18 +1310,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>一般</translation>
     </message>
     <message>
-        <source>Image Control</source>
-        <translation>影像控制</translation>
-    </message>
-    <message>
-        <source>Licensing</source>
-        <translation>授權</translation>
-    </message>
-    <message>
-        <source>Get More Licenses...</source>
-        <translation>取得更多授權…</translation>
-    </message>
-    <message>
         <source>Authentication</source>
         <translation>認證</translation>
     </message>
@@ -1176,24 +1322,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>密碼:</translation>
     </message>
     <message>
-        <source>Force aspect ratio to:</source>
-        <translation>強制顯示比例為:</translation>
-    </message>
-    <message>
-        <source>Default rotation:</source>
-        <translation>影像預先轉向:</translation>
-    </message>
-    <message>
-        <source>Use an analog license to view this camera</source>
-        <translation>此攝影機需使用類比授權</translation>
-    </message>
-    <message>
         <source>Enable audio</source>
         <translation>允許聲音</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens camera</source>
-        <translation>這是魚眼 (360度) 攝影機</translation>
     </message>
     <message>
         <source>Recording</source>
@@ -2531,6 +2661,18 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Ask About Statistics Reporting</source>
         <translation>要求狀況報告</translation>
     </message>
+    <message>
+        <source>Audit trail...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User management...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -2571,6 +2713,224 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Preview</source>
         <translation>預覽</translation>
+    </message>
+</context>
+<context>
+    <name>QnAuditLogDialog</name>
+    <message>
+        <source>Play this</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Selection to Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Selection to File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished">選擇全部</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">搜尋</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished">資訊</translation>
+    </message>
+    <message>
+        <source>No archive data for that position left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This resources already removed from the system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export selected records to a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit log replay</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnAuditLogModel</name>
+    <message>
+        <source>%1d </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1h </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1m </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">未知</translation>
+    </message>
+    <message>
+        <source>Unsuccessful login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished">登入</translation>
+    </message>
+    <message>
+        <source>User updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watching live</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watching archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exporting video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System name changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System merge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General settings updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Business rule updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Business rule removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Business rule reseted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database restored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play this</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">設定</translation>
+    </message>
+    <message>
+        <source>%1 - %2, </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras</source>
+        <translation type="unfinished">
+            <numerusform>%n支攝影機</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n action(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Session begins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session ends</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">描述</translation>
+    </message>
+    <message>
+        <source>View it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to expand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Red mark means that an archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E-mail settings changed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2740,22 +3100,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Starts/Stops</source>
         <translation>開始 / 停止</translation>
-    </message>
-    <message>
-        <source>start</source>
-        <translation>開始</translation>
-    </message>
-    <message>
-        <source>stop</source>
-        <translation>停止</translation>
-    </message>
-    <message>
-        <source>While %1</source>
-        <translation>當 %1</translation>
-    </message>
-    <message>
-        <source>On %1 %2</source>
-        <translation>於 %1 %2</translation>
     </message>
 </context>
 <context>
@@ -3946,6 +4290,93 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnIOPortItemDelegate</name>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open circuit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grounded circuit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnIOPortSettingsWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnIOPortsViewModel</name>
+    <message>
+        <source>#</source>
+        <translation type="unfinished">#</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished">類別</translation>
+    </message>
+    <message>
+        <source>Default state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">名稱</translation>
+    </message>
+    <message>
+        <source>Pulse time(ms)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnImageControlWidget</name>
+    <message>
+        <source>4:3</source>
+        <translation type="unfinished">4:3</translation>
+    </message>
+    <message>
+        <source>16:9</source>
+        <translation type="unfinished">16:9</translation>
+    </message>
+    <message>
+        <source>1:1</source>
+        <translation type="unfinished">1:1</translation>
+    </message>
+    <message>
+        <source>%1 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnIoModuleOverlayWidgetPrivate</name>
+    <message>
+        <source>Failed to turn on IO port &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to turn off IO port &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO port error</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnLayoutExportTool</name>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
@@ -3997,6 +4428,42 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation>&lt;影像無法讀取&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapSettingsDialog</name>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished">測試</translation>
+    </message>
+    <message>
+        <source>Test failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Test completed successfully: %n users found.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapSettingsDialogPrivate</name>
+    <message>
+        <source>The provided settings are not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None of your servers is connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed out</source>
+        <translation type="unfinished">逾時</translation>
     </message>
 </context>
 <context>
@@ -4257,6 +4724,29 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnLicensesProposeWidget</name>
+    <message numerus="yes">
+        <source>Use analog licenses to view these %n cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Use I/O licenses to enable these %n modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Use licenses for selected cameras and modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use licenses for selected cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnLoginDialog</name>
     <message>
         <source>Invalid Login Information</source>
@@ -4451,6 +4941,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
         <translation>%1 (巡航 &quot;%2&quot; 正在執行)</translation>
     </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
@@ -4554,37 +5048,16 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Check</source>
         <translation>檢查</translation>
     </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.
+As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
+If you understand this and would like to proceed please click Merge to continue.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
-    <message>
-        <source>4:3</source>
-        <translation>4:3</translation>
-    </message>
-    <message>
-        <source>16:9</source>
-        <translation>16:9</translation>
-    </message>
-    <message>
-        <source>1:1</source>
-        <translation>1:1</translation>
-    </message>
-    <message>
-        <source>0 degrees</source>
-        <translation>0 度</translation>
-    </message>
-    <message>
-        <source>90 degrees</source>
-        <translation>90 度</translation>
-    </message>
-    <message>
-        <source>180 degrees</source>
-        <translation>180 度</translation>
-    </message>
-    <message>
-        <source>270 degrees</source>
-        <translation>270 度</translation>
-    </message>
     <message>
         <source>Invalid schedule</source>
         <translation>無效的排程</translation>
@@ -5119,6 +5592,88 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnRecordingStatisticsWidget</name>
+    <message>
+        <source>Copy Selection to Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Selection to File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished">選擇全部</translation>
+    </message>
+    <message>
+        <source>Export selected events to file</source>
+        <translation type="unfinished">匯出選擇的事件到檔案</translation>
+    </message>
+</context>
+<context>
+    <name>QnRecordingStatsModel</name>
+    <message numerus="yes">
+        <source>%n years</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n months</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n days</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hours</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Total %1 camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras with non empty archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage space occupied by camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived duration in calendar days between the first record and the current moment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average bitrate for the recorded period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Space</source>
+        <translation type="unfinished">空白鍵</translation>
+    </message>
+    <message>
+        <source>Calendar Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>less than an hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnRecordingStatusHelper</name>
     <message>
         <source>Not recording</source>
@@ -5336,76 +5891,87 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
-        <source>Remove Storage</source>
-        <translation>移除儲存裝置</translation>
-    </message>
-    <message>
         <source>Open Web Page...</source>
         <translation>開啟網頁界面...</translation>
     </message>
     <message>
-        <source>Not available</source>
-        <translation>不允許</translation>
+        <source>General</source>
+        <translation type="unfinished">一般</translation>
+    </message>
+    <message>
+        <source>Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnServerSettingsWidget</name>
+    <message>
+        <source>Remove Storage</source>
+        <translation type="unfinished">移除儲存裝置</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation>載入...</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not available</source>
+        <translation type="unfinished">不允許</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>警告</translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation>已結束</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation>重建目錄完成。</translation>
-    </message>
-    <message>
-        <source>At least two servers are required for this feature.</source>
-        <translation>此功能最少需要兩台伺服器.</translation>
-    </message>
-    <message>
-        <source>This server already has more than max cameras</source>
-        <translation>此伺服器已達最大攝影機數量</translation>
-    </message>
-    <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>為了避免故障發生, 請調整攝影機數量上限</translation>
-    </message>
-    <message>
-        <source>Could not load storages from server.</source>
-        <translation>無法從伺服器載入儲存裝置.</translation>
-    </message>
-    <message>
-        <source>Add external Storage...</source>
-        <translation>新增外部儲存裝置...</translation>
+        <translation type="unfinished">警告</translation>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation>您正在運行例行的同步工作.</translation>
+        <translation type="unfinished">您正在運行例行的同步工作.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation>請注意! 同步時將可能使您的硬碟忙碌! 根據資料大小的不同, 此工作可能持續數小時.</translation>
+        <translation type="unfinished">請注意! 同步時將可能使您的硬碟忙碌! 根據資料大小的不同, 此工作可能持續數小時.</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation>只有在您的錄影資料夾被移動過, 被更名過或被取代過您才需要做這個動作. 您可隨時取消此重建動作而不會遺失任何資料.</translation>
+        <translation type="unfinished">只有在您的錄影資料夾被移動過, 被更名過或被取代過您才需要做這個動作. 您可隨時取消此重建動作而不會遺失任何資料.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation>是否要繼續?</translation>
+        <translation type="unfinished">是否要繼續?</translation>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation>儲存空間 &apos;%1&apos; 的資料索引重建正在執行中</translation>
+        <translation type="unfinished">儲存空間 &apos;%1&apos; 的資料索引重建正在執行中</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; is in progress</source>
-        <translation>儲存空間 &apos;%1&apos; 的快速資料掃瞄正在執行中</translation>
+        <translation type="unfinished">儲存空間 &apos;%1&apos; 的快速資料掃瞄正在執行中</translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation type="unfinished">已結束</translation>
+    </message>
+    <message>
+        <source>Rebuilding archive index is completed.</source>
+        <translation type="unfinished">重建目錄完成。</translation>
+    </message>
+    <message>
+        <source>At least two servers are required for this feature.</source>
+        <translation type="unfinished">此功能最少需要兩台伺服器.</translation>
+    </message>
+    <message>
+        <source>This server already has more than max cameras</source>
+        <translation type="unfinished">此伺服器已達最大攝影機數量</translation>
+    </message>
+    <message>
+        <source>To avoid malfunction adjust max number of cameras</source>
+        <translation type="unfinished">為了避免故障發生, 請調整攝影機數量上限</translation>
+    </message>
+    <message>
+        <source>Could not load storages from server.</source>
+        <translation type="unfinished">無法從伺服器載入儲存裝置.</translation>
+    </message>
+    <message>
+        <source>Add external Storage...</source>
+        <translation type="unfinished">新增外部儲存裝置...</translation>
     </message>
 </context>
 <context>
@@ -5732,34 +6298,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
-        <source>4:3</source>
-        <translation>4:3</translation>
-    </message>
-    <message>
-        <source>16:9</source>
-        <translation>16:9</translation>
-    </message>
-    <message>
-        <source>1:1</source>
-        <translation>1:1</translation>
-    </message>
-    <message>
-        <source>0 degrees</source>
-        <translation>0 度</translation>
-    </message>
-    <message>
-        <source>90 degrees</source>
-        <translation>90 度</translation>
-    </message>
-    <message>
-        <source>180 degrees</source>
-        <translation>180 度</translation>
-    </message>
-    <message>
-        <source>270 degrees</source>
-        <translation>270 度</translation>
-    </message>
-    <message>
         <source>Hardware (Camera built-in)</source>
         <translation>硬體 (攝影機內建)</translation>
     </message>
@@ -5768,36 +6306,36 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>不使用位移錄影</translation>
     </message>
     <message>
-        <source>Invalid schedule</source>
-        <translation>無效的排程</translation>
-    </message>
-    <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>此攝影機的第二串流已關閉. Motion + LQ 選項無效. 點擊 &quot;是&quot; 變更錄影類型成 &quot;全時錄影&quot; 或 &quot;否&quot; 啟動第二串流.</translation>
-    </message>
-    <message>
-        <source>Confirm motion regions reset</source>
-        <translation>確認重置位移區域</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translation>是否確認重置影像位移區域?</translation>
-    </message>
-    <message>
-        <source>This action CANNOT be undone!</source>
-        <translation>本動作將 無法 還原!</translation>
-    </message>
-    <message>
         <source>FPS value is too high</source>
-        <translation>FPS數值過高</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>目前排程表中的FPS值為%1. FPS值將自動降至攝影機可允許之最大FPS %2.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>軟體位移偵測所須第二串流最低FPS為2. 目前排程表中的FPS為 %1. FPS將自動降至 %2.</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid schedule</source>
+        <translation type="unfinished">無效的排程</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished">攝影機的第二串流已關閉. Motion + LQ選項無效. 請點擊 &quot;是&quot; 將錄影類型改成 &quot;全時錄影&quot; 或點擊 &quot;否&quot; 將第二串流開啟.</translation>
+    </message>
+    <message>
+        <source>Confirm motion regions reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to reset motion regions to the defaults?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation type="unfinished">此動作 無法 還原!</translation>
     </message>
 </context>
 <context>
@@ -5909,12 +6447,28 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>請購買類比授權</translation>
     </message>
     <message>
-        <source>Diagnose...</source>
-        <translation>診斷...</translation>
-    </message>
-    <message>
         <source>Please check authentication information in camera settings</source>
         <translation>請檢查攝影機設定內的認証資訊</translation>
+    </message>
+    <message>
+        <source>No video stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate license...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Module is disabled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5935,20 +6489,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>提供的儲存路徑沒有定義有效的外部儲存裝置。</translation>
     </message>
     <message>
-        <source>Windows Network Shared Resource</source>
-        <translation>Windows網路分享資源</translation>
-    </message>
-    <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
         <translation>\\&lt;電腦名稱&gt;\&lt;資料夾&gt;</translation>
     </message>
     <message>
-        <source>Coldstore Network Storage</source>
-        <translation>Coldstore 網路儲存空間</translation>
+        <source>Network Shared Resource</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>coldstore://&lt;Address&gt;</source>
-        <translation>coldstore://&lt;地址&gt;</translation>
+        <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">警告</translation>
+    </message>
+    <message>
+        <source>Add storage</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5996,6 +6554,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Update is in process now.</source>
         <translation>更新正在進行中.</translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished">使用者</translation>
     </message>
 </context>
 <context>
@@ -6233,6 +6795,91 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>
             <numerusform>%1, %n 個額外</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnUserListModel</name>
+    <message>
+        <source>LDAP user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normal user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">名稱</translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserListModelPrivate</name>
+    <message>
+        <source>Owner</source>
+        <translation type="unfinished">擁有者</translation>
+    </message>
+    <message>
+        <source>Administrator</source>
+        <translation type="unfinished">管理者</translation>
+    </message>
+    <message>
+        <source>View live video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust camera settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use PTZ controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View video archives</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Video Walls</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserManagementWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import from LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6986,6 +7633,21 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>You can try to update the servers again in the System Administration.</source>
         <translation>您可以於系統管理中再次更新這些伺服器.</translation>
     </message>
+    <message>
+        <source>Warning: You are about to merge Systems with START licenses.
+As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
+If you understand this and would like to proceed please click Merge to continue.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">警告</translation>
+    </message>
+    <message>
+        <source>Merge</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchLayoutsHandler</name>
@@ -7518,6 +8180,57 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
 </context>
 <context>
+    <name>RecordingStatisticsWidget</name>
+    <message>
+        <source>Refresh</source>
+        <translation type="unfinished">重新整理</translation>
+    </message>
+    <message>
+        <source>All Servers are offline. Logs are not available.</source>
+        <translation type="unfinished">所有攝影機皆已離線. 無法記錄.</translation>
+    </message>
+    <message>
+        <source>10 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forecast for full storage(s) usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional storage:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1000 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ResourceBrowserWidget</name>
     <message>
         <source>Resources</source>
@@ -7579,77 +8292,89 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Server settings</source>
         <translation>伺服器設定</translation>
     </message>
+</context>
+<context>
+    <name>ServerSettingsWidget</name>
     <message>
         <source>Name:</source>
-        <translation>名稱:</translation>
+        <translation type="unfinished">名稱:</translation>
     </message>
     <message>
         <source>IP Address:</source>
-        <translation>IP位址:</translation>
-    </message>
-    <message>
-        <source>Port:</source>
-        <translation>通訊埠:</translation>
-    </message>
-    <message>
-        <source>9000</source>
-        <translation>9000</translation>
+        <translation type="unfinished">IP 位址:</translation>
     </message>
     <message>
         <source>Ping</source>
-        <translation>Ping</translation>
+        <translation type="unfinished">Ping</translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation type="unfinished">通訊埠:</translation>
+    </message>
+    <message>
+        <source>9000</source>
+        <translation type="unfinished">9000</translation>
     </message>
     <message>
         <source>Failover</source>
-        <translation>備援</translation>
+        <translation type="unfinished">備援</translation>
     </message>
     <message>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation>啟動備援 (伺服器將自動接手斷線伺服器的錄影工作)</translation>
+        <translation type="unfinished">啟動備援 (伺服器將自動接手斷線伺服器的錄影工作)</translation>
     </message>
     <message>
         <source>Max. cameras on this server:</source>
-        <translation>本伺服器最大攝影機數量:</translation>
+        <translation type="unfinished">本伺服器最大攝影機數量:</translation>
     </message>
     <message>
         <source>Storages</source>
-        <translation>儲存</translation>
+        <translation type="unfinished">儲存</translation>
     </message>
     <message>
         <source>In Use</source>
-        <translation>使用中</translation>
+        <translation type="unfinished">已被使用</translation>
+    </message>
+    <message>
+        <source>Protocol</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Path</source>
-        <translation>路徑</translation>
+        <translation type="unfinished">路徑</translation>
     </message>
     <message>
         <source>Capacity</source>
-        <translation>容量</translation>
+        <translation type="unfinished">容量</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation>登入</translation>
+        <translation type="unfinished">登入</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation>密碼</translation>
+        <translation type="unfinished">密碼</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation>空白鍵</translation>
+        <translation type="unfinished">空白鍵</translation>
+    </message>
+    <message>
+        <source>Unchecking the storage will cause nothing but writing stop.
+It won&apos;t deny oldest footage removing from the drive.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Rebuild archive index</source>
-        <translation>重建錄影目錄</translation>
+        <translation type="unfinished">重建錄影目錄</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation>開始</translation>
+        <translation type="unfinished">開始</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>取消</translation>
+        <translation type="unfinished">取消</translation>
     </message>
 </context>
 <context>
@@ -7688,26 +8413,6 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Firmware:</source>
         <translation>韌體:</translation>
-    </message>
-    <message>
-        <source>Image Control</source>
-        <translation>影像控制</translation>
-    </message>
-    <message>
-        <source>Default rotation:</source>
-        <translation>預設翻轉:</translation>
-    </message>
-    <message>
-        <source>Licensing</source>
-        <translation>授權</translation>
-    </message>
-    <message>
-        <source>Use an analog license to view this camera</source>
-        <translation>此攝影機需使用類比授權</translation>
-    </message>
-    <message>
-        <source>Get More Licenses...</source>
-        <translation>取得更多授權…</translation>
     </message>
     <message>
         <source>Software (Max FPS may be slightly decreased on Server)</source>
@@ -7750,16 +8455,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>密碼:</translation>
     </message>
     <message>
-        <source>Force aspect ratio to:</source>
-        <translation>強制顯示比例為:</translation>
-    </message>
-    <message>
         <source>Enable audio</source>
         <translation>允許聲音</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens camera</source>
-        <translation>這是魚眼 (360度) 攝影機</translation>
     </message>
     <message>
         <source>Recording</source>
@@ -7820,6 +8517,10 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Expert</source>
         <translation>專家模式</translation>
+    </message>
+    <message>
+        <source>IO ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7956,6 +8657,33 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
 </context>
 <context>
+    <name>SystemSettingsWidget</name>
+    <message>
+        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
+        <translation type="unfinished">警告! 錄影排程的 FPS 及 畫質設定將無作用!</translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
+        <translation type="unfinished">(建議)</translation>
+    </message>
+    <message>
+        <source>Enable audit trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send anonymous usage and crash statistics to software developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers auto discovery</source>
+        <translation type="unfinished">開啟攝影機與伺服器自動搜尋功能</translation>
+    </message>
+    <message>
+        <source>Allow system to optimize camera settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TimeServerSelectionWidget</name>
     <message>
         <source>Current system time:</source>
@@ -7975,10 +8703,6 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Create New User</source>
         <translation>新增使用者</translation>
-    </message>
-    <message>
-        <source>User Properties</source>
-        <translation>使用者屬性</translation>
     </message>
     <message>
         <source>Advanced...</source>
@@ -8009,8 +8733,12 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>&amp;登入:</translation>
     </message>
     <message>
-        <source>&amp;Email:</source>
-        <translation>&amp;Email:</translation>
+        <source>E&amp;mail:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -1186,7 +1186,9 @@ void QnWorkbenchNavigator::updateLines() {
     }
 
     QnLayoutResourcePtr currentLayoutResource = workbench()->currentLayout()->resource().staticCast<QnLayoutResource>();
-    if (context()->snapshotManager()->isFile(currentLayoutResource)) {
+    if (context()->snapshotManager()->isFile(currentLayoutResource) || 
+        (currentLayoutResource && !currentLayoutResource->getLocalRange().isEmpty()))
+    {
         m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, false);
         m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, false);
     } else {

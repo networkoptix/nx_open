@@ -12,7 +12,7 @@ namespace nx_ms_conf
 
     static const QLatin1String MIN_STORAGE_SPACE( "minStorageSpace" );
 #ifdef __arm__
-    static const qint64 DEFAULT_MIN_STORAGE_SPACE =    100*1024*1024; // 100MB
+    static const qint64 DEFAULT_MIN_STORAGE_SPACE = 100*1024*1024; // 100MB
 #else
     static const qint64 DEFAULT_MIN_STORAGE_SPACE = 5*1024*1024*1024ll; // 5gb
 #endif
@@ -79,6 +79,10 @@ namespace nx_ms_conf
 
     static const QLatin1String HTTP_MSG_LOG_LEVEL( "http-log-level" );
     static const QLatin1String DEFAULT_HTTP_MSG_LOG_LEVEL( "none" );
+
+    //!If set to \a true, EC DB is opened in read-only mode. So, any data modification operation except license activation will fail
+    static const QLatin1String EC_DB_READ_ONLY( "ecDbReadOnly" );
+    static const QLatin1String DEFAULT_EC_DB_READ_ONLY( "false" );
 }
 
 /*!

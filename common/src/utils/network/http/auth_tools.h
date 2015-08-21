@@ -6,6 +6,8 @@
 #ifndef NX_AUTH_TOOLS_H
 #define NX_AUTH_TOOLS_H
 
+#include <QString>
+
 #include "httptypes.h"
 
 
@@ -25,6 +27,13 @@ namespace nx_http
         const StringType& userName,
         const StringType& realm,
         const StringType& userPassword );
+    /*!
+        Covenience method
+    */
+    BufferType calcHa1(
+        const QString& userName,
+        const QString& realm,
+        const QString& userPassword );
 
     BufferType calcHa2(
         const StringType& method,

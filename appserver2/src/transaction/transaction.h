@@ -168,6 +168,9 @@ namespace ec2
 
             getTransactionLog           = 10000,  /*< QnAbstractTransactionList*/
 
+            /* Ldap */
+            testLdapSettings            = 11001, /*< QnLdapSettings */
+
             maxTransactionValue         = 65535
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
@@ -182,6 +185,26 @@ namespace ec2
         /** Check if transaction should be written to data base. */
         bool isPersistent( Value val );
     }
+
+    //!Contains information on how transaction has been delivered
+    class QnTranDeliveryInformation
+    {
+    public:
+        enum TranOriginatorType
+        {
+            localServer,
+            remoteServer,
+            client
+        };
+
+        TranOriginatorType originatorType;
+
+        QnTranDeliveryInformation()
+        :
+            originatorType( TranOriginatorType::localServer )
+        {
+        }
+    };
 
     class QnAbstractTransaction
     {
@@ -212,6 +235,7 @@ namespace ec2
         ApiCommand::Value command;
         QnUuid peerID;
         PersistentInfo persistentInfo;
+        QnTranDeliveryInformation deliveryInfo;
         
         bool isLocal; // do not propagate transactions to other server peers
 

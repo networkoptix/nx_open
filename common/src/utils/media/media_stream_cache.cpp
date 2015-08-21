@@ -377,7 +377,7 @@ void MediaStreamCache::unblockData( int blockingID )
     m_dataBlockings.erase( it );
 }
 
-size_t MediaStreamCache::inactivityPeriod() const
+qint64 MediaStreamCache::inactivityPeriod() const
 {
     QnMutexLocker lk( &m_mutex );
     return m_inactivityTimer.elapsed();

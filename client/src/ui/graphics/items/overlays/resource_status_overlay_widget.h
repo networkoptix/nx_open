@@ -19,6 +19,13 @@ class QnStatusOverlayWidget: public GraphicsWidget, protected QnGeometry {
     typedef GraphicsWidget base_type;
 
 public:
+    enum ButtonType {
+        NoButton,
+        DiagnosticsButton,
+        IoEnableButton,
+        MoreLicensesButton
+    };
+
     QnStatusOverlayWidget(QGraphicsWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnStatusOverlayWidget();
 
@@ -27,12 +34,15 @@ public:
 
     virtual void setGeometry(const QRectF &geometry) override;
 
-    bool isDiagnosticsVisible() const;
-    void setDiagnosticsVisible(bool diagnosticsVisible);
+    ButtonType buttonType() const;
+    void setButtonType(ButtonType buttonType);
 
 signals:
     void statusOverlayChanged();
+
     void diagnosticsRequested();
+    void ioEnableRequested();
+    void moreLicensesRequested();
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -48,6 +58,7 @@ private:
         NoVideoStreamText,
         AnalogLicenseText,
         VideowallLicenseText,
+        IoModuleDisabledText,
         TextCount
     };
 
@@ -55,7 +66,8 @@ private:
     void paintPixmap(QPainter *painter, const QPixmap &picture, qreal imageSize);
 
     void updateLayout();
-    void updateDiagnosticsButtonOpacity(bool animate = true);
+    void updateButtonOpacity(bool animate = true);
+    void updateButtonText();
 
 private:
     QSharedPointer<QnPausedPainter> m_pausedPainter;
@@ -63,10 +75,11 @@ private:
     Qn::ResourceStatusOverlay m_statusOverlay;
 
     boost::array<QStaticText, TextCount> m_staticTexts;
+
     QFont m_staticFont;
 
-    bool m_diagnosticsVisible;
-    QnTextButtonWidget *m_diagnosticsButton;
+    ButtonType m_buttonType;
+    QnTextButtonWidget *m_button;
     std::unique_ptr<QPixmap> m_ioSpeakerPixmap;
 };
 

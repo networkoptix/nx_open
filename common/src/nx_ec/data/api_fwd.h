@@ -26,7 +26,7 @@ namespace ec2 {
     struct ApiClientInfoData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
-	struct ApiFullInfoData;
+    struct ApiFullInfoData;
     struct ApiSyncMarkerRecord;
     struct ApiUpdateSequenceData;
     struct ApiIdData;

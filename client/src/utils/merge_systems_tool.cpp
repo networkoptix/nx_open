@@ -31,6 +31,8 @@ namespace {
             return QnMergeSystemsTool::AuthentificationError;
         else if (str == lit("BACKUP_ERROR"))
             return QnMergeSystemsTool::BackupError;
+        else if (str == lit("STARTER_LICENSE_ERROR"))
+            return QnMergeSystemsTool::StarterLicenseError;
         else
             return QnMergeSystemsTool::InternalError;
     }
@@ -85,9 +87,9 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 
     ErrorCode errorCode = (status == 0) ? errorStringToErrorCode(errorString) : InternalError;
 
-    if (errorCode == NoError) {
+    if (errorCode == NoError || errorCode == StarterLicenseError) {
         m_serverByRequestHandle.clear();
-        emit systemFound(moduleInformation, server, NoError);
+        emit systemFound(moduleInformation, server, errorCode);
         return;
     }
 

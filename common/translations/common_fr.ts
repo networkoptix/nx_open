@@ -15,6 +15,17 @@
     </message>
 </context>
 <context>
+    <name>QnActiResource</name>
+    <message>
+        <source>Output %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>User Defined (%1)</source>
@@ -254,10 +265,6 @@
         <translation>Perte de paquet RTP détectée.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>Serveur arrêté.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>Démarrage du serveur après un plantage.</translation>
     </message>
@@ -276,6 +283,30 @@
     <message>
         <source>Conflicting Server: %1</source>
         <translation>Conflit de serveur: %1</translation>
+    </message>
+    <message>
+        <source>start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -574,6 +605,22 @@
         <source>Unknown error</source>
         <translation>Erreur inconnue</translation>
     </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseUsageHelper</name>
@@ -638,6 +685,20 @@
     <message>
         <source>Preset #</source>
         <translation>Préréglage #</translation>
+    </message>
+</context>
+<context>
+    <name>QnPlAxisResource</name>
+    <message>
+        <source>Can&apos;t initialize IO port settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPlOnvifResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -887,6 +948,17 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>Paramètre invalide</translation>
+    </message>
+</context>
+<context>
+    <name>QnThirdPartyResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

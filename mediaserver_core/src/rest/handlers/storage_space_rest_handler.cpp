@@ -8,6 +8,7 @@
 #include <platform/platform_abstraction.h>
 #include <plugins/plugin_manager.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
+#include <plugins/storage/file_storage/file_storage_resource.h>
 
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
 #include <utils/serialization/json.h>
@@ -16,6 +17,7 @@
 #include "media_server/settings.h"
 
 #include <utils/common/app_info.h>
+#include <utils/common/util.h>
 
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
     m_monitor(qnPlatform->monitor()) 
@@ -25,13 +27,23 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
 {
     QnStorageSpaceReply reply;
 
-    QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo(QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition);
+    QList<QnPlatformMonitor::PartitionSpace> partitions =
+        m_monitor->totalPartitionSpaceInfo(
+            QnPlatformMonitor::LocalDiskPartition |
+            QnPlatformMonitor::NetworkPartition
+        );
+
     for(int i = 0; i < partitions.size(); i++)
         partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);
 
     QList<QString> storagePaths;
     for(const QnStorageResourcePtr &storage: qnStorageMan->getStorages()) {
-        QString path = QnStorageResource::toNativeDirPath(storage->getPath());
+        QString path;
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource>(storage);
+        if (fileStorage != nullptr && !fileStorage->getLocalPath().isEmpty())
+            path = QnStorageResource::toNativeDirPath(fileStorage->getLocalPath());
+        else
+            path = QnStorageResource::toNativeDirPath(storage->getPath());
         
         if (storage->hasFlags(Qn::deprecated))
             continue;
@@ -60,13 +72,15 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
             data.freeSpace = -1;
 
         reply.storages.push_back(data);
-        storagePaths.push_back(path);
+        storagePaths.push_back(path);        
     }
+
+    qnStorageMan->getCurrentlyUsedLocalPathes(&storagePaths);
 
     for(const QnPlatformMonitor::PartitionSpace &partition: partitions) {
         bool hasStorage = false;
         for(const QString &storagePath: storagePaths) {
-            if(storagePath.startsWith(partition.path)) {
+            if(closeDirPath(storagePath).startsWith(partition.path)) {
                 hasStorage = true;
                 break;
             }
@@ -109,10 +123,10 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
     {
         reply.storageProtocols.push_back(storagePlugin->storageType());
     }
-#ifdef Q_OS_WIN
+//#ifdef Q_OS_WIN
     reply.storageProtocols.push_back(lit("smb"));
     /* Coldstore is not supported for now as nobody uses it. */
-#endif
+//#endif
 
     result.setReply(reply);
     return CODE_OK;

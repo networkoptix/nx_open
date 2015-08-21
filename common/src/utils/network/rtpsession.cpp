@@ -26,6 +26,7 @@
 #include "utils/common/synctime.h"
 #include "tcp_connection_priv.h"
 #include "http/custom_headers.h"
+#include "version.h"
 
 
 #define DEFAULT_RTP_PORT 554
@@ -38,7 +39,6 @@ static const quint32 CSRC_CONST = 0xe8a9552a;
 static const int TCP_CONNECT_TIMEOUT = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
-static const char USER_AGENT_STR[] = "Network Optix";
 //static const int TIME_RESYNC_THRESHOLD = 15;
 //static const int TIME_FUTURE_THRESHOLD = 4;
 //static const double TIME_RESYNC_THRESHOLD2 = 30;
@@ -374,6 +374,7 @@ static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64*1024;
 static std::atomic<int> RTPSessionInstanceCounter(0);
 
 // ================================================== RTPSession ==========================================
+
 RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
 :
     m_csec(2),
@@ -395,7 +396,7 @@ RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
-    m_userAgent(USER_AGENT_STR)
+    m_userAgent(QByteArray(QN_PRODUCT_NAME_LONG) + QByteArray(" ") + QByteArray(QN_APPLICATION_VERSION))
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
@@ -557,10 +558,12 @@ void RTPSession::parseSDP()
 
 void RTPSession::parseRangeHeader(const QString& rangeStr)
 {
+    //TODO use nx_rtsp::parseRangeHeader
+
     QStringList rangeType = rangeStr.trimmed().split(QLatin1Char('='));
     if (rangeType.size() < 2)
         return;
-    if (rangeType[0] == QLatin1String("npt"))
+    if (rangeType[0] == QLatin1String("clock"))
     {
         int index = rangeType[1].lastIndexOf(QLatin1Char('-'));
         QString start = rangeType[1].mid(0, index);
@@ -795,6 +798,12 @@ void RTPSession::addAuth(QByteArray& request)
 }   
 #endif
 
+void RTPSession::addCommonHeaders(nx_http::HttpHeaders& headers)
+{
+    headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
+    headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+}
+
 nx_http::Request RTPSession::createDescribeRequest()
 {
     m_sdpTracks.clear();
@@ -803,8 +812,7 @@ nx_http::Request RTPSession::createDescribeRequest()
     request.requestLine.method = "DESCRIBE";
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
-    request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+    addCommonHeaders(request.headers);
     request.headers.insert( nx_http::HttpHeader( "Accept", "application/sdp" ) );
     if( (quint64)m_openedTime != AV_NOPTS_VALUE )
         addRangeHeader( &request, m_openedTime, AV_NOPTS_VALUE );
@@ -840,8 +848,7 @@ bool RTPSession::sendOptions()
     request.requestLine.method = "OPTIONS";
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
-    request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+    addCommonHeaders(request.headers);
     return sendRequestInternal(std::move(request));
 }
 
@@ -995,8 +1002,7 @@ bool RTPSession::sendSetup()
             request.requestLine.urlPostfix = QByteArray("/") + trackInfo->setupURL;
         }
         request.requestLine.version = nx_rtsp::rtsp_1_0;
-        request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-        request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+        addCommonHeaders(request.headers);
 
 
         {   //generating transport header
@@ -1116,8 +1122,7 @@ bool RTPSession::sendSetParameter( const QByteArray& paramName, const QByteArray
     request.requestLine.method = "SET_PARAMETER";
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
-    request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+    addCommonHeaders(request.headers);
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     request.headers.insert( nx_http::HttpHeader( "Content-Length", QByteArray::number(request.messageBody.size()) ) );
     return sendRequestInternal(std::move(request));
@@ -1129,16 +1134,16 @@ void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPo
     {
         nx_http::StringType rangeVal;
         if (startPos != DATETIME_NOW)
-            rangeVal += "npt=" + nx_http::StringType::number(startPos);
+            rangeVal += "clock=" + nx_http::StringType::number(startPos);
         else
-            rangeVal += "npt=now";
+            rangeVal += "clock=now";
         rangeVal += '-';
         if (endPos != qint64(AV_NOPTS_VALUE))
         {
             if (endPos != DATETIME_NOW)
                 rangeVal += nx_http::StringType::number(endPos);
             else
-                rangeVal += "now";
+                rangeVal += "clock";
         }
         request->headers.insert( nx_http::HttpHeader( "Range", rangeVal ) );
     }
@@ -1158,8 +1163,7 @@ nx_http::Request RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
     request.requestLine.method = "PLAY";
     request.requestLine.url = m_contentBase;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
-    request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+    addCommonHeaders(request.headers);
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     addRangeHeader( &request, startPos, endPos );
     request.headers.insert( nx_http::HttpHeader( "Scale", QByteArray::number(m_scale) ) );
@@ -1223,8 +1227,7 @@ bool RTPSession::sendPause()
     request.requestLine.method = "PAUSE";
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
-    request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+    addCommonHeaders(request.headers);
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
 }
@@ -1235,8 +1238,7 @@ bool RTPSession::sendTeardown()
     request.requestLine.method = "TEARDOWN";
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
-    request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+    addCommonHeaders(request.headers);
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
 }
@@ -1354,8 +1356,7 @@ bool RTPSession::sendKeepAlive()
     request.requestLine.method = "GET_PARAMETER";
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
-    request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+    addCommonHeaders(request.headers);
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
 }
@@ -1881,11 +1882,11 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
                 return true;
         }
 
-        if( !qnAuthHelper->authenticate(
+        if( qnAuthHelper->authenticate(
                 m_auth,
                 response,
                 &request,
-                &m_rtspAuthCtx ) )
+                &m_rtspAuthCtx ) != Auth_OK)
             return false;
     }
 

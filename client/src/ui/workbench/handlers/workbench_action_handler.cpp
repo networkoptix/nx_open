@@ -2,8 +2,6 @@
 
 #include <cassert>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-
 #include <QtCore/QProcess>
 
 #include <QtWidgets/QApplication>
@@ -152,7 +150,6 @@
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
 #include "network/authenticate_helper.h"
-#include "ui/widgets/iomodule/iostate_display_widget.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -231,13 +228,14 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
     connect(action(Qn::OpenBookmarksSearchAction),              SIGNAL(triggered()),    this,   SLOT(at_openBookmarksSearchAction_triggered()));
-    connect(action(Qn::RecordingStatisticsAction),              SIGNAL(triggered()),    this,   SLOT(at_openRecordingStatsAction_triggered()));
     connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
+    connect(action(Qn::OpenAuditLogAction),                     SIGNAL(triggered()),    this,   SLOT(at_openAuditLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
     connect(action(Qn::SystemAdministrationAction),             SIGNAL(triggered()),    this,   SLOT(at_systemAdministrationAction_triggered()));
     connect(action(Qn::SystemUpdateAction),                     SIGNAL(triggered()),    this,   SLOT(at_systemUpdateAction_triggered()));
+    connect(action(Qn::UserManagementAction),                   SIGNAL(triggered()),    this,   SLOT(at_userManagementAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -314,8 +312,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DelayedForcedExitAction),                &QAction::triggered,    this,   [this] {  closeApplication(true);    }, Qt::QueuedConnection);
 
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
-
-    connect(action(Qn::OpenIOMonitorAction),              SIGNAL(triggered()),    this,   SLOT(at_openIOMonitorAction_triggered()));
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -495,10 +491,6 @@ QnBusinessRulesDialog *QnWorkbenchActionHandler::businessRulesDialog() const {
 
 QnEventLogDialog *QnWorkbenchActionHandler::businessEventsLogDialog() const {
     return m_businessEventsLogDialog.data();
-}
-
-QnRecordingStatsDialog *QnWorkbenchActionHandler::recordingStatsDialog() const {
-    return m_recordingStatsDialog.data();
 }
 
 QnCameraListDialog *QnWorkbenchActionHandler::cameraListDialog() const {
@@ -804,18 +796,6 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
         layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QnUuid()));
 
         workbench()->setCurrentLayout(layout);
-    }
-}
-
-void QnWorkbenchActionHandler::at_openIOMonitorAction_triggered() 
-{
-    foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
-        QnServerCameraPtr cameraResource = resource.dynamicCast<QnServerCamera>();
-        if(cameraResource) {
-            QnIOStateDisplayWidget* ioStateDisplay = new QnIOStateDisplayWidget(mainWindow());
-            ioStateDisplay->setCamera(cameraResource);
-            ioStateDisplay->show();
-        }
     }
 }
 
@@ -1183,6 +1163,11 @@ void QnWorkbenchActionHandler::at_systemUpdateAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UpdatesPage);
 }
 
+void QnWorkbenchActionHandler::at_userManagementAction_triggered() {
+    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UserManagement);
+}
+
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
 {
     QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
@@ -1208,14 +1193,9 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
     }
 }
 
-void QnWorkbenchActionHandler::at_openRecordingStatsAction_triggered() 
-{
-    QnNonModalDialogConstructor<QnRecordingStatsDialog> dialogConstructor(m_recordingStatsDialog, mainWindow());
+void QnWorkbenchActionHandler::at_openAuditLogAction_triggered() {
+    QnNonModalDialogConstructor<QnAuditLogDialog> dialogConstructor(m_auditLogDialog, mainWindow());
     QnActionParameters parameters = menu()->currentParameters(sender());
-    QnMediaServerResourcePtr server;
-    if (!parameters.resources().isEmpty())
-        server = parameters.resource().dynamicCast<QnMediaServerResource>();
-    recordingStatsDialog()->setServer(server);
 }
 
 void QnWorkbenchActionHandler::at_cameraListAction_triggered() {
@@ -1527,8 +1507,6 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
     QnMediaServerResourcePtr server = servers.first();
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->instance<QnCameraDataManager>(), &QnCameraDataManager::clearCache);
-
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
         return;
@@ -1824,6 +1802,10 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     /* User cannot delete himself. */
     resources.removeOne(context()->user());
+
+    /* No one can delete Administrator. */
+    resources.removeOne(qnResPool->getAdministrator());
+
     if(resources.isEmpty())
         return;
 

@@ -274,6 +274,9 @@ QnTransactionTransport::~QnTransactionTransport()
 
     if (m_connected)
         connectDone(m_remotePeer.id);
+
+    if (m_ttFinishCallback)
+        m_ttFinishCallback();
 }
 
 void QnTransactionTransport::addData(QByteArray&& data)
@@ -455,7 +458,7 @@ void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& ht
     }
     else {
         QUrl url = QnAppServerConnectionFactory::url();
-        httpClient->setUserName(url.userName());
+        httpClient->setUserName(url.userName().toLower());
         if (dbManager) {
             QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
             if (adminUser) {
@@ -519,6 +522,10 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     m_httpClient->addAdditionalHeader(
         Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME,
         ConnectionType::toString(m_connectionType) );   //incoming means this peer wants to receive data via this connection
+    m_httpClient->addAdditionalHeader(
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME,
+        qnCommon->runningInstanceGUID().toByteArray() );
+    
 
     // Client reconnects to the server
     if( m_localPeer.isClient() ) {
@@ -1570,6 +1577,11 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
         return;
 
     serializeAndSendNextDataBuffer();
+}
+
+void QnTransactionTransport::setBeforeDestroyCallback(std::function<void ()> ttFinishCallback)
+{
+    m_ttFinishCallback = ttFinishCallback;
 }
 
 }

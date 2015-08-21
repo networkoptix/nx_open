@@ -229,8 +229,11 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
 #endif
 
     const auto version = QnAppInfo::applicationFullVersion();
-    const auto systemInfo = QnSystemInformation::currentSystemInformation()
-        .toString().replace( QChar( ' ' ), QChar( '-' ) );
+    const auto systemInfo = QnSystemInformation::currentSystemInformation().toString();
+    const auto systemRuntime = QnSystemInformation::currentSystemRuntime();
+    const auto system = lit( "%1 %2" ).arg( systemInfo ).arg( systemRuntime )
+            .replace( QChar( ' ' ), QChar( '-' ) );
+
     const auto timestamp = m_crashFile.created().toUTC().toString("yyyy-MM-dd_hh-mm-ss");
     const auto extension = fileName.split(QChar('.')).last();
 
@@ -241,7 +244,7 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
     headers.insert(std::make_pair("Nx-Binary", binName.toUtf8()));
     headers.insert(std::make_pair("Nx-Uuid-Hash", uuidHash.result().toHex()));
     headers.insert(std::make_pair("Nx-Version", version.toUtf8()));
-    headers.insert(std::make_pair("Nx-System", systemInfo.toUtf8()));
+    headers.insert(std::make_pair("Nx-System", system.toUtf8()));
     headers.insert(std::make_pair("Nx-Timestamp", timestamp.toUtf8()));
     headers.insert(std::make_pair("Nx-Extension", extension.toUtf8()));
     return headers;

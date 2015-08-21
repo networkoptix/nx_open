@@ -13,6 +13,7 @@
 #include <ui/style/warning_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -26,87 +27,6 @@ namespace {
     const int portAuto = 0;
 }
 
-
-// -------------------------------------------------------------------------- //
-// QnCheckBoxedHeaderView
-// -------------------------------------------------------------------------- //
-QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(QWidget *parent):
-    base_type(Qt::Horizontal, parent),
-    m_checkState(Qt::Unchecked)
-{
-    connect(this, SIGNAL(sectionClicked(int)), this, SLOT(at_sectionClicked(int)));
-}
-
-Qt::CheckState QnCheckBoxedHeaderView::checkState() const {
-    return m_checkState;
-}
-
-void QnCheckBoxedHeaderView::setCheckState(Qt::CheckState state) {
-    if (state == m_checkState)
-        return;
-    m_checkState = state;
-    emit checkStateChanged(state);
-}
-
-void QnCheckBoxedHeaderView::paintEvent(QPaintEvent *e) {
-    base_type::paintEvent(e);
-}
-
-void QnCheckBoxedHeaderView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const {
-    base_type::paintSection(painter, rect, logicalIndex);
-
-    if (logicalIndex == CheckBoxColumn) {
-        if (!rect.isValid())
-            return;
-        QStyleOptionButton opt;
-        opt.initFrom(this);
-
-        QStyle::State state = QStyle::State_Raised;
-        if (isEnabled())
-            state |= QStyle::State_Enabled;
-        if (window()->isActiveWindow())
-            state |= QStyle::State_Active;
-
-        switch(m_checkState) {
-        case Qt::Checked:
-            state |= QStyle::State_On;
-            break;
-        case Qt::Unchecked:
-            state |= QStyle::State_Off;
-            break;
-        default:
-            state |= QStyle::State_NoChange;
-            break;
-        }
-
-        opt.rect = rect.adjusted(4, 0, 0, 0);
-        opt.state |= state;
-        opt.text = QString();
-        style()->drawControl(QStyle::CE_CheckBox, &opt, painter, this);
-        return;
-    }
-}
-
-QSize QnCheckBoxedHeaderView::sectionSizeFromContents(int logicalIndex) const {
-    QSize size = base_type::sectionSizeFromContents(logicalIndex);
-    if (logicalIndex != CheckBoxColumn)
-        return size;
-    size.setWidth(15);
-    return size;
-}
-
-void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
-    if (logicalIndex != CheckBoxColumn)
-        return;
-    if (m_checkState != Qt::Checked)
-        setCheckState(Qt::Checked);
-    else
-        setCheckState(Qt::Unchecked);
-}
-
-// -------------------------------------------------------------------------- //
-// QnCameraAdditionDialog
-// -------------------------------------------------------------------------- //
 QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::CameraAdditionDialog),
@@ -131,7 +51,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::ManualCameraAddition_Help);
 
-    m_header = new QnCheckBoxedHeaderView(this);
+    m_header = new QnCheckBoxedHeaderView(CheckBoxColumn, this);
     ui->camerasTable->setHorizontalHeader(m_header);
     m_header->setVisible(true);
     m_header->setSectionResizeMode(CheckBoxColumn, QHeaderView::ResizeToContents);
@@ -608,24 +528,22 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
 
-    QStringList urls;
-    QStringList manufacturers;
+    QnManualCameraSearchCameraList camerasToAdd;
     int rowCount = ui->camerasTable->rowCount();
     for (int row = 0; row < rowCount; ++row) {
         if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() != Qt::Checked)
             continue;
 
         QnManualCameraSearchSingleCamera info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualCameraSearchSingleCamera>();
-        urls.append(info.url);
-        manufacturers.append(info.manufacturer);
+        camerasToAdd << info;
     }
-    if (urls.empty()){
+    if (camerasToAdd.empty()){
         QMessageBox::information(this, tr("No cameras selected"), tr("Please select at least one camera"));
         return;
     }
 
     QnConnectionRequestResult result;
-    m_server->apiConnection()->addCameraAsync(urls, manufacturers, username, password, &result, SLOT(processReply(int, const QVariant &, int)));
+    m_server->apiConnection()->addCameraAsync(camerasToAdd, username, password, &result, SLOT(processReply(int, const QVariant &, int)));
     setState(Adding);
 
     QEventLoop loop;
@@ -643,7 +561,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
             QMessageBox::information(
                 this,
                 tr("Success"),
-                tr("%n cameras added successfully.", "", urls.size()) + L'\n' + tr("It might take a few moments to populate them in the tree."),
+                tr("%n cameras added successfully.", "", camerasToAdd.size()) + L'\n' + tr("It might take a few moments to populate them in the tree."),
                 QMessageBox::Ok
             );
         } else {
@@ -651,7 +569,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
                 setState(CamerasOffline);
                 return;
             }
-            QMessageBox::critical(this, tr("Error"), tr("Error while adding %n cameras.", "", urls.size()));
+            QMessageBox::critical(this, tr("Error"), tr("Error while adding %n cameras.", "", camerasToAdd.size()));
         }
     }
     setState(CamerasFound);

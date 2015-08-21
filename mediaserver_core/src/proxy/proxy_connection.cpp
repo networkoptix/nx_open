@@ -263,6 +263,9 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
                 return false;
 
             nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader(Qn::PROXY_TTL_HEADER_NAME, QByteArray::number(ttl)));
+            nx_http::StringType existAuthSession = nx_http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
+            if (existAuthSession.isEmpty())
+                nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader(Qn::AUTH_SESSION_HEADER_NAME, authSession().toByteArray()));
 
             QString path = urlPath;
             if (!path.startsWith(QLatin1Char('/')))
@@ -287,6 +290,9 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             &d->request.headers,
             nx_http::HttpHeader( "Via", (viaHeaderStr.isEmpty() ? nx_http::StringType() : ", ") + via.toString() ) );
     }
+
+    //NOTE next hop should accept Authorization header already present
+    //  in request since we use current time as nonce value
 
     d->clientRequest.clear();
     d->request.serialize(&d->clientRequest);

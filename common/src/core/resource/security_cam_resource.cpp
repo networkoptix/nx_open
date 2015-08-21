@@ -319,7 +319,10 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
     if (m_cachedLicenseType == Qn::LC_Count) 
     {
         QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
-        if (resType && resType->getManufacture() == lit("VMAX"))
+
+        if (hasCameraCapabilities(Qn::IOModuleCapability))
+            m_cachedLicenseType = Qn::LC_IO;
+        else if (resType && resType->getManufacture() == lit("VMAX"))
             m_cachedLicenseType =  Qn::LC_VMAX;
         else if (isAnalogEncoder())
             m_cachedLicenseType =  Qn::LC_AnalogEncoder; // AnalogEncoder should have priority over Analog type because of analog type is deprecated (DW-CP04 has both analog and analogEncoder params)
@@ -691,6 +694,44 @@ void QnSecurityCamResource::setScheduleDisabled(bool value) {
 bool QnSecurityCamResource::isScheduleDisabled() const {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     return (*userAttributesLock)->scheduleDisabled;
+}
+
+void QnSecurityCamResource::setLicenseUsed(bool value) {
+
+    /// TODO: #gdm Refactor licence management
+    /*
+    switch (licenseType()) {
+    case Qn::LC_IO:
+        {
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+            if ((*userAttributesLock)->licenseUsed == value)
+                return;
+            (*userAttributesLock)->licenseUsed = value;
+        }
+    default:
+        break;
+    }
+    */
+    setScheduleDisabled(!value);  
+    emit licenseUsedChanged(::toSharedPointer(this));
+}
+
+
+bool QnSecurityCamResource::isLicenseUsed() const {
+    /// TODO: #gdm Refactor licence management
+    /*
+    switch (licenseType()) {
+    case Qn::LC_IO:
+        {
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+            return (*userAttributesLock)->licenseUsed;
+        }
+    default:
+        break;
+    }
+    */
+    /* By default camera requires license when recording is enabled. */
+    return !isScheduleDisabled();
 }
 
 void QnSecurityCamResource::setAudioEnabled(bool enabled) {

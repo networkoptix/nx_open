@@ -23,9 +23,12 @@
                 <meta name="description" content=""/>
                 <meta name="viewport" content="width=device-width"/>
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-                <link rel="stylesheet" href="styles/29403685.vendor.css"/>
+                <link rel="stylesheet" href="styles/409938f1.vendor.css">
+                </link> <!-- This is strange hack, I know -->
 
-                <link rel="stylesheet" href="styles/2de0a171.main.css"/>
+                <link rel="stylesheet" href="styles/092a3cdd.main.css">
+
+                </link><!-- This is strange hack, I know -->
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
@@ -131,7 +134,7 @@
 
 
                                                 </h4> <div class="well">
-                                                    <xsl:value-of select="description"/>
+                                                    <xsl:copy-of select="description"/>
                                                 </div> <dl>
                                                     <dt>Parameters</dt>
                                                     <dd>
@@ -153,7 +156,7 @@
                                                                                 <xsl:value-of select="name"/>
                                                                             </td>
                                                                             <td>
-                                                                                <xsl:value-of select="description"/>
+                                                                                <xsl:copy-of select="description"/>
                                                                             </td>
                                                                             <td>
                                                                                 <xsl:value-of select="optional"/>
@@ -168,7 +171,7 @@
                                                                   data-placement="right"
                                                                   data-trigger="hover focus click">
                                                                                                     <xsl:attribute name="title">
-                                                                                                        <xsl:value-of select="description"/>
+                                                                                                        <xsl:copy-of select="description"/>
                                                                                                     </xsl:attribute> (?) </a>
                                                                                             </li>
                                                                                         </xsl:for-each>
@@ -193,7 +196,7 @@
             </body>
 
 
-            <script src="scripts/5ed9c348.api_documentation.js"></script>
+            <script src="scripts/ad1872f1.api_documentation.js"></script>
 
             <script>
                 $(function () {
@@ -235,7 +238,7 @@
                                 <xsl:value-of select="name"/>
                             </td>
                             <td>
-                                <xsl:value-of select="description"/>
+                                <xsl:copy-of select="description"/>
                             </td>
                         </tr>
                     </xsl:for-each>

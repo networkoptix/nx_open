@@ -1069,7 +1069,7 @@ QnIOPortDataList QnPlAxisResource::mergeIOSettings(const QnIOPortDataList& camer
 
 bool QnPlAxisResource::ioPortErrorOccured()
 {
-    if (getCameraCapabilities() & Qn::IOModuleCapability) {
+    if (hasCameraCapabilities(Qn::IOModuleCapability)) {
         return false; // it's error if can't read IO state for IO module
     }
     else {
@@ -1204,6 +1204,10 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
 
     QString portDisplayName = QString::fromLatin1(notification.mid(0, sepPos));
     int portIndex = portDisplayNameToIndex(portDisplayName);
+    if (portIndex == -1) {
+        NX_LOG( lit("Error parsing Axis notification message %1. Camera: %2").arg(QString::fromLatin1(notification)).arg(getUrl()), cl_logDEBUG1 );
+        return;
+    }
     QString portId = portIndexToId(portIndex);
     const char portType = notification[portTypePos];
     NX_LOG( lit("%1 port %2 changed its state to %3. Camera %4").
