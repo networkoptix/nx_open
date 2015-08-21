@@ -20,6 +20,7 @@ public:
         IncompatibleVersion,
         IncompatibleProtocol,
         Unauthorized,
+        TemporaryUnauthorized,
         ServerError
     };
 

@@ -59,6 +59,8 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode) {
     if (errorCode == ec2::ErrorCode::unauthorized)
         return Result::Unauthorized;
+    else if (errorCode == ec2::ErrorCode::temporary_unauthorized)
+        return Result::TemporaryUnauthorized;
 
     if (errorCode != ec2::ErrorCode::ok)
         return Result::ServerError;
@@ -312,11 +314,17 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
     bool compatibleProduct = qnRuntime->isDevMode() || connectionInfo.brand.isEmpty()
         || connectionInfo.brand == QnAppInfo::productNameShort();
 
-    if (errorCode == ec2::ErrorCode::unauthorized) {
+    if (errorCode == ec2::ErrorCode::temporary_unauthorized) {
         result.result = Result::Unauthorized;
-        result.details = tr("The username or password you have entered is incorrect. Please try again.");
+        result.details = tr("Can't check user name and password because of LDAP server is not accessible now");
         result.helpTopicId = Qn::Login_Help;
-    } else if (errorCode != ec2::ErrorCode::ok) {
+    }
+    else if (errorCode == ec2::ErrorCode::unauthorized) {
+            result.result = Result::Unauthorized;
+            result.details = tr("The username or password you have entered is incorrect. Please try again.");
+            result.helpTopicId = Qn::Login_Help;
+    }
+    else if (errorCode != ec2::ErrorCode::ok) {
         result.result = Result::ServerError;
         result.details = tr("Connection to the Server could not be established.") + L'\n' 
             + tr("Connection details that you have entered are incorrect, please try again.") + L'\n' 
