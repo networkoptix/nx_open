@@ -31,7 +31,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
-
+#include <QScopedPointer>
 #include <QtSingleApplication>
 
 extern "C"
@@ -266,23 +266,6 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #ifndef API_TEST_MAIN
 //#define ENABLE_DYNAMIC_CUSTOMIZATION
 
-void loadTranslation(const QString &translationPath)
-{
-	QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
-	QnTranslation translation;
-	if(!translationPath.isEmpty()) /* From command line. */
-		translation = translationManager->loadTranslation(translationPath);
-
-	if(translation.isEmpty()) /* By path. */
-		translation = translationManager->loadTranslation(qnSettings->translationPath());
-
-	/* Check if qnSettings value is invalid. */
-	if (translation.isEmpty()) 
-		translation = translationManager->defaultTranslation();
-
-	translationManager->installTranslation(translation);
-}
-
 int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // these functions should be called in every thread that wants to use rand() and qrand()
     srand(::time(NULL));
@@ -327,6 +310,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
 
     /* Development options */
+#define ENABLE_DYNAMIC_TRANSLATION
 #ifdef ENABLE_DYNAMIC_TRANSLATION
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
 #endif
@@ -355,8 +339,31 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
+        
+    /// We should load translations before major client's services are started to prevent races
+    typedef QScopedPointer<QnClientTranslationManager> TranslationManager;
+    TranslationManager translationManager(new QnClientTranslationManager());
+
+    QnTranslation translation;
+    if(!translationPath.isEmpty()) /* From command line. */
+        translation = translationManager->loadTranslation(translationPath);
+
+
+    if(translation.isEmpty()) /* By path. */
+    {
+        typedef QScopedPointer<QnClientSettings> ClientSettings;
+        const ClientSettings settings(new QnClientSettings(forceLocalSettings));
+        translation = translationManager->loadTranslation(settings->translationPath());
+    }
+
+    /* Check if qnSettings value is invalid. */
+    if (translation.isEmpty()) 
+        translation = translationManager->defaultTranslation();
+
+    translationManager->installTranslation(translation);
 
     QnClientModule client(forceLocalSettings);
+    qnCommon->store<QnClientTranslationManager>(translationManager.take());
 
     /* Parse command line. */
 #ifdef _DEBUG
@@ -545,9 +552,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // ===========================================================================
 
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
-	
-	/* Load translation. */
-	loadTranslation(translationPath);
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));

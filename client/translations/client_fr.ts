@@ -5816,10 +5816,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cameras with non empty archive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Storage space occupied by camera</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5857,6 +5853,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>%1 Gb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras with non-empty archive</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

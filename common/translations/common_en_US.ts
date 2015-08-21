@@ -4,14 +4,14 @@
 <context>
     <name>Language</name>
     <message>
-        <source>English (US)</source>
+        <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation></translation>
+        <translation>English (US)</translation>
     </message>
     <message>
-        <source>en_US</source>
+        <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation></translation>
+        <translation>en_US</translation>
     </message>
 </context>
 <context>
@@ -172,14 +172,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>An unknown event has occurred</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation></translation>
     </message>
@@ -192,15 +184,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Input Port: %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Conflict Address: %1</source>
         <translation></translation>
     </message>
     <message>
@@ -305,6 +289,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -313,10 +313,6 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
         <source>OK</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Not authorised. Url %1.</source>
         <translation></translation>
     </message>
     <message>
@@ -439,6 +435,10 @@
         <source>Parameters:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCommandLineParser</name>
@@ -454,12 +454,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation></translation>
+        <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
+        <translation>Could not find explorer.exe in path to launch Windows Explorer.</translation>
     </message>
     <message>
-        <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation></translation>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -474,11 +474,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -516,7 +516,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -542,51 +542,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Analog Encoder</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Video Wall</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Trial Licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analog Licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Professional Licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Edge Licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Vmax Licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analog Encoder Licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Video Wall Licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalide Signature</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server with matching hardware ID not found</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid Customization</source>
         <translation></translation>
     </message>
     <message>
@@ -594,16 +550,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Invalid Type</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Only single license is allowed for this device</source>
-        <translation></translation>
+        <translation>Only single license is allowed for this device</translation>
     </message>
     <message>
         <source>Unknown error</source>
-        <translation></translation>
+        <translation>Unknown error</translation>
     </message>
     <message>
         <source>I/O Module</source>
@@ -614,11 +566,59 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Analog Encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trial Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>I/O Module Licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Start Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalide Signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -653,24 +653,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation></translation>
     </message>
     <message>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -715,15 +715,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Trial License</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Licensed To: </source>
         <translation></translation>
     </message>
     <message>
@@ -731,8 +723,16 @@
         <translation></translation>
     </message>
     <message>
+        <source>Trial License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>FREE License</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -859,19 +859,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Storage is full</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
         <translation></translation>
     </message>
     <message>
@@ -920,6 +908,18 @@
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -973,11 +973,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
