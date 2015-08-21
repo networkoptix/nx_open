@@ -34,7 +34,7 @@
                 </td>
             </tr>
             <tr>
-                <td class="hidden-xs">
+                <td class="hidden-mobile">
                     <div class="view-wrapper">
                         <div class="cameras-panel">
                             <ul class="tree nav" >
@@ -77,7 +77,7 @@
                     <div class="view-wrapper">
                         <div class="view-panel" ng-class="{'live-only':liveOnly}">
                             <div class="stick-to-top">
-                                <div class="webclient-panel webclient-bottom-border hidden-xs">
+                                <div class="webclient-panel webclient-bottom-border hidden-mobile">
                                     <div class="pull-right" >
                                         <!--
                                         <div class="webclient-panel-border"></div>
@@ -126,7 +126,7 @@
                                 </div>
                             </div>
 
-                            <div class="float-size hidden-xs">
+                            <div class="float-size hidden-mobile">
                                 <div class="camera-view-informer" ng-if="!positionSelected && activeCamera.status == 'Offline' ">
                                     <div class="camera-view-offline camera-view-message-icon"></div><br/><div class="camera-view-message">OFFLINE</div>
                                 </div>
@@ -143,7 +143,7 @@
                                 </videowindow>
                             </div>
 
-                            <div class="stick-to-bottom hidden-xs" ng-class="{invisible:liveOnly && !activeCamera}">
+                            <div class="stick-to-bottom hidden-mobile" ng-class="{invisible:liveOnly && !activeCamera}">
                                 <timeline
                                         can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"
                                     live-only="liveOnly"

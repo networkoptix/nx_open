@@ -348,7 +348,6 @@ angular.module('webadminApp')
                 var format = null;
 
                 scope.$watch("vgSrc",function(){
-
                     scope.loading = false;
                     scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {

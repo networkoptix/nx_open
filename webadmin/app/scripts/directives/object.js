@@ -40,11 +40,6 @@ angular.module('webadminApp')
                         content +
                         '</object>';
 
-
-
-                if(Config.allowDebugMode && Config.debug.video){
-                    console.log("objecter",objectHTML);
-                }
                     $_current.html(objectHTML);
 
                 //}, true);
