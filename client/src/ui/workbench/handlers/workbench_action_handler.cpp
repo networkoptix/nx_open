@@ -2024,10 +2024,15 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         ((permissions & Qn::WriteEmailPermission) ? QnUserSettingsDialog::Editable : zero);
     emailFlags &= flags;
 
+    QnUserSettingsDialog::ElementFlags enabledFlags =  
+        ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable | QnUserSettingsDialog::Visible : zero);
+    enabledFlags &= flags;
+
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Email, emailFlags);
+    dialog->setElementFlags(QnUserSettingsDialog::Enabled, enabledFlags);
 
 
     // TODO #Elric: This is a totally evil hack. Store password hash/salt in user.
@@ -2045,9 +2050,11 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     if (!(permissions & Qn::SavePermission))
         return;
-    
-    
+       
     dialog->submitToResource();
+    if (!connection2())
+        return;
+
     connection2()->getUserManager()->save(
         user, this, 
         [this, user]( int reqID, ec2::ErrorCode errorCode ) {

@@ -136,6 +136,7 @@ var flashlsAPI = new (function(){
 
     this.getFlashMovieObject = function (){
         var movieName = flashParameters.name || this.element;
+
         if (window.document[movieName])
         {
             return window.document[movieName];
@@ -154,8 +155,10 @@ var flashlsAPI = new (function(){
         if(!this.flashObject) {
             this.flashObject = this.getFlashMovieObject(); //e.ref is a pointer to the <object>
 
-            //console.log("embed handler");
-            //console.log(this.flashObject);
+            if(Config.allowDebugMode && Config.debug.video){
+                console.log("embed handler");
+                console.log(this.flashObject);
+            }
 
             if(window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.browserMajorVersion<=10) { // Force disabling hardware acceleration for IE9, IE10
                 this.playerSetUseHardwareVideoDecoder(false);
@@ -501,9 +504,6 @@ flashlsAPI.flashlsEvents = {
 
 
 window.flashlsCallback = function(eventName, args) {
-    if(!flashlsAPI.flashObject) {
-        //console.log("flashlsCallback ", eventName, args);
-    }
     flashlsAPI.embedHandler();
     if(flashlsAPI.flashlsEvents[eventName]) {
         flashlsAPI.flashlsEvents[eventName].apply(null, args);

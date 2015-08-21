@@ -20,7 +20,8 @@
 #include <utils/common/ldap.h>
 
 namespace {
-    const int testLdapTimeoutMSec = 20 * 1000;
+    //TODO: #GDM move timeout constant to more common module
+    const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
 }
 
 QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
@@ -88,7 +89,9 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
 #endif
         stopTesting(result);
         return;
-    } 
+    }
+
+    updateExistingUsers(users);
 
     QnLdapUsers filteredUsers = filterExistingUsers(users);
     if (filteredUsers.isEmpty()) {
@@ -108,8 +111,9 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
     auto header = new QnCheckBoxedHeaderView(QnLdapUserListModel::CheckBoxColumn, this);
     sortModel->setSourceModel(usersModel);
 
-    connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, [usersModel](Qt::CheckState state){
-        usersModel->setCheckState(state);
+    connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, [this, usersModel](Qt::CheckState state) {
+        for (const auto &user: visibleUsers())
+            usersModel->setCheckState(state, user.login);
     });
 
     ui->usersTable->setModel(sortModel);  
@@ -122,22 +126,38 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
 
     ui->usersTable->sortByColumn(QnLdapUserListModel::FullNameColumn, Qt::AscendingOrder);
 
-    connect(ui->usersTable, &QTableView::clicked, this,  [usersModel, header] (const QModelIndex &index) {
+    auto updateSelection = [this, header, sortModel] {
+        auto users = visibleSelectedUsers();
+        Qt::CheckState selectionState = Qt::Unchecked;
+
+        if (!users.isEmpty()) {
+
+            if (users.size() == sortModel->rowCount())
+                selectionState = Qt::Checked;
+            else
+                selectionState = Qt::PartiallyChecked;
+        }
+
+        header->setCheckState(selectionState);
+    };
+
+    connect(ui->usersTable, &QTableView::clicked, this,  [usersModel, updateSelection] (const QModelIndex &index) {
         if (index.column() != QnLdapUserListModel::CheckBoxColumn) 
             return;
 
-        QnLdapUser user = usersModel->getUser(index);
-        if (user.login.isEmpty())
+        QString login = index.data(QnLdapUserListModel::LoginRole).toString();
+        if (login.isEmpty())
             return;
 
         /* Invert current state */
-        usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, user.login);
-        header->setCheckState(usersModel->checkState());
+        usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, login);
+        updateSelection();
+        
     });
 
     m_importButton->setVisible(true);
-    connect(m_importButton, &QPushButton::clicked, this, [this, usersModel] {
-        importUsers(usersModel->selectedUsers());
+    connect(m_importButton, &QPushButton::clicked, this, [this] {
+        importUsers(visibleSelectedUsers());
         accept();
     });
 
@@ -148,6 +168,14 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
     //TODO: #GDM model should notify about its check state changes
     connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, updateButton);
     updateButton();
+
+    sortModel->setDynamicSortFilter(true);
+    sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    sortModel->setFilterKeyColumn(-1);
+    connect(ui->filterLineEdit,  &QLineEdit::textChanged, this, [sortModel, updateSelection](const QString &text) {
+        sortModel->setFilterWildcard(text);
+        updateSelection();
+    });
 }
 
 void QnLdapUsersDialog::stopTesting(const QString &text /*= QString()*/) {
@@ -162,6 +190,34 @@ void QnLdapUsersDialog::stopTesting(const QString &text /*= QString()*/) {
     ui->errorLabel->setText(text);
     ui->errorLabel->setVisible(true);
 }
+
+void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users) {
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    auto importedUsers = qnResPool->getResources<QnUserResource>().filtered([](const QnUserResourcePtr &user) {
+        return user->isLdap();
+    });  
+
+    for (const QnLdapUser &ldapUser: users) {
+        auto it = std::find_if(importedUsers.cbegin(), importedUsers.cend(), [ldapUser](const QnUserResourcePtr &user) {
+            return QString::compare(ldapUser.login, user->getName(), Qt::CaseInsensitive) == 0;
+        });
+
+        if (it == importedUsers.cend())
+            continue;
+
+        QnUserResourcePtr existingUser = *it;
+        if (existingUser->getEmail() == ldapUser.email)
+            continue;
+
+        existingUser->setEmail(ldapUser.email);
+
+        connection->getUserManager()->save(existingUser, this,[] {} );
+    }
+}
+
 
 void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
 
@@ -198,5 +254,35 @@ QnLdapUsers QnLdapUsersDialog::filterExistingUsers(const QnLdapUsers &users) con
         result << user;
     }
 
+    return result;
+}
+
+QnLdapUsers QnLdapUsersDialog::visibleUsers() const {
+    QnLdapUsers result;
+    auto model = ui->usersTable->model();
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        QModelIndex index = model->index(row, QnLdapUserListModel::CheckBoxColumn);
+
+        auto user = index.data(QnLdapUserListModel::LdapUserRole).value<QnLdapUser>();
+        if (!user.login.isEmpty())
+            result << user;
+    }
+    return result;
+}
+
+QnLdapUsers QnLdapUsersDialog::visibleSelectedUsers() const {
+    QnLdapUsers result;
+    auto model = ui->usersTable->model();
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        QModelIndex index = model->index(row, QnLdapUserListModel::CheckBoxColumn);
+        bool checked = index.data(Qt::CheckStateRole).toBool();
+        if (!checked)
+            continue;
+        auto user = index.data(QnLdapUserListModel::LdapUserRole).value<QnLdapUser>();
+        if (!user.login.isEmpty())
+            result << user;
+    }
     return result;
 }

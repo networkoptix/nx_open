@@ -16,7 +16,8 @@ angular.module('webadminApp')
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
 
-                var debugEventsMode = true;
+                var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
+
 
                 var timelineConfig = {
                     initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
@@ -26,7 +27,7 @@ angular.module('webadminApp')
                     minMarkWidth: 1, // Minimum width for visible mark
 
                     zoomSpeed: 0.025, // Zoom speed for dblclick
-                    zoomAccuracy: 0.00001,
+                    zoomAccuracy: 0.01,
                     slowZoomSpeed: 0.01, // Zoom speed for holding buttons
                     maxVerticalScrollForZoom: 250, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
@@ -75,7 +76,7 @@ angular.module('webadminApp')
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
-                    loadingChunkColor: [0,255,0,0.3],
+                    loadingChunkColor: [0,255,255,0.3],
                     blindChunkColor:  [255,0,0,0.3],
                     highlighChunkColor: [255,255,0,1],
 
@@ -282,10 +283,11 @@ angular.module('webadminApp')
                     scope.viewportWidth = element.find(".viewport").width();
                     canvas.width  = scope.viewportWidth;
                     scope.scaleManager.setViewportWidth(scope.viewportWidth);
+                    $timeout(checkZoomButtons);
                 }
                 function initTimeline(){
                     var now = (new Date()).getTime();
-                    scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.start : (now - timelineConfig.initialInterval));
+                    scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd(now);
 
                     scope.zoomTo(1); // Animate full zoom out
@@ -734,6 +736,7 @@ angular.module('webadminApp')
                     var start = scope.scaleManager.alignStart(level);
                     var end = scope.scaleManager.alignEnd(level);
 
+
                     if(scope.recordsProvider && scope.recordsProvider.chunksTree) {
                         // 1. Splice events
                         var events = scope.recordsProvider.getIntervalRecords(start, end, levelIndex);
@@ -753,25 +756,28 @@ angular.module('webadminApp')
 
                     context.fillStyle = blurColor(timelineConfig.exactChunkColor,blur);
 
-                    if(debug){
-                        if(levelIndex == chunk.level) { // not exact chunk
-                            context.fillStyle = blurColor(timelineConfig.loadingChunkColor,blur);
-                        }
-                        if(!chunk.level){ //blind spot!
-                            context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
-                        }
-                        if(targetLevelIndex == levelIndex) {
-                            context.fillStyle = blurColor(timelineConfig.highlighChunkColor, 1);
-                        }
-                    }
 
 
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
                     var height = timelineConfig.chunkHeight * scope.viewportHeight;
 
                     if(debug){
-                        top += (1+levelIndex)/RulerModel.levels.length * height;
+                        if(targetLevelIndex == levelIndex) {
+                            context.fillStyle = blurColor(timelineConfig.highlighChunkColor, 1);
+                        }
+
+                        if(levelIndex == chunk.level) { // not exact chunk
+                            context.fillStyle = blurColor(timelineConfig.loadingChunkColor,blur);
+                        }
+                        if(!chunk.level){ //blind spot!
+                            context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
+                        }
+
+                        top += (1+levelIndex) / RulerModel.levels.length * height;
                         height /= RulerModel.levels.length;
+
+                        top = Math.floor(top);
+                        height = Math.ceil(height);
                     }
 
                     context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
@@ -1135,9 +1141,8 @@ angular.module('webadminApp')
                     return false;
                 }
                 function checkZoomButtons(){
-                    var zoom = scope.scaleManager.zoom();
-                    scope.disableZoomOut = zoom >= scope.scaleManager.fullZoomOutValue() - timelineConfig.zoomAccuracy;
-                    scope.disableZoomIn = zoom <= scope.scaleManager.fullZoomInValue() + timelineConfig.zoomAccuracy;
+                    scope.disableZoomOut = !scope.scaleManager.çheckZoomOut();
+                    scope.disableZoomIn =  !scope.scaleManager.çheckZoomIn();
                 }
                 scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 
@@ -1226,10 +1231,8 @@ angular.module('webadminApp')
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
 
                 scope.$watch("positionProvider.liveMode",function(mode){
-                    if(scope.positionProvider) {
-                        if (scope.positionProvider.liveMode) {
-                            scope.goToLive(true);
-                        }
+                    if(scope.positionProvider && scope.positionProvider.liveMode) {
+                        scope.goToLive(true);
                     }
                 });
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
