@@ -7,7 +7,7 @@ var Config = {
 
     demo:"/~ebalashov/webclient/api",
     demoMedia:"//10.0.2.186:7001",
-    webclientEnabled: true, // set to false to disable webclient from top menu and show placeholder instead
+    webclientEnabled: false, // set to false to disable webclient from top menu and show placeholder instead
     allowDebugMode:false, // Allow debugging at all. Set to false in production
     debug: {
         video: false, // videowindow.js - disable loader, allow rightclick
