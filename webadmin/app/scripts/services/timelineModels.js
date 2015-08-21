@@ -20,6 +20,22 @@ Chunk.prototype.debug = function(){
     console.log(new Array(this.level + 1).join(" "), this.title, this.level,  this.children.length);
 };
 
+
+function isDate(val){
+    return val instanceof Date;
+}
+function NumberToDate(date){
+    if(typeof(date)=='number' || typeof(date)=='Number'){
+        date = Math.round(date);
+        date = new Date(date);
+    }
+    if(!isDate(date)){
+        console.error("non date " + (typeof date) + ": " + date );
+        return null;
+    }
+    return date;
+}
+
 // Additional mini-library for declaring and using settings for ruler levels
 function Interval (ms,seconds,minutes,hours,days,months,years){
     this.seconds = seconds;
@@ -30,22 +46,10 @@ function Interval (ms,seconds,minutes,hours,days,months,years){
     this.years = years;
     this.milliseconds = ms
 };
-if(!Number.isInteger) {
-    Number.isInteger = function (num) {
-        return (typeof num === 'number') && (Math.round(num) === num);
-    };
-};
-function isDate(val){
-    return val instanceof Date;
-}
+
 Interval.prototype.addToDate = function(date, count){
-    if(Number.isInteger(date)) {
-        date = new Date(date);
-    }
-    if(!isDate(date)){
-        console.error("non date " + (typeof date) + ": " + date );
-        return date;
-    }
+    date = NumberToDate(date);
+
     if(typeof(count)==='undefined') {
         count = 1;
     }
@@ -127,11 +131,9 @@ Interval.prototype.alignToPast = function(dateToAlign){
 
 //Check if current date aligned by interval
 Interval.prototype.checkDate = function(date){
-    if(Number.isInteger(date)) {
-        date = new Date(date);
-    }
-    if(!isDate(date)){
-        console.error("checkDate - non date" , date);
+    date = NumberToDate(date);
+
+    if(!date ){
         return false;
     }
 
