@@ -3439,11 +3439,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>năm</translation>
     </message>
     <message>
-        <source>List of tags divided by commas or spaces.</source>
+        <source>Do not lock archive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not lock archive.</source>
+        <source>List of tags divided by commas or spaces.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4363,6 +4363,46 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Pulse time(ms)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Unknown</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished">không biết</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Circuit</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grounded circuit</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid state</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnImageControlWidget</name>
@@ -4661,16 +4701,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>kích hoạt giấy phép</translation>
     </message>
     <message>
-        <source>Network error has occurred during automatic license activation. Please contact support team to activate your license key manually.</source>
-        <translation>Lỗi mạng đã xảy ra trong quá trình kích hoạt giấy phép tự động. Hãy liên hệ với nhóm hỗ trợ để kích hoạt key bản quyền của bạn bằng tay.</translation>
-    </message>
-    <message>
         <source>Remove license</source>
         <translation>loại bỏ giấy phép</translation>
-    </message>
-    <message>
-        <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
-        <translation>Hướng dẫn khóa kích hoạt tập tin bạn đã chọn không hợp lệ. Chọn đúng nhãn key kích hoạt tập tin. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ.</translation>
     </message>
     <message>
         <source>License was successfully activated.</source>
@@ -4734,6 +4766,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5131,10 +5171,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Phần thứ hai được vô hiệu hóa trên máy ảnh này. Tùy chọn Chuyển động + LQ không có effect.Press &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
-    </message>
-    <message>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
         <translation>&lt;nhiều lựa chọn&gt;</translation>
@@ -5146,6 +5182,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5563,20 +5603,20 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>không ai</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset &quot;%1&quot;</source>
-        <translation>Các phím nóng là thời điểm định sẵn &quot;%1&quot; dùng</translation>
-    </message>
-    <message>
-        <source>This hotkey is used by tour &quot;%1&quot;</source>
-        <translation>Hotkey này đã được bay đường &quot;%1&quot; dùng</translation>
-    </message>
-    <message>
         <source>Change hotkey</source>
         <translation>Thay đổi phím nóng</translation>
     </message>
     <message>
         <source>Reassign</source>
         <translation>phân công lại</translation>
+    </message>
+    <message>
+        <source>This hotkey is used by preset &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This hotkey is used by tour &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5742,6 +5782,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>less than an hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Gb</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6272,18 +6324,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Kiểm tra các bản cập nhật tự động</translation>
     </message>
     <message>
-        <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Available Update:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Caution: Applying system updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6345,6 +6385,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to extract update file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to check updates via internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Update:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To update manually, download and use the archive file on the following link:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7523,10 +7575,6 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         </translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>sự phản đối</translation>
-    </message>
-    <message>
         <source>AVI (*.avi)</source>
         <translation>AVI (*.avi)</translation>
     </message>
@@ -7612,6 +7660,10 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Unable to export file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8274,10 +8326,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Làm mới</translation>
     </message>
     <message>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished">Tất cả máy chủ đang offline. Logs là không có sẵn.</translation>
-    </message>
-    <message>
         <source>10 Tb</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8315,6 +8363,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servers is offline. Statistics is not available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8543,10 +8595,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <translation>vận động</translation>
     </message>
     <message>
-        <source>Hardware (Camera built-in)</source>
-        <translation>Phần cứng (camera built-in)</translation>
-    </message>
-    <message>
         <source>Sensitivity:</source>
         <translation>Độ nhạy:</translation>
     </message>
@@ -8557,10 +8605,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>URL</source>
         <translation>nơi</translation>
-    </message>
-    <message>
-        <source>Dewarping</source>
-        <translation>mở rộng để tích cực (Dewarping)</translation>
     </message>
     <message>
         <source>Advanced</source>
@@ -8608,6 +8652,14 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Reset Motion Regions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware (camera built-in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fisheye</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

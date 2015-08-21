@@ -3429,11 +3429,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>년</translation>
     </message>
     <message>
-        <source>List of tags divided by commas or spaces.</source>
+        <source>Do not lock archive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not lock archive.</source>
+        <source>List of tags divided by commas or spaces.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4353,6 +4353,46 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Pulse time(ms)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Unknown</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished">알려지지 않음</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Circuit</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grounded circuit</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid state</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnImageControlWidget</name>
@@ -4651,16 +4691,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>인증키 활성화</translation>
     </message>
     <message>
-        <source>Network error has occurred during automatic license activation. Please contact support team to activate your license key manually.</source>
-        <translation>네트워크 오류로 인해 인증키를 자동 등록하는 과정에 문제가 발생하였습니다. 관리자를 통해 수동 등록을 통해 인증 받으세요.</translation>
-    </message>
-    <message>
         <source>Remove license</source>
         <translation>인증키 삭제</translation>
-    </message>
-    <message>
-        <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
-        <translation>유효하지 않은 인증 파일입니다. 올바른 인증 파일을 선택하여 주십시오.만약 문제가 지속 될 경우, 관리자에게 문의하십시오.</translation>
     </message>
     <message>
         <source>License was successfully activated.</source>
@@ -4724,6 +4756,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5121,10 +5161,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>카메라의 보조 스트림을 사용할 수 없습니다. Motion + LQ 옵션이 동작하지 않습니다. 보조 스트림을 활성화 하신 후에 녹화 설정을 &quot;항상&quot; 또는 &quot;아니오&quot;로 변경하려면 &quot;예&quot;를 누르세요.</translation>
-    </message>
-    <message>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
         <translation>&lt;중복 결과&gt;</translation>
@@ -5136,6 +5172,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5553,20 +5593,20 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation></translation>
     </message>
     <message>
-        <source>This hotkey is used by preset &quot;%1&quot;</source>
-        <translation>이 단축키는 &quot;%1&quot; 프리셋에서 사용합니다</translation>
-    </message>
-    <message>
-        <source>This hotkey is used by tour &quot;%1&quot;</source>
-        <translation>이 단축키는 &quot;%1&quot; 투어에서 사용합니다</translation>
-    </message>
-    <message>
         <source>Change hotkey</source>
         <translation>단축키 변경</translation>
     </message>
     <message>
         <source>Reassign</source>
         <translation>재할당</translation>
+    </message>
+    <message>
+        <source>This hotkey is used by preset &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This hotkey is used by tour &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5732,6 +5772,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>less than an hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Gb</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6262,18 +6314,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>자동 업데이트 체크</translation>
     </message>
     <message>
-        <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Available Update:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Caution: Applying system updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6335,6 +6375,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to extract update file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to check updates via internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Update:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To update manually, download and use the archive file on the following link:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7512,10 +7564,6 @@ If you would like to disable this feature you can do so in the System Settings d
         </translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>주의</translation>
-    </message>
-    <message>
         <source>AVI (*.avi)</source>
         <translation></translation>
     </message>
@@ -7601,6 +7649,10 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to export file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8263,10 +8315,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">새로고침</translation>
     </message>
     <message>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished">모든 서버가 오프라인 상태입니다. 로그를 사용할 수 없습니다.</translation>
-    </message>
-    <message>
         <source>10 Tb</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8304,6 +8352,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servers is offline. Statistics is not available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8532,10 +8584,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <translation>움직임</translation>
     </message>
     <message>
-        <source>Hardware (Camera built-in)</source>
-        <translation>하드웨어 (카메라 포함)</translation>
-    </message>
-    <message>
         <source>Sensitivity:</source>
         <translation>민감도:</translation>
     </message>
@@ -8546,10 +8594,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>URL</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Dewarping</source>
-        <translation>Dewarping</translation>
     </message>
     <message>
         <source>Advanced</source>
@@ -8597,6 +8641,14 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Reset Motion Regions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware (camera built-in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fisheye</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

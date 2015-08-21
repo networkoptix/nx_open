@@ -3431,11 +3431,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>ปี</translation>
     </message>
     <message>
-        <source>List of tags divided by commas or spaces.</source>
+        <source>Do not lock archive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not lock archive.</source>
+        <source>List of tags divided by commas or spaces.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4355,6 +4355,46 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Pulse time(ms)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Unknown</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished">ไม่ทราบ</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Circuit</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grounded circuit</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid state</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnImageControlWidget</name>
@@ -4657,16 +4697,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>การอนุญาตใช้งานเรียบร้อย</translation>
     </message>
     <message>
-        <source>Network error has occurred during automatic license activation. Please contact support team to activate your license key manually.</source>
-        <translation>เครือข่ายขัดข้องมีผลต่อการเปิดใช้งานอัตโนมัต กรุณาติดต่อทีมสนับสนุนเพื่อทำการเปิดใช้งานระบบ.</translation>
-    </message>
-    <message>
         <source>Remove license</source>
         <translation>ยกเลิกการเปิดใช้งาน</translation>
-    </message>
-    <message>
-        <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
-        <translation>ข้อมูลในการเปิดใช้งานผิด กรุณาเลือก.</translation>
     </message>
     <message>
         <source>%1 %2</source>
@@ -4726,6 +4758,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5123,10 +5163,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>สตรีมมิ่งสำรองถูกปิดใช้งานในกล้องนี้ การเคลื่อนไหว + LQ ไม่มี effect.Press &quot;ตกลง&quot; เพื่อเปลี่ยนประเภทการบันทึกเพื่อ &quot;ตลอดไป&quot; หรือ &quot;ไม่&quot; เพื่อเปิดใช้งานสตรีมมิ่งสำรอง.</translation>
-    </message>
-    <message>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
         <translation>&lt;multiple values&gt;</translation>
@@ -5138,6 +5174,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5555,20 +5595,20 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>ไม่มี</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset &quot;%1&quot;</source>
-        <translation>hotkey นี้ถูกตั้งไว้ &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>This hotkey is used by tour &quot;%1&quot;</source>
-        <translation>hotkey นี้ถูกใช้โดย ทัวร์ &quot;%1&quot;</translation>
-    </message>
-    <message>
         <source>Change hotkey</source>
         <translation>เปลี่ยน hotkey</translation>
     </message>
     <message>
         <source>Reassign</source>
         <translation>กำหนดใหม่</translation>
+    </message>
+    <message>
+        <source>This hotkey is used by preset &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This hotkey is used by tour &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5734,6 +5774,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>less than an hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Gb</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6264,18 +6316,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>ตรวจหาการปรับปรุงโดยอัตโนมัติ</translation>
     </message>
     <message>
-        <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Available Update:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Caution: Applying system updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6337,6 +6377,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to extract update file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to check updates via internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Update:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To update manually, download and use the archive file on the following link:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7515,10 +7567,6 @@ If you would like to disable this feature you can do so in the System Settings d
         </translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>คำเตือน</translation>
-    </message>
-    <message>
         <source>AVI (*.avi)</source>
         <translation>AVI (*.avi)</translation>
     </message>
@@ -7604,6 +7652,10 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to export file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8266,10 +8318,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">รีเฟส</translation>
     </message>
     <message>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished">เซิร์ฟเวอร์ทั้งหมดออฟไลน์ บันทึกจะไม่สามารถใช้ได้.</translation>
-    </message>
-    <message>
         <source>10 Tb</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8307,6 +8355,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servers is offline. Statistics is not available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8535,10 +8587,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <translation>โมชั่น</translation>
     </message>
     <message>
-        <source>Hardware (Camera built-in)</source>
-        <translation>ฮาร์ดแวร์ (ในตัวกล้อง)</translation>
-    </message>
-    <message>
         <source>Sensitivity:</source>
         <translation>ความไว:</translation>
     </message>
@@ -8549,10 +8597,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>URL</source>
         <translation>URL</translation>
-    </message>
-    <message>
-        <source>Dewarping</source>
-        <translation>Dewarping</translation>
     </message>
     <message>
         <source>Advanced</source>
@@ -8600,6 +8644,14 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Reset Motion Regions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware (camera built-in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fisheye</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -209,7 +209,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     if(period.durationMs > maxRecordingDurationMsec &&
             QMessageBox::warning(
                 mainWindow(),
-                tr("Warning"),
+                tr("Warning!"),
                 tr("You are about to export a video sequence that is longer than 30 minutes.") + L'\n' 
               + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n'
               + tr("Do you want to continue?"),
@@ -660,7 +660,7 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
     if(exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30) { // TODO: #Elric implement more precise estimation
         int button = QMessageBox::question(
             mainWindow(),
-            tr("Warning"),
+            tr("Warning!"),
             tr("You are about to export several video sequences with a total length exceeding 30 minutes.") + L'\n' 
           + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n' 
           + tr("Do you want to continue?"),

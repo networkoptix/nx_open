@@ -304,7 +304,7 @@
             <item>
              <widget class="QRadioButton" name="cameraMotionButton">
               <property name="text">
-               <string>Hardware (Camera built-in)</string>
+               <string>Hardware (camera built-in)</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -474,7 +474,7 @@
      </widget>
      <widget class="QWidget" name="fisheyeTab">
       <attribute name="title">
-       <string>Dewarping</string>
+       <string>Fisheye</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <property name="leftMargin">

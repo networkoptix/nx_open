@@ -3478,11 +3478,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>год</translation>
     </message>
     <message>
-        <source>List of tags divided by commas or spaces.</source>
+        <source>Do not lock archive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not lock archive.</source>
+        <source>List of tags divided by commas or spaces.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4424,6 +4424,46 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Pulse time(ms)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Unknown</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished">неизвестно</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <comment>IO Port Type</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Circuit</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grounded circuit</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid state</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnImageControlWidget</name>
@@ -4726,16 +4766,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Активация лицензии</translation>
     </message>
     <message>
-        <source>Network error has occurred during automatic license activation. Please contact support team to activate your license key manually.</source>
-        <translation>При автоматической активации лицензии произошла сетевая ошибка. Свяжитесь со службой поддержки для активации вручную.</translation>
-    </message>
-    <message>
         <source>Remove license</source>
         <translation>Удалить лицензию</translation>
-    </message>
-    <message>
-        <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
-        <translation>Выбранный файл ключа ручной активации некорректен. Выберите правильный файл или обратитесь в службу поддержки.</translation>
     </message>
     <message>
         <source>License was successfully activated.</source>
@@ -4803,6 +4835,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5204,10 +5244,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Второй поток для данной камеры отключён. Опция &apos;По движению + Низкое качество&apos; не будет иметь никакого эффекта. Нажмите &quot;Да&quot; для изменения типа записи на &quot;Всегда&quot; или &quot;Нет&quot; для включения второго потока.</translation>
-    </message>
-    <message>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
         <translation>&lt;несколько значений&gt;</translation>
@@ -5219,6 +5255,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5645,20 +5685,20 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Нет</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset &quot;%1&quot;</source>
-        <translation>Горячая клавиша уже используется позицией &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>This hotkey is used by tour &quot;%1&quot;</source>
-        <translation>Горячая клавиша уже используется маршрутом &quot;%1&quot;</translation>
-    </message>
-    <message>
         <source>Change hotkey</source>
         <translation>Изменить горячую клавишу</translation>
     </message>
     <message>
         <source>Reassign</source>
         <translation>Переопределить</translation>
+    </message>
+    <message>
+        <source>This hotkey is used by preset &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This hotkey is used by tour &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5834,6 +5874,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>less than an hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Tb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Gb</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6374,18 +6426,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Автоматически проверять наличие обновлений</translation>
     </message>
     <message>
-        <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Available Update:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Caution: Applying system updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6447,6 +6487,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to extract update file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to check updates via internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Update:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To update manually, download and use the archive file on the following link:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7650,10 +7702,6 @@ If you would like to disable this feature you can do so in the System Settings d
         </translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>Предупреждение</translation>
-    </message>
-    <message>
         <source>AVI (*.avi)</source>
         <translation>AVI (*.avi)</translation>
     </message>
@@ -7739,6 +7787,10 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to export file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8415,10 +8467,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Обновить</translation>
     </message>
     <message>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished">Все серверы отключены. Журналы недоступны.</translation>
-    </message>
-    <message>
         <source>10 Tb</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8456,6 +8504,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servers is offline. Statistics is not available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8684,10 +8736,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <translation>Детекция движения</translation>
     </message>
     <message>
-        <source>Hardware (Camera built-in)</source>
-        <translation>Аппаратный (Встроенний в камеру)</translation>
-    </message>
-    <message>
         <source>Sensitivity:</source>
         <translation>Чувствительность:</translation>
     </message>
@@ -8706,10 +8754,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>Expert</source>
         <translation>Экспертные</translation>
-    </message>
-    <message>
-        <source>Dewarping</source>
-        <translation>Наcтройки fish-eye</translation>
     </message>
     <message>
         <source>IO ports</source>
@@ -8749,6 +8793,14 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Reset Motion Regions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware (camera built-in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fisheye</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

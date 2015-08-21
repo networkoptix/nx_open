@@ -362,7 +362,7 @@ void QnLicenseManagerWidget::at_downloadError() {
         /* QNetworkReply slots should not start eventLoop */
         emit showMessageLater(tr("License Activation ") + reply->errorString(),
             tr("Network error has occurred during automatic license activation. "
-               "Please contact support team to activate your license key manually."),
+               "Please contact support to activate your license key manually."),
             true);
 
         ui->licenseWidget->setOnline(false);
@@ -478,7 +478,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
             QString message;
             switch (errCode) {
             case QnLicense::InvalidSignature:
-                message = tr("The manual activation key file you have selected is invalid. Select correct manual activation key file. "
+                message = tr("The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. "
                              "If problem continues, please contact support team.");
                 break;
             case QnLicense::InvalidHardwareID:
