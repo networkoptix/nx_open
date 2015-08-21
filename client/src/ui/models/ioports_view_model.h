@@ -1,25 +1,19 @@
 #ifndef IOPORTS_VIEW_MODEL_H
 #define IOPORTS_VIEW_MODEL_H
 
-#include <QtCore/QAbstractItemModel>
-#include <QtGui/QStandardItemModel>
-#include <QtCore/QModelIndex>
+#include <QtCore/QAbstractListModel>
 #include <QtCore/QVariant>
 #include <QtCore/QList>
 
-#include <business/business_fwd.h>
+#include <api/model/api_ioport_data.h>
 
-#include <ui/models/business_rule_view_model.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <common/common_globals.h>
 
-#include <utils/common/id.h>
-#include "api/model/api_ioport_data.h"
-
-class QnIOPortsViewModel : public QAbstractItemModel //, public QnWorkbenchContextAware
+class QnIOPortsViewModel : public QAbstractListModel
 {
     Q_OBJECT
 
-    typedef QAbstractItemModel base_type;
+    typedef QAbstractListModel base_type;
 public:
 
     enum Columns {
@@ -35,8 +29,6 @@ public:
     explicit QnIOPortsViewModel(QObject *parent = 0);
     virtual ~QnIOPortsViewModel();
 
-    virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-    virtual QModelIndex parent(const QModelIndex &child) const override;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -51,6 +43,9 @@ private:
     QString textData(const QModelIndex &index) const;
     QVariant editData(const QModelIndex &index) const;
     bool isDisabledData(const QModelIndex &index) const;
+
+    QString portTypeToString(Qn::IOPortType portType) const; 
+    QString stateToString(Qn::IODefaultState state) const;
 private:
     QnIOPortDataList m_data;
 };

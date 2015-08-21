@@ -130,7 +130,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->imageControlWidget,     &QnImageControlWidget::fisheyeChanged,  this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
     connect(ui->imageControlWidget,     &QnImageControlWidget::changed,         this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->ioPortSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+    connect(ui->ioPortSettingsWidget,   &QnIOPortSettingsWidget::dataChanged,   this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
     updateFromResource(true);
 }
