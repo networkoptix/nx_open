@@ -157,7 +157,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         ui->infoLabel->setText(msg);
     } else {
         if (qnLicensePool->currentHardwareId().isEmpty()) {
-            ui->infoLabel->setText(tr("Obtaining licenses from Server..."));
+            ui->infoLabel->setText(tr("Obtaining licenses from server..."));
             useRedLabel = false;
         } else {
             QString text = (qnProductFeatures().freeLicenseCount > 0) ?
@@ -299,7 +299,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
                               true);
     } else if (licenseListHelper.getLicenseByKey(licenseKey)) {
         emit showMessageLater(tr("License Activation"),
-                              tr("The license is already activated."),
+                              tr("License has arleady been activated."),
                               true);
     }
 }
@@ -337,7 +337,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode erro
         
     QString message;
     if (!license || (errorCode != ec2::ErrorCode::ok))
-        message = tr("There was a problem activating your license key. Network error has occurred.");
+        message = tr("There was a problem activating your license key. A network error has occurred.");
     else if (license)
         message = tr("License was successfully activated.");
 
@@ -402,7 +402,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
 
         if (infoMode) {
             if (!license->isValid(&errCode, QnLicense::VM_CheckInfo) && errCode != QnLicense::Expired) {
-                emit showMessageLater(tr("License activation"), tr("Can't activate license:  %1").arg(QnLicense::errorMessage(errCode)), true);
+                emit showMessageLater(tr("License Activation"), tr("Unable to activate license:  %1").arg(QnLicense::errorMessage(errCode)), true);
                 ui->licenseWidget->setState(QnLicenseWidget::Normal);
             }
             else {
@@ -456,7 +456,7 @@ void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCo
         ui->gridLicenses->model()->removeRow(index.row());
     }
     else {
-        emit showMessageLater(tr("Remove license"), tr("Can't remove license from server:  %1").arg(ec2::toString(errorCode)), true);
+        emit showMessageLater(tr("Remove license"), tr("Unable to remove license from server:  %1").arg(ec2::toString(errorCode)), true);
     }
     updateLicenses();
 }
@@ -482,7 +482,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
                              "If problem continues, please contact support team.");
                 break;
             case QnLicense::InvalidHardwareID:
-                message = tr("This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.")
+                message = tr("This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.")
                     .arg(QString::fromUtf8(license->hardwareId()));
                 break;
             case QnLicense::InvalidBrand:

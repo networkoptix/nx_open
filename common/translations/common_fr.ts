@@ -4,14 +4,14 @@
 <context>
     <name>Language</name>
     <message>
-        <source>Language Name</source>
+        <source>English (US)</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>Français</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Locale Code</source>
+        <source>en_US</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>fr</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -172,14 +172,6 @@
         <translation>Serveur &quot;%1&quot; Démarré</translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>Serveur &quot;%1&quot; a un problème de licence</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>Évènement inconnu s&apos;est produit</translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation>Évènement: %1</translation>
     </message>
@@ -192,16 +184,8 @@
         <translation>URLL %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>Port d&apos;entrée: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>Raison: %1</translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
-        <translation>Conflit d&apos;adresse: %1</translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -308,6 +292,22 @@
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -318,10 +318,6 @@
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Non autorisé. URL %1.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -439,6 +435,10 @@
         <source>Parameters:</source>
         <translation>Paramètres:</translation>
     </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCommandLineParser</name>
@@ -454,12 +454,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>Le lancement de l&apos;explorateur Windows a échoué</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>Impossible de trouver &apos;explorer.exe&apos; pour lancer l&apos;explorateur Windows.</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -473,12 +473,12 @@
         <translation>Ne peut pas trouver l&apos;encodeur pour le codec %1.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>Ne peut pas initialiser l&apos;encodeur audio.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>Ne peut pas initialiser le décodeur audio.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -515,8 +515,8 @@
         <translation>Ne peut pas trouver l&apos;encodeur pour le codec %1.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>Ne peut pas initialiser l&apos;encodeur vidéo.</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -542,60 +542,12 @@
         <translation>Vmax</translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>Encodeur Analogue</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>Mur Vidéo</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>Licences d&apos;essaie</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>Licences Analogue</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>Licences Professionnel</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>Licences Edge</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>Licences Vmax</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>Licenses d&apos;encodeur vidéo</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>Licences de mur vidéo</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>Signature Invalide</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>Serveur avec l&apos;ID matériel nécessaire ne peut être trouvé</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>Personnalisation invalide</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>Expiré</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>Type invalide</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -614,11 +566,59 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module licenses</source>
+        <source>Analog Encoder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start licenses</source>
+        <source>Trial Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalide Signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -653,24 +653,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>Il a eu un problème d&apos;activation de votre clé de licence. Une erreur de base de données s&apos;est produite.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>Il a eu un problème d&apos;activation de votre licence. Données invalides reçues. S.V.P., contactez l’assistance technique pour signaler cette erreur.</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>La clé de licence que vous avez entrée est invalide. S.V.P., vérifiez que la licence est correctement entrée. Si le problème persiste, S.V.P. contactez l&apos;assistance technique pour confirmer que la licence est valide ou pour obtenir une licence valide.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>Vous essayez d&apos;activer une licence incompatible avec votre logiciel. S.V.P, contactez l&apos;assistance technique pour obtenir une licence valide.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>La licence à déjà été activé sur l&apos;ID matériel {{hwid}} le {{time}}. S.V.P, contactez l&apos;assistance technique pour obtenir une licence valide.</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -715,24 +715,24 @@
         <translation>Inconnue</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>Licence d&apos;essaie</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>ID du matériel: </translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>Licence gratuite</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>Licence accordée à:</translation>
-    </message>
-    <message>
         <source>Watermark: </source>
         <translation>Filigrane: </translation>
+    </message>
+    <message>
+        <source>Trial License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -859,20 +859,8 @@
         <translation>Erreur lors de l&apos;envoi de courriel</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>Les périphériques de stockages sont pleins</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>Les périphériques de stockages ne sont pas configurés</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>Adresse courriel non définie pour l&apos;usager %1</translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>Plusieurs serveurs ont l&apos;heure différente et la bonne heure ne peut pas être détectée automatiquement.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -921,6 +909,18 @@
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>Reconstruction de l&apos;index d&apos;archive est complété sur les serveurs suivants:</translation>
+    </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -972,12 +972,12 @@
         <translation>Méthode de transcodage inconnue.</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>&apos;OpenCLTranscode&apos; n&apos;est pas implémenté</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>Méthode de transcodage inconnue</translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

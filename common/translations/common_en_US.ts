@@ -614,11 +614,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module licenses</source>
+        <source>I/O Module Licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start licenses</source>
+        <source>Start Licenses</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

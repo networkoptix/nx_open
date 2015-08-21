@@ -221,12 +221,12 @@
         <translation>進階…</translation>
     </message>
     <message>
-        <source>Filter by cameras...</source>
-        <translation>依攝影機篩選…</translation>
-    </message>
-    <message>
         <source>X</source>
         <translation>X</translation>
+    </message>
+    <message>
+        <source>filter by camera...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -325,20 +325,20 @@
         <translation>進階設定無法讀取</translation>
     </message>
     <message>
-        <source>This camera has no advanced settings</source>
-        <translation>此攝影機不提供進階設定</translation>
-    </message>
-    <message>
-        <source>Warning: all changes are applied instantly</source>
-        <translation>警告: 所有設定會立即套用</translation>
-    </message>
-    <message>
         <source>Category</source>
         <translation>類別</translation>
     </message>
     <message>
         <source>about:blank</source>
         <translation>空白</translation>
+    </message>
+    <message>
+        <source>Advanced settings not available for this camera. Check the camera web page directly for more options.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note: Any changes made will be applied instantly!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -355,16 +355,15 @@
         <translation>攝影機診斷</translation>
     </message>
     <message>
-        <source>Diagnostics for camera</source>
-        <translation>攝影機的診斷</translation>
+        <source>Camera:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
-        <source>Event will be raised when any camera goes offline</source>
-        <translatorcomment>任何攝影機斷線時會觸發事件</translatorcomment>
-        <translation>任何攝影機斷線時會觸發事件</translation>
+        <source>Event will be triggered when a camera becomes offline</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -382,20 +381,12 @@
         <translation>保留攝影機串流及相關設定</translation>
     </message>
     <message>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>警告! 錄影排程的 FPS 及 畫質設定將無作用!</translation>
-    </message>
-    <message>
         <source>Secondary Stream Control</source>
         <translation>第二串流控制</translation>
     </message>
     <message>
         <source>Override secondary stream quality</source>
         <translation>覆蓋第二串流設定</translation>
-    </message>
-    <message>
-        <source>Don&apos;t use</source>
-        <translation>不使用</translation>
     </message>
     <message>
         <source>Low quality</source>
@@ -408,10 +399,6 @@
     <message>
         <source>High quality</source>
         <translation>高畫質</translation>
-    </message>
-    <message utf8="true">
-        <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
-        <translation>警告! 高畫質可能導致伺服器CPU過載、網路連線錯誤及其它問題.</translation>
     </message>
     <message>
         <source>Archive control</source>
@@ -446,10 +433,6 @@
         <translation>UDP</translation>
     </message>
     <message>
-        <source>Warning! Please read documentation before changing these settings!</source>
-        <translation>警告! 變更這些設定前請先閱讀手冊!</translation>
-    </message>
-    <message>
         <source>Restore Defaults</source>
         <translation>恢復預設值</translation>
     </message>
@@ -464,6 +447,22 @@
     <message>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
         <translation>算GOP流量而非每秒流量(這會增加攝影機的流量)</translation>
+    </message>
+    <message>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -512,18 +511,6 @@
         <translation>取得更多的授權(License)…</translation>
     </message>
     <message>
-        <source>Schedule Grid</source>
-        <translation>排程表格</translation>
-    </message>
-    <message>
-        <source>Display Quality on Grid</source>
-        <translation>顯示畫質在表格內</translation>
-    </message>
-    <message>
-        <source>Display FPS on Grid</source>
-        <translation>顯示FPS在表格內</translation>
-    </message>
-    <message>
         <source>Panic Mode: </source>
         <translation>緊急模式:</translation>
     </message>
@@ -552,32 +539,12 @@
         <translation>僅位移偵測</translation>
     </message>
     <message>
-        <source>Motion+ Lo-Res Always</source>
-        <translation>位移偵測+全時低畫質錄影</translation>
-    </message>
-    <message>
-        <source>Do not Record</source>
-        <translation>不要錄影</translation>
-    </message>
-    <message>
         <source>Fixed Archive Length</source>
         <translation>固定錄影天數</translation>
     </message>
     <message>
         <source>Auto</source>
         <translation>自動</translation>
-    </message>
-    <message>
-        <source>Warning! High value may prevent other cameras from recording!</source>
-        <translation>警告! 高畫質可能影響其它攝影機錄影!</translation>
-    </message>
-    <message>
-        <source>Min days:</source>
-        <translation>最少天數:</translation>
-    </message>
-    <message>
-        <source>Max days:</source>
-        <translation>最多天數:</translation>
     </message>
     <message>
         <source>Motion Recording</source>
@@ -605,6 +572,38 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Apply changes before copying schedule</source>
         <translation>複製排程前先套用變更</translation>
+    </message>
+    <message>
+        <source>Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Quality on Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show FPS on Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion + Low-Res </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do Not Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Min. Days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max. Days</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -701,16 +700,8 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>EventLogDialog</name>
     <message>
-        <source>Event log</source>
-        <translation>事件記錄</translation>
-    </message>
-    <message>
         <source>-</source>
         <translation>-</translation>
-    </message>
-    <message>
-        <source>Clear filter</source>
-        <translation>清除篩選器</translation>
     </message>
     <message>
         <source>Refresh</source>
@@ -728,28 +719,36 @@ Short for &quot;seconds&quot;</extracomment>
         <source>All Servers are offline. Logs are not available.</source>
         <translation>所有攝影機皆已離線. 無法記錄.</translation>
     </message>
+    <message>
+        <source>Event Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Filter</source>
+        <translation type="unfinished">清除篩選器</translation>
+    </message>
 </context>
 <context>
     <name>FisheyeSettingsWidget</name>
     <message>
-        <source>Horizontal mount (camera on the wall)</source>
-        <translation>水平安裝(攝影機在牆上)</translation>
-    </message>
-    <message>
-        <source>Vertical mount (camera on the floor)</source>
-        <translation>垂直安裝(攝影機在地板)</translation>
-    </message>
-    <message>
-        <source>Vertical mount (camera on the ceiling)</source>
-        <translation>垂直安裝(攝影機在天花板)</translation>
-    </message>
-    <message>
-        <source>Camera view angle correction:</source>
-        <translation>攝影機視角校正:</translation>
-    </message>
-    <message>
         <source>Calibration</source>
         <translation>校準</translation>
+    </message>
+    <message>
+        <source>Ceiling Mount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wall Mount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Floor/Table Mount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera View Angle Correction</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -775,44 +774,44 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>&amp;移除</translation>
     </message>
     <message>
-        <source>Auto pause video:</source>
-        <translation>影像休眠模式:</translation>
-    </message>
-    <message>
         <source>Misc</source>
         <translation>其他</translation>
-    </message>
-    <message>
-        <source>Downmix audio from 5.1 to 2.1:</source>
-        <translation>將聲音從5.1降為2.1聲道:</translation>
     </message>
     <message>
         <source>after</source>
         <translation>過</translation>
     </message>
     <message>
-        <source>minutes of inactivity</source>
-        <translation>分鐘閒置</translation>
-    </message>
-    <message>
-        <source>Double buffering:</source>
-        <translation>雙重緩衝:</translation>
-    </message>
-    <message>
-        <source>Browse logs</source>
-        <translation>瀏覽記錄</translation>
-    </message>
-    <message>
-        <source>Clear local cache</source>
-        <translation>清除本地快取</translation>
-    </message>
-    <message>
-        <source>Run application when PC boots up:</source>
-        <translation>隨電腦啟動執行軟體:</translation>
-    </message>
-    <message>
         <source>Restart required</source>
         <translation>需要重啟</translation>
+    </message>
+    <message>
+        <source>Downmix Audio from 5.1 to 2.1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Pause Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minutes of Inactivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run Application when PC Boots:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Double Buffering:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse Logs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Local Cache</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -850,14 +849,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>&amp;系統資源監視器</translation>
     </message>
     <message>
-        <source>Open all servers statistics on one layout</source>
-        <translation>同時開啟所有伺服器的系統資源監視器</translation>
-    </message>
-    <message>
-        <source>System Configuration Backup and Restore</source>
-        <translation>系統設定備份及還原</translation>
-    </message>
-    <message>
         <source>System Settings</source>
         <translation>系統設定</translation>
     </message>
@@ -869,60 +860,68 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Open audit trail log</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Monitor All Servers on a Single Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Backup and Restore</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
     <message>
-        <source>Scroll here</source>
-        <translation>滾動至此</translation>
-    </message>
-    <message>
-        <source>Left edge</source>
-        <translation>左邊角落</translation>
-    </message>
-    <message>
         <source>Top</source>
         <translation>最頂部</translation>
-    </message>
-    <message>
-        <source>Right edge</source>
-        <translation>右邊角落</translation>
     </message>
     <message>
         <source>Bottom</source>
         <translation>最底部</translation>
     </message>
     <message>
-        <source>Page left</source>
-        <translation>左頁面</translation>
+        <source>Scroll Here</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Page up</source>
-        <translation>上頁面</translation>
+        <source>Left Edge</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Page right</source>
-        <translation>右頁面</translation>
+        <source>Right Edge</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Page down</source>
-        <translation>下頁面</translation>
+        <source>Page Left</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Scroll left</source>
-        <translation>向左滾動</translation>
+        <source>Page Up</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Scroll up</source>
-        <translation>向上滾動</translation>
+        <source>Page Right</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Scroll right</source>
-        <translation>向右滾動</translation>
+        <source>Page Down</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Scroll down</source>
-        <translation>向下滾動</translation>
+        <source>Scroll Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll Down</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -951,12 +950,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>影像顯示</translation>
     </message>
     <message>
-        <source>Loading image... Please wait.</source>
-        <translation>載入影像…請稍等.</translation>
-    </message>
-    <message>
         <source>&lt;No image&gt;</source>
         <translation>&lt;無影像&gt;</translation>
+    </message>
+    <message>
+        <source>Loading Image...Please Wait.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -968,10 +967,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>General Settings</source>
         <translation>一般設定</translation>
-    </message>
-    <message>
-        <source>Layout is locked</source>
-        <translation>佈局已鎖定</translation>
     </message>
     <message>
         <source>Background</source>
@@ -988,10 +983,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Clear</source>
         <translation>清除</translation>
-    </message>
-    <message>
-        <source>Processing image... Please wait.</source>
-        <translation>處理影像…請稍等.</translation>
     </message>
     <message>
         <source>&amp;Crop to monitor aspect ratio</source>
@@ -1018,8 +1009,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>%</translation>
     </message>
     <message>
-        <source>Keep aspect ratio</source>
-        <translation>維持長寬比</translation>
+        <source>Layout is Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Processing Image...Please Wait.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep Aspect Ratio</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1054,6 +1053,29 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Testing...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LdapUsersDialog</name>
+    <message>
+        <source>Fetch Users from LDAP...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select users to import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter...</source>
+        <translation type="unfinished">篩選器...</translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1141,16 +1163,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>從剪貼簿貼上</translation>
     </message>
     <message>
-        <source>License key is invalid</source>
-        <translation>授權金鑰無效</translation>
-    </message>
-    <message>
         <source>Copy to Clipboard</source>
         <translation>複製到剪貼簿</translation>
-    </message>
-    <message>
-        <source>Select license file...</source>
-        <translation>選擇授權檔案...</translation>
     </message>
     <message>
         <source>License will be bound to the current server</source>
@@ -1163,6 +1177,14 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Activate License</source>
         <translation>啟動授權 </translation>
+    </message>
+    <message>
+        <source>License Key is Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select License File...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1192,10 +1214,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>刪除</translation>
     </message>
     <message>
-        <source>&amp;Connection options:</source>
-        <translation>&amp;連線選項:</translation>
-    </message>
-    <message>
         <source>&amp;Host:</source>
         <translation>&amp;網址:</translation>
     </message>
@@ -1219,16 +1237,16 @@ Short for &quot;seconds&quot;</extracomment>
         <source>&amp;Auto-Login</source>
         <translation>&amp;自動登入</translation>
     </message>
+    <message>
+        <source>&amp;Connection Options:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
         <source>Look and Feel</source>
         <translation>視覺調整</translation>
-    </message>
-    <message>
-        <source>Timeline mode:</source>
-        <translation>時間軸模式:</translation>
     </message>
     <message>
         <source>Language:</source>
@@ -1302,6 +1320,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Mode:</source>
         <translation>模式:</translation>
     </message>
+    <message>
+        <source>Timeline Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultipleCameraSettingsWidget</name>
@@ -1322,16 +1344,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>密碼:</translation>
     </message>
     <message>
-        <source>Enable audio</source>
-        <translation>允許聲音</translation>
-    </message>
-    <message>
         <source>Recording</source>
         <translation>錄影</translation>
     </message>
     <message>
         <source>Expert</source>
         <translation>匯出</translation>
+    </message>
+    <message>
+        <source>Enable Audio</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1352,12 +1374,12 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>PopupBusinessActionWidget</name>
     <message>
-        <source>Show to Administrators only</source>
-        <translation>僅顯示於管理者帳號</translation>
-    </message>
-    <message>
         <source>Global Notification Settings...</source>
         <translation>全域通知設定…</translation>
+    </message>
+    <message>
+        <source>Show to administrators only</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1409,10 +1431,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>詳細</translation>
     </message>
     <message>
-        <source>No tour selected</source>
-        <translation>沒有選擇巡航</translation>
-    </message>
-    <message>
         <source>Preview</source>
         <translation>預覽</translation>
     </message>
@@ -1423,6 +1441,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Get Preview</source>
         <translation>取得預覽</translation>
+    </message>
+    <message>
+        <source>No Tour Selected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1455,16 +1477,16 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>PtzPresetDialog</name>
     <message>
-        <source>Save position</source>
-        <translation>儲存位置</translation>
-    </message>
-    <message>
         <source>Name:</source>
         <translation>名稱:</translation>
     </message>
     <message>
         <source>Hotkey:</source>
         <translation>快速鍵:</translation>
+    </message>
+    <message>
+        <source>Save Position</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1622,10 +1644,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>丟棄資源</translation>
     </message>
     <message>
-        <source>Drop Resources into a New Layout</source>
-        <translation>丟棄資源到新佈局</translation>
-    </message>
-    <message>
         <source>Delayed Drop Resources</source>
         <translation>延遲丟棄資源</translation>
     </message>
@@ -1700,10 +1718,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Restart application</source>
         <translation>重新啟動應用程式</translation>
-    </message>
-    <message>
-        <source>Select time server</source>
-        <translation>選擇校時伺服器</translation>
     </message>
     <message>
         <source>Fit in View</source>
@@ -2172,10 +2186,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Activate PTZ Tour</source>
         <translation>啟動 PTZ 巡航</translation>
-    </message>
-    <message>
-        <source>Activate PTZ object</source>
-        <translation>啟動 PTZ 物件</translation>
     </message>
     <message>
         <source>Show Beta Version Warning Message</source>
@@ -2673,6 +2683,18 @@ Short for &quot;seconds&quot;</extracomment>
         <source>User management...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Drop Resources into New Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Time Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate PTZ Object</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -2935,27 +2957,19 @@ Short for &quot;seconds&quot;</extracomment>
 </context>
 <context>
     <name>QnBlinkingImageButtonWidget</name>
-    <message>
-        <source>You have new notifications</source>
-        <translation>您有新的通知</translation>
-    </message>
     <message numerus="yes">
         <source>You have %n notifications</source>
         <translation>
             <numerusform>您有 %n 個通知</numerusform>
         </translation>
     </message>
+    <message>
+        <source>You have new notifications.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBuildNumberDialog</name>
-    <message>
-        <source>Install specific build</source>
-        <translation>安裝特定的版號</translation>
-    </message>
-    <message>
-        <source>Build number:</source>
-        <translation>版號:</translation>
-    </message>
     <message>
         <source>99990</source>
         <translation>99990</translation>
@@ -2969,8 +2983,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>錯誤</translation>
     </message>
     <message>
-        <source>The password you have entered is invalid</source>
-        <translation>您輸入的密碼有誤</translation>
+        <source>Install a specific build.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Build Number:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The password you have entered is not valid.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2978,10 +3000,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>&lt;Any Camera&gt;</source>
         <translation>&lt;任何攝影機&gt;</translation>
-    </message>
-    <message>
-        <source>Select at least one camera</source>
-        <translation>至少選擇一個攝影機</translation>
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
@@ -2994,6 +3012,10 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>
             <numerusform>%n 於 %1 個中攝影機</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Select at least one camera.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3038,24 +3060,8 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>Administrators only</source>
-        <translation>僅管理者</translation>
-    </message>
-    <message>
-        <source>All users</source>
-        <translation>全部使用者</translation>
-    </message>
-    <message>
-        <source>Enter text</source>
-        <translation>輸入文字</translation>
-    </message>
-    <message>
         <source>Select at least one camera</source>
         <translation>至少選擇一個攝影機</translation>
-    </message>
-    <message>
-        <source>Select a sound</source>
-        <translation>選擇一個聲音</translation>
     </message>
     <message>
         <source>Not Applied</source>
@@ -3101,6 +3107,22 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Starts/Stops</source>
         <translation>開始 / 停止</translation>
     </message>
+    <message>
+        <source>Administrators Only</source>
+        <translation type="unfinished">僅管理者</translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Text</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -3120,16 +3142,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>重設預設規則</translation>
     </message>
     <message>
-        <source>Confirm exit</source>
-        <translation>確認退出</translation>
-    </message>
-    <message>
         <source>Unsaved changes will be lost. Save?</source>
         <translation>將遺失未儲存的變更，儲存嗎?</translation>
-    </message>
-    <message>
-        <source>Confirm rules reset</source>
-        <translation>確認重設規則</translation>
     </message>
     <message>
         <source>Error</source>
@@ -3142,10 +3156,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Error while saving rule.</source>
         <translation>儲存規則時發生錯誤.</translation>
-    </message>
-    <message>
-        <source>Error while deleting rule</source>
-        <translation>刪除規則時發生錯誤</translation>
     </message>
     <message>
         <source>Hide Advanced</source>
@@ -3168,10 +3178,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>&amp;排程...</translation>
     </message>
     <message>
-        <source>Confirm save</source>
-        <translation>確認儲存</translation>
-    </message>
-    <message>
         <source>Some rules are not valid. Should they be disabled?</source>
         <translation>部分規則無效. 是否不採用呢?</translation>
     </message>
@@ -3182,6 +3188,22 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>This action CANNOT be undone!</source>
         <translation>此動作 無法 還原!</translation>
+    </message>
+    <message>
+        <source>Confirm Rules Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while deleting rule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm Exit</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3254,48 +3276,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>起始位址大於終止位址.</translation>
     </message>
     <message>
-        <source>Specified IP address range contains more than 255 addresses.</source>
-        <translation>指定的 IP 位址不可大於 255.</translation>
-    </message>
-    <message>
-        <source>Camera address field must contain valid URL, IP address or RTSP link.</source>
-        <translation>攝影機位址欄位必須包含有效的 URL、IP 位址或 RTSP 連結.</translation>
-    </message>
-    <message>
-        <source>Finishing search...</source>
-        <translation>結束掃描…</translation>
-    </message>
-    <message>
-        <source>No cameras selected</source>
-        <translation>沒有選擇的攝影機</translation>
-    </message>
-    <message>
-        <source>Please select at least one camera</source>
-        <translation>請至少選擇一個攝影機</translation>
-    </message>
-    <message>
         <source>Success</source>
         <translation>成功</translation>
-    </message>
-    <message>
-        <source>Server went offline, search aborted.</source>
-        <translation>伺服器已被移除, 搜尋失敗.</translation>
-    </message>
-    <message>
-        <source>Server went offline, cameras can be added when the server will be available.</source>
-        <translation>伺服器離線, 攝影機可於伺服器允許時加入.</translation>
-    </message>
-    <message>
-        <source>Server was removed, search aborted.</source>
-        <translation>伺服器離線, 搜尋失敗.</translation>
-    </message>
-    <message>
-        <source>Server was removed, cameras cannot be added anymore.</source>
-        <translation>伺服器已被移除, 無法新增攝影機.</translation>
-    </message>
-    <message>
-        <source>Error while searching cameras.</source>
-        <translation>搜尋攝影機時發生錯誤.</translation>
     </message>
     <message>
         <source>Scanning online hosts...</source>
@@ -3345,24 +3327,52 @@ Short for &quot;seconds&quot;</extracomment>
             <numerusform>新增 %n 支攝影機時發生錯誤.</numerusform>
         </translation>
     </message>
+    <message>
+        <source>The specified IP address range has more than 255 addresses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera address field must contain a valid URL, IP address, or RTSP link.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finished searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras selected.</source>
+        <translation type="unfinished">沒有選擇的攝影機。</translation>
+    </message>
+    <message>
+        <source>Please select at least one camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server went offline - search aborted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server is offline, cameras can only be added to an online server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been removed - search aborted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has been removed - cannot add cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while searching for camera(s).</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
-        <source>Applying settings...</source>
-        <translation>套用設定...</translation>
-    </message>
-    <message>
-        <source>Possibly, appropriate camera&apos;s service is unavailable now</source>
-        <translation>攝影機的服務目前可能剛好無法服務</translation>
-    </message>
-    <message>
         <source>Server returned the following error code : </source>
         <translation>伺服器回應以下錯誤訊息碼 :</translation>
-    </message>
-    <message>
-        <source>Could not save parameters</source>
-        <translation>無法儲存參數</translation>
     </message>
     <message>
         <source>Failed to save the following parameters (%1):
@@ -3376,6 +3386,18 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>This can take a lot of time.</source>
         <translation>這個動作可能需要一些時間.</translation>
+    </message>
+    <message>
+        <source>Applying Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Target camera&apos;s service is unavailable. Try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save paramaters.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3401,14 +3423,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>&amp;標記</translation>
     </message>
     <message>
-        <source>List of tags divided by commas or spaces</source>
-        <translation>標記列表以逗號或空格分開</translation>
-    </message>
-    <message>
-        <source>Do not lock archive</source>
-        <translation>不鎖定錄影</translation>
-    </message>
-    <message>
         <source>1 month</source>
         <translation>1個月</translation>
     </message>
@@ -3424,6 +3438,14 @@ Short for &quot;seconds&quot;</extracomment>
         <source>year</source>
         <translation>1年</translation>
     </message>
+    <message>
+        <source>List of tags divided by commas or spaces.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not lock archive.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsDialog</name>
@@ -3436,22 +3458,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>診斷攝影機 %1。</translation>
     </message>
     <message>
-        <source>Checking Server availability</source>
-        <translation>檢測伺服器可用性</translation>
-    </message>
-    <message>
-        <source>Checking that camera is accessible</source>
-        <translation>檢查攝影機是否可以存取</translation>
-    </message>
-    <message>
-        <source>Checking that camera provides media stream</source>
-        <translation>檢查攝影機提供的媒體串流</translation>
-    </message>
-    <message>
-        <source>Checking media stream for errors</source>
-        <translation>檢查媒體串流的錯誤</translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation>確認</translation>
     </message>
@@ -3460,8 +3466,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>失敗：%1</translation>
     </message>
     <message>
-        <source>Diagnostics finished</source>
-        <translation>診斷完成</translation>
+        <source>Confirming server availability.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming camera is accessible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target camera provides media stream.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Evaluating media stream for errors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diagnostics complete!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3507,8 +3529,8 @@ Short for &quot;seconds&quot;</extracomment>
         </translation>
     </message>
     <message>
-        <source>Export selected cameras to file</source>
-        <translation>匯出選擇的攝影機到檔案</translation>
+        <source>Export selected cameras to a file.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3633,10 +3655,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnCameraSettingsDialog</name>
     <message>
-        <source>Camera settings</source>
-        <translation>攝影機設定</translation>
-    </message>
-    <message>
         <source>Open in New Tab</source>
         <translation>開啟新頁籤</translation>
     </message>
@@ -3648,35 +3666,11 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Camera Rules</source>
         <translation>攝影機規則</translation>
     </message>
-    <message>
-        <source>Camera(s) not Saved</source>
-        <translation>攝影機未儲存</translation>
-    </message>
     <message numerus="yes">
         <source>Save changes to the following %n camera(s)?</source>
         <translation>
             <numerusform>儲存以下 %n 個攝影機的變更?</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation>錄影變更並未儲存. 挑選需要的錄影類型、FPS以及品質, 然後在排程上註記變更.</translation>
-    </message>
-    <message>
-        <source>Changes are not applied</source>
-        <translation>沒有套用變更</translation>
-    </message>
-    <message>
-        <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
-        <translation>位移偵測靈敏度未被改變。請在畫面上框選並變更位移靈敏度。</translation>
-    </message>
-    <message>
-        <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
-        <translation>超出授權限制。可儲存變更，但不會有效果。</translation>
-    </message>
-    <message>
-        <source>Could not apply changes</source>
-        <translation>無法套用變更</translation>
     </message>
     <message>
         <source>Error</source>
@@ -3687,6 +3681,34 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>
             <numerusform>無法儲存以下 %n 個攝影機至伺服器中.</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Camera Settings</source>
+        <translation type="unfinished">攝影機設定</translation>
+    </message>
+    <message>
+        <source>Camera(s) not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes have not been applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not apply changes.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3717,38 +3739,30 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnClockLabel</name>
     <message>
-        <source>Server time</source>
-        <translation>伺服器時間</translation>
+        <source>Server Time</source>
+        <translation type="unfinished">伺服器時間</translation>
     </message>
     <message>
-        <source>Local system time</source>
-        <translation>本機系統時間</translation>
+        <source>Local System Time</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
-        <source>Configuring server(s)</source>
-        <translation>設定伺服器</translation>
+        <source>Configuring Server(s)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Updating server(s)</source>
-        <translation>更新伺服器</translation>
+        <source>Updating Server(s)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
-        <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation>登入帳號或密碼錯誤，請重試一次。</translation>
-    </message>
-    <message>
         <source>You are trying to connect to incompatible Server.</source>
         <translation>您正嘗試連線不相容的伺服器.</translation>
-    </message>
-    <message>
-        <source>Could not connect to Server</source>
-        <translation>無法連線至伺服器</translation>
     </message>
     <message>
         <source>Server</source>
@@ -3757,10 +3771,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Client</source>
         <translation>用戶端</translation>
-    </message>
-    <message>
-        <source>Launcher process is not found</source>
-        <translation>找不到啟動程式</translation>
     </message>
     <message>
         <source>Failure</source>
@@ -3850,28 +3860,36 @@ Short for &quot;seconds&quot;</extracomment>
         <source>You will be asked to update your %1</source>
         <translation>您正在更新至 %1</translation>
     </message>
+    <message>
+        <source>The username or password you have entered is incorrect. Please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to connect to the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnConnectionTestingDialog</name>
-    <message>
-        <source>Request timed out.</source>
-        <translation>要求逾時。</translation>
-    </message>
     <message>
         <source>Success</source>
         <translation>成功</translation>
     </message>
     <message>
-        <source>Failed</source>
-        <translation>失敗</translation>
+        <source>Request timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test Failed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCredentialsDialog</name>
-    <message>
-        <source>Enter user name and password...</source>
-        <translation>輸入使用者名稱及密碼...</translation>
-    </message>
     <message>
         <source>User:</source>
         <translation>使用者:</translation>
@@ -3879,6 +3897,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Password:</source>
         <translation>密碼:</translation>
+    </message>
+    <message>
+        <source>Enter a valid username and password...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3916,10 +3938,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>資訊</translation>
     </message>
     <message>
-        <source>Failed to dump Server database to &apos;%1&apos;</source>
-        <translation>輸出伺服器資料庫 %1 錯誤</translation>
-    </message>
-    <message>
         <source>Database was successfully backed up into file &apos;%1&apos;.</source>
         <translation>資料庫已成功備份至檔案 %1.</translation>
     </message>
@@ -3936,10 +3954,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>警告</translation>
     </message>
     <message>
-        <source>Are you sure you want to start restoring database? All current data will be lost.</source>
-        <translation>您確定要開始復原資料庫嗎? 將會移師目前所有的資料。</translation>
-    </message>
-    <message>
         <source>Restoring Database Backup</source>
         <translation>資料庫備份還原</translation>
     </message>
@@ -3948,16 +3962,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>資料庫備份已上傳至伺服器。請稍等。</translation>
     </message>
     <message>
-        <source>You need to connect to a server before doing backup</source>
-        <translation>須連線至伺服器後才能做系統備份</translation>
-    </message>
-    <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
         <translation>資料庫已成功從檔案 %1 還原. 媒體伺服器將重啟.</translation>
     </message>
     <message>
         <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
         <translation>從檔案 %1 還原資料庫錯誤.</translation>
+    </message>
+    <message>
+        <source>Failed to dump server database to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to connect to a server prior to performing a backup.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3969,10 +3991,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Could not find video encoder %1.</source>
         <translation>找不到影像編碼器 &apos;%1&apos;。</translation>
-    </message>
-    <message>
-        <source>Screen width must be a multiplier of 8.</source>
-        <translation>螢幕寬度必須是 8 的倍數。</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
@@ -3993,6 +4011,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Could not start primary audio device.</source>
         <translation>無法啟動主要音效設備。</translation>
+    </message>
+    <message>
+        <source>Screen width must be a multiple of 8.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4045,10 +4067,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnEventLogDialog</name>
     <message>
-        <source>Any action</source>
-        <translation>任何動作</translation>
-    </message>
-    <message>
         <source>Filter Similar Rows</source>
         <translation>篩選相似行</translation>
     </message>
@@ -4094,6 +4112,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Export selected events to file</source>
         <translation>匯出選擇的事件到檔案</translation>
     </message>
+    <message>
+        <source>Any Action</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnEventLogModel</name>
@@ -4126,16 +4148,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>描述</translation>
     </message>
     <message>
-        <source>All users</source>
-        <translation>全部使用者</translation>
-    </message>
-    <message>
         <source>Administrators Only</source>
         <translation>僅管理者</translation>
     </message>
     <message>
         <source>%1 times</source>
         <translation>%1 次</translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4145,12 +4167,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>複製錄影天數設定</translation>
     </message>
     <message>
-        <source>Schedule motion type is not supported by some cameras</source>
-        <translation>部分攝影機不支援位移排程</translation>
+        <source>Schedule motion type is not supported by some cameras.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording cannot be enabled for some cameras</source>
-        <translation>部分攝影機無法錄影</translation>
+        <source>Recording cannot be enabled for some cameras.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4187,20 +4209,20 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>伺服器時間...</translation>
     </message>
     <message>
-        <source>Folder is already added</source>
-        <translation>目錄已新增</translation>
-    </message>
-    <message>
-        <source>This folder is already added.</source>
-        <translation>此目錄已新增.</translation>
-    </message>
-    <message>
         <source>Folder &apos;%1&apos; does not exist.</source>
         <translation>目錄 &apos;%1&apos; 不存在。</translation>
     </message>
     <message>
         <source>Disable only if the client takes too much CPU</source>
         <translation>若客戶端佔用太多CPU效能時請關閉它</translation>
+    </message>
+    <message>
+        <source>Folder has already been added.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This folder has already been added.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4383,16 +4405,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>檔案 &apos;%1&apos; 已被其他程式使用。請重試其他名稱。</translation>
     </message>
     <message>
-        <source>Could not create output file %1</source>
-        <translation>無法建立輸出檔案 %1</translation>
-    </message>
-    <message>
-        <source>Could not export camera %1</source>
-        <translation>無法匯出攝影機 %1</translation>
-    </message>
-    <message>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation>匯出到 &quot;%1&quot;…</translation>
+    </message>
+    <message>
+        <source>Could not create output file %1.</source>
+        <translation type="unfinished">無法建立輸出檔案 %1.</translation>
+    </message>
+    <message>
+        <source>Could not export camera %1.</source>
+        <translation type="unfinished">無法匯出攝影機 %1.</translation>
     </message>
 </context>
 <context>
@@ -4464,6 +4486,60 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Timed out</source>
         <translation type="unfinished">逾時</translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapUserListModel</name>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished">登入</translation>
+    </message>
+    <message>
+        <source>Full Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished">Email</translation>
+    </message>
+    <message>
+        <source>DN</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnLdapUsersDialog</name>
+    <message>
+        <source>The provided settings are not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None of your servers is connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not load users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed out</source>
+        <translation type="unfinished">逾時</translation>
+    </message>
+    <message>
+        <source>Error while loading users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No new users found.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4569,10 +4645,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>本軟體已授權給:</translation>
     </message>
     <message>
-        <source>Obtaining licenses from Server...</source>
-        <translation>正在從伺服器取得授權...</translation>
-    </message>
-    <message>
         <source>Copy to Clipboard</source>
         <translation>複製到剪貼簿</translation>
     </message>
@@ -4585,10 +4657,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>您正試著啟動不相容的授權. 請聯絡您的廠商取得正式授權.</translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Network error has occurred.</source>
-        <translation>啟動授權時發生了網路問題.</translation>
-    </message>
-    <message>
         <source>License Activation </source>
         <translation>授權啟動</translation>
     </message>
@@ -4597,32 +4665,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>自動啟動授權發生網路問題. 請聯絡您的廠商協助啟動您的授權.</translation>
     </message>
     <message>
-        <source>License activation</source>
-        <translation>授權啟動</translation>
-    </message>
-    <message>
-        <source>Can&apos;t activate license:  %1</source>
-        <translation>無法啟動授權: %1</translation>
-    </message>
-    <message>
         <source>Remove license</source>
         <translation>移除授權</translation>
     </message>
     <message>
-        <source>Can&apos;t remove license from server:  %1</source>
-        <translation>無法從伺服器移除授權: %1</translation>
-    </message>
-    <message>
         <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
         <translation>您選用的手動啟動金鑰檔案無效. 請選擇正確的手動啟動金鑰檔. 若問題持續發生, 請聯絡您的廠商.</translation>
-    </message>
-    <message>
-        <source>This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.</source>
-        <translation>授權金鑰已於硬體ID %1. 請聯絡您的廠商取得有效授權金鑰.</translation>
-    </message>
-    <message>
-        <source>The license is already activated.</source>
-        <translation>此授權已啟用。</translation>
     </message>
     <message>
         <source>License was successfully activated.</source>
@@ -4663,6 +4711,30 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Try to activate your license manually.</source>
         <translation>請嘗試手動啟動您的授權.</translation>
+    </message>
+    <message>
+        <source>Obtaining licenses from server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License has arleady been activated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. A network error has occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to activate license:  %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to remove license from server:  %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4769,10 +4841,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>&lt;無&gt;</translation>
     </message>
     <message>
-        <source>Connection with this name already exists. Do you want to overwrite it?</source>
-        <translation>已存在相同的連線名稱，要覆蓋嗎?</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>連線至伺服器...</translation>
     </message>
@@ -4783,10 +4851,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Auto-Discovered Servers</source>
         <translation>自動搜尋伺服器</translation>
-    </message>
-    <message>
-        <source>Invalid parameters</source>
-        <translation>無效參數</translation>
     </message>
     <message>
         <source>The information you have entered is not valid.</source>
@@ -4805,24 +4869,28 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>%1 於 %2</translation>
     </message>
     <message>
-        <source>Connection already exists</source>
-        <translation>連線已存在</translation>
-    </message>
-    <message>
-        <source>Delete connections</source>
-        <translation>刪除連線</translation>
-    </message>
-    <message>
         <source>Are you sure you want to delete this connection: %1?</source>
         <translation>是否確定刪除此連線: %1?</translation>
+    </message>
+    <message>
+        <source>Invalid Paramaters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A connection with this name already exists. Do you want to overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Connections</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnLookAndFeelPreferencesWidget</name>
-    <message>
-        <source>Select file...</source>
-        <translation>選擇檔案...</translation>
-    </message>
     <message>
         <source>Pictures %1</source>
         <translation>畫面%1</translation>
@@ -4879,6 +4947,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
         <translation>此功能將不影響錄影排程. 錄影排程僅依系統時間為準.</translation>
     </message>
+    <message>
+        <source>Select File...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -4922,14 +4994,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>影像強化</translation>
     </message>
     <message>
-        <source>Zoom window</source>
-        <translation>放大窗格</translation>
-    </message>
-    <message>
-        <source>Lo-Res</source>
-        <translation>低解析度</translation>
-    </message>
-    <message>
         <source>Hi-Res</source>
         <translation>高解析度</translation>
     </message>
@@ -4943,6 +5007,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4985,14 +5057,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>密碼不可為空.</translation>
     </message>
     <message>
-        <source>testing...</source>
-        <translation>測試中...</translation>
-    </message>
-    <message>
-        <source>merging systems...</source>
-        <translation>系統合併中...</translation>
-    </message>
-    <message>
         <source>Use a specific hostname or IP address rather than %1.</source>
         <translation>請輸入具體的主機位址或IP, 而不是 %1.</translation>
     </message>
@@ -5007,10 +5071,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>The password is invalid.</source>
         <translation>密碼無效.</translation>
-    </message>
-    <message>
-        <source>The found system %1 has an incompatible version %2.</source>
-        <translation>此系統 %1 的版本 %2 不相容.</translation>
     </message>
     <message>
         <source>The system was not found.</source>
@@ -5055,13 +5115,21 @@ If you understand this and would like to proceed please click Merge to continue.
 </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Testing...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merging Systems...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
-    <message>
-        <source>Invalid schedule</source>
-        <translation>無效的排程</translation>
-    </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation>攝影機的第二串流已關閉. Motion + LQ選項無效. 請點擊 &quot;是&quot; 將錄影類型改成 &quot;全時錄影&quot; 或點擊 &quot;否&quot; 將第二串流開啟.</translation>
@@ -5075,6 +5143,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;multiple values&gt;</source>
         <comment>PasswordEdit</comment>
         <translation>&lt;多選&gt;</translation>
+    </message>
+    <message>
+        <source>Invalid Schedule</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5159,14 +5231,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>&amp;刪除...</translation>
     </message>
     <message>
-        <source>Select file...</source>
-        <translation>選擇檔案...</translation>
-    </message>
-    <message>
-        <source>Sound files</source>
-        <translation>聲音檔案</translation>
-    </message>
-    <message>
         <source>Clip sound up to %1 seconds</source>
         <translation>剪輯最多 %1 秒的聲音</translation>
     </message>
@@ -5183,10 +5247,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>重新命名聲音</translation>
     </message>
     <message>
-        <source>Enter new title:</source>
-        <translation>輸入新標題:</translation>
-    </message>
-    <message>
         <source>New title could not be set.</source>
         <translation>新標題沒有被設定.</translation>
     </message>
@@ -5195,12 +5255,24 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>您確定要刪除 &apos;%1&apos; 嗎?</translation>
     </message>
     <message>
-        <source>Confirm file deletion</source>
-        <translation>確認刪除檔案</translation>
-    </message>
-    <message>
         <source>Custom title:</source>
         <translation>自定標題:</translation>
+    </message>
+    <message>
+        <source>Sound Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter New Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm File Deletion</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5348,32 +5420,8 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnPtzManageDialog</name>
     <message>
-        <source>Could not get position from camera</source>
-        <translation>無法從攝影機取得位置</translation>
-    </message>
-    <message>
-        <source>Could not set position for camera</source>
-        <translation>無法設定攝影機位置</translation>
-    </message>
-    <message>
-        <source>Remove preset</source>
-        <translation>移除預設點</translation>
-    </message>
-    <message>
         <source>Do not show again.</source>
         <translation>不再顯示.</translation>
-    </message>
-    <message>
-        <source>Manage PTZ for %1</source>
-        <translation>管理 PTZ %1</translation>
-    </message>
-    <message>
-        <source>PTZ configuration is not saved</source>
-        <translation>PTZ 設定值未被儲存</translation>
-    </message>
-    <message>
-        <source>Changes are not saved. Do you want to save them?</source>
-        <translation>變更未儲存。您確定要儲存他們嗎?</translation>
     </message>
     <message>
         <source>This preset is used in some tours.</source>
@@ -5395,17 +5443,33 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>An error has occurred while trying to set current position for camera %1.</source>
         <translation>嘗試設定攝影機 %1 之位置時發生錯誤.</translation>
     </message>
+    <message>
+        <source>Could not get position from camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not set position for camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage PTZ for %1.</source>
+        <translation type="unfinished">管理 PTZ %1.</translation>
+    </message>
+    <message>
+        <source>PTZ configuration has not been saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changes have not been saved. Would you like to save them?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnPtzManageModel</name>
-    <message>
-        <source>New tour %1</source>
-        <translation>新巡航 %1</translation>
-    </message>
-    <message>
-        <source>Saved position %1</source>
-        <translation>儲存位置 %1</translation>
-    </message>
     <message>
         <source>#</source>
         <translation>#</translation>
@@ -5444,19 +5508,11 @@ If you understand this and would like to proceed please click Merge to continue.
             <numerusform>這個預設點將在 %n 分鐘後啟動</numerusform>
         </translation>
     </message>
-    <message>
-        <source>Tour should contain at least 2 positions</source>
-        <translation>巡航必須至少包含兩個以上的位置</translation>
-    </message>
     <message numerus="yes">
         <source>Tour has %n identical positions</source>
         <translation>
             <numerusform>巡航包含了 %n 個相同的位置</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Tour time: %1</source>
-        <translation>巡航時間：%1</translation>
     </message>
     <message>
         <source>less than a minute</source>
@@ -5471,6 +5527,22 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Invalid tour</source>
         <translation>無效的巡航</translation>
+    </message>
+    <message>
+        <source>New Tour %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saved Position %1</source>
+        <translation type="unfinished">儲存位置 %1</translation>
+    </message>
+    <message>
+        <source>Tour should contain at least 2 positions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tour Time: %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5749,16 +5821,16 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnResourceSelectionDialog</name>
     <message>
-        <source>Select cameras...</source>
-        <translation>選擇攝影機...</translation>
+        <source>Select Users...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select users...</source>
-        <translation>選擇使用者...</translation>
+        <source>Select Cameras...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select resources...</source>
-        <translation>選擇資源...</translation>
+        <source>Slect Resources...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5988,14 +6060,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnServerUpdatesWidget</name>
     <message>
-        <source>Cannot check updates via the internet.</source>
-        <translation>無法從網際網路取得更新.</translation>
-    </message>
-    <message>
-        <source>Available version:</source>
-        <translation>有效的版本:</translation>
-    </message>
-    <message>
         <source>Unknown</source>
         <translation>未知</translation>
     </message>
@@ -6016,10 +6080,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>複製到剪貼簿</translation>
     </message>
     <message>
-        <source>To update manually, download an archive with the following link:</source>
-        <translation>請至以下連結下載更新檔以手動更新:</translation>
-    </message>
-    <message>
         <source>...</source>
         <translation>...</translation>
     </message>
@@ -6038,10 +6098,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Update Files (*.zip)</source>
         <translation>更新檔 (*.zip)</translation>
-    </message>
-    <message>
-        <source>As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.</source>
-        <translation>一般來說為了能及時給予協助, 我們不建議系統在週末時更新.</translation>
     </message>
     <message>
         <source>Release notes</source>
@@ -6080,14 +6136,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>將網址複製到剪貼簿.</translation>
     </message>
     <message>
-        <source>Latest version:</source>
-        <translation>最新的版本:</translation>
-    </message>
-    <message>
-        <source>Target version:</source>
-        <translation>目前版本:</translation>
-    </message>
-    <message>
         <source>Information</source>
         <translation>資訊</translation>
     </message>
@@ -6100,48 +6148,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>錯誤</translation>
     </message>
     <message>
-        <source>Update finished... 100%</source>
-        <translation>更新已完成...100%</translation>
-    </message>
-    <message>
         <source>Update has been successfully finished.</source>
         <translation>更新已成功完成.</translation>
-    </message>
-    <message>
-        <source>Now you have to update the client manually.</source>
-        <translation>您必須手動更新客戶端.</translation>
-    </message>
-    <message>
-        <source>Now you have to update the client manually using an installer.</source>
-        <translation>您必須手動更新客戶端.</translation>
     </message>
     <message>
         <source>The client will be restarted to the updated version.</source>
         <translation>客戶端將重啟至更新後的版本.</translation>
     </message>
     <message>
-        <source>Update is successful</source>
-        <translation>更新成功</translation>
-    </message>
-    <message>
-        <source>Launcher process is not found</source>
-        <translation>找不到啟動程式</translation>
-    </message>
-    <message>
-        <source>Update cancelled</source>
-        <translation>更新取消</translation>
-    </message>
-    <message>
         <source>Update has been cancelled.</source>
         <translation>更新已被取消.</translation>
-    </message>
-    <message>
-        <source>Update failed</source>
-        <translation>更新失敗</translation>
-    </message>
-    <message>
-        <source>Someone has already started an update.</source>
-        <translation>已有人開始進行更新.</translation>
     </message>
     <message>
         <source>Could not download updates.</source>
@@ -6192,22 +6208,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>檢測更新...</translation>
     </message>
     <message>
-        <source>Internet connection problem</source>
-        <translation>網路連線問題</translation>
-    </message>
-    <message>
-        <source>There is no such build on the update server</source>
-        <translation>在更新伺服器中找不到此版號</translation>
-    </message>
-    <message>
-        <source>Cannot start update. An update for one or more servers was not found.</source>
-        <translation>無法進行更新. 無法找到一個或多台伺服器的更新.</translation>
-    </message>
-    <message>
-        <source>Cannot start update. An update for the client was not found.</source>
-        <translation>無法進行更新. 無法找到客戶端的更新.</translation>
-    </message>
-    <message>
         <source>Newer version found.</source>
         <translation>找到新版本.</translation>
     </message>
@@ -6226,10 +6226,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Cannot update from this file.</source>
         <translation>無法用此檔案做更新.</translation>
-    </message>
-    <message>
-        <source>Cannot extract the update file.</source>
-        <translation>無法取得更新檔.</translation>
     </message>
     <message>
         <source>Checking for updates... %1%</source>
@@ -6275,6 +6271,82 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Check for updates automatically</source>
         <translation>勾選自動更新</translation>
     </message>
+    <message>
+        <source>Unable to check updates via internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Update:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To update manually, download and use the archive file on the following link:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Caution: Applying system updates at the end of the week is not recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Latest Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Target Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update Finished...100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update the client manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update the client manually using an installation package.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update Succeeded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update Cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update unsuccessful.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Another user has already started an update.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internet Connectivity Problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. An update for one or more servers not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. An update for the client was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to extract update file.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -6283,28 +6355,20 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>分析中: %1%</translation>
     </message>
     <message>
-        <source>Watermark not found</source>
-        <translation>找不到浮水印</translation>
-    </message>
-    <message>
-        <source>Watermark matched</source>
-        <translation>浮水印符合</translation>
-    </message>
-    <message>
         <source>Invalid watermark</source>
         <translation>無效的浮水印</translation>
+    </message>
+    <message>
+        <source>Watermark Not Found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark Matched</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
-    <message>
-        <source>Hardware (Camera built-in)</source>
-        <translation>硬體 (攝影機內建)</translation>
-    </message>
-    <message>
-        <source>Do not record motion</source>
-        <translation>不使用位移錄影</translation>
-    </message>
     <message>
         <source>FPS value is too high</source>
         <translation type="unfinished"></translation>
@@ -6337,6 +6401,14 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>This action CANNOT be undone!</source>
         <translation type="unfinished">此動作 無法 還原!</translation>
     </message>
+    <message>
+        <source>Hardware (camera built-in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do Not Record Motion</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSmtpSettingsWidget</name>
@@ -6345,16 +6417,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>自動</translation>
     </message>
     <message>
-        <source>Email is not valid</source>
-        <translation>E-Mail 無效</translation>
-    </message>
-    <message>
         <source>Invalid data</source>
         <translation>無效資料</translation>
-    </message>
-    <message>
-        <source>Provided parameters are not valid. Could not perform a test.</source>
-        <translation>提供的參數無效，無法執行測試。</translation>
     </message>
     <message>
         <source>Network Error</source>
@@ -6371,18 +6435,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Canceled</source>
         <translation>已取消</translation>
-    </message>
-    <message>
-        <source>Timed out</source>
-        <translation>逾時</translation>
-    </message>
-    <message>
-        <source>No preset found. Use &apos;Advanced&apos; option</source>
-        <translation>找不到預設點. 請使用&quot;進階&quot;選項</translation>
-    </message>
-    <message>
-        <source>Support email is not valid</source>
-        <translation>支援 email 不正確</translation>
     </message>
     <message>
         <source>TLS</source>
@@ -6403,6 +6455,26 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Success</source>
         <translation>成功</translation>
+    </message>
+    <message>
+        <source>Provided parameters not valid. Could not perform test.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E-Mail is not valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No preset found. Use &apos;Advanced&apos; option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Support email is not valid.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6425,10 +6497,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>NO SIGNAL</source>
         <translation>無訊號</translation>
-    </message>
-    <message>
-        <source>Server offline</source>
-        <translation>伺服器離線</translation>
     </message>
     <message>
         <source>Unauthorized</source>
@@ -6470,6 +6538,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Module is disabled</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Server Offline</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageSpaceSlider</name>
@@ -6483,10 +6555,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Invalid Storage</source>
         <translation>無效的儲存裝置</translation>
-    </message>
-    <message>
-        <source>Provided storage path does not define a valid external storage.</source>
-        <translation>提供的儲存路徑沒有定義有效的外部儲存裝置。</translation>
     </message>
     <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
@@ -6506,6 +6574,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Add storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provided storage path does not point to a valid external storage location.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6870,16 +6942,36 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnUserManagementWidget</name>
     <message>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import from LDAP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>LDAP Settings...</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter...</source>
+        <translation type="unfinished">篩選器...</translation>
+    </message>
+    <message>
+        <source>New User...</source>
+        <translation type="unfinished">新增使用者…</translation>
+    </message>
+    <message>
+        <source>Fetch Users from LDAP...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Selection</source>
+        <translation type="unfinished">清除選擇的區塊</translation>
     </message>
 </context>
 <context>
@@ -6901,16 +6993,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>指定的登入使用者已存在。</translation>
     </message>
     <message>
-        <source>To change your password, please enter your current password.</source>
-        <translation>請輸入目前的密碼以變更您的密碼.</translation>
-    </message>
-    <message>
         <source>Invalid current password.</source>
         <translation>目前的密碼無效。</translation>
-    </message>
-    <message>
-        <source>User was renamed. Password must be updated.</source>
-        <translation>使用者已更名. 密碼必須更新.</translation>
     </message>
     <message>
         <source>Passwords do not match.</source>
@@ -6972,6 +7056,14 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Can edit Video Walls</source>
         <translation>可以編輯電視牆</translation>
     </message>
+    <message>
+        <source>To modify your password, please enter existing one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User has been renamed. Password must be updated.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnVideowallItemWidget</name>
@@ -7027,12 +7119,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>電視牆設定</translation>
     </message>
     <message>
-        <source>Start Video Wall when the Windows starts</source>
-        <translation>作業系統開啟時自動啟動電視牆</translation>
+        <source>Launch video wall when Windows starts.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Shortcut on the desktop</source>
-        <translation>在桌面新增捷徑</translation>
+        <source>Place shortcut on desktop.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7065,24 +7157,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>無法新增本地檔案到多個影像</translation>
     </message>
     <message>
-        <source>Open file</source>
-        <translation>開啟檔案</translation>
-    </message>
-    <message>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
         <translation>全部支援的檔案 (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>新佈局 %1</translation>
-    </message>
-    <message>
-        <source>Can&apos;t move camera(s) to other server. Server %1 doesn&apos;t answer to request.</source>
-        <translation>無法將攝影機移動至其它伺服器. 伺服器 %1 無回應.</translation>
-    </message>
-    <message>
-        <source>Server %1 cannot discover these cameras so far. Are you sure you want to move them?</source>
-        <translation>伺服器 %1 目前無法找到這些攝影機. 是否要移除這些攝影機?</translation>
     </message>
     <message>
         <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
@@ -7109,20 +7185,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>伺服器時間...</translation>
     </message>
     <message>
-        <source>Could not perform preview search</source>
-        <translation>無法執行預覽搜尋</translation>
-    </message>
-    <message>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
         <translation>選擇的時段太短無法預覽搜尋。請選擇較長的時段。</translation>
     </message>
     <message>
         <source>Preview Search for %1</source>
         <translation>預覽搜尋 %1</translation>
-    </message>
-    <message>
-        <source>Process is in progress</source>
-        <translation>找不到啟動程式</translation>
     </message>
     <message>
         <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
@@ -7161,10 +7229,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>相同名稱的使用者已存在</translation>
     </message>
     <message>
-        <source>Video Wall with the same name already exists</source>
-        <translation>相同名稱的電視牆已存在</translation>
-    </message>
-    <message>
         <source>Rename</source>
         <translation>重新命名</translation>
     </message>
@@ -7197,24 +7261,8 @@ If you understand this and would like to proceed please click Merge to continue.
         </translation>
     </message>
     <message>
-        <source>You are running beta version of %1.</source>
-        <translation>您正在執行測試版本 %1。</translation>
-    </message>
-    <message>
-        <source>Launcher process is not found</source>
-        <translation>找不到啟動程式</translation>
-    </message>
-    <message>
         <source>User Settings</source>
         <translation>使用者設定</translation>
-    </message>
-    <message>
-        <source>Updating background</source>
-        <translation>背景更新</translation>
-    </message>
-    <message>
-        <source>Image processing can take a lot of time. Please be patient.</source>
-        <translation>影像處理會消耗一些時間。請稍待。</translation>
     </message>
     <message>
         <source>Could not delete resource</source>
@@ -7229,10 +7277,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Version Mismatch</source>
         <translation>版本不匹配</translation>
-    </message>
-    <message>
-        <source>New layout</source>
-        <translation>新佈局</translation>
     </message>
     <message numerus="yes">
         <source>These %n cameras are auto-discovered.</source>
@@ -7308,6 +7352,54 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>系統寄送匿名使用與故障狀況給軟體開發團隊以協助我們改善您的使用經驗.
 若您想關閉此功能, 您可在系統設定視窗內關閉.</translation>
     </message>
+    <message>
+        <source>New Layout</source>
+        <translation type="unfinished">新佈局</translation>
+    </message>
+    <message>
+        <source>New Layout %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot move camera(s) to server %1. Server is unresponsive.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server %1 is unable to find and access these cameras. Are you sure you would like to move them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to perform preview search.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Process in progress...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Wall with the same name already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating Background...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image processing may take a few moments. Please be patient.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a beta version of %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -7316,28 +7408,28 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>錯誤</translation>
     </message>
     <message>
-        <source>Bookmark can only be added to an online server.</source>
-        <translation>書籤僅能加入至有上線的伺服器.</translation>
-    </message>
-    <message>
         <source>Bookmark</source>
         <translation>書籤</translation>
     </message>
     <message>
-        <source>Bookmark can only be edited on an online server.</source>
-        <translation>書籤僅可在有上線的伺服器編輯.</translation>
-    </message>
-    <message>
-        <source>Bookmark can only be deleted from an online server.</source>
-        <translation>書籤僅可在有上線的伺服器移除.</translation>
-    </message>
-    <message>
-        <source>Confirm delete</source>
-        <translation>移除確認</translation>
-    </message>
-    <message>
         <source>Are you sure you want to delete this bookmark %1?</source>
         <translation>是否確定刪除書籤 %1?</translation>
+    </message>
+    <message>
+        <source>Bookmarks can only be added to an online server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmarks can only be edited on an online server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmarks can only be deleted from an online server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm Deletion</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7370,10 +7462,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>警告</translation>
     </message>
     <message>
-        <source>Can&apos;t start recording due to the following error: %1</source>
-        <translation>因為以下錯誤無法錄影：%1</translation>
-    </message>
-    <message>
         <source>Recording in...%1</source>
         <translation>即將開始錄影...%1</translation>
     </message>
@@ -7390,12 +7478,16 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>AVI (聲音影像檔) (*.avi)</translation>
     </message>
     <message>
-        <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
-        <translation>無法覆寫檔案 &apos;%1&apos;. 請重試其他名稱.</translation>
+        <source>Unable to start recording due to the following error: %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Press any key to stop the tour</source>
-        <translation>請按任何鍵停止輪跳</translation>
+        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press any key to stop the tour.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7407,10 +7499,6 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Executable %1 Media File (x86) (*.exe)</source>
         <translation>可執行的 %1 媒體檔案  (x86) (*.exe)</translation>
-    </message>
-    <message>
-        <source>File is in use</source>
-        <translation>檔案使用中</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
@@ -7427,10 +7515,6 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Exporting Layout</source>
         <translation>匯出佈局</translation>
-    </message>
-    <message>
-        <source>Could not export file</source>
-        <translation>無法匯出檔案</translation>
     </message>
     <message numerus="yes">
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
@@ -7455,26 +7539,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>匯出影像為...</translation>
     </message>
     <message>
-        <source>No timestamp</source>
-        <translation>無時間戳記</translation>
-    </message>
-    <message>
-        <source>Top left corner (requires transcoding)</source>
-        <translation>左上角 (需要重新轉碼)</translation>
-    </message>
-    <message>
-        <source>Top right corner (requires transcoding)</source>
-        <translation>右上角 (需要重新轉碼)</translation>
-    </message>
-    <message>
-        <source>Bottom left corner (requires transcoding)</source>
-        <translation>左下角 (需要重新轉碼)</translation>
-    </message>
-    <message>
-        <source>Bottom right corner (requires transcoding)</source>
-        <translation>右下角 (需要重新轉碼)</translation>
-    </message>
-    <message>
         <source>Timestamps:</source>
         <translation>時間戳記:</translation>
     </message>
@@ -7495,10 +7559,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>另存新檔</translation>
     </message>
     <message>
-        <source>You are about to export video with filters that require transcoding, which can take a long time. Do you want to continue?</source>
-        <translation>您選擇的匯出影像檔案需要轉碼，轉碼動作會需要較長的時間，您確定要繼續嗎?</translation>
-    </message>
-    <message>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
         <translation>檔案 &apos;%1&apos; 已存在。您確定要覆寫嗎?</translation>
     </message>
@@ -7511,28 +7571,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>匯出到 &quot;%1&quot;…</translation>
     </message>
     <message>
-        <source>Export finished</source>
-        <translation>匯出完成</translation>
-    </message>
-    <message>
-        <source>Export successfully finished</source>
-        <translation>匯出成功完成</translation>
-    </message>
-    <message>
-        <source>Could not export layout</source>
-        <translation>無法匯出佈局</translation>
-    </message>
-    <message>
-        <source>Could not save a layout</source>
-        <translation>無法儲存佈局</translation>
-    </message>
-    <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
         <translation>目前的佈局含有圖片檔案，圖片無法與多個影像一同匯出。</translation>
-    </message>
-    <message>
-        <source>Save local layout As...</source>
-        <translation>另存本地佈局為…</translation>
     </message>
     <message>
         <source>Export Layout As...</source>
@@ -7541,18 +7581,6 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>%1 Media File (*.nov)</source>
         <translation>%1 媒體檔案 (*.nov)</translation>
-    </message>
-    <message>
-        <source>Make file read-only</source>
-        <translation>將檔案建立為唯獨模式</translation>
-    </message>
-    <message>
-        <source>Could not export video</source>
-        <translation>無法匯出影像</translation>
-    </message>
-    <message>
-        <source>Export successfully finished.</source>
-        <translation>匯出成功完成.</translation>
     </message>
     <message>
         <source>You are about to export a video sequence that is longer than 30 minutes.</source>
@@ -7578,16 +7606,76 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>exported</source>
         <translation>已匯出</translation>
     </message>
+    <message>
+        <source>File is in use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to export file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top Left Corner (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top Right Corner (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom Left Corner (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom Right Corner (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Successful</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to export layout.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to save layout.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save local layout as...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make file read-only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Successful.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to export video.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
         <source>Error</source>
         <translation>錯誤</translation>
-    </message>
-    <message>
-        <source>Please, wait before the previously requested servers will be added to your system.</source>
-        <translation>請稍候, 您所要求的伺服器即將加入系統.</translation>
     </message>
     <message>
         <source>Enter Password...</source>
@@ -7608,10 +7696,6 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Information</source>
         <translation>資訊</translation>
-    </message>
-    <message>
-        <source>The selected servers has been successfully connected to your system!</source>
-        <translation>所選伺服器已成功與系統連結!</translation>
     </message>
     <message>
         <source>Could not configure the selected servers.</source>
@@ -7648,28 +7732,20 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Merge</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Please wait. Requested servers will be added to your system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rejoice! Selected servers have been successfully connected to your system!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchLayoutsHandler</name>
     <message>
-        <source>Layout already exists</source>
-        <translation>佈局已存在</translation>
-    </message>
-    <message>
-        <source>Layout with the same name already exists and you do not have the rights to overwrite it.</source>
-        <translation>已存在相同的佈局名稱，您確定要覆蓋嗎.</translation>
-    </message>
-    <message>
         <source>Save Layout As</source>
         <translation>另存佈局為</translation>
-    </message>
-    <message>
-        <source>Enter layout name:</source>
-        <translation>輸入佈局名稱:</translation>
-    </message>
-    <message>
-        <source>Layout with the same name already exists. Do you want to overwrite it?</source>
-        <translation>已存在相同的佈局名稱，您確定要覆蓋嗎?</translation>
     </message>
     <message>
         <source>Close Layouts</source>
@@ -7704,14 +7780,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>輸入要建立的佈局名稱:</translation>
     </message>
     <message>
-        <source>New layout</source>
-        <translation>新佈局</translation>
-    </message>
-    <message>
-        <source>New layout %1</source>
-        <translation>新佈局 %1</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>錯誤</translation>
     </message>
@@ -7726,6 +7794,26 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>
             <numerusform>您確定要還原這 %n 個佈局嗎?</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Layout already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Layout Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A layout with the same name already exists. Would you like to overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Layout %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7758,18 +7846,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnWorkbenchPtzHandler</name>
     <message>
-        <source>Could not get position from camera</source>
-        <translation>無法從攝影機取得位置</translation>
-    </message>
-    <message>
-        <source>Could not set position for camera</source>
-        <translation>無法設定攝影機的位置</translation>
-    </message>
-    <message>
-        <source>Could not set position to camera</source>
-        <translation>無法設定位置至攝影機</translation>
-    </message>
-    <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
@@ -7784,6 +7860,18 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
         <translation>嘗試設定攝影機 %1 位置時發生錯誤.</translation>
+    </message>
+    <message>
+        <source>Unable to get position from camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to set position for camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to set position of camera.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7801,32 +7889,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>另存為</translation>
     </message>
     <message>
-        <source>Could not overwrite file</source>
-        <translation>無法覆蓋檔案</translation>
-    </message>
-    <message>
         <source>JPEG Image (*.jpg)</source>
         <translation>JPEG 影像 (*.jpg)</translation>
-    </message>
-    <message>
-        <source>No timestamp</source>
-        <translation>無時間戳記</translation>
-    </message>
-    <message>
-        <source>Top left corner</source>
-        <translation>左上角</translation>
-    </message>
-    <message>
-        <source>Top right corner</source>
-        <translation>右上角</translation>
-    </message>
-    <message>
-        <source>Bottom left corner</source>
-        <translation>左下角</translation>
-    </message>
-    <message>
-        <source>Bottom right corner</source>
-        <translation>右下角</translation>
     </message>
     <message>
         <source>Timestamp:</source>
@@ -7845,31 +7909,47 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>%1 儲存中</translation>
     </message>
     <message>
-        <source>Could not save screenshot</source>
-        <translation>無法儲存螢幕截圖</translation>
-    </message>
-    <message>
-        <source>An error has occurred while saving screenshot &apos;%1&apos;.</source>
-        <translation>當儲存螢幕截圖時發生一個錯誤 &apos;%1&apos;。</translation>
-    </message>
-    <message>
         <source>Saving Screenshot...</source>
         <translation>螢幕擷圖儲存中...</translation>
+    </message>
+    <message>
+        <source>No Timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top Left Corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top Right Corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom Left Corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom Right Corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not overwrite file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save screenshot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error occured while saving screenshot &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
-        <source>Newer version is available</source>
-        <translation>已有新版本</translation>
-    </message>
-    <message>
         <source>Would you like to update?</source>
         <translation>是否更新?</translation>
-    </message>
-    <message>
-        <source>Update is recommended</source>
-        <translation>建議進行更新</translation>
     </message>
     <message>
         <source>Major issues have been fixed.</source>
@@ -7878,10 +7958,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Update is strongly recommended.</source>
         <translation>強烈建議進行更新.</translation>
-    </message>
-    <message>
-        <source>Don&apos;t notify again about this update.</source>
-        <translation>不再通知此更新。</translation>
     </message>
     <message>
         <source>Release Notes</source>
@@ -7895,48 +7971,32 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>New version %1 is available.</source>
         <translation>已可取得新版本 %1.</translation>
     </message>
+    <message>
+        <source>A newer version is available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not notify me again about this update.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
-        <source>Control session is already running</source>
-        <translation>控制進程正在執行</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>錯誤</translation>
-    </message>
-    <message>
-        <source>Unexpected error has occurred. Changes cannot be saved.</source>
-        <translation>非預期的錯誤發生. 無法儲存變更.</translation>
-    </message>
-    <message>
-        <source>There are no offline videowall items attached to this pc.</source>
-        <translation>此電腦並無添加離線的電視牆.</translation>
     </message>
     <message>
         <source>Switch to Video Wall Mode...</source>
         <translation>切換至電視牆模式...</translation>
     </message>
     <message>
-        <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
-        <translation>電視牆即將開始運作. 是否關閉 %1 客戶端?</translation>
-    </message>
-    <message>
-        <source>More licenses required</source>
-        <translation>需要更多授權</translation>
-    </message>
-    <message>
-        <source>To enable the feature please activate at least one Video Wall license.</source>
-        <translation>請啟動至少一個電視牆授權以啟用此功能.</translation>
-    </message>
-    <message>
         <source>Could not start Video Wall control session.</source>
         <translation>無法啟動電視牆控制進程.</translation>
-    </message>
-    <message>
-        <source>To enable the feature please activate at least one Video Wall license</source>
-        <translation>請啟動至少一個電視牆授權以啟用此功能</translation>
     </message>
     <message>
         <source>Video Wall</source>
@@ -7953,14 +8013,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Enter the name of the Video Wall to create:</source>
         <translation>請輸入新增電視牆的名稱:</translation>
-    </message>
-    <message>
-        <source>Video Wall already exists</source>
-        <translation>電視牆已存在</translation>
-    </message>
-    <message>
-        <source>Video Wall with the same name already exists</source>
-        <translation>已有相同名稱的電視牆</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -8033,6 +8085,42 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n cameras</source>
         <translation>%n支攝影機</translation>
     </message>
+    <message>
+        <source>A control session is already running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unexpected error has occured. Changes cannot be applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no offline video wall items attached to this computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional licenses required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To enable this feature please activate at least one Video Wall license.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To enable Video Wall, please activate at least one Video Wall license.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Wall already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A Video Wall with the same name already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReconnectInfoDialog</name>
@@ -8041,8 +8129,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>重新連線中...</translation>
     </message>
     <message>
-        <source>Please wait while connection is being restored...</source>
-        <translation>重新連線中, 請稍候...</translation>
+        <source>Please wait while the connection is restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8056,20 +8144,20 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>FPS</translation>
     </message>
     <message>
-        <source>Pre-recording:</source>
-        <translation>事前錄影:</translation>
-    </message>
-    <message>
         <source>s</source>
         <translation>秒</translation>
     </message>
     <message>
-        <source>Post-recording:</source>
-        <translation>事後錄影:</translation>
-    </message>
-    <message>
         <source>max</source>
         <translation>最大</translation>
+    </message>
+    <message>
+        <source>Pre-Recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post-Recording:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8175,8 +8263,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>外接裝置:</translation>
     </message>
     <message>
-        <source>Very powerful machine is required for Best quality and high resolution.</source>
-        <translation>高畫質及高畫質需要非常高階的電腦.</translation>
+        <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8289,8 +8377,8 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>ServerSettingsDialog</name>
     <message>
-        <source>Server settings</source>
-        <translation>伺服器設定</translation>
+        <source>Server Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8380,24 +8468,20 @@ It won&apos;t deny oldest footage removing from the drive.</source>
 <context>
     <name>SignDialog</name>
     <message>
-        <source>Watermark check</source>
-        <translation>檢查浮水印</translation>
+        <source>Watermark Check</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Checked file:</source>
-        <translation>檢查檔案:</translation>
+        <source>Checked File:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check result:</source>
-        <translation>檢查結果:</translation>
+        <source>Check Result:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SingleCameraSettingsWidget</name>
-    <message>
-        <source>Camera settings</source>
-        <translation>攝影機設定</translation>
-    </message>
     <message>
         <source>General</source>
         <translation>一般</translation>
@@ -8413,10 +8497,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>Firmware:</source>
         <translation>韌體:</translation>
-    </message>
-    <message>
-        <source>Software (Max FPS may be slightly decreased on Server)</source>
-        <translation>軟體 (伺服器最大FPS可能會略為降低)</translation>
     </message>
     <message>
         <source>Vendor:</source>
@@ -8455,28 +8535,12 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <translation>密碼:</translation>
     </message>
     <message>
-        <source>Enable audio</source>
-        <translation>允許聲音</translation>
-    </message>
-    <message>
         <source>Recording</source>
         <translation>錄影</translation>
     </message>
     <message>
         <source>Motion</source>
         <translation>位移偵測</translation>
-    </message>
-    <message>
-        <source>Motion is not available for this camera</source>
-        <translation>此攝影機不支援位移偵測</translation>
-    </message>
-    <message>
-        <source>Motion settings</source>
-        <translation>位移設定</translation>
-    </message>
-    <message>
-        <source>Motion detection:</source>
-        <translation>位移偵測:</translation>
     </message>
     <message>
         <source>Hardware (Camera built-in)</source>
@@ -8487,24 +8551,12 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <translation>靈敏度:</translation>
     </message>
     <message>
-        <source>Motion mask (0)</source>
-        <translation>不偵測位移 (0)</translation>
-    </message>
-    <message>
         <source>Maximum sensitivity (9)</source>
         <translation>最大靈敏度 (9)</translation>
     </message>
     <message>
-        <source>Camera motion web page:</source>
-        <translation>攝影機位移偵測網頁:</translation>
-    </message>
-    <message>
         <source>URL</source>
         <translation>網址</translation>
-    </message>
-    <message>
-        <source>Reset motion regions</source>
-        <translation>重設位移偵測區域</translation>
     </message>
     <message>
         <source>Dewarping</source>
@@ -8520,6 +8572,42 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>IO ports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Settings</source>
+        <translation type="unfinished">攝影機設定</translation>
+    </message>
+    <message>
+        <source>Enable Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion is not available for this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Software - maximum FPS could decrease slightly on server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion Mask (0)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera web page:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Motion Regions</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8550,10 +8638,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <translation>&amp;系統簽章:</translation>
     </message>
     <message>
-        <source>Enter short system description here...</source>
-        <translation>在此輸入簡短的系統描述...</translation>
-    </message>
-    <message>
         <source>Support Signature:</source>
         <translation>支援簽章:</translation>
     </message>
@@ -8572,18 +8656,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>P&amp;ort:</source>
         <translation>&amp;通訊埠:</translation>
-    </message>
-    <message>
-        <source>Unsecure connection</source>
-        <translation>不安全的連線</translation>
-    </message>
-    <message>
-        <source>Secure connection using TLS</source>
-        <translation>使用 TLS 安全連線</translation>
-    </message>
-    <message>
-        <source>Secure connection using SSL</source>
-        <translation>使用 SSL 安全連線</translation>
     </message>
     <message>
         <source>Server:</source>
@@ -8620,6 +8692,22 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>(recommended)</source>
         <translation>(建議)</translation>
+    </message>
+    <message>
+        <source>Enter a short system description here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsecure Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secure connection using TLS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secure connection using SSL.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8686,16 +8774,16 @@ It won&apos;t deny oldest footage removing from the drive.</source>
 <context>
     <name>TimeServerSelectionWidget</name>
     <message>
-        <source>Current system time:</source>
-        <translation>目前系統時間:</translation>
-    </message>
-    <message>
         <source>Synchronizing...</source>
         <translation>同步中...</translation>
     </message>
     <message>
-        <source>Choose the server which is going to be used as a time server if the system has no internet access:</source>
-        <translation>選擇無網際網路時做為校時伺服器的主機:</translation>
+        <source>Current System Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8744,14 +8832,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
 <context>
     <name>WeekTimeScheduleDialog</name>
     <message>
-        <source>Schedule Grid</source>
-        <translation>排程表格</translation>
-    </message>
-    <message>
-        <source>Note: Schedule is based on Server Time</source>
-        <translation>備註：排程時間為伺服器時間</translation>
-    </message>
-    <message>
         <source>Schedule Settings</source>
         <translation>排程設定</translation>
     </message>
@@ -8762,6 +8842,14 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <source>Off</source>
         <translation>關</translation>
+    </message>
+    <message>
+        <source>Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note: Schedule is based on server time.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

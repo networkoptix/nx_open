@@ -77,7 +77,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 
     QString detail;
     if (result == Result::Unauthorized) {
-        detail = tr("Login or password you have entered are incorrect, please try again.");
+        detail = tr("The username or password you have entered is incorrect. Please try again.");
     } else if (result == Result::ServerError) {
         detail = tr("Connection to the Server could not be established.") + L'\n' 
                + tr("Connection details that you have entered are incorrect, please try again.") + L'\n' 
@@ -90,7 +90,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         QnMessageBox::warning(
             parentWidget,
             Qn::Login_Help,
-            tr("Could not connect to Server"),
+            tr("Unable to connect to the server"),
             detail
             );
         return result;
@@ -134,7 +134,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
-                tr("Could not connect to Server"),
+                tr("Unable to connect to the server"),
                 message,
                 QMessageBox::Ok
                 );
@@ -146,7 +146,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         QnMessageBox::warning(
             parentWidget,
             Qn::VersionMismatch_Help,
-            tr("Could not connect to Server"),
+            tr("Unable to connect to the server"),
             tr("You are about to connect to Server which has a different version:") + L'\n'
             + versionDetails
             + tr("Compatibility mode for versions lower than %1 is not supported.").arg(minSupportedVersion.toString()),
@@ -160,7 +160,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         QnMessageBox::warning(
             parentWidget,
             Qn::VersionMismatch_Help,
-            tr("Could not connect to Server"),
+            tr("Unable to connect to the server"),
             tr("Selected Server has a different version:") + L'\n'
             + versionDetails
             + tr("The other version of the Client is needed in order to establish the connection to this Server."),
@@ -178,7 +178,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
-                tr("Could not connect to Server"),
+                tr("Unable to connect to the server"),
                 tr("Selected Server has a different version:") + L'\n'
                 + versionDetails
                 + tr("An error has occurred while trying to restart in compatibility mode."),
@@ -188,7 +188,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
-                tr("Could not connect to Server"),
+                tr("Unable to connect to the server"),
                 tr("Selected Server has a different version:") + L'\n'
                 + versionDetails
                 + tr("The other version of the Client is needed in order to establish the connection to this Server."),
@@ -207,7 +207,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             int selectedButton = QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
-                tr("Could not connect to Server"),
+                tr("Unable to connect to the server"),
                 tr("You are about to connect to Server which has a different version:") + L'\n'
                 + tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n' 
                 + tr(" - Server version: %1.").arg(versionString) + L'\n'
@@ -234,7 +234,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         int button = QnMessageBox::warning(
             parentWidget,
             Qn::VersionMismatch_Help,
-            tr("Could not connect to Server"),
+            tr("Unable to connect to the server"),
             tr("You are about to connect to Server which has a different version:") + L'\n'
             + versionDetails
             + tr("Would you like to restart the Client in compatibility mode?"),
@@ -252,7 +252,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         case applauncher::api::ResultType::connectError:
             QMessageBox::critical(
                 parentWidget,
-                tr("Launcher process is not found"),
+                tr("Launcher process not found."),
                 tr("Cannot restart the Client in compatibility mode.") + L'\n' 
               + tr("Please close the application and start it again using the shortcut in the start menu.")
                 );
@@ -314,7 +314,7 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
 
     if (errorCode == ec2::ErrorCode::unauthorized) {
         result.result = Result::Unauthorized;
-        result.details = tr("Login or password you have entered are incorrect, please try again.");
+        result.details = tr("The username or password you have entered is incorrect. Please try again.");
         result.helpTopicId = Qn::Login_Help;
     } else if (errorCode != ec2::ErrorCode::ok) {
         result.result = Result::ServerError;

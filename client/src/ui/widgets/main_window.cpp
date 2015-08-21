@@ -841,7 +841,7 @@ Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) con
 
 void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     if(event->type() != QEvent::FileOpen) {
-        qnWarning("Expected event of type %1, received an event of type %2.", static_cast<int>(QEvent::FileOpen), static_cast<int>(event->type()));
+        qnWarning!("Expected event of type %1, received an event of type %2.", static_cast<int>(QEvent::FileOpen), static_cast<int>(event->type()));
         return;
     }
 

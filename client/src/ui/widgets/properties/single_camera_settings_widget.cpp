@@ -89,7 +89,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->motionTab,                                             Qn::CameraSettings_Motion_Help);
     setHelpTopic(ui->advancedTab,                                           Qn::CameraSettings_Properties_Help);
     setHelpTopic(ui->ioSettingsTab,                                         Qn::CameraSettings_Properties_Help);
-    setHelpTopic(ui->fisheyeTab,                                            Qn::CameraSettings_Dewarping_Help);
+    setHelpTopic(ui->fisheyeTab,                                            Qn::CameraSettings_Fisheye_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
@@ -285,10 +285,10 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
         ui->ioPortSettingsWidget->submitToResource(m_camera);
 
-        QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
+        QnMediaFisheyeParams dewarpingParams = m_camera->getFisheyeParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
         dewarpingParams.enabled = ui->imageControlWidget->isFisheye(); //this step is really not needed as 'enabled' flag was set by imageControlWidget
-        m_camera->setDewarpingParams(dewarpingParams);
+        m_camera->setFisheyeParams(dewarpingParams);
 
         setHasDbChanges(false);
     }
@@ -364,9 +364,9 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         if (!dtsBased) {
             ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);
             if (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow))
-                ui->cameraMotionButton->setText(tr("Hardware (Camera built-in)"));
+                ui->cameraMotionButton->setText(tr("Hardware (camera built-in)"));
             else
-                ui->cameraMotionButton->setText(tr("Do not record motion"));
+                ui->cameraMotionButton->setText(tr("Do Not Record Motion"));
 
             QnVirtualCameraResourceList cameras;
             cameras.push_back(m_camera);
@@ -401,7 +401,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
                 m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::JpgFormat, this);
-            ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
+            ui->fisheyeSettingsWidget->updateFromParams(m_camera->getFisheyeParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }
 
@@ -437,7 +437,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         return;
 
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
-        mediaWidget->setDewarpingParams(mediaWidget->resource()->getDewarpingParams());
+        mediaWidget->setFisheyeParams(mediaWidget->resource()->getFisheyeParams());
     }
 
 }
@@ -873,14 +873,14 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged() {
         return;
 
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
-        QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
+        QnMediaFisheyeParams dewarpingParams = mediaWidget->dewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
         dewarpingParams.enabled = ui->imageControlWidget->isFisheye();
-        mediaWidget->setDewarpingParams(dewarpingParams);
+        mediaWidget->setFisheyeParams(dewarpingParams);
 
         QnWorkbenchItem *item = mediaWidget->item();
-        QnItemDewarpingParams itemParams = item->dewarpingParams();
+        QnItemFisheyeParams itemParams = item->dewarpingParams();
         itemParams.enabled = dewarpingParams.enabled;
-        item->setDewarpingParams(itemParams);
+        item->setFisheyeParams(itemParams);
     }
 }

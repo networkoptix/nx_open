@@ -84,17 +84,17 @@ void QnResourceSelectionDialog::init() {
     switch (m_target) {
     case UserResourceTarget:
         scope = QnResourcePoolModel::UsersScope;
-        setWindowTitle(tr("Select users..."));
+        setWindowTitle(tr("Select Users..."));
         ui->detailsWidget->hide();
         resize(minimumSize());
         break;
     case CameraResourceTarget:
         scope = QnResourcePoolModel::CamerasScope;
-        setWindowTitle(tr("Select cameras..."));
+        setWindowTitle(tr("Select Cameras..."));
         break;
     default:
         scope = QnResourcePoolModel::FullScope;
-        setWindowTitle(tr("Select resources..."));
+        setWindowTitle(tr("Slect Resources..."));
         ui->detailsWidget->hide();
         resize(minimumSize());
         break;

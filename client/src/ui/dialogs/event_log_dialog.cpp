@@ -77,7 +77,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
     // init actions model
     {
-        QStandardItem *anyActionItem = new QStandardItem(tr("Any action"));
+        QStandardItem *anyActionItem = new QStandardItem(tr("Any Action"));
         anyActionItem->setData(QnBusiness::UndefinedAction);
         anyActionItem->setData(false, ProlongedActionRole);
         m_actionTypesModel->appendRow(anyActionItem);
