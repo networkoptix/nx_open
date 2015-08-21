@@ -137,34 +137,17 @@ var flashlsAPI = new (function(){
     this.getFlashMovieObject = function (){
         var movieName = flashParameters.name || this.element;
 
-        if(Config.allowDebugMode && Config.debug.video){
-            console.log("getFlashMovieObject", movieName);
-        }
         if (window.document[movieName])
         {
-
-            if(Config.allowDebugMode && Config.debug.video){
-                console.log("window.document[movieName]");
-            }
             return window.document[movieName];
         }
         if (navigator.appName.indexOf("Microsoft Internet")==-1)
         {
-
-            if(Config.allowDebugMode && Config.debug.video){
-                console.log("document.embeds - IE");
-            }
-
             if (document.embeds && document.embeds[movieName])
                 return document.embeds[movieName];
         }
         else // if (navigator.appName.indexOf("Microsoft Internet")!=-1)
         {
-
-            if(Config.allowDebugMode && Config.debug.video){
-                console.log("document.getElementById");
-            }
-
             return document.getElementById(movieName);
         }
     };

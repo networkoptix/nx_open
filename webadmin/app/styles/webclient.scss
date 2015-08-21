@@ -417,7 +417,7 @@ table.webclient-window>tbody>tr>td.alert{
 }
 
 @media only screen and (max-device-width:640px) {
-  .invisible-xs{
+  .invisible-xs,.hidden-mobile{
     display:none;
   }
 }
