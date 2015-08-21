@@ -17,3 +17,8 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
 
 QnUserManagementWidget::~QnUserManagementWidget() {
 }
+
+void QnUserManagementWidget::updateFromSettings() {
+    Q_D(QnUserManagementWidget);
+    d->updateFromSettings();
+}

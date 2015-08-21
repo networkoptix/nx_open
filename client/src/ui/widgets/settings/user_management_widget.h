@@ -19,6 +19,7 @@ public:
     explicit QnUserManagementWidget(QWidget *parent = 0);
     ~QnUserManagementWidget();
 
+    virtual void updateFromSettings() override;
 private:
     QScopedPointer<Ui::QnUserManagementWidget> ui;
     QScopedPointer<QnUserManagementWidgetPrivate> const d_ptr;

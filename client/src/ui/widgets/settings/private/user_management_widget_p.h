@@ -18,6 +18,7 @@ public:
     QnUserManagementWidgetPrivate(QnUserManagementWidget *parent);
 
     void setupUi();
+    void updateFromSettings();
 private:
     void at_usersTable_activated(const QModelIndex &index);
     void at_usersTable_clicked(const QModelIndex &index);

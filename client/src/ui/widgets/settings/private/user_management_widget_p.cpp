@@ -18,6 +18,7 @@
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/ldap.h>
@@ -55,18 +56,17 @@ void QnUserManagementWidgetPrivate::setupUi() {
         q->ui->fetchButton->setEnabled(QnGlobalSettings::instance()->ldapSettings().isValid());
     };
 
-
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::ldapSettingsChanged, this, updateFetchButton);
 
     connect(q->ui->usersTable,              &QTableView::activated, this,  &QnUserManagementWidgetPrivate::at_usersTable_activated);
     connect(q->ui->usersTable,              &QTableView::clicked,   this,  &QnUserManagementWidgetPrivate::at_usersTable_clicked);
-    connect(q->ui->ldapSettingsButton,      &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::openLdapSettings);
-    connect(q->ui->fetchButton,             &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::fetchUsers);
     connect(q->ui->createUserButton,        &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::createUser);
     connect(q->ui->clearSelectionButton,    &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::clearSelection);
     connect(q->ui->enableSelectedButton,    &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::enableSelected);
     connect(q->ui->disableSelectedButton,   &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::disableSelected);
     connect(q->ui->deleteSelectedButton,    &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::deleteSelected);
+    connect(q->ui->ldapSettingsButton,      &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::openLdapSettings);
+    connect(q->ui->fetchButton,             &QPushButton::clicked,  this,  &QnUserManagementWidgetPrivate::fetchUsers);
 
     updateFetchButton();
 
@@ -81,6 +81,16 @@ void QnUserManagementWidgetPrivate::setupUi() {
     connect(m_sortModel, &QAbstractItemModel::rowsInserted, this, &QnUserManagementWidgetPrivate::updateSelection);
     connect(m_sortModel, &QAbstractItemModel::rowsRemoved, this, &QnUserManagementWidgetPrivate::updateSelection);
 }
+
+
+void QnUserManagementWidgetPrivate::updateFromSettings() {
+    Q_Q(QnUserManagementWidget);
+    bool currentUserIsLdap = context()->user() && context()->user()->isLdap();
+    q->ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
+    q->ui->fetchButton->setVisible(!currentUserIsLdap);
+    updateSelection();
+}
+
 
 void QnUserManagementWidgetPrivate::updateSelection() {
     
@@ -106,12 +116,12 @@ void QnUserManagementWidgetPrivate::updateSelection() {
     using boost::algorithm::any_of;
 
     q->ui->enableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
-        return accessController()->hasPermissions(user, Qn::WritePermission) 
+        return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission) 
             && !user->isEnabled();
     }));
 
     q->ui->disableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
-        return accessController()->hasPermissions(user, Qn::WritePermission) 
+        return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission) 
             && user->isEnabled()
             && !user->isAdmin();
     }));
@@ -124,6 +134,9 @@ void QnUserManagementWidgetPrivate::updateSelection() {
 }
 
 void QnUserManagementWidgetPrivate::openLdapSettings() {
+    if (!context()->user() || context()->user()->isLdap())
+        return;
+
     Q_Q(QnUserManagementWidget);
 
     QScopedPointer<QnLdapSettingsDialog> dialog(new QnLdapSettingsDialog(q));
@@ -136,6 +149,9 @@ void QnUserManagementWidgetPrivate::createUser() {
 }
 
 void QnUserManagementWidgetPrivate::fetchUsers() {
+    if (!context()->user() || context()->user()->isLdap())
+        return;
+
     if (!QnGlobalSettings::instance()->ldapSettings().isValid()) 
         return;
 
