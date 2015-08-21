@@ -43,7 +43,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="timelineModeLabel">
         <property name="text">
-         <string>Timeline mode:</string>
+         <string>Timeline Mode:</string>
         </property>
        </widget>
       </item>

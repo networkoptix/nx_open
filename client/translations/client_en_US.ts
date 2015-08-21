@@ -546,7 +546,7 @@
     </message>
     <message>
         <source>Do Not Record</source>
-        <translation>Do Not Record</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Fixed Archive Length</source>
@@ -690,15 +690,15 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>EventLogDialog</name>
     <message>
-        <source>Event log</source>
-        <translation>Event Log</translation>
+        <source>Event Log</source>
+        <translation></translation>
     </message>
     <message>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <source>Clear filter</source>
+        <source>Clear Filter</source>
         <translation>Clear Filter</translation>
     </message>
     <message>
@@ -721,20 +721,20 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>FisheyeSettingsWidget</name>
     <message>
-        <source>Vertical mount (camera on the ceiling)</source>
-        <translation>Ceiling Mount</translation>
+        <source>Ceiling Mount</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Horizontal mount (camera on the wall)</source>
-        <translation>Wall Mount</translation>
+        <source>Wall Mount</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Vertical mount (camera on the floor)</source>
-        <translation>Floor/Table Mount</translation>
+        <source>Floor/Table Mount</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Camera view angle correction:</source>
-        <translation>Camera View Angle Correction</translation>
+        <source>Camera View Angle Correction</source>
+        <translation></translation>
     </message>
     <message>
         <source>Calibration</source>
@@ -768,11 +768,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Downmix audio from 5.1 to 2.1:</source>
+        <source>Downmix Audio from 5.1 to 2.1</source>
         <translation>Downmix Audio from 5.1 to 2.1</translation>
     </message>
     <message>
-        <source>Auto pause video:</source>
+        <source>Auto Pause Video</source>
         <translation>Auto Pause Video</translation>
     </message>
     <message>
@@ -780,24 +780,24 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>minutes of inactivity</source>
-        <translation>Minutes of Inactivity</translation>
+        <source>Minutes of Inactivity</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Run application when PC boots up:</source>
-        <translation>Run Application when PC Boots:</translation>
+        <source>Run Application when PC Boots:</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Double buffering:</source>
-        <translation>Double Buffering:</translation>
+        <source>Double Buffering:</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Browse logs</source>
-        <translation>Browse Logs</translation>
+        <source>Browse Logs</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Clear local cache</source>
-        <translation>Clear Local Cache</translation>
+        <source>Clear Local Cache</source>
+        <translation></translation>
     </message>
     <message>
         <source>Restart required</source>
@@ -839,12 +839,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Open all servers statistics on one layout</source>
-        <translation>Monitor All Servers on a Single Layout</translation>
+        <source>Monitor All Servers on a Single Layout</source>
+        <translation></translation>
     </message>
     <message>
-        <source>System Configuration Backup and Restore</source>
-        <translation>System Backup and Restore</translation>
+        <source>System Backup and Restore</source>
+        <translation></translation>
     </message>
     <message>
         <source>System Settings</source>
@@ -862,56 +862,56 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>GraphicsScrollBar</name>
     <message>
-        <source>Scroll here</source>
-        <translation>Scroll Here</translation>
+        <source>Scroll Here</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Left edge</source>
-        <translation>Left Edge</translation>
+        <source>Left Edge</source>
+        <translation></translation>
     </message>
     <message>
         <source>Top</source>
         <translation></translation>
     </message>
     <message>
-        <source>Right edge</source>
-        <translation>Right Edge</translation>
+        <source>Right Edge</source>
+        <translation></translation>
     </message>
     <message>
         <source>Bottom</source>
         <translation></translation>
     </message>
     <message>
-        <source>Page left</source>
-        <translation>Page Left</translation>
+        <source>Page Left</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Page up</source>
-        <translation>Page Up</translation>
+        <source>Page Up</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Page right</source>
-        <translation>Page Right</translation>
+        <source>Page Right</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Page down</source>
-        <translation>Page Down</translation>
+        <source>Page Down</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Scroll left</source>
-        <translation>Scroll Left</translation>
+        <source>Scroll Left</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Scroll up</source>
-        <translation>Scroll Up</translation>
+        <source>Scroll Up</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Scroll right</source>
-        <translation>Scroll Right</translation>
+        <source>Scroll Right</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Scroll down</source>
-        <translation>Scroll Down</translation>
+        <source>Scroll Down</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -940,8 +940,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Loading image... Please wait.</source>
-        <translation>Loading Image...Please Wait.</translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
@@ -959,8 +959,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Layout is locked</source>
-        <translation>Layout is Locked</translation>
+        <source>Layout is Locked</source>
+        <translation></translation>
     </message>
     <message>
         <source>Background</source>
@@ -979,8 +979,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Processing image... Please wait.</source>
-        <translation>Processing Image...Please Wait.</translation>
+        <source>Processing Image...Please Wait.</source>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Crop to monitor aspect ratio</source>
@@ -1007,8 +1007,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Keep aspect ratio</source>
-        <translation>Keep Aspect Ratio</translation>
+        <source>Keep Aspect Ratio</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1118,8 +1118,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>License key is invalid</source>
-        <translation>License Key is Invalid</translation>
+        <source>License Key is Invalid</source>
+        <translation></translation>
     </message>
     <message>
         <source>Hardware ID:</source>
@@ -1134,8 +1134,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Select license file...</source>
-        <translation>Select License File...</translation>
+        <source>Select License File...</source>
+        <translation></translation>
     </message>
     <message>
         <source>Browse...</source>
@@ -1181,8 +1181,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>&amp;Connection options:</source>
-        <translation>&amp;Connection Options:</translation>
+        <source>&amp;Connection Options:</source>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Host:</source>
@@ -1216,8 +1216,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Timeline mode:</source>
-        <translation>Timeline Mode:</translation>
+        <source>Timeline Mode:</source>
+        <translation></translation>
     </message>
     <message>
         <source>Language:</source>
@@ -1311,8 +1311,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Enable audio</source>
-        <translation>Enable Audio</translation>
+        <source>Enable Audio</source>
+        <translation></translation>
     </message>
     <message>
         <source>Recording</source>
@@ -1341,8 +1341,8 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>PopupBusinessActionWidget</name>
     <message>
-        <source>Show to Administrators only</source>
-        <translation>Show do administrators only</translation>
+        <source>Show to administrators only</source>
+        <translation></translation>
     </message>
     <message>
         <source>Global Notification Settings...</source>
@@ -1353,7 +1353,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>PopupSettingsWidget</name>
     <message>
         <source>Show all notifications</source>
-        <translation>Show all notifications</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Alarms/Events</source>
@@ -1375,7 +1375,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>PtzManageDialog</name>
     <message>
         <source>Save Current Position</source>
-        <translation>Save Current Position</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Go To Position</source>
@@ -1398,8 +1398,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>No tour selected</source>
-        <translation>No Tour Selected</translation>
+        <source>No Tour Selected</source>
+        <translation></translation>
     </message>
     <message>
         <source>Preview</source>
@@ -1444,8 +1444,8 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>PtzPresetDialog</name>
     <message>
-        <source>Save position</source>
-        <translation>Save Position</translation>
+        <source>Save Position</source>
+        <translation></translation>
     </message>
     <message>
         <source>Name:</source>
@@ -1631,8 +1631,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Drop Resources into a New Layout</source>
-        <translation>Drop Resources into New Layout</translation>
+        <source>Drop Resources into New Layout</source>
+        <translation></translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
@@ -1723,8 +1723,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Select time server</source>
-        <translation>Select Time Server</translation>
+        <source>Select Time Server</source>
+        <translation></translation>
     </message>
     <message>
         <source>Go To Saved Position</source>
@@ -1735,8 +1735,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>Activate PTZ object</source>
-        <translation>Activate PTZ Object</translation>
+        <source>Activate PTZ Object</source>
+        <translation></translation>
     </message>
     <message>
         <source>Fit in View</source>
@@ -2935,8 +2935,8 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message>
-        <source>You have new notifications</source>
-        <translation>You have new notifications.</translation>
+        <source>You have new notifications.</source>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>You have %n notifications</source>
