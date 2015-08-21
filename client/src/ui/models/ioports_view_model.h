@@ -1,5 +1,4 @@
-#ifndef IOPORTS_VIEW_MODEL_H
-#define IOPORTS_VIEW_MODEL_H
+#pragma once
 
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QVariant>
@@ -49,7 +48,3 @@ private:
 private:
     QnIOPortDataList m_data;
 };
-
-
-
-#endif // IOPORTS_VIEW_MODEL_H
