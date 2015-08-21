@@ -82,7 +82,7 @@
      <item>
       <widget class="QLineEdit" name="filterLineEdit">
        <property name="placeholderText">
-        <string>Filter by cameras...</string>
+        <string>filter by camera...</string>
        </property>
       </widget>
      </item>

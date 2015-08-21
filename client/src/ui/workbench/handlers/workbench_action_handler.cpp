@@ -590,7 +590,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
                 resourcePool()->removeResource(layout);
     }
 
-    /* Sometimes we get here when 'New layout' has already been added. But all user's layouts must be created AFTER this method.
+    /* Sometimes we get here when 'New Layout' has already been added. But all user's layouts must be created AFTER this method.
     * Otherwise the user will see uncreated layouts in layout selection menu.
     * As temporary workaround we can just remove that layouts. */
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
@@ -814,7 +814,7 @@ void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
 
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout"), tr("New layout %1")));
+    layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);
@@ -838,7 +838,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Can't move camera(s) to other server. Server %1 doesn't answer to request.", NULL, modifiedResources.size()).arg(server->getName()),
+            tr("Cannot move camera(s) to server %1. Server is unresponsive.", NULL, modifiedResources.size()).arg(server->getName()),
             QDialogButtonBox::Ok
             );
         return;
@@ -861,7 +861,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 errorResources,
                 Qn::MainWindow_Tree_DragCameras_Help,
                 tr("Error"),
-                tr("Server %1 cannot discover these cameras so far. Are you sure you want to move them?", NULL, errorResources.size()).arg(server->getName()),
+                tr("Server %1 is unable to find and access these cameras. Are you sure you would like to move them?", NULL, errorResources.size()).arg(server->getName()),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
                 );
         /* If user is sure, return invalid cameras back to list. */
@@ -1021,7 +1021,7 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     filters << tr("All files (*.*)");
 
     QStringList files = QnFileDialog::getOpenFileNames(mainWindow(),
-                                                       tr("Open file"),
+                                                       tr("Open File"),
                                                        QString(),
                                                        filters.join(lit(";;")),
                                                        0,
@@ -1038,7 +1038,7 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     filters << tr("All files (*.*)");
 
     QString fileName = QnFileDialog::getOpenFileName(mainWindow(),
-                                                     tr("Open file"),
+                                                     tr("Open File"),
                                                      QString(),
                                                      filters.join(lit(";;")),
                                                      0,
@@ -1283,7 +1283,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
-        QMessageBox::warning(mainWindow(), tr("Could not perform preview search"), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
+        QMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
         return;
     }
 
@@ -1478,7 +1478,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 
             int result = QMessageBox::warning(
                         mainWindow(),
-                        tr("Process is in progress"),
+                        tr("Process in progress..."),
                         tr("Camera addition is already in progress."\
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
                         QMessageBox::Ok | QMessageBox::Cancel,
@@ -1667,7 +1667,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
 
         QString message = checkedFlags == Qn::user 
             ? tr("User with the same name already exists")
-            : tr("Video Wall with the same name already exists");
+            : tr("Video Wall with the same name already exists.");
 
         QMessageBox::warning(
             mainWindow(),
@@ -2165,8 +2165,8 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
         return;
 
     QnProgressDialog *progressDialog = new QnProgressDialog(mainWindow());
-    progressDialog->setWindowTitle(tr("Updating background"));
-    progressDialog->setLabelText(tr("Image processing can take a lot of time. Please be patient."));
+    progressDialog->setWindowTitle(tr("Updating Background..."));
+    progressDialog->setLabelText(tr("Image processing may take a few moments. Please be patient."));
     progressDialog->setRange(0, 0);
     progressDialog->setCancelButton(NULL);
     connect(progressDialog, &QnProgressDialog::canceled, progressDialog,     &QObject::deleteLater);
@@ -2481,7 +2481,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
     QMessageBox::warning(mainWindow(),
                          tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
-                         tr("You are running beta version of %1.")
+                         tr("This is a beta version of %1.")
                          .arg(qApp->applicationDisplayName()));
 }
 
@@ -2537,7 +2537,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     if (!success) {
         QMessageBox::critical(
                     mainWindow(),
-                    tr("Launcher process is not found"),
+                    tr("Launcher process not found."),
                     tr("Cannot restart the client.") + L'\n' 
                   + tr("Please close the application and start it again using the shortcut in the start menu.")
                     );

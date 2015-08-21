@@ -1,14 +1,18 @@
 #include "ioport_settings_widget.h"
 #include "ui_ioport_settings_widget.h"
-#include "ui/models/ioports_actual_model.h"
+#include "ui/models/ioports_view_model.h"
 #include "ui/delegates/ioport_item_delegate.h"
 
+namespace {
+    const int headerSpacing = 2;
+}
+
 QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent /* = 0*/):
-    base_type(parent),
-    ui(new Ui::QnIOPortSettingsWidget)
+    base_type(parent)
+    , ui(new Ui::QnIOPortSettingsWidget)
+    , m_model(new QnIOPortsViewModel(this))
 {
     ui->setupUi(this);
-    m_model = new QnIOPortsActualModel(this);
     ui->tableView->setModel(m_model);
     ui->tableView->setItemDelegate(new QnIOPortItemDelegate(this));  
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -19,24 +23,24 @@ QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent /* = 0*/):
     connect(m_model, &QAbstractItemModel::dataChanged, this, &QnIOPortSettingsWidget::dataChanged);
 }
 
-QnIOPortSettingsWidget::~QnIOPortSettingsWidget() {
-}
+QnIOPortSettingsWidget::~QnIOPortSettingsWidget() 
+{ }
 
-void QnIOPortSettingsWidget::updateHeaderWidth()
+void QnIOPortSettingsWidget::updateHeaderWidth() 
 {
     if (m_model->rowCount() == 0)
         return;
+
     for (int j = 0; j <= QnIOPortsViewModel::DefaultStateColumn; ++j)
     {
         QModelIndex idx = m_model->index(0, j);
-        QWidget* widget = ui->tableView->itemDelegate()->createEditor(0, QStyleOptionViewItem(), idx);
+        QScopedPointer<QWidget> widget(ui->tableView->itemDelegate()->createEditor(0, QStyleOptionViewItem(), idx));
         ui->tableView->horizontalHeader()->resizeSection(j, widget->minimumSizeHint().width());
-        delete widget;
     }
-    QString text = m_model->headerData(QnIOPortsViewModel::AutoResetColumn, Qt::Horizontal).toString();
 
+    QString text = m_model->headerData(QnIOPortsViewModel::AutoResetColumn, Qt::Horizontal).toString();
     QFontMetrics fm(ui->tableView->font());
-    ui->tableView->horizontalHeader()->resizeSection(QnIOPortsViewModel::AutoResetColumn, fm.width(text));
+    ui->tableView->horizontalHeader()->resizeSection(QnIOPortsViewModel::AutoResetColumn, fm.width(text) + headerSpacing * 2);
 }
 
 void QnIOPortSettingsWidget::updateFromResource(const QnVirtualCameraResourcePtr &camera)

@@ -341,7 +341,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
                 !ui->confirmPasswordEdit->text().isEmpty())
                 && !m_currentPassword.isEmpty() && ui->currentPasswordEdit->text() != m_currentPassword) {
                     if(ui->currentPasswordEdit->text().isEmpty()) {
-                        hint = tr("To change your password, please enter your current password.");
+                        hint = tr("To modify your password, please enter existing one.");
                         valid = false;
                     } else {
                         hint = tr("Invalid current password.");
@@ -355,7 +355,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         if (m_mode == Mode::OtherUser && ui->loginEdit->text().trimmed() != m_user->getName()) {
             /* ..and have not entered new password. */
             if (ui->passwordEdit->text().isEmpty()) {
-                hint = tr("User was renamed. Password must be updated.");
+                hint = tr("User has been renamed. Password must be updated.");
                 valid = false;
             }
         } 

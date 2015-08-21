@@ -19,12 +19,12 @@
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <source>Insufficient privileges to manage services</source>
-        <translation>權限不足無法管理服務</translation>
+        <source>Insufficient rights to manage services.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>非管理者必須啟動 UAC 以取得權限</translation>
+        <source>UAC must be enabled to request privileges for non-admin users.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -94,10 +94,6 @@
         <translation>媒體伺服器 Web 頁面</translation>
     </message>
     <message>
-        <source>Media server is going to be stopped. Are you sure?</source>
-        <translation>媒體伺服器將會停止運作，您確定嗎?</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;離開</translation>
     </message>
@@ -112,6 +108,10 @@
     <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>嘗試存取已安裝服務時發生錯誤:</translation>
+    </message>
+    <message>
+        <source>Media server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

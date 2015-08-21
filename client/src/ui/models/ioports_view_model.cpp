@@ -1,43 +1,22 @@
 #include "ioports_view_model.h"
 
-#include <QtCore/QFileInfo>
-
-#include <client/client_settings.h>
-
-#include <ui/models/notification_sound_model.h>
-#include <ui/workbench/workbench_context.h>
-
-#include <utils/app_server_notification_cache.h>
-#include "utils/serialization/lexical.h"
-
-
 QnIOPortsViewModel::QnIOPortsViewModel(QObject *parent) :
     base_type(parent)
-    //QnWorkbenchContextAware(parent)
-{
-}
+{}
 
-QnIOPortsViewModel::~QnIOPortsViewModel() {
-
-}
-
-QModelIndex QnIOPortsViewModel::index(int row, int column, const QModelIndex &parent) const {
-    return hasIndex(row, column, parent) ? createIndex(row, column, (void*)0) : QModelIndex();
-}
-
-QModelIndex QnIOPortsViewModel::parent(const QModelIndex &child) const {
-    Q_UNUSED(child)
-    return QModelIndex();
-}
+QnIOPortsViewModel::~QnIOPortsViewModel() 
+{}
 
 int QnIOPortsViewModel::rowCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent)
-    return (int) m_data.size();
+    if (!parent.isValid())
+        return static_cast<int>(m_data.size());
+    return 0;
 }
 
 int QnIOPortsViewModel::columnCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent);
-    return ColumnCount;
+    if (!parent.isValid())
+        return ColumnCount;
+    return 0;
 }
 
 QString QnIOPortsViewModel::textData(const QModelIndex &index) const
@@ -49,9 +28,9 @@ QString QnIOPortsViewModel::textData(const QModelIndex &index) const
     case IdColumn:
         return value.id;
     case TypeColumn:
-        return QnLexical::serialized(value.portType);
+        return portTypeToString(value.portType);
     case DefaultStateColumn:
-        return QnLexical::serialized<Qn::IODefaultState>(value.getDefaultState());
+        return stateToString(value.getDefaultState());
     case NameColumn:
         return value.getName();
     case AutoResetColumn:
@@ -142,10 +121,10 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
         switch (ioPort.portType)
         {
         case Qn::PT_Input:
-            ioPort.iDefaultState = (Qn::IODefaultState) value.toInt();
+            ioPort.iDefaultState = static_cast<Qn::IODefaultState>(value.toInt());
             break;
         case Qn::PT_Output:
-            ioPort.oDefaultState = (Qn::IODefaultState) value.toInt();
+            ioPort.oDefaultState = static_cast<Qn::IODefaultState>(value.toInt());
             break;
         default:
             return false;
@@ -252,4 +231,39 @@ void QnIOPortsViewModel::setModelData(const QnIOPortDataList& data)
 QnIOPortDataList QnIOPortsViewModel::modelData() const
 {
     return m_data;
+}
+
+QString QnIOPortsViewModel::portTypeToString(Qn::IOPortType portType) const {
+    const auto disambiguation = "IO Port Type";
+
+    switch (portType) {
+    case Qn::PT_Unknown:
+        return tr("Unknown", disambiguation);
+    case Qn::PT_Disabled:
+        return tr("Disabled", disambiguation);
+    case Qn::PT_Input:
+        return tr("Input", disambiguation);
+    case Qn::PT_Output:
+        return tr("Output", disambiguation);
+    default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        break;
+    }
+    return tr("Invalid", disambiguation);
+
+}
+
+QString QnIOPortsViewModel::stateToString(Qn::IODefaultState state) const {
+    const auto disambiguation = "IO Port State";
+
+    switch (state) {
+    case Qn::IO_OpenCircuit:
+        return tr("Open Circuit", disambiguation);
+    case Qn::IO_GroundedCircuit:
+        return tr("Grounded circuit", disambiguation);
+    default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        break;
+    }
+    return tr("Invalid state", disambiguation);
 }

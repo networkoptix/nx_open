@@ -62,10 +62,10 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
 void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     //TODO: #GDM #Common progressbar required
 
-    QString supportedFormats = tr("Sound files");
+    QString supportedFormats = tr("Sound Files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
 
-    QScopedPointer<QnCustomFileDialog> dialog(new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (this, tr("Select file..."), qnSettings->mediaFolder(), supportedFormats));
+    QScopedPointer<QnCustomFileDialog> dialog(new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (this, tr("Select File..."), qnSettings->mediaFolder(), supportedFormats));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     int cropSoundSecs = 5;
@@ -103,7 +103,7 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked() {
 
     QString newTitle = QInputDialog::getText(this,
                                              tr("Rename sound"),
-                                             tr("Enter new title:"),
+                                             tr("Enter New Title:"),
                                              QLineEdit::Normal,
                                              title);
     if (newTitle.isEmpty())
@@ -128,7 +128,7 @@ void QnNotificationSoundManagerDialog::at_deleteButton_clicked() {
 
     QString title = soundModel->titleByFilename(filename);
     if (QMessageBox::question(this,
-                              tr("Confirm file deletion"),
+                              tr("Confirm File Deletion"),
                               tr("Are you sure you want to delete '%1'?").arg(title),
                               QMessageBox::Ok,
                               QMessageBox::Cancel) == QMessageBox::Cancel)

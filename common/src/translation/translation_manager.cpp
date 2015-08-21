@@ -166,10 +166,10 @@ QnTranslation QnTranslationManager::loadTranslationInternal(const QString &trans
     /* Note that '//:' denotes a comment for translators that will appear in TS files. */
 
     //: Language name that will be displayed to user. Must not be empty.
-    QString languageName = translator.translate("Language", "Language Name");
+    QString languageName = translator.translate("Language", "English (US)");
 
     //: Internal. Please don't change existing translation.
-    QString localeCode = translator.translate("Language", "Locale Code");
+    QString localeCode = translator.translate("Language", "en_US");
 
     if(languageName.isEmpty() || localeCode.isEmpty())
         return QnTranslation(); /* Invalid translation. */

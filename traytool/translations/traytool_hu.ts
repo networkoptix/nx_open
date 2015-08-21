@@ -19,12 +19,12 @@
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <source>Insufficient privileges to manage services</source>
-        <translation>Nem megfelelő jogosultság a szolgáltatások kezeléséhez</translation>
+        <source>Insufficient rights to manage services.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>Nem rendszergazda felhasználóknak engedélyezni kell az UAC-t a jogok kéréséhez</translation>
+        <source>UAC must be enabled to request privileges for non-admin users.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -90,10 +90,6 @@
         <translation>(szünetel)</translation>
     </message>
     <message>
-        <source>Media server is going to be stopped. Are you sure?</source>
-        <translation>A media szerver le fog állni. Folytatja?</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Kilépés</translation>
     </message>
@@ -112,6 +108,10 @@
     <message>
         <source>Media Server Web Page</source>
         <translation>Media szerver Weboldal</translation>
+    </message>
+    <message>
+        <source>Media server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

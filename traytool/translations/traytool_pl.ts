@@ -19,12 +19,12 @@
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <source>Insufficient privileges to manage services</source>
-        <translation>Za słabe uprawnienia by zarządzać usługami</translation>
+        <source>Insufficient rights to manage services.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>UAC musi być włączony, by żądać uprawnień dla użytkowników non-admin</translation>
+        <source>UAC must be enabled to request privileges for non-admin users.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -90,10 +90,6 @@
         <translation>(wstrzymywanie)</translation>
     </message>
     <message>
-        <source>Media server is going to be stopped. Are you sure?</source>
-        <translation>Media serwer zostanie zatrzymany.Czy kKontynuoawć?</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Wyjście</translation>
     </message>
@@ -112,6 +108,10 @@
     <message>
         <source>Media Server Web Page</source>
         <translation>Strona Web Media Serwera</translation>
+    </message>
+    <message>
+        <source>Media server will be stopped. Continue?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -32,7 +32,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_selectionScope(Qn::SceneScope),
     m_ignoreAccept(false)
 {
-    setWindowTitle(tr("Camera settings"));
+    setWindowTitle(tr("Camera Settings"));
 
     m_settingsWidget = new QnCameraSettingsWidget(this);
 
@@ -157,7 +157,7 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
             this,
             m_settingsWidget->cameras(),
-            tr("Camera(s) not Saved"),
+            tr("Camera(s) not saved."),
             tr("Save changes to the following %n camera(s)?", "", m_settingsWidget->cameras().size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
             );
@@ -172,8 +172,8 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) 
     bool hasDbChanges = m_settingsWidget->hasDbChanges();
 
     if (checkControls && m_settingsWidget->hasScheduleControlsChanges()){
-        QString message = tr("Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
-        int button = QMessageBox::warning(this, tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
+        QString message = tr("Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.");
+        int button = QMessageBox::warning(this, tr("Changes have not been applied."), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry) {
             m_ignoreAccept = true;
             return;
@@ -181,8 +181,8 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) 
             m_settingsWidget->clearScheduleControlsChanges();
         }
     } else if (checkControls && m_settingsWidget->hasMotionControlsChanges()){
-        QString message = tr("Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.");
-        int button = QMessageBox::warning(this, tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
+        QString message = tr("Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.");
+        int button = QMessageBox::warning(this, tr("Changes have not been applied."), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
             m_ignoreAccept = true;
             return;
@@ -217,8 +217,8 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) 
         QnCamLicenseUsageHelper helper(cameras, m_settingsWidget->isScheduleEnabled());
         if (!helper.isValid())
         {
-            QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
-            QMessageBox::warning(this, tr("Could not apply changes"), message);
+            QString message = tr("License limit exceeded. Changes have been saved, but will not be applied.");
+            QMessageBox::warning(this, tr("Could not apply changes."), message);
             m_settingsWidget->setScheduleEnabled(false);
         }
     }

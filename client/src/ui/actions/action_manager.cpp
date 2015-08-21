@@ -409,7 +409,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::DropResourcesIntoNewLayoutAction).
         flags(Qn::ResourceTarget | Qn::WidgetTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::SingleTarget | Qn::MultiTarget).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Drop Resources into a New Layout"));
+        text(tr("Drop Resources into New Layout"));
 
     factory(Qn::DelayedOpenVideoWallItemAction).
         flags(Qn::NoTarget).
@@ -524,7 +524,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SelectTimeServerAction).
         flags(Qn::NoTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Select time server"));
+        text(tr("Select Time Server"));
 
     factory(Qn::PtzActivatePresetAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
@@ -540,7 +540,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::PtzActivateObjectAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
-        text(tr("Activate PTZ object")).
+        text(tr("Activate PTZ Object")).
         requiredPermissions(Qn::WritePtzPermission);
 
     /* Context menu actions. */

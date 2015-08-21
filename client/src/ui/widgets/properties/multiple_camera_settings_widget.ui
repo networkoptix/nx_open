@@ -63,7 +63,7 @@
        <item>
         <widget class="QCheckBox" name="enableAudioCheckBox">
          <property name="text">
-          <string>Enable audio</string>
+          <string>Enable Audio</string>
          </property>
          <property name="tristate">
           <bool>true</bool>

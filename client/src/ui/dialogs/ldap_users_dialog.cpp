@@ -178,7 +178,7 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
     });
 }
 
-void QnLdapUsersDialog::stopTesting(const QString &text /*= QString()*/) {
+void QnLdapUsersDialog::stopTesting(const QString &text /* = QString()*/) {
     if (!m_loading)
         return;
 

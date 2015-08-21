@@ -190,7 +190,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage() {
 
     QScopedPointer<QnCustomFileDialog> dialog(
         new QnCustomFileDialog (
-        this, tr("Select file..."),
+        this, tr("Select File..."),
         qnSettings->backgroundsFolder(),
         tr("Pictures %1").arg(nameFilter)
         )

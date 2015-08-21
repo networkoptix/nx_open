@@ -377,11 +377,11 @@ void QnRecordingStatisticsWidget::requestFinished()
             m_hiddenCameras << camera;
     }
     m_model->setModelData(existsCameras);
+    at_forecastParamsChanged();
 
     ui->gridEvents->setDisabled(false);
     setCursor(Qt::ArrowCursor);
     ui->loadingProgressBar->hide();
-    at_forecastParamsChanged();
 }
 
 void QnRecordingStatisticsWidget::at_eventsGrid_clicked(const QModelIndex& /*idx*/)
@@ -550,23 +550,20 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::getForecastData(qint64 extraS
     // 1. collect camera related forecast params
     for(const auto& cameraStats: modelData) 
     {
-        if (cameraStats.uniqueId.isNull())
-            continue;
-        QnSecurityCamResourcePtr camRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraStats.uniqueId);
-        if (!camRes)
-            continue;
-
         ForecastDataPerCamera cameraForecast;
-        //cameraForecast.archiveDurationSecs =  (currentTimeMs - cameraStats.archiveStartTimeMs) / 1000;
         cameraForecast.stats = cameraStats;
-        cameraForecast.expand = !camRes->isScheduleDisabled();
-        cameraForecast.expand &= (camRes->getStatus() == Qn::Online || camRes->getStatus() == Qn::Recording);
-        cameraForecast.expand &= cameraForecast.stats.archiveDurationSecs > 0 && cameraForecast.stats.recordedBytes > 0;
-        cameraForecast.maxDays = camRes->maxDays();
-        qint64 calendarBitrate = cameraForecast.stats.recordedBytes / cameraForecast.stats.archiveDurationSecs;
-        cameraForecast.bytesPerStep = calendarBitrate * forecastStep;
-        cameraForecast.usageCoeff = cameraForecast.stats.recordedSecs / (qreal) cameraForecast.stats.archiveDurationSecs;
-        Q_ASSERT(qBetween(0.0, cameraForecast.usageCoeff, 1.00001));
+
+        QnSecurityCamResourcePtr camRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraStats.uniqueId);
+        if (camRes) {
+            cameraForecast.expand = !camRes->isScheduleDisabled();
+            cameraForecast.expand &= (camRes->getStatus() == Qn::Online || camRes->getStatus() == Qn::Recording);
+            cameraForecast.expand &= cameraForecast.stats.archiveDurationSecs > 0 && cameraForecast.stats.recordedBytes > 0;
+            cameraForecast.maxDays = camRes->maxDays();
+            qint64 calendarBitrate = cameraForecast.stats.recordedBytes / cameraForecast.stats.archiveDurationSecs;
+            cameraForecast.bytesPerStep = calendarBitrate * forecastStep;
+            cameraForecast.usageCoeff = cameraForecast.stats.recordedSecs / (qreal) cameraForecast.stats.archiveDurationSecs;
+            Q_ASSERT(qBetween(0.0, cameraForecast.usageCoeff, 1.00001));
+        }
         forecastData.cameras.push_back(std::move(cameraForecast));
     }
 

@@ -256,7 +256,7 @@ void QnCameraAdvancedSettingsWidget::initWebView() {
 
 void QnCameraAdvancedSettingsWidget::updateApplyingParamsLabel() {
     ui->manualApplyingProgressWidget->setVisible(m_applyingParamsCount > 0);
-    ui->manualApplyingProgressWidget->setText(tr("Applying settings..."));
+    ui->manualApplyingProgressWidget->setText(tr("Applying Settings..."));
 }
 
 
@@ -338,7 +338,7 @@ void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int httpStatusCode, 
     updateApplyingParamsLabel();
 
     QString error = httpStatusCode == 0 
-        ? tr("Possibly, appropriate camera's service is unavailable now")
+        ? tr("Target camera's service is unavailable. Try again.")
         : tr("Server returned the following error code : ") + httpStatusCode; 
 
     QString failedParams;
@@ -354,7 +354,7 @@ void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int httpStatusCode, 
     if (!failedParams.isEmpty()) {
         QMessageBox::warning(
             this,
-            tr("Could not save parameters"),
+            tr("Could not save paramaters."),
             tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
             );
     }

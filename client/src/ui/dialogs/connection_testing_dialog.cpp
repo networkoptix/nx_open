@@ -77,7 +77,7 @@ void QnConnectionTestingDialog::tick() {
     }
 
     m_timeoutTimer->stop();
-    updateUi(false, tr("Request timed out."));
+    updateUi(false, tr("Request timeout"));
 }
 
 void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo) {
@@ -94,7 +94,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
 }
 
 void QnConnectionTestingDialog::updateUi(bool success, const QString &details, int helpTopicId) {
-    ui->statusLabel->setText(success ? tr("Success") : tr("Failed"));
+    ui->statusLabel->setText(success ? tr("Success") : tr("Test Failed"));
     ui->descriptionLabel->setText(details);
     ui->descriptionLabel->setVisible(!details.isEmpty());
 
