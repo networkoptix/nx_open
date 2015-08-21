@@ -62,6 +62,19 @@ namespace nx_http
                         std::forward<AuthorizationRef>(authorization) ) )
             {
             }
+
+            //AuthorizationCacheItem( AuthorizationCacheItem&& right ) = default;
+            AuthorizationCacheItem( AuthorizationCacheItem&& right )
+            :
+                url( std::move(right.url) ),
+                method( std::move(right.method) ),
+                userName( std::move(right.userName) ),
+                password( std::move(right.password ) ),
+                ha1( std::move(right.ha1 ) ),
+                wwwAuthenticateHeader( std::move(right.wwwAuthenticateHeader ) ),
+                authorizationHeader( std::move(right.authorizationHeader ) )
+            {
+            }
         };
 
 
