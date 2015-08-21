@@ -4,14 +4,14 @@
 <context>
     <name>Language</name>
     <message>
-        <source>English (US)</source>
+        <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Nyelv</translation>
     </message>
     <message>
-        <source>en_US</source>
+        <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>hu</translation>
     </message>
 </context>
 <context>
@@ -266,6 +266,22 @@
         <translation>Felvétel a %n kamerán letiltva: </translation>
     </message>
     <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -287,22 +303,6 @@
     </message>
     <message>
         <source>%1 --&gt; %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Conflict Address: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -555,15 +555,15 @@
         <translation>Ismeretlen hiba</translation>
     </message>
     <message>
+        <source>Analog Encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>I/O Module</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Analog Encoder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

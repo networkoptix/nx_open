@@ -4,14 +4,14 @@
 <context>
     <name>Language</name>
     <message>
-        <source>English (US)</source>
+        <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Português do Brasil</translation>
     </message>
     <message>
-        <source>en_US</source>
+        <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>pt_BR</translation>
     </message>
 </context>
 <context>
@@ -289,10 +289,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to server is lost.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server &apos;%1&apos; has a license problem</source>
         <translation type="unfinished"></translation>
     </message>
@@ -306,6 +302,10 @@
     </message>
     <message>
         <source>Conflict Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
