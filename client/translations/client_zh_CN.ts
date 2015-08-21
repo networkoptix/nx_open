@@ -149,7 +149,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audit trail</source>
+        <source>Audit Trail</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -843,10 +843,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>系统设置</translation>
     </message>
     <message>
-        <source>Audit trail</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open audit trail log</source>
         <translation type="unfinished"></translation>
     </message>
@@ -856,6 +852,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>System Backup and Restore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit Trail</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2663,15 +2663,7 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>获取数据统计报告</translation>
     </message>
     <message>
-        <source>Audit trail...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User management...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2684,6 +2676,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Activate PTZ Object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Management...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit Trail...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3861,6 +3861,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Launcher process not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP Server connection timed out.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
