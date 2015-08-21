@@ -816,7 +816,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::UserManagementAction).
         flags(Qn::Main | Qn::Tree).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
-        text(tr("User management...")).
+        text(tr("User Management...")).
         condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this));
 
     factory(Qn::PreferencesGeneralTabAction).
@@ -829,7 +829,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenAuditLogAction).
         flags(Qn::Main).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Audit trail..."));
+        text(tr("Audit Trail..."));
 
     factory().
         flags(Qn::Main).

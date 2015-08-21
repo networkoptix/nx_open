@@ -100,7 +100,7 @@
       <item row="3" column="0">
        <widget class="QPushButton" name="auditLogButton">
         <property name="text">
-         <string>Audit trail</string>
+         <string>Audit Trail</string>
         </property>
        </widget>
       </item>

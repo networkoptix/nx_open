@@ -340,7 +340,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
         
-    /// We should load translations before major client's servervices are started to prevent races
+    /// We should load translations before major client's services are started to prevent races
     typedef QScopedPointer<QnClientTranslationManager> TranslationManager;
     TranslationManager translationManager(new QnClientTranslationManager());
 
