@@ -315,8 +315,7 @@ TEST( HttpHeaderTest, Via_parse )
 
 
     via.entries.clear();
-    EXPECT_TRUE( via.parse( " " ) );
-    EXPECT_EQ( via.entries.size(), 0 );
+    EXPECT_FALSE( via.parse( " " ) );
 }
 
 TEST( HttpHeaderTest, Via_toString )
