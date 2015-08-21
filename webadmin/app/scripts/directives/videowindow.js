@@ -40,8 +40,8 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
-                scope.debugMode = false;
-                scope.debugFormat = "flashls";
+                scope.debugMode = Config.debug.video && Config.allowDebugMode;
+                scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
@@ -130,28 +130,28 @@ angular.module('webadminApp')
                             // Check version here
 
 
-                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
-                                return "flashls";
-                            }
+                            /*if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
+                                return "flashls"; //TODO: support flashls for IE!
+                            }*/
+
 
                             /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
                                 return "jshls";
                             }*/
 
-                            if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
+                            /*if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
                                 scope.flashOrWebmRequired = true;
-                                return false;
+                                return false; //TODO: support flashls for IE!
                             }
+
+                            if(weHaveHls) {
+                                scope.flashRequired = true;
+                                return false;//TODO: support flashls for IE!
+                            }*/
 
                             if(weHaveWebm && (window.jscd.osVersion < 10))
                             {
                                 scope.ieNoWebm = true;
-                            }
-
-                            //
-
-                            if(weHaveHls) {
-                                scope.flashRequired = true;
                                 return false;
                             }
 
@@ -246,6 +246,12 @@ angular.module('webadminApp')
                     scope.flashls = true;
                     scope.native = false;
                     scope.flashSource = "components/flashlsChromeless.swf";
+
+                    if(scope.debugMode && scope.debugFormat){
+                        scope.flashSource = "components/flashlsChromeless_debug.swf";
+                    }
+
+
                     scope.flashParam = flashlsAPI.flashParams();
                     if(flashlsAPI.ready()){
                         flashlsAPI.kill();
