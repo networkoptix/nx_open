@@ -192,6 +192,6 @@ public:
     (QnBusiness::ActionType)\
     (QnBusiness::UserGroup)\
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_BUSINESS_ENUM_TYPES, (metatype)(numeric)(lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_BUSINESS_ENUM_TYPES, (metatype)(lexical))
 
 #endif // QN_BUSINESS_FWD_H

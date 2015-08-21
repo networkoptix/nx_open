@@ -38,14 +38,14 @@ int QnBusinessLog2RestHandler::executeGet(const QString& path, const QnRequestPa
             else
                 errStr = QString("Camera resource %1 not found").arg(params[i].second);
         }
-        else if (params[i].first == "event") {
-            eventType = (QnBusiness::EventType) params[i].second.toInt();
+        else if (params[i].first == "event_type") {
+            eventType = QnLexical::deserialized<QnBusiness::EventType>(params[i].second);
             if(!QnBusiness::allEvents().contains(eventType) 
                 && !QnBusiness::hasChild(eventType))
                 errStr = QString("Invalid event type %1").arg(params[i].second);
         }
-        else if (params[i].first == "action") {
-            actionType = (QnBusiness::ActionType) params[i].second.toInt();
+        else if (params[i].first == "action_type") {
+            actionType = QnLexical::deserialized<QnBusiness::ActionType>(params[i].second);
             if (!QnBusiness::allActions().contains(actionType))
                 errStr = QString("Invalid action type %1.").arg(params[i].second);
         }
