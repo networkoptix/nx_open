@@ -255,6 +255,8 @@ void QnRecordingStatsModel::clear() {
 
 void QnRecordingStatsModel::setModelData(const QnRecordingStatsReply& data) {
     beginResetModel();
+    m_forecastData.clear();
+    m_forecastFooter = QnFooterData();
     m_data = data;
     m_footer = calculateFooter(data);
     endResetModel();
