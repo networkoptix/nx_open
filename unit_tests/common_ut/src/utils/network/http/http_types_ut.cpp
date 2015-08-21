@@ -311,6 +311,12 @@ TEST( HttpHeaderTest, Via_parse )
     EXPECT_EQ( via.entries[0].protoVersion, QByteArray( "1.1" ) );
     EXPECT_EQ( via.entries[0].receivedBy, QByteArray( "{47bf37a0-72a6-2890-b967-5da9c390d28a}" ) );
     EXPECT_TRUE( via.entries[0].comment.isEmpty() );
+
+
+
+    via.entries.clear();
+    EXPECT_TRUE( via.parse( " " ) );
+    EXPECT_EQ( via.entries.size(), 0 );
 }
 
 TEST( HttpHeaderTest, Via_toString )
