@@ -357,7 +357,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
-        ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->hasCameraCapabilities(Qn::IOModuleCapability));
+        ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->isIOModule());
 
         ui->imageControlWidget->updateFromResources(cameras);
 
