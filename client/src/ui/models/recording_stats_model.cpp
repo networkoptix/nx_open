@@ -5,6 +5,8 @@
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 
+#include <utils/common/string.h>
+
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
     const qreal BYTES_IN_TB = 1000.0 * BYTES_IN_GB;
@@ -33,12 +35,9 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
             return isNulIDLeft > isNulIDRight; // keep footer without ID at the last place
     }
 
-    if (left.column() == QnRecordingStatsModel::CameraNameColumn)
-        return left.data(Qt::DisplayRole).toString() < right.data(Qt::DisplayRole).toString();
-
-
-    switch(left.column())
-    {
+    switch(left.column()) {
+    case QnRecordingStatsModel::CameraNameColumn:
+        return naturalStringLess(left.data(Qt::DisplayRole).toString(), right.data(Qt::DisplayRole).toString());
     case QnRecordingStatsModel::BytesColumn:
         return leftData.recordedBytes < rightData.recordedBytes;
     case QnRecordingStatsModel::DurationColumn:
@@ -73,22 +72,20 @@ int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const {
     return 0;
 }
 
-QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
-{
+QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
     const QnRecordingStatsReply& data = internalModelData();
     const QnCamRecordingStatsData& value = data.at(index.row());
-    switch(index.column())
-    {
-        case CameraNameColumn:
-            return getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId));
-        case BytesColumn:
-            return formatBytesString(value.recordedBytes);
-        case DurationColumn:
-            return formatDurationString(value);           
-        case BitrateColumn:
-            return formatBitrateString(value.averageBitrate);
-        default:
-            return QString();
+    switch(index.column()) {
+    case CameraNameColumn:
+        return getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId));
+    case BytesColumn:
+        return formatBytesString(value.recordedBytes);
+    case DurationColumn:
+        return formatDurationString(value);           
+    case BitrateColumn:
+        return formatBitrateString(value.averageBitrate);
+    default:
+        return QString();
     }
 }
 
@@ -157,6 +154,8 @@ QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) c
     case Qt::DisplayRole:
     case Qn::DisplayHtmlRole:
         return footerDisplayData(index);
+    case Qt::ToolTipRole:
+        return tooltipText(static_cast<Columns>(index.column()));
     case Qt::FontRole: {
         QFont font;
         font.setBold(true);
@@ -164,6 +163,9 @@ QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) c
     }
     case Qt::BackgroundRole:
         return qApp->palette().color(QPalette::Normal, QPalette::Background);
+
+    case Qn::RecordingStatsDataRole:
+        return QVariant::fromValue<QnCamRecordingStatsData>(internalFooterData());
     default:
         break;
     }
@@ -176,7 +178,7 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
     switch (column)
     {
         case CameraNameColumn:
-            return tr("Cameras with non empty archive");
+            return tr("Cameras with non-empty archive");
         case BytesColumn:
             return tr("Storage space occupied by camera");
         case DurationColumn:
@@ -194,8 +196,6 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
     /* Check invalid indices. */
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
-    if (index.row() >= rowCount())
-        return false;
 
     if (index.row() >= internalModelData().size())
         return footerData(index, role);
@@ -208,11 +208,8 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
         return qnResIconCache->icon(getResource(index));
     case Qn::ResourceRole:
         return QVariant::fromValue<QnResourcePtr>(getResource(index));
-    case Qt::TextColorRole:
-        break;
     case Qt::BackgroundRole:
         return qApp->palette().color(QPalette::Normal, QPalette::Base);
-        break;
     case Qn::RecordingStatsDataRole:
         return QVariant::fromValue<QnCamRecordingStatsData>(m_data.at(index.row()));
     case Qn::RecordingStatChartDataRole:
@@ -222,7 +219,7 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
     case Qn::RecordingStatColorsDataRole:
         return QVariant::fromValue<QnRecordingStatsColors>(m_colors);
     case Qt::ToolTipRole:
-        return tooltipText((Columns) index.column());
+        return tooltipText(static_cast<Columns>(index.column()));
     default:
         break;
     }
