@@ -406,6 +406,13 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>              
                 <dependency>
+                    <groupId>org.cyrus</groupId>
+                    <artifactId>sasl2</artifactId>
+                    <version>${sasl2.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>            
+                <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
                     <version>${openssl.version}</version>
@@ -458,6 +465,13 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>             
                 <dependency>
+                    <groupId>org.cyrus</groupId>
+                    <artifactId>sasl2</artifactId>
+                    <version>${sasl2.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>            
+                <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
                     <version>${openssl.version}</version>
@@ -504,6 +518,13 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
                 <dependency>
+                    <groupId>org.cyrus</groupId>
+                    <artifactId>sasl2</artifactId>
+                    <version>${sasl2.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>            
+                <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
                     <version>${ffmpeg.version}</version>
@@ -539,6 +560,13 @@
                     <groupId>org.openldap</groupId>
                     <artifactId>openldap</artifactId>
                     <version>${openldap.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>            
+                <dependency>
+                    <groupId>org.cyrus</groupId>
+                    <artifactId>sasl2</artifactId>
+                    <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>            
