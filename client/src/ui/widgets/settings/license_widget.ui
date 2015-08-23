@@ -84,7 +84,7 @@
        <item>
         <widget class="QLabel" name="licenseKeyWarningLabel">
          <property name="text">
-          <string>License key is invalid</string>
+          <string>License Key is Invalid</string>
          </property>
         </widget>
        </item>
@@ -171,7 +171,7 @@
            <item>
             <widget class="QLineEdit" name="fileLineEdit">
              <property name="text">
-              <string>Select license file...</string>
+              <string>Select License File...</string>
              </property>
              <property name="readOnly">
               <bool>true</bool>

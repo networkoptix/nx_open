@@ -65,7 +65,7 @@ public:
                 break;
             case notAuthorised:
                 requiredParamCount = 1;
-                errorMessageParts   << tr("Not authorized. Url %1.");
+                errorMessageParts   << tr("Not authorised. Url %1.");
                 break;
             case unsupportedProtocol:
                 requiredParamCount = 2;

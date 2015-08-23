@@ -67,7 +67,7 @@ void QnCameraBookmarkDialog::loadData(const QnCameraBookmark &bookmark) {
 
     QDateTime start = QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs);
     ui->timeoutComboBox->clear();
-    ui->timeoutComboBox->addItem(tr("Do not lock archive"), 0);
+    ui->timeoutComboBox->addItem(tr("Do not lock archive."), 0);
     ui->timeoutComboBox->addItem(tr("1 month"), start.addMonths(1).toMSecsSinceEpoch() - bookmark.startTimeMs);
     ui->timeoutComboBox->addItem(tr("3 month"), start.addMonths(3).toMSecsSinceEpoch() - bookmark.startTimeMs);
     ui->timeoutComboBox->addItem(tr("6 month"), start.addMonths(6).toMSecsSinceEpoch() - bookmark.startTimeMs);

@@ -850,9 +850,9 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     case QnBusiness::ShowPopupAction:
     {
         if (m_actionParams.userGroup == QnBusinessActionParameters::AdminOnly)
-            return tr("Administrators only");
+            return tr("Administrators Only");
         else
-            return tr("All users");
+            return tr("All Users");
     }
     case QnBusiness::CameraRecordingAction:
     {
@@ -868,7 +868,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     {
         QString filename = m_actionParams.soundUrl;
         if (filename.isEmpty())
-            return tr("Select a sound");
+            return tr("Select Sound");
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         return soundModel->titleByFilename(filename);
     }
@@ -876,7 +876,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     {
         QString text = m_actionParams.sayText;
         if (text.isEmpty())
-            return tr("Enter text");
+            return tr("Enter Text");
         return text;
     }
     default:

@@ -111,13 +111,13 @@ void QnCameraDiagnosticsDialog::clearLog() {
 QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     switch(stepType) {
     case CameraDiagnostics::Step::mediaServerAvailability:
-        return tr("Checking Server availability");
+        return tr("Confirming server availability.");
     case CameraDiagnostics::Step::cameraAvailability:
-        return tr("Checking that camera is accessible");
+        return tr("Confirming camera is accessible.");
     case CameraDiagnostics::Step::mediaStreamAvailability:
-        return tr("Checking that camera provides media stream");
+        return tr("Confirming target camera provides media stream.");
     case CameraDiagnostics::Step::mediaStreamIntegrity: 
-        return tr("Checking media stream for errors");
+        return tr("Evaluating media stream for errors.");
     default:
         return QString();
     }
@@ -146,7 +146,7 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(CameraDiagnostics:
 }
 
 void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone() {
-    ui->textEdit->append(tr("Diagnostics finished"));
+    ui->textEdit->append(tr("Diagnostics complete!"));
 
     m_finished = true;
 

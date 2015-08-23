@@ -173,14 +173,6 @@
         <translation>เซิร์ฟเวอร์ &quot;%1&quot;เริ่มทำงาน</translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>เซิร์ฟเวอร์ &quot;%1&quot; มีปัญหาใบอนุญาต</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>เหตุการณ์ที่ไม่รู้จักได้เกิดขึ้น</translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation>เหตุการณ์: %1</translation>
     </message>
@@ -193,16 +185,8 @@
         <translation>Url: %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>พอร์ตเข้า: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>เหตุผล: %1</translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
-        <translation>ที่อยู่ขัดข้อง: %1</translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -303,6 +287,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -312,10 +312,6 @@
     <message>
         <source>OK</source>
         <translation>ตกลง</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>ไม่ได้รับอนุญาต. Url %1.</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -437,6 +433,10 @@
         <source>Parameters:</source>
         <translation>พารามิเตอร์:</translation>
     </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCommandLineParser</name>
@@ -452,12 +452,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>การเปิดตัว Windows Explorer ล้มเหลว</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>ไม่พบ explorer.exe ในเส้นทางที่จะเปิดตัว Windows Explorer.</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -471,12 +471,12 @@
         <translation>ไม่พบการเข้ารหัสสำหรับตัวแปลงสัญญาณ %1.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>ไม่สามารถเริ่มต้นเข้ารหัสเสียง.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>ไม่สามารถเริ่มต้นการถอดรหัสเสียง.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -513,8 +513,8 @@
         <translation>ไม่พบการเข้ารหัสสำหรับตัวแปลงสัญญาณ %1.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>ไม่สามารถเริ่มต้นการเข้ารหัสวิดีโอ.</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -540,60 +540,12 @@
         <translation>Vmax</translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>เข้ารหัสอนาล็อก</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>วีดีโอ กำแพง</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>ใบอนุญาตทดลอง</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>ใบอนุญาตอนาล๊อก</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>ใบอนุญาตมืออาชีพ</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>ใบอนุญาตทั่วไป</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>ใบอนุญาต Vmax</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>ใบอนุญาตการเข้ารหัสแบบอะนาล็อก</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>ใบอนุญาต วีดีโอ กำแพง</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>ลายเซ็นไม่ถูกต้อง</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>ไม่พบฮาร์ดแวร์ ID ที่จำเป็นของเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>การปรับแต่งไม่ถูกต้อง</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>หมดอายุ</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>ชนิดไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -612,11 +564,59 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module licenses</source>
+        <source>Analog Encoder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start licenses</source>
+        <source>Trial Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalide Signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -647,24 +647,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ ฐานข้อมูลเกิดข้อผิดพลาดขึ้น.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ ได้รับข้อมูลไม่ถูกต้อง กรุณาติดต่อทีมสนับสนุนที่จะรายงานปัญหา.</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>คีย์ใบอนุญาตคุณป้อนไม่ถูกต้อง กรุณาตรวจสอบคีย์ใบอนุญาตที่ถูกต้อง หากปัญหายังคงอยู่โปรดติดต่อทีมสนับสนุนเพื่อยืนยันว่าคีย์ใบอนุญาตถูกต้องหรือที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>คุณพยายามที่จะเปิดใช้งานใบอนุญาตเข้ากันไม่ได้กับซอฟต์แวร์ของคุณ กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>คีย์ใบอนุญาตนี้ได้รับการเปิดใช้งานก่อนหน้านี้ฮาร์ดแวร์ id {{hwid}} บน {{time}}.กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -709,24 +709,24 @@
         <translation>ไม่ระบุ</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>ใบอนุญาตทดลอง</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>ฮาร์ดแวร์ ID:</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>ได้รับใบอนุญาตไปที่:</translation>
     </message>
     <message>
         <source>Watermark: </source>
         <translation>ลายน้ำ:</translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>ใบอนุญาตฟรี</translation>
+        <source>Trial License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -853,20 +853,8 @@
         <translation>เกิดข้อผิดพลาดในขณะที่ส่งอีเมล</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>หน่วยความจำเต็ม</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>หน่วยความจำไม่ได้กำหนดค่า</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>ที่อยู่อีเมลไม่ได้ตั้งค่าสำหรับการใช้งาน %1</translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>เซิร์ฟเวอร์หลายเครื่องมีเวลาที่แตกต่างกันและเวลาที่ถูกต้องไม่สามารถตรวจพบโดยอัตโนมัติ.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -915,6 +903,18 @@
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>ดัชนีเก็บสร้างใหม่เสร็จสมบูรณ์บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
+    </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -966,12 +966,12 @@
         <translation>วิธีการแปลงไม่รู้จัก.</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>เปิด CL แปลงไม่ได้ดำเนินการ</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>ไม่รู้จัก การแปลง </translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

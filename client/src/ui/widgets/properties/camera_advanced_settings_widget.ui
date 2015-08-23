@@ -38,7 +38,7 @@
        <item>
         <widget class="QLabel" name="noSettingsLabel">
          <property name="text">
-          <string>This camera has no advanced settings</string>
+          <string>Advanced settings not available for this camera. Check the camera web page directly for more options.</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -113,7 +113,7 @@
            <item>
             <widget class="QLabel" name="manualWarningLabel">
              <property name="text">
-              <string>Warning: all changes are applied instantly</string>
+              <string>Note: Any changes made will be applied instantly!</string>
              </property>
             </widget>
            </item>

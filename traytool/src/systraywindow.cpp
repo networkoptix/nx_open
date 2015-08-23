@@ -333,7 +333,7 @@ void QnSystrayWindow::at_mediaServerStopAction() {
     if (!isServerInstalled())
         return;
 
-    if (QMessageBox::question(0, tr(""), tr("Media server is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+    if (QMessageBox::question(0, tr(""), tr("Media server will be stopped. Continue?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
         StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_mediaServerHandle);
         connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
         QThreadPool::globalInstance()->start(stopTask);
@@ -372,7 +372,7 @@ void QnElevationChecker::triggered()
         // already elevated, but not admin. Prevent recursion calls here
         QnSystrayWindow *systray = static_cast<QnSystrayWindow*> (parent());
         // TODO: #TR uac must be enabled? why? maybe disabled?
-        systray->showMessage(tr("Insufficient privileges to manage services"), tr("UAC must be enabled to request privileges for non-admin users"), QSystemTrayIcon::Warning);
+        systray->showMessage(tr("Insufficient rights to manage services."), tr("UAC must be enabled to request privileges for non-admin users."), QSystemTrayIcon::Warning);
         m_rightWarnShowed = true;
     }
     else

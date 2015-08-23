@@ -55,7 +55,7 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
     const QString explorer = searchInPath(QLatin1String("explorer.exe"));
     if (explorer.isEmpty()) {
         QMessageBox::warning(parent,
-            tr("Launching Windows Explorer failed"),
+            tr("Launching file explorer failed."),
             tr("Could not find explorer.exe in path to launch Windows Explorer."));
         return;
     }

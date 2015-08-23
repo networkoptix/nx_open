@@ -34,9 +34,9 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     addPage(LicensesPage, new QnLicenseManagerWidget(this), tr("Licenses"));
     addPage(SmtpPage, new QnSmtpSettingsWidget(this), tr("Email"));
     addPage(UpdatesPage, m_updatesWidget, tr("Updates"));
+    addPage(UserManagement, new QnUserManagementWidget(this), tr("Users"));
     addPage(RoutingManagement, new QnRoutingManagementWidget(this), tr("Routing Management"));
     addPage(TimeServerSelection, new QnTimeServerSelectionWidget(this), tr("Time Synchronization"));
-    addPage(UserManagement, new QnUserManagementWidget(this), tr("Users"));
 
     loadData();
 }
