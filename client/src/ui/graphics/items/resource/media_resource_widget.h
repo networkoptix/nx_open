@@ -239,6 +239,7 @@ private:
     QnMediaDewarpingParams m_dewarpingParams;
 
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
+    bool m_ioModuleOverlayVisible;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

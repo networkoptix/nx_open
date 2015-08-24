@@ -132,7 +132,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_motionSensitivityValid(false),
     m_binaryMotionMaskValid(false),
     m_homePtzController(NULL),
-    m_ioModuleOverlayWidget(nullptr)
+    m_ioModuleOverlayWidget(nullptr),
+    m_ioModuleOverlayVisible(false)
+    
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource)
@@ -1114,8 +1116,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
 
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
-        const bool ioOverlayVisible = !qFuzzyEquals(m_ioModuleOverlayWidget->opacity(), Invisible);
-        if (ioOverlayVisible)           /// If visible then licences Ok
+        if (m_ioModuleOverlayVisible)           /// If visible then licences Ok
             return Qn::EmptyOverlay;
 
         const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
@@ -1365,9 +1366,10 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     const bool ioBtnChecked = (button && button->isChecked());
     const bool onlyIoData = (ioModule && !m_camera->hasVideo(m_display->mediaProvider()));
     const bool correctLicenceStatus = (cameraLicenseStatus(m_camera) == LicenseUsed);
-    const OverlayVisibility visibility = ((ioBtnChecked || onlyIoData) && correctLicenceStatus 
-        ? Visible : Invisible);
 
+    m_ioModuleOverlayVisible = ((ioBtnChecked || onlyIoData) && correctLicenceStatus);
+
+    const OverlayVisibility visibility =  (m_ioModuleOverlayVisible ? Visible : Invisible);
     setOverlayWidgetVisibility(m_ioModuleOverlayWidget, visibility);
     updateOverlayWidgetsVisibility(animate);
 
