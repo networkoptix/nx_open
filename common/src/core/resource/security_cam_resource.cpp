@@ -511,6 +511,7 @@ bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabil
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
     setProperty(Qn::CAMERA_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+    m_cachedCameraCapabilities.reset();
 }
 
 void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability, bool value) {
