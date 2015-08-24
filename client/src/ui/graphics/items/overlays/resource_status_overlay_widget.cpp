@@ -132,6 +132,25 @@ void QnStatusOverlayWidget::updateLayout() {
     m_button->setGeometry(QRectF(rect.center() - toPoint(size) / 2.0 + QPointF(0.0, point * 4.0), size));
 }
 
+void QnStatusOverlayWidget::setButtonVisible(bool visible
+    , bool animate)
+{
+    static const char kVisiblePropertyName[] = "isVisible";
+    const QVariant &variant = m_button->property(kVisiblePropertyName);
+    const bool currentVisible = (variant.isValid() ? variant.toBool() : false);
+
+    if (currentVisible == visible) 
+        return;
+
+    m_button->setProperty(kVisiblePropertyName, visible);
+
+    const qreal buttonOpacity = (visible ? 1.0 : 0.0);
+    if (animate)
+        opacityAnimator(m_button)->animateTo(buttonOpacity);
+    else
+        m_button->setOpacity(buttonOpacity);
+}
+
 void QnStatusOverlayWidget::updateButtonOpacity(bool animate) {
     bool visible = false;
 
@@ -147,14 +166,7 @@ void QnStatusOverlayWidget::updateButtonOpacity(bool animate) {
         break;
     }
 
-    qreal buttonOpacity = visible ? 1.0 : 0.0;
-
-    if (!qFuzzyEquals(buttonOpacity, m_button->opacity())) {
-        if (animate)
-            opacityAnimator(m_button)->animateTo(buttonOpacity);
-        else
-            m_button->setOpacity(buttonOpacity);
-    }
+    setButtonVisible(visible, animate);
 }
 
 void QnStatusOverlayWidget::updateButtonText() {

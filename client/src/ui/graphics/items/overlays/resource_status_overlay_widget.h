@@ -70,6 +70,10 @@ private:
     void updateButtonText();
 
 private:
+    void setButtonVisible(bool visible
+        , bool animate);
+
+private:
     QSharedPointer<QnPausedPainter> m_pausedPainter;
     QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
     Qn::ResourceStatusOverlay m_statusOverlay;

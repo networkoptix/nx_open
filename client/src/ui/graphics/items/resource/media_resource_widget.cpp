@@ -133,7 +133,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_binaryMotionMaskValid(false),
     m_homePtzController(NULL),
     m_ioModuleOverlayWidget(nullptr),
-    m_ioModuleOverlayVisible(false)
+    m_ioCouldBeShown(false)
     
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
@@ -318,13 +318,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         connect(timer,              &QTimer::timeout,                                   this,   &QnMediaResourceWidget::updateIconButton);
         connect(context->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::offsetsChanged, this, &QnMediaResourceWidget::updateIconButton);
         connect(m_camera.data(),    &QnResource::statusChanged,                         this,   &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera.data(),    &QnResource::statusChanged,                         this,   &QnMediaResourceWidget::updateOverlayButton);
+        connect(m_camera.data(),    &QnResource::statusChanged,                         this, [this](){ updateIoModuleVisibility(true); }); /// Moreover, updates overlay button 
         connect(m_camera.data(),    &QnSecurityCamResource::scheduleTasksChanged,       this,   &QnMediaResourceWidget::updateIconButton);
         timer->start(1000 * 60); /* Update icon button every minute. */
+
 
         connect(statusOverlayWidget(), &QnStatusOverlayWidget::diagnosticsRequested,    this,   &QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested);
         connect(statusOverlayWidget(), &QnStatusOverlayWidget::ioEnableRequested,       this,   &QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested);
         connect(statusOverlayWidget(), &QnStatusOverlayWidget::moreLicensesRequested,   this,   &QnMediaResourceWidget::at_statusOverlayWidget_moreLicensesRequested);
+
 
         updateOverlayButton();
     }
@@ -1116,13 +1118,20 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
 
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
-        if (m_ioModuleOverlayVisible)           /// If visible then licences Ok
+        const bool isOffline = (m_display->camDisplay()->isRealTimeSource() 
+            && (resource->getStatus() == Qn::Offline));
+
+        if (isOffline)
+            return Qn::OfflineOverlay;
+
+        if (m_ioCouldBeShown) /// If vidget could be shown then licences Ok
             return Qn::EmptyOverlay;
 
-        const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
         const bool buttonIsVisible = (buttonBar()->visibleButtons() & IoModuleButton);
+        const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
         const bool licenceError = (!button || button->isChecked() || !buttonIsVisible); /// Io is invisble in this case if licence error
         const bool isNotZoomWindow = zoomRect().isNull();
+
         if (licenceError && isNotZoomWindow)
             return Qn::IoModuleDisabledOverlay;
     } 
@@ -1367,9 +1376,12 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     const bool onlyIoData = (ioModule && !m_camera->hasVideo(m_display->mediaProvider()));
     const bool correctLicenceStatus = (cameraLicenseStatus(m_camera) == LicenseUsed);
 
-    m_ioModuleOverlayVisible = ((ioBtnChecked || onlyIoData) && correctLicenceStatus);
+    const auto resource = m_display->resource();
+    const bool isOffline = (m_display->camDisplay()->isRealTimeSource() 
+        && (resource->getStatus() == Qn::Offline));
 
-    const OverlayVisibility visibility =  (m_ioModuleOverlayVisible ? Visible : Invisible);
+    m_ioCouldBeShown = ((ioBtnChecked || onlyIoData) && correctLicenceStatus);
+    const OverlayVisibility visibility =  (m_ioCouldBeShown && !isOffline ? Visible : Invisible);
     setOverlayWidgetVisibility(m_ioModuleOverlayWidget, visibility);
     updateOverlayWidgetsVisibility(animate);
 
