@@ -45,6 +45,13 @@ QnVideoCameraPool* QnVideoCameraPool::instance()
     //return &inst;
 }
 
+void QnVideoCameraPool::updateActivity()
+{
+    QMutexLocker lock(&m_staticMtx);
+    for (const auto&camera: m_cameras)
+        camera->updateActivity();
+}
+
 QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res)
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))

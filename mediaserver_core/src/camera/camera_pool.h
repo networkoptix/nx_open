@@ -24,7 +24,7 @@ public:
     */
     QnVideoCameraPtr getVideoCamera(const QnResourcePtr& res);
     void removeVideoCamera(const QnResourcePtr& res);
-
+    void updateActivity();
 private:
     typedef QMap<QnResourcePtr, QnVideoCameraPtr> CameraMap;
     CameraMap m_cameras;

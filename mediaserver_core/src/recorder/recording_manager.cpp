@@ -381,7 +381,6 @@ bool QnRecordingManager::startOrStopRecording(
                     recorderLowRes->pleaseStop();
                     camera->notInUse(recorderLowRes);
                 }
-                camera->updateActivity();
             }
         }
         if (recorderHiRes || recorderLowRes)
@@ -403,8 +402,6 @@ bool QnRecordingManager::startOrStopRecording(
             recorderLowRes->pleaseStop();
             camera->notInUse(recorderLowRes);
         }
-
-        camera->updateActivity();
 
         if (needStopHi) {
             NX_LOG(QString(lit("Recording stopped for camera %1")).arg(res->getUniqueId()), cl_logINFO);
@@ -565,7 +562,7 @@ void QnRecordingManager::onTimer()
         const Recorders& recorders = itrRec.value();
 
         if (!recorders.recorderHiRes && !recorders.recorderLowRes)
-            return; // no recorders are created now
+            continue; // no recorders are created now
 
         if (recorders.recorderHiRes)
             recorders.recorderHiRes->updateScheduleInfo(time);
@@ -581,6 +578,8 @@ void QnRecordingManager::onTimer()
         if (stopTime <= time*1000ll)
             stopForcedRecording(itrDelayedStop.key(), false);
     }
+    qnCameraPool->updateActivity();
+
 }
 
 QnVirtualCameraResourceList QnRecordingManager::getLocalControlledCameras() const
