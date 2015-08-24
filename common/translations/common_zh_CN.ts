@@ -295,15 +295,15 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发生未知事件</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">报警输入端口: %1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">冲突IP地址:: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
@@ -438,7 +438,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未经授权。Url %1.</translation>
     </message>
 </context>
 <context>
@@ -460,7 +460,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">启动Windows浏览器失败</translation>
     </message>
 </context>
 <context>
@@ -475,11 +475,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法初始化音频编码器.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法初始化音频解码器.</translation>
     </message>
 </context>
 <context>
@@ -517,7 +517,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法初始化视频编码器</translation>
     </message>
 </context>
 <context>
@@ -568,35 +568,35 @@
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">模拟编码器</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">测试授权</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">模拟授权</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">专业版授权</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">edge授权</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vmax许可</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">模拟编码器授权</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">电视墙授权</translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
@@ -608,7 +608,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无效签名</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -616,11 +616,11 @@
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无效定制</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无效类型</translation>
     </message>
 </context>
 <context>
@@ -656,19 +656,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">There was a problem activating your license key. Database error has occurred.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">输入授权无效，请确认输入的授权是否正确。如果问题仍存在，请联系技术支持确认授权码是否有效或获取有效授权码。</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">当前激活的授权码不可用，请联系技术支持获取有效授权码。</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">此授权码已在 {{time}}激活过硬件ID{{hwid}} ，请联系技术支持获取有效的授权码。</translation>
     </message>
 </context>
 <context>
@@ -722,15 +722,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">试用授权</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">授权给:</translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">免费许可</translation>
     </message>
 </context>
 <context>
@@ -911,11 +911,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">存储空间已满</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未设置存储空间</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>
@@ -972,11 +972,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCL代码转换器未执行</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未知编码转换方法</translation>
     </message>
 </context>
 <context>

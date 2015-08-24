@@ -291,15 +291,15 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Một sự kiện chưa biết</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhập các cổng giao tiếp：%1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">xung đột địa chỉ：%1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trái phép. nơi %1.</translation>
     </message>
 </context>
 <context>
@@ -456,7 +456,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">thực hiện Windows Explorer thất bại</translation>
     </message>
 </context>
 <context>
@@ -471,11 +471,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể khởi tạo bộ giải mã âm thanh.</translation>
     </message>
 </context>
 <context>
@@ -513,7 +513,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể khởi tạo bộ mã hóa video.</translation>
     </message>
 </context>
 <context>
@@ -564,35 +564,35 @@
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">phép loại suy encoder</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">giấy phép thử nghiệm</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">phép loại suy giấy phép</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">giấy phép chuyên nghiệp</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">giấy phép cạnh</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">giấy phép Vmax</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">giấy phép phép loại suy encoder</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Giấy phép bức tường video</translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
@@ -604,7 +604,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">chữ ký không hợp lệ</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -612,11 +612,11 @@
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">tùy biến không hợp lệ</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">kiểu không hợp lệ</translation>
     </message>
 </context>
 <context>
@@ -651,19 +651,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi cơ sở dữ đã xảy ra.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
 </context>
 <context>
@@ -717,15 +717,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">giấy phép thử nghiệm</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licensed to:</translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">miễn phí bản quyền</translation>
     </message>
 </context>
 <context>
@@ -905,11 +905,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu trữ đầy</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thiết bị lưu trữ không được thiết lập</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>
@@ -966,11 +966,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCL chuyển mã không được thực hiện</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cách chuyển mã Unknown</translation>
     </message>
 </context>
 <context>

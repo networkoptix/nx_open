@@ -271,15 +271,15 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ismeretlen esemény történt</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bemeneti port: %1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ütközés címe: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem engedélyezett. %1 Url.</translation>
     </message>
 </context>
 <context>
@@ -456,7 +456,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A Windows Explorer indítása sikertelen</translation>
     </message>
 </context>
 <context>
@@ -471,11 +471,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem lehet inicializálni az audio enkódert.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem lehet inicializálni az audio dekódert.</translation>
     </message>
 </context>
 <context>
@@ -513,7 +513,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem lehet inicializálni a video enkódert.</translation>
     </message>
 </context>
 <context>
@@ -556,7 +556,7 @@
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Analóg enkóder</translation>
     </message>
     <message>
         <source>I/O Module</source>
@@ -568,31 +568,31 @@
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Próba licencek</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Analóg licencek</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Professional licencek</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Edge licencek</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vmax licencek</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Analóg enkóder licencek</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video fal licencek</translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
@@ -604,7 +604,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Érvénytelen aláírás</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -612,11 +612,11 @@
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Érvénytelen testreszabás</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Érvénytelen típus</translation>
     </message>
 </context>
 <context>
@@ -651,19 +651,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A licence kulcs aktiválásas közben probléma lépett fel. Adatbázis hiba történt.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A megadott licence kulcs érvénytelen. Kérem ellenőrizze a megadott licence kulcs helyességét. Ha a probléma továbbra is fennáll, kérem keresse fel a segítségnyújtó csapatot, hogy megerősítsék a licence kulcs érvényességét vagy egy érvényes licence kulcs beszserzéséhez.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem kompatibilis licencet próbál aktiválni a szoftverrel. Kérem keresse fel a segítségnyújtó csapatot az érvényes licence kulcs beszerzéséhez.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A licence kulcs előzőleg aktiválva lett a {{hwid}}hardver azonosítóval {{time}}. Kérem keresse fel a segítségnyújtó csapatot az érvényes licence kulcs beszerzéséhez.</translation>
     </message>
 </context>
 <context>
@@ -717,15 +717,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Próba licence</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencelve a következővel:</translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ingyenes licence</translation>
     </message>
 </context>
 <context>
@@ -766,7 +766,7 @@
     <message>
         <source>Lo</source>
         <extracomment>Short for &apos;Low&apos;</extracomment>
-        <translation></translation>
+        <translation>Alacsony</translation>
     </message>
     <message>
         <source>Me</source>
@@ -905,11 +905,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A tárhelyek beteltek</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tárhelyek nincsenek konfigurálva</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>
@@ -966,11 +966,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCL átkódolás nincs megvalósítva</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ismeretlen átkódolási metódus</translation>
     </message>
 </context>
 <context>

@@ -68,6 +68,7 @@ namespace {
     }
 
 
+/** Make sure class names totally the same as on the activation server. */
 static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
 {
     LicenseTypeInfo(Qn::LC_Trial,           "trial",         1),
@@ -77,8 +78,8 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0),
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
-    LicenseTypeInfo(Qn::LC_IO,              "io",            0),
-    LicenseTypeInfo(Qn::LC_Start,           "start",         0)
+    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      0),
+    LicenseTypeInfo(Qn::LC_Start,           "starter",       0)
 };
 } // anonymous namespace
 
@@ -420,6 +421,8 @@ Qn::LicenseType QnLicense::type() const
             return ::licenseTypeInfo[i].licenseType;
     }
 
+    //TODO: #ivigasin create "invalid" class for this case
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid license class");
     return Qn::LC_Professional; // default value
 }
 

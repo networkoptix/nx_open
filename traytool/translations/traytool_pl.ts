@@ -20,11 +20,11 @@
     <name>QnElevationChecker</name>
     <message>
         <source>Insufficient rights to manage services.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Za słabe uprawnienia by zarządzać usługami</translation>
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">UAC musi być włączony, by żądać uprawnień dla użytkowników non-admin</translation>
     </message>
 </context>
 <context>

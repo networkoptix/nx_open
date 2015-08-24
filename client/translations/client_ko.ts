@@ -149,7 +149,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audit trail</source>
+        <source>Audit Trail</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -220,7 +220,7 @@
     </message>
     <message>
         <source>filter by camera...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">필터...</translation>
     </message>
 </context>
 <context>
@@ -287,15 +287,15 @@
     </message>
     <message>
         <source>Add camera(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 추가...</translation>
     </message>
     <message>
         <source>Selected Server:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">선택된 서버:</translation>
     </message>
     <message>
         <source>S&amp;ubnet Scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서브넷 검색 (&amp;u)</translation>
     </message>
     <message>
         <source>Brand</source>
@@ -307,7 +307,7 @@
     </message>
     <message>
         <source>New Scan...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">새로 찾기...</translation>
     </message>
 </context>
 <context>
@@ -355,7 +355,7 @@
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
         <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">모든 카메라가 오프라인이 되면 이벤트가 발생함</translation>
     </message>
 </context>
 <context>
@@ -446,7 +446,7 @@
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">사용안함</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
@@ -581,7 +581,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do Not Record</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">녹화안함</translation>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
@@ -589,11 +589,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">최소 저장일:</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">최대 저장일:</translation>
     </message>
 </context>
 <context>
@@ -711,7 +711,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이벤트 로그</translation>
     </message>
     <message>
         <source>Clear Filter</source>
@@ -738,7 +738,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Camera View Angle Correction</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 각도 보정:</translation>
     </message>
 </context>
 <context>
@@ -777,31 +777,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">오디오 채널 5.1채널에서 2.1채널:</translation>
     </message>
     <message>
         <source>Auto Pause Video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">자동 정지 설정:</translation>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">비활성 시간(분)</translation>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PC시작 시 자동 실행:</translation>
     </message>
     <message>
         <source>Double Buffering:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">추가 버퍼링:</translation>
     </message>
     <message>
         <source>Browse Logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">찾기 로그</translation>
     </message>
     <message>
         <source>Clear Local Cache</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">캐쉬 초기화</translation>
     </message>
 </context>
 <context>
@@ -843,10 +843,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>시스템설정</translation>
     </message>
     <message>
-        <source>Audit trail</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open audit trail log</source>
         <translation type="unfinished"></translation>
     </message>
@@ -856,6 +852,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>System Backup and Restore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit Trail</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -871,47 +871,47 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Scroll Here</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">현 위치 돌리기</translation>
     </message>
     <message>
         <source>Left Edge</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">왼쪽 끝</translation>
     </message>
     <message>
         <source>Right Edge</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">오른쪽 끝</translation>
     </message>
     <message>
         <source>Page Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">페이지 좌측</translation>
     </message>
     <message>
         <source>Page Up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">페이지 위</translation>
     </message>
     <message>
         <source>Page Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">페이지 우측</translation>
     </message>
     <message>
         <source>Page Down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">페이지 아래</translation>
     </message>
     <message>
         <source>Scroll Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">좌측으로 돌리기</translation>
     </message>
     <message>
         <source>Scroll Up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">위로 돌리기</translation>
     </message>
     <message>
         <source>Scroll Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">우측으로 돌리기</translation>
     </message>
     <message>
         <source>Scroll Down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">아래로 돌리기</translation>
     </message>
 </context>
 <context>
@@ -945,7 +945,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이미지 로딩중...기다려주세요.</translation>
     </message>
 </context>
 <context>
@@ -1000,15 +1000,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout is Locked</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">레이아웃 잠금</translation>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이미지 처리중...기다려주세요.</translation>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">비율 유지</translation>
     </message>
 </context>
 <context>
@@ -1043,7 +1043,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">시험...</translation>
     </message>
 </context>
 <context>
@@ -1170,11 +1170,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License Key is Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">인증키 오류</translation>
     </message>
     <message>
         <source>Select License File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">인증 파일 선택...</translation>
     </message>
 </context>
 <context>
@@ -1229,7 +1229,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Connection Options:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">접속 옵션(&amp;C):</translation>
     </message>
 </context>
 <context>
@@ -1312,7 +1312,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">시간 표기 기준:</translation>
     </message>
 </context>
 <context>
@@ -1343,7 +1343,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">오디오 사용</translation>
     </message>
 </context>
 <context>
@@ -1369,7 +1369,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Show to administrators only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">관리자에게만 출력</translation>
     </message>
 </context>
 <context>
@@ -1434,7 +1434,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No Tour Selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">투어 선택 안됨</translation>
     </message>
 </context>
 <context>
@@ -1476,7 +1476,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Save Position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">위치 저장</translation>
     </message>
 </context>
 <context>
@@ -2662,27 +2662,27 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>파일 설정</translation>
     </message>
     <message>
-        <source>Audit trail...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User management...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">파일 설정</translation>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">새로운 탭으로 리스소 이동</translation>
     </message>
     <message>
         <source>Select Time Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">시간 서버 선택</translation>
     </message>
     <message>
         <source>Activate PTZ Object</source>
+        <translation type="unfinished">PTZ 대상 활성화</translation>
+    </message>
+    <message>
+        <source>User Management...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit Trail...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2955,7 +2955,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You have new notifications.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">새로운 알림이 있음</translation>
     </message>
 </context>
 <context>
@@ -2974,15 +2974,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Install a specific build.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">특정 빌드 설치</translation>
     </message>
     <message>
         <source>Build Number:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">빌드 버젼:</translation>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">입력하신 비밀번호가 유효하지 않습니다</translation>
     </message>
 </context>
 <context>
@@ -3005,7 +3005,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select at least one camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">최소 하나의 카메라를 선택하세요</translation>
     </message>
 </context>
 <context>
@@ -3103,15 +3103,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">모든 사용자</translation>
     </message>
     <message>
         <source>Select Sound</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">음원 선택</translation>
     </message>
     <message>
         <source>Enter Text</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">텍스트 입력</translation>
     </message>
 </context>
 <context>
@@ -3181,19 +3181,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm Rules Reset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">규칙 초기화 확인</translation>
     </message>
     <message>
         <source>Error while deleting rule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">규칙을 삭제하는 동안 오류 발생</translation>
     </message>
     <message>
         <source>Confirm Save</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">확인 및 저장</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">종료 확인</translation>
     </message>
 </context>
 <context>
@@ -3319,15 +3319,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">지정된 IP주소의 범위가 255이상을 포함하고 있습니다.</translation>
     </message>
     <message>
         <source>Camera address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 주소는 반드시 유효한 URL, IP 주소, 또는 RTSP 링크를 포함해야합니다.</translation>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">검색 종요중...</translation>
     </message>
     <message>
         <source>No cameras selected.</source>
@@ -3335,11 +3335,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please select at least one camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">최소 하나의 카메라를 선택하세요</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서버가 오프라인되어, 검색이 중단됨.</translation>
     </message>
     <message>
         <source>Server is offline, cameras can only be added to an online server.</source>
@@ -3347,7 +3347,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서버가 삭제되어, 검색이 중단됨.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add cameras.</source>
@@ -3355,7 +3355,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Error while searching for camera(s).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라를 검색하는 동안 오류가 발생함.</translation>
     </message>
 </context>
 <context>
@@ -3379,7 +3379,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Applying Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">설정 적용 중...</translation>
     </message>
     <message>
         <source>Target camera&apos;s service is unavailable. Try again.</source>
@@ -3387,7 +3387,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not save paramaters.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">해당 변수를 저장할 수 없습니다</translation>
     </message>
 </context>
 <context>
@@ -3430,11 +3430,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do not lock archive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">저장일수 제한하지 않음</translation>
     </message>
     <message>
         <source>List of tags divided by commas or spaces.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">쉼표나 태그로 태그의 목록 구분</translation>
     </message>
 </context>
 <context>
@@ -3457,7 +3457,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서버 가용성 확인</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
@@ -3465,11 +3465,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">미디어 스트림을 제공하는지 확인 중</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">오류에 대한 미디어 스트림 확인 중</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
@@ -3520,7 +3520,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">선택된 카메라 파일로 내보내기</translation>
     </message>
 </context>
 <context>
@@ -3678,27 +3678,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Camera(s) not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 저장되지 않음</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">변경 사항이 저장되지 않았습니다. 원하는 유형의 녹화, FPS, 품질을 선택하신 후 일정표에 변경사항을 표시하여 주십시오.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">변경 사항이 적용되지 않음</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">실제 모션 감도 변경이 되지 않았습니다. 모션 변경 감도 이미지에 사각형을 그려주십시오.</translation>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">인증키 제한을 넘었습니다. 설정값은 저장하지만, 설정의 영향을 받지 않습니다.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">변경 사항을 적용할 수 없음</translation>
     </message>
 </context>
 <context>
@@ -3734,18 +3734,18 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Local System Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">로컬 타임</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">구성 서버</translation>
     </message>
     <message>
         <source>Updating Server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트 서버</translation>
     </message>
 </context>
 <context>
@@ -3852,7 +3852,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">입력된 로그인 또는 비밀번호가 맞지 않습니다, 다시 시도해 주세요.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
@@ -3860,6 +3860,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Launcher process not found.</source>
+        <translation type="unfinished">시작 프로세서를 찾을 수 없음</translation>
+    </message>
+    <message>
+        <source>LDAP Server connection timed out.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3871,7 +3875,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">요청 시간 초과.</translation>
     </message>
     <message>
         <source>Test Failed</source>
@@ -3890,7 +3894,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">사용자 이름과 비밀번호를 입력하세요...</translation>
     </message>
 </context>
 <context>
@@ -3961,7 +3965,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1로의 서버 데이터 베이스 덤프 실패</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
@@ -3969,7 +3973,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">백업을 실행 하기 전 먼저 서버를 연결 하십시오</translation>
     </message>
 </context>
 <context>
@@ -4004,7 +4008,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Screen width must be a multiple of 8.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">화면 너비는 반드시 8의 승수여야 합니다.</translation>
     </message>
 </context>
 <context>
@@ -4104,7 +4108,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Any Action</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">모든 동작</translation>
     </message>
 </context>
 <context>
@@ -4147,7 +4151,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">모든 사용자</translation>
     </message>
 </context>
 <context>
@@ -4158,11 +4162,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">몇몇 카메라가 모션 일정을 지원하지 않습니다</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">몇몇 카메라에 저장 설정이 되지 않습니다</translation>
     </message>
 </context>
 <context>
@@ -4208,11 +4212,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이 폴더는 이미 추가 되었습니다</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이 폴더는 이미 추가 되었습니다.</translation>
     </message>
 </context>
 <context>
@@ -4736,7 +4740,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Obtaining licenses from server...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서버로부터 인증키를 얻어오는 중...</translation>
     </message>
     <message>
         <source>License has arleady been activated.</source>
@@ -4744,27 +4748,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">네트워크 오류로 인해 인증키를 등록하는 과정에 문제가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">라이센스를 인증 받을 수 없음:  %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서버로부터 인증키를 지울 수 없음:  %1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">선택하신 인증 키는 %1 시스템에 이미 사용하였습니다. 관리자를 통해 유효한 인증키를 받으십시오.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">네트워크 오류로 인해 인증키를 자동 등록하는 과정에 문제가 발생하였습니다. 관리자를 통해 수동 등록을 통해 인증 받으세요.</translation>
     </message>
     <message>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">유효하지 않은 인증 파일입니다. 올바른 인증 파일을 선택하여 주십시오.만약 문제가 지속 될 경우, 관리자에게 문의하십시오.</translation>
     </message>
 </context>
 <context>
@@ -4904,19 +4908,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Invalid Paramaters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">잘못된 변수</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">연결정보가 이미 존재합니다</translation>
     </message>
     <message>
         <source>A connection with this name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">같은 이름을 가진 연결정보가 이미 존재합니다. 덮어쓸까요?</translation>
     </message>
     <message>
         <source>Delete Connections</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">연결 정보 삭제</translation>
     </message>
 </context>
 <context>
@@ -4979,7 +4983,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">파일선택...</translation>
     </message>
 </context>
 <context>
@@ -5041,11 +5045,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Zoom Window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">줌 영역</translation>
     </message>
     <message>
         <source>Low-Res</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">저-해상도</translation>
     </message>
 </context>
 <context>
@@ -5147,15 +5151,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">시험...</translation>
     </message>
     <message>
         <source>Merging Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">시스템 병합 중...</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 시스템에서 호환되지 않는 %2 버젼이 발견되었습니다.</translation>
     </message>
 </context>
 <context>
@@ -5172,11 +5176,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">유효하지 않은 스케줄</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라의 보조 스트림을 사용할 수 없습니다. Motion + LQ 옵션이 동작하지 않습니다. 보조 스트림을 활성화 하신 후에 녹화 설정을 &quot;항상&quot; 또는 &quot;아니오&quot;로 변경하려면 &quot;예&quot;를 누르세요.</translation>
     </message>
 </context>
 <context>
@@ -5290,19 +5294,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Sound Files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">음원 파일</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">파일선택...</translation>
     </message>
     <message>
         <source>Enter New Title:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">새 타이틀 입력:</translation>
     </message>
     <message>
         <source>Confirm File Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">파일 삭제 확인</translation>
     </message>
 </context>
 <context>
@@ -5475,15 +5479,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 위치를 가져올 수 없음</translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라의 위치를 설정할 수 없음</translation>
     </message>
     <message>
         <source>Remove Preset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">프리셋 삭제</translation>
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
@@ -5491,11 +5495,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PTZ 설정이 저장되지 않음</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">변경사항이 저장되지 않았습니다. 저장하시겠습니까?</translation>
     </message>
 </context>
 <context>
@@ -5560,7 +5564,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Tour %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 새 투어</translation>
     </message>
     <message>
         <source>Saved Position %1</source>
@@ -5568,11 +5572,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Tour should contain at least 2 positions.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">투어는 2개 이상의 위치를 포함합니다</translation>
     </message>
     <message>
         <source>Tour Time: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">투어 시간: %1</translation>
     </message>
 </context>
 <context>
@@ -5602,11 +5606,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이 단축키는 &quot;%1&quot; 프리셋에서 사용합니다</translation>
     </message>
     <message>
         <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이 단축키는 &quot;%1&quot; 투어에서 사용합니다</translation>
     </message>
 </context>
 <context>
@@ -5864,15 +5868,15 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnResourceSelectionDialog</name>
     <message>
         <source>Select Users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">사용자 선택...</translation>
     </message>
     <message>
         <source>Select Cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 선택...</translation>
     </message>
     <message>
         <source>Slect Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">리소스 선택...</translation>
     </message>
 </context>
 <context>
@@ -6319,15 +6323,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Latest Version:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">최종 버전:</translation>
     </message>
     <message>
         <source>Target Version:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">대상 버전:</translation>
     </message>
     <message>
         <source>Update Finished...100%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트 완료... 100%</translation>
     </message>
     <message>
         <source>Please update the client manually.</source>
@@ -6343,23 +6347,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">시작 프로세서를 찾을 수 없음</translation>
     </message>
     <message>
         <source>Update Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트 취소</translation>
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트 완료</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트가 이미 시작되었습니다.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">인터넷 연결 오류</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
@@ -6367,11 +6371,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트를 시작 할 수 없습니다. 하나 이상의 서버에 대한 업데이트를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트를 시작할 수 없습니다. 클라이언트에 대한 업데이트를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
@@ -6379,7 +6383,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">인터넷을 통해 업데이트를 확인할 수 없습니다.</translation>
     </message>
     <message>
         <source>Available Update:</source>
@@ -6387,7 +6391,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">수동 업데이트를 할 경우, 아래 링크를 통해 다운로드 받기:</translation>
     </message>
 </context>
 <context>
@@ -6402,11 +6406,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Watermark Not Found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">영상 변조를 찾을 수 없습니다</translation>
     </message>
     <message>
         <source>Watermark Matched</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">변조되지 않은 데이터</translation>
     </message>
 </context>
 <context>
@@ -6445,11 +6449,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">하드웨어 (카메라 포함)</translation>
     </message>
     <message>
         <source>Do Not Record Motion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">움직임 저장하지 않음</translation>
     </message>
 </context>
 <context>
@@ -6500,23 +6504,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">제공된 변수가 유효하지 않습니다.테스트를 시행할 수 없습니다.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">시간제한</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이메일 정보가 유효하지 않습니다</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">프리셋을 찾을 수 없습니다. &apos;고급&apos;설정을 사용하세요</translation>
     </message>
     <message>
         <source>Support email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이메일 정보가 유효하지 않습니다</translation>
     </message>
 </context>
 <context>
@@ -6566,7 +6570,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">진단...</translation>
     </message>
     <message>
         <source>Enable</source>
@@ -6582,7 +6586,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Server Offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">오프라인</translation>
     </message>
 </context>
 <context>
@@ -6604,7 +6608,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">윈도우 네트워크 공유 리스소</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
@@ -6620,7 +6624,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">외부 저장소 정보가 유효하지 않아 저장 경로를 사용할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -7104,7 +7108,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">사용자 이름이 재 설정 되었습니다. 비밀번호를 반드시 업데이트 하셔야 합니다.</translation>
     </message>
 </context>
 <context>
@@ -7162,7 +7166,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">윈도우 시작 시 비디오 월 실행</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
@@ -7399,7 +7403,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 새 레이아웃</translation>
     </message>
     <message>
         <source>Cannot move camera(s) to server %1. Server is unresponsive.</source>
@@ -7411,27 +7415,27 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Open File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">파일 열기</translation>
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">미리보기 검색을 수행할 수 없음</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">과정의 진행</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">같은 이름의 비디오 월이 존재합니다</translation>
     </message>
     <message>
         <source>Updating Background...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">배경 업데이트</translation>
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이미지 처리 시간이 많이 걸릴 수 있습니다. 기다려 주십시오.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
@@ -7439,7 +7443,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">시작프로세서를 찾을 수 없음</translation>
     </message>
 </context>
 <context>
@@ -7458,19 +7462,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Bookmarks can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">북마크는 활성화된 서버에만 추가 됩니다.</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">북마크는 활성화된 서버에만 변경 됩니다.</translation>
     </message>
     <message>
         <source>Bookmarks can only be deleted from an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">북마크는 활성화된 서버에서만 삭제됩니다.</translation>
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">삭제 확인</translation>
     </message>
 </context>
 <context>
@@ -7520,15 +7524,15 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">다음 오류로 인해 녹화를 시작할 수 없습니다: %1</translation>
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&apos;%1&apos; 파일은 덮어쓸수 없습니다. 다른이름으로 다시 시도하십시오.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">투어를 중단하려면 아무 키나 누르십시오</translation>
     </message>
 </context>
 <context>
@@ -7645,7 +7649,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>File is in use.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">사용 중</translation>
     </message>
     <message>
         <source>Unable to export file.</source>
@@ -7653,31 +7657,31 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">주의</translation>
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">타임스템프 없음</translation>
     </message>
     <message>
         <source>Top Left Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">상단 좌측 모서리 (변환 필요)</translation>
     </message>
     <message>
         <source>Top Right Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">상단 우측 모서리 (변환 필요)</translation>
     </message>
     <message>
         <source>Bottom Left Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">하단 좌측 모서리 (변환 필요)</translation>
     </message>
     <message>
         <source>Bottom Right Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">하단 우측 모서리 (변환 필요)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">변환에 필요한 필터를 적용하여 비디오 백업을 받을 경우, 많은 시간이 소요될 수 있습니다. 계속 진행하시겠습니까?</translation>
     </message>
     <message>
         <source>Export Complete</source>
@@ -7697,11 +7701,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Save local layout as...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">로컬 레이아웃으로 저장...</translation>
     </message>
     <message>
         <source>Make file read-only.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">읽기 전용 파일 생성</translation>
     </message>
     <message>
         <source>Export Successful.</source>
@@ -7775,11 +7779,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">기다려 주세요, 이전 요청을 서버에 저장 중에 있습니다.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">선택된 서버 시스템에 성공적으로 연결되었습니다!</translation>
     </message>
 </context>
 <context>
@@ -7838,23 +7842,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Layout already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">지정된 레이아웃은 이미 존재함</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">지정된 레이아웃의 이름이 이미 존재하며 덮어쓸수 있는 권한이 없습니다.</translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">레이아웃 이름 설정:</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">같은 이름을 가진 연결정보가 이미 존재합니다. 덮어쓸까요?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 새 레이아웃</translation>
     </message>
 </context>
 <context>
@@ -7904,11 +7908,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 위치를 가져올 수 없음</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라의 위치를 설정할 수 없음</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
@@ -7955,35 +7959,35 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">타임스템프 없음</translation>
     </message>
     <message>
         <source>Top Left Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">상단 좌측 모서리</translation>
     </message>
     <message>
         <source>Top Right Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">상단 우측 모서리</translation>
     </message>
     <message>
         <source>Bottom Left Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">하단 좌측 모서리</translation>
     </message>
     <message>
         <source>Bottom Right Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">하단 우측 모서리</translation>
     </message>
     <message>
         <source>Could not overwrite file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">덮어쓰기 실패</translation>
     </message>
     <message>
         <source>Could not save screenshot.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">스크린샷 저장 실패</translation>
     </message>
     <message>
         <source>An error occured while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&apos;%1&apos; 스크린 샷을 저장하는 동안 오류가 발생하였습니다.</translation>
     </message>
 </context>
 <context>
@@ -8014,15 +8018,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">최신 버젼 사용 가능</translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">업데이트 권장</translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">해당 업데이트에 대한 알람을 다시 열지 않습니다.</translation>
     </message>
 </context>
 <context>
@@ -8128,19 +8132,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A control session is already running.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">제어 세션이 이미 동작 중입니다</translation>
     </message>
     <message>
         <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">예상치 못한 오류가 발생하였습니다. 변경된 사항이 저장되지 않았습니다.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이 PC에 연결된 비디오 월이 없습니다.</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">비디어 월이 시작됩니다. %1 클라이언트를 종료 하시겠습니까?</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
@@ -8148,19 +8152,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To enable this feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">기능 사용을 위해 최소 하나의 비디오 월 인증키가 필요합니다.</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">기능 사용을 위해 최소 하나의 비디오 월 인증키가 필요합니다.</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">비디오 월이 이미 존재합니다</translation>
     </message>
     <message>
         <source>A Video Wall with the same name already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">동일한 이름의 비디오 월이 존재합니다</translation>
     </message>
 </context>
 <context>
@@ -8171,7 +8175,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">연결을 복원하는 동안 잠시 기다려주세요...</translation>
     </message>
 </context>
 <context>
@@ -8194,11 +8198,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Pre-Recording:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">사전녹화:</translation>
     </message>
     <message>
         <source>Post-Recording:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">사후 녹화:</translation>
     </message>
 </context>
 <context>
@@ -8419,7 +8423,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>ServerSettingsDialog</name>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">서버 설정</translation>
     </message>
 </context>
 <context>
@@ -8510,15 +8514,15 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SignDialog</name>
     <message>
         <source>Watermark Check</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">변조 확인</translation>
     </message>
     <message>
         <source>Checked File:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">확인 파일:</translation>
     </message>
     <message>
         <source>Check Result:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">확인 결과:</translation>
     </message>
 </context>
 <context>
@@ -8613,19 +8617,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">오디오 사용</translation>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">이 카메라에서 움직임 감지를 사용할 수 없습니다</translation>
     </message>
     <message>
         <source>Motion Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">움직임 설정</translation>
     </message>
     <message>
         <source>Motion Detection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">움직임 감지:</translation>
     </message>
     <message>
         <source>Software - maximum FPS could decrease slightly on server</source>
@@ -8633,19 +8637,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Motion Mask (0)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">움직임 감지 마스크 (0)</translation>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 모션 웹 페이지:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">움직임 감지 범위 초기화</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">하드웨어 (카메라 포함)</translation>
     </message>
     <message>
         <source>Fisheye</source>
@@ -8736,19 +8740,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">간단한 설명이 필요할 경우 여기에 기입...</translation>
     </message>
     <message>
         <source>Unsecure Connection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">신뢰할 수 없는 연결</translation>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TLS를 이용한 보안 연결</translation>
     </message>
     <message>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SSL을 이용한 보안 연결</translation>
     </message>
 </context>
 <context>
@@ -8820,7 +8824,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Current System Time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">현재 시스템 시간:</translation>
     </message>
     <message>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
@@ -8863,7 +8867,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;이메일:</translation>
     </message>
     <message>
         <source>Enabled:</source>
@@ -8890,7 +8894,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Note: Schedule is based on server time.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">참고: 일정 설정은 서버시간을 기준으로 함</translation>
     </message>
 </context>
 </TS>

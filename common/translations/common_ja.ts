@@ -291,15 +291,15 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">不明なイベント</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">入力ポート:・%1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">競合アドレス: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">・URL・%1.は、承認されていません.</translation>
     </message>
 </context>
 <context>
@@ -456,7 +456,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ウィンドウズエクスプローラーの軌道に失敗しました</translation>
     </message>
 </context>
 <context>
@@ -471,11 +471,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">音声エンコーダーを初期化出来ません.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">音声デコーダーを初期化出来ません.</translation>
     </message>
 </context>
 <context>
@@ -513,7 +513,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ビデオエンコーダーを初期化出来ません.</translation>
     </message>
 </context>
 <context>
@@ -564,35 +564,35 @@
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">アナログエンコーダー</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">トライアルライセンス</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">アナログライセンス</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">プロフェッショナルライセンス</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">エッジライセンス</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vmaxライセンス</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">アナログエンコーダーライセンス</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ビデオウォールライセンス</translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
@@ -604,7 +604,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無効な署名</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -612,11 +612,11 @@
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無効なカスタマイズ</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無効なタイプ</translation>
     </message>
 </context>
 <context>
@@ -651,19 +651,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ライセンスキーのアクティベートエラー　データベースエラーが発生しました.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無効なライセンスキーが入力されました　サポート窓口に問合せて正しいライセンスキーを入力してください.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">互換性のないライセンスキーを入力しました　サポート窓口にお問合せ下さい.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">このライセンスキーはハードウェアID {{hwid}}  {{time}} に既にアクティベートされています..</translation>
     </message>
 </context>
 <context>
@@ -717,15 +717,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">トライアルライセンス</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">以下にライセンス:</translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無償ライセンス</translation>
     </message>
 </context>
 <context>
@@ -905,11 +905,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ストレージが一杯です</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ストレージが構成されていません</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>
@@ -966,11 +966,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">オープンCLトランスコードが実装されていません</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未知のトランスコード手段</translation>
     </message>
 </context>
 <context>

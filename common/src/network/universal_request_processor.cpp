@@ -12,7 +12,7 @@
 #include "http/custom_headers.h"
 #include "utils/network/flash_socket/types.h"
 #include "audit/audit_manager.h"
-
+#include <utils/common/model_functions.h>
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 //static const int AUTHORIZED_TIMEOUT = 60 * 1000;
@@ -74,15 +74,19 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         QElapsedTimer t;
         t.restart();
         AuthMethod::Value usedMethod = AuthMethod::noAuth;
-        AuthResult authResult;
-        while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &usedMethod)) != Auth_OK)
+        Qn::AuthResult authResult;
+        while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &usedMethod)) != Qn::Auth_OK)
         {
+            nx_http::insertOrReplaceHeader(
+                &d->response.headers,
+                nx_http::HttpHeader( Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(authResult).toUtf8() ) );
+
             int retryThreshold = 0;
-            if (authResult == Auth_WrongDigest)
+            if (authResult == Qn::Auth_WrongDigest)
                 retryThreshold = MAX_AUTH_RETRY_COUNT;
             else if (d->authenticatedOnce)
                 retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
-            if (retryCount >= retryThreshold && !logReported && authResult != Auth_WrongInternalLogin)
+            if (retryCount >= retryThreshold && !logReported && authResult != Qn::Auth_WrongInternalLogin)
             {   
                 logReported = true;
                 auto session = authSession();
@@ -126,8 +130,9 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
                 d->response.messageBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
                 contentEncoding );
 
-            if (++retryCount > MAX_AUTH_RETRY_COUNT)
+            if (++retryCount > MAX_AUTH_RETRY_COUNT) {
                 return false;
+            }
             while (t.elapsed() < AUTH_TIMEOUT && d->socket->isConnected()) 
             {
                 if (readRequest()) {
