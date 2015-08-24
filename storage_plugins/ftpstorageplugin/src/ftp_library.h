@@ -270,6 +270,7 @@ namespace nx_spl
     {
         friend class aux::PluginRefCounter<FtpStorageFactory>;
     public:
+        FtpStorageFactory();
         // currently unimplemented
         virtual const char** STORAGE_METHOD_CALL findAvailable() const override;
 

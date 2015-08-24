@@ -84,7 +84,7 @@ public:
 
     void setAuditHandle(const AuditHandle& handle) { m_auditHandle = handle; }
 
-    void copyLastGopFromCamera(QnVideoCamera* camera)
+    void copyLastGopFromCamera(const QnVideoCameraPtr& camera)
     {
         CLDataQueue tmpQueue(20);
         camera->copyLastGop(true, 0, tmpQueue, 0);
@@ -543,7 +543,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
         bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
+        auto camera = qnCameraPool->getVideoCamera(resource);
 
         //QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
         //if (camRes && camRes->isAudioEnabled())

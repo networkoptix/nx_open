@@ -172,14 +172,6 @@
         <translation>Server &quot;%1&quot; bắt đầu</translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>Server &quot;%1&quot; có vấn đề giấy phép</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>Một sự kiện chưa biết</translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation>biến cố：%1</translation>
     </message>
@@ -192,16 +184,8 @@
         <translation>nơi：%1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>Nhập các cổng giao tiếp：%1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>lý do：%1</translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
-        <translation>xung đột địa chỉ：%1</translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -262,10 +246,6 @@
         <translation>RTP Phát hiện mất gói tin.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>máy chủ bị gián đoạn.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>Bắt đầu sau khi tai nạn máy chủ.</translation>
     </message>
@@ -305,16 +285,32 @@
         <source>%1 --&gt; %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished">Một sự kiện chưa biết</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished">Nhập các cổng giao tiếp：%1</translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished">xung đột địa chỉ：%1</translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
         <source>OK</source>
         <translation>xác định</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Trái phép. nơi %1.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -436,6 +432,10 @@
         <source>Parameters:</source>
         <translation>tham số:</translation>
     </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished">Trái phép. nơi %1.</translation>
+    </message>
 </context>
 <context>
     <name>QnCommandLineParser</name>
@@ -451,12 +451,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>thực hiện Windows Explorer thất bại</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>Không thể tìm thấy con đường thực hiện explorer.exe của Windows Explorer.</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished">thực hiện Windows Explorer thất bại</translation>
     </message>
 </context>
 <context>
@@ -470,12 +470,12 @@
         <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished">Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>Không thể khởi tạo bộ giải mã âm thanh.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished">Không thể khởi tạo bộ giải mã âm thanh.</translation>
     </message>
 </context>
 <context>
@@ -512,8 +512,8 @@
         <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>Không thể khởi tạo bộ mã hóa video.</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished">Không thể khởi tạo bộ mã hóa video.</translation>
     </message>
 </context>
 <context>
@@ -539,60 +539,12 @@
         <translation>Vmax</translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>phép loại suy encoder</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>bức tường video</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>giấy phép thử nghiệm</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>phép loại suy giấy phép</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>giấy phép chuyên nghiệp</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>giấy phép cạnh</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>giấy phép Vmax</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>giấy phép phép loại suy encoder</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>Giấy phép bức tường video</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>chữ ký không hợp lệ</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>Server với ID phần cứng cần thiết không được tìm thấy</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>tùy biến không hợp lệ</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>hết hạn</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>kiểu không hợp lệ</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -611,12 +563,60 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module licenses</source>
+        <source>Analog Encoder</source>
+        <translation type="unfinished">phép loại suy encoder</translation>
+    </message>
+    <message>
+        <source>Trial Licenses</source>
+        <translation type="unfinished">giấy phép thử nghiệm</translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished">phép loại suy giấy phép</translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished">giấy phép chuyên nghiệp</translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished">giấy phép cạnh</translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished">giấy phép Vmax</translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished">giấy phép phép loại suy encoder</translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished">Giấy phép bức tường video</translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start licenses</source>
+        <source>Start Licenses</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalide Signature</source>
+        <translation type="unfinished">chữ ký không hợp lệ</translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished">tùy biến không hợp lệ</translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
+        <translation type="unfinished">kiểu không hợp lệ</translation>
     </message>
 </context>
 <context>
@@ -646,24 +646,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi cơ sở dữ đã xảy ra.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Dữ liệu không hợp lệ nhận được. Hãy liên hệ với nhóm hỗ trợ để báo cáo vấn đề.</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished">Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi cơ sở dữ đã xảy ra.</translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished">Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
 </context>
 <context>
@@ -708,24 +708,24 @@
         <translation>không biết</translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>miễn phí bản quyền</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>Phần cứng ID:</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>giấy phép thử nghiệm</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>Licensed to:</translation>
-    </message>
-    <message>
         <source>Watermark: </source>
         <translation>watermark:</translation>
+    </message>
+    <message>
+        <source>Trial License</source>
+        <translation type="unfinished">giấy phép thử nghiệm</translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished">Licensed to:</translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished">miễn phí bản quyền</translation>
     </message>
 </context>
 <context>
@@ -852,20 +852,8 @@
         <translation>Lỗi trong khi gửi email</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>Lưu trữ đầy</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>Thiết bị lưu trữ không được thiết lập</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>Địa chỉ email không được thiết lập cho người dùng %1</translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>Nhiều máy chủ có thời gian khác nhau và thời gian chính xác không thể được phát hiện tự động.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -914,6 +902,18 @@
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>Xây dựng lại chỉ mục lưu trữ được hoàn thành trên máy chủ sau đây:</translation>
+    </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished">Lưu trữ đầy</translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished">Thiết bị lưu trữ không được thiết lập</translation>
+    </message>
+    <message>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -965,12 +965,12 @@
         <translation>Chế độ chuyển mã không rõ.</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>OpenCL chuyển mã không được thực hiện</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished">OpenCL chuyển mã không được thực hiện</translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>Cách chuyển mã Unknown</translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished">Cách chuyển mã Unknown</translation>
     </message>
 </context>
 <context>

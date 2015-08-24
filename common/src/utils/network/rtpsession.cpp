@@ -758,7 +758,7 @@ const QByteArray& RTPSession::getSdp() const
     return m_sdp;
 }
 
-//===================================================================
+// ===================================================================
 
 QByteArray RTPSession::calcDefaultNonce() const
 {
@@ -1884,7 +1884,7 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
                 m_auth,
                 response,
                 &request,
-                &m_rtspAuthCtx ) != Auth_OK)
+                &m_rtspAuthCtx ) != Qn::Auth_OK)
             return false;
     }
 

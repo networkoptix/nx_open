@@ -76,7 +76,7 @@ static std::array<LicenseCompatibility, 19> compatibleLicenseType =
 /************************************************************************/
 /* QnLicenseUsageHelper                                                 */
 /************************************************************************/
-QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /*= NULL*/):
+QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /* = NULL*/):
     base_type(parent)
 {
 
@@ -269,16 +269,16 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
     QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
 
     if(messageId == lit("DatabaseError")) {
-        message = tr("There was a problem activating your license key. Database error has occurred.");  //TODO: Feature #3629 case J
+        message = tr("There was a problem activating your license key. A database error has occurred.");  //TODO: Feature #3629 case J
     } else if(messageId == lit("InvalidData")) {
         message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
     } else if(messageId == lit("InvalidKey")) {
         message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
-            "If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.");
+            "If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.");
     } else if(messageId == lit("InvalidBrand")) {
-        message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
+        message = tr("You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.");
     } else if(messageId == lit("AlreadyActivated")) {
-        message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.");
+        message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.");
     }
 
     return Mustache::renderTemplate(message, arguments);
@@ -288,7 +288,7 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
 /* QnCamLicenseUsageWatcher                                             */
 /************************************************************************/
 
-QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /*= NULL*/):
+QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /* = NULL*/):
     base_type(parent)
 {
     init(QnVirtualCameraResourcePtr());
@@ -427,7 +427,7 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
 /************************************************************************/
 /* QnVideoWallLicenseUsageWatcher                                       */
 /************************************************************************/
-QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent /*= NULL*/):
+QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent /* = NULL*/):
     base_type(parent)
 {
     auto updateIfNeeded = [this](const QnResourcePtr &resource) {

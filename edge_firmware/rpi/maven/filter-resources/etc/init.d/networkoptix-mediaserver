@@ -20,6 +20,7 @@ BIN_PATH=$INSTALL_ROOT/bin/$MODULE_NAME
 RUN_ARGS="-e --disable-crash-handler"
 export LD_LIBRARY_PATH=$INSTALL_ROOT/lib/
 export VMS_PLUGIN_DIR=$INSTALL_ROOT/bin/plugins/
+export SASL_PATH=LD_LIBRARY_PATH/sasl2/
 
 RUNNING_APP_PID="`pidof $MODULE_NAME`"
 

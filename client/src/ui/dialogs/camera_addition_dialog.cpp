@@ -13,6 +13,7 @@
 #include <ui/style/warning_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -26,103 +27,6 @@ namespace {
     const int portAuto = 0;
 }
 
-
-// -------------------------------------------------------------------------- //
-// QnCheckBoxedHeaderView
-// -------------------------------------------------------------------------- //
-QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(QWidget *parent):
-    base_type(Qt::Horizontal, parent),
-    m_checkState(Qt::Unchecked)
-{
-    connect(this, &QnCheckBoxedHeaderView::sectionClicked, this, &QnCheckBoxedHeaderView::at_sectionClicked);
-}
-
-Qt::CheckState QnCheckBoxedHeaderView::checkState() const {
-    return m_checkState;
-}
-
-void QnCheckBoxedHeaderView::setCheckState(Qt::CheckState state) {
-    if (state == m_checkState)
-        return;
-    m_checkState = state;
-    emit checkStateChanged(state);
-}
-
-void QnCheckBoxedHeaderView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const {
-    base_type::paintSection(painter, rect, logicalIndex);
-
-    if (logicalIndex == CheckBoxColumn) {
-        if (!rect.isValid())
-            return;
-        QStyleOptionButton opt;
-        opt.initFrom(this);
-
-        QStyle::State state = QStyle::State_Raised;
-        if (isEnabled())
-            state |= QStyle::State_Enabled;
-        if (window()->isActiveWindow())
-            state |= QStyle::State_Active;
-
-        switch(m_checkState) {
-        case Qt::Checked:
-            state |= QStyle::State_On;
-            break;
-        case Qt::Unchecked:
-            state |= QStyle::State_Off;
-            break;
-        default:
-            state |= QStyle::State_NoChange;
-            break;
-        }
-
-        opt.rect = rect.adjusted(4, 0, 0, 0);
-        opt.state |= state;
-        opt.text = QString();
-        style()->drawControl(QStyle::CE_CheckBox, &opt, painter, this);
-        return;
-    }
-}
-
-QSize QnCheckBoxedHeaderView::sectionSizeFromContents(int logicalIndex) const {
-    QSize size = base_type::sectionSizeFromContents(logicalIndex);
-    if (logicalIndex != CheckBoxColumn)
-        return size;
-    size.setWidth(15);
-    return size;
-}
-
-void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
-    if (logicalIndex != CheckBoxColumn)
-        return;
-    if (m_checkState != Qt::Checked)
-        setCheckState(Qt::Checked);
-    else
-        setCheckState(Qt::Unchecked);
-}
-
-void QnCheckBoxedHeaderView::mouseReleaseEvent(QMouseEvent *e)
-{
-    int pos = orientation() == Qt::Horizontal ? e->x() : e->y();
-    int section = logicalIndexAt(pos);
-    if (section == 0) {
-        emit sectionClicked(section);
-    }
-    else {
-        base_type::mouseReleaseEvent(e);
-    }
-}
-
-void QnCheckBoxedHeaderView::mousePressEvent(QMouseEvent *e)
-{
-    int pos = orientation() == Qt::Horizontal ? e->x() : e->y();
-    int section = logicalIndexAt(pos);
-    if (section != 0)
-        base_type::mousePressEvent(e);
-}
-
-// -------------------------------------------------------------------------- //
-// QnCameraAdditionDialog
-// -------------------------------------------------------------------------- //
 QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::CameraAdditionDialog),
@@ -147,7 +51,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::ManualCameraAddition_Help);
 
-    m_header = new QnCheckBoxedHeaderView(this);
+    m_header = new QnCheckBoxedHeaderView(CheckBoxColumn, this);
     ui->camerasTable->setHorizontalHeader(m_header);
     m_header->setVisible(true);
     m_header->setSectionResizeMode(CheckBoxColumn, QHeaderView::ResizeToContents);
@@ -580,7 +484,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         }
 
         if (!endAddr.isInSubnet(startAddr, 8)){
-            ui->validateLabelSearch->setText(tr("Specified IP address range contains more than 255 addresses."));
+            ui->validateLabelSearch->setText(tr("The specified IP address range has more than 255 addresses."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
@@ -588,7 +492,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         QString userInput = ui->singleCameraLineEdit->text().simplified();
         QUrl url = QUrl::fromUserInput(userInput);
         if (!url.isValid()) {
-            ui->validateLabelSearch->setText(tr("Camera address field must contain valid URL, IP address or RTSP link."));
+            ui->validateLabelSearch->setText(tr("Camera address field must contain a valid URL, IP address, or RTSP link."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
@@ -611,7 +515,7 @@ void QnCameraAdditionDialog::at_stopScanButton_clicked() {
         return; //TODO: #GDM #CameraAddition do something
 
     m_server->apiConnection()->searchCameraAsyncStop(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
-    ui->progressBar->setFormat(tr("Finishing search..."));
+    ui->progressBar->setFormat(tr("Finished searching..."));
     ui->progressBar->setMaximum(1);
     ui->progressBar->setValue(0);
     m_processUuid = QnUuid();
@@ -634,7 +538,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
         camerasToAdd << info;
     }
     if (camerasToAdd.empty()){
-        QMessageBox::information(this, tr("No cameras selected"), tr("Please select at least one camera"));
+        QMessageBox::information(this, tr("No cameras selected."), tr("Please select at least one camera."));
         return;
     }
 
@@ -706,12 +610,12 @@ void QnCameraAdditionDialog::at_server_statusChanged(const QnResourcePtr &resour
             break;
         case Searching:
             setState(InitialOffline);
-            updateServerStatus(tr("Server went offline, search aborted."));
+            updateServerStatus(tr("Server went offline - search aborted."));
             break;
         case CamerasFound:
         case Adding:
             setState(CamerasOffline);
-            updateServerStatus(tr("Server went offline, cameras can be added when the server will be available."));
+            updateServerStatus(tr("Server is offline, cameras can only be added to an online server."));
             break;
         default:
             break;
@@ -737,11 +641,11 @@ void QnCameraAdditionDialog::at_resPool_resourceRemoved(const QnResourcePtr &res
     setServer(QnMediaServerResourcePtr());
     switch (oldState) {
     case Searching:
-        updateServerStatus(tr("Server was removed, search aborted."));
+        updateServerStatus(tr("Server has been removed - search aborted."));
         break;
     case CamerasFound:
     case Adding:
-        updateServerStatus(tr("Server was removed, cameras cannot be added anymore."));
+        updateServerStatus(tr("Server has been removed - cannot add cameras."));
         break;
     default:
         break;
@@ -756,7 +660,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 
     if (status != 0) {
         setState(Initial);
-        QMessageBox::warning(this, tr("Error"), tr("Error while searching cameras."));
+        QMessageBox::warning(this, tr("Error"), tr("Error while searching for camera(s)."));
         return;
     }
 

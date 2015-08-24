@@ -1,5 +1,5 @@
 'use strict';
-var JSLoaderFragment = {
+/*var JSLoaderFragment = {
 
     requestFragment : function(instanceId,url, resourceLoadedFlashCallback, resourceFailureFlashCallback) {
         if(!this.flashObject) {
@@ -85,7 +85,7 @@ var JSLoaderPlaylist = {
         ////console.log("An error occurred while transferring the file :" + oEvent.target.status);
         this.binding.flashObject[this.resourceFailureFlashCallback](res);
     }
-};
+};*/
 
 
 
@@ -109,7 +109,7 @@ var flashlsAPI = new (function(){
             swliveconnect:true,
             allowScriptAccess:"always",
             bgcolor:"#1C2327",
-            allowFullScreen:true,
+            allowFullScreen:false,
             wmode:"window",
             FlashVars:"callback=flashlsCallback"
         },
@@ -123,7 +123,9 @@ var flashlsAPI = new (function(){
             class:""*/
         }
     };
-
+    this.kill = function(){
+        this.flashObject = null;
+    };
     this.ready = function(){
         return !!this.flashObject;
     };
@@ -134,6 +136,7 @@ var flashlsAPI = new (function(){
 
     this.getFlashMovieObject = function (){
         var movieName = flashParameters.name || this.element;
+
         if (window.document[movieName])
         {
             return window.document[movieName];
@@ -151,6 +154,15 @@ var flashlsAPI = new (function(){
     this.embedHandler = function (e){
         if(!this.flashObject) {
             this.flashObject = this.getFlashMovieObject(); //e.ref is a pointer to the <object>
+
+            if(Config.allowDebugMode && Config.debug.video){
+                console.log("embed handler");
+                console.log(this.flashObject);
+            }
+
+            if(window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.browserMajorVersion<=10) { // Force disabling hardware acceleration for IE9, IE10
+                this.playerSetUseHardwareVideoDecoder(false);
+            }
             this.readyHandler(this);
         }
     };
@@ -162,9 +174,6 @@ var flashlsAPI = new (function(){
         this.readyHandler = readyHandler;
         this.errorHandler = errorHandler;
         this.positionHandler = positionHandler;
-
-
-        //console.log("flashls init",readyHandler);
 
         /*swfobject.embedSWF(
             flashParameters.player,
@@ -360,6 +369,7 @@ var flashlsAPI = new (function(){
         return this.flashObject.getAutoLevelCapping();
     };
 
+
 })();
 var timer = 0;
 flashlsAPI.flashlsEvents = {
@@ -483,18 +493,19 @@ flashlsAPI.flashlsEvents = {
         var event = {time : new Date() - jsLoadDate, type : "ID3Data", id3data: atob(ID3Data)};
 
         //console.log("id3Updated",event);
-    },
+    }
+    /*,
     requestPlaylist: JSLoaderPlaylist.requestPlaylist.bind(JSLoaderPlaylist),
     abortPlaylist: JSLoaderPlaylist.abortPlaylist.bind(JSLoaderPlaylist),
     requestFragment: JSLoaderFragment.requestFragment.bind(JSLoaderFragment),
     abortFragment: JSLoaderFragment.abortFragment.bind(JSLoaderFragment)
+    */
 };
 
 
 window.flashlsCallback = function(eventName, args) {
-    if(eventName!="position") {
-        //console.log("flashlsCallback", eventName, args);
-    }
     flashlsAPI.embedHandler();
-    flashlsAPI.flashlsEvents[eventName].apply(null, args);
+    if(flashlsAPI.flashlsEvents[eventName]) {
+        flashlsAPI.flashlsEvents[eventName].apply(null, args);
+    }
 };

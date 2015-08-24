@@ -172,14 +172,6 @@
         <translation>服务器 &quot;%1&quot;已开启</translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>服务器 &quot;%1&quot; 出现授权问题</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>发生未知事件</translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation>事件: %1</translation>
     </message>
@@ -192,16 +184,8 @@
         <translation>网址: %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>报警输入端口: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>原因: %1</translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
-        <translation>冲突IP地址:: %1</translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -278,10 +262,6 @@
         <translation>HDD / SSD磁盘%1已满.磁盘包含太多不是由VMS管理的数据.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>服务器停止.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>服务器停止后启动.</translation>
     </message>
@@ -309,6 +289,26 @@
         <source>%1 --&gt; %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished">发生未知事件</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished">报警输入端口: %1</translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished">冲突IP地址:: %1</translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -319,10 +319,6 @@
     <message>
         <source>OK</source>
         <translation>确定</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>未经授权。Url %1.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -440,6 +436,10 @@
         <source>Parameters:</source>
         <translation>参数:</translation>
     </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished">未经授权。Url %1.</translation>
+    </message>
 </context>
 <context>
     <name>QnCommandLineParser</name>
@@ -455,12 +455,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>启动Windows浏览器失败</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>启动Windows浏览器时无法找到explorer.exe。</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished">启动Windows浏览器失败</translation>
     </message>
 </context>
 <context>
@@ -474,12 +474,12 @@
         <translation>%1无法发现音频编码器.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>无法初始化音频编码器.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished">无法初始化音频编码器.</translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>无法初始化音频解码器.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished">无法初始化音频解码器.</translation>
     </message>
 </context>
 <context>
@@ -516,8 +516,8 @@
         <translation>%1无法发现音频编码器.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>无法初始化视频编码器</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished">无法初始化视频编码器</translation>
     </message>
 </context>
 <context>
@@ -543,60 +543,12 @@
         <translation>Vmax</translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>模拟编码器</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>电视墙</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>测试授权</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>模拟授权</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>专业版授权</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>edge授权</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>Vmax许可</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>模拟编码器授权</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>电视墙授权</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>无效签名</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>服务器所需的硬件ID无法找到</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>无效定制</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>过期</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>无效类型</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -615,12 +567,60 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module licenses</source>
+        <source>Analog Encoder</source>
+        <translation type="unfinished">模拟编码器</translation>
+    </message>
+    <message>
+        <source>Trial Licenses</source>
+        <translation type="unfinished">测试授权</translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished">模拟授权</translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished">专业版授权</translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished">edge授权</translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished">Vmax许可</translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished">模拟编码器授权</translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished">电视墙授权</translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start licenses</source>
+        <source>Start Licenses</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalide Signature</source>
+        <translation type="unfinished">无效签名</translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished">无效定制</translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
+        <translation type="unfinished">无效类型</translation>
     </message>
 </context>
 <context>
@@ -651,25 +651,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translatorcomment>授权码出现问题，发生数据库错误。</translatorcomment>
-        <translation>There was a problem activating your license key. Database error has occurred.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>授权码出现问题，接收到无效数据，请联系技术支持报告此问题。</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>输入授权无效，请确认输入的授权是否正确。如果问题仍存在，请联系技术支持确认授权码是否有效或获取有效授权码。</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished">There was a problem activating your license key. Database error has occurred.</translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>当前激活的授权码不可用，请联系技术支持获取有效授权码。</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished">输入授权无效，请确认输入的授权是否正确。如果问题仍存在，请联系技术支持确认授权码是否有效或获取有效授权码。</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>此授权码已在 {{time}}激活过硬件ID{{hwid}} ，请联系技术支持获取有效的授权码。</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">当前激活的授权码不可用，请联系技术支持获取有效授权码。</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">此授权码已在 {{time}}激活过硬件ID{{hwid}} ，请联系技术支持获取有效的授权码。</translation>
     </message>
 </context>
 <context>
@@ -714,24 +713,24 @@
         <translation>未知</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>试用授权</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>硬件ID:</translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>免费许可</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>授权给:</translation>
-    </message>
-    <message>
         <source>Watermark: </source>
         <translation>水印:</translation>
+    </message>
+    <message>
+        <source>Trial License</source>
+        <translation type="unfinished">试用授权</translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished">授权给:</translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished">免费许可</translation>
     </message>
 </context>
 <context>
@@ -859,20 +858,8 @@
         <translation>发送邮件错误</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>存储空间已满</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>未设置存储空间</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>未给用户 %1设置邮箱地址</translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>多服务器上的时间不一致，无法自动获取到准确时间。</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -921,6 +908,18 @@
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>以下服务器已完成录像索引重建:</translation>
+    </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished">存储空间已满</translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished">未设置存储空间</translation>
+    </message>
+    <message>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -972,12 +971,12 @@
         <translation>未知编码转换方法.</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>OpenCL代码转换器未执行</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished">OpenCL代码转换器未执行</translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>未知编码转换方法</translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished">未知编码转换方法</translation>
     </message>
 </context>
 <context>

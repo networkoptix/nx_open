@@ -642,7 +642,7 @@ void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage)
     if (QnScreenRecorder::isSupported())
         action(Qn::ToggleScreenRecordingAction)->setChecked(false);
 
-    QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to the following error: %1").arg(errorMessage));
+    QMessageBox::warning(display()->view(), tr("Warning"), tr("Unable to start recording due to the following error: %1").arg(errorMessage));
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
@@ -668,7 +668,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 
             QFile::remove(filePath);
             if (!QFile::rename(recordedFileName, filePath)) {
-                QString message = tr("Could not overwrite file '%1'. Please try another name.").arg(filePath);
+                QString message = tr("Could not overwrite file '%1'. Please try a different name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
                 QMessageBox::warning(display()->view(), tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
                 continue;
@@ -1442,7 +1442,7 @@ void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
         }
         return;
     }
-    m_tourModeHintLabel = QnGraphicsMessageBox::information(tr("Press any key to stop the tour"));
+    m_tourModeHintLabel = QnGraphicsMessageBox::information(tr("Press any key to stop the tour."));
     connect(m_tourModeHintLabel, SIGNAL(finished()), this, SLOT(at_tourModeLabel_finished()));
 }
 

@@ -16,7 +16,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 
-QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget *parent /*= NULL*/):
+QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget *parent /* = NULL*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::GeneralSystemAdministrationWidget)

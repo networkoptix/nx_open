@@ -335,7 +335,7 @@ bool QnPlAreconVisionResource::isH264() const
     return getProperty(lit("Codec")) == lit("H.264");
 }
 
-//===============================================================================================================================
+// ===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString &param, QVariant &val)
 {
     QUrl devUrl(getUrl());

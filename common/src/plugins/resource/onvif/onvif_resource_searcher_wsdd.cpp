@@ -578,6 +578,9 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
         manufacturer = lit("ISD");
         name = name.mid(4);
     }
+    else if (name == lit("ISD")) {
+        qSwap(name, manufacturer);
+    }
     else if (lowerName == lit("networkcamera") && manufacturer.isEmpty()) {
         name.clear(); // some DW cameras report invalid model in multicast and empty vendor
     }

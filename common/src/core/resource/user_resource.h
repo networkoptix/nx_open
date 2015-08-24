@@ -55,9 +55,9 @@ public:
     /*!
         \return \a true if password expiration timestamp has been increased
     */
-    bool doPasswordProlongation();
+    Qn::AuthResult doPasswordProlongation();
     //!Check \a digest validity with external authentication service (LDAP currently)
-    bool checkDigestValidity( const QByteArray& digest );
+    Qn::AuthResult checkDigestValidity( const QByteArray& digest );
 
 signals:
     void hashChanged(const QnResourcePtr &resource);

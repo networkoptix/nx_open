@@ -172,14 +172,6 @@
         <translation>&quot;%1&quot; 서버 시작 됨</translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>&quot;%1&quot; 서버 인증키 이슈</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>알지 못하는 이벤트 발생</translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation>이벤트: %1</translation>
     </message>
@@ -192,16 +184,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>입력포트: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>원인: %1</translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
-        <translation>주소 충돌: %1</translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -262,10 +246,6 @@
         <translation>RTP 패킷 손실이 발생함.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>서버 종료 됨.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>서버 비정상 종료 후 시작.</translation>
     </message>
@@ -305,16 +285,32 @@
         <source>%1 --&gt; %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished">알지 못하는 이벤트 발생</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished">입력포트: %1</translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished">주소 충돌: %1</translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
         <source>OK</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>%1. Url에 대한 권한이 없습니다.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -436,6 +432,10 @@
         <source>Parameters:</source>
         <translation>변수:</translation>
     </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished">%1. Url에 대한 권한이 없습니다.</translation>
+    </message>
 </context>
 <context>
     <name>QnCommandLineParser</name>
@@ -451,12 +451,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>윈도우 탐색기의 실행이 실패함</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>Windows 탐색기를 시작 하는 경로에서 explorer.exe를 찾을 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished">윈도우 탐색기의 실행이 실패함</translation>
     </message>
 </context>
 <context>
@@ -470,12 +470,12 @@
         <translation>%1 codec의 인코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished">오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>오디오 디코더를 초기화 할 수 없습니다.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished">오디오 디코더를 초기화 할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -512,8 +512,8 @@
         <translation>%1 codec의 인코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished">오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -539,60 +539,12 @@
         <translation>Vmax</translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>아날로그 인코더</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>비디오 월</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>기간제한 인증키</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>아날로그 인증키</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>정식 인증키</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>Edge 인증키</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>Vmax 인증키</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>아날로그 인코더 인증키</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>비디오 월 인증키</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>유효하지 않은 서명</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>서버의 하드웨어 ID를 찾을 수 없습니다</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>유효하지 않은 변경</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>만료</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>유효하지 않은 방식</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -611,12 +563,60 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module licenses</source>
+        <source>Analog Encoder</source>
+        <translation type="unfinished">아날로그 인코더</translation>
+    </message>
+    <message>
+        <source>Trial Licenses</source>
+        <translation type="unfinished">기간제한 인증키</translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished">아날로그 인증키</translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished">정식 인증키</translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished">Edge 인증키</translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished">Vmax 인증키</translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished">아날로그 인코더 인증키</translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished">비디오 월 인증키</translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start licenses</source>
+        <source>Start Licenses</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalide Signature</source>
+        <translation type="unfinished">유효하지 않은 서명</translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished">유효하지 않은 변경</translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
+        <translation type="unfinished">유효하지 않은 방식</translation>
     </message>
 </context>
 <context>
@@ -646,24 +646,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>인증키를 등록하는 동안 문제가 발생하였습니다. 데이터 베이스에서 오류가 발생했습니다.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>인증키를 등록하는 동안 문제가 발생하였습니다. 유효하지 않은 데이터가 전달되었으니 관리자에게 연락하십시오.</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>입력한 인증키가 유효하지 않습니다. 입력한 인증키가 맞는지 다시 확인해 주십시오. 문제가 지속 될 경우 관리자를 통해 정상적인 인증키인지 확인하십시오.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished">인증키를 등록하는 동안 문제가 발생하였습니다. 데이터 베이스에서 오류가 발생했습니다.</translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>부정확한 인증키의 등록을 시도 중입니다. 관리자를 통해 유효한 인증키를 발급 받으십시오.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished">입력한 인증키가 유효하지 않습니다. 입력한 인증키가 맞는지 다시 확인해 주십시오. 문제가 지속 될 경우 관리자를 통해 정상적인 인증키인지 확인하십시오.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>{{hwid}} on {{time}}에서 이미 사용된 인증 키입니다. 관리자를 통해 유효한 인증키를 발급 받으세요.</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">부정확한 인증키의 등록을 시도 중입니다. 관리자를 통해 유효한 인증키를 발급 받으십시오.</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">{{hwid}} on {{time}}에서 이미 사용된 인증 키입니다. 관리자를 통해 유효한 인증키를 발급 받으세요.</translation>
     </message>
 </context>
 <context>
@@ -708,24 +708,24 @@
         <translation>알수 없음</translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>무료 인증키</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>하드웨어 ID:</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>기간한정 인증키</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>인증키:</translation>
-    </message>
-    <message>
         <source>Watermark: </source>
         <translation>파일변조:</translation>
+    </message>
+    <message>
+        <source>Trial License</source>
+        <translation type="unfinished">기간한정 인증키</translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished">인증키:</translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished">무료 인증키</translation>
     </message>
 </context>
 <context>
@@ -852,20 +852,8 @@
         <translation>이메일을 보내는 동안 오류 발생</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>저장기의 용량이 꽉참</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>저장기 구성이 되어있지 않음</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>%1 사용자에 대한 이메일 주소가 설정되지 않음</translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>여러 서버는 각각 다른 시간을 가지고 있어 올바른 시간을 자동으로 감지 될 수 없습니다.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -914,6 +902,18 @@
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>저장기 인덱스 재 설정이 완료된 서버 목록:</translation>
+    </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished">저장기의 용량이 꽉참</translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished">저장기 구성이 되어있지 않음</translation>
+    </message>
+    <message>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -965,12 +965,12 @@
         <translation>알수없는 변환 방법.</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>OpenCLTranscode가 구현되어있지 않음</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished">OpenCLTranscode가 구현되어있지 않음</translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>알수없는 변환 방법</translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished">알수없는 변환 방법</translation>
     </message>
 </context>
 <context>

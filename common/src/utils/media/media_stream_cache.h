@@ -5,10 +5,7 @@
 #ifndef MEDIASTREAMCACHE_H
 #define MEDIASTREAMCACHE_H
 
-#include <deque>
-#include <map>
-#include <set>
-#include <vector>
+#include <memory>
 #include <functional> /* For std::function. */
 
 #include <QtCore/QElapsedTimer>
@@ -17,6 +14,11 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 
 
+
+namespace detail
+{
+    class MediaStreamCache;
+}
 
 //!Caches specified duration of media stream for later use
 /*!
@@ -46,7 +48,7 @@ public:
         quint64 currentPos() const;
 
     private:
-        MediaStreamCache* m_cache;
+        std::weak_ptr<detail::MediaStreamCache> m_sharedCache;
         quint64 m_startTimestamp;
         bool m_firstFrame;
         //!timestamp of previous given frame
@@ -58,6 +60,7 @@ public:
         \param cacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis is dropped
     */
     MediaStreamCache( unsigned int cacheSizeMillis );
+    virtual ~MediaStreamCache();
 
     //!Implementation of QnAbstractDataReceptor::canAcceptData
     virtual bool canAcceptData() const override;
@@ -95,7 +98,7 @@ public:
     /*!
         \return id of event receiver
     */
-    int addKeyFrameEventReceiver( const std::function<void (quint64)>& keyFrameEventReceiver );
+    int addKeyFrameEventReceiver( std::function<void (quint64)> keyFrameEventReceiver );
     /*!
         \param receiverID id received from \a MediaStreamCache::addKeyFrameEventReceiver
     */
@@ -114,47 +117,8 @@ public:
     //!Time (millis) from last usage of this object
     qint64 inactivityPeriod() const;
 
-    struct MediaPacketContext
-    {
-        quint64 timestamp;
-        QnAbstractDataPacketPtr packet;
-        bool isKeyFrame;
-
-        MediaPacketContext() 
-        :
-            timestamp( 0 ),
-            isKeyFrame( false )
-        {
-        }
-
-        MediaPacketContext(
-            quint64 _timestamp,
-            QnAbstractDataPacketPtr _packet,
-            bool _isKeyFrame )
-        :
-            timestamp( _timestamp ),
-            packet( _packet ),
-            isKeyFrame( _isKeyFrame )
-        {
-        }
-    };
-
 private:
-    //!map<timestamp, pair<packet, key_flag> >
-    typedef std::deque<MediaPacketContext> PacketContainerType;
-
-    unsigned int m_cacheSizeMillis;
-    PacketContainerType m_packetsByTimestamp;
-    mutable QMutex m_mutex;
-    qint64 m_prevPacketSrcTimestamp;
-    //!In micros
-    quint64 m_currentPacketTimestamp;
-    size_t m_cacheSizeInBytes;
-    //!map<event receiver id, function>
-    std::map<int, std::function<void (quint64)> > m_eventReceivers;
-    int m_prevGivenEventReceiverID;
-    std::map<int, quint64> m_dataBlockings;
-    mutable QElapsedTimer m_inactivityTimer;
+    std::shared_ptr<detail::MediaStreamCache> m_sharedImpl;
 };
 
 #endif  //MEDIASTREAMCACHE_H

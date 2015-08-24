@@ -1,6 +1,6 @@
 <div class="videowindow">
 
-    <div class="camera-view-informer camera-loading" ng-if="loading && !debugMode">
+    <div class="camera-view-informer camera-loading" ng-if="loading" ng-hide="debugMode">
         <div class="camera-view-preloader camera-view-message-icon"></div>
     </div>
 
@@ -25,9 +25,14 @@
     </div>
 
 
-    <div class="camera-view-informer" ng-if="edgeNoWebm">
+    <div class="camera-view-informer" ng-if="ieNoWebm">
         Video cannot be played.<br>
         Please, install <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a> for Internet Explorer.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        Video cannot be played.<br>
+        Please, use Microsoft Edge or Google Chrome browsers.<br>
     </div>
 
     <div class="camera-view-informer" ng-if="errorLoading">
@@ -37,13 +42,11 @@
 
 
     <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading && !debugMode}">
-        <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
-                width="100%" height="100%"
-                id="flashvideo"
+        <objecter ng-id="'flashvideoembed'"
                 ng-name="'flashvideoembed'"
                 ng-source="flashSource"
                 ng-param="flashParam">
-        </object>
+        </objecter>
     </div>
 
     <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading && !debugMode}">

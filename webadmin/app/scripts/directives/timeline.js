@@ -15,14 +15,19 @@ angular.module('webadminApp')
             },
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
+
+                var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
+
+
                 var timelineConfig = {
                     initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
                     stickToLiveMs: 1000, // Value to stick viewpoert to Live - 1 second
                     maxMsPerPixel: 1000*60*60*24*365,   // one year per pixel - maximum view
-                    minMsPerPixel: 1, // Minimum level for zooming:
+                    minMsPerPixel: 10, // Minimum level for zooming:
+                    minMarkWidth: 1, // Minimum width for visible mark
 
                     zoomSpeed: 0.025, // Zoom speed for dblclick
-                    zoomAccuracy: 0.00001,
+                    zoomAccuracy: 0.01,
                     slowZoomSpeed: 0.01, // Zoom speed for holding buttons
                     maxVerticalScrollForZoom: 250, // value for adjusting zoom
                     maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
@@ -71,9 +76,8 @@ angular.module('webadminApp')
                     minChunkWidth: 1,
                     chunksBgColor:[34,57,37],
                     exactChunkColor: [58,145,30],
-                    loadingChunkColor: [58,145,30,0.5],
-
-                    blindChunkColor:  [255,128,128,0.5],
+                    loadingChunkColor: [0,255,255,0.3],
+                    blindChunkColor:  [255,0,0,0.3],
                     highlighChunkColor: [255,255,0,1],
 
                     scrollBarSpeed: 0.1, // By default - scroll by 10%
@@ -201,7 +205,7 @@ angular.module('webadminApp')
                     topLabelMarkerAttach:"top", // top, bottom
                     topLabelBgColor: [33,42,47],
                     topLabelBgOddColor: [43,56,63],
-                    topLabelPositionFix:0, //Vertical fix for position
+                    topLabelPositionFix:-2, //Vertical fix for position
                     topLabelFixed: true,
 
 
@@ -211,10 +215,10 @@ angular.module('webadminApp')
                         size:15,
                         weight:400,
                         face:"Roboto",
-                        color: [105,135,150] // Color for text for top labels
+                        color: [145,167,178] // Color for text for top labels
                     },
                     labelMarkerAttach:"top", // top, bottom
-                    labelMarkerColor:[83,112,127,0.6],//false
+                    labelMarkerColor:[105,135,150],//false
                     labelBgColor: [28,35,39],
                     labelPositionFix:5, //Vertical fix for position
                     labelMarkerHeight:20/110,
@@ -279,10 +283,11 @@ angular.module('webadminApp')
                     scope.viewportWidth = element.find(".viewport").width();
                     canvas.width  = scope.viewportWidth;
                     scope.scaleManager.setViewportWidth(scope.viewportWidth);
+                    $timeout(checkZoomButtons);
                 }
                 function initTimeline(){
                     var now = (new Date()).getTime();
-                    scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.start : (now - timelineConfig.initialInterval));
+                    scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd(now);
 
                     scope.zoomTo(1); // Animate full zoom out
@@ -302,12 +307,16 @@ angular.module('webadminApp')
 
                     drawLabels(context);
 
-                    drawOrCheckEvents(context);
+                    if(!debugEventsMode) {
+                        drawOrCheckEvents(context);
+                    }else{
+                        debugEvents(context);
+                    }
                     drawOrCheckScrollBar(context);
                     drawTimeMarker(context);
                     drawPointerMarker(context);
 
-                    //debugEvents(context);
+                    //
                 }
 
                 function blurColor(color,alpha){ // Bluring function [r,g,b] + alpha -> String
@@ -508,7 +517,16 @@ angular.module('webadminApp')
 
 
                     var levelIndex = Math.max(scope.scaleManager.levels.marks.index, targetLevels.marks.index); // Target level is lowest of visible
+
+                    // If it this point levelIndex is invisible (less than one pixel per mark) - skip it!
                     var level = RulerModel.levels[levelIndex]; // Actual calculating level
+                    var levelDetailizaion = level.interval.getMilliseconds();
+                    while( levelDetailizaion < timelineConfig.minMarkWidth * scope.scaleManager.msPerPixel)
+                    {
+                        levelIndex --;
+                        level = RulerModel.levels[levelIndex];
+                        levelDetailizaion = level.interval.getMilliseconds();
+                    }
 
                     var start = scope.scaleManager.alignStart(RulerModel.levels[levelIndex>0?(levelIndex-1):0]); // Align start by upper level!
                     var point = start;
@@ -517,7 +535,7 @@ angular.module('webadminApp')
                     var counter = 0;// Protection from neverending cycles.
 
                     while(point <= end && counter++ < 3000){
-                        var odd = bgColor!= bgOddColor || Math.round((point.getTime() / level.interval.getMilliseconds())) % 2 === 1; // add or even for zebra coloring
+                        var odd = bgColor!= bgOddColor || Math.round((point.getTime() / levelDetailizaion)) % 2 === 1; // add or even for zebra coloring
 
                         var pointLevelIndex = RulerModel.findBestLevelIndex(point, levelIndex);
 
@@ -561,11 +579,12 @@ angular.module('webadminApp')
                     var start1 = scope.scaleManager.alignStart(level);
                     var start = scope.scaleManager.alignStart(level);
                     var end = scope.scaleManager.alignEnd(level);
+                    var levelDetailizaion = level.interval.getMilliseconds();
 
 
                     var counter = 1000;
                     while(start <= end && counter-- > 0){
-                        var odd = Math.round((start.getTime() / level.interval.getMilliseconds())) % 2 === 1;
+                        var odd = Math.round((start.getTime() / levelDetailizaion)) % 2 === 1;
                         var pointLevelIndex = RulerModel.findBestLevelIndex(start);
                         var alpha = 1;
                         if(pointLevelIndex > taretLevelIndex){ //fade out
@@ -717,6 +736,7 @@ angular.module('webadminApp')
                     var start = scope.scaleManager.alignStart(level);
                     var end = scope.scaleManager.alignEnd(level);
 
+
                     if(scope.recordsProvider && scope.recordsProvider.chunksTree) {
                         // 1. Splice events
                         var events = scope.recordsProvider.getIntervalRecords(start, end, levelIndex);
@@ -734,23 +754,30 @@ angular.module('webadminApp')
                     var exactChunk = levelIndex == chunk.level;
                     var blur = 1;//chunk.level/(RulerModel.levels.length - 1);
 
-                    context.fillStyle = exactChunk? blurColor(timelineConfig.exactChunkColor,blur):blurColor(timelineConfig.loadingChunkColor,blur);
+                    context.fillStyle = blurColor(timelineConfig.exactChunkColor,blur);
 
-                    if(debug && targetLevelIndex == levelIndex){
-                        context.fillStyle = blurColor(timelineConfig.highlighChunkColor,1);
-                    }
-                    // TODO: uncomment debug here, we may very well have blind spots, we just need to test them
-                    if(/*debug &&*/ !chunk.level){ //blind spot!
-                        context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
-                    }
 
 
                     var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * scope.viewportHeight;
                     var height = timelineConfig.chunkHeight * scope.viewportHeight;
 
                     if(debug){
-                        top += (1+levelIndex)/RulerModel.levels.length * height;
+                        if(targetLevelIndex == levelIndex) {
+                            context.fillStyle = blurColor(timelineConfig.highlighChunkColor, 1);
+                        }
+
+                        if(levelIndex == chunk.level) { // not exact chunk
+                            context.fillStyle = blurColor(timelineConfig.loadingChunkColor,blur);
+                        }
+                        if(!chunk.level){ //blind spot!
+                            context.fillStyle = blurColor(timelineConfig.blindChunkColor,1);
+                        }
+
+                        top += (1+levelIndex) / RulerModel.levels.length * height;
                         height /= RulerModel.levels.length;
+
+                        top = Math.floor(top);
+                        height = Math.ceil(height);
                     }
 
                     context.fillRect(startCoordinate - timelineConfig.minChunkWidth/2,
@@ -1114,9 +1141,8 @@ angular.module('webadminApp')
                     return false;
                 }
                 function checkZoomButtons(){
-                    var zoom = scope.scaleManager.zoom();
-                    scope.disableZoomOut = zoom >= scope.scaleManager.fullZoomOutValue() - timelineConfig.zoomAccuracy;
-                    scope.disableZoomIn = zoom <= scope.scaleManager.fullZoomInValue() + timelineConfig.zoomAccuracy;
+                    scope.disableZoomOut = !scope.scaleManager.çheckZoomOut();
+                    scope.disableZoomIn =  !scope.scaleManager.çheckZoomIn();
                 }
                 scope.zoomTo = function(zoomTarget, zoomDate, instant, slow){
 
@@ -1174,17 +1200,12 @@ angular.module('webadminApp')
 
 
 
-                scope.goToLive = function(){
-                    if(scope.positionProvider.liveMode){
-                        scope.scaleManager.watchPlaying();
-                        return;
-                    }
+                scope.goToLive = function(force){
                     var moveDate = scope.scaleManager.screenCoordinateToDate(1);
                     animateScope.progress(scope, "goingToLive" ).then(
                         function(){
                             var activeDate = (new Date()).getTime();
                             scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
-
                             scope.scaleManager.watchPlaying();
                         },
                         function(){},
@@ -1192,7 +1213,8 @@ angular.module('webadminApp')
                             var activeDate = moveDate + val * ((new Date()).getTime() - moveDate);
                             scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
                         });
-                    if(! scope.scaleManager.liveMode) {
+
+                    if(!scope.positionProvider.liveMode || force) {
                         scope.positionHandler(false);
                     }
                 };
@@ -1208,6 +1230,11 @@ angular.module('webadminApp')
                 // !!! Subscribe for different events which affect timeline
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized
 
+                scope.$watch("positionProvider.liveMode",function(mode){
+                    if(scope.positionProvider && scope.positionProvider.liveMode) {
+                        scope.goToLive(true);
+                    }
+                });
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
