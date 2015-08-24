@@ -291,7 +291,7 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Một sự kiện chưa biết</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trái phép. nơi %1.</translation>
     </message>
 </context>
 <context>
@@ -471,11 +471,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể khởi tạo bộ giải mã âm thanh.</translation>
     </message>
 </context>
 <context>
@@ -513,7 +513,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể khởi tạo bộ mã hóa video.</translation>
     </message>
 </context>
 <context>
@@ -604,7 +604,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">chữ ký không hợp lệ</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -651,19 +651,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi cơ sở dữ đã xảy ra.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
 </context>
 <context>
@@ -966,7 +966,7 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCL chuyển mã không được thực hiện</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>

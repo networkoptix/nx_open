@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">非管理者必須啟動 UAC 以取得權限</translation>
     </message>
 </context>
 <context>

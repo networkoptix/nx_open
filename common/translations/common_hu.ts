@@ -271,7 +271,7 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ismeretlen esemény történt</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem engedélyezett. %1 Url.</translation>
     </message>
 </context>
 <context>
@@ -471,11 +471,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem lehet inicializálni az audio enkódert.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem lehet inicializálni az audio dekódert.</translation>
     </message>
 </context>
 <context>
@@ -513,7 +513,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem lehet inicializálni a video enkódert.</translation>
     </message>
 </context>
 <context>
@@ -604,7 +604,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Érvénytelen aláírás</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -651,19 +651,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A licence kulcs aktiválásas közben probléma lépett fel. Adatbázis hiba történt.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A megadott licence kulcs érvénytelen. Kérem ellenőrizze a megadott licence kulcs helyességét. Ha a probléma továbbra is fennáll, kérem keresse fel a segítségnyújtó csapatot, hogy megerősítsék a licence kulcs érvényességét vagy egy érvényes licence kulcs beszserzéséhez.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem kompatibilis licencet próbál aktiválni a szoftverrel. Kérem keresse fel a segítségnyújtó csapatot az érvényes licence kulcs beszerzéséhez.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A licence kulcs előzőleg aktiválva lett a {{hwid}}hardver azonosítóval {{time}}. Kérem keresse fel a segítségnyújtó csapatot az érvényes licence kulcs beszerzéséhez.</translation>
     </message>
 </context>
 <context>
@@ -966,7 +966,7 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCL átkódolás nincs megvalósítva</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>

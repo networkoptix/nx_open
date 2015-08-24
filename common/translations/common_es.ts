@@ -294,7 +294,7 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ha ocurrido un evento desconocido</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
@@ -437,7 +437,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No autorizado. Url %1.</translation>
     </message>
 </context>
 <context>
@@ -474,11 +474,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se pudo inicializar el codificador de audio.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se pudo inicializar el decodificador de audio.</translation>
     </message>
 </context>
 <context>
@@ -516,7 +516,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se pudo inicializar el codificador de video.</translation>
     </message>
 </context>
 <context>
@@ -607,7 +607,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Firma no válida</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -658,19 +658,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hubo un problema al activar su clave de licencia. Error en la base de datos se ha producido.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La clave de licencia que ha introducido no es válida. Compruebe por favor que la clave de licencia es introducida correctamente. Si el problema persiste, póngase en contacto con el equipo de asistencia para confirmar si la clave de licencia es válida o para obtener una clave de licencia válida.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Intentas activar una licencia incompatible con su software. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Esta clave de licencia se ha activado anteriormente en el hardware id { {hwid}} { {tiempo} }. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
     </message>
 </context>
 <context>
@@ -973,7 +973,7 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCLTranscode no está implementada</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>

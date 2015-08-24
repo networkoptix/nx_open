@@ -295,7 +295,7 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unbekanntes Ereignis aufgetreten</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
@@ -438,7 +438,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nicht authentifiziert. URL %1.</translation>
     </message>
 </context>
 <context>
@@ -476,11 +476,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Initalisierung des Audio-Encoders gescheitert.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Initalisierung des Audio-Decoders gescheitert.</translation>
     </message>
 </context>
 <context>
@@ -518,7 +518,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Initalisierung des Video-Encoders gescheitert.</translation>
     </message>
 </context>
 <context>
@@ -610,7 +610,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ungültige Signatur</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -661,19 +661,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Es gab ein Problem bei der Aktivierung Ihres Lizenzschlüssels. Ein Datenbankfehler trat auf.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Support Team,falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten bzw. ihren Lizenzschlüssel zu prüfen.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sie versuchen einen mit der Software inkompatiblen Lizenzschlüssel zu aktivieren.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dieser Lizenzschlüssel wurde bereits am {{time}} für Hardware-ID {{hwid}} aktiviert.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
     </message>
 </context>
 <context>
@@ -976,7 +976,7 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCLTranscode wurde nicht implementiert</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>

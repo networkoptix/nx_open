@@ -291,7 +291,7 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">알지 못하는 이벤트 발생</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1. Url에 대한 권한이 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -471,11 +471,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">오디오 디코더를 초기화 할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -513,7 +513,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -604,7 +604,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">유효하지 않은 서명</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -651,19 +651,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">인증키를 등록하는 동안 문제가 발생하였습니다. 데이터 베이스에서 오류가 발생했습니다.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">입력한 인증키가 유효하지 않습니다. 입력한 인증키가 맞는지 다시 확인해 주십시오. 문제가 지속 될 경우 관리자를 통해 정상적인 인증키인지 확인하십시오.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">부정확한 인증키의 등록을 시도 중입니다. 관리자를 통해 유효한 인증키를 발급 받으십시오.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{{hwid}} on {{time}}에서 이미 사용된 인증 키입니다. 관리자를 통해 유효한 인증키를 발급 받으세요.</translation>
     </message>
 </context>
 <context>
@@ -966,7 +966,7 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCLTranscode가 구현되어있지 않음</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>

@@ -226,7 +226,7 @@
     </message>
     <message>
         <source>filter by camera...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">依攝影機篩選…</translation>
     </message>
 </context>
 <context>
@@ -295,7 +295,7 @@
     </message>
     <message>
         <source>Add camera(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">新增攝影機…</translation>
     </message>
     <message>
         <source>Selected Server:</source>
@@ -748,7 +748,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Camera View Angle Correction</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">攝影機視角校正:</translation>
     </message>
 </context>
 <context>
@@ -787,11 +787,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">將聲音從5.1降為2.1聲道:</translation>
     </message>
     <message>
         <source>Auto Pause Video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">影像休眠模式:</translation>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
@@ -799,7 +799,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">隨電腦啟動執行軟體:</translation>
     </message>
     <message>
         <source>Double Buffering:</source>
@@ -955,7 +955,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">載入影像…請稍等.</translation>
     </message>
 </context>
 <context>
@@ -1014,7 +1014,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">處理影像…請稍等.</translation>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
@@ -2677,7 +2677,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">丟棄資源到新佈局</translation>
     </message>
     <message>
         <source>Select Time Server</source>
@@ -2965,7 +2965,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You have new notifications.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">您有新的通知</translation>
     </message>
 </context>
 <context>
@@ -2984,7 +2984,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Install a specific build.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">安裝特定的版號</translation>
     </message>
     <message>
         <source>Build Number:</source>
@@ -2992,7 +2992,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">您輸入的密碼有誤</translation>
     </message>
 </context>
 <context>
@@ -3015,7 +3015,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select at least one camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">至少選擇一個攝影機</translation>
     </message>
 </context>
 <context>
@@ -3117,7 +3117,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select Sound</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">選擇一個聲音</translation>
     </message>
     <message>
         <source>Enter Text</source>
@@ -3195,7 +3195,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Error while deleting rule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">刪除規則時發生錯誤</translation>
     </message>
     <message>
         <source>Confirm Save</source>
@@ -3329,11 +3329,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">指定的 IP 位址不可大於 255.</translation>
     </message>
     <message>
         <source>Camera address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">攝影機位址欄位必須包含有效的 URL、IP 位址或 RTSP 連結.</translation>
     </message>
     <message>
         <source>Finished searching...</source>
@@ -3345,11 +3345,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please select at least one camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">請至少選擇一個攝影機</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">伺服器已被移除, 搜尋失敗.</translation>
     </message>
     <message>
         <source>Server is offline, cameras can only be added to an online server.</source>
@@ -3365,7 +3365,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Error while searching for camera(s).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">搜尋攝影機時發生錯誤.</translation>
     </message>
 </context>
 <context>
@@ -3397,7 +3397,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not save paramaters.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無法儲存參數</translation>
     </message>
 </context>
 <context>
@@ -3440,11 +3440,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do not lock archive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">不鎖定錄影</translation>
     </message>
     <message>
         <source>List of tags divided by commas or spaces.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">標記列表以逗號或空格分開</translation>
     </message>
 </context>
 <context>
@@ -3530,7 +3530,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">匯出選擇的攝影機到檔案</translation>
     </message>
 </context>
 <context>
@@ -3688,7 +3688,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Camera(s) not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">攝影機未儲存</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
@@ -3700,7 +3700,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">位移偵測靈敏度未被改變。請在畫面上框選並變更位移靈敏度。</translation>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
@@ -3708,7 +3708,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not apply changes.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無法套用變更</translation>
     </message>
 </context>
 <context>
@@ -3870,7 +3870,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">找不到啟動程式</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
@@ -3885,7 +3885,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">要求逾時。</translation>
     </message>
     <message>
         <source>Test Failed</source>
@@ -3975,7 +3975,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">輸出伺服器資料庫 %1 錯誤</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
@@ -4018,7 +4018,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Screen width must be a multiple of 8.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">螢幕寬度必須是 8 的倍數。</translation>
     </message>
 </context>
 <context>
@@ -4172,11 +4172,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">部分攝影機不支援位移排程</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">部分攝影機無法錄影</translation>
     </message>
 </context>
 <context>
@@ -4758,7 +4758,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">啟動授權時發生了網路問題.</translation>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
@@ -4770,15 +4770,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">授權金鑰已於硬體ID %1. 請聯絡您的廠商取得有效授權金鑰.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">自動啟動授權發生網路問題. 請聯絡您的廠商協助啟動您的授權.</translation>
     </message>
     <message>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">您選用的手動啟動金鑰檔案無效. 請選擇正確的手動啟動金鑰檔. 若問題持續發生, 請聯絡您的廠商.</translation>
     </message>
 </context>
 <context>
@@ -4918,15 +4918,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Invalid Paramaters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無效參數</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">連線已存在</translation>
     </message>
     <message>
         <source>A connection with this name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">已存在相同的連線名稱，要覆蓋嗎?</translation>
     </message>
     <message>
         <source>Delete Connections</source>
@@ -5059,7 +5059,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Low-Res</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">低解析度</translation>
     </message>
 </context>
 <context>
@@ -5190,7 +5190,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">攝影機的第二串流已關閉. Motion + LQ選項無效. 請點擊 &quot;是&quot; 將錄影類型改成 &quot;全時錄影&quot; 或點擊 &quot;否&quot; 將第二串流開啟.</translation>
     </message>
 </context>
 <context>
@@ -5489,11 +5489,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無法從攝影機取得位置</translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無法設定攝影機位置</translation>
     </message>
     <message>
         <source>Remove Preset</source>
@@ -5582,11 +5582,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Tour should contain at least 2 positions.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">巡航必須至少包含兩個以上的位置</translation>
     </message>
     <message>
         <source>Tour Time: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">巡航時間：%1</translation>
     </message>
 </context>
 <context>
@@ -5616,11 +5616,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">這個熱鍵已被預設點 &quot;%1&quot; 使用</translation>
     </message>
     <message>
         <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">這個熱鍵已被巡航 &quot;%1&quot; 使用</translation>
     </message>
 </context>
 <context>
@@ -5886,7 +5886,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Slect Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">選擇資源...</translation>
     </message>
 </context>
 <context>
@@ -6341,7 +6341,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update Finished...100%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">更新已完成...100%</translation>
     </message>
     <message>
         <source>Please update the client manually.</source>
@@ -6357,7 +6357,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">找不到啟動程式</translation>
     </message>
     <message>
         <source>Update Cancelled</source>
@@ -6514,7 +6514,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">提供的參數無效，無法執行測試。</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -6522,15 +6522,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E-Mail 無效</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">找不到預設點. 請使用&quot;進階&quot;選項</translation>
     </message>
     <message>
         <source>Support email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">支援 email 不正確</translation>
     </message>
 </context>
 <context>
@@ -7118,7 +7118,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">使用者已更名. 密碼必須更新.</translation>
     </message>
 </context>
 <context>
@@ -7438,11 +7438,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">相同名稱的電視牆已存在</translation>
     </message>
     <message>
         <source>Updating Background...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">背景更新</translation>
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
@@ -7454,7 +7454,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">找不到啟動程式</translation>
     </message>
 </context>
 <context>
@@ -7473,15 +7473,15 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Bookmarks can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">書籤僅能加入至有上線的伺服器.</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">書籤僅可在有上線的伺服器編輯.</translation>
     </message>
     <message>
         <source>Bookmarks can only be deleted from an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">書籤僅可在有上線的伺服器移除.</translation>
     </message>
     <message>
         <source>Confirm Deletion</source>
@@ -7535,7 +7535,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">因為以下錯誤無法錄影：%1</translation>
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
@@ -7543,7 +7543,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">請按任何鍵停止輪跳</translation>
     </message>
 </context>
 <context>
@@ -7660,7 +7660,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>File is in use.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">檔案使用中</translation>
     </message>
     <message>
         <source>Unable to export file.</source>
@@ -7668,7 +7668,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">警告</translation>
     </message>
     <message>
         <source>No Timestamp</source>
@@ -7692,7 +7692,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">您選擇的匯出影像檔案需要轉碼，轉碼動作會需要較長的時間，您確定要繼續嗎?</translation>
     </message>
     <message>
         <source>Export Complete</source>
@@ -7716,7 +7716,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Make file read-only.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">將檔案建立為唯獨模式</translation>
     </message>
     <message>
         <source>Export Successful.</source>
@@ -7794,7 +7794,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">所選伺服器已成功與系統連結!</translation>
     </message>
 </context>
 <context>
@@ -7853,11 +7853,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Layout already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">佈局已存在</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">已存在相同的佈局名稱，您確定要覆蓋嗎.</translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
@@ -7990,15 +7990,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not overwrite file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無法覆蓋檔案</translation>
     </message>
     <message>
         <source>Could not save screenshot.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無法儲存螢幕截圖</translation>
     </message>
     <message>
         <source>An error occured while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">當儲存螢幕截圖時發生一個錯誤 &apos;%1&apos;。</translation>
     </message>
 </context>
 <context>
@@ -8029,15 +8029,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">已有新版本</translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">建議進行更新</translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">不再通知此更新。</translation>
     </message>
 </context>
 <context>
@@ -8143,15 +8143,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A control session is already running.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">控制進程正在執行</translation>
     </message>
     <message>
         <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">非預期的錯誤發生. 無法儲存變更.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">此電腦並無添加離線的電視牆.</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
@@ -8163,7 +8163,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To enable this feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">請啟動至少一個電視牆授權以啟用此功能.</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
@@ -8171,11 +8171,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Video Wall already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">電視牆已存在</translation>
     </message>
     <message>
         <source>A Video Wall with the same name already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">已有相同名稱的電視牆</translation>
     </message>
 </context>
 <context>
@@ -8632,7 +8632,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">此攝影機不支援位移偵測</translation>
     </message>
     <message>
         <source>Motion Settings</source>
@@ -8640,7 +8640,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Motion Detection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">位移偵測:</translation>
     </message>
     <message>
         <source>Software - maximum FPS could decrease slightly on server</source>
@@ -8751,7 +8751,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">在此輸入簡短的系統描述...</translation>
     </message>
     <message>
         <source>Unsecure Connection</source>
@@ -8759,11 +8759,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">使用 TLS 安全連線</translation>
     </message>
     <message>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">使用 SSL 安全連線</translation>
     </message>
 </context>
 <context>
@@ -8905,7 +8905,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Note: Schedule is based on server time.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">備註：排程時間為伺服器時間</translation>
     </message>
 </context>
 </TS>

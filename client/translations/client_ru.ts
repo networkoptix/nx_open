@@ -220,7 +220,7 @@
     </message>
     <message>
         <source>filter by camera...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Фильтр по камерам...</translation>
     </message>
 </context>
 <context>
@@ -288,7 +288,7 @@
     </message>
     <message>
         <source>Add camera(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Добавить камеры...</translation>
     </message>
     <message>
         <source>Selected Server:</source>
@@ -739,7 +739,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Camera View Angle Correction</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Коррекция угла обзора:</translation>
     </message>
 </context>
 <context>
@@ -778,11 +778,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Микшировать звук 5.1 в 2.1:</translation>
     </message>
     <message>
         <source>Auto Pause Video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Приостанавливать воспроизведение:</translation>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
@@ -790,7 +790,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Запустить приложение при загрузке ПК:</translation>
     </message>
     <message>
         <source>Double Buffering:</source>
@@ -946,7 +946,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Загрузка изображения... Пожалуйста, подождите.</translation>
     </message>
 </context>
 <context>
@@ -1005,7 +1005,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Обработка изображения... Пожалуйста, подождите.</translation>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
@@ -1645,7 +1645,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Alt+F</source>
-        <translation></translation>
+        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Drop Resources</source>
@@ -1857,7 +1857,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Alt+S</source>
-        <translation></translation>
+        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -2685,7 +2685,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Положить ресурсы на новую раскладку</translation>
     </message>
     <message>
         <source>Select Time Server</source>
@@ -2979,7 +2979,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You have new notifications.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Есть новые оповещения</translation>
     </message>
 </context>
 <context>
@@ -2998,7 +2998,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Install a specific build.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Установить выбранную сборку</translation>
     </message>
     <message>
         <source>Build Number:</source>
@@ -3006,7 +3006,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Введён неправильный пароль</translation>
     </message>
 </context>
 <context>
@@ -3033,7 +3033,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select at least one camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выберите хотя бы одну камеру</translation>
     </message>
 </context>
 <context>
@@ -3147,7 +3147,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select Sound</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выберите звук</translation>
     </message>
     <message>
         <source>Enter Text</source>
@@ -3225,7 +3225,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Error while deleting rule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка при удалении правила</translation>
     </message>
     <message>
         <source>Confirm Save</source>
@@ -3367,11 +3367,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выбранный диапазон содержит более 255 адресов.</translation>
     </message>
     <message>
         <source>Camera address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Поле адреса должно содержать корректный URL, IP адрес или ссылку RTSP.</translation>
     </message>
     <message>
         <source>Finished searching...</source>
@@ -3383,11 +3383,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please select at least one camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">пожалуйста выберите хотя бы одну камеру</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сервер вышел из сети, поиск прекращен.</translation>
     </message>
     <message>
         <source>Server is offline, cameras can only be added to an online server.</source>
@@ -3403,7 +3403,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Error while searching for camera(s).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка при поиске камер(ы).</translation>
     </message>
 </context>
 <context>
@@ -3436,7 +3436,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not save paramaters.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно сохранить настройки</translation>
     </message>
 </context>
 <context>
@@ -3479,11 +3479,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do not lock archive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не блокировать архив</translation>
     </message>
     <message>
         <source>List of tags divided by commas or spaces.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Список тегов, разделённый запятыми или пробелами</translation>
     </message>
 </context>
 <context>
@@ -3575,7 +3575,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Экспорт выбранных камер в файл</translation>
     </message>
 </context>
 <context>
@@ -3743,7 +3743,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Camera(s) not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Камера(ы) не сохранена</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
@@ -3755,7 +3755,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Чувствительность детектора движения не изменена. Чтобы изменить чувствительность детектора движения, выберите область на изображении.</translation>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
@@ -3763,7 +3763,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not apply changes.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно сохранить изменения</translation>
     </message>
 </context>
 <context>
@@ -3925,7 +3925,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Процесс Launcher не найден</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
@@ -3940,7 +3940,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Истекло время ожидания ответа на запрос.</translation>
     </message>
     <message>
         <source>Test Failed</source>
@@ -4030,7 +4030,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось сохранить копию базы данных сервера в &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
@@ -4073,7 +4073,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Screen width must be a multiple of 8.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ширина экрана должна быть кратна 8.</translation>
     </message>
 </context>
 <context>
@@ -4233,11 +4233,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Исходный тип записи не поддерживается на некоторых камерах</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Запись не может быть включения на некоторых камерах</translation>
     </message>
 </context>
 <context>
@@ -4827,7 +4827,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">При активации лицензии произошла сетевая ошибка.</translation>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
@@ -4839,15 +4839,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Этот лицензионный ключ уже был активирован на аппаратный ID %1. Свяжитесь со службой поддержки для получения лицензии.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">При автоматической активации лицензии произошла сетевая ошибка. Свяжитесь со службой поддержки для активации вручную.</translation>
     </message>
     <message>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выбранный файл ключа ручной активации некорректен. Выберите правильный файл или обратитесь в службу поддержки.</translation>
     </message>
 </context>
 <context>
@@ -4991,15 +4991,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Invalid Paramaters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неверные параметры</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Соединение уже существует</translation>
     </message>
     <message>
         <source>A connection with this name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Соединение с таким именем уже существует. Перезаписать?</translation>
     </message>
     <message>
         <source>Delete Connections</source>
@@ -5132,7 +5132,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Low-Res</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lo-Res</translation>
     </message>
 </context>
 <context>
@@ -5263,7 +5263,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Второй поток для данной камеры отключён. Опция &apos;По движению + Низкое качество&apos; не будет иметь никакого эффекта. Нажмите &quot;Да&quot; для изменения типа записи на &quot;Всегда&quot; или &quot;Нет&quot; для включения второго потока.</translation>
     </message>
 </context>
 <context>
@@ -5565,11 +5565,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно получить положение камеры</translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно задать положение камеры</translation>
     </message>
     <message>
         <source>Remove Preset</source>
@@ -5664,11 +5664,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Tour should contain at least 2 positions.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Маршрут обхода должен содержать хотя бы 2 позиции</translation>
     </message>
     <message>
         <source>Tour Time: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Время маршрута обхода: %1</translation>
     </message>
 </context>
 <context>
@@ -5698,11 +5698,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Горячая клавиша уже используется позицией &quot;%1&quot;</translation>
     </message>
     <message>
         <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Горячая клавиша уже используется маршрутом &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
@@ -5978,7 +5978,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Slect Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выберите ресурсы...</translation>
     </message>
 </context>
 <context>
@@ -6443,7 +6443,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update Finished...100%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Обновление завершено... 100%</translation>
     </message>
     <message>
         <source>Please update the client manually.</source>
@@ -6459,7 +6459,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Процесс Launcher не найден</translation>
     </message>
     <message>
         <source>Update Cancelled</source>
@@ -6616,7 +6616,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Приведенные параметры неверны. Выполнение теста невозможно.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -6624,15 +6624,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Некорректный e-mail</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Шаблон не найден. Воспользуйтесь дополнительными настройками</translation>
     </message>
     <message>
         <source>Support email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Некорректный адрес техподдержки</translation>
     </message>
 </context>
 <context>
@@ -7228,7 +7228,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя пользоавтеля изменено. Пароль должен быть обновлён.</translation>
     </message>
 </context>
 <context>
@@ -7563,11 +7563,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Видеостена с таким именем уже существует</translation>
     </message>
     <message>
         <source>Updating Background...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Обновление заднего фона</translation>
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
@@ -7579,7 +7579,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Процесс Launcher не найден</translation>
     </message>
 </context>
 <context>
@@ -7598,15 +7598,15 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Bookmarks can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Закладка может быть добавлена только на сервер, находящийся в сети.</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Закладка может быть отредактирована только на сервере, находящемся в сети.</translation>
     </message>
     <message>
         <source>Bookmarks can only be deleted from an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Закладка может быть удалена только с сервера, находящегося в сети.</translation>
     </message>
     <message>
         <source>Confirm Deletion</source>
@@ -7660,7 +7660,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно начать запись из-за следующей ошибки: %1</translation>
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
@@ -7668,7 +7668,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Нажмите любую кнопку, чтобы остановить тур</translation>
     </message>
 </context>
 <context>
@@ -7787,7 +7787,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>File is in use.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Файл используется</translation>
     </message>
     <message>
         <source>Unable to export file.</source>
@@ -7795,7 +7795,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Предупреждение</translation>
     </message>
     <message>
         <source>No Timestamp</source>
@@ -7819,7 +7819,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Вы собираетесь экспортировать видео с фильтрами, которые требуют перекодировки. Перекодировка может занять длительное время. Продолжить?</translation>
     </message>
     <message>
         <source>Export Complete</source>
@@ -7843,7 +7843,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Make file read-only.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сделать доступным только для чтения</translation>
     </message>
     <message>
         <source>Export Successful.</source>
@@ -7921,7 +7921,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выбранные сервера были успешно добавлен в систему!</translation>
     </message>
 </context>
 <context>
@@ -7988,11 +7988,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Layout already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Раскладка уже существует</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Раскладка с таким именем уже существует и у Вас нет прав на её изменение.</translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
@@ -8125,15 +8125,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not overwrite file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно перезаписать файл</translation>
     </message>
     <message>
         <source>Could not save screenshot.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Нвозможно сохранить скриншот</translation>
     </message>
     <message>
         <source>An error occured while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка при сохранении скриншота &quot;%1&quot;.</translation>
     </message>
 </context>
 <context>
@@ -8164,15 +8164,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Доступна более новая версия</translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Рекомендовано обновление</translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не уведомлять больше об этом обновлении.</translation>
     </message>
 </context>
 <context>
@@ -8284,15 +8284,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A control session is already running.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сессия управления уже запущена</translation>
     </message>
     <message>
         <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Случилась непредвиденная ошибка. Изменения не могут быть сохранены.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отсутствуют оффлайн элементы видеостены, прикрепленные к этому компьютеру.</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
@@ -8304,7 +8304,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To enable this feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Для включения этой функции, пожалуйста, активируйте хотя бы одну лицензию на видеостену.</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
@@ -8312,11 +8312,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Video Wall already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Видеостена уже существует</translation>
     </message>
     <message>
         <source>A Video Wall with the same name already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Видеостена с таким именем уже существует</translation>
     </message>
 </context>
 <context>
@@ -8773,7 +8773,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Для данной камеры недоступна детекция движения</translation>
     </message>
     <message>
         <source>Motion Settings</source>
@@ -8781,7 +8781,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Motion Detection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Детектор движения:</translation>
     </message>
     <message>
         <source>Software - maximum FPS could decrease slightly on server</source>
@@ -8892,7 +8892,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Введите краткое описание...</translation>
     </message>
     <message>
         <source>Unsecure Connection</source>
@@ -8900,11 +8900,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Защищенное соединение с TLS</translation>
     </message>
     <message>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Защищенное соединение с SSL</translation>
     </message>
 </context>
 <context>
@@ -9046,7 +9046,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Note: Schedule is based on server time.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Примечание: Расписание по серверному времени</translation>
     </message>
 </context>
 </TS>

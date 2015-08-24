@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nem rendszergazda felhasználóknak engedélyezni kell az UAC-t a jogok kéréséhez</translation>
     </message>
 </context>
 <context>

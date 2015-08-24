@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Контроль учетных записей (UAC) должен быть включен для запроса привилегий пользователей</translation>
     </message>
 </context>
 <context>

@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">非管理员用户必须通过账户控制来获取权限</translation>
     </message>
 </context>
 <context>

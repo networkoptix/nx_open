@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">UAC musi być włączony, by żądać uprawnień dla użytkowników non-admin</translation>
     </message>
 </context>
 <context>
