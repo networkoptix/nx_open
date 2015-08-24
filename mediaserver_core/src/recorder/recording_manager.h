@@ -10,10 +10,11 @@
 #include <server/server_globals.h>
 
 #include <core/resource/resource_fwd.h>
-
 #include <core/dataprovider/data_provider_factory.h>
 
+#include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"
+
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
@@ -72,7 +73,7 @@ private:
 
     QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, const QSharedPointer<QnAbstractMediaStreamDataProvider>& reader, 
                                            QnServer::ChunksCatalog catalog, const QSharedPointer<QnDualStreamingHelper>& dualStreamingHelper);
-    bool startOrStopRecording(const QnResourcePtr& res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
+    bool startOrStopRecording(const QnResourcePtr& res, const QnVideoCameraPtr& camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(const QnResourcePtr& res) const;
     QnVirtualCameraResourceList getLocalControlledCameras() const;
 

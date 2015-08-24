@@ -15,14 +15,12 @@ QMutex QnVideoCameraPool::m_staticMtx;
 
 void QnVideoCameraPool::stop()
 {
-    for(QnVideoCamera* camera: m_cameras.values())
+    for( const QnVideoCameraPtr& camera: m_cameras.values())
         camera->beforeStop();
 
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
         VMaxStreamFetcher::pleaseStopAll(); // increase stop time
 #endif
-    for(QnVideoCamera* camera: m_cameras.values())
-        delete camera;
 
     m_cameras.clear();
 }
@@ -47,16 +45,22 @@ QnVideoCameraPool* QnVideoCameraPool::instance()
     //return &inst;
 }
 
-QnVideoCamera* QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res)
+void QnVideoCameraPool::updateActivity()
+{
+    QMutexLocker lock(&m_staticMtx);
+    for (const auto&camera: m_cameras)
+        camera->updateActivity();
+}
+
+QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res)
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
-        return 0;
+        return QnVideoCameraPtr();
 
     QMutexLocker lock(&m_staticMtx);
-    QnVideoCamera* result = 0;
     CameraMap::iterator itr = m_cameras.find(res);
     if (itr == m_cameras.end()) {
-        result = new QnVideoCamera(res);
+        QnVideoCameraPtr result = std::make_shared<QnVideoCamera>(res);
         m_cameras.insert(res, result);
         return result;
     }
@@ -68,9 +72,5 @@ QnVideoCamera* QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res)
 void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 {
     QMutexLocker lock(&m_staticMtx);
-    CameraMap::iterator itr = m_cameras.find(res);
-    if (itr == m_cameras.end())
-        return;
-    delete itr.value();
-    m_cameras.erase(itr);
+    m_cameras.remove( res );
 }

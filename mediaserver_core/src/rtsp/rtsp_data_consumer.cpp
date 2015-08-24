@@ -652,7 +652,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
-    QnVideoCamera* camera = 0;
+    QnVideoCameraPtr camera;
     QnResourcePtr res;
     if (m_owner->getResource()) {
         res = m_owner->getResource()->toResourcePtr();

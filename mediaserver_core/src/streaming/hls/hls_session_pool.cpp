@@ -21,7 +21,7 @@ namespace nx_hls
         unsigned int targetDurationMS,
         bool _isLive,
         MediaQuality streamQuality,
-        QnVideoCamera* const videoCamera,
+        const QnVideoCameraPtr& videoCamera,
         const QnAuthSession& authSession)
     :
         m_id( id ),
@@ -56,7 +56,7 @@ namespace nx_hls
             if( resource )
             {
                 //checking resource stream type. Only h.264 is OK for HLS
-                QnVideoCamera* camera = qnCameraPool->getVideoCamera( resource );
+                QnVideoCameraPtr camera = qnCameraPool->getVideoCamera( resource );
                 if( camera )
                     camera->notInUse( this );
             }
