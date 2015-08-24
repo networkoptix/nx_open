@@ -1,71 +1,33 @@
-////////////////////////////////////////////////////////////
-// 14 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
+/**********************************************************
+* Aug 24, 2015
+* a.kolesnikov
+***********************************************************/
 
-#ifndef MEDIASTREAMCACHE_H
-#define MEDIASTREAMCACHE_H
+#ifndef MEDIA_STREAM_CACHE_DETAIL_H
+#define MEDIA_STREAM_CACHE_DETAIL_H
 
-#include <memory>
-#include <functional> /* For std::function. */
+#include <deque>
+#include <map>
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
 
-#include <core/dataconsumer/abstract_data_receptor.h>
-
+#include <core/datapacket/abstract_data_packet.h>
 
 
-namespace detail
-{
-    class MediaStreamCache;
-}
+namespace detail {
 
-//!Caches specified duration of media stream for later use
-/*!
-    \note Class is thread-safe (concurrent threads can read and write to class instance)
-    \note Always tries to perform so that first cache frame is an I-frame
-*/
 class MediaStreamCache
-:
-    public QnAbstractDataReceptor
 {
 public:
-    /*!
-        By using this class, one can be sure that old data will not be removed until it has been read
-        \note Class is not thread-safe
-    */
-    class SequentialReadContext
-    {
-    public:
-        SequentialReadContext(
-            MediaStreamCache* cache,
-            quint64 startTimestamp );
-        ~SequentialReadContext();
-
-        //!If no next frame returns NULL
-        QnAbstractDataPacketPtr getNextFrame();
-        //!Returns timestamp of previous packet
-        quint64 currentPos() const;
-
-    private:
-        std::weak_ptr<detail::MediaStreamCache> m_sharedCache;
-        quint64 m_startTimestamp;
-        bool m_firstFrame;
-        //!timestamp of previous given frame
-        quint64 m_currentTimestamp;
-        int m_blockingID;
-    };
-
     /*!
         \param cacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis is dropped
     */
     MediaStreamCache( unsigned int cacheSizeMillis );
-    virtual ~MediaStreamCache();
 
     //!Implementation of QnAbstractDataReceptor::canAcceptData
-    virtual bool canAcceptData() const override;
+    bool canAcceptData() const;
     //!Implementation of QnAbstractDataReceptor::putData
-    virtual void putData( const QnAbstractDataPacketPtr& data ) override;
+    void putData( const QnAbstractDataPacketPtr& data );
 
     void clear();
 
@@ -118,7 +80,48 @@ public:
     qint64 inactivityPeriod() const;
 
 private:
-    std::shared_ptr<detail::MediaStreamCache> m_sharedImpl;
+    struct MediaPacketContext
+    {
+        quint64 timestamp;
+        QnAbstractDataPacketPtr packet;
+        bool isKeyFrame;
+
+        MediaPacketContext()
+            :
+            timestamp( 0 ),
+            isKeyFrame( false )
+        {
+        }
+
+        MediaPacketContext(
+            quint64 _timestamp,
+            QnAbstractDataPacketPtr _packet,
+            bool _isKeyFrame )
+            :
+            timestamp( _timestamp ),
+            packet( _packet ),
+            isKeyFrame( _isKeyFrame )
+        {
+        }
+    };
+
+    //!map<timestamp, pair<packet, key_flag> >
+    typedef std::deque<MediaPacketContext> PacketContainerType;
+
+    unsigned int m_cacheSizeMillis;
+    PacketContainerType m_packetsByTimestamp;
+    mutable QMutex m_mutex;
+    qint64 m_prevPacketSrcTimestamp;
+    //!In micros
+    quint64 m_currentPacketTimestamp;
+    size_t m_cacheSizeInBytes;
+    //!map<event receiver id, function>
+    std::map<int, std::function<void (quint64)> > m_eventReceivers;
+    int m_prevGivenEventReceiverID;
+    std::map<int, quint64> m_dataBlockings;
+    mutable QElapsedTimer m_inactivityTimer;
 };
 
-#endif  //MEDIASTREAMCACHE_H
+}
+
+#endif  //MEDIA_STREAM_CACHE_DETAIL_H
