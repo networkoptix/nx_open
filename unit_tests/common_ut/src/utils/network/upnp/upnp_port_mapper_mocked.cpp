@@ -1,9 +1,11 @@
+
 #include "upnp_port_mapper_mocked.h"
 
 #include <common/common_globals.h>
 #include <utils/network/upnp/upnp_port_mapper_internal.h>
 
 #include <QtConcurrent>
+
 
 namespace nx_upnp {
 namespace test {

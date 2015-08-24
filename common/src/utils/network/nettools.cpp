@@ -508,6 +508,12 @@ QString getMacByIP(const QHostAddress& ip, bool net)
     return res;
 }
 
+QHostAddress getGatewayOfIf( const QString& ip )
+{
+    Q_ASSERT( false );
+    return QHostAddress();
+}
+
 #elif defined(Q_OS_MAC)
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
@@ -569,7 +575,7 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
     return QString();
 }
 
-QHostAddress getGatewayOfIf(const QString& ip);
+QHostAddress getGatewayOfIf(const QString& ip)
 {
     return QHostAddress();
 }

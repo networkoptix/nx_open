@@ -122,7 +122,7 @@ win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
   ICON = ${customization.dir}/icons/hdw_logo.ico
   LIBS += ${windows.oslibs}
-  DEFINES += ${windows.defines}
+  DEFINES += NOMINMAX= ${windows.defines}
   DEFINES += ${global.windows.defines}
   win32-msvc* {
     # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
