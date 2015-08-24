@@ -291,11 +291,11 @@
     </message>
     <message>
         <source>Selected Server:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลือกเซิร์ฟเวอร์:</translation>
     </message>
     <message>
         <source>S&amp;ubnet Scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;สแกน Subnet </translation>
     </message>
     <message>
         <source>Brand</source>
@@ -307,7 +307,7 @@
     </message>
     <message>
         <source>New Scan...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เริ่มตรวจสอบใหม่...</translation>
     </message>
 </context>
 <context>
@@ -581,7 +581,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do Not Record</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่ทำการบันทึก</translation>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
@@ -711,7 +711,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เหตุการณ์บันทึก</translation>
     </message>
     <message>
         <source>Clear Filter</source>
@@ -785,7 +785,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">นาที ไม่มีการใช้งาน</translation>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
@@ -793,15 +793,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Double Buffering:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เพิ่มบัฟเฟอร์:</translation>
     </message>
     <message>
         <source>Browse Logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ค้นหา logs</translation>
     </message>
     <message>
         <source>Clear Local Cache</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ล้างข้อมูลแคช</translation>
     </message>
 </context>
 <context>
@@ -872,47 +872,47 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Scroll Here</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลื่อนที่นี่</translation>
     </message>
     <message>
         <source>Left Edge</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ขอบด้านซ้าย</translation>
     </message>
     <message>
         <source>Right Edge</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ขอบบนขวา</translation>
     </message>
     <message>
         <source>Page Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">หน้าซ้าย</translation>
     </message>
     <message>
         <source>Page Up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">หน้าบน</translation>
     </message>
     <message>
         <source>Page Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">หน้าขวา</translation>
     </message>
     <message>
         <source>Page Down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">หน้าล่าง</translation>
     </message>
     <message>
         <source>Scroll Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลื่อนทางซ้าย</translation>
     </message>
     <message>
         <source>Scroll Up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลื่อนขึ้นบน</translation>
     </message>
     <message>
         <source>Scroll Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลื่อนทางขวา</translation>
     </message>
     <message>
         <source>Scroll Down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลื่อนลงล่าง</translation>
     </message>
 </context>
 <context>
@@ -1001,7 +1001,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout is Locked</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ปิดการแสดงผล</translation>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
@@ -1009,7 +1009,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เก็บ ตามอัตราส่วน</translation>
     </message>
 </context>
 <context>
@@ -1044,7 +1044,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กำลังทดสอบ...</translation>
     </message>
 </context>
 <context>
@@ -1171,11 +1171,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License Key is Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">คีย์ใบอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Select License File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลือกไฟล์ใบอนุญาติ...</translation>
     </message>
 </context>
 <context>
@@ -1230,7 +1230,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Connection Options:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;ตัวเลือกการเชื่อมต่อ:</translation>
     </message>
 </context>
 <context>
@@ -1313,7 +1313,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">โหมด Timeline:</translation>
     </message>
 </context>
 <context>
@@ -1344,7 +1344,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เปิดเสียง</translation>
     </message>
 </context>
 <context>
@@ -1370,7 +1370,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Show to administrators only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">แสดงให้ผู้ดูแลระบบเท่านั้น</translation>
     </message>
 </context>
 <context>
@@ -1435,7 +1435,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No Tour Selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่ได้เลือกตำแหน่งทัวร์</translation>
     </message>
 </context>
 <context>
@@ -1477,7 +1477,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Save Position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">บันทึกตำแหน่ง</translation>
     </message>
 </context>
 <context>
@@ -2672,11 +2672,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select Time Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลือกเวลาเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เปิดใช้งานวัตถุ PTZ</translation>
     </message>
     <message>
         <source>User Management...</source>
@@ -2979,7 +2979,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Build Number:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">สร้างหมายเลข:</translation>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
@@ -3104,7 +3104,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ผู้ใช้ทั้งหมด</translation>
     </message>
     <message>
         <source>Select Sound</source>
@@ -3112,7 +3112,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter Text</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ป้อนข้อความ</translation>
     </message>
 </context>
 <context>
@@ -3182,7 +3182,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm Rules Reset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ยืนยันการตั้งค่า</translation>
     </message>
     <message>
         <source>Error while deleting rule.</source>
@@ -3190,11 +3190,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm Save</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ยอมรับการบันทึก</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ยืนยันการออก</translation>
     </message>
 </context>
 <context>
@@ -3381,7 +3381,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Applying Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การตั้งค่าการใช้งาน...</translation>
     </message>
     <message>
         <source>Target camera&apos;s service is unavailable. Try again.</source>
@@ -3736,18 +3736,18 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Local System Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เวลาของเครื่องนี้</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การกำหนดค่าเซิร์ฟเวอร์ (s)</translation>
     </message>
     <message>
         <source>Updating Server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การปรับปรุงเซิร์ฟเวอร์ (s)</translation>
     </message>
 </context>
 <context>
@@ -4110,7 +4110,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Any Action</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ทุกการกระทำ</translation>
     </message>
 </context>
 <context>
@@ -4153,7 +4153,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ผู้ใช้ทุกคน</translation>
     </message>
 </context>
 <context>
@@ -4742,7 +4742,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Obtaining licenses from server...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การได้รับอนุญาตจากเซอร์ฟเวอร์...</translation>
     </message>
     <message>
         <source>License has arleady been activated.</source>
@@ -4922,7 +4922,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Delete Connections</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ลบการเชื่อมต่อ</translation>
     </message>
 </context>
 <context>
@@ -4985,7 +4985,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลือกไฟล์...</translation>
     </message>
 </context>
 <context>
@@ -5047,7 +5047,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Zoom Window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">หน้าต่างซูม</translation>
     </message>
     <message>
         <source>Low-Res</source>
@@ -5153,11 +5153,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กำลังทดสอบ...</translation>
     </message>
     <message>
         <source>Merging Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กำลังผสานระบบ ...</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
@@ -5178,7 +5178,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ตารางเวลาที่ไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
@@ -5296,19 +5296,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Sound Files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไฟล์เสียง</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลือกไฟล์...</translation>
     </message>
     <message>
         <source>Enter New Title:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ใส่ชื่อใหม่:</translation>
     </message>
     <message>
         <source>Confirm File Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ยืนยันการลบไฟล์</translation>
     </message>
 </context>
 <context>
@@ -5489,7 +5489,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Remove Preset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ลบที่ตั้งไว้ล่วงหน้า</translation>
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
@@ -5566,7 +5566,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Tour %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ทัวร์ใหม่ %1</translation>
     </message>
     <message>
         <source>Saved Position %1</source>
@@ -5870,11 +5870,11 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnResourceSelectionDialog</name>
     <message>
         <source>Select Users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลือกผู้ใช้งาน...</translation>
     </message>
     <message>
         <source>Select Cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เลือกกล้อง...</translation>
     </message>
     <message>
         <source>Slect Resources...</source>
@@ -6325,11 +6325,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Latest Version:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">รุ่นล่าสุด:</translation>
     </message>
     <message>
         <source>Target Version:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">รุ่นเป้าหมาย:</translation>
     </message>
     <message>
         <source>Update Finished...100%</source>
@@ -6353,7 +6353,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ยกเลิกการปรับปรุง</translation>
     </message>
     <message>
         <source>Update unsuccessful.</source>
@@ -6408,11 +6408,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Watermark Not Found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ลายน้ำไม่พบ</translation>
     </message>
     <message>
         <source>Watermark Matched</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ลายน้ำจับคู่</translation>
     </message>
 </context>
 <context>
@@ -6451,11 +6451,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ฮาร์ดแวร์ (ในตัวกล้อง)</translation>
     </message>
     <message>
         <source>Do Not Record Motion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่ทำการบันทึกเคลื่อนไหว</translation>
     </message>
 </context>
 <context>
@@ -6510,7 +6510,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">หมดเวลา</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
@@ -6588,7 +6588,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Server Offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
 </context>
 <context>
@@ -7406,7 +7406,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เปิดหน้าต่างใหม่ %1</translation>
     </message>
     <message>
         <source>Cannot move camera(s) to server %1. Server is unresponsive.</source>
@@ -7418,7 +7418,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Open File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เปิดไฟล์</translation>
     </message>
     <message>
         <source>Unable to perform preview search.</source>
@@ -7664,23 +7664,23 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การประทับเวลาไม่มี</translation>
     </message>
     <message>
         <source>Top Left Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">มุมซ้ายด้านบน (ต้องแปลง)</translation>
     </message>
     <message>
         <source>Top Right Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">มุมขวาบน (ต้องแปลง)</translation>
     </message>
     <message>
         <source>Bottom Left Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bottom left corner (requires transcoding)</translation>
     </message>
     <message>
         <source>Bottom Right Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">มุมขวาล่าง (ต้องแปลง)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
@@ -7704,7 +7704,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Save local layout as...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">บันทึกรูปแบบท้องถิ่นเป็น ...</translation>
     </message>
     <message>
         <source>Make file read-only.</source>
@@ -7853,7 +7853,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Enter Layout Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ใส่ชื่อรูปแบบ:</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
@@ -7861,7 +7861,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">รูปแบบใหม่ %1</translation>
     </message>
 </context>
 <context>
@@ -7962,23 +7962,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การประทับเวลาไม่มี</translation>
     </message>
     <message>
         <source>Top Left Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">มุมซ้ายบน</translation>
     </message>
     <message>
         <source>Top Right Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">มุมขวาด้านบน</translation>
     </message>
     <message>
         <source>Bottom Left Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">มุมซ้ายล่าง</translation>
     </message>
     <message>
         <source>Bottom Right Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">มุมขวาล่าง</translation>
     </message>
     <message>
         <source>Could not overwrite file.</source>
@@ -8201,11 +8201,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Pre-Recording:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ก่อนการบันทึก:</translation>
     </message>
     <message>
         <source>Post-Recording:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ขณะการบันทึก:</translation>
     </message>
 </context>
 <context>
@@ -8426,7 +8426,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>ServerSettingsDialog</name>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การตั้งค่าเซิร์ฟเวอร์</translation>
     </message>
 </context>
 <context>
@@ -8517,15 +8517,15 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SignDialog</name>
     <message>
         <source>Watermark Check</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ตรวจสอบลายน้ำ</translation>
     </message>
     <message>
         <source>Checked File:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การตรวจสอบไฟล์:</translation>
     </message>
     <message>
         <source>Check Result:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ผลการตรวจสอบ:</translation>
     </message>
 </context>
 <context>
@@ -8620,7 +8620,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เปิดเสียง</translation>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
@@ -8628,7 +8628,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Motion Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การตั้งค่าการเคลื่อนไหว</translation>
     </message>
     <message>
         <source>Motion Detection</source>
@@ -8640,7 +8640,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Motion Mask (0)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">พื้นที่โมชั่น (0)</translation>
     </message>
     <message>
         <source>Camera web page:</source>
@@ -8648,11 +8648,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Reset Motion Regions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">รีเซ็ตการเคลื่อนไหว</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ฮาร์ดแวร์ (ในตัวกล้อง)</translation>
     </message>
     <message>
         <source>Fisheye</source>
@@ -8747,7 +8747,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Unsecure Connection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การเชื่อมต่อไม่มีการป้องกัน</translation>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
@@ -8827,7 +8827,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Current System Time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เวลาปัจจุบัน:</translation>
     </message>
     <message>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>

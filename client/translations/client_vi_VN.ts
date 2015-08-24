@@ -299,11 +299,11 @@
     </message>
     <message>
         <source>Selected Server:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Máy chủ đã chọn:</translation>
     </message>
     <message>
         <source>S&amp;ubnet Scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">子&amp;quét mạng</translation>
     </message>
     <message>
         <source>Brand</source>
@@ -315,7 +315,7 @@
     </message>
     <message>
         <source>New Scan...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">quét…</translation>
     </message>
 </context>
 <context>
@@ -591,7 +591,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do Not Record</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">làm Video</translation>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
@@ -721,7 +721,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ghi sự kiện</translation>
     </message>
     <message>
         <source>Clear Filter</source>
@@ -795,7 +795,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">phút nhàn rỗi</translation>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
@@ -803,15 +803,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Double Buffering:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đôi đệm:</translation>
     </message>
     <message>
         <source>Browse Logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">lịch sử</translation>
     </message>
     <message>
         <source>Clear Local Cache</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bộ nhớ cache của địa phương rõ ràng</translation>
     </message>
 </context>
 <context>
@@ -881,47 +881,47 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Scroll Here</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trong cuốn này</translation>
     </message>
     <message>
         <source>Left Edge</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">cạnh trái</translation>
     </message>
     <message>
         <source>Right Edge</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">cạnh phải</translation>
     </message>
     <message>
         <source>Page Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">trang trái</translation>
     </message>
     <message>
         <source>Page Up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">trang</translation>
     </message>
     <message>
         <source>Page Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">trang bên phải</translation>
     </message>
     <message>
         <source>Page Down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">trang tiếp theo</translation>
     </message>
     <message>
         <source>Scroll Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Di chuyển sang trái</translation>
     </message>
     <message>
         <source>Scroll Up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Di chuyển lên</translation>
     </message>
     <message>
         <source>Scroll Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Di chuyển sang phải</translation>
     </message>
     <message>
         <source>Scroll Down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">cuộn xuống</translation>
     </message>
 </context>
 <context>
@@ -1010,7 +1010,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout is Locked</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Layout bị khóa</translation>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
@@ -1018,7 +1018,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Giữ tỉ lệ</translation>
     </message>
 </context>
 <context>
@@ -1053,7 +1053,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">thử nghiệm ...</translation>
     </message>
 </context>
 <context>
@@ -1180,11 +1180,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License Key is Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Key bản quyền là không hợp lệ</translation>
     </message>
     <message>
         <source>Select License File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chọn tập tin giấy phép ...</translation>
     </message>
 </context>
 <context>
@@ -1239,7 +1239,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Connection Options:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Lựa chọn kết nối:</translation>
     </message>
 </context>
 <context>
@@ -1322,7 +1322,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chế độ cột thời gian:</translation>
     </message>
 </context>
 <context>
@@ -1353,7 +1353,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">cho phép âm thanh</translation>
     </message>
 </context>
 <context>
@@ -1379,7 +1379,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Show to administrators only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hiện chỉ có các nhà quản lý</translation>
     </message>
 </context>
 <context>
@@ -1444,7 +1444,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No Tour Selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không có sự lựa chọn hành trình</translation>
     </message>
 </context>
 <context>
@@ -1486,7 +1486,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Save Position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">lưu trữ Location</translation>
     </message>
 </context>
 <context>
@@ -2681,11 +2681,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select Time Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chọn máy chủ thời gian</translation>
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kích hoạt PTZ đối tượng</translation>
     </message>
     <message>
         <source>User Management...</source>
@@ -2988,7 +2988,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Build Number:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xây dựng số:</translation>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
@@ -3113,7 +3113,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tất cả người dùng</translation>
     </message>
     <message>
         <source>Select Sound</source>
@@ -3121,7 +3121,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter Text</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nhập văn bản</translation>
     </message>
 </context>
 <context>
@@ -3191,7 +3191,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm Rules Reset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thiết lập lại để xác nhận các quy tắc</translation>
     </message>
     <message>
         <source>Error while deleting rule.</source>
@@ -3199,11 +3199,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm Save</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xác nhận cửa hàng</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xác nhận Exit</translation>
     </message>
 </context>
 <context>
@@ -3389,7 +3389,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Applying Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Áp dụng các thiết lập ...</translation>
     </message>
     <message>
         <source>Target camera&apos;s service is unavailable. Try again.</source>
@@ -3744,18 +3744,18 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Local System Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hiện hệ thống địa phương</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cấu hình máy chủ (s)</translation>
     </message>
     <message>
         <source>Updating Server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đang cập nhật máy chủ (s)</translation>
     </message>
 </context>
 <context>
@@ -4118,7 +4118,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Any Action</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">bất kỳ hành động</translation>
     </message>
 </context>
 <context>
@@ -4161,7 +4161,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tất cả người dùng</translation>
     </message>
 </context>
 <context>
@@ -4750,7 +4750,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Obtaining licenses from server...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lấy giấy phép từ Server ...</translation>
     </message>
     <message>
         <source>License has arleady been activated.</source>
@@ -4930,7 +4930,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Delete Connections</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">xóa kết nối</translation>
     </message>
 </context>
 <context>
@@ -4993,7 +4993,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chọn File...</translation>
     </message>
 </context>
 <context>
@@ -5055,7 +5055,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Zoom Window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">phóng to cửa sổ</translation>
     </message>
     <message>
         <source>Low-Res</source>
@@ -5161,11 +5161,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">thử nghiệm ...</translation>
     </message>
     <message>
         <source>Merging Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">sáp nhập hệ thống ...</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
@@ -5186,7 +5186,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">lịch trình không hợp lệ</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
@@ -5304,19 +5304,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Sound Files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu trữ âm thanh</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chọn File...</translation>
     </message>
     <message>
         <source>Enter New Title:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhập tiêu đề mới:</translation>
     </message>
     <message>
         <source>Confirm File Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xác nhận tập tin Xóa</translation>
     </message>
 </context>
 <context>
@@ -5497,7 +5497,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Remove Preset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hủy bỏ các điểm định sẵn</translation>
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
@@ -5574,7 +5574,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Tour %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">du lịch mới %1</translation>
     </message>
     <message>
         <source>Saved Position %1</source>
@@ -5878,11 +5878,11 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnResourceSelectionDialog</name>
     <message>
         <source>Select Users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chọn người dùng...</translation>
     </message>
     <message>
         <source>Select Cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">chọn máy ảnh...</translation>
     </message>
     <message>
         <source>Slect Resources...</source>
@@ -6333,11 +6333,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Latest Version:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phiên bản mới nhất:</translation>
     </message>
     <message>
         <source>Target Version:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phiên bản mục tiêu:</translation>
     </message>
     <message>
         <source>Update Finished...100%</source>
@@ -6361,7 +6361,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cập nhật hủy</translation>
     </message>
     <message>
         <source>Update unsuccessful.</source>
@@ -6416,11 +6416,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Watermark Not Found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">không thể tìm thấy một watermark</translation>
     </message>
     <message>
         <source>Watermark Matched</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">watermark phù hợp</translation>
     </message>
 </context>
 <context>
@@ -6459,11 +6459,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phần cứng (camera built-in)</translation>
     </message>
     <message>
         <source>Do Not Record Motion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không sử dụng các video chuyển</translation>
     </message>
 </context>
 <context>
@@ -6518,7 +6518,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">giờ nghĩ giảo lao</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
@@ -6596,7 +6596,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Server Offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">máy chủ đang ẩn</translation>
     </message>
 </context>
 <context>
@@ -7414,7 +7414,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">新佈局 %1</translation>
     </message>
     <message>
         <source>Cannot move camera(s) to server %1. Server is unresponsive.</source>
@@ -7426,7 +7426,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Open File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">mở tập tin</translation>
     </message>
     <message>
         <source>Unable to perform preview search.</source>
@@ -7672,23 +7672,23 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không có thời gian đóng dấu</translation>
     </message>
     <message>
         <source>Top Left Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Góc trên bên trái (cần phải chuyển mã)</translation>
     </message>
     <message>
         <source>Top Right Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Góc trên bên phải (cần phải chuyển mã)</translation>
     </message>
     <message>
         <source>Bottom Left Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Góc dưới bên trái (cần phải chuyển mã)</translation>
     </message>
     <message>
         <source>Bottom Right Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">góc dưới bên phải (cần phải chuyển mã)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
@@ -7712,7 +7712,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Save local layout as...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu bố trí địa phương…</translation>
     </message>
     <message>
         <source>Make file read-only.</source>
@@ -7861,7 +7861,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Enter Layout Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhập tên bố trí:</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
@@ -7869,7 +7869,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">việc bố trí mới %1</translation>
     </message>
 </context>
 <context>
@@ -7970,23 +7970,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không có thời gian đóng dấu</translation>
     </message>
     <message>
         <source>Top Left Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">góc trên bên trái</translation>
     </message>
     <message>
         <source>Top Right Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">góc trên bên phải</translation>
     </message>
     <message>
         <source>Bottom Left Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">góc dưới cùng bên trái</translation>
     </message>
     <message>
         <source>Bottom Right Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">góc dưới bên phải</translation>
     </message>
     <message>
         <source>Could not overwrite file.</source>
@@ -8209,11 +8209,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Pre-Recording:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">pre-recording:</translation>
     </message>
     <message>
         <source>Post-Recording:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">bài-ghi âm:</translation>
     </message>
 </context>
 <context>
@@ -8434,7 +8434,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>ServerSettingsDialog</name>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">cài đặt máy chủ</translation>
     </message>
 </context>
 <context>
@@ -8525,15 +8525,15 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SignDialog</name>
     <message>
         <source>Watermark Check</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">watermark</translation>
     </message>
     <message>
         <source>Checked File:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiểm tra các tài liệu lưu trữ:</translation>
     </message>
     <message>
         <source>Check Result:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kết quả thử nghiệm:</translation>
     </message>
 </context>
 <context>
@@ -8628,7 +8628,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">cho phép âm thanh</translation>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
@@ -8636,7 +8636,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Motion Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Displacement bộ</translation>
     </message>
     <message>
         <source>Motion Detection</source>
@@ -8648,7 +8648,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Motion Mask (0)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không phát hiện di dời (0)</translation>
     </message>
     <message>
         <source>Camera web page:</source>
@@ -8656,11 +8656,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Reset Motion Regions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thiết lập lại khu vực phát hiện chuyển động</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Phần cứng (camera built-in)</translation>
     </message>
     <message>
         <source>Fisheye</source>
@@ -8755,7 +8755,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Unsecure Connection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dây không an toàn</translation>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
@@ -8835,7 +8835,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Current System Time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thời gian hiện tại:</translation>
     </message>
     <message>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>

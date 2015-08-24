@@ -298,11 +298,11 @@
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Porta de Entrada: %1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Endereço em conflito: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
@@ -728,11 +728,11 @@
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licenciado para : </translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licensa LIVRE</translation>
     </message>
 </context>
 <context>
@@ -977,7 +977,7 @@
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Método Transcode desconhecido</translation>
     </message>
 </context>
 <context>
