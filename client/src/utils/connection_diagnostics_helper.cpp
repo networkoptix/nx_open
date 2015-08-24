@@ -390,6 +390,8 @@ QString QnConnectionDiagnosticsHelper::resultToString(Result value) {
     return QString();
 }
 
+#endif
+
 QString QnConnectionDiagnosticsHelper::strings(ErrorStrings id) {
     switch (id) {
     case ErrorStrings::ContactAdministrator:
@@ -403,4 +405,3 @@ QString QnConnectionDiagnosticsHelper::strings(ErrorStrings id) {
     return QString();
 }
 
-#endif

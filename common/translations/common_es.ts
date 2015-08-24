@@ -294,15 +294,15 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ha ocurrido un evento desconocido</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Puerto de entrada: %1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dirección en conflicto: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
@@ -437,7 +437,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No autorizado. Url %1.</translation>
     </message>
 </context>
 <context>
@@ -459,7 +459,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se pudo iniciar el explorador de Windows</translation>
     </message>
 </context>
 <context>
@@ -474,11 +474,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se pudo inicializar el codificador de audio.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se pudo inicializar el decodificador de audio.</translation>
     </message>
 </context>
 <context>
@@ -516,7 +516,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se pudo inicializar el codificador de video.</translation>
     </message>
 </context>
 <context>
@@ -567,35 +567,35 @@
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Codificador analógico</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Las licencias de prueba</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencias analógicas</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencias profesionales</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencias Edge</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencias Vmax</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencias de codificador analógico</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencias para pared de vídeo</translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
@@ -607,7 +607,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Firma no válida</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -615,11 +615,11 @@
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Personalización no es válida</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tipo no válido</translation>
     </message>
 </context>
 <context>
@@ -658,19 +658,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hubo un problema al activar su clave de licencia. Error en la base de datos se ha producido.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La clave de licencia que ha introducido no es válida. Compruebe por favor que la clave de licencia es introducida correctamente. Si el problema persiste, póngase en contacto con el equipo de asistencia para confirmar si la clave de licencia es válida o para obtener una clave de licencia válida.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Intentas activar una licencia incompatible con su software. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Esta clave de licencia se ha activado anteriormente en el hardware id { {hwid}} { {tiempo} }. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
     </message>
 </context>
 <context>
@@ -724,15 +724,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Las licencias de prueba</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencia para:</translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Licencia GRATIS</translation>
     </message>
 </context>
 <context>
@@ -912,11 +912,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Almacenamientos están llenos</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Almacenamientos no están configurados</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>
@@ -973,11 +973,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCLTranscode no está implementada</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Método de transcodificación desconocido</translation>
     </message>
 </context>
 <context>

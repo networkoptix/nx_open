@@ -220,7 +220,7 @@
     </message>
     <message>
         <source>filter by camera...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">filter by camera...</translation>
     </message>
 </context>
 <context>
@@ -255,7 +255,7 @@
     </message>
     <message>
         <source>Auto</source>
-        <translation></translation>
+        <translation>Auto</translation>
     </message>
     <message>
         <source>&amp;Discovery Port:</source>
@@ -287,15 +287,15 @@
     </message>
     <message>
         <source>Add camera(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Add camera(s)...</translation>
     </message>
     <message>
         <source>Selected Server:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Selected Server:</translation>
     </message>
     <message>
         <source>S&amp;ubnet Scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">S&amp;ubnet Scan</translation>
     </message>
     <message>
         <source>Brand</source>
@@ -307,7 +307,7 @@
     </message>
     <message>
         <source>New Scan...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">New Scan...</translation>
     </message>
 </context>
 <context>
@@ -355,7 +355,7 @@
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
         <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Event will be triggered when a camera becomes offline</translation>
     </message>
 </context>
 <context>
@@ -446,7 +446,7 @@
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Do not use</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
@@ -581,7 +581,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do Not Record</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Do Not Record</translation>
     </message>
     <message>
         <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
@@ -589,11 +589,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Min. Days</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Max. Days</translation>
     </message>
 </context>
 <context>
@@ -711,11 +711,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Event Log</translation>
     </message>
     <message>
         <source>Clear Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Clear Filter</translation>
     </message>
 </context>
 <context>
@@ -738,7 +738,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Camera View Angle Correction</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Camera View Angle Correction</translation>
     </message>
 </context>
 <context>
@@ -777,31 +777,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Downmix Audio from 5.1 to 2.1</translation>
     </message>
     <message>
         <source>Auto Pause Video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Auto Pause Video</translation>
     </message>
     <message>
         <source>Minutes of Inactivity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Minutes of Inactivity</translation>
     </message>
     <message>
         <source>Run Application when PC Boots:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Run Application when PC Boots:</translation>
     </message>
     <message>
         <source>Double Buffering:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Double Buffering:</translation>
     </message>
     <message>
         <source>Browse Logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Browse Logs</translation>
     </message>
     <message>
         <source>Clear Local Cache</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Clear Local Cache</translation>
     </message>
 </context>
 <context>
@@ -871,47 +871,47 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Scroll Here</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scroll Here</translation>
     </message>
     <message>
         <source>Left Edge</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Left Edge</translation>
     </message>
     <message>
         <source>Right Edge</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Right Edge</translation>
     </message>
     <message>
         <source>Page Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Page Left</translation>
     </message>
     <message>
         <source>Page Up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Page Up</translation>
     </message>
     <message>
         <source>Page Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Page Right</translation>
     </message>
     <message>
         <source>Page Down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Page Down</translation>
     </message>
     <message>
         <source>Scroll Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scroll Left</translation>
     </message>
     <message>
         <source>Scroll Up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scroll Up</translation>
     </message>
     <message>
         <source>Scroll Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scroll Right</translation>
     </message>
     <message>
         <source>Scroll Down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scroll Down</translation>
     </message>
 </context>
 <context>
@@ -945,7 +945,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Loading Image...Please Wait.</translation>
     </message>
 </context>
 <context>
@@ -1000,15 +1000,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout is Locked</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Layout is Locked</translation>
     </message>
     <message>
         <source>Processing Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Processing Image...Please Wait.</translation>
     </message>
     <message>
         <source>Keep Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Keep Aspect Ratio</translation>
     </message>
 </context>
 <context>
@@ -1043,7 +1043,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Testing...</translation>
     </message>
 </context>
 <context>
@@ -1170,11 +1170,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License Key is Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">License Key is Invalid</translation>
     </message>
     <message>
         <source>Select License File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select License File...</translation>
     </message>
 </context>
 <context>
@@ -1229,7 +1229,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&amp;Connection Options:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Connection Options:</translation>
     </message>
 </context>
 <context>
@@ -1312,7 +1312,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Timeline Mode:</translation>
     </message>
 </context>
 <context>
@@ -1343,7 +1343,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Enable Audio</translation>
     </message>
 </context>
 <context>
@@ -1369,7 +1369,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Show to administrators only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Show do administrators only</translation>
     </message>
 </context>
 <context>
@@ -1434,7 +1434,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No Tour Selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No Tour Selected</translation>
     </message>
 </context>
 <context>
@@ -1476,7 +1476,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Save Position</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Save Position</translation>
     </message>
 </context>
 <context>
@@ -2675,15 +2675,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Drop Resources into New Layout</translation>
     </message>
     <message>
         <source>Select Time Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select Time Server</translation>
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activate PTZ Object</translation>
     </message>
     <message>
         <source>User Management...</source>
@@ -2966,7 +2966,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You have new notifications.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">You have new notifications.</translation>
     </message>
 </context>
 <context>
@@ -2985,15 +2985,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Install a specific build.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Install a specific build.</translation>
     </message>
     <message>
         <source>Build Number:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Build Number:</translation>
     </message>
     <message>
         <source>The password you have entered is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">The password you have entered is not valid.</translation>
     </message>
 </context>
 <context>
@@ -3018,7 +3018,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select at least one camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select at least one camera.</translation>
     </message>
 </context>
 <context>
@@ -3118,19 +3118,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Administrators Only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Administrators Only</translation>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">All Users</translation>
     </message>
     <message>
         <source>Select Sound</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select Sound</translation>
     </message>
     <message>
         <source>Enter Text</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Enter Text</translation>
     </message>
 </context>
 <context>
@@ -3156,11 +3156,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Error while receiving rules.</source>
-        <translation></translation>
+        <translation>Error while deleting rule.</translation>
     </message>
     <message>
         <source>Error while saving rule.</source>
-        <translation></translation>
+        <translation>Error while deleting rule.</translation>
     </message>
     <message>
         <source>Hide Advanced</source>
@@ -3200,19 +3200,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirm Rules Reset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Confirm Rules Reset</translation>
     </message>
     <message>
         <source>Error while deleting rule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error while deleting rule.</translation>
     </message>
     <message>
         <source>Confirm Save</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Confirm Save</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Confirm Exit</translation>
     </message>
 </context>
 <context>
@@ -3342,27 +3342,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">The specified IP address range has more than 255 addresses.</translation>
     </message>
     <message>
         <source>Camera address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Camera address field must contain a valid URL, IP address, or RTSP link.</translation>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Finished searching...</translation>
     </message>
     <message>
         <source>No cameras selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No cameras selected.</translation>
     </message>
     <message>
         <source>Please select at least one camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Please select at least one camera.</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Server went offline - search aborted.</translation>
     </message>
     <message>
         <source>Server is offline, cameras can only be added to an online server.</source>
@@ -3370,7 +3370,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Server has been removed - search aborted.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add cameras.</source>
@@ -3378,7 +3378,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Error while searching for camera(s).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error while searching for camera(s).</translation>
     </message>
 </context>
 <context>
@@ -3402,7 +3402,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Applying Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Applying Settings...</translation>
     </message>
     <message>
         <source>Target camera&apos;s service is unavailable. Try again.</source>
@@ -3410,7 +3410,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not save paramaters.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not save paramaters.</translation>
     </message>
 </context>
 <context>
@@ -3453,11 +3453,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Do not lock archive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Do not lock archive.</translation>
     </message>
     <message>
         <source>List of tags divided by commas or spaces.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">List of tags divided by commas or spaces.</translation>
     </message>
 </context>
 <context>
@@ -3480,7 +3480,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Confirming server availability.</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
@@ -3488,11 +3488,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Confirming target camera provides media stream.</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Evaluating media stream for errors.</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
@@ -3546,7 +3546,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Export selected cameras to a file.</translation>
     </message>
 </context>
 <context>
@@ -3705,31 +3705,31 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
         <source>Camera(s) not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Camera(s) not saved.</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Changes have not been applied.</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</translation>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">License limit exceeded. Changes have been saved, but will not be applied.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not apply changes.</translation>
     </message>
 </context>
 <context>
@@ -3761,22 +3761,22 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnClockLabel</name>
     <message>
         <source>Server Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Server Time</translation>
     </message>
     <message>
         <source>Local System Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Local System Time</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configuring Server(s)</translation>
     </message>
     <message>
         <source>Updating Server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Updating Server(s)</translation>
     </message>
 </context>
 <context>
@@ -3883,7 +3883,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">The username or password you have entered is incorrect. Please try again.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
@@ -3891,7 +3891,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Launcher process not found.</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
@@ -3906,7 +3906,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Request timeout</translation>
     </message>
     <message>
         <source>Test Failed</source>
@@ -3925,7 +3925,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Enter a valid username and password...</translation>
     </message>
 </context>
 <context>
@@ -3996,7 +3996,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Failed to dump server database to %1.</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
@@ -4004,7 +4004,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">You need to connect to a server prior to performing a backup.</translation>
     </message>
 </context>
 <context>
@@ -4015,7 +4015,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation></translation>
+        <translation>Could not initialise video encoder.</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
@@ -4039,7 +4039,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Screen width must be a multiple of 8.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Screen width must be a multiple of 8.</translation>
     </message>
 </context>
 <context>
@@ -4050,7 +4050,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation></translation>
+        <translation>Could not initialise video encoder.</translation>
     </message>
     <message>
         <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
@@ -4142,7 +4142,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Any Action</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Any Action</translation>
     </message>
 </context>
 <context>
@@ -4185,7 +4185,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">All Users</translation>
     </message>
 </context>
 <context>
@@ -4196,11 +4196,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Schedule motion type is not supported by some cameras.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Recording cannot be enabled for some cameras.</translation>
     </message>
 </context>
 <context>
@@ -4246,11 +4246,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Folder has already been added.</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">This folder has already been added.</translation>
     </message>
 </context>
 <context>
@@ -4720,7 +4720,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License Activation</source>
-        <translation></translation>
+        <translation>License Activation</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
@@ -4732,7 +4732,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License Activation </source>
-        <translation></translation>
+        <translation>License Activation</translation>
     </message>
     <message>
         <source>Remove license</source>
@@ -4778,7 +4778,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Obtaining licenses from server...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Obtaining licenses from server...</translation>
     </message>
     <message>
         <source>License has arleady been activated.</source>
@@ -4786,27 +4786,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">There was a problem activating your license key. A network error has occurred.</translation>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to activate license:  %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to remove license from server:  %1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</translation>
     </message>
     <message>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</translation>
     </message>
 </context>
 <context>
@@ -4948,19 +4948,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Invalid Paramaters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Invalid Paramaters</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Connection already exists.</translation>
     </message>
     <message>
         <source>A connection with this name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A connection with this name already exists. Do you want to overwrite it?</translation>
     </message>
     <message>
         <source>Delete Connections</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Delete Connections</translation>
     </message>
 </context>
 <context>
@@ -5023,7 +5023,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select File...</translation>
     </message>
 </context>
 <context>
@@ -5085,18 +5085,18 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Zoom Window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zoom Window</translation>
     </message>
     <message>
         <source>Low-Res</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Low-Res</translation>
     </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
     <message>
         <source>Merge Systems...</source>
-        <translation></translation>
+        <translation>Merging Systems...</translation>
     </message>
     <message>
         <source>Server URL:</source>
@@ -5191,15 +5191,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Testing...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Testing...</translation>
     </message>
     <message>
         <source>Merging Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Merging Systems...</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">The discovered system %1 has an incompatible version %2.</translation>
     </message>
 </context>
 <context>
@@ -5216,11 +5216,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Invalid Schedule</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</translation>
     </message>
 </context>
 <context>
@@ -5335,19 +5335,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Sound Files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sound Files</translation>
     </message>
     <message>
         <source>Select File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select File...</translation>
     </message>
     <message>
         <source>Enter New Title:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Enter New Title:</translation>
     </message>
     <message>
         <source>Confirm File Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Confirm File Deletion</translation>
     </message>
 </context>
 <context>
@@ -5520,15 +5520,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not get position from camera.</translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not set position for camera.</translation>
     </message>
     <message>
         <source>Remove Preset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Remove Preset</translation>
     </message>
     <message>
         <source>Manage PTZ for %1.</source>
@@ -5536,11 +5536,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PTZ configuration has not been saved.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Changes have not been saved. Would you like to save them?</translation>
     </message>
 </context>
 <context>
@@ -5608,19 +5608,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Tour %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">New Tour %1</translation>
     </message>
     <message>
         <source>Saved Position %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Saved Position %1</translation>
     </message>
     <message>
         <source>Tour should contain at least 2 positions.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tour should contain at least 2 positions.</translation>
     </message>
     <message>
         <source>Tour Time: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tour Time: %1.</translation>
     </message>
 </context>
 <context>
@@ -5650,11 +5650,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">This hotkey is used by preset &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">This hotkey is used by tour &quot;%1&quot;.</translation>
     </message>
 </context>
 <context>
@@ -5917,15 +5917,15 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnResourceSelectionDialog</name>
     <message>
         <source>Select Users...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select Users...</translation>
     </message>
     <message>
         <source>Select Cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select Cameras...</translation>
     </message>
     <message>
         <source>Slect Resources...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Slect Resources...</translation>
     </message>
 </context>
 <context>
@@ -6281,11 +6281,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>You will have to update the client manually.</source>
-        <translation></translation>
+        <translation>Please update the client manually.</translation>
     </message>
     <message>
         <source>You will have to update the client manually using an installer.</source>
-        <translation></translation>
+        <translation>Please update the client manually using an installation package.</translation>
     </message>
     <message>
         <source>All components in your system are up to date.</source>
@@ -6377,15 +6377,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Latest Version:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Latest Version:</translation>
     </message>
     <message>
         <source>Target Version:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Target Version:</translation>
     </message>
     <message>
         <source>Update Finished...100%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Update Finished...100%</translation>
     </message>
     <message>
         <source>Please update the client manually.</source>
@@ -6401,23 +6401,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Launcher process not found.</translation>
     </message>
     <message>
         <source>Update Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Update Cancelled</translation>
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Update Succeeded.</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Another user has already started an update.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Internet Connectivity Problem</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
@@ -6425,11 +6425,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to begin update. An update for one or more servers not found.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to begin update. An update for the client was not found.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
@@ -6437,7 +6437,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to check updates via internet.</translation>
     </message>
     <message>
         <source>Available Update:</source>
@@ -6445,7 +6445,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">To update manually, download and use the archive file on the following link:</translation>
     </message>
 </context>
 <context>
@@ -6460,11 +6460,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Watermark Not Found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Watermark Not Found</translation>
     </message>
     <message>
         <source>Watermark Matched</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Watermark Matched</translation>
     </message>
 </context>
 <context>
@@ -6503,11 +6503,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hardware (camera built-in)</translation>
     </message>
     <message>
         <source>Do Not Record Motion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Do Not Record Motion</translation>
     </message>
 </context>
 <context>
@@ -6558,23 +6558,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Provided parameters not valid. Could not perform test.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Timed Out</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E-Mail is not valid</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No preset found. Use &apos;Advanced&apos; option.</translation>
     </message>
     <message>
         <source>Support email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Support email is not valid.</translation>
     </message>
 </context>
 <context>
@@ -6640,7 +6640,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Server Offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Server Offline</translation>
     </message>
 </context>
 <context>
@@ -6678,7 +6678,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Provided storage path does not point to a valid external storage location.</translation>
     </message>
 </context>
 <context>
@@ -7225,7 +7225,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Launch video wall when Windows starts.</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
@@ -7333,7 +7333,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>User with the same name already exists</source>
-        <translation></translation>
+        <translation>Video Wall with the same name already exists.</translation>
     </message>
     <message>
         <source>Rename</source>
@@ -7465,11 +7465,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">New Layout</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">New Layout %1</translation>
     </message>
     <message>
         <source>Cannot move camera(s) to server %1. Server is unresponsive.</source>
@@ -7481,27 +7481,27 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Open File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Open File</translation>
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to perform preview search.</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Process in progress...</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video Wall with the same name already exists.</translation>
     </message>
     <message>
         <source>Updating Background...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Updating Background...</translation>
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Image processing may take a few moments. Please be patient.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
@@ -7509,7 +7509,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Launcher process not found.</translation>
     </message>
 </context>
 <context>
@@ -7528,19 +7528,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Bookmarks can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bookmarks can only be added to an online server.</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bookmarks can only be edited on an online server.</translation>
     </message>
     <message>
         <source>Bookmarks can only be deleted from an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bookmarks can only be deleted from an online server.</translation>
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Confirm Deletion</translation>
     </message>
 </context>
 <context>
@@ -7590,15 +7590,15 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to start recording due to the following error: %1</translation>
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not overwrite file &apos;%1&apos;. Please try a different name.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Press any key to stop the tour.</translation>
     </message>
 </context>
 <context>
@@ -7617,7 +7617,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation></translation>
+        <translation>Unable to export file.</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
@@ -7716,7 +7716,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>File is in use.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File is in use.</translation>
     </message>
     <message>
         <source>Unable to export file.</source>
@@ -7724,31 +7724,31 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Warning!</translation>
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No Timestamp</translation>
     </message>
     <message>
         <source>Top Left Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Top Left Corner (requires transcoding)</translation>
     </message>
     <message>
         <source>Top Right Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Top Right Corner (requires transcoding)</translation>
     </message>
     <message>
         <source>Bottom Left Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bottom Left Corner (requires transcoding)</translation>
     </message>
     <message>
         <source>Bottom Right Corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bottom Right Corner (requires transcoding)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</translation>
     </message>
     <message>
         <source>Export Complete</source>
@@ -7768,11 +7768,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Save local layout as...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Save local layout as...</translation>
     </message>
     <message>
         <source>Make file read-only.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Make file read-only.</translation>
     </message>
     <message>
         <source>Export Successful.</source>
@@ -7846,11 +7846,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Please wait. Requested servers will be added to your system.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rejoice! Selected servers have been successfully connected to your system!</translation>
     </message>
 </context>
 <context>
@@ -7887,7 +7887,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Layout</source>
-        <translation></translation>
+        <translation>New Layout</translation>
     </message>
     <message>
         <source>Enter the name of the layout to create:</source>
@@ -7913,23 +7913,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Layout already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Layout already exists.</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A layout with the same name already exists. You do not have the rights to overwrite it.</translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Enter Layout Name:</translation>
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A layout with the same name already exists. Would you like to overwrite it?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">New Layout %1</translation>
     </message>
 </context>
 <context>
@@ -7979,11 +7979,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to get position from camera.</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to set position for camera.</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
@@ -8006,7 +8006,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Timestamp:</source>
-        <translation></translation>
+        <translation>No Timestamp</translation>
     </message>
     <message>
         <source>Save As</source>
@@ -8030,35 +8030,35 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>No Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No Timestamp</translation>
     </message>
     <message>
         <source>Top Left Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Top Left Corner</translation>
     </message>
     <message>
         <source>Top Right Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Top Right Corner</translation>
     </message>
     <message>
         <source>Bottom Left Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bottom Left Corner</translation>
     </message>
     <message>
         <source>Bottom Right Corner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bottom Right Corner</translation>
     </message>
     <message>
         <source>Could not overwrite file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not overwrite file.</translation>
     </message>
     <message>
         <source>Could not save screenshot.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not save screenshot.</translation>
     </message>
     <message>
         <source>An error occured while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">An error occured while saving screenshot &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
@@ -8073,7 +8073,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update is strongly recommended.</source>
-        <translation></translation>
+        <translation>Update is recommended.</translation>
     </message>
     <message>
         <source>Release Notes</source>
@@ -8085,19 +8085,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New version %1 is available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A newer version is available.</translation>
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A newer version is available.</translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Update is recommended.</translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Do not notify me again about this update.</translation>
     </message>
 </context>
 <context>
@@ -8206,19 +8206,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A control session is already running.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A control session is already running.</translation>
     </message>
     <message>
         <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">An unexpected error has occured. Changes cannot be applied.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">There are no offline video wall items attached to this computer.</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video Wall is about to start. Would you like to close this %1 Client instance?</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
@@ -8226,19 +8226,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To enable this feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">To enable this feature please activate at least one Video Wall license.</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">To enable this feature please activate at least one Video Wall license.</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video Wall already exists.</translation>
     </message>
     <message>
         <source>A Video Wall with the same name already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A Video Wall with the same name already exists.</translation>
     </message>
 </context>
 <context>
@@ -8249,7 +8249,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Please wait while the connection is restored...</translation>
     </message>
 </context>
 <context>
@@ -8272,11 +8272,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Pre-Recording:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pre-Recording:</translation>
     </message>
     <message>
         <source>Post-Recording:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Post-Recording:</translation>
     </message>
 </context>
 <context>
@@ -8497,7 +8497,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>ServerSettingsDialog</name>
     <message>
         <source>Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Server Settings</translation>
     </message>
 </context>
 <context>
@@ -8588,15 +8588,15 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SignDialog</name>
     <message>
         <source>Watermark Check</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Watermark Check</translation>
     </message>
     <message>
         <source>Checked File:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Checked File:</translation>
     </message>
     <message>
         <source>Check Result:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Check Result:</translation>
     </message>
 </context>
 <context>
@@ -8687,23 +8687,23 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
         <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Enable Audio</translation>
     </message>
     <message>
         <source>Motion is not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Motion is not available for this camera.</translation>
     </message>
     <message>
         <source>Motion Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Motion Settings</translation>
     </message>
     <message>
         <source>Motion Detection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Motion Detection</translation>
     </message>
     <message>
         <source>Software - maximum FPS could decrease slightly on server</source>
@@ -8711,19 +8711,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Motion Mask (0)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Motion Mask (0)</translation>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Camera web page:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reset Motion Regions</translation>
     </message>
     <message>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hardware (camera built-in)</translation>
     </message>
     <message>
         <source>Fisheye</source>
@@ -8814,19 +8814,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Enter a short system description here.</translation>
     </message>
     <message>
         <source>Unsecure Connection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unsecure Connection</translation>
     </message>
     <message>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Secure connection using TLS.</translation>
     </message>
     <message>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Secure connection using SSL.</translation>
     </message>
 </context>
 <context>
@@ -8898,7 +8898,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Current System Time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Current System Time:</translation>
     </message>
     <message>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
@@ -8968,7 +8968,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Note: Schedule is based on server time.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Note: Schedule is based on server time.</translation>
     </message>
 </context>
 </TS>

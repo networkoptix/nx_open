@@ -297,15 +297,15 @@
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Произошло неизвестное событие</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Тревожный вход: %1</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Конфликтующий адрес: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
@@ -440,7 +440,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка авторизации. Адрес %1.</translation>
     </message>
 </context>
 <context>
@@ -462,7 +462,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка запуска Проводника Windows</translation>
     </message>
 </context>
 <context>
@@ -477,11 +477,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно инициализировать аудио кодировщик.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно инициализировать аудио декодер.</translation>
     </message>
 </context>
 <context>
@@ -519,7 +519,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно инициализировать видео кодировщик.</translation>
     </message>
 </context>
 <context>
@@ -570,35 +570,35 @@
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Аналоговый энкодер</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Временная лицензия</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Лицензия на аналоговую камеру</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Профессиональная лицензия</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Лицензия Edge</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Лицензия Vmax</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Лицензии на аналоговые энкодеры</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Лицензии на видеостены</translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
@@ -610,7 +610,7 @@
     </message>
     <message>
         <source>Invalide Signature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неверная подпись</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -618,11 +618,11 @@
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неверная кастомизация</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неверный тип</translation>
     </message>
 </context>
 <context>
@@ -665,19 +665,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Проблема при активации лицензионного ключа. Произошла ошибка базы данных.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Лицензионный ключ, введенный вами, неверен. Пожалуйста, проверьте, что вы правильно ввели лицензионный ключ. Если проблема не исчезла обратитесь в службу поддержки, стобы подтвердить правильность лицензионного ключа либо для получения верного лицензионного ключа.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Вы пытаетесь активировать несовместимую с вашим программным обеспечением лицензию. Обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Этот лицензионный ключ был активирован {{time}} для аппаратного ID {{hwid}}. Пожалуйста, обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
     </message>
 </context>
 <context>
@@ -731,15 +731,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Временная лицензия</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Лицензировано для:</translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Бесплатная лицензия</translation>
     </message>
 </context>
 <context>
@@ -919,11 +919,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Хранилища заполнены</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Хранилища не настроены</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>
@@ -980,11 +980,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCLTranscode не реализован</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неизвестный метод перекодирования</translation>
     </message>
 </context>
 <context>

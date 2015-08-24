@@ -437,7 +437,7 @@
     </message>
     <message>
         <source>Not authorised. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Not authorized. URL %1.</translation>
     </message>
 </context>
 <context>
