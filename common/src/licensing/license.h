@@ -111,7 +111,7 @@ protected:
     bool isValidStartLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
     bool isAllowedForArm() const;
 
-
+    void setClass(const QString &xclass);
 private:
     void parseLicenseBlock(
         const QByteArray& licenseBlock,

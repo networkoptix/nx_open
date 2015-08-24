@@ -250,6 +250,10 @@ QString QnLicense::xclass() const
     return m_class;
 }
 
+void QnLicense::setClass(const QString &xclass) {
+    m_class = xclass;
+}
+
 QString QnLicense::version() const
 {
     return m_version;

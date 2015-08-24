@@ -47,6 +47,7 @@ void QnLicenseStub::setArmServer(bool value) {
 QnFutureLicenseStub::QnFutureLicenseStub(int count) {
     ++initialKey.data1;
     setKey(initialKey.toByteArray());
+    setClass("some-future-class");
     setCameraCount(count);
 }
 
