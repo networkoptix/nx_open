@@ -59,6 +59,9 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode) {
     if (errorCode == ec2::ErrorCode::unauthorized)
         return Result::Unauthorized;
+    
+    if (errorCode == ec2::ErrorCode::temporary_unauthorized)
+        return Result::TemporaryUnauthorized;
 
     if (errorCode != ec2::ErrorCode::ok)
         return Result::ServerError;
@@ -78,10 +81,13 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
     QString detail;
     if (result == Result::Unauthorized) {
         detail = tr("The username or password you have entered is incorrect. Please try again.");
+    } else if (result == Result::TemporaryUnauthorized) {
+        detail = tr("LDAP Server connection timed out.") + L'\n' 
+            + strings(ErrorStrings::ContactAdministrator);
     } else if (result == Result::ServerError) {
         detail = tr("Connection to the Server could not be established.") + L'\n' 
                + tr("Connection details that you have entered are incorrect, please try again.") + L'\n' 
-               + tr("If this error persists, please contact your VMS administrator.");
+               + strings(ErrorStrings::ContactAdministrator);
     } else if (result == Result::IncompatibleBrand) { //brand incompatible
         detail = tr("You are trying to connect to incompatible Server.");
     }
@@ -90,7 +96,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         QnMessageBox::warning(
             parentWidget,
             Qn::Login_Help,
-            tr("Unable to connect to the server"),
+            strings(ErrorStrings::UnableConnect),
             detail
             );
         return result;
@@ -134,7 +140,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
-                tr("Unable to connect to the server"),
+                strings(ErrorStrings::UnableConnect),
                 message,
                 QMessageBox::Ok
                 );
@@ -146,7 +152,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         QnMessageBox::warning(
             parentWidget,
             Qn::VersionMismatch_Help,
-            tr("Unable to connect to the server"),
+            strings(ErrorStrings::UnableConnect),
             tr("You are about to connect to Server which has a different version:") + L'\n'
             + versionDetails
             + tr("Compatibility mode for versions lower than %1 is not supported.").arg(minSupportedVersion.toString()),
@@ -160,7 +166,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         QnMessageBox::warning(
             parentWidget,
             Qn::VersionMismatch_Help,
-            tr("Unable to connect to the server"),
+            strings(ErrorStrings::UnableConnect),
             tr("Selected Server has a different version:") + L'\n'
             + versionDetails
             + tr("The other version of the Client is needed in order to establish the connection to this Server."),
@@ -178,7 +184,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
-                tr("Unable to connect to the server"),
+                strings(ErrorStrings::UnableConnect),
                 tr("Selected Server has a different version:") + L'\n'
                 + versionDetails
                 + tr("An error has occurred while trying to restart in compatibility mode."),
@@ -188,7 +194,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
-                tr("Unable to connect to the server"),
+                strings(ErrorStrings::UnableConnect),
                 tr("Selected Server has a different version:") + L'\n'
                 + versionDetails
                 + tr("The other version of the Client is needed in order to establish the connection to this Server."),
@@ -207,7 +213,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             int selectedButton = QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
-                tr("Unable to connect to the server"),
+                strings(ErrorStrings::UnableConnect),
                 tr("You are about to connect to Server which has a different version:") + L'\n'
                 + tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n' 
                 + tr(" - Server version: %1.").arg(versionString) + L'\n'
@@ -234,7 +240,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         int button = QnMessageBox::warning(
             parentWidget,
             Qn::VersionMismatch_Help,
-            tr("Unable to connect to the server"),
+            strings(ErrorStrings::UnableConnect),
             tr("You are about to connect to Server which has a different version:") + L'\n'
             + versionDetails
             + tr("Would you like to restart the Client in compatibility mode?"),
@@ -316,11 +322,16 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
         result.result = Result::Unauthorized;
         result.details = tr("The username or password you have entered is incorrect. Please try again.");
         result.helpTopicId = Qn::Login_Help;
+    } else if (errorCode == ec2::ErrorCode::temporary_unauthorized) {
+        result.result = Result::TemporaryUnauthorized;
+        result.details = tr("LDAP Server connection timed out.") + L'\n' 
+            + strings(ErrorStrings::ContactAdministrator);
+        result.helpTopicId = Qn::Login_Help;
     } else if (errorCode != ec2::ErrorCode::ok) {
         result.result = Result::ServerError;
         result.details = tr("Connection to the Server could not be established.") + L'\n' 
             + tr("Connection details that you have entered are incorrect, please try again.") + L'\n' 
-            + tr("If this error persists, please contact your VMS administrator.");
+            + strings(ErrorStrings::ContactAdministrator);
         result.helpTopicId = Qn::Login_Help;
     } else if (!compatibleProduct) {
         result.result = Result::IncompatibleBrand;
@@ -378,4 +389,18 @@ QString QnConnectionDiagnosticsHelper::resultToString(Result value) {
     }
     return QString();
 }
+
+QString QnConnectionDiagnosticsHelper::strings(ErrorStrings id) {
+    switch (id) {
+    case ErrorStrings::ContactAdministrator:
+        return tr("If this error persists, please contact your VMS administrator.");
+    case ErrorStrings::UnableConnect:
+        return tr("Unable to connect to the server");
+    default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        break;
+    }
+    return QString();
+}
+
 #endif

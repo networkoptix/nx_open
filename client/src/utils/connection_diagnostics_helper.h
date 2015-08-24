@@ -20,6 +20,7 @@ public:
         IncompatibleVersion,
         IncompatibleProtocol,
         Unauthorized,
+        TemporaryUnauthorized,
         ServerError
     };
 
@@ -49,6 +50,16 @@ public:
     //TODO: #GDM think about refactoring
     /** Another check of connection, used from 'Test connection' dialog. */
     static TestConnectionResult validateConnectionTest(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode);
+
+private:
+    //TODO: #GDM move all duplicating strings here
+    enum class ErrorStrings {
+        ContactAdministrator,
+        UnableConnect
+    };
+
+    static QString strings(ErrorStrings id);
+
 };
 
 #endif // __CONNECTION_DIAGNOSTICS_HELPER_H__

@@ -311,10 +311,10 @@ bool QnUserResource::passwordExpired() const
     return passwordExpirationTimestamp() < qnSyncTime->currentMSecsSinceEpoch();
 }
 
-bool QnUserResource::doPasswordProlongation()
+Qn::AuthResult QnUserResource::doPasswordProlongation()
 {
     if( !isLdap() )
-        return true;
+        return Qn::Auth_OK;
 
     QString name;
     QString digest;
@@ -324,22 +324,27 @@ bool QnUserResource::doPasswordProlongation()
         digest = QLatin1String(m_digest);
     }
 
-    if( !QnLdapManager::instance()->authenticateWithDigest( name, digest ) )
-        return !passwordExpired();
+    auto errorCode = QnLdapManager::instance()->authenticateWithDigest( name, digest );
+    if( errorCode != Qn::Auth_OK ) {
+        if (!passwordExpired())
+            return Qn::Auth_OK;
+        else
+            return errorCode;
+    }
 
     QMutexLocker lk( &m_mutex );
     if( m_name != name || QLatin1String(m_digest) != digest )  //user data has been updated somehow while performing ldap request
-        return m_passwordExpirationTimestamp > qnSyncTime->currentMSecsSinceEpoch();
+        return m_passwordExpirationTimestamp > qnSyncTime->currentMSecsSinceEpoch() ? Qn::Auth_OK : Qn::Auth_PasswordExpired;
     m_passwordExpirationTimestamp =
         qnSyncTime->currentMSecsSinceEpoch() +
         LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC;
-    return true;
+    return Qn::Auth_OK;
 }
 
-bool QnUserResource::checkDigestValidity( const QByteArray& digest )
+Qn::AuthResult QnUserResource::checkDigestValidity( const QByteArray& digest )
 {
     if( !isLdap() )
-        return true;
+        return Qn::Auth_OK;
 
     return QnLdapManager::instance()->authenticateWithDigest( getName(), QLatin1String(digest) );
 }

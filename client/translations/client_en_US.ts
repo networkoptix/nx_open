@@ -149,7 +149,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audit trail</source>
+        <source>Audit Trail</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -851,11 +851,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audit trail</source>
+        <source>Open audit trail log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open audit trail log</source>
+        <source>Audit Trail</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2682,15 +2682,15 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audit trail...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>IO Module Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>User management...</source>
+        <source>User Management...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit Trail...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3893,6 +3893,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Launcher process not found.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>LDAP Server connection timed out.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnConnectionTestingDialog</name>
@@ -4381,7 +4385,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Model</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Pulse time(ms)</source>
@@ -6993,7 +6997,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Model</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Permissions</source>

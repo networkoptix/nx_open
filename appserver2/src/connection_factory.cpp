@@ -513,7 +513,7 @@ namespace ec2
         const QUrl& ecURL,
         impl::TestConnectionHandlerPtr handler )
     {
-        if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized )
+        if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized || errorCode == ErrorCode::temporary_unauthorized)
         {
             handler->done( reqID, errorCode, connectionInfo );
             QMutexLocker lk( &m_mutex );

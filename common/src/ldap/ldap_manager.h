@@ -8,21 +8,23 @@
 
 #include <utils/common/singleton.h>
 #include <utils/common/ldap.h>
+#include "common/common_globals.h"
 
 
 class QnLdapManagerPrivate;
 
 class QnLdapManager : public Singleton<QnLdapManager> {
 public:
+
     QnLdapManager();
     ~QnLdapManager();
 
     bool fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings);
     bool fetchUsers(QnLdapUsers &users);
 
-    QString realm() const;
+    Qn::AuthResult realm(QString* realm) const;
 
-    bool authenticateWithDigest(const QString &login, const QString &ha1);
+    Qn::AuthResult authenticateWithDigest(const QString &login, const QString &ha1);
     bool testSettings(const QnLdapSettings& settings);
 
 private:
