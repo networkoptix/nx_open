@@ -355,7 +355,7 @@
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
         <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Evento se planteará cuando cualquier cámara está desconectada</translation>
     </message>
 </context>
 <context>
@@ -446,7 +446,7 @@
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No utilice</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
@@ -589,11 +589,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Min días:</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Máx. de días:</translation>
     </message>
 </context>
 <context>
@@ -2671,7 +2671,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ajustes del archivo...</translation>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
@@ -3350,7 +3350,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Terminando la búsqueda...</translation>
     </message>
     <message>
         <source>No cameras selected.</source>
@@ -3370,7 +3370,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Se eliminó servidor, búsqueda anulada.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add cameras.</source>
@@ -3480,7 +3480,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comprobar la disponibilidad del servidor</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
@@ -3488,11 +3488,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comprobación de que la cámara proporciona los medios de comunicación</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comprobación de errores de medios</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
@@ -3713,11 +3713,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se han guardado los cambios de la grabación. Elegir tipo de grabación, FPS y calidad deseada y marque los cambios en el calendario.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Los cambios no se aplicaron</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
@@ -3725,7 +3725,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Excedido el límite de licencias. Los cambios se guardarán, pero no tendrá efecto.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
@@ -3883,7 +3883,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Inicio de sesión o la contraseña que ha introducido son incorrectos, por favor intentelo nuevamente.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
@@ -3925,7 +3925,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Introduzca el nombre de usuario y contraseña...</translation>
     </message>
 </context>
 <context>
@@ -4004,7 +4004,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Necesita conectarse a un servidor antes de realizar la copia de seguridad</translation>
     </message>
 </context>
 <context>
@@ -4246,11 +4246,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ya se ha agregado la carpeta</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Esta carpeta ya se ha agregado.</translation>
     </message>
 </context>
 <context>
@@ -4790,11 +4790,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se puede activar la licencia: %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se puede eliminar la licencia de servidor: %1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
@@ -5199,7 +5199,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El sistema %1 tiene una versión incompatible %2.</translation>
     </message>
 </context>
 <context>
@@ -5536,11 +5536,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se a guardado la configuración PTZ</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Los cambios no se guardan. ¿Desea guardarlos?</translation>
     </message>
 </context>
 <context>
@@ -6409,15 +6409,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Se ha actualizado con éxito</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alguien ya ha empezado una actualización.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Problema de conexión de Internet</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
@@ -6425,11 +6425,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se puede iniciar la actualización. No se encontró ni una actualización para uno o más servidores.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se puede iniciar la actualización. No se encontró ni una actualización para el cliente.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
@@ -6437,7 +6437,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se puede comprobar las actualizaciones a través de internet.</translation>
     </message>
     <message>
         <source>Available Update:</source>
@@ -6445,7 +6445,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Para actualizar manualmente, descarga un archivo con el siguiente enlace:</translation>
     </message>
 </context>
 <context>
@@ -6624,7 +6624,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">diagnostico...</translation>
     </message>
     <message>
         <source>Enable</source>
@@ -6662,7 +6662,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Recursos compartidos de la red Windows</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
@@ -6678,7 +6678,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ruta de almacenamiento no define un válido almacenamiento externo.</translation>
     </message>
 </context>
 <context>
@@ -7225,7 +7225,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Inicia pared de vídeo cuando se inicia Windows</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
@@ -7485,11 +7485,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se pudo realizar la búsqueda de vista previa</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Proceso está en curso</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
@@ -7501,7 +7501,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El procesamiento de imágenes puede tomar mucho tiempo. Por favor, sea paciente.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
@@ -7540,7 +7540,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Confirmar eliminacion</translation>
     </message>
 </context>
 <context>
@@ -7594,7 +7594,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se puede sobrescribir el archivo &apos;%1&apos;. Por favor, pruebe otro nombre.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -7846,7 +7846,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Por favor, espere antes de añadir los servidores solicitados previamente a su sistema.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
@@ -7925,7 +7925,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diseño con el mismo nombre ya existe. ¿Quieres sobrescribirlo?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
@@ -7979,11 +7979,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se pudo obtener posición de cámara</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No pudo establecer la posición de cámara</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
@@ -8218,7 +8218,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pared de vídeo se pondrá en marcha ahora. ¿Desea cerrar esta instancia %1 Cliente?</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
@@ -8230,7 +8230,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Para activar la función active por lo menos una licensia de  pared de video.</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
@@ -8249,7 +8249,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Por favor espere mientras se está restaurando la conexión...</translation>
     </message>
 </context>
 <context>
@@ -8715,7 +8715,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Página de web de movimiento de cámara:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
@@ -8941,7 +8941,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Correo electrónico:</translation>
     </message>
     <message>
         <source>Enabled:</source>

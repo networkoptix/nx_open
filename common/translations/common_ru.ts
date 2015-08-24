@@ -462,7 +462,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка запуска Проводника Windows</translation>
     </message>
 </context>
 <context>
@@ -919,11 +919,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Хранилища заполнены</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Хранилища не настроены</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>

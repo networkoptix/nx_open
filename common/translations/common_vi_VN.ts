@@ -456,7 +456,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">thực hiện Windows Explorer thất bại</translation>
     </message>
 </context>
 <context>
@@ -905,11 +905,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lưu trữ đầy</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thiết bị lưu trữ không được thiết lập</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>

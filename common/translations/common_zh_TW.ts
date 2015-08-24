@@ -456,7 +456,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">執行 Windows Explorer 失敗</translation>
     </message>
 </context>
 <context>
@@ -905,11 +905,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">儲存裝置已滿</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">儲存裝置未被設定</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>

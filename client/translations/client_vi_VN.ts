@@ -363,7 +363,7 @@
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
         <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sự kiện này được kích hoạt khi bất kỳ máy ảnh sẽ phá vỡ</translation>
     </message>
 </context>
 <context>
@@ -454,7 +454,7 @@
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">không sử dụng</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
@@ -599,11 +599,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tối thiểu (ngày):</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tối đa (ngày):</translation>
     </message>
 </context>
 <context>
@@ -2673,7 +2673,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cài đặt tập tin ...</translation>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
@@ -3337,7 +3337,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">quét End…</translation>
     </message>
     <message>
         <source>No cameras selected.</source>
@@ -3357,7 +3357,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">máy chủ đang ẩn, tìm kiếm thất bại.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add cameras.</source>
@@ -3467,7 +3467,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiểm tra tính sẵn sàng chủ</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
@@ -3475,11 +3475,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiểm tra các dòng phương tiện truyền thông được cung cấp bởi các máy ảnh</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiểm tra các lỗi dòng phương tiện truyền thông</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
@@ -3692,11 +3692,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Những thay đổi tích đã không được lưu. Pick mong muốn Loại Recording, FPS, và chất lượng và đánh dấu những thay đổi về lịch trình.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không áp dụng các thay đổi</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
@@ -3704,7 +3704,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vượt quá giới hạn cho phép. Để lưu thay đổi của bạn, nhưng sẽ không có hiệu lực.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
@@ -3862,7 +3862,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đăng nhập Tên đăng nhập hoặc mật khẩu không đúng, vui lòng thử lại.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
@@ -3904,7 +3904,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nhập tên người dùng và mật khẩu ...</translation>
     </message>
 </context>
 <context>
@@ -3983,7 +3983,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bạn cần phải kết nối với một máy chủ sao lưu trước khi làm</translation>
     </message>
 </context>
 <context>
@@ -4222,11 +4222,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thư mục đã được thêm vào</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Thư mục này đã được thêm vào.</translation>
     </message>
 </context>
 <context>
@@ -4762,11 +4762,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể kích hoạt giấy phép: %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể loại bỏ giấy phép từ máy chủ:%1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
@@ -5169,7 +5169,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Việc tìm thấy hệ thống %1 có một phiên bản không tương thích %2.</translation>
     </message>
 </context>
 <context>
@@ -5505,11 +5505,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PTZ Các giá trị cài đặt không được lưu trữ</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Những thay đổi chưa được lưu. Bạn có chắc chắn muốn lưu chúng?</translation>
     </message>
 </context>
 <context>
@@ -6365,15 +6365,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cập nhật thành công</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Một người nào đó đã bắt đầu cập nhật.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vấn đề kết nối Internet</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
@@ -6381,11 +6381,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể bắt đầu cập nhật. Bản cập nhật cho một hoặc nhiều máy chủ đã không được tìm thấy.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể bắt đầu cập nhật. Bản cập nhật cho khách hàng đã không được tìm thấy.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
@@ -6393,7 +6393,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể kiểm tra cập nhật thông qua internet.</translation>
     </message>
     <message>
         <source>Available Update:</source>
@@ -6401,7 +6401,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Để cập nhật bằng tay, tải về một kho lưu trữ với các liên kết sau đây:</translation>
     </message>
 </context>
 <context>
@@ -6580,7 +6580,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chẩn đoán...</translation>
     </message>
     <message>
         <source>Enable</source>
@@ -6618,7 +6618,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Windows mạng chia sẻ tài nguyên</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
@@ -6634,7 +6634,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cung cấp đường dẫn lưu trữ không định nghĩa một thiết bị lưu trữ bên ngoài hiệu quả.</translation>
     </message>
 </context>
 <context>
@@ -7176,7 +7176,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">start video wall when the Windows starts</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
@@ -7430,11 +7430,11 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tìm kiếm không thể thực thi Preview</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể tìm thấy khởi động</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
@@ -7446,7 +7446,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xử lý hình ảnh sẽ tiêu thụ một số thời gian, xin vui lòng chờ đợi.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
@@ -7485,7 +7485,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xác nhận xóa</translation>
     </message>
 </context>
 <context>
@@ -7539,7 +7539,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể ghi đè lên tập tin &apos;%1&apos;, Hãy thử một tên khác.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -7790,7 +7790,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xin vui lòng chờ đợi trước khi các máy chủ yêu cầu trước đó sẽ được bổ sung vào hệ thống của bạn.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
@@ -7865,7 +7865,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cùng tên đã tồn tại trong cách bố trí, bạn có chắc muốn ghi đè lên nó?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
@@ -7919,11 +7919,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Không thể có được từ vị trí camera</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">無法設定攝影機的位置</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
@@ -8155,7 +8155,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">tường video sẽ được bắt đầu ngay bây giờ. Bạn có muốn đóng %1 Khách hàng dụ này?</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
@@ -8167,7 +8167,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Để kích hoạt tính năng xin vui lòng kích hoạt ít nhất một giấy phép Video Wall.</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
@@ -8186,7 +8186,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Xin vui lòng chờ trong khi kết nối đang được phục hồi ...</translation>
     </message>
 </context>
 <context>
@@ -8652,7 +8652,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Máy ảnh trang phát hiện chuyển động:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
@@ -8878,7 +8878,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Email:</translation>
     </message>
     <message>
         <source>Enabled:</source>

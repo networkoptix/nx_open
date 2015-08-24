@@ -460,7 +460,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">启动Windows浏览器失败</translation>
     </message>
 </context>
 <context>
@@ -911,11 +911,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">存储空间已满</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未设置存储空间</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>

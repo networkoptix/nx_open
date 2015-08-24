@@ -461,7 +461,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Der Start von Windows Explorer ist gescheitert</translation>
     </message>
 </context>
 <context>
@@ -915,11 +915,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Speichermedien sind voll</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Speichermedien sind nicht konfiguriert</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>

@@ -355,7 +355,7 @@
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
         <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Evento será acionado quando uma câmera estiver desconectada</translation>
     </message>
 </context>
 <context>
@@ -446,7 +446,7 @@
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Não usar</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
@@ -1081,7 +1081,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License Type:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chave de Licença:</translation>
     </message>
     <message>
         <source>License Key:</source>
@@ -2075,7 +2075,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Shift+C</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+Shift+Tab</translation>
     </message>
     <message>
         <source>Video Wall...</source>
@@ -2087,7 +2087,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+Shift+Tab</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -2111,7 +2111,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Local Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ajustes de Câmeras...</translation>
     </message>
     <message>
         <source>Merge Systems...</source>
@@ -2663,7 +2663,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>File Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ajustes de Usuário...</translation>
     </message>
     <message>
         <source>Ask About Statistics Reporting</source>
@@ -3350,7 +3350,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Terminando a procura...</translation>
     </message>
     <message>
         <source>No cameras selected.</source>
@@ -3370,7 +3370,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Servidor foi removido, a procura foi abortada.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add cameras.</source>
@@ -3489,11 +3489,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Conferindo se a câmera provê fluxo de mídia</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Conferindo fluxo de mídia para erros</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
@@ -3718,7 +3718,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mudanças não são aplilcáveis</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
@@ -3726,7 +3726,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Excedido o limite de licenças. As alterações serão salvas, mas não farão efeito.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
@@ -3884,7 +3884,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Usuário ou senha incorretos, tente novamente.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
@@ -4247,11 +4247,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pasta já foi adicionada</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Essa pasta já foi adicionada.</translation>
     </message>
 </context>
 <context>
@@ -5538,11 +5538,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configuração PTZ não está salva</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mudanças não foram salvas. Gostaria de salvar agora?</translation>
     </message>
 </context>
 <context>
@@ -6576,7 +6576,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Support email is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Email inválido</translation>
     </message>
 </context>
 <context>
@@ -6598,7 +6598,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Activate Video Wall license to remove this message</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ative a licença analógica para remover essa mensagem</translation>
     </message>
     <message>
         <source>NO SIGNAL</source>
@@ -6626,7 +6626,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diagnosticando...</translation>
     </message>
     <message>
         <source>Enable</source>
@@ -6680,7 +6680,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">O caminho provido não indica um storage externo válido.</translation>
     </message>
 </context>
 <context>
@@ -7487,11 +7487,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Não foi possivel realizar a procura prévia</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Processo em andamento</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
@@ -7503,7 +7503,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Processamento de Imagens pode levar um certo tempo. Por favor, seja paciente.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
@@ -7565,7 +7565,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not connect to server...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Conectar a um Servidor...</translation>
     </message>
 </context>
 <context>
@@ -7596,7 +7596,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Não é possivel gravar arquivo %1. Tente outro nome.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -7654,7 +7654,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Layout atual contém arquivos de imagem. Imagens não são permitidas para exporte Multi-Vídeo.</translation>
     </message>
     <message>
         <source>AVI format is not recommended</source>
@@ -7927,7 +7927,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Layout com o mesmo nome já existe. Gostaria de substituir?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
@@ -7981,11 +7981,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Não foi possivel receber posição da câmera</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Não foi possivel definir posição da câmera</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
@@ -8020,7 +8020,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Saving Screenshot...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Salvar foto de tela como...</translation>
     </message>
     <message>
         <source>Save As</source>
@@ -8717,7 +8717,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Página web de movimente de câmera:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
@@ -8943,7 +8943,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Email:</translation>
     </message>
     <message>
         <source>Enabled:</source>

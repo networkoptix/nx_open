@@ -355,7 +355,7 @@
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
         <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เหตุการณ์จะเพิ่มขึ้นเมื่อกล้องไปออฟไลน์</translation>
     </message>
 </context>
 <context>
@@ -446,7 +446,7 @@
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่ได้ใช้</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
@@ -589,11 +589,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">วันน้อยสุด:</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">วันมากสุด:</translation>
     </message>
 </context>
 <context>
@@ -2664,7 +2664,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ตั้งค่าแฟ้มข้อมูล...</translation>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
@@ -2695,7 +2695,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Image Enhancement - %1</source>
-        <translation></translation>
+        <translation>การเพิ่มประสิทธิภาพของภาพ</translation>
     </message>
 </context>
 <context>
@@ -3328,7 +3328,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ค้นหาเสร็จสิ้น....</translation>
     </message>
     <message>
         <source>No cameras selected.</source>
@@ -3348,7 +3348,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เซิร์ฟเวอร์จะถูกลบออก  การค้นหายกเลิก.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add cameras.</source>
@@ -3459,7 +3459,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การตรวจสอบความพร้อมของเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
@@ -3467,11 +3467,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การตรวจสอบกล้องโดยการสตรีม</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ตรวจสอบข้อผิดพลาดสำหรับการสตรีา</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
@@ -3684,11 +3684,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การเปลี่ยนแปลงการบันทึกไม่ได้รับการบันทึกไว้ เลือกประเภทที่ต้องการบันทึก FPS และคุณภาพและการทำเครื่องหมายการเปลี่ยนแปลงในตาราง.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การเปลี่ยนแปลงจะตอบรับ</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
@@ -3696,7 +3696,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ใบอนุญาตเกินขีด จำกัด การเปลี่ยนแปลงจะถูกบันทึกไว้ แต่จะไม่มีผล.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
@@ -3854,7 +3854,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ข้าสู่ระบบหรือรหัสผ่านที่คุณป้อนไม่ถูกต้องโปรดลองอีกครั้ง.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
@@ -3896,7 +3896,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ป้อนชื่อผู้ใช้และรหัสผ่าน...</translation>
     </message>
 </context>
 <context>
@@ -3975,7 +3975,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">คุณจำเป็นต้องเชื่อมต่อกับเซิร์ฟเวอร์ก่อนที่จะทำสำรองข้อมูล</translation>
     </message>
 </context>
 <context>
@@ -4214,11 +4214,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เพิ่มโฟลเดอร์เรียบร้อยแล้ว</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">โฟลเดอร์นี้ได้ทำการเพิ่มแล้ว.</translation>
     </message>
 </context>
 <context>
@@ -4754,11 +4754,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถเปิดใช้งานระบบได้ %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถยกเลิกการใช้งานได้จากเซร์อฟเวอร์ %1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
@@ -5161,7 +5161,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ระบบพบ %1 มีรุ่น %2 เข้ากันไม่ได้.</translation>
     </message>
 </context>
 <context>
@@ -5315,7 +5315,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnNotificationSoundModel</name>
     <message>
         <source>&lt;Downloading sound list...&gt;</source>
-        <translation></translation>
+        <translation>&lt;Downloading sound...&gt;</translation>
     </message>
     <message>
         <source>&lt;No Sound&gt;</source>
@@ -5497,11 +5497,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การตั้งค่า PTZ ยังไม่ได้ทำการบันทึก</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การเปลี่ยนแปลงยังไม่ถูกบันทึก คุณต้องการที่จะบันทึกหรือไ่ม่?</translation>
     </message>
 </context>
 <context>
@@ -6357,15 +6357,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ปรับปรุงสำเร็จ</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">มีใครบางคนได้เริ่มต้นแล้วการปรับปรุง.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ปัญหาการเชื่อมต่ออินเทอร์เน็ต</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
@@ -6373,11 +6373,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถเริ่มต้นการปรับปรุงการปรับปรุงสำหรับหนึ่งหรือเซิร์ฟเวอร์ไม่พบ.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถเริ่มต้นการปรับปรุงการปรับปรุงสำหรับไคลแอนต์ไม่พบ.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
@@ -6385,7 +6385,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถตรวจสอบการอัพเดทผ่านทางอินเทอร์เน็ต.</translation>
     </message>
     <message>
         <source>Available Update:</source>
@@ -6393,7 +6393,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การอัปเดตด้วยตนเองดาวน์โหลดเก็บมีการเชื่อมโยงต่อไปนี้:</translation>
     </message>
 </context>
 <context>
@@ -6572,7 +6572,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">วินิจฉัย ...</translation>
     </message>
     <message>
         <source>Enable</source>
@@ -6610,7 +6610,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เครือข่ายของ Windows ใช้งานทรัพทยากรร่วมกัน</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
@@ -6626,7 +6626,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เส้นทางการจัดเก็บที่มีให้ไม่ได้กำหนดจัดเก็บข้อมูลภายนอกที่ถูกต้อง.</translation>
     </message>
 </context>
 <context>
@@ -7168,7 +7168,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เริ่มวีดีโอ เมื่อวินโดร์เริ่มทำงาน</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
@@ -7422,11 +7422,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถดำเนินการค้นหาตัวอย่าง</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กระบวนการที่อยู่ในความคืบหน้า</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
@@ -7438,7 +7438,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การประมวลผลภาพใช้เวลามาก กรุณารอสักครู่.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
@@ -7477,7 +7477,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ยืนยันการลบ</translation>
     </message>
 </context>
 <context>
@@ -7531,7 +7531,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถเขียนทับแฟ้ม &apos;%1&apos; กรุณาใช้ชื่ออื่น.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -7782,7 +7782,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">กรุณารอสักครู่ก่อนที่เซิร์ฟเวอร์ร้องขอก่อนหน้านี้จะถูกเพิ่มลงในระบบของคุณ.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
@@ -7857,7 +7857,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เค้าโครงที่มีชื่อเดียวกันที่มีอยู่แล้ว คุณต้องการที่จะเขียนทับมัน?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
@@ -7911,11 +7911,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถได้รับตำแหน่งจากกล้อง</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ไม่สามารถกำหนดตำแหน่งกล้อง</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
@@ -8147,7 +8147,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video Wall ของจะได้รับการเริ่มต้นตอนนี้ คุณต้องการที่จะปิด %1 ไคลเอนต์นี้?</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
@@ -8159,7 +8159,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">เมื่อต้องการเปิดใช้งานคุณลักษณะกรุณาเปิดใช้งานอย่างน้อยหนึ่งใบอนุญาตของ Video Wall .</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
@@ -8178,7 +8178,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">โปรดรอสักครู่ในขณะที่การเชื่อมต่อจะถูกเรียกคืน...</translation>
     </message>
 </context>
 <context>
@@ -8644,7 +8644,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การเคลื่อนไหวกล้องหน้าเว็บ:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
@@ -8870,7 +8870,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;อีเมลล์:</translation>
     </message>
     <message>
         <source>Enabled:</source>

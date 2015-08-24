@@ -456,7 +456,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A Windows Explorer indítása sikertelen</translation>
     </message>
 </context>
 <context>
@@ -766,7 +766,7 @@
     <message>
         <source>Lo</source>
         <extracomment>Short for &apos;Low&apos;</extracomment>
-        <translation></translation>
+        <translation>Alacsony</translation>
     </message>
     <message>
         <source>Me</source>
@@ -905,11 +905,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A tárhelyek beteltek</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tárhelyek nincsenek konfigurálva</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>

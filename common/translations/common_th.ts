@@ -457,7 +457,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">การเปิดตัว Windows Explorer ล้มเหลว</translation>
     </message>
 </context>
 <context>
@@ -906,11 +906,11 @@
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">หน่วยความจำเต็ม</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">หน่วยความจำไม่ได้กำหนดค่า</translation>
     </message>
     <message>
         <source>Server times are not synchronised and a common time could not be detected automatically.</source>

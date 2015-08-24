@@ -355,7 +355,7 @@
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
         <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">カメラオフラインでイベント発生</translation>
     </message>
 </context>
 <context>
@@ -446,7 +446,7 @@
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">使用しない</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
@@ -589,11 +589,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最低(日):</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最大(日):</translation>
     </message>
 </context>
 <context>
@@ -2663,7 +2663,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ファイル設定...</translation>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
@@ -3327,7 +3327,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">検索終了...</translation>
     </message>
     <message>
         <source>No cameras selected.</source>
@@ -3347,7 +3347,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">サーバーは削除されました　検索は異常終了しました.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add cameras.</source>
@@ -3458,7 +3458,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">サーバーをチェック</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
@@ -3466,11 +3466,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">カメラストリーム配信をチェック</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ストリームエラーをチェック</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
@@ -3683,11 +3683,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">録画設定変更は保存されませんでした　録画タイプ、FPS、画質をスケジュール設定してください.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">変更は適用されません</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
@@ -3695,7 +3695,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ライセンスを超過しています　変更は保存されますが適用されません.</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
@@ -3853,7 +3853,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">入力したログイン情報は無効です.</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
@@ -3895,7 +3895,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">名前とパスワード入力...</translation>
     </message>
 </context>
 <context>
@@ -3974,7 +3974,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">バックアップ前にサーバーに接続してくだだい</translation>
     </message>
 </context>
 <context>
@@ -4213,11 +4213,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">フォルダーは既に追加されています</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">フォルダーは既に追加されています.</translation>
     </message>
 </context>
 <context>
@@ -4753,11 +4753,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ライセンス %1 をアクティベートできません</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">サーバー %1 からライセンスを削除できません</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
@@ -5160,7 +5160,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">検索されたシステム %1 は互換性のバージョン %2.</translation>
     </message>
 </context>
 <context>
@@ -5496,11 +5496,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PTZ設定が保存されていません</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">変更内容が保存されていません　保存しますか?</translation>
     </message>
 </context>
 <context>
@@ -6356,15 +6356,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">更新は正常に終了</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">既に更新が開始されています.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">インターネット接続問題</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
@@ -6372,11 +6372,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">更新が開始できません　1台か複数台のサーバーが見つかりません.</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">更新が開始できません　クライアントが見つかりません.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
@@ -6384,7 +6384,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">インターネット経由で確認できません.</translation>
     </message>
     <message>
         <source>Available Update:</source>
@@ -6392,7 +6392,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">マニュアル更新を行うには次のリンクよりアーカイブをダウンロード:</translation>
     </message>
 </context>
 <context>
@@ -6571,7 +6571,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">診断...</translation>
     </message>
     <message>
         <source>Enable</source>
@@ -6609,7 +6609,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Windowsネットワーク共有リソース</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
@@ -6625,7 +6625,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">このストレージパスでは外部ストレージを設定できません.</translation>
     </message>
 </context>
 <context>
@@ -7167,7 +7167,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Windows起動時にビデオウォールを開始する</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
@@ -7421,11 +7421,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">検索表示を実行できません</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">プロセス処理中</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
@@ -7437,7 +7437,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">イメージプロセッッシングには時間を要します.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
@@ -7476,7 +7476,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">削除確認</translation>
     </message>
 </context>
 <context>
@@ -7530,7 +7530,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ファイル%1の上書きができません　他の名前を使用してください.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -7781,7 +7781,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">前にリクエストしたサーバーが追加されるまでお待ちください.</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
@@ -7856,7 +7856,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">同じ名前のレイアウトが既に存在します　上書きしますか？</translation>
     </message>
     <message>
         <source>New Layout %1</source>
@@ -7910,11 +7910,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">カメラからポジションを取得できません</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">カメラからポジションを登録できません</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
@@ -8146,7 +8146,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ビデオウォールが開始されます　 %1 クライアントを終了しますか？</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
@@ -8158,7 +8158,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">有効にするにはビデオウォールライセンスをアクティベートしてください.</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
@@ -8177,7 +8177,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">接続がリストアされるまでお待ちください...</translation>
     </message>
 </context>
 <context>
@@ -8643,7 +8643,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">カメラモーションウェブページ:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>

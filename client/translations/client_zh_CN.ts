@@ -355,7 +355,7 @@
     <name>CameraDisconnectedBusinessEventWidget</name>
     <message>
         <source>Event will be triggered when a camera becomes offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">当有摄像机离线时事件会产生</translation>
     </message>
 </context>
 <context>
@@ -446,7 +446,7 @@
     </message>
     <message>
         <source>Do not use</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">不使用</translation>
     </message>
     <message>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
@@ -589,11 +589,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Min. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最小天数:</translation>
     </message>
     <message>
         <source>Max. Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最大天数:</translation>
     </message>
 </context>
 <context>
@@ -2664,7 +2664,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">文件设置...</translation>
     </message>
     <message>
         <source>Drop Resources into New Layout</source>
@@ -3328,7 +3328,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Finished searching...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">搜索结束...</translation>
     </message>
     <message>
         <source>No cameras selected.</source>
@@ -3348,7 +3348,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server has been removed - search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">服务器已被移除, 搜索中止.</translation>
     </message>
     <message>
         <source>Server has been removed - cannot add cameras.</source>
@@ -3458,7 +3458,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming server availability.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">检查服务器是否可用</translation>
     </message>
     <message>
         <source>Confirming camera is accessible.</source>
@@ -3466,11 +3466,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">检查摄像机是否可提供媒体流</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">检查媒体流的错误</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
@@ -3683,11 +3683,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">录像修改未能保存！请将需要修改的录像类型，FPS，画质同步到时间日程表上。</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">修改未生效</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
@@ -3695,7 +3695,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">超过许可限制！当前修改将会保存，但不会生效。</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
@@ -3853,7 +3853,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">当前输入的登陆信息不正确, 请再试一次。</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
@@ -3895,7 +3895,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">请输入用户名和密码...</translation>
     </message>
 </context>
 <context>
@@ -3974,7 +3974,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">在进行备份前,请连接到服务器</translation>
     </message>
 </context>
 <context>
@@ -4213,11 +4213,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">文件夹已添加</translation>
     </message>
     <message>
         <source>This folder has already been added.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">此文件夹已添加。</translation>
     </message>
 </context>
 <context>
@@ -4753,11 +4753,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法激活授权许可:  %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法从服务器上移除授权许可： %1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
@@ -5160,7 +5160,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">搜索到的系统 %1存在不兼容的版本 %2。</translation>
     </message>
 </context>
 <context>
@@ -5496,11 +5496,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">云台设置为保存</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">设定尚未保存 是否保存?</translation>
     </message>
 </context>
 <context>
@@ -6356,15 +6356,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update unsuccessful.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">升级成功！</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">已经开始更新。</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">网络连接问题</translation>
     </message>
     <message>
         <source>No such build available on update server.</source>
@@ -6372,11 +6372,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法开始更新，未发现一个或多个服务器。</translation>
     </message>
     <message>
         <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法开始更新，未发现客户端。</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
@@ -6384,7 +6384,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">不能通过互联网检查更新.</translation>
     </message>
     <message>
         <source>Available Update:</source>
@@ -6392,7 +6392,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">执行手动升级,从以下链接下载:</translation>
     </message>
 </context>
 <context>
@@ -6571,7 +6571,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">诊断...</translation>
     </message>
     <message>
         <source>Enable</source>
@@ -6609,7 +6609,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Network Shared Resource</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Windows网络共享资源</translation>
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
@@ -6625,7 +6625,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">提供的存储路径无法定义可用的外部存储空间。</translation>
     </message>
 </context>
 <context>
@@ -7167,7 +7167,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">系统启动时开启电视墙</translation>
     </message>
     <message>
         <source>Place shortcut on desktop.</source>
@@ -7421,11 +7421,11 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法执行预览搜索</translation>
     </message>
     <message>
         <source>Process in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">处理中</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists.</source>
@@ -7437,7 +7437,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">图像处理需要很多时间。请耐心等待。</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
@@ -7476,7 +7476,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Confirm Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">确认删除</translation>
     </message>
 </context>
 <context>
@@ -7530,7 +7530,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法覆盖文件&apos;%1&apos;,请尝试另一个名称。</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -7781,7 +7781,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait. Requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">请等待先前请求的服务器被添加到系统中。</translation>
     </message>
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
@@ -7856,7 +7856,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>A layout with the same name already exists. Would you like to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">相同名称的视窗已经存在。要覆盖吗?</translation>
     </message>
     <message>
         <source>New Layout %1</source>
@@ -7910,11 +7910,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to get position from camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法从摄像机获取预置位</translation>
     </message>
     <message>
         <source>Unable to set position for camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法给摄像机设置位置</translation>
     </message>
     <message>
         <source>Unable to set position of camera.</source>
@@ -8146,7 +8146,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">电视墙将重启，是否需要关闭%1 客户端?</translation>
     </message>
     <message>
         <source>Additional licenses required.</source>
@@ -8158,7 +8158,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To enable Video Wall, please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">需要使用此功能，请激活至少一个电视墙授权。</translation>
     </message>
     <message>
         <source>Video Wall already exists.</source>
@@ -8177,7 +8177,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">正在恢复连接，请稍候...</translation>
     </message>
 </context>
 <context>
@@ -8643,7 +8643,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>Camera web page:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机移动侦测网页:</translation>
     </message>
     <message>
         <source>Reset Motion Regions</source>
@@ -8869,7 +8869,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <source>E&amp;mail:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;邮箱:</translation>
     </message>
     <message>
         <source>Enabled:</source>
