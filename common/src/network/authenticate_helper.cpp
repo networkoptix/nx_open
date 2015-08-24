@@ -172,7 +172,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
         if( !authQueryParam.isEmpty() )
         {
             auto authResult = authenticateByUrl( authQueryParam, request.requestLine.method, authUserId, std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1));
-            if(authResult == Auth_OK)
+            if(authResult == Qn::Auth_OK)
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = AuthMethod::urlQueryParam;
