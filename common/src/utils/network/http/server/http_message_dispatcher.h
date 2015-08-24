@@ -48,7 +48,7 @@ namespace nx_http
         template<typename RequestHandlerType>
         bool registerRequestProcessor(
             const QString& path,
-            std::function<RequestHandlerType*()> factoryFunc )
+            std::function<std::unique_ptr<RequestHandlerType>()> factoryFunc )
         {
             return m_factories.emplace(
                 path,
@@ -60,7 +60,8 @@ namespace nx_http
         {
             return m_factories.emplace(
                 path,
-                []()->AbstractHttpRequestHandler*{ return new RequestHandlerType(); } ).second;
+                []()->std::unique_ptr<AbstractHttpRequestHandler>{
+                    return std::make_unique<RequestHandlerType>(); } ).second;
         }
 #endif
         //!Pass message to corresponding processor
@@ -90,17 +91,18 @@ namespace nx_http
             if( it == m_factories.end() )
                 return false;
             auto requestProcessor = it->second();
+            auto requestProcessorPtr = requestProcessor.release();  //TODO #ak get rid of this when general lambdas available
 
-            return requestProcessor->processRequest(
+            return requestProcessorPtr->processRequest(
                 conn,
                 std::move( message ),
                 std::move( authInfo ),
-                [completionFunc, requestProcessor](
+                [completionFunc, requestProcessorPtr](
                     nx_http::Message&& responseMsg,
                     std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
                 {
                     completionFunc( std::move(responseMsg), std::move(responseMsgBody) );
-                    delete requestProcessor;
+                    delete requestProcessorPtr;
                 } );
 #endif
         }
@@ -111,7 +113,7 @@ namespace nx_http
 #else
         std::map<
             QString,
-            std::function<AbstractHttpRequestHandler*()>    //TODO #ak return std::unique_ptr when general lambdas available
+            std::function<std::unique_ptr<AbstractHttpRequestHandler>()>
             > m_factories;
 #endif
     };

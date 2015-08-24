@@ -203,20 +203,20 @@ void CloudDBProcess::registerApiHandlers(
 {
     msgDispatcher->registerRequestProcessor<AddAccountHttpHandler>(
         AddAccountHttpHandler::HANDLER_PATH,
-        [accountManager, &authorizationManager]() -> AddAccountHttpHandler* {
-            return new AddAccountHttpHandler( accountManager, authorizationManager );
+        [accountManager, &authorizationManager]() -> std::unique_ptr<AddAccountHttpHandler> {
+            return std::make_unique<AddAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<VerifyEmailAddressHandler>(
         VerifyEmailAddressHandler::HANDLER_PATH,
-        [accountManager, &authorizationManager]() -> VerifyEmailAddressHandler* {
-            return new VerifyEmailAddressHandler( accountManager, authorizationManager );
+        [accountManager, &authorizationManager]() ->std::unique_ptr<VerifyEmailAddressHandler> {
+            return std::make_unique<VerifyEmailAddressHandler>( accountManager, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<GetAccountHttpHandler>(
         GetAccountHttpHandler::HANDLER_PATH,
-        [accountManager, &authorizationManager]() -> GetAccountHttpHandler* {
-            return new GetAccountHttpHandler( accountManager, authorizationManager );
+        [accountManager, &authorizationManager]() ->std::unique_ptr<GetAccountHttpHandler> {
+            return std::make_unique<GetAccountHttpHandler>( accountManager, authorizationManager );
         } );
 }
 
