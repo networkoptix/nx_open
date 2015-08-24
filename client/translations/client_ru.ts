@@ -1645,7 +1645,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Alt+F</source>
-        <translation>Ctrl+Alt+T</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Drop Resources</source>
@@ -1677,7 +1677,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+S</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select All</source>
@@ -1857,7 +1857,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Alt+S</source>
-        <translation>Ctrl+Alt+T</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save Video Wall View</source>

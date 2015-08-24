@@ -2035,7 +2035,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Alt+D</source>
-        <translation type="unfinished">Ctrl+Alt+F</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
@@ -2075,7 +2075,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Shift+C</source>
-        <translation type="unfinished">Ctrl+Shift+Tab</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Video Wall...</source>
@@ -2087,7 +2087,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished">Ctrl+Shift+Tab</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -2103,7 +2103,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Alt+A</source>
-        <translation type="unfinished">Ctrl+Alt+F</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>System Update...</source>
@@ -2183,7 +2183,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Ctrl+Alt+T</source>
-        <translation type="unfinished">Ctrl+Alt+F</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -7931,7 +7931,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New Layout %1</source>
-        <translation type="unfinished">Novo layout %1</translation>
+        <translation type="unfinished">Novo Layout %1</translation>
     </message>
 </context>
 <context>
