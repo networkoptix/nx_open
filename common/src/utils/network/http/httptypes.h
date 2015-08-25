@@ -9,6 +9,7 @@
 #include <cstring>
 #include <functional>
 #include <map>
+#include <vector>
 
 #include <boost/optional.hpp>
 

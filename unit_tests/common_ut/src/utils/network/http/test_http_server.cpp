@@ -7,29 +7,22 @@
 
 
 TestHttpServer::TestHttpServer()
-:
-    m_httpServer(
+{
+    m_httpServerManagers.setDispatcher( &m_httpMessageDispatcher );
+    m_httpServer.reset(
         new nx_http::HttpStreamSocketServer(
             false,
-            SocketFactory::nttDisabled ) )
-{
-    //let server choose any port available
-    if( !m_httpServer->bind( SocketAddress( HostAddress::localhost, 0 ) ) ||
-        !m_httpServer->listen() )
-    {
-        assert( false );
-    }
-
-    //m_httpMessageDispatcher.registerRequestProcessor(
-    //    RegisterSystemHttpHandler::HANDLER_PATH,
-    //    [&registerHttpHandler](HttpServerConnection* connection, nx_http::Message&& message) -> bool {
-    //        return registerHttpHandler.processRequest( connection, std::move(message) );
-    //    }
-    //);
+            SocketFactory::nttDisabled ) );
 }
 
 TestHttpServer::~TestHttpServer()
 {
+}
+
+bool TestHttpServer::bindAndListen()
+{
+    return m_httpServer->bind( SocketAddress( HostAddress::localhost, 0 ) )
+        && m_httpServer->listen();
 }
 
 SocketAddress TestHttpServer::serverAddress() const
