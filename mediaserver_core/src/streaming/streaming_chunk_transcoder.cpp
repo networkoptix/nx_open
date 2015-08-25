@@ -416,7 +416,12 @@ void StreamingChunkTranscoder::onResourceRemoved( const QnResourcePtr& resource 
     const auto resourceIDStr = resource->getId().toString();
     if( resourceIDStr.isEmpty() )
         return;
+
     auto nextResourceIDStr = resourceIDStr;
+    //we want to remove all cache elements having id resourceIDStr. 
+    //  That's why we need to generate next id value
+    //  We can be sure that unicode char will not overflow because nextResourceIDStr 
+    //      contains only ascii symbols (guid)
     nextResourceIDStr[nextResourceIDStr.size()-1] =
         QChar(nextResourceIDStr[nextResourceIDStr.size()-1].unicode()+1);
 
