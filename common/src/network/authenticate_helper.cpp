@@ -171,8 +171,8 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             isProxy ? lit( "proxy_auth" ) : QString::fromLatin1(URL_QUERY_AUTH_KEY_NAME) ).toLatin1();
         if( !authQueryParam.isEmpty() )
         {
-            if( authenticateByUrl( authQueryParam, request.requestLine.method, authUserId, 
-                                   std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1)))
+            auto authResult = authenticateByUrl( authQueryParam, request.requestLine.method, authUserId, std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1));
+            if(authResult == Qn::Auth_OK)
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = AuthMethod::urlQueryParam;

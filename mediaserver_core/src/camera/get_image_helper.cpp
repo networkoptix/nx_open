@@ -77,7 +77,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
                                                                    QnServerArchiveDelegate& serverDelegate, 
                                                                    int prefferedChannel)
 {
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
+    auto camera = qnCameraPool->getVideoCamera(res);
 
     QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
 

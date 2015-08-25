@@ -165,6 +165,8 @@ public:
     QUrl remoteAddr() const;
     SocketAddress remoteSocketAddr() const;
 
+    nx_http::AuthInfoCache::AuthorizationCacheItem authData() const;
+
     ApiPeerData remotePeer() const { return m_remotePeer; }
 
     // This is multi thread getters/setters
@@ -302,6 +304,7 @@ private:
     int m_waiterCount;
     QWaitCondition m_cond;
     std::function<void ()> m_ttFinishCallback;
+
 private:
     void default_initializer();
     void sendHttpKeepAlive( quint64 taskID );
