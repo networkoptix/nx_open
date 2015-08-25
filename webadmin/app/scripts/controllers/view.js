@@ -58,7 +58,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm',false)){
-            $scope.ieNoWebm = true;
+            if(window.jscd.osVersion < 10) { //For 10th version webm codec doesn't work
+                $scope.ieNoWebm = true;
+            }
         }
 
         if(window.jscd.mobile) {
@@ -96,7 +98,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             if(type=='hls'){
                 return !!window.jscd.flashVersion ; // flash hls support
             }
-
             return false;
         }
         function cameraSupports(type){
@@ -189,7 +190,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             var positionMedia = !live ? "&pos=" + (playing) : "";
             var positionHls = !live ? "&startTimestamp=" + (playing) : "";
 
-            // TODO: check resolution ? 
+            // TODO: check resolution ?
             $scope.acitveVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + $scope.activeResolution + positionHls   + authParam ), type: mimeTypes['hls'], transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution=' + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
@@ -217,6 +218,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.selectCameraById = function (cameraId, position, silent) {
+            if($scope.activeCamera && $scope.activeCamera.id == cameraId){
+                return;
+            }
             var oldTimePosition = null;
             if($scope.positionProvider && !$scope.positionProvider.liveMode){
                 oldTimePosition = $scope.positionProvider.playedPosition;
@@ -228,7 +232,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             $scope.activeCamera = getCamera ($scope.storage.cameraId  );
             if (!silent && $scope.activeCamera) {
-                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
 
                 $scope.liveOnly = true;

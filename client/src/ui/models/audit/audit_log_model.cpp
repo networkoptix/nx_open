@@ -542,7 +542,7 @@ int QnAuditLogModel::rowCount(const QModelIndex &parent) const {
     return 0;
 }
 
-int QnAuditLogModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const {
+int QnAuditLogModel::columnCount(const QModelIndex &parent /* = QModelIndex()*/) const {
     if(!parent.isValid())
         return m_columns.size();
     return 0;

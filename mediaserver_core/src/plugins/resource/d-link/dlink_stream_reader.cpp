@@ -59,7 +59,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
     //setRole(Qn::CR_SecondaryLiveVideo);
     m_rtpReader.setRole(getRole());
 
-    //==== init if needed
+    // ==== init if needed
     Qn::ConnectionRole role = getRole();
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     if (!res->getCamInfo().inited())
@@ -67,7 +67,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         res->init();
     }
 
-    //==== profile setup
+    // ==== profile setup
     QString prifileStr = composeVideoProfile(isCameraControlRequired, params);
 
     if (prifileStr.length()==0)
@@ -109,7 +109,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         }
     }
 
-    //=====requesting a video
+    // =====requesting a video
 
     if (m_h264)
     //if (m_h264) //look_for_this_comment
@@ -196,7 +196,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
 
 }
 
-//=====================================================================================
+// =====================================================================================
 
 int scaleInt(int value, int from, int to)
 {

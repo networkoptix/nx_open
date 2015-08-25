@@ -69,8 +69,8 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
     if (!canRemoveLayouts(existing)) {
         QMessageBox::warning(
             mainWindow(),
-            tr("Layout already exists"),
-            tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
+            tr("Layout already exists."),
+            tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
         );
         return;
     }
@@ -141,7 +141,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindow()));
         dialog->setWindowTitle(tr("Save Layout As"));
-        dialog->setText(tr("Enter layout name:"));
+        dialog->setText(tr("Enter Layout Name:"));
 
         QString proposedName = hasSavePermission
             ? layout->getName()
@@ -188,8 +188,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             if (!canRemoveLayouts(existing)) {
                 QMessageBox::warning(
                     mainWindow(),
-                    tr("Layout already exists"),
-                    tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
+                    tr("Layout already exists."),
+                    tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
                 );
                 dialog->setName(proposedName);
                 continue;
@@ -210,8 +210,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         if (!canRemoveLayouts(existing)) {
             QMessageBox::warning(
                 mainWindow(),
-                tr("Layout already exists"),
-                tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
+                tr("Layout already exists."),
+                tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
             );
             return;
         }
@@ -291,8 +291,8 @@ QMessageBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QMessag
                                                                         QMessageBox::StandardButton defaultButton) {
     return QMessageBox::warning(
         mainWindow(),
-        tr("Layout already exists"),
-        tr("Layout with the same name already exists. Do you want to overwrite it?"),
+        tr("Layout already exists."),
+        tr("A layout with the same name already exists. Would you like to overwrite it?"),
         buttons,
         defaultButton
     );
@@ -505,7 +505,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
-    dialog->setName(generateUniqueLayoutName(user, tr("New layout"), tr("New layout %1")));
+    dialog->setName(generateUniqueLayoutName(user, tr("New Layout"), tr("New Layout %1")));
     dialog->setWindowModality(Qt::ApplicationModal);
 
     QMessageBox::Button button;
@@ -519,8 +519,8 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
         if (!canRemoveLayouts(existing)) {
             QMessageBox::warning(
                 mainWindow(),
-                tr("Layout already exists"),
-                tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
+                tr("Layout already exists."),
+                tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
             );
             return;
         }

@@ -1281,8 +1281,11 @@ namespace nx_http
                 ProxyEntry entry;
 
                 //skipping spaces at the start of entry
-                while( (strValue.at(curEntryStart) == ' ') && (curEntryStart < (curEntryEnd == nx_http::BufferNpos ? strValue.size() : curEntryEnd)) )
+                while( (curEntryStart < (curEntryEnd == nx_http::BufferNpos ? strValue.size() : curEntryEnd)) &&
+                       (strValue.at(curEntryStart) == ' ') )
+                {
                     ++curEntryStart;
+                }
 
                 //curEntryStart points first char after comma
                 size_t receivedProtoEnd = nx_http::find_first_of( strValue, " ", curEntryStart );

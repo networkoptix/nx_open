@@ -661,7 +661,7 @@ void QnMediaResourceWidget::updateIconButton() {
     if (!zoomRect().isNull()) {
         iconButton()->setVisible(true);
         iconButton()->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
-        iconButton()->setToolTip(tr("Zoom window"));
+        iconButton()->setToolTip(tr("Zoom Window"));
         return;
     }
 
@@ -1043,7 +1043,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
     if (m_resource->hasVideo(m_display->mediaProvider()) && !(m_resource->toResource()->flags() & Qn::local))
-        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
+        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Low-Res") : tr("Hi-Res");
 #endif
 
     QString timeString;

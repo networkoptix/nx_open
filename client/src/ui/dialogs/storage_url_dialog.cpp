@@ -143,7 +143,7 @@ void QnStorageUrlDialog::accept()
 
     m_storage = result.reply().value<QnStorageStatusReply>().storage;
     if(result.status() != 0 || !m_storage.isWritable || !m_storage.isExternal) {
-        QMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not define a valid external storage."));
+        QMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not point to a valid external storage location."));
         return;
     }
 

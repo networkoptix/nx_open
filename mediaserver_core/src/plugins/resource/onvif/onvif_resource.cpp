@@ -1512,7 +1512,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         return false;
 
     //TODO: #ak if this variable is unused following code may be deleted as well
-    time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
+    time_t utcTerminationTime; // = ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
     if( response.oasisWsnB2__TerminationTime )
     {
         if( response.oasisWsnB2__CurrentTime )

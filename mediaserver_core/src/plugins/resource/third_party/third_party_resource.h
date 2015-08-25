@@ -10,6 +10,7 @@
 
 #include <memory>
 
+#include <QCoreApplication>
 #include <QSharedPointer>
 
 #include "core/resource/camera_resource.h"
@@ -22,6 +23,8 @@ class QnThirdPartyResource
     public QnPhysicalCameraResource,
     public nxcip::CameraInputEventHandler
 {
+    Q_DECLARE_TR_FUNCTIONS(QnThirdPartyResource)
+
     typedef QnPhysicalCameraResource base_type;
 
 public:

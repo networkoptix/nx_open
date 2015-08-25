@@ -15,15 +15,14 @@
 #include <ui/help/help_topics.h>
 
 namespace {
-    const int testLdapTimeoutMSec = 20 * 1000;
-
-    int defaultLdapPort(bool ssl = false) {
-        return ssl ? 636 : 389;
-    }
+    //TODO: #GDM move timeout constant to more common module
+    const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
 }
 
 class QnLdapSettingsDialogPrivate: public QObject {
     Q_DECLARE_PUBLIC(QnLdapSettingsDialog)
+    Q_DECLARE_TR_FUNCTIONS(QnLdapSettingsDialogPrivate)
+
 public:
     QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *parent);
 
@@ -122,7 +121,7 @@ QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
     QUrl url = QUrl::fromUserInput(q->ui->serverLineEdit->text());
     if (url.isValid()) {
         if (url.port() == -1)
-            url.setPort(defaultLdapPort(url.scheme() == lit("ldaps")));
+            url.setPort(QnLdapSettings::defaultPort(url.scheme() == lit("ldaps")));
         result.uri = url;
     }
     
@@ -141,7 +140,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
     const QnLdapSettings &settings = QnGlobalSettings::instance()->ldapSettings();
 
     QUrl url = settings.uri;
-    if (url.port() == defaultLdapPort(url.scheme() == lit("ldaps")))
+    if (url.port() == QnLdapSettings::defaultPort(url.scheme() == lit("ldaps")))
         url.setPort(-1);
     q->ui->serverLineEdit->setText(url.toString());
     q->ui->adminDnLineEdit->setText(settings.adminDn);

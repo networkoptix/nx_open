@@ -25,7 +25,9 @@ namespace nx_hls
         m_mediaSequence( 0 ),
         m_totalPlaylistDuration( 0 ),
         m_blockID( -1 ),
-        m_removedChunksToKeepCount( MSSettings::roSettings()->value( nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP, nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() ),
+        m_removedChunksToKeepCount( MSSettings::roSettings()->value(
+            nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
+            nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() ),
         m_eventRegistrationID( 0 )
     {
         using namespace std::placeholders;

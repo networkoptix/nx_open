@@ -281,14 +281,17 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         //adding entry corresponding to current server to Via header
         nx_http::header::Via via;
+        auto viaHeaderIter = d->request.headers.find( "Via" );
+        if( viaHeaderIter != d->request.headers.end() )
+            via.parse( viaHeaderIter->second );
+
         nx_http::header::Via::ProxyEntry proxyEntry;
         proxyEntry.protoVersion = d->request.requestLine.version.version;
         proxyEntry.receivedBy = qnCommon->moduleGUID().toByteArray();
         via.entries.push_back( proxyEntry );
-        nx_http::StringType viaHeaderStr = nx_http::getHeaderValue( d->request.headers, "Via" );
         nx_http::insertOrReplaceHeader(
             &d->request.headers,
-            nx_http::HttpHeader( "Via", (viaHeaderStr.isEmpty() ? nx_http::StringType() : ", ") + via.toString() ) );
+            nx_http::HttpHeader( "Via", via.toString() ) );
     }
 
     //NOTE next hop should accept Authorization header already present

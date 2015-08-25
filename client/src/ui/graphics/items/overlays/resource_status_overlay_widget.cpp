@@ -60,7 +60,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
 
     m_staticTexts[NoDataText] = tr("NO DATA");
     m_staticTexts[OfflineText] = tr("NO SIGNAL");
-    m_staticTexts[ServerOfflineText] = tr("Server offline");
+    m_staticTexts[ServerOfflineText] = tr("Server Offline");
     m_staticTexts[UnauthorizedText] = tr("Unauthorized");
     m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information in camera settings");
     m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");

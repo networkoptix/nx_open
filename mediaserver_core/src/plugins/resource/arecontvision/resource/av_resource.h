@@ -34,10 +34,10 @@ public:
 
     virtual bool getDescription() {return true;};
 
-    //========
+    // ========
     bool unknownResource() const;
     virtual QnResourcePtr updateResource();
-    //========
+    // ========
 
     //!Implementation of QnNetworkResource::ping
     virtual bool ping() override;

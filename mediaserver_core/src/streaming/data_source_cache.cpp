@@ -19,17 +19,20 @@ DataSourceCache::~DataSourceCache()
 {
     //removing all timers
         //only DataSourceCache::onTimer method can be called while we are here
+    std::map<quint64, StreamingChunkCacheKey> timers;
     {
         QnMutexLocker lk( &m_mutex );
         m_terminated = true;
+        std::swap( timers, m_timers );
     }
 
-    for( auto val: m_timers )
+    for( auto val: timers )
         TimerManager::instance()->joinAndDeleteTimer( val.first );
 }
 
 DataSourceContextPtr DataSourceCache::find( const StreamingChunkCacheKey& key )
 {
+    TimerManager::TimerGuard timerGuard;
     QnMutexLocker lk( &m_mutex );
 
     //searching reader in cache
@@ -43,10 +46,13 @@ DataSourceContextPtr DataSourceCache::find( const StreamingChunkCacheKey& key )
             it->first.videoCodec() == key.videoCodec() &&
             it->first.audioCodec() == key.audioCodec() &&
             it->first.live() == key.live() &&
-            it->second->mediaDataProvider->currentPos() == key.startTimestamp() )
+            it->second.first->mediaDataProvider->currentPos() == key.startTimestamp() )
         {
             //taking existing reader which is already at required position (from previous chunk)
-            DataSourceContextPtr item = it->second;
+            DataSourceContextPtr item = it->second.first;
+            timerGuard = TimerManager::TimerGuard( it->second.second );
+            //timerGuard will remove timer after unlocking mutex
+            m_timers.erase( timerGuard.get() );
             m_cachedDataProviders.erase( it++ );
             return item;
         }
@@ -65,9 +71,27 @@ void DataSourceCache::put(
     const unsigned int livetimeMs )
 {
     QnMutexLocker lk( &m_mutex );
-    m_cachedDataProviders.insert( std::make_pair( key, data ) );
-    const quint64 timerID = TimerManager::instance()->addTimer( this, livetimeMs == 0 ? DEFAULT_LIVE_TIME_MS : livetimeMs );
+    const quint64 timerID = TimerManager::instance()->addTimer(
+        this,
+        livetimeMs == 0 ? DEFAULT_LIVE_TIME_MS : livetimeMs );
+    m_cachedDataProviders.emplace( key, std::make_pair( data, timerID ) );
     m_timers[timerID] = key;
+}
+
+void DataSourceCache::removeRange(
+    const StreamingChunkCacheKey& beginKey,
+    const StreamingChunkCacheKey& endKey )
+{
+    std::list<TimerManager::TimerGuard> timerGuards;
+    QMutexLocker lk( &m_mutex );
+    for( auto
+        it = m_cachedDataProviders.lower_bound( beginKey );
+        it != m_cachedDataProviders.end() && (it->first < endKey);
+         )
+    {
+        timerGuards.emplace_back( TimerManager::TimerGuard( it->second.second ) );
+        it = m_cachedDataProviders.erase( it );
+    }
 }
 
 void DataSourceCache::onTimer( const quint64& timerID )

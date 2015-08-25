@@ -154,7 +154,7 @@ bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     }
 
     bool rez = startIOMonitor(Qn::PT_Input, m_ioHttpMonitor[0]);
-    if (hasCameraCapabilities(Qn::IOModuleCapability))
+    if (isIOModule())
         startIOMonitor(Qn::PT_Output, m_ioHttpMonitor[1]);
 
     QnMutexLocker lk( &m_inputPortMutex );
@@ -245,7 +245,7 @@ bool QnPlAxisResource::isInputPortMonitored() const
 bool QnPlAxisResource::isInitialized() const
 {
     QnMutexLocker lock( &m_mutex );
-    return hasCameraCapabilities(Qn::IOModuleCapability) ? base_type::isInitialized() : !m_resolutionList.isEmpty();
+    return isIOModule() ? base_type::isInitialized() : !m_resolutionList.isEmpty();
 }
 
 void QnPlAxisResource::clear()
@@ -1069,7 +1069,7 @@ QnIOPortDataList QnPlAxisResource::mergeIOSettings(const QnIOPortDataList& camer
 
 bool QnPlAxisResource::ioPortErrorOccured()
 {
-    if (hasCameraCapabilities(Qn::IOModuleCapability)) {
+    if (isIOModule()) {
         return false; // it's error if can't read IO state for IO module
     }
     else {
@@ -1094,9 +1094,6 @@ void QnPlAxisResource::readPortIdLIst()
 bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
 {
     readPortIdLIst();
-
-    if (getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0)
-        setCameraCapability(Qn::IOModuleCapability, true);
 
     QnIOPortDataList cameraPorts;
     if (!readPortSettings(http, cameraPorts))

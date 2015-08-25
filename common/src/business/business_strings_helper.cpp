@@ -120,12 +120,12 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     case ServerStartEvent:
         return tr("Server \"%1\" Started").arg(resourceName);
     case LicenseIssueEvent:
-        return tr("Server \"%1\" had license issue").arg(resourceName);
+        return tr("Server \'%1\' has a license problem").arg(resourceName);
 
     default:
         break;
     }
-    return tr("Unknown event has occurred");
+    return tr("An unknown event has occurred");
 }
 
 QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameters &params, int /*resourceCount*/)
@@ -189,7 +189,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
 
     switch (params.eventType) {
     case CameraInputEvent: {
-        result = tr("Input port: %1").arg(params.inputPortId);
+        result = tr("Input Port: %1").arg(params.inputPortId);
         break;
     }
     case StorageFailureEvent:
@@ -201,7 +201,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case CameraIpConflictEvent: {
-        result += tr("Conflict address: %1").arg(params.source);
+        result += tr("Conflict Address: %1").arg(params.source);
 
         int n = 0;
         for (const QString& mac: params.conflicts) {

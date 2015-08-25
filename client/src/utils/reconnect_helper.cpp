@@ -46,7 +46,7 @@ QnReconnectHelper::InterfaceInfo::InterfaceInfo():
     count(0)
 {}
 
-QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
+QnReconnectHelper::QnReconnectHelper(QObject *parent /* = NULL*/):
     QObject(parent),
     m_currentServer(qnCommon->currentServer()),
     m_currentUrl(QnAppServerConnectionFactory::url())

@@ -229,7 +229,6 @@ table.webclient-window>tbody>tr>td.alert{
   padding:0;
 }
 
-
 .webclient-window .cameras-panel{
   height: 100%;
   width: 350px;
@@ -334,6 +333,7 @@ table.webclient-window>tbody>tr>td.alert{
   top: 50%;
   transform: translateY(-50%);
   -ms-transform: translateY(-50%);
+  background-size: 100% 100%;
 
   margin-left: auto;
   margin-right: auto;
@@ -416,6 +416,11 @@ table.webclient-window>tbody>tr>td.alert{
   font-size: 75%
 }
 
+@media only screen and (max-device-width:640px) {
+  .invisible-xs,.hidden-mobile{
+    display:none;
+  }
+}
 
 @media only screen and (min-device-width: 641px) and (max-device-width:961px) {
   /* For general iPad layouts */
@@ -431,7 +436,6 @@ table.webclient-window>tbody>tr>td.alert{
   .dark-theme .nav > li.active > a {
     padding-left: 72px;
   }
-
 
   .webclient-window .cameras-panel {
     height: 100%;

@@ -25,7 +25,7 @@ namespace Qn
 
     //!Class that want to receive signals directly, MUST inherit this type
     /*!
-        \warning Implementation MUST call \a EnableSafeDirectConnection::safeDirectDisconnect before object destruction
+        \warning Implementation MUST call \a EnableSafeDirectConnection::directDisconnectAll before object destruction
     */
     class EnableSafeDirectConnection
     {

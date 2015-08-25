@@ -121,7 +121,7 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy, QnUuid* authUserId, AuthMethod::Value* usedAuthMethod)
+Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy, QnUuid* authUserId, AuthMethod::Value* usedAuthMethod)
 {
     if (authUserId)
         *authUserId = QnUuid();
@@ -132,10 +132,10 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
 
     const unsigned int allowedAuthMethods = m_authMethodRestrictionList.getAllowedAuthMethods( request );
     if( allowedAuthMethods == 0 )
-        return Auth_Forbidden;   //NOTE assert?
+        return Qn::Auth_Forbidden;   //NOTE assert?
 
     if( allowedAuthMethods & AuthMethod::noAuth )
-        return Auth_OK;
+        return Qn::Auth_OK;
 
     {
         QnMutexLocker lk( &m_mutex );
@@ -147,7 +147,7 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = AuthMethod::tempUrlQueryParam;
-                return Auth_OK;
+                return Qn::Auth_OK;
             }
         }
     }
@@ -159,9 +159,9 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
             if (usedAuthMethod)
                 *usedAuthMethod = AuthMethod::videowall;
             if (qnResPool->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull())
-                return Auth_Forbidden;
+                return Qn::Auth_Forbidden;
             else
-                return Auth_OK;
+                return Qn::Auth_OK;
         }
     }
 
@@ -171,12 +171,12 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
             isProxy ? lit( "proxy_auth" ) : QString::fromLatin1(URL_QUERY_AUTH_KEY_NAME) ).toLatin1();
         if( !authQueryParam.isEmpty() )
         {
-            if( authenticateByUrl( authQueryParam, request.requestLine.method, authUserId, 
-                                   std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1)))
+            auto authResult = authenticateByUrl( authQueryParam, request.requestLine.method, authUserId, std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1));
+            if(authResult == Qn::Auth_OK)
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = AuthMethod::urlQueryParam;
-                return Auth_OK;
+                return Qn::Auth_OK;
             }
         }
     }
@@ -200,15 +200,19 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
         const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME );
         if( authorization.isEmpty() )
         {
+            Qn::AuthResult authResult = Qn::Auth_WrongDigest;
             QnUserResourcePtr userResource;
             if( !nxUserName.isEmpty() )
             {
                 userResource = findUserByName( nxUserName );
                 if( userResource )
                 {
-                    const QString desiredRealm = userResource->isLdap()
-                        ? QnLdapManager::instance()->realm()
-                        : QnAppInfo::realm();
+                    QString desiredRealm = QnAppInfo::realm();
+                    if (userResource->isLdap()) {
+                        auto errCode = QnLdapManager::instance()->realm(&desiredRealm);
+                        if (errCode != Qn::Auth_OK)
+                            return errCode;
+                    }
                     if( userResource->getRealm() != desiredRealm ||
                         userResource->getDigest().isEmpty() )   //in case of ldap digest is initially empty
                     {
@@ -218,13 +222,15 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
                             nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
                     }
                     else if( userResource->isLdap() &&
-                        userResource->passwordExpired() &&
-                        !userResource->doPasswordProlongation() )
+                        userResource->passwordExpired())
                     {
-                        //requesting password update from client
-                        nx_http::insertOrReplaceHeader(
-                            &response.headers,
-                            nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
+                        authResult = userResource->doPasswordProlongation();
+                        if (authResult != Qn::Auth_OK) {
+                            //requesting password update from client
+                            nx_http::insertOrReplaceHeader(
+                                &response.headers,
+                                nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
+                        }
                     }
                 }
             }
@@ -233,17 +239,20 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
                 response,
                 userResource,
                 isProxy);
-            return Auth_WrongDigest;
+            return authResult;
         }
 
         nx_http::header::Authorization authorizationHeader;
         if( !authorizationHeader.parse( authorization ) )
-            return Auth_Forbidden;
+            return Qn::Auth_Forbidden;
         QnUserResourcePtr userResource = findUserByName( authorizationHeader.userid() );
 
-        const QString desiredRealm = (userResource && userResource->isLdap())
-            ? QnLdapManager::instance()->realm()
-            : QnAppInfo::realm();
+        QString desiredRealm = QnAppInfo::realm();
+        if (userResource && userResource->isLdap()) {
+            Qn::AuthResult authResult = QnLdapManager::instance()->realm(&desiredRealm);
+            if (authResult != Qn::Auth_OK)
+                return authResult;
+        }
 
         UserDigestData userDigestData;
         userDigestData.parse( request );
@@ -251,7 +260,7 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
         if( userResource )
         {
             if (!userResource->isEnabled())
-                return Auth_WrongLogin;
+                return Qn::Auth_WrongLogin;
 
             if( userResource->isLdap() && !userDigestData.empty() )
             {
@@ -259,7 +268,7 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
                 //checking for digest in received request
 
                 //checking received credentials for validity
-                if( userResource->checkDigestValidity( userDigestData.ha1Digest ) )
+                if( userResource->checkDigestValidity( userDigestData.ha1Digest ) == Qn::Auth_OK)
                 {
                     //changing stored user's password
                     applyClientCalculatedPasswordHashToResource( userResource, userDigestData );
@@ -267,7 +276,7 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
             }
 
             if( userResource->getDigest().isEmpty() )
-                return Auth_WrongDigest;   //user has no password yet
+                return Qn::Auth_WrongDigest;   //user has no password yet
         }
 
         nx_http::StringType authType;
@@ -278,7 +287,7 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
             authData = authorization.mid(pos+1);
         }
 
-        AuthResult authResult = Auth_Forbidden;
+        Qn::AuthResult authResult = Qn::Auth_Forbidden;
         if (authType == "digest") 
         {
             if (usedAuthMethod)
@@ -296,9 +305,9 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
         else {
             if (usedAuthMethod)
                 *usedAuthMethod = AuthMethod::httpBasic;
-            authResult = Auth_Forbidden;
+            authResult = Qn::Auth_Forbidden;
         }
-        if( authResult  == Auth_OK)
+        if( authResult  == Qn::Auth_OK)
         {
             //checking whether client re-calculated ha1 digest
             if( userDigestData.empty() )
@@ -319,10 +328,10 @@ AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::
         return authResult;
     }
 
-    return Auth_Forbidden;   //failed to authorise request with any method
+    return Qn::Auth_Forbidden;   //failed to authorise request with any method
 }
 
-AuthResult QnAuthHelper::authenticate(
+Qn::AuthResult QnAuthHelper::authenticate(
     const QAuthenticator& auth,
     const nx_http::Response& response,
     nx_http::Request* const request,
@@ -337,7 +346,7 @@ AuthResult QnAuthHelper::authenticate(
     {
         nx_http::header::WWWAuthenticate authenticateHeader;
         if( !authenticateHeader.parse( authHeaderBuf ) )
-            return Auth_WrongDigest;
+            return Qn::Auth_WrongDigest;
         authenticationCtx->authenticateHeader = std::move( authenticateHeader );
     }
     authenticationCtx->responseStatusCode = response.statusLine.statusCode;
@@ -348,7 +357,7 @@ AuthResult QnAuthHelper::authenticate(
         authenticationCtx );
 }
 
-AuthResult QnAuthHelper::authenticate(
+Qn::AuthResult QnAuthHelper::authenticate(
     const QAuthenticator& auth,
     nx_http::Request* const request,
     const HttpAuthenticationClientContext* const authenticationCtx )
@@ -373,26 +382,26 @@ AuthResult QnAuthHelper::authenticate(
             nx_http::parseHeader( CLSimpleHTTPClient::basicAuth(auth) ) );
     }
     
-    return Auth_OK;
+    return Qn::Auth_OK;
 }
 
-AuthResult QnAuthHelper::authenticate( const QString& login, const QByteArray& digest ) const
+Qn::AuthResult QnAuthHelper::authenticate( const QString& login, const QByteArray& digest ) const
 {
     QnMutexLocker lock( &m_mutex );
     for(const QnUserResourcePtr& user: m_users)
     {
         if (user->getName().toLower() == login.toLower()) {
             if (user->getDigest() == digest)
-                return Auth_OK;
+                return Qn::Auth_OK;
             else
-                return Auth_Forbidden;
+                return Qn::Auth_Forbidden;
         }
     }
     //checking if it videowall connect
     if (qnResPool->getResourceById<QnVideoWallResource>(QnUuid(login)).isNull())
-        return Auth_Forbidden;
+        return Qn::Auth_Forbidden;
     else
-        return Auth_OK;
+        return Qn::Auth_OK;
 }
 
 QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()
@@ -473,13 +482,13 @@ QByteArray QnAuthHelper::createHttpQueryAuthParam(
     return (userName.toUtf8() + ":" + nonce + ":" + authDigest).toBase64();
 }
 
-AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, 
+Qn::AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, 
                                 bool isProxy, QnUuid* authUserId, char delimiter, std::function<bool(const QByteArray&)> checkNonceFunc,
                                 QnUserResourcePtr* const outUserResource)
 {
     const QMap<QByteArray, QByteArray> authParams = parseAuthData(authData, delimiter);
     if (authParams.isEmpty())
-        return Auth_Forbidden;
+        return Qn::Auth_Forbidden;
 
     QByteArray userName;
     QByteArray response;
@@ -504,7 +513,7 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
     }
 
     if (nonce.isEmpty() || userName.isEmpty() || realm.isEmpty())
-        return Auth_WrongDigest;
+        return Qn::Auth_WrongDigest;
 
     QCryptographicHash md5Hash( QCryptographicHash::Md5 );
     md5Hash.addData(method);
@@ -514,21 +523,23 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
 
     QnUserResourcePtr userResource;
     //if (isNonceValid(nonce))
-    AuthResult errCode = Auth_WrongDigest;
+    Qn::AuthResult errCode = Qn::Auth_WrongDigest;
     if (checkNonceFunc(nonce))
     {
-        errCode = Auth_WrongLogin;
+        errCode = Qn::Auth_WrongLogin;
         userResource = findUserByName(userName);
         if( userResource )
         {
+            errCode = Qn::Auth_WrongPassword;
             if( outUserResource )
                 *outUserResource = userResource;
 
             if( userResource->passwordExpired() )
             {
                 //user password has expired, validating password
-                if( !userResource->doPasswordProlongation() )
-                    return Auth_WrongPassword;
+                errCode = userResource->doPasswordProlongation();
+                if( errCode != Qn::Auth_OK )
+                    return errCode;
             }
 
             QByteArray dbHash = userResource->getDigest();
@@ -544,7 +555,7 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
             if( authUserId )
                 *authUserId = userResource->getId();
             if (calcResponse == response)
-                return Auth_OK;
+                return Qn::Auth_OK;
         }
 
         QnMutexLocker lock( &m_mutex );
@@ -567,7 +578,7 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
                 QByteArray calcResponse = md5Hash.result().toHex();
 
                 if (calcResponse == response)
-                    return Auth_OK;
+                    return Qn::Auth_OK;
             }
         }
     }
@@ -585,26 +596,26 @@ AuthResult QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray
         userResource,
         isProxy );
 
-    if (errCode == Auth_WrongLogin && !QUuid(userName).isNull())
-        errCode = Auth_WrongInternalLogin;
+    if (errCode == Qn::Auth_WrongLogin && !QUuid(userName).isNull())
+        errCode = Qn::Auth_WrongInternalLogin;
 
     return errCode;
 }
 
-AuthResult QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*response*/, QnUuid* authUserId)
+Qn::AuthResult QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*response*/, QnUuid* authUserId)
 {
     QByteArray digest = QByteArray::fromBase64(authData);
     int pos = digest.indexOf(':');
     if (pos == -1)
-        return Auth_Forbidden;
+        return Qn::Auth_Forbidden;
     QString userName = QUrl::fromPercentEncoding(digest.left(pos)).toLower();
     QString password = QUrl::fromPercentEncoding(digest.mid(pos+1));
-    AuthResult errCode = Auth_WrongLogin;     
+    Qn::AuthResult errCode = Qn::Auth_WrongLogin;     
     for(const QnUserResourcePtr& user: m_users)
     {
         if (user->getName().toLower() == userName)
         {
-            errCode = Auth_WrongPassword;
+            errCode = Qn::Auth_WrongPassword;
             if (authUserId)
                 *authUserId = user->getId();
 
@@ -614,15 +625,16 @@ AuthResult QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Respon
             if( user->passwordExpired() )
             {
                 //user password has expired, validating password
-                if( !user->doPasswordProlongation() )
-                    return Auth_WrongDigest;
+                auto authResult = user->doPasswordProlongation();
+                if( authResult != Qn::Auth_OK)
+                    return authResult;
             }
 
             if (user->checkPassword(password))
             {
                 if (user->getDigest().isEmpty())
                     emit emptyDigestDetected(user, userName, password);
-                return Auth_OK;
+                return Qn::Auth_OK;
             }
         }
     }
@@ -633,7 +645,7 @@ AuthResult QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Respon
         if (server->getId().toString().toLower() == userName)
         {
             if (server->getAuthKey() == password)
-                return Auth_OK;
+                return Qn::Auth_OK;
         }
     }
 
@@ -676,7 +688,7 @@ bool QnAuthHelper::isCookieNonceValid(const QByteArray& nonce)
     return rez;
 }
 
-AuthResult QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId)
+Qn::AuthResult QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId)
 {
     nx_http::Response tmpHeaders;
     QnUserResourcePtr outUserResource;
@@ -684,7 +696,7 @@ AuthResult QnAuthHelper::doCookieAuthorization(const QByteArray& method, const Q
     QMap<nx_http::BufferType, nx_http::BufferType> params;
     nx_http::header::parseDigestAuthParams( authData, &params, ';' );
         
-    AuthResult authResult = Auth_Forbidden;
+    Qn::AuthResult authResult = Qn::Auth_Forbidden;
     if( params.contains( URL_QUERY_AUTH_KEY_NAME ) )
     {
         //authenticating
@@ -705,7 +717,7 @@ AuthResult QnAuthHelper::doCookieAuthorization(const QByteArray& method, const Q
             std::bind(&QnAuthHelper::isCookieNonceValid, this, std::placeholders::_1),
             &outUserResource);
     }
-    if( authResult != Auth_OK)
+    if( authResult != Qn::Auth_OK)
     {
         nx_http::insertHeader(
             &responseHeaders.headers,
@@ -727,8 +739,12 @@ void QnAuthHelper::addAuthHeader(
     bool isProxy)
 {
     QString realm;
-    if( userResource )
-        realm = userResource->isLdap() ? QnLdapManager::instance()->realm() : userResource->getRealm();
+    if( userResource ) {
+        if (userResource->isLdap())
+            QnLdapManager::instance()->realm(&realm);
+        else
+            realm = userResource->getRealm();
+    }
     else
         realm = QnAppInfo::realm();
 
@@ -794,28 +810,28 @@ QByteArray QnAuthHelper::symmetricalEncode(const QByteArray& data)
     return result;
 }
 
-AuthResult QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, const QByteArray& method, QnUuid* authUserId,
+Qn::AuthResult QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, const QByteArray& method, QnUuid* authUserId,
                                            std::function<bool(const QByteArray&)> checkNonceFunc) const
 {
     auto authRecord = QByteArray::fromBase64( authRecordBase64 );
     auto authFields = authRecord.split( ':' );
     if( authFields.size() != 3 )
-        return Auth_WrongDigest;
+        return Qn::Auth_WrongDigest;
 
     const auto& userName = authFields[0];
     const auto& nonce = authFields[1];
     const auto& authDigest = authFields[2];
 
     if( !checkNonceFunc( nonce ) )
-        return Auth_WrongDigest;
+        return Qn::Auth_WrongDigest;
     
     QnMutexLocker lock( &m_mutex );
-    AuthResult errCode = Auth_WrongLogin;
+    Qn::AuthResult errCode = Qn::Auth_WrongLogin;
     for( const QnUserResourcePtr& user : m_users )
     {
         if( user->getName().toUtf8().toLower() != userName )
             continue;
-        errCode = Auth_WrongPassword;
+        errCode = Qn::Auth_WrongPassword;
         if (authUserId)
             *authUserId = user->getId();
         const QByteArray& ha1 = user->getDigest();
@@ -834,7 +850,7 @@ AuthResult QnAuthHelper::authenticateByUrl( const QByteArray& authRecordBase64, 
         const QByteArray calcResponse = md5Hash.result().toHex();
 
         if (calcResponse == authDigest)
-            return Auth_OK;
+            return Qn::Auth_OK;
     }
 
     return errCode;

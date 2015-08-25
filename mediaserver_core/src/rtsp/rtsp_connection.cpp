@@ -161,7 +161,7 @@ public:
         dataProcessor = 0;
 
         if (mediaRes) {
-            QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes->toResourcePtr());
+            auto camera = qnCameraPool->getVideoCamera(mediaRes->toResourcePtr());
             if (camera)
                 camera->notInUse(this);
         }
@@ -607,7 +607,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
     bool canCheckLive = (dataType == QnAbstractMediaData::VIDEO) || (d->startTime == DATETIME_NOW);
     if (canCheckLive)
     {
-        QnVideoCamera* camera = 0;
+        QnVideoCameraPtr camera;
         if (getResource())
             camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
         if (camera) {
@@ -959,7 +959,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     else 
         d->dataProcessor->clearUnprocessedData();
 
-    QnVideoCamera* camera = 0;
+    QnVideoCameraPtr camera;
     if (d->mediaRes) {
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
@@ -1102,7 +1102,7 @@ int QnRtspConnectionProcessor::composePlay()
     d->lastPlayCSeq = nx_http::getHeaderValue(d->request.headers, "CSeq").toInt();
 
 
-    QnVideoCamera* camera = 0;
+    QnVideoCameraPtr camera;
     if (d->mediaRes)
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
     if (d->liveMode == Mode_Live) {
@@ -1432,7 +1432,7 @@ void QnRtspConnectionProcessor::run()
     {
         for (int i = 0; i < 3 && !m_needStop; ++i)
         {
-            if(qnAuthHelper->authenticate(d->request, d->response) != Auth_OK)
+            if(qnAuthHelper->authenticate(d->request, d->response) != Qn::Auth_OK)
             {
                 sendResponse(CODE_AUTH_REQUIRED);
                 if (readRequest()) 

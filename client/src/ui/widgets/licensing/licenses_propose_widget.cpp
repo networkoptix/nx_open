@@ -76,7 +76,7 @@ void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &came
         return camera->isDtsBased(); }
     );
     int ioModules = boost::count_if(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {
-        return camera->hasCameraCapabilities(Qn::IOModuleCapability);
+        return camera->isIOModule();
     });
 
     setVisible(analogCameras > 0 || ioModules > 0);

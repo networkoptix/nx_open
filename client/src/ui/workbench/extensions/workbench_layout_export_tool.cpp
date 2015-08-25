@@ -90,7 +90,7 @@ bool QnLayoutExportTool::start() {
 
     QScopedPointer<QIODevice> itemNamesIO(m_storage->open(lit("item_names.txt"), QIODevice::WriteOnly));
     if (itemNamesIO.isNull()) {
-        m_errorMessage = tr("Could not create output file %1").arg(m_targetFilename);
+        m_errorMessage = tr("Could not create output file %1.").arg(m_targetFilename);
         emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
         return false;
     }
@@ -382,7 +382,7 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
     camera->deleteLater();
 
     if (error) {
-        m_errorMessage = tr("Could not export camera %1").arg(camera->resource()->toResource()->getName());
+        m_errorMessage = tr("Could not export camera %1.").arg(camera->resource()->toResource()->getName());
         finishExport(false);
     } else {
         exportNextCamera();
