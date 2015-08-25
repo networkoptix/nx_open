@@ -13,6 +13,8 @@
 #include "core/resource/camera_user_attribute_pool.h"
 #include "api/global_settings.h"
 #include "core/resource_management/resource_properties.h"
+#include "core/resource/storage_plugin_factory.h"
+#include "plugins/storage/file_storage/file_storage_resource.h"
 
 
 QString doUnquote(const QString& fileName)
@@ -29,8 +31,7 @@ void ffmpegInit()
 {
     av_register_all();
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
-    QnStoragePluginFactory::instance()->registerStoragePlugin("qtfile", QnQtFileStorageResource::instance);
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
 }
 
 int main(int argc, char *argv[])
