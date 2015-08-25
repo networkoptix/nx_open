@@ -528,13 +528,15 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
     return m_licenseDict.keys();
 }
 
-int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType) const
+int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType, bool ignoreValidity) const
 {
     int result = 0;
 
     for (const QnLicensePtr& license: m_licenseDict.values()) 
     {
-        if (license->type() == licenseType && license->isValid())
+        if (license->type() == licenseType 
+            && (ignoreValidity || license->isValid())
+            )
             result += license->cameraCount();
     }
     return result;

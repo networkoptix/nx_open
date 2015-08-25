@@ -161,7 +161,7 @@ public:
     QList<QByteArray> allLicenseKeys() const;
     bool haveLicenseKey(const QByteArray& key) const;
     QnLicensePtr getLicenseByKey(const QByteArray& key) const;
-    int totalLicenseByType(Qn::LicenseType licenseType) const;
+    int totalLicenseByType(Qn::LicenseType licenseType, bool ignoreValidity = false) const;
 
 private:
 
