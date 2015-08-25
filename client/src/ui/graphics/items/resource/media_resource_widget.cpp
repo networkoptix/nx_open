@@ -1126,9 +1126,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     QnResourcePtr resource = m_display->resource();
 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
-    const bool realtimeSource = m_display->camDisplay()->isRealTimeSource();
-    const bool isOffline = (realtimeSource && (resource->getStatus() == Qn::Offline));
-    const bool isUnauthorized = (realtimeSource && (resource->getStatus() == Qn::Unauthorized));
+    bool isOffline = false;
+    bool isUnauthorized = false;
+    checkWrongState(&isOffline, &isUnauthorized);
 
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
@@ -1383,6 +1383,23 @@ void QnMediaResourceWidget::updateCustomAspectRatio() {
     m_display->camDisplay()->setOverridenAspectRatio(m_resource->customAspectRatio());
 }
 
+bool QnMediaResourceWidget::checkWrongState(bool *isOffline
+    , bool *isUnauthorized) const
+{
+    const auto camDisplay = (m_display ? m_display->camDisplay() : nullptr);
+    const bool realtimeSource = (camDisplay ? camDisplay->isRealTimeSource() : false);
+    const auto resource = (m_display ? m_display->resource() : QnResourcePtr());
+    const bool localIsOffline = (realtimeSource && (!resource || (resource->getStatus() == Qn::Offline)));
+    const bool localIsUnauthorized = (realtimeSource && (resource && (resource->getStatus() == Qn::Unauthorized)));
+    
+    if (isOffline)
+        *isOffline = localIsOffline;
+    if (isUnauthorized)
+        *isUnauthorized = localIsUnauthorized;
+
+    return (localIsOffline || localIsUnauthorized);
+}
+
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
     const bool ioModule = m_camera->hasFlags(Qn::io_module);
@@ -1393,13 +1410,9 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     const auto resource = m_display->resource();
     
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
-    const bool isRealtime = m_display->camDisplay()->isRealTimeSource();
-    const bool isOffline = (isRealtime && (resource->getStatus() == Qn::Offline));
-    const bool isUnauthorized = (isRealtime && (resource->getStatus() == Qn::Unauthorized));
-    const bool properState = (!isOffline && !isUnauthorized);
 
     m_ioCouldBeShown = ((ioBtnChecked || onlyIoData) && correctLicenceStatus);
-    const OverlayVisibility visibility =  (m_ioCouldBeShown && properState ? Visible : Invisible);
+    const OverlayVisibility visibility =  (m_ioCouldBeShown && !checkWrongState() ? Visible : Invisible);
     setOverlayWidgetVisibility(m_ioModuleOverlayWidget, visibility);
     updateOverlayWidgetsVisibility(animate);
 
