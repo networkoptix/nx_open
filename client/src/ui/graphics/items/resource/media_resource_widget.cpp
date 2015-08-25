@@ -1088,8 +1088,13 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result &= ~PtzButton;
     }
 
-    if ((resource()->toResource()->hasFlags(Qn::io_module)) && hasVideo)
-        result |= IoModuleButton;
+    if ((resource()->toResource()->hasFlags(Qn::io_module)))
+    {
+        if (hasVideo)
+            result |= IoModuleButton;
+        else
+            result &= ~RotateButton;    /// Do not allow rotate widget if it is IO module only
+    }
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo) {
         if(item()
