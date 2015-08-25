@@ -79,14 +79,15 @@ TEST_F( AsyncHttpClientTest, FastRemoveBadHost )
 
 TEST_F( AsyncHttpClientTest, motionJpegRetrieval )
 {
-    static const int CONCURRENT_CLIENT_COUNT = 10;
+    static const int CONCURRENT_CLIENT_COUNT = 100;
 
     const nx::Buffer frame1 =
         "1xxxxxxxxxxxxxxx\rxxxxxxxx\nxxxxxxxxxx"
         "xxxxxxxxxxxxxxxxx\r\nxxxxxxxxxxxxxxxx2";
+    const nx::String boundary = "fbdr";
 
-    const nx::Buffer testFrame = 
-        "\r\n--fbdr"
+    const nx::Buffer testFrame =
+        "\r\n--"+boundary+
         "\r\n"
         "Content-Type: image/jpeg\r\n"
         "\r\n"
@@ -94,23 +95,34 @@ TEST_F( AsyncHttpClientTest, motionJpegRetrieval )
 
     m_testHttpServer->registerRequestProcessor<RepeatingBufferSender>(
         "/mjpg",
-        [&testFrame]()->std::unique_ptr<RepeatingBufferSender>{
+        [&]()->std::unique_ptr<RepeatingBufferSender>{
             return std::make_unique<RepeatingBufferSender>(
-                "multipart/x-mixed-replace;boundary=--fbdr",
+                "multipart/x-mixed-replace;boundary="+boundary,
                 testFrame );
         } );
+
+    ASSERT_TRUE( m_testHttpServer->bindAndListen() );
 
     //fetching mjpeg with async http client
     const QUrl url( lit("http://127.0.0.1:%1/mjpg").arg( m_testHttpServer->serverAddress().port) );
 
     struct ClientContext
     {
+        ~ClientContext()
+        {
+            client->terminate();
+            client.reset(); //ensuring client removed before multipartParser
+        }
+
         nx_http::AsyncHttpClientPtr client;
         nx_http::MultipartContentParser multipartParser;
     };
 
+    std::atomic<size_t> bytesProcessed = 0;
+
     auto checkReceivedContentFunc = [&]( const QnByteArrayConstRef& data ){
         ASSERT_EQ( data, frame1 );
+        bytesProcessed += data.size();
     };
 
     std::vector<ClientContext> clients( CONCURRENT_CLIENT_COUNT );
@@ -118,6 +130,17 @@ TEST_F( AsyncHttpClientTest, motionJpegRetrieval )
     {
         clientCtx.client = nx_http::AsyncHttpClient::create();
         clientCtx.multipartParser.setNextFilter( makeCustomOutputStream( checkReceivedContentFunc ) );
+        QObject::connect(
+            clientCtx.client.get(), &nx_http::AsyncHttpClient::responseReceived,
+            clientCtx.client.get(),
+            [&]( nx_http::AsyncHttpClientPtr client ) {
+                ASSERT_TRUE( client->response() != nullptr );
+                ASSERT_EQ( client->response()->statusLine.statusCode, nx_http::StatusCode::ok );
+                auto contentTypeIter = client->response()->headers.find( "Content-Type" );
+                ASSERT_TRUE( contentTypeIter != client->response()->headers.end() );
+                clientCtx.multipartParser.setContentType( contentTypeIter->second );
+            },
+            Qt::DirectConnection );
         QObject::connect(
             clientCtx.client.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
             clientCtx.client.get(),
@@ -130,7 +153,9 @@ TEST_F( AsyncHttpClientTest, motionJpegRetrieval )
         }
     }
 
-    std::this_thread::sleep_for( std::chrono::seconds( 20 ) );
+    std::this_thread::sleep_for( std::chrono::seconds( 7 ) );
+
+    clients.clear();
 }
 
 } // namespace nx_http

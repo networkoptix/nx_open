@@ -29,6 +29,6 @@ void RepeatingBufferSender::processRequest(
         std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler )
 {
     completionHandler(
-        nx_http::StatusCode::notImplemented,
+        nx_http::StatusCode::ok,
         std::make_unique<RepeatingBufferMsgBodySource>( m_mimeType, m_buffer ) );
 }
