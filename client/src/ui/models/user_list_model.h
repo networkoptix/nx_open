@@ -2,14 +2,18 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <client\client_color_types.h>
+
 #include <core/resource/resource_fwd.h>
 
+#include <ui/customization/customized.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnUserListModelPrivate;
-class QnUserListModel : public QAbstractListModel, public QnWorkbenchContextAware {
+class QnUserListModel : public Customized<QAbstractListModel>, public QnWorkbenchContextAware {
     Q_OBJECT
-    typedef QAbstractListModel base_type;
+    Q_PROPERTY(QnUserManagementColors colors READ colors WRITE setColors)
+    typedef Customized<QAbstractListModel> base_type;
 
 public:
     enum Columns {
@@ -34,6 +38,9 @@ public:
 
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state, const QnUserResourcePtr &user = QnUserResourcePtr());
+
+    const QnUserManagementColors colors() const;
+    void setColors(const QnUserManagementColors &colors);
 private:
     QnUserListModelPrivate *d;
     friend class QnUserListModelPrivate;

@@ -196,6 +196,14 @@ private:
     Q_SLOT void updateOverlayButton();
 
 private:
+    /// @brief Checks if state is Offline or Unauthorized
+    /// @param isOffline [out] stores result of check if state is Offline
+    /// @param isUnauthorized [out] stores result of check if state is Unauthorized
+    /// @return true if state is Offline or Unauthorized
+    bool checkWrongState(bool *isOffline = nullptr
+        , bool *isUnauthorized = nullptr) const;
+
+private:
     /** Media resource. */
     QnMediaResourcePtr m_resource;
 
@@ -239,6 +247,7 @@ private:
     QnMediaDewarpingParams m_dewarpingParams;
 
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
+    bool m_ioCouldBeShown;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

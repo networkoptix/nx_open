@@ -4015,7 +4015,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation>Could not initialise video encoder.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
@@ -4050,7 +4050,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation>Could not initialise video encoder.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>

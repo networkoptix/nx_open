@@ -2,6 +2,9 @@
 
 static QUuid initialKey = QUuid::createUuid();
 
+/************************************************************************/
+/* QnLicenseStub                                                        */
+/************************************************************************/
 
 QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
     m_type(licenseType),
@@ -12,8 +15,8 @@ QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
     setCameraCount(count);
 }
 
-bool QnLicenseStub::isValid(ErrorCode* /*errCode = 0 */,
-                            ValidationMode /*mode = VM_Regular */) const {
+bool QnLicenseStub::isValid(ErrorCode* errCode /* = 0 */, ValidationMode mode /* = VM_Regular */) const {
+    QN_UNUSED(errCode, mode);
 
     if (isArmServer() && !isAllowedForArm())
         return false;
@@ -35,4 +38,20 @@ bool QnLicenseStub::isArmServer() const {
 
 void QnLicenseStub::setArmServer(bool value) {
     m_armServer = value;
+}
+
+/************************************************************************/
+/* QnFutureLicenseStub                                                  */
+/************************************************************************/
+
+QnFutureLicenseStub::QnFutureLicenseStub(int count) {
+    ++initialKey.data1;
+    setKey(initialKey.toByteArray());
+    setClass("some-future-class");
+    setCameraCount(count);
+}
+
+bool QnFutureLicenseStub::isValid(ErrorCode* errCode /* = 0 */, ValidationMode mode /* = VM_Regular */) const {
+    QN_UNUSED(errCode, mode);
+    return true;
 }

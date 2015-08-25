@@ -26,10 +26,6 @@ namespace Qn {
     const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
 }
 
-namespace {
-    const QString defaultPlaceholder(6, L'*');
-}
-
 QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent): 
     base_type(parent),
     ui(new Ui::UserSettingsDialog()),
@@ -231,7 +227,6 @@ void QnUserSettingsDialog::updateFromResource() {
 
         loadAccessRightsToUi(accessController()->globalPermissions(m_user));
     }
-    updatePlaceholders();
     updateLogin();
     updatePassword();
 
@@ -586,21 +581,6 @@ void QnUserSettingsDialog::at_advancedButton_toggled() {
         widget = widget->parentWidget();
     }
     updateSizeLimits();
-}
-
-void QnUserSettingsDialog::updatePlaceholders() {
-
-    bool showPlaceholder = m_mode == Mode::OwnUser;
-
-    QString placeholder = showPlaceholder 
-        ? defaultPlaceholder 
-        : QString();
-
-    ui->currentPasswordEdit->clear();
-    ui->passwordEdit->clear();
-    ui->passwordEdit->setPlaceholderText(placeholder);
-    ui->confirmPasswordEdit->clear();
-    ui->confirmPasswordEdit->setPlaceholderText(placeholder);
 }
 
 // Utility functions

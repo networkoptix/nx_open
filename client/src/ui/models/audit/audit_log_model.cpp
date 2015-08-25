@@ -208,12 +208,12 @@ void QnAuditLogModel::setDetail(QnAuditRecord* record, bool showDetail)
 
 QnAuditLogModel::QnAuditLogModel(QObject *parent):
     base_type(parent)
+    , m_index(new DataIndex())
 {
-    m_index = new DataIndex();
+    
 }
 
 QnAuditLogModel::~QnAuditLogModel() {
-    delete m_index;
 }
 
 void QnAuditLogModel::setData(const QnAuditRecordRefList &data) {
@@ -236,18 +236,7 @@ void QnAuditLogModel::clear() {
     endResetModel();
 }
 
-QModelIndex QnAuditLogModel::index(int row, int column, const QModelIndex &parent) const 
-{
-    return hasIndex(row, column, parent) 
-        ? createIndex(row, column, (void*)0) 
-        : QModelIndex();
-}
-
-QModelIndex QnAuditLogModel::parent(const QModelIndex &) const {
-    return QModelIndex();
-}
-
-QString QnAuditLogModel::getResourceNameString(QnUuid id) 
+QString QnAuditLogModel::getResourceNameById(const QnUuid &id) 
 {
     return getResourceName(qnResPool->getResourceById(id));
 }
@@ -364,7 +353,7 @@ QString QnAuditLogModel::getResourcesString(const std::vector<QnUuid>& resources
     {
         if (!result.isEmpty())
             result += lit(",");
-        result += getResourceNameString(res);
+        result += getResourceNameById(res);
     }
     return result;
 }
@@ -443,7 +432,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
                         else
                             result += QString(lit("<font size=5>%1</font>")).arg(circleSymbol);
                     }
-                    result += getResourceNameString(camera);
+                    result += getResourceNameById(camera);
                 }
             }
             return result;
@@ -883,4 +872,8 @@ void QnAuditLogModel::calcColorInterleaving()
         }
         m_interleaveInfo[i] = colorIndex;
     }
+}
+
+void QnAuditLogModel::setHeaderHeight(int value) {
+    m_headerHeight = value;
 }
