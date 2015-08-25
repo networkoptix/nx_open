@@ -13,6 +13,7 @@ update () {
   /etc/init.d/$COMPANY_NAME-mediaserver stop
   tar xfv $DISTRIB.tar.gz --exclude='./opt/${deb.customization.company.name}/mediaserver/etc/mediaserver.conf' -C /
   if [[ "${box}" == "bpi" ]]; then /etc/init.d/upgrade; fi
+  # TODO: add errorlevel handling
   /etc/init.d/$COMPANY_NAME-mediaserver start
   /etc/init.d/cron start
 }
