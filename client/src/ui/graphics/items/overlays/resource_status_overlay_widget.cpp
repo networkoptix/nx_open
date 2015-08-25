@@ -79,6 +79,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_button->setObjectName(lit("statusOverlayButton"));
     m_button->setFrameShape(Qn::RectangularFrame);
     m_button->setRelativeFrameWidth(1.0 / 16.0);
+    m_button->setOpacity(0);
     m_button->setStateOpacity(0, 0.4);
     m_button->setStateOpacity(QnImageButtonWidget::Hovered, 0.7);
     m_button->setStateOpacity(QnImageButtonWidget::Pressed, 1.0);
@@ -136,8 +137,7 @@ void QnStatusOverlayWidget::setButtonVisible(bool visible
     , bool animate)
 {
     static const char kVisiblePropertyName[] = "isVisible";
-    const QVariant &variant = m_button->property(kVisiblePropertyName);
-    const bool currentVisible = (variant.isValid() ? variant.toBool() : false);
+    const bool currentVisible = m_button->property(kVisiblePropertyName).toBool();
 
     if (currentVisible == visible) 
         return;
