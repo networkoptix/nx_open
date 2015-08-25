@@ -19,7 +19,7 @@ update () {
 
 if [ "$1" != "" ]
 then
-    update >> $1 2>&1
+  update >> $1 2>&1
 else
-    update 2>&1
+  update 2>&1
 fi
