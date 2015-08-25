@@ -2,7 +2,7 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
-#include <client\client_color_types.h>
+#include <client/client_color_types.h>
 
 #include <core/resource/resource_fwd.h>
 
