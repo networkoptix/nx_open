@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="titleLabel">
      <property name="text">
-      <string>Diagnostics for camera</string>
+      <string>Camera:</string>
      </property>
     </widget>
    </item>

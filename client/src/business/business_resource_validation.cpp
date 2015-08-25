@@ -13,7 +13,7 @@ namespace {
         Q_DECLARE_TR_FUNCTIONS(QnBusinessResourceValidationStrings)
     public:
         static QString anyCamera() { return tr("<Any Camera>"); }
-        static QString selectCamera() { return tr("Select at least one camera"); }
+        static QString selectCamera() { return tr("Select at least one camera."); }
         static QString multipleCameras(int total) { return tr("%n Camera(s)", "", total); }
         static QString subsetCameras(int count, int total) { return tr("%n of %1 cameras", "", count).arg(total); } 
     };

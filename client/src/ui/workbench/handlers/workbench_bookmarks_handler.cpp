@@ -100,7 +100,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
-            tr("Bookmark can only be added to an online server.")); //TODO: #tr
+            tr("Bookmarks can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
         return;
     }
 
@@ -134,7 +134,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
-            tr("Bookmark can only be edited on an online server.")); //TODO: #Elric ec2 update text if needed
+            tr("Bookmarks can only be edited on an online server.")); //TODO: #Elric ec2 update text if needed
         return;
     }
 
@@ -162,12 +162,12 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
-            tr("Bookmark can only be deleted from an online server.")); //TODO: #Elric ec2 update text if needed
+            tr("Bookmarks can only be deleted from an online server.")); //TODO: #Elric ec2 update text if needed
         return;
     }
 
     if (QMessageBox::information(mainWindow(),
-            tr("Confirm delete"),
+            tr("Confirm Deletion"),
             tr("Are you sure you want to delete this bookmark %1?").arg(bookmark.name),
             QMessageBox::Ok | QMessageBox::Cancel, 
             QMessageBox::Cancel) != QMessageBox::Ok)

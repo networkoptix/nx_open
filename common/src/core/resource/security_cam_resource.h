@@ -49,6 +49,7 @@ public:
 
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
+    bool isIOModule() const;
     Qn::MotionType getCameraBasedMotionType() const;
     Qn::MotionType getDefaultMotionType() const;
     int motionWindowCount() const;
@@ -335,6 +336,7 @@ private:
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
+    mutable CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
 

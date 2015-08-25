@@ -62,6 +62,9 @@ QnSecurityCamResource::QnSecurityCamResource():
         &m_mutex ),
     m_motionType(
         std::bind( &QnSecurityCamResource::calculateMotionType, this ),
+        &m_mutex ),
+    m_cachedIsIOModule(
+        [this]()->bool{ return getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0; },
         &m_mutex )
 {
     addFlags(Qn::live_cam);
@@ -255,6 +258,8 @@ void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int chan
 
     if (motionType != Qn::MT_SoftwareGrid)
         setMotionMaskPhysical(channel);
+
+    emit motionRegionChanged(::toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList) {
@@ -272,6 +277,8 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
         for (int i = 0; i < getVideoLayout()->channelCount(); ++i)
             setMotionMaskPhysical(i);
     }
+
+    emit motionRegionChanged(::toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks) {
@@ -320,7 +327,7 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
     {
         QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
 
-        if (hasCameraCapabilities(Qn::IOModuleCapability))
+        if (isIOModule())
             m_cachedLicenseType = Qn::LC_IO;
         else if (resType && resType->getManufacture() == lit("VMAX"))
             m_cachedLicenseType =  Qn::LC_VMAX;
@@ -539,6 +546,7 @@ bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabil
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
     setProperty(Qn::CAMERA_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+    m_cachedCameraCapabilities.reset();
 }
 
 void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability, bool value) {
@@ -941,6 +949,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedCameraCapabilities.reset();
     m_cachedIsDtsBased.reset();
     m_motionType.reset();
+    m_cachedIsIOModule.reset();
 }
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
@@ -953,4 +962,9 @@ Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
         return Qn::BPG_User;
 
     return Qn::BPG_None;
+}
+
+bool QnSecurityCamResource::isIOModule() const
+{
+    return m_cachedIsIOModule.get();
 }

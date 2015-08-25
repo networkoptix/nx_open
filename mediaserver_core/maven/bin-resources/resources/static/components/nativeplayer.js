@@ -16,6 +16,7 @@ var nativePlayer = new (function () {
     };
 
     var currentVideo;
+    var $currentVideo;
 
     this.play = function(){
         if(currentVideo) {
@@ -28,6 +29,7 @@ var nativePlayer = new (function () {
             currentVideo.addEventListener(event,handler);
         }
     };
+
     this.pause = function(){
         if(currentVideo) {
             currentVideo.pause();
@@ -35,12 +37,12 @@ var nativePlayer = new (function () {
     };
 
     this.load = function(url,type){
-
-        if(!currentVideo || !node.has("video").length) {
-            currentVideo = $("<video  src='" + url + "' type='" + type + "'>").appendTo(node).get(0);
-        }else{
-            currentVideo.pause();
-            $(currentVideo).attr("src",url).attr("type",type);
+        if( currentVideo || node.has("video").length){
+            node.find("video").remove();
         }
+        $currentVideo = $("<video  src='" + url + "' type='" + type + "'>").appendTo(node).html('<source src="' + url + '" type="' + type + '"></source>' );
+
+        currentVideo = $currentVideo.get(0);
+        currentVideo.load();
     };
 })();

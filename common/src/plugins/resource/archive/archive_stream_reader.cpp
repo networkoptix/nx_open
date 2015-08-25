@@ -386,7 +386,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
             m_singleShowWaitCond.wait(&m_jumpMtx);
     }
 
-    //=================
+    // =================
     {
         QnMutexLocker mutex( &m_jumpMtx );
         while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == qint64(AV_NOPTS_VALUE) && !needToStop())

@@ -144,7 +144,7 @@ static inline void bs_write_startcode( bs_t *s)
 	bs_write(s,32,0x00000001);// 0x00000001 - start code.
 }
 
-//==============================================================================
+// ==============================================================================
 // P = 1 for P frame ; P = 0 for I frame
 int create_unit_delimiter(int P, unsigned char* data, int max_datalen)
 {
@@ -164,7 +164,7 @@ int create_unit_delimiter(int P, unsigned char* data, int max_datalen)
 	return stream.p - stream.p_start;
 
 }
-//==============================================================================
+// ==============================================================================
 int create_sps_pps(
 				   int frameWidth,
 				   int frameHeight,
@@ -188,7 +188,7 @@ int create_sps_pps(
 
 	bs_write(&stream,8,0x67); // header
 
-	//======= sps main======
+	// ======= sps main======
 	bs_write( &stream, 8, 66 ); //i_profile_idc = 66
 
 	bs_write( &stream, 1, 0 );
@@ -236,13 +236,13 @@ int create_sps_pps(
 	bs_write( &stream, 1, 0 ); //vui_parameters_present_flag
 
 	bs_rbsp_trailing( &stream );
-	//======= sps main======
+	// ======= sps main======
 
 	bs_write_startcode(&stream); // write start code
 	//int header = ( 0x00 << 7 ) | ( i_ref_idc << 5 ) | i_type;
 	//for sps header = 104 (0x68)
 	bs_write(&stream,8,0x68); // header
-	//=======pps main========
+	// =======pps main========
 
 	bs_write_ue( &stream, 0); //pic_parameter_set_id
 	bs_write_ue( &stream, 0); //seq_parameter_set_id
@@ -269,10 +269,10 @@ int create_sps_pps(
 	bs_write( &stream, 1, 0 ); //redundant_pic_cnt_present_flag
 
 	bs_rbsp_trailing( &stream );
-	//=======================
+	// =======================
 
 	return stream.p - stream.p_start;
 
 }
-//==============================================================================
+// ==============================================================================
 

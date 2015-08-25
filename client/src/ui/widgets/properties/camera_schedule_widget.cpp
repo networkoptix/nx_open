@@ -70,13 +70,13 @@ namespace {
             parent->layout()->addWidget(m_licensesLabel);
 
             m_motionLabel = new QLabel(parent);
-            m_motionLabel->setText(tr("Schedule motion type is not supported by some cameras"));
+            m_motionLabel->setText(tr("Schedule motion type is not supported by some cameras."));
             setWarningStyle(m_motionLabel);
             parent->layout()->addWidget(m_motionLabel);
             m_motionLabel->setVisible(false);
 
             m_dtsLabel = new QLabel(parent);
-            m_dtsLabel->setText(tr("Recording cannot be enabled for some cameras"));
+            m_dtsLabel->setText(tr("Recording cannot be enabled for some cameras."));
             setWarningStyle(m_dtsLabel);
             parent->layout()->addWidget(m_dtsLabel);
             m_dtsLabel->setVisible(false);

@@ -1,6 +1,8 @@
 #ifndef QN_AUDIT_LOG_REST_HANDLER_H
 #define QN_AUDIT_LOG_REST_HANDLER_H
 
+
+#include "rest/server/json_rest_handler.h"
 #include "rest/server/fusion_rest_handler.h"
 
 

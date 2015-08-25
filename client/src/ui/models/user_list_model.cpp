@@ -89,7 +89,7 @@ void QnUserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr
         return;
 
     QModelIndex index = model->index(row);
-    model->dataChanged(index, index.sibling(row, QnUserListModel::ColumnCount));
+    emit model->dataChanged(index, index.sibling(row, QnUserListModel::ColumnCount - 1));
 }
 
 int QnUserListModelPrivate::userIndex(const QnUuid &id) const {
@@ -183,13 +183,15 @@ QnUserListModel::QnUserListModel(QObject *parent)
 QnUserListModel::~QnUserListModel() {}
 
 int QnUserListModel::rowCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent)
-    return d->userList.size();
+    if (!parent.isValid())
+        return d->userList.size();
+    return 0;
 }
 
 int QnUserListModel::columnCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent)
-    return ColumnCount;
+    if (!parent.isValid())
+        return ColumnCount;
+    return 0;
 }
 
 QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
@@ -322,11 +324,6 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
     }
         
 }
-
-QnUserResourceList QnUserListModel::selectedUsers() const {
-    return d->checkedUsers.toList();
-}
-
 
 QnSortedUserListModel::QnSortedUserListModel(QObject *parent)
     : base_type(parent)

@@ -484,7 +484,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         }
 
         if (!endAddr.isInSubnet(startAddr, 8)){
-            ui->validateLabelSearch->setText(tr("Specified IP address range contains more than 255 addresses."));
+            ui->validateLabelSearch->setText(tr("The specified IP address range has more than 255 addresses."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
@@ -492,7 +492,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         QString userInput = ui->singleCameraLineEdit->text().simplified();
         QUrl url = QUrl::fromUserInput(userInput);
         if (!url.isValid()) {
-            ui->validateLabelSearch->setText(tr("Camera address field must contain valid URL, IP address or RTSP link."));
+            ui->validateLabelSearch->setText(tr("Camera address field must contain a valid URL, IP address, or RTSP link."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
@@ -515,7 +515,7 @@ void QnCameraAdditionDialog::at_stopScanButton_clicked() {
         return; //TODO: #GDM #CameraAddition do something
 
     m_server->apiConnection()->searchCameraAsyncStop(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
-    ui->progressBar->setFormat(tr("Finishing search..."));
+    ui->progressBar->setFormat(tr("Finished searching..."));
     ui->progressBar->setMaximum(1);
     ui->progressBar->setValue(0);
     m_processUuid = QnUuid();
@@ -538,7 +538,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
         camerasToAdd << info;
     }
     if (camerasToAdd.empty()){
-        QMessageBox::information(this, tr("No cameras selected"), tr("Please select at least one camera"));
+        QMessageBox::information(this, tr("No cameras selected."), tr("Please select at least one camera."));
         return;
     }
 
@@ -610,12 +610,12 @@ void QnCameraAdditionDialog::at_server_statusChanged(const QnResourcePtr &resour
             break;
         case Searching:
             setState(InitialOffline);
-            updateServerStatus(tr("Server went offline, search aborted."));
+            updateServerStatus(tr("Server went offline - search aborted."));
             break;
         case CamerasFound:
         case Adding:
             setState(CamerasOffline);
-            updateServerStatus(tr("Server went offline, cameras can be added when the server will be available."));
+            updateServerStatus(tr("Server is offline, cameras can only be added to an online server."));
             break;
         default:
             break;
@@ -641,11 +641,11 @@ void QnCameraAdditionDialog::at_resPool_resourceRemoved(const QnResourcePtr &res
     setServer(QnMediaServerResourcePtr());
     switch (oldState) {
     case Searching:
-        updateServerStatus(tr("Server was removed, search aborted."));
+        updateServerStatus(tr("Server has been removed - search aborted."));
         break;
     case CamerasFound:
     case Adding:
-        updateServerStatus(tr("Server was removed, cameras cannot be added anymore."));
+        updateServerStatus(tr("Server has been removed - cannot add cameras."));
         break;
     default:
         break;
@@ -660,7 +660,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 
     if (status != 0) {
         setState(Initial);
-        QMessageBox::warning(this, tr("Error"), tr("Error while searching cameras."));
+        QMessageBox::warning(this, tr("Error"), tr("Error while searching for camera(s)."));
         return;
     }
 

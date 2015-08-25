@@ -28,6 +28,7 @@
 #include "camera/camera_pool.h"
 #include "hls_archive_playlist_manager.h"
 #include "hls_live_playlist_manager.h"
+#include "hls_playlist_manager_proxy.h"
 #include "hls_session_pool.h"
 #include "hls_types.h"
 #include "media_server/settings.h"
@@ -231,7 +232,7 @@ namespace nx_hls
         }
 
         //checking resource stream type. Only h.264 is OK for HLS
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera( camResource );
+        QnVideoCameraPtr camera = qnCameraPool->getVideoCamera( camResource );
         if( !camera )
         {
             NX_LOG( QString::fromLatin1("Error. HLS request to resource %1 which is not camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
@@ -366,7 +367,7 @@ namespace nx_hls
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getPlaylist(
         const nx_http::Request& request,
         const QnSecurityCamResourcePtr& camResource,
-        QnVideoCamera* const videoCamera,
+        const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
@@ -446,7 +447,7 @@ namespace nx_hls
         HLSSession* session,
         const nx_http::Request& request,
         const QnSecurityCamResourcePtr& camResource,
-        QnVideoCamera* const videoCamera,
+        const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& /*requestParams*/,
         nx_http::Response* const response )
     {
@@ -836,7 +837,7 @@ namespace nx_hls
         const QString& sessionID,
         const std::multimap<QString, QString>& requestParams,
         const QnSecurityCamResourcePtr& camResource,
-        QnVideoCamera* const videoCamera,
+        const QnVideoCameraPtr& videoCamera,
         MediaQuality streamQuality,
         HLSSession** session )
     {
@@ -890,7 +891,10 @@ namespace nx_hls
                     return nx_http::StatusCode::noContent;
                 }
                 assert( videoCamera->hlsLivePlaylistManager(quality) );
-                newHlsSession->setPlaylistManager( quality, videoCamera->hlsLivePlaylistManager(quality) );
+                newHlsSession->setPlaylistManager(
+                    quality,
+                    std::make_shared<nx_hls::HlsPlayListManagerWeakRefProxy>(
+                        videoCamera->hlsLivePlaylistManager(quality)) );
             }
         }
         else
@@ -934,7 +938,7 @@ namespace nx_hls
     int QnHttpLiveStreamingProcessor::estimateStreamBitrate(
         HLSSession* const session,
         QnSecurityCamResourcePtr camResource,
-        QnVideoCamera* const videoCamera,
+        const QnVideoCameraPtr& videoCamera,
         MediaQuality streamQuality )
     {
         int bandwidth = session->playlistManager(streamQuality)->getMaxBitrate();

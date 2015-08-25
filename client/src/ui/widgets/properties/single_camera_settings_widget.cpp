@@ -131,7 +131,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->imageControlWidget,     &QnImageControlWidget::fisheyeChanged,  this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
     connect(ui->imageControlWidget,     &QnImageControlWidget::changed,         this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    connect(ui->ioPortSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+    connect(ui->ioPortSettingsWidget,   &QnIOPortSettingsWidget::dataChanged,   this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
     updateFromResource(true);
 }
@@ -358,16 +358,16 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
-        ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->hasCameraCapabilities(Qn::IOModuleCapability));
+        ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->isIOModule());
 
         ui->imageControlWidget->updateFromResources(cameras);
 
         if (!dtsBased) {
             ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);
             if (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow))
-                ui->cameraMotionButton->setText(tr("Hardware (Camera built-in)"));
+                ui->cameraMotionButton->setText(tr("Hardware (camera built-in)"));
             else
-                ui->cameraMotionButton->setText(tr("Do not record motion"));
+                ui->cameraMotionButton->setText(tr("Do Not Record Motion"));
 
             QnVirtualCameraResourceList cameras;
             cameras.push_back(m_camera);

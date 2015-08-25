@@ -70,7 +70,7 @@
                                             <xsl:for-each select="functions/function">
                                                 <xsl:if test="not(@proprietary)">
                                                     <xsl:variable name="quotedName"
-                                                      select="translate(name, '/&lt;&gt;', '___')"/>
+                                                      select="translate(name, ' /&lt;&gt;', '____')"/>
                                                     <li>
                                                         <a href="#execAction">
                                                             <xsl:attribute name="href">#group_<xsl:value-of
@@ -106,7 +106,7 @@
                                     </div> <xsl:for-each select="functions/function">
                                         <xsl:if test="not(@proprietary)">
                                             <xsl:variable name="quotedName"
-                                                select="translate(name, '/&lt;&gt;', '___')"/>
+                                                select="translate(name, ' /&lt;&gt;', '____')"/>
                                             <div class="subgroup"
                                                 style="padding-top: 70px; margin-top: -70px;">
                                                 <xsl:attribute name="id">group_<xsl:value-of

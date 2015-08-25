@@ -102,7 +102,7 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename) {
     if (m_filesIsUse.contains(filename)) {
         QMessageBox::critical(
             mainWindow(),
-            tr("File is in use"),
+            tr("File is in use."),
             tr("File '%1' is used for recording already. Please enter another name.").arg(QFileInfo(filename).completeBaseName()),
             QMessageBox::Ok
         );
@@ -191,7 +191,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             if (!widget) {
                 QMessageBox::critical(
                     mainWindow(),
-                    tr("Could not export file"),
+                    tr("Unable to export file."),
                     tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", "", parameters.size())
                 );
                 return;
@@ -211,7 +211,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     if(period.durationMs > maxRecordingDurationMsec &&
             QMessageBox::warning(
                 mainWindow(),
-                tr("Warning"),
+                tr("Warning!"),
                 tr("You are about to export a video sequence that is longer than 30 minutes.") + L'\n' 
               + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n'
               + tr("Do you want to continue?"),
@@ -294,11 +294,11 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
         if (widget->resource()->hasVideo(archive)) {
             comboBox = new QComboBox(dialog.data());
-            comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
-            comboBox->addItem(tr("Top left corner (requires transcoding)"), Qn::TopLeftCorner);
-            comboBox->addItem(tr("Top right corner (requires transcoding)"), Qn::TopRightCorner);
-            comboBox->addItem(tr("Bottom left corner (requires transcoding)"), Qn::BottomLeftCorner);
-            comboBox->addItem(tr("Bottom right corner (requires transcoding)"), Qn::BottomRightCorner);
+            comboBox->addItem(tr("No Timestamp"), Qn::NoCorner);
+            comboBox->addItem(tr("Top Left Corner (requires transcoding)"), Qn::TopLeftCorner);
+            comboBox->addItem(tr("Top Right Corner (requires transcoding)"), Qn::TopRightCorner);
+            comboBox->addItem(tr("Bottom Left Corner (requires transcoding)"), Qn::BottomLeftCorner);
+            comboBox->addItem(tr("Bottom Right Corner (requires transcoding)"), Qn::BottomRightCorner);
 
             dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
@@ -356,7 +356,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             QMessageBox::StandardButton button = QMessageBox::question(
                         mainWindow(),
                         tr("Save As"),
-                        tr("You are about to export video with filters that require transcoding, which can take a long time. Do you want to continue?"),
+                        tr("You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?"),
                         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                         QMessageBox::No
                         );
@@ -469,10 +469,10 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QStr
 
     if (success) {
         if (tool->mode() == Qn::LayoutExport) {
-            QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+            QMessageBox::information(mainWindow(), tr("Export Complete"), tr("Export Successful"), QMessageBox::Ok);
         }
     } else if (!tool->errorMessage().isEmpty()) {
-        QMessageBox::warning(mainWindow(), tr("Could not export layout"), tool->errorMessage(), QMessageBox::Ok);
+        QMessageBox::warning(mainWindow(), tr("Unable to export layout."), tool->errorMessage(), QMessageBox::Ok);
     }
 }
 
@@ -496,7 +496,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
     if (hasImage) {
         QMessageBox::critical(
             mainWindow(),
-            tr("Could not save a layout"),
+            tr("Unable to save layout."),
             tr("Current layout contains image files. Images are not allowed for Multi-Video export."),
             QMessageBox::Ok
         );
@@ -509,7 +509,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
 
         QMessageBox::critical(
             mainWindow(),
-            tr("Could not save a layout"),
+            tr("Unable to save layout."),
             tr("Current layout contains local files. Local files are not allowed for Multi-Video export."),
             QMessageBox::Ok
         );
@@ -545,7 +545,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
     QString dialogName;
     if (mode == Qn::LayoutLocalSaveAs)
-        dialogName = tr("Save local layout As...");
+        dialogName = tr("Save local layout as...");
     else if (mode == Qn::LayoutExport)
         dialogName = tr("Export Layout As...");
     else
@@ -587,7 +587,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         ));
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
-        dialog->addCheckBox(tr("Make file read-only"), &readOnly);
+        dialog->addCheckBox(tr("Make file read-only."), &readOnly);
 
         setHelpTopic(dialog.data(), Qn::Exporting_Layout_Help);
 
@@ -666,7 +666,7 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
     if(exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30) { // TODO: #Elric implement more precise estimation
         int button = QMessageBox::question(
             mainWindow(),
-            tr("Warning"),
+            tr("Warning!"),
             tr("You are about to export several video sequences with a total length exceeding 30 minutes.") + L'\n' 
           + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n' 
           + tr("Do you want to continue?"),
@@ -699,8 +699,8 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
         file->setStatus(Qn::Online);
         resourcePool()->addResource(file);
 
-        QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished."), QMessageBox::Ok);
+        QMessageBox::information(mainWindow(), tr("Export Complete"), tr("Export Successful."), QMessageBox::Ok);
     } else if (tool->status() != QnClientVideoCamera::NoError) {
-        QMessageBox::warning(mainWindow(), tr("Could not export video"), QnClientVideoCamera::errorString(tool->status()), QMessageBox::Ok);
+        QMessageBox::warning(mainWindow(), tr("Unable to export video."), QnClientVideoCamera::errorString(tool->status()), QMessageBox::Ok);
     }
 }

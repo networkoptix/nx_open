@@ -12,14 +12,9 @@ int QnTestLdapSettingsHandler::executePost(const QString &path, const QnRequestP
 
     auto ldapManager = QnLdapManager::instance();
 
-    if (!ldapManager->testSettings(settings)) {
-        result.setError(QnRestResult::CantProcessRequest, lit("Invalid ldap settings"));
-        return nx_http::StatusCode::ok;
-    }
-
     QnLdapUsers ldapUsers;
     if (!ldapManager->fetchUsers(ldapUsers, settings)) {
-        result.setError(QnRestResult::CantProcessRequest, lit("Can't authenticate"));
+        result.setError(QnRestResult::CantProcessRequest, lit("Invalid ldap settings"));
         return nx_http::StatusCode::ok;
     }
 

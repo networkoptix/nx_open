@@ -4,6 +4,12 @@ CONFIG += console
 exists( ${libdir}/libcreateprocess.pri ) {
   include(${libdir}/libcreateprocess.pri)
 }
+exists( ${libdir}/sasl2.pri ) {
+  include(${libdir}/sasl2.pri)
+}
+exists( ${libdir}/openldap.pri ) {
+  include(${libdir}/openldap.pri)
+}
 
 INCLUDEPATH += ${root.dir}/appserver2/src/
 INCLUDEPATH += ${root.dir}/mediaserver_core/src/

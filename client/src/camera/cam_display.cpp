@@ -490,13 +490,13 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     m_previousVideoTime = currentTime;
 
-    //===== to avoid unrelated streams / stop play delays
+    // ===== to avoid unrelated streams / stop play delays
     if (needToSleep < 0)
         needToSleep = 0;
 
     if (needToSleep > MAX_VALID_SLEEP_TIME) // in case of key frame only and sliding archive slider forward - would not look good; need to do smth
         needToSleep = 0;
-    //=========
+    // =========
 
     if (sleep && m_lastFrameDisplayed != QnVideoStreamDisplay::Status_Buffered)
     {
@@ -1564,7 +1564,7 @@ void QnCamDisplay::pauseAudio()
         setMTDecoding(false);
 }
 
-//==========================================================================
+// ==========================================================================
 
 bool QnCamDisplay::haveAudio(float speed) const
 {

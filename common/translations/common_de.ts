@@ -173,14 +173,6 @@
         <translation>Server &quot;%1&quot; gestartet</translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>Server &quot;%1&quot; hat Lizenzprobleme</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>Unbekanntes Ereignis aufgetreten</translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation>Ereignis: %1</translation>
     </message>
@@ -193,16 +185,8 @@
         <translation>Url: %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>Input port: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>Grund: %1</translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
-        <translation>Konflikt Adresse: %1</translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -306,6 +290,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished">Unbekanntes Ereignis aufgetreten</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished">Input port: %1</translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished">Konflikt Adresse: %1</translation>
+    </message>
+    <message>
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -315,10 +315,6 @@
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Nicht authentifiziert. URL %1.</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -440,6 +436,10 @@
         <source>Parameters:</source>
         <translation>Parameter:</translation>
     </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished">Nicht authentifiziert. URL %1.</translation>
+    </message>
 </context>
 <context>
     <name>QnCommandLineParser</name>
@@ -456,12 +456,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>Der Start von Windows Explorer ist gescheitert</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>Konnte explorer.exe innerhalb des Suchpfades nicht finden, um Windows Explorer zu starten.</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished">Der Start von Windows Explorer ist gescheitert</translation>
     </message>
 </context>
 <context>
@@ -475,12 +475,12 @@
         <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>Initalisierung des Audio-Encoders gescheitert.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished">Initalisierung des Audio-Encoders gescheitert.</translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>Initalisierung des Audio-Decoders gescheitert.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished">Initalisierung des Audio-Decoders gescheitert.</translation>
     </message>
 </context>
 <context>
@@ -517,8 +517,8 @@
         <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>Initalisierung des Video-Encoders gescheitert.</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished">Initalisierung des Video-Encoders gescheitert.</translation>
     </message>
 </context>
 <context>
@@ -545,60 +545,12 @@
         <translation>Vmax</translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>Analog Encoder</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>Video-Wand</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>Trial Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>Analog Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>Professional Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>Edge Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>Vmax Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>Analog Encoder Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>Video-Wand Lizenz(en)</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>Ungültige Signatur</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>Server mit der benötigten Hardware-ID konnte nicht gefunden werden</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>Ungültige Anpassung</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>Abgelaufen</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>Ungültiger Typ</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -617,12 +569,60 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module licenses</source>
+        <source>Analog Encoder</source>
+        <translation type="unfinished">Analog Encoder</translation>
+    </message>
+    <message>
+        <source>Trial Licenses</source>
+        <translation type="unfinished">Trial Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished">Analog Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished">Professional Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished">Edge Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished">Vmax Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished">Analog Encoder Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished">Video-Wand Lizenz(en)</translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start licenses</source>
+        <source>Start Licenses</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalide Signature</source>
+        <translation type="unfinished">Ungültige Signatur</translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished">Ungültige Anpassung</translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
+        <translation type="unfinished">Ungültiger Typ</translation>
     </message>
 </context>
 <context>
@@ -656,24 +656,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>Es gab ein Problem bei der Aktivierung Ihres Lizenzschlüssels. Ein Datenbankfehler trat auf.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>Es gab ein Problem bei der Aktivierung Ihres Lizenzschlüssels. Ungültige Daten wurden übertragen. Bitte kontaktieren Sie das Support Team und melden Sie das Problem.</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Support Team,falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten bzw. ihren Lizenzschlüssel zu prüfen.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished">Es gab ein Problem bei der Aktivierung Ihres Lizenzschlüssels. Ein Datenbankfehler trat auf.</translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>Sie versuchen einen mit der Software inkompatiblen Lizenzschlüssel zu aktivieren.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished">Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Support Team,falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten bzw. ihren Lizenzschlüssel zu prüfen.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>Dieser Lizenzschlüssel wurde bereits am {{time}} für Hardware-ID {{hwid}} aktiviert.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">Sie versuchen einen mit der Software inkompatiblen Lizenzschlüssel zu aktivieren.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">Dieser Lizenzschlüssel wurde bereits am {{time}} für Hardware-ID {{hwid}} aktiviert.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
     </message>
 </context>
 <context>
@@ -718,24 +718,24 @@
         <translation>Unbekannt</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>Trial Lizenz</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>Hardware-ID:</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>Lizensiert für: </translation>
     </message>
     <message>
         <source>Watermark: </source>
         <translation>Wasserzeichen: </translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>FREE Lizenz</translation>
+        <source>Trial License</source>
+        <translation type="unfinished">Trial Lizenz</translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished">Lizensiert für: </translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished">FREE Lizenz</translation>
     </message>
 </context>
 <context>
@@ -862,20 +862,8 @@
         <translation>Fehler beim Emailversand</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>Speichermedien sind voll</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>Speichermedien sind nicht konfiguriert</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>Email Adresse für Benutzer %1 wurde nicht gesetzt</translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>Die Zeiteinstellung zwischen einigen Servern weicht ab und die korrekte Zeit konnte nicht automatisch bestimmt werden.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -924,6 +912,18 @@
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>Der Wiederaufbau des Archivindexes wurde auf folgenden Servern abgeschlossen:</translation>
+    </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished">Speichermedien sind voll</translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished">Speichermedien sind nicht konfiguriert</translation>
+    </message>
+    <message>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -975,12 +975,12 @@
         <translation>Unbekannte Transcoding Methode.</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>OpenCLTranscode wurde nicht implementiert</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished">OpenCLTranscode wurde nicht implementiert</translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>Unbekannte Transcode Methode</translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished">Unbekannte Transcode Methode</translation>
     </message>
 </context>
 <context>

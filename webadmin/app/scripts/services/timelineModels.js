@@ -20,6 +20,22 @@ Chunk.prototype.debug = function(){
     console.log(new Array(this.level + 1).join(" "), this.title, this.level,  this.children.length);
 };
 
+
+function isDate(val){
+    return val instanceof Date;
+}
+function NumberToDate(date){
+    if(typeof(date)=='number' || typeof(date)=='Number'){
+        date = Math.round(date);
+        date = new Date(date);
+    }
+    if(!isDate(date)){
+        console.error("non date " + (typeof date) + ": " + date );
+        return null;
+    }
+    return date;
+}
+
 // Additional mini-library for declaring and using settings for ruler levels
 function Interval (ms,seconds,minutes,hours,days,months,years){
     this.seconds = seconds;
@@ -30,22 +46,10 @@ function Interval (ms,seconds,minutes,hours,days,months,years){
     this.years = years;
     this.milliseconds = ms
 };
-if(!Number.isInteger) {
-    Number.isInteger = function (num) {
-        return (typeof num === 'number') && (Math.round(num) === num);
-    };
-};
-function isDate(val){
-    return val instanceof Date;
-}
+
 Interval.prototype.addToDate = function(date, count){
-    if(Number.isInteger(date)) {
-        date = new Date(date);
-    }
-    if(!isDate(date)){
-        console.error("non date " + (typeof date) + ": " + date );
-        return date;
-    }
+    date = NumberToDate(date);
+
     if(typeof(count)==='undefined') {
         count = 1;
     }
@@ -127,11 +131,9 @@ Interval.prototype.alignToPast = function(dateToAlign){
 
 //Check if current date aligned by interval
 Interval.prototype.checkDate = function(date){
-    if(Number.isInteger(date)) {
-        date = new Date(date);
-    }
-    if(!isDate(date)){
-        console.error("checkDate - non date" , date);
+    date = NumberToDate(date);
+
+    if(!date ){
         return false;
     }
 
@@ -241,6 +243,7 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width,timeCorrection) {
         if(!self.chunksTree){
             return; //No chunks for this camera
         }
+
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
         var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,width);
         if(nextLevel<RulerModel.levels.length-1) {
@@ -323,8 +326,8 @@ CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start,en
 
 CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     var deferred = this.$q.defer();
-    this.start = start;
-    this.end = end;
+    //this.start = start;
+    //this.end = end;
     this.level = level;
     var detailization = RulerModel.levels[level].interval.getMilliseconds();
 
@@ -511,7 +514,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
  * @param parent - parent for recursive call
  * @param result - heap for recursive call
  */
-CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent,debugLevel){
+CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent, debugLevel){
     parent = parent || this.chunksTree;
 
     if(!parent){
@@ -528,10 +531,10 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     if(parent.children.length == 0){
-        if(!debugLevel) {
+        //if(!debugLevel) {
             result.push(parent); // Bad chunk, but no choice
             return;
-        }
+        //}
     }
 
     // Iterate children:
@@ -554,7 +557,7 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
  * ShortCache - special collection for short chunks with best detailization for calculating playing position and date
  * @constructor
  */
-function ShortCache(cameras,mediaserver,$q){
+function ShortCache(cameras,mediaserver,$q,timeCorrection){
 
     this.$q = $q;
 
@@ -576,6 +579,8 @@ function ShortCache(cameras,mediaserver,$q){
     this.requestDetailization = 1;//the deepest detailization possible
     this.limitChunks = 100; // limit for number of chunks
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
+
+    this.timeCorrection = timeCorrection || 0;
 }
 ShortCache.prototype.init = function(start){
     this.liveMode = false;
@@ -615,8 +620,8 @@ ShortCache.prototype.update = function(requestPosition,position){
     // Get next {{limitChunks}} chunks
     this.mediaserver.getRecords('/',
             this.cameras[0],
-            requestPosition,
-            (new Date()).getTime()+1000,
+            Math.max(requestPosition - this.timeCorrection,0),
+            (new Date()).getTime() + 100000 - this.timeCorrection,
             this.requestDetailization,
             this.limitChunks).
         then(function(data){
@@ -626,7 +631,7 @@ ShortCache.prototype.update = function(requestPosition,position){
 
             _.forEach(chunks,function(chunk){
                 chunk.durationMs = parseInt(chunk.durationMs);
-                chunk.startTimeMs = parseInt(chunk.startTimeMs);
+                chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeCorrection;
 
                 if(chunk.durationMs == -1){
                     chunk.durationMs = (new Date()).getTime() - chunk.startTimeMs;//in future
@@ -794,8 +799,8 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
+    var needZoomOut = !this.çheckZoomOut();
     this.end = end;
-    var needZoomOut =  this.fullZoomOutValue() - this.zoom() < this.zoomAccuracy;
     this.updateTotalInterval();
     if(needZoomOut){
         this.zoom(1);
@@ -819,6 +824,7 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.msPerPixel = this.bound(this.minMsPerPixel, this.msPerPixel, this.maxMsPerPixel);
     this.anchorPoint = this.bound(0, this.anchorPoint, 1);
     this.anchorDate = this.bound(this.start, Math.round(this.anchorDate), this.end);
+
 
     this.visibleStart = Math.round(this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint);
     this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));
@@ -1095,6 +1101,12 @@ ScaleManager.prototype.targetLevels = function(zoomTarget){
     return this.calcLevels(msPerPixel);
 };
 
+ScaleManager.prototype.çheckZoomOut = function(){
+    return this.zoom() < this.fullZoomOutValue() - this.zoomAccuracy;
+};
+ScaleManager.prototype.çheckZoomIn = function(){
+    return this.zoom() > this.fullZoomInValue() + this.zoomAccuracy;
+};
 ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
     if(typeof(zoomValue)=="undefined"){
         return this.msToZoom(this.msPerPixel);
