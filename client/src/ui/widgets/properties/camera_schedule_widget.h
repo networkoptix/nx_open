@@ -113,6 +113,10 @@ private slots:
     void at_releaseSignalizer_activated(QObject *target);
     void at_exportScheduleButton_clicked();
 private:
+    void updateScheduleEnabled();
+    void updateMinDays();
+    void updateMaxDays();
+
     int qualityToComboIndex(const Qn::StreamQuality& q);
 
     void connectToGridWidget();

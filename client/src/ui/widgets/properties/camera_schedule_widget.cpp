@@ -337,57 +337,63 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     if(m_cameras == cameras)
         return;
 
-    foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
+    for (const QnVirtualCameraResourcePtr &camera: m_cameras) 
         disconnect(camera.data(), &QnSecurityCamResource::resourceChanged, this, &QnCameraScheduleWidget::updateMotionButtons);
 
     m_cameras = cameras;
 
-    int enabledCount = 0, disabledCount = 0;
-    
-    int minDays = 0, maxDays = 0;
-    bool mixedMinDays = false, mixedMaxDays = false;
-    bool firstCamera = true;
-
-    foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
-    {
+    for (const QnVirtualCameraResourcePtr &camera: m_cameras) 
         connect(camera.data(), &QnSecurityCamResource::resourceChanged, this, &QnCameraScheduleWidget::updateMotionButtons, Qt::QueuedConnection);
 
-        (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
-
-        if (firstCamera) {
-            minDays = camera->minDays();
-            maxDays = camera->maxDays();
-            firstCamera = false;
-            continue;
-        }
-        mixedMinDays |= camera->minDays() != minDays;
-        if (mixedMinDays)
-            minDays = qMin(qAbs(minDays), qAbs(camera->minDays()));
-
-        mixedMaxDays |= camera->maxDays() != maxDays;
-        if (mixedMaxDays)
-            maxDays = qMax(qAbs(camera->maxDays()), qAbs(maxDays));
-    }
-
-    QnCheckbox::setupTristateCheckbox(ui->enableRecordingCheckBox, enabledCount == 0 || disabledCount == 0, enabledCount > 0);
-    QnCheckbox::setupTristateCheckbox(ui->checkBoxMinArchive, mixedMinDays, minDays <= 0);
-    QnCheckbox::setupTristateCheckbox(ui->checkBoxMaxArchive, mixedMaxDays, maxDays <= 0);
-
-    if (minDays != 0)
-        ui->spinBoxMinDays->setValue(qAbs(minDays));
-    else 
-        ui->spinBoxMinDays->setValue(defaultMinArchiveDays);
-
-    if (maxDays != 0)
-        ui->spinBoxMaxDays->setValue(qAbs(maxDays));
-    else
-        ui->spinBoxMaxDays->setValue(defaultMaxArchiveDays);
-
+    updateScheduleEnabled();
+    updateMinDays();
+    updateMaxDays();
     updatePanicLabelText();
     updateMotionButtons();
     updateLicensesLabelText();
 }
 
+void QnCameraScheduleWidget::updateScheduleEnabled() {
+    int enabledCount = 0, disabledCount = 0;
+    for (const QnVirtualCameraResourcePtr &camera: m_cameras) {
+        (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
+    }
+    QnCheckbox::setupTristateCheckbox(ui->enableRecordingCheckBox, enabledCount == 0 || disabledCount == 0, enabledCount > 0);
+}
+
+void QnCameraScheduleWidget::updateMinDays() {
+    auto calcMinDays = [](int d) { return d == 0 ? defaultMinArchiveDays : qAbs(d);  };
+
+    const int minDays = m_cameras.isEmpty()
+        ? 0
+        : (*std::min_element(m_cameras.cbegin(), m_cameras.cend(), [calcMinDays](const QnVirtualCameraResourcePtr &l, const QnVirtualCameraResourcePtr &r) {
+                return calcMinDays(l->minDays()) < calcMinDays(r->minDays());
+            }))->minDays();
+    
+    bool sameMinDays = boost::algorithm::all_of(m_cameras, [minDays](const QnVirtualCameraResourcePtr &camera) {
+        return camera->minDays() == minDays;
+    });
+
+    QnCheckbox::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, minDays <= 0);
+    ui->spinBoxMinDays->setValue(calcMinDays(minDays));
+}
+
+void QnCameraScheduleWidget::updateMaxDays() {
+    auto calcMaxDays = [](int d) { return d == 0 ? defaultMaxArchiveDays : qAbs(d);  };
+
+    const int maxDays = m_cameras.isEmpty()
+        ? 0
+        : (*std::max_element(m_cameras.cbegin(), m_cameras.cend(), [calcMaxDays](const QnVirtualCameraResourcePtr &l, const QnVirtualCameraResourcePtr &r) {
+                return calcMaxDays(l->maxDays()) < calcMaxDays(r->maxDays());
+            }))->maxDays();
+
+    bool sameMaxDays = boost::algorithm::all_of(m_cameras, [maxDays](const QnVirtualCameraResourcePtr &camera) {
+        return camera->maxDays() == maxDays;
+    });
+
+    QnCheckbox::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, maxDays <= 0);
+    ui->spinBoxMaxDays->setValue(calcMaxDays(maxDays));
+}
 
 void QnCameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled) {
     ui->exportScheduleButton->setEnabled(enabled);
