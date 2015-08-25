@@ -231,14 +231,14 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
     case Qt::DecorationRole:
         switch (index.column()) {
         case EditIconColumn:
-            return qnSkin->icon("/edit.png");
+            return qnSkin->icon("edit.png");
         case LdapColumn:
             if (user->isLdap())
-                return qnSkin->icon("/done.png");
+                return qnSkin->icon("done.png");
             break;
         case EnabledColumn:
             if (user->isEnabled())
-                return qnSkin->icon("/done.png");
+                return qnSkin->icon("done.png");
             break;
         default:
             break;
