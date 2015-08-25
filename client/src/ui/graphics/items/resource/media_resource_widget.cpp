@@ -5,6 +5,8 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 
+#include <api/app_server_connection.h>
+
 #include <plugins/resource/archive/abstract_archive_stream_reader.h>
 
 #include <utils/common/warnings.h>
@@ -20,6 +22,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/camera_user_attributes.h>
+#include <core/resource/camera_user_attribute_pool.h>
 
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/preset_ptz_controller.h>
@@ -1431,7 +1435,15 @@ void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
 
     if (!QnCamLicenseUsageHelper(m_camera, true).isOverflowForCamera(m_camera)) {
         m_camera->setLicenseUsed(true);
-        m_camera->saveAsync();
+
+        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
+            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(QnVirtualCameraResourceList() << m_camera)),
+            this,
+            [this]( int reqID, ec2::ErrorCode errorCode ) {
+                Q_UNUSED(reqID);
+                if (errorCode != ec2::ErrorCode::ok)
+                    m_camera->setLicenseUsed(false);
+        } );
     }
 
     updateIoModuleVisibility(true);
