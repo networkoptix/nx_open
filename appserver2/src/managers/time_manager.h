@@ -287,6 +287,7 @@ namespace ec2
         void timeSyncRequestDone(
             const QnUuid& peerID,
             nx_http::AsyncHttpClientPtr clientPtr );
+        TimeSyncInfo getTimeSyncInfoNonSafe() const;
 
     private slots:
         void onNewConnectionEstablished(QnTransactionTransport* transport );
