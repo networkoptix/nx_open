@@ -2,6 +2,9 @@
 
 #include "upnp_port_mapper_internal.h"
 
+#include "common/common_globals.h"
+#include "utils/common/log.h"
+
 namespace nx_upnp {
 
 PortMapper::PortMapper( quint64 checkMappingsInterval,
@@ -135,24 +138,13 @@ bool PortMapper::searchForMappers( const HostAddress& localAddress,
         if( service.serviceType != AsyncClient::WAN_IP )
             continue; // uninteresting
 
-        {
-            QUrl url;
-            url.setHost( devAddress.address.toString() );
-            url.setPort( devAddress.port );
-            url.setPath( service.controlUrl );
+        QUrl url;
+        url.setHost( devAddress.address.toString() );
+        url.setPort( devAddress.port );
+        url.setPath( service.controlUrl );
 
-            std::unique_ptr< Device > device(
-                new Device( m_upnpClient.get(), localAddress, url, m_description ) );
-
-            QMutexLocker lk( &m_mutex );
-            const auto itBool = m_devices.emplace( devInfo.serialNumber, std::move( device ) );
-            if( !itBool.second )
-                continue; // known device
-
-            // ask to map all existing mappings on this device as well
-            for( const auto& mapping : m_mappings )
-                enableMappingOnDevice( *itBool.first->second, false, mapping.first );
-        }
+        QMutexLocker lk( &m_mutex );
+        addNewMapper( localAddress, url, devInfo.serialNumber );
     }
 
     for( const auto& subDev : devInfo.deviceList )
@@ -170,6 +162,43 @@ void PortMapper::onTimer( const quint64& /*timerID*/ )
 
     if( m_timerId )
         m_timerId = TimerManager::instance()->addTimer( this, m_checkMappingsInterval );
+}
+
+void PortMapper::addNewMapper( const HostAddress& localAddress,
+                               const QUrl& url, const QString& serial )
+{
+    std::unique_ptr< Device > device( new Device(
+        m_upnpClient.get(), localAddress, url, m_description ) );
+
+    const auto itBool = m_devices.emplace( serial, std::move( device ) );
+    if( !itBool.second )
+        return; // known device
+
+    const auto result = itBool.first->second->resolveExternalIp(
+                [ this ]( HostAddress /*externalIp*/ )
+    {
+        // TODO: use externalIp in case we need it
+
+        QMutexLocker lk( &m_mutex );
+        if( --m_asyncInProgress == 0)
+            m_asyncCondition.wakeOne();
+    } );
+
+    if( !result )
+    {
+        m_devices.erase( itBool.first );
+        return;
+    }
+
+    ++m_asyncInProgress;
+
+    // ask to map all existing mappings on this device as well
+    for( const auto& mapping : m_mappings )
+        enableMappingOnDevice( *itBool.first->second, false, mapping.first );
+
+    NX_LOG( lit( "%1 New device %2 ( %3 ) has been found on %4" )
+            .arg( QLatin1String( Q_FUNC_INFO ) ).arg( url.toString() )
+            .arg( serial ).arg( localAddress.toString() ), cl_logDEBUG2 );
 }
 
 } // namespace nx_upnp

@@ -274,6 +274,13 @@ bool AsyncClient::MappingInfo::isValid() const
     return !( internalIp == HostAddress() ) && internalPort && externalPort;
 }
 
+QString AsyncClient::MappingInfo::toString() const
+{
+    return lit( "MappingInfo( %1:%2 -> %3 %4 : %5 )" )
+            .arg( internalIp.toString() ).arg( internalPort ).arg( externalPort )
+            .arg( QnLexical::serialized( protocol ) ).arg( description );
+}
+
 bool AsyncClient::getMapping(
         const QUrl& url, quint32 index,
         std::function< void( MappingInfo ) > callback )
@@ -358,8 +365,8 @@ bool AsyncClient::getAllMappings(
 }
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( AsyncClient::Protocol,
-    ( AsyncClient::TCP, "tcp" )
-    ( AsyncClient::UDP, "udp" )
+    ( AsyncClient::Protocol::TCP, "tcp" )
+    ( AsyncClient::Protocol::UDP, "udp" )
 )
 
 } // namespace nx_upnp

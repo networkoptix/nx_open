@@ -1,6 +1,7 @@
 #include "upnp_port_mapper_internal.h"
 
 #include "utils/common/model_functions.h"
+#include "utils/common/log.h"
 
 #include <QDateTime>
 
@@ -64,15 +65,20 @@ bool FailCounter::isOk()
 }
 
 PortMapper::Device::Device( AsyncClient* upnpClient,
-                           const HostAddress& internalIp,
-                           const QUrl& url,
-                           const QString& description )
+                            const HostAddress& internalIp,
+                            const QUrl& url,
+                            const QString& description )
     : m_upnpClient( upnpClient )
     , m_internalIp( internalIp )
     , m_url( url )
     , m_description( description )
 {
-    m_upnpClient->externalIp( url, [this]( const HostAddress& newIp )
+}
+
+bool PortMapper::Device::resolveExternalIp(
+        std::function< void( HostAddress ) > onGotExternalIp )
+{
+    return m_upnpClient->externalIp( m_url, [ = ]( const HostAddress& newIp )
     {
         std::vector< std::function< void() > > successQueue;
         {
@@ -84,6 +90,8 @@ PortMapper::Device::Device( AsyncClient* upnpClient,
         // notify all callbacks in queue (they were not notified bc externalIp was unknown
         for( const auto& callback : successQueue )
             callback();
+
+        onGotExternalIp( std::move( newIp ) );
     } );
 }
 
@@ -116,7 +124,10 @@ bool PortMapper::Device::map(
                         = mapping.externalPort;
                 lk.unlock();
 
-                // already mapped, let's use this one
+                NX_LOG( lit( "%1 Already mapped %2" )
+                        .arg( QLatin1String( Q_FUNC_INFO ) )
+                        .arg( mapping.toString() ), cl_logDEBUG2 );
+
                 callback( mapping.externalPort );
                 return;
             }
@@ -203,6 +214,11 @@ bool PortMapper::Device::mapImpl(
         m_url, m_internalIp, port, desiredPort, protocol, m_description,
         [ this, callback, port, desiredPort, protocol, retrys ]( bool success )
     {
+        NX_LOG( lit( "%1 Mapping %2 to %3 for %4, result: %5" )
+                .arg( QLatin1String( Q_FUNC_INFO ) ).arg( port ).arg( desiredPort )
+                .arg( QnLexical::serialized( protocol ) )
+                .arg( success ), cl_logDEBUG2 );
+
         QMutexLocker lk( &m_mutex );
         if( !success )
         {

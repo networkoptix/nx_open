@@ -993,6 +993,16 @@ void MediaServerProcess::updateAllowCameraCHangesIfNeed()
     }
 }
 
+template< typename Container>
+QString containerToQString( const Container& container )
+{
+    QStringList list;
+    for (const auto& it : container)
+        list << it.toString();
+
+    return list.join( lit(", ") );
+}
+
 void MediaServerProcess::updateAddressesList()
 {
     QList<SocketAddress> serverAddresses;
@@ -1005,6 +1015,8 @@ void MediaServerProcess::updateAddressesList()
         serverAddresses << SocketAddress(host.first, host.second);
 
     m_mediaServer->setNetAddrList(serverAddresses);
+    NX_LOG(lit("%1 Update mediaserver addresses: %2")
+           .arg(Q_FUNC_INFO).arg(containerToQString(serverAddresses)), cl_logDEBUG1);
 
     const QUrl defaultUrl(m_mediaServer->getApiUrl());
     const SocketAddress defaultAddress(defaultUrl.host(), port);
@@ -1298,11 +1310,25 @@ void MediaServerProcess::at_portMappingChanged(
                "Unexpected internal port has been mapped");
 
     if (externalPort)
-        m_forwardedAddresses[externalIp] = externalPort;
-    else
-        m_forwardedAddresses.erase(m_forwardedAddresses.find(externalIp));
+    {
+        NX_LOG(lit("%1 New external address %2:%3 has been mapped")
+               .arg(Q_FUNC_INFO).arg(externalIp).arg(externalPort), cl_logALWAYS)
 
-    updateAddressesList();
+        m_forwardedAddresses[externalIp] = externalPort;
+        updateAddressesList();
+    }
+    else
+    {
+        const auto oldIp = m_forwardedAddresses.find(externalIp);
+        if (oldIp != m_forwardedAddresses.end())
+        {
+            NX_LOG(lit("%1 External address %2:%3 has been unmapped")
+                   .arg(Q_FUNC_INFO).arg(externalIp).arg(externalPort), cl_logALWAYS)
+
+            m_forwardedAddresses.erase(oldIp);
+            updateAddressesList();
+        }
+    }
 }
 
 void MediaServerProcess::at_serverSaved(int, ec2::ErrorCode err)
@@ -1847,6 +1873,8 @@ void MediaServerProcess::run()
         if (server->getNetAddrList() != serverAddresses) {
             server->setNetAddrList(serverAddresses);
             isModified = true;
+            NX_LOG(lit("%1 Update mediaserver addresses on startup: %2")
+                   .arg(Q_FUNC_INFO).arg(containerToQString(serverAddresses)), cl_logDEBUG1);
         }
 
         bool needUpdateAuthKey = false;
@@ -2001,11 +2029,13 @@ void MediaServerProcess::run()
         Q_ASSERT_X(info.protocol == nx_upnp::PortMapper::Protocol::TCP, Q_FUNC_INFO,
                    "Unexpected protochol has been mapped");
 
-        QMetaObject::invokeMethod(
+        const auto result = QMetaObject::invokeMethod(
             this, "at_portMappingChanged", Qt::AutoConnection,
             Q_ARG(quint16, info.internalPort),
             Q_ARG(quint16, info.externalPort),
             Q_ARG(QString, info.externalIp.toString()));
+
+        Q_ASSERT_X(result, Q_FUNC_INFO, "Could not call at_portMappingChanged(...)");
     });
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );

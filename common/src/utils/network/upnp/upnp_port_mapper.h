@@ -70,6 +70,10 @@ protected: // for testing only
 
     virtual void onTimer( const quint64& timerID ) override;
 
+private:
+    void addNewMapper( const HostAddress& localAddress,
+                       const QUrl& url, const QString& serial );
+
 protected: // for testing only
     QMutex m_mutex;
     std::unique_ptr<AsyncClient> m_upnpClient;

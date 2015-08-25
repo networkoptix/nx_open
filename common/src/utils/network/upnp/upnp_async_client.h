@@ -13,6 +13,7 @@ class AsyncClient
 {   
 public:
     enum Protocol { TCP, UDP };
+
     virtual ~AsyncClient() {}
 
     //! Simple SOAP call
@@ -69,9 +70,12 @@ public:
         QString     description;
 
         MappingInfo( const HostAddress& inIp = HostAddress(),
-                     quint16 inPort = 0, quint16 exPort = 0, Protocol prot = TCP,
+                     quint16 inPort = 0, quint16 exPort = 0,
+                     Protocol prot = Protocol::TCP,
                      const QString& desc = QString() );
+
         bool isValid() const;
+        QString toString() const;
     };
 
     //! Provides mapping info by @param index
@@ -95,7 +99,7 @@ private:
     std::set< nx_http::AsyncHttpClientPtr > m_httpClients;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS( AsyncClient::Protocol, ( lexical ) )
+QN_FUSION_DECLARE_FUNCTIONS( AsyncClient::Protocol, ( lexical ) );
 
 } // namespace nx_upnp
 

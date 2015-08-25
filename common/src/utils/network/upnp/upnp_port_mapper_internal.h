@@ -40,8 +40,9 @@ public:
     Device( AsyncClient* upnpClient,
             const HostAddress& internalIp,
             const QUrl& url,
-            const QString& description);
+            const QString& description );
 
+    bool resolveExternalIp( std::function< void( HostAddress ) > onGotExternalIp );
     HostAddress externalIp() const;
 
     bool map( quint16 port, quint16 desiredPort, Protocol protocol,
