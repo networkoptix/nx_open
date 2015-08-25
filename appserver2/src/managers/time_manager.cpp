@@ -479,7 +479,7 @@ namespace ec2
         m_timeSynchronized = false;
         m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
         m_usedTimeSyncInfo = TimeSyncInfo(
-            0,
+            m_monotonicClock.elapsed(),
             currentMSecsSinceEpoch(),
             m_localTimePriorityKey );
     }
@@ -665,7 +665,7 @@ namespace ec2
         //adding periodic task
         ctx.syncTimerID = TimerManager::instance()->addTimer(
             std::bind(&TimeSynchronizationManager::synchronizeWithPeer, this, peerID),
-            TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC );
+            0 );    //performing initial synchronization immediately
     }
 
     void TimeSynchronizationManager::stopSynchronizingTimeWithPeer( const QnUuid& peerID )
