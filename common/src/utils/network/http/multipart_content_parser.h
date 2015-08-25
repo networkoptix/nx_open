@@ -67,13 +67,14 @@ namespace nx_http
         StringType m_startBoundaryLine;
         StringType m_endBoundaryLine;
         StringType m_boundaryForUnsizedBinaryParsing;
+        StringType m_boundaryForUnsizedBinaryParsingWOTrailingCRLF;
         unsigned int m_contentLength;
         ChunkParseState m_chunkParseState;
         nx::Buffer m_supposedBoundary;
         nx_http::HttpHeaders m_currentFrameHeaders;
 
         bool readUnsizedBinaryData(
-            const QnByteArrayConstRef& data,
+            QnByteArrayConstRef data,
             size_t* const offset );
     };
 }

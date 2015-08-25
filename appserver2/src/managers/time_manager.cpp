@@ -461,12 +461,7 @@ namespace ec2
     TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfo() const
     {
         QnMutexLocker lk( &m_mutex );
-
-        const qint64 elapsed = m_monotonicClock.elapsed();
-        return TimeSyncInfo(
-            elapsed,
-            m_usedTimeSyncInfo.syncTime + elapsed - m_usedTimeSyncInfo.monotonicClockValue,
-            m_usedTimeSyncInfo.timePriorityKey );
+        return getTimeSyncInfoNonSafe();
     }
 
     qint64 TimeSynchronizationManager::getMonotonicClock() const
@@ -691,7 +686,6 @@ namespace ec2
 
     void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
     {
-        const auto timeSyncInfo = getTimeSyncInfo();
         nx_http::AsyncHttpClientPtr clientPtr;
 
         QnMutexLocker lk( &m_mutex );
@@ -716,7 +710,15 @@ namespace ec2
                 timeSyncRequestDone(peerID, std::move(clientPtr));
             },
             Qt::DirectConnection );
-        clientPtr->addAdditionalHeader( QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME, timeSyncInfo.toString() );
+
+        if( m_peerType == Qn::PT_Server )
+        {
+            //client does not send its time to anyone
+            const auto timeSyncInfo = getTimeSyncInfoNonSafe();
+            clientPtr->addAdditionalHeader(
+                QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME,
+                timeSyncInfo.toString() );
+        }
         clientPtr->addAdditionalHeader( Qn::PEER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray() );
 
         clientPtr->setUserName( peerIter->second.authData.userName );
@@ -1062,5 +1064,14 @@ namespace ec2
             m_monotonicClock.elapsed(),
             data.peerSysTime,
             peerPriorityKey );
+    }
+
+    TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfoNonSafe() const
+    {
+        const qint64 elapsed = m_monotonicClock.elapsed();
+        return TimeSyncInfo(
+            elapsed,
+            m_usedTimeSyncInfo.syncTime + elapsed - m_usedTimeSyncInfo.monotonicClockValue,
+            m_usedTimeSyncInfo.timePriorityKey );
     }
 }
