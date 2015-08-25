@@ -634,7 +634,7 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
     gridMaster->setHorizontalHeader(headers);
     gridMaster->setItemDelegate(m_itemDelegate);
     gridMaster->setMouseTracking(true);
-    model->setheaderHeight(calcHeaderHeight(gridMaster->horizontalHeader()));
+    model->setHeaderHeight(calcHeaderHeight(gridMaster->horizontalHeader()));
 
     connect(model, &QAbstractItemModel::dataChanged, this, &QnAuditLogDialog::at_updateDetailModel);
     connect(model, &QAbstractItemModel::modelReset, this, &QnAuditLogDialog::at_updateDetailModel);
@@ -706,7 +706,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     ui->gridDetails->setModel(m_detailModel);
     ui->gridDetails->setItemDelegate(m_itemDelegate);
     ui->gridDetails->setWordWrap(true);
-    m_detailModel->setheaderHeight(calcHeaderHeight(ui->gridDetails->horizontalHeader()));
+    m_detailModel->setHeaderHeight(calcHeaderHeight(ui->gridDetails->horizontalHeader()));
 
     ui->gridDetails->horizontalHeader()->setMinimumSectionSize(48);
     
