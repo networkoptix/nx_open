@@ -145,9 +145,9 @@ int ApplauncherProcess::run()
     if( !m_taskServer.listen( launcherPipeName ) )
     {
         //another instance already running?
-#ifdef _WIN32
+#ifdef Q_OS_WIN
         launchMostRecentClient();
-#elif
+#else
         sendTaskToRunningLauncherInstance();
 #endif
         return 0;
