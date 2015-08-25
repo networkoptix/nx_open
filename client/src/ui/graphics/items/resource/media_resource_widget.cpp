@@ -1017,7 +1017,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     }
     if (m_resource->hasVideo(m_display->mediaProvider()))
     {
-        return lit(" Video %1x%2 %3fps @ %4Mbps%5 %6\t%7")
+        return lit(" %1x%2 %3fps @ %4Mbps%5 %6\t%7")
             .arg(size.width())
             .arg(size.height())
             .arg(fps, 0, 'f', 2)
@@ -1028,7 +1028,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     }
     else
     {
-        return lit(" Audio %1Mbps%2 %3\t%4")
+        return lit(" %1Mbps%2 %3\t%4")
             .arg(mbps, 0, 'f', 2)
             .arg(codecString)
             .arg(hqLqString)
