@@ -67,7 +67,7 @@ namespace {
                 , Qt::AlignCenter   // Output state
                 , Qt::AlignLeft     // Output caption
             };
-            const int count = _countof(aligns);
+            const int count = sizeof(aligns) / sizeof(aligns[0]);
 
             ColumnInfoVector result;
             for (int columnIndex = 0; columnIndex != count; ++columnIndex)
