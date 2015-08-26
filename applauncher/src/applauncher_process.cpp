@@ -119,12 +119,37 @@ void ApplauncherProcess::processRequest(
     }
 }
 
+void ApplauncherProcess::launchMostRecentClient()
+{
+    QnSoftwareVersion versionToLaunch;
+    QString appArgs;
+    if(!getVersionToLaunch(&versionToLaunch, &appArgs))
+        return;
+
+    applauncher::api::Response response;
+    enum { kTriesCount = 2 };
+    for(int i = 0; i < kTriesCount; ++i)
+    {
+        const auto startAppTask = std::make_shared<applauncher::api::StartApplicationTask>(versionToLaunch, appArgs);
+        if(startApplication(startAppTask, &response))
+            break;
+
+        //failed to start, trying to restore version
+        if(!blockingRestoreVersion(versionToLaunch))
+            versionToLaunch = m_installationManager->latestVersion();
+    }
+}
+
 int ApplauncherProcess::run()
 {
     if( !m_taskServer.listen( launcherPipeName ) )
     {
         //another instance already running?
+#ifdef Q_OS_WIN
+        launchMostRecentClient();
+#else
         sendTaskToRunningLauncherInstance();
+#endif
         return 0;
     }
 
@@ -132,26 +157,7 @@ int ApplauncherProcess::run()
     if( m_quitMode )
         return 0;
 
-    //launching most recent version
-    QnSoftwareVersion versionToLaunch;
-    QString appArgs;
-    if( getVersionToLaunch( &versionToLaunch, &appArgs ) )
-    {
-        applauncher::api::Response response;
-        for( int i = 0; i < 2; ++i )
-        {
-            if( startApplication(
-                    std::make_shared<applauncher::api::StartApplicationTask>(versionToLaunch, appArgs),
-                    &response ) )
-                break;
-
-            //failed to start, trying to restore version
-            if( !blockingRestoreVersion( versionToLaunch ) )
-                versionToLaunch = m_installationManager->latestVersion();
-        }
-
-        //if( response.result != applauncher::api::ResultType::ok )
-    }
+    launchMostRecentClient();
 
     std::unique_lock<std::mutex> lk( m_mutex );
     m_cond.wait( lk, [this](){ return m_terminated; } );

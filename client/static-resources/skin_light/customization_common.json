@@ -402,6 +402,22 @@
             "recordNever": "#a0a0a0",
             "recordMotion": "#be3938"
         }
+    },
+
+    "QnUserManagementWidget": {
+        "colors": {
+            "disabledSelectedText": "#b5d7ee",
+            "disabledButtonsText":  "#000000",
+            "selectionBackground": "#95bfe0"
+        }
+    },
+    
+    "QnUserListModel": {
+        "colors": {
+            "disabledSelectedText": "#b5d7ee",
+            "disabledButtonsText":  "#000000",
+            "selectionBackground": "#95bfe0"
+        }
     }
 
 }

@@ -21,3 +21,8 @@ void QnLicensePoolScaffold::addLicenses(Qn::LicenseType licenseType, int count) 
 void QnLicensePoolScaffold::addLicense(Qn::LicenseType licenseType) {
     addLicenses(licenseType, 1);
 }
+
+void QnLicensePoolScaffold::addFutureLicenses(int count) {
+    auto stub = new QnFutureLicenseStub(count);
+    qnLicensePool->addLicense(QnLicensePtr(stub));
+}

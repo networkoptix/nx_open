@@ -157,6 +157,14 @@ QnRecordingStatsColors::QnRecordingStatsColors()
     chartForecastColor = QColor(0x0c, 0x51, 0x69);
 }
 
+
+QnUserManagementColors::QnUserManagementColors()
+{
+    disabledSelectedText = QColor(0xb5, 0xd7, 0xee);
+    disabledButtonsText = QColor(0xff, 0xff, 0xff);
+    selectionBackground = QColor(0x22, 0x53, 0x77);
+}
+
 QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
     desktop = Qt::darkGray;
     freeSpace = Qt::lightGray;

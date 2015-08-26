@@ -2695,7 +2695,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Image Enhancement - %1</source>
-        <translation>การเพิ่มประสิทธิภาพของภาพ</translation>
+        <translation type="unfinished">การเพิ่มประสิทธิภาพของภาพ  - %1</translation>
     </message>
 </context>
 <context>

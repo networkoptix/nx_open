@@ -79,7 +79,8 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
     LicenseTypeInfo(Qn::LC_IO,              "iomodule",      0),
-    LicenseTypeInfo(Qn::LC_Start,           "starter",       0)
+    LicenseTypeInfo(Qn::LC_Start,           "starter",       0),
+    LicenseTypeInfo(Qn::LC_Invalid,         "",              1),
 };
 } // anonymous namespace
 
@@ -167,6 +168,7 @@ QString QnLicense::displayName(Qn::LicenseType licenseType) {
     case Qn::LC_VideoWall:      return tr("Video Wall");
     case Qn::LC_IO:             return tr("I/O Module");
     case Qn::LC_Start:          return tr("Start");
+    case Qn::LC_Invalid:        return tr("Invalid");
     default:
         break;
     }
@@ -188,6 +190,7 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     case Qn::LC_VideoWall:      return tr("Video Wall Licenses");
     case Qn::LC_IO:             return tr("I/O Module Licenses");
     case Qn::LC_Start:          return tr("Start Licenses");
+    case Qn::LC_Invalid:        return tr("Invalid Licenses");
     default:
         break;
     }
@@ -248,6 +251,10 @@ QByteArray QnLicense::signature() const
 QString QnLicense::xclass() const
 {
     return m_class;
+}
+
+void QnLicense::setClass(const QString &xclass) {
+    m_class = xclass;
 }
 
 QString QnLicense::version() const
@@ -421,9 +428,7 @@ Qn::LicenseType QnLicense::type() const
             return ::licenseTypeInfo[i].licenseType;
     }
 
-    //TODO: #ivigasin create "invalid" class for this case
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid license class");
-    return Qn::LC_Professional; // default value
+    return Qn::LC_Invalid; // default value
 }
 
 void QnLicense::parseLicenseBlock(
@@ -523,13 +528,15 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
     return m_licenseDict.keys();
 }
 
-int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType) const
+int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType, bool ignoreValidity) const
 {
     int result = 0;
 
     for (const QnLicensePtr& license: m_licenseDict.values()) 
     {
-        if (license->type() == licenseType && license->isValid())
+        if (license->type() == licenseType 
+            && (ignoreValidity || license->isValid())
+            )
             result += license->cameraCount();
     }
     return result;

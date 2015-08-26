@@ -49,19 +49,32 @@ namespace {
         }
     };
 
-    void clearLayout(QGraphicsLayout *layout) {
-        while (layout->count() > 0) {
-            QGraphicsLayoutItem *item = layout->itemAt(0);
-            layout->removeAt(0);
-            delete item;
-        }
-    }
-
     QGraphicsGridLayout *createGridLayout()
     {
         typedef QPair<int, Qt::Alignment> ColumnInfo;
-        static const ColumnInfo kColumns[] = { ColumnInfo(0, Qt::AlignRight)
-            , ColumnInfo(1, Qt::AlignCenter), ColumnInfo(2, Qt::AlignLeft) };
+        typedef QVector<ColumnInfo> ColumnInfoVector;
+        static const ColumnInfoVector kColumns = []() -> ColumnInfoVector
+        { 
+            const Qt::AlignmentFlag aligns[] = 
+            {
+                Qt::AlignRight      // Input name
+                , Qt::AlignCenter   // Input state
+                , Qt::AlignLeft     // Input caption
+                
+                , Qt::AlignCenter   // Spacer
+
+                , Qt::AlignRight    // Output name
+                , Qt::AlignCenter   // Output state
+                , Qt::AlignLeft     // Output caption
+            };
+            const int count = sizeof(aligns) / sizeof(aligns[0]);
+
+            ColumnInfoVector result;
+            for (int columnIndex = 0; columnIndex != count; ++columnIndex)
+                result.push_back(ColumnInfo(columnIndex, aligns[columnIndex]));
+
+            return result;
+        }();
 
         QGraphicsGridLayout * const result = new QGraphicsGridLayout();
         for (auto &column: kColumns)
@@ -92,10 +105,7 @@ class QnIoModuleOverlayWidgetPrivate : public Connective<QObject> {
 
 public:
     QnIoModuleOverlayWidget * const q_ptr;
-    QGraphicsLinearLayout *leftLayout;
-    QGraphicsLinearLayout *rightLayout;
-    QGraphicsGridLayout *inputsLayout;
-    QGraphicsGridLayout *outputsLayout;
+
     QnVirtualCameraResourcePtr camera;
     QnIOModuleMonitorPtr monitor;
     bool connectionOpened;
@@ -133,50 +143,48 @@ public:
 
     QGraphicsLayoutItem *createButton(QnIoModuleOverlayWidgetPrivate::ModelData *data);
     QGraphicsLayoutItem *createLabel(QnIoModuleOverlayWidgetPrivate::ModelData *data);
+
+private:
+    void clearControlsLayout();
+
+    QGraphicsGridLayout *controlsLayout;
+    int m_inputsCount;
+    int m_outputsCount;
+
 };
 
 QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget *widget)
     : base_type(widget)
     , q_ptr(widget)
-    , inputsLayout(createGridLayout())
-    , outputsLayout(createGridLayout())
     , connectionOpened(false)
     , indicatorOnPixmap(qnSkin->pixmap("item/io_indicator_on.png"))
     , indicatorOffPixmap(qnSkin->pixmap("item/io_indicator_off.png"))
     , timer(new QTimer(this))
+
+    , controlsLayout(createGridLayout())
+    , m_inputsCount(0)
+    , m_outputsCount(0)
 {
     widget->setAutoFillBackground(true);
-
-    enum { kVeryBigStretch = 1000 };
-    leftLayout = new QGraphicsLinearLayout();
-    leftLayout->setOrientation(Qt::Vertical);
-    leftLayout->addItem(inputsLayout);
-    leftLayout->addStretch(kVeryBigStretch);
-
-    rightLayout = new QGraphicsLinearLayout();
-    rightLayout->setOrientation(Qt::Vertical);
-    rightLayout->addItem(outputsLayout);
-    rightLayout->addStretch(kVeryBigStretch);
 
     enum 
     {
         kOuterMargin = 24
         , kTopMargin = kOuterMargin * 2
-        , kItemsSpacing = 8
-        , kInnerMargin = kItemsSpacing
     };
 
-    rightLayout->setContentsMargins(kInnerMargin, kTopMargin, kOuterMargin, kOuterMargin);
-    leftLayout->setContentsMargins(kOuterMargin, kTopMargin, kInnerMargin, kOuterMargin);
+    controlsLayout->setContentsMargins(kOuterMargin, kTopMargin, kOuterMargin, kOuterMargin);
 
-    QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout();
-    mainLayout->setOrientation(Qt::Horizontal);
-    mainLayout->addItem(leftLayout);
-    mainLayout->addItem(rightLayout);
-    mainLayout->setSpacing(kItemsSpacing);
-    mainLayout->addStretch(kVeryBigStretch);
+    enum { kVeryBigStretch = 1000 };
+    QGraphicsLinearLayout * const v = new QGraphicsLinearLayout(Qt::Vertical);
+    v->addItem(controlsLayout);
+    v->addStretch(kVeryBigStretch);
 
-    widget->setLayout(mainLayout);
+    QGraphicsLinearLayout * const h = new QGraphicsLinearLayout(Qt::Horizontal);
+    h->addItem(v);
+    h->addStretch(kVeryBigStretch);
+
+    widget->setLayout(h);
 
     connect(timer,  &QTimer::timeout,   this,   &QnIoModuleOverlayWidgetPrivate::at_timerTimeout);
     timer->setInterval(stateCheckInterval);
@@ -236,9 +244,6 @@ QGraphicsLayoutItem *QnIoModuleOverlayWidgetPrivate::createLabel(QnIoModuleOverl
 }
 
 void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::ModelData *data) {
-    if (!inputsLayout || !outputsLayout)
-        return;
-
     if (data->ioConfigData.portType != Qn::PT_Input && data->ioConfigData.portType != Qn::PT_Output)
         return;
 
@@ -254,20 +259,52 @@ void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::M
     data->indicator = new IndicatorWidget(indicatorOnPixmap, indicatorOffPixmap, q);
     data->indicator->setOn(data->ioState.isActive);
 
-    QGraphicsGridLayout * const layout = (data->ioConfigData.portType == Qn::PT_Output ? outputsLayout : inputsLayout);
-    const int row = layout->rowCount();
-    layout->addItem(portIdLabel, row, 0);
-    layout->addItem(data->indicator, row, 1);
+    const bool isOutput = (data->ioConfigData.portType == Qn::PT_Output);
 
-    QGraphicsLayoutItem * const thirdItem = (data->ioConfigData.portType == Qn::PT_Output ? 
-        createButton(data) : createLabel(data));
+    enum 
+    {
+        kInputsStartColumn = 0
+        , kOutputsStartColumn = 4
+        , kSpacerColumn = 3
 
-    layout->addItem(thirdItem, row, 2);
+        , kIndicatorColumnOffset = 1
+        , kCaptionColumnOffset = 2
+    };
+
+    const int startColumn = (isOutput ? kOutputsStartColumn : kInputsStartColumn);
+    int &itemsCount = (isOutput ? m_outputsCount : m_inputsCount);
+
+    controlsLayout->addItem(portIdLabel, itemsCount, startColumn);
+    controlsLayout->addItem(data->indicator, itemsCount, startColumn + kIndicatorColumnOffset);
+
+    QGraphicsLayoutItem * const thirdItem = (isOutput ? createButton(data) : createLabel(data));
+    controlsLayout->addItem(thirdItem, itemsCount, startColumn + kCaptionColumnOffset);
+
+    ++itemsCount;
+
+    enum 
+    {
+        kNoSpacing = 0
+        , kSpacingSize = 24 
+    };
+    controlsLayout->setColumnFixedWidth(kSpacerColumn, m_inputsCount ? kSpacingSize : kNoSpacing);
+}
+
+void QnIoModuleOverlayWidgetPrivate::clearControlsLayout()
+{
+    m_inputsCount = 0;
+    m_outputsCount = 0;
+    while (controlsLayout->count())
+    {
+        enum { kFirstItemIndex = 0 };
+        QGraphicsLayoutItem * const item = controlsLayout->itemAt(kFirstItemIndex);
+        controlsLayout->removeAt(kFirstItemIndex);
+        delete item;
+    }
 }
 
 void QnIoModuleOverlayWidgetPrivate::updateControls() {
-    clearLayout(inputsLayout);
-    clearLayout(outputsLayout);
+    clearControlsLayout();
 
     for (const auto &value: camera->getIOPorts())
         model[value.id].ioConfigData = value;

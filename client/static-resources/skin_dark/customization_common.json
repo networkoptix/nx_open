@@ -359,8 +359,26 @@
     
     "QnShadowItem": {
         "color": "#00000080"
-    }
+    },
 
+    "QnUserManagementWidget": {
+        "colors": {
+            "disabledSelectedText": "#b5d7ee",
+            "disabledButtonsText":  "#FFFFFF",
+            "selectionBackground": "#225377"
+        }
+    },
+    
+    "QnUserListModel": {
+        "colors": {
+            "disabledSelectedText": "#b5d7ee",
+            "disabledButtonsText":  "#FFFFFF",
+            "selectionBackground": "#225377"
+        }
+    }
+ 
+    
+    
 }
 
 

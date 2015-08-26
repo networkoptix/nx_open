@@ -12,15 +12,18 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/models/user_list_model.h>
+#include <ui/common/palette.h>
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
+#include <ui/models/user_list_model.h>
+#include <ui/style/globals.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/ldap.h>
+#include <utils/math/color_transformations.h>
 
 QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     : base_type(parent)
@@ -100,9 +103,11 @@ void QnUserManagementWidget::updateSelection() {
 
     m_header->setCheckState(selectionState);
 
-    ui->actionsWidget->setCurrentWidget(selectionState == Qt::Unchecked
-        ? ui->defaultPage
-        : ui->selectionPage
+    bool selectionActive = selectionState != Qt::Unchecked;
+
+    ui->actionsWidget->setCurrentWidget(selectionActive
+        ? ui->selectionPage
+        : ui->defaultPage
         );
 
     using boost::algorithm::any_of;
@@ -123,6 +128,20 @@ void QnUserManagementWidget::updateSelection() {
             && !user->isAdmin();
     }));
 
+    QColor normalColor = this->palette().color(QPalette::Window);
+
+    /* Here all children palette will be overwritten, so restoring it manually. */
+    setPaletteColor(ui->backgroundWidget, QPalette::Window, selectionActive 
+        ? m_colors.selectionBackground 
+        : normalColor);
+
+    for (QPushButton* button: ui->selectionPage->findChildren<QPushButton*>(QString(), Qt::FindDirectChildrenOnly)) {
+        setPaletteColor(button, QPalette::Window, normalColor);       
+        setPaletteColor(button, QPalette::Disabled, QPalette::WindowText, m_colors.disabledButtonsText);
+    }
+    setPaletteColor(m_header, QPalette::Window, normalColor);
+    
+    update();
 }
 
 void QnUserManagementWidget::openLdapSettings() {
@@ -256,4 +275,13 @@ QnUserResourceList QnUserManagementWidget::visibleSelectedUsers() const {
             result << user;
     }
     return result;
+}
+
+const QnUserManagementColors QnUserManagementWidget::colors() const {
+    return m_colors;
+}
+
+void QnUserManagementWidget::setColors(const QnUserManagementColors &colors) {
+    m_colors = colors;
+    updateSelection();
 }
