@@ -312,6 +312,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
     if (m_camera)
         cameras << m_camera;
     ui->licensingWidget->setCameras(cameras);
+    ui->imageControlWidget->updateFromResources(cameras);
 
     if(!m_camera) {
         ui->nameEdit->clear();
@@ -336,8 +337,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
-
-        ui->imageControlWidget->updateFromResources(QnVirtualCameraResourceList());
     } else {
         bool hasVideo = m_camera->hasVideo(0);
         ui->nameEdit->setText(m_camera->getName());
@@ -358,8 +357,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo);
         ui->tabWidget->setTabEnabled(Qn::IOSettingsSettingsTab, camera()->isIOModule());
-
-        ui->imageControlWidget->updateFromResources(cameras);
 
         if (!dtsBased) {
             ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);

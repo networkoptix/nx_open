@@ -601,6 +601,9 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         m_renderer->setChannelCount(0);
     }
 
+    bool hasVideo = m_resource->hasVideo(m_display ? m_display->mediaProvider() : nullptr);
+    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo);
+
     emit displayChanged();
 }
 
@@ -1016,7 +1019,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         
     }
     if (m_resource->hasVideo(m_display->mediaProvider()))
-        return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
+    {
+        return lit(" %1x%2 %3fps @ %4Mbps%5 %6\t%7")
             .arg(size.width())
             .arg(size.height())
             .arg(fps, 0, 'f', 2)
@@ -1024,12 +1028,15 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             .arg(codecString)
             .arg(hqLqString)
             .arg(timeString);
+    }
     else
-        return lit("@ %1Mbps%2 %3\t%4")
-        .arg(mbps, 0, 'f', 2)
-        .arg(codecString)
-        .arg(hqLqString)
-        .arg(timeString);
+    {
+        return lit(" %1Mbps%2 %3\t%4")
+            .arg(mbps, 0, 'f', 2)
+            .arg(codecString)
+            .arg(hqLqString)
+            .arg(timeString);
+    }
 }
 
 QString QnMediaResourceWidget::calculateTitleText() const {
@@ -1096,8 +1103,6 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     {
         if (hasVideo)
             result |= IoModuleButton;
-        else
-            result &= ~RotateButton;    /// Do not allow rotate widget if it is IO module only
     }
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo) {

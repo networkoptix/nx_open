@@ -107,6 +107,12 @@ QString QnVideowallScreenWidget::calculateTitleText() const {
     return tr("Pc %1 - Screens %2", "", screens.size()).arg(idx + 1).arg(screenIndices.join(lit(" ,")));
 }
 
+Qn::ResourceStatusOverlay QnVideowallScreenWidget::calculateStatusOverlay() const {
+    if (renderStatus() == Qn::NothingRendered)
+        return Qn::LoadingOverlay;
+    return Qn::EmptyOverlay;
+}
+
 void QnVideowallScreenWidget::updateLayout(bool force) {
     if (!m_layoutUpdateRequired && !force)
         return;
