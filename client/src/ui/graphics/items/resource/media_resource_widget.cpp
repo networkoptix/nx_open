@@ -601,6 +601,9 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         m_renderer->setChannelCount(0);
     }
 
+    bool hasVideo = m_resource->hasVideo(m_display ? m_display->mediaProvider() : nullptr);
+    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo);
+
     emit displayChanged();
 }
 
@@ -1100,8 +1103,6 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     {
         if (hasVideo)
             result |= IoModuleButton;
-        else
-            result &= ~RotateButton;    /// Do not allow rotate widget if it is IO module only
     }
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo) {
