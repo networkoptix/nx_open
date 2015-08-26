@@ -55,12 +55,20 @@ startquiet() {
     start
 }
 
+SECONDS_TO_WAIT_BEFORE_KILL_9=30
+
 stop() {
     echo -n "Stopping $BIN_NAME..... "
     /usr/bin/killall $1 $BIN_NAME 1>/dev/null
-    while [ `/bin/pidof $BIN_NAME` ]
+    local i=0
+    while [ "`/bin/pidof $BIN_NAME`" ]
     do
         /bin/sleep 1
+        let i++
+        if [ $i -gt $SECONDS_TO_WAIT_BEFORE_KILL_9 ]; then
+            echo -n "sending 9 signal...    "
+            /usr/bin/killall -9 $BIN_NAME 1>/dev/null 2>&1
+        fi
     done
     echo "OK"
 }
