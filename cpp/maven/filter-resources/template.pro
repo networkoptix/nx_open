@@ -183,6 +183,6 @@ mac {
   INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
 }
 
-INCLUDEPATH += ${environment.dir}/boost_1_56
+INCLUDEPATH += ${environment.dir}/boost_1_56_0
 INCLUDEPATH += ${environment.dir}/include/ffmpeg-misc-headers-win32
 INCLUDEPATH += ${environment.dir}/include/glext
