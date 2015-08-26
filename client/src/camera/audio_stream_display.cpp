@@ -59,7 +59,7 @@ qint64 QnAudioStreamDisplay::getCurrentTime() const
     else if (m_lastAudioTime == qint64(AV_NOPTS_VALUE))
         return qint64(AV_NOPTS_VALUE);
     else
-        return m_lastAudioTime - msInBuffer();
+        return m_lastAudioTime - msInBuffer() * 1000ll;
 }
 
 void QnAudioStreamDisplay::blockTimeValue(qint64 value)

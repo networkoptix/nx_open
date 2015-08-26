@@ -45,6 +45,8 @@ public:
     QList<QnByteArrayConstRef> split( char sep ) const;
     //!Removes from front and back of the string any character of null-terminated string \a charsToTrim
     QnByteArrayConstRef trimmed( const value_type* charsToTrim = " \t" ) const;
+    //!Removes \a count elements in the front
+    void pop_front( size_type count = 1 );
 
     bool isEqualCaseInsensitive( const char* str, size_t strLength = (size_t)-1 ) const;
 

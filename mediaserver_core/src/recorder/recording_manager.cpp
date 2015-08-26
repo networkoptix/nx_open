@@ -123,16 +123,16 @@ void QnRecordingManager::stopRecorder(const Recorders& recorders)
 
 void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& /*resource*/)
 {
-	QnVideoCameraPtr camera;
+    QnVideoCameraPtr camera;
     if (recorders.recorderHiRes) {
         recorders.recorderHiRes->stop();
-		camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
-	}
+        camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
+    }
     if (recorders.recorderLowRes) {
         recorders.recorderLowRes->stop();
         if (!camera)
             camera = qnCameraPool->getVideoCamera(recorders.recorderLowRes->getResource());
-	}
+    }
     if (camera)
     {
         if (recorders.recorderHiRes) {
@@ -238,7 +238,7 @@ void QnRecordingManager::at_historyMutexTimeout()
 
 void QnRecordingManager::at_historyMutexLocked()
 {
-	QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutex);
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     if (!mutex)
         return;

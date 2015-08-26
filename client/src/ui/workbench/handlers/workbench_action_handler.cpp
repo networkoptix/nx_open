@@ -1504,18 +1504,21 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     QnMediaServerResourcePtr server = servers.first();
-
-    const auto acceptCallback = [this, server]()
+    QnMediaServerUserAttributes oldAttrValue = *QnMediaServerUserAttributesPool::instance()->get(server->getId());
+    const auto acceptCallback = [this, server, oldAttrValue]()
     {
         if (!server->resourcePool())    /// Wrong server status - it could be deleted from the system, for example
             return;
 
         // TODO: #Elric move submitToResources here.
-        const auto serverAttrs = (QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(server->getId()));
-        const auto handler = [this, server]( int reqID, ec2::ErrorCode errorCode ) 
-            { at_resources_saved( reqID, errorCode, QnResourceList() << server ); };
+        QnMediaServerUserAttributesPtr newAttrValue = QnMediaServerUserAttributesPool::instance()->get(server->getId());
+        if (!(*newAttrValue == oldAttrValue)) {
+            const auto serverAttrs = QnMediaServerUserAttributesList() << newAttrValue;
+            const auto handler = [this, server]( int reqID, ec2::ErrorCode errorCode ) 
+                { at_resources_saved( reqID, errorCode, QnResourceList() << server ); };
 
-        connection2()->getMediaServerManager()->saveUserAttributes(serverAttrs, this, handler);
+            connection2()->getMediaServerManager()->saveUserAttributes(serverAttrs, this, handler);
+        }
         server->saveUpdatedStorages();
     };
 
