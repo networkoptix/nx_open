@@ -61,11 +61,17 @@ namespace nx_http
             }
         }
 
-        auto sendResponseFunc = [this](
+        auto strongRef = shared_from_this();
+        std::weak_ptr<HttpServerConnection> weakThis = strongRef;
+
+        auto sendResponseFunc = [this, weakThis](
             nx_http::Message&& response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
         {
-            prepareAndSendResponse(
+            auto strongThis = weakThis.lock();
+            if( !strongThis )
+                return; //connection has been removed while request has been processed
+            strongThis->prepareAndSendResponse(
                 std::move(response),
                 std::move(responseMsgBody) );
         };

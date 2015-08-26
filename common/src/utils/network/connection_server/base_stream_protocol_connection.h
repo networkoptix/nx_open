@@ -150,6 +150,7 @@ namespace nx_api
             sendMessageInternal( std::move(msg) );
             return true;
         }
+
         bool sendMessage( MessageType msg ) // template can not be resolved by default value
         {
             return sendMessage( std::move(msg),

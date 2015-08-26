@@ -27,7 +27,8 @@ namespace nx_http
             nx_http::HttpStreamSocketServer,
             nx_http::Message,
             nx_http::MessageParser,
-            nx_http::MessageSerializer>
+            nx_http::MessageSerializer>,
+        public std::enable_shared_from_this<HttpServerConnection>
     {
     public:
         typedef BaseStreamProtocolConnection<
@@ -54,7 +55,12 @@ namespace nx_http
         void responseSent();
         void someMsgBodyRead( SystemError::ErrorCode, BufferType buf );
         void someMessageBodySent();
+
+        HttpServerConnection( const HttpServerConnection& );
+        HttpServerConnection& operator=( const HttpServerConnection& );
     };
+
+    typedef std::weak_ptr<HttpServerConnection> HttpServerConnectionPtr;
 }
 
 #endif  //HTTP_SERVER_CONNECTION_H
