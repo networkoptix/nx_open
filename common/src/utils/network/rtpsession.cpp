@@ -1488,12 +1488,11 @@ int RTPSession::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& 
 // demux text data only
 bool RTPSession::readTextResponce(QByteArray& response)
 {
-    bool readMoreData = m_responseBufferLen == 0;
     int ignoreDataSize = 0;
     for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock->isConnected(); ++i)
     {
-        if (readMoreData) {
-            int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
+        if (m_responseBufferLen == 0) {
+            int readed = readSocketWithBuffering(m_responseBuffer, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
             if (readed <= 0)
             {
                 if( readed == 0 )
@@ -1530,7 +1529,6 @@ bool RTPSession::readTextResponce(QByteArray& response)
                 return true;
             }
         }
-        readMoreData = true;
         if (m_responseBufferLen == RTSP_BUFFER_LEN)
         {
             NX_LOG( lit("RTSP response from %1 has exceeded max response size (%2)").
