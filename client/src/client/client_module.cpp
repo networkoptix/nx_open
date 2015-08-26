@@ -13,9 +13,11 @@
     #include "common/systemexcept_win32.h"
 #endif
 
+#include <client/client_startup_parameters.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
+#include <client/client_translation_manager.h>
 
 #include <redass/redass_controller.h>
 #include <client/client_message_processor.h>
@@ -41,7 +43,37 @@
 
 #include "version.h"
 
-QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObject(parent) {
+namespace
+{
+    void initializeTranslations(QnCommonModule *common
+        , const QString &translationPath
+        , bool forceLocalSettings)
+    {
+        const auto translationManager = common->instance<QnClientTranslationManager>();
+
+        QnTranslation translation;
+        if(!translationPath.isEmpty()) /* From command line. */
+            translation = translationManager->loadTranslation(translationPath);
+
+        if(translation.isEmpty()) /* By path. */
+        {
+            typedef QScopedPointer<QnClientSettings> ClientSettings;
+            const ClientSettings settings(new QnClientSettings(forceLocalSettings));
+            translation = translationManager->loadTranslation(settings->translationPath());
+        }
+
+        /* Check if qnSettings value is invalid. */
+        if (translation.isEmpty()) 
+            translation = translationManager->defaultTranslation();
+
+        translationManager->installTranslation(translation);
+    }
+}
+
+QnClientModule::QnClientModule(const QnStartupParameters &startupParams
+    , QObject *parent)
+    : QObject(parent) 
+{
     Q_INIT_RESOURCE(client);
     Q_INIT_RESOURCE(appserver2);
 
@@ -58,13 +90,14 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
     /* We don't want changes in desktop color settings to mess up our custom style. */
     QApplication::setDesktopSettingsAware(false);
  
-    
-
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
 
+    /// We should load translations before major client's services are started to prevent races
+    initializeTranslations(qnCommon, startupParams.translationPath, startupParams.forceLocalSettings);
+
     common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
-    common->store<QnClientSettings>(new QnClientSettings(forceLocalSettings));
+    common->store<QnClientSettings>(new QnClientSettings(startupParams.forceLocalSettings));
 
     auto clientInstanceManager = new QnClientInstanceManager(); /* Depends on QnClientSettings */
     common->store<QnClientInstanceManager>(clientInstanceManager); 

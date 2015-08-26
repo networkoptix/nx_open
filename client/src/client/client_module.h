@@ -3,10 +3,16 @@
 
 #include <QtCore/QObject>
 
-class QnClientModule: public QObject {
+class QnStartupParameters;
+
+class QnClientModule: public QObject 
+{
     Q_OBJECT
+
 public:
-    QnClientModule(bool forceLocalSettings = false, QObject *parent = NULL);
+    QnClientModule(const QnStartupParameters &startupParams
+        , QObject *parent = NULL);
+
     virtual ~QnClientModule();
 };
 
