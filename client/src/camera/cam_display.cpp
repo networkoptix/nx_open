@@ -402,6 +402,19 @@ float sign(float value)
     return value > 0 ? 1 : -1;
 }
 
+qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
+{
+    qint64 maxSleepTime = needToSleep * 2;
+    if (qAbs(speed) > 1.0)
+        maxSleepTime *= speed;
+    maxSleepTime = qAbs(maxSleepTime);  // needToSleep OR speed can be negative, but maxSleepTime should always be positive
+    if (m_isRealTimeSource)
+        return m_delay.terminatedSleep(needToSleep, maxSleepTime);
+    else
+        return m_delay.sleep(needToSleep, maxSleepTime);
+
+}
+
 bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 {
 //    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
@@ -559,14 +572,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
         else if (!m_display[0]->selfSyncUsed()) {
             if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed) {
-                qint64 maxSleepTime = needToSleep * 2;
-                if (qAbs(speed) > 1.0)
-                    maxSleepTime *= speed;
-                maxSleepTime = qAbs(maxSleepTime);  // needToSleep OR speed can be negative, but maxSleepTime should always be positive
-                if (m_isRealTimeSource)
-                    realSleepTime = m_delay.terminatedSleep(needToSleep, maxSleepTime);
-                else
-                    realSleepTime = m_delay.sleep(needToSleep, maxSleepTime);
+                realSleepTime = doSmartSleep(needToSleep, speed);
             }
             else
                 realSleepTime = m_delay.addQuant(needToSleep);
@@ -721,6 +727,7 @@ bool QnCamDisplay::doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed
     {
         qint32 needToSleep = qMin(MAX_FRAME_DURATION * 1000, ad->timestamp - m_previousVideoTime);
         needToSleep *= 1.0/qAbs(speed);
+        doSmartSleep(needToSleep, speed);
         m_previousVideoTime = ad->timestamp;
     }
     m_isLongWaiting = false;
