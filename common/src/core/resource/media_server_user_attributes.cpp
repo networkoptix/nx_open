@@ -4,7 +4,7 @@
 ***********************************************************/
 
 #include "media_server_user_attributes.h"
-
+#include <utils/common/model_functions.h>
 
 QnMediaServerUserAttributes::QnMediaServerUserAttributes()
 :
@@ -33,3 +33,5 @@ QnMediaServerUserAttributesPool::QnMediaServerUserAttributesPool()
         userAttributes->serverID = serverID;
     } );
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnMediaServerUserAttributes), (eq), _Fields)
