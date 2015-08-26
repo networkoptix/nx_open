@@ -647,8 +647,11 @@ void QnCameraScheduleWidget::setRecordingParamsAvailability(bool available)
 
     ui->gridWidget->setShowQuality(ui->displayQualityCheckBox->isChecked() && m_recordingParamsAvailable);
     ui->gridWidget->setShowFps(ui->displayFpsCheckBox->isChecked() && m_recordingParamsAvailable);
+
     ui->fpsSpinBox->setEnabled(m_recordingParamsAvailable);
     ui->qualityComboBox->setEnabled(m_recordingParamsAvailable);
+    ui->displayQualityCheckBox->setEnabled(m_recordingParamsAvailable);
+    ui->displayFpsCheckBox->setEnabled(m_recordingParamsAvailable);
 }
 
 bool QnCameraScheduleWidget::isMotionAvailable() const
