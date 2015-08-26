@@ -83,11 +83,11 @@ bool MediaserverApi::pingServer( const SocketAddress& address, const QnUuid& exp
     }
 
     QnPingReply reply;
-    if( !QJson::deserialize( result.reply(), &reply ) )
+    if( !QJson::deserialize( result.reply, &reply ) )
     {
         NX_LOG( lit("%1 Url %2 response is a bad REST result: %3")
                 .arg( Q_FUNC_INFO ).arg( url.toString() )
-                .arg( result.reply().toString() ), cl_logDEBUG1 );
+                .arg( result.reply.toString() ), cl_logDEBUG1 );
         return false;
     }
 
