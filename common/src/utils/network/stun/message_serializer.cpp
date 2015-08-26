@@ -384,23 +384,28 @@ bool MessageSerializer::checkMessageIntegratiy() {
 }
 
 nx_api::SerializerState::Type MessageSerializer::serialize( nx::Buffer* const user_buffer, size_t* const bytesWritten ) {
-    Q_ASSERT(m_initialized && checkMessageIntegratiy());
-    Q_ASSERT(user_buffer->size() == 0 && user_buffer->capacity() != 0);
-    MessageSerializerBuffer buffer(user_buffer);
-    *bytesWritten = user_buffer->size();
-    // header serialization
-    if( serializeHeader(&buffer) == nx_api::SerializerState::needMoreBufferSpace )
-        return nx_api::SerializerState::needMoreBufferSpace;
-    // attributes serialization
-    std::uint16_t length = 0;
-    if( serializeAttributes(&buffer,&length) == nx_api::SerializerState::needMoreBufferSpace ) {
-        return nx_api::SerializerState::needMoreBufferSpace;
+    for( int i = 0; ; ++i ) //TODO #ak ensure loop is not inifinite
+    {
+        if( i > 0 )
+            user_buffer->reserve( user_buffer->capacity() * 2 );
+
+        Q_ASSERT(m_initialized && checkMessageIntegratiy());
+        Q_ASSERT(user_buffer->size() == 0 && user_buffer->capacity() != 0);
+        MessageSerializerBuffer buffer(user_buffer);
+        *bytesWritten = user_buffer->size();
+        // header serialization
+        if( serializeHeader(&buffer) == nx_api::SerializerState::needMoreBufferSpace )
+            continue;
+        // attributes serialization
+        std::uint16_t length = 0;
+        if( serializeAttributes(&buffer,&length) == nx_api::SerializerState::needMoreBufferSpace )
+            continue;
+        // setting the header value 
+        buffer.WriteMessageLength(length);
+        m_initialized = false;
+        *bytesWritten = user_buffer->size() - *bytesWritten;
+        return nx_api::SerializerState::done;
     }
-    // setting the header value 
-    buffer.WriteMessageLength(length);
-    m_initialized = false;
-    *bytesWritten = user_buffer->size() - *bytesWritten;
-    return nx_api::SerializerState::done;
 }
 
 } // namespase stun
