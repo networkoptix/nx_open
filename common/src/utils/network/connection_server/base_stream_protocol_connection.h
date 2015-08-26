@@ -7,7 +7,9 @@
 #define BASE_STREAM_PROTOCOL_CONNECTION_H
 
 #include <atomic>
+#include <deque>
 #include <functional>
+#include <mutex>
 
 #include "base_protocol_message_types.h"
 #include "base_server_connection.h"
@@ -63,12 +65,18 @@ namespace nx_api
         :
             BaseType( connectionManager, std::move(streamSocket) ),
             m_serializerState( SerializerState::done ),
-            m_isSendingMessage( 0 )
+            m_connectionFreedFlag( nullptr )
         {
             static const size_t DEFAULT_SEND_BUFFER_SIZE = 4*1024;
             m_writeBuffer.reserve( DEFAULT_SEND_BUFFER_SIZE );
 
             m_parser.setMessage( &m_request );
+        }
+
+        virtual ~BaseStreamProtocolConnection()
+        {
+            if( m_connectionFreedFlag )
+                *m_connectionFreedFlag = true;
         }
 
         void bytesReceived( const nx::Buffer& buf )
@@ -110,14 +118,24 @@ namespace nx_api
 
             if( m_serializerState != SerializerState::needMoreBufferSpace )
             {
-                //can accept another outgoing message
-                m_isSendingMessage = 0;
-                if( m_sendCompletionHandler )
+                //message sent, triggerring completion handler
+                std::function<void( SystemError::ErrorCode )> sendCompletionHandler;
+                assert( !m_sendQueue.empty() );
+                //completion handler is allowed to remove this connection, so moving handler to local variable
+                sendCompletionHandler = std::move( m_sendQueue.front().handler );
+                m_sendQueue.pop_front();
+
+                if( sendCompletionHandler )
                 {
-                    //completion handler is allowed to remove this connection, so moving handler to local variable
-                    auto sendCompletionHandlerBak = std::move( m_sendCompletionHandler );
-                    sendCompletionHandlerBak( SystemError::noError );
+                    bool connectionFreed = false;
+                    m_connectionFreedFlag = &connectionFreed;
+                    sendCompletionHandler( SystemError::noError );
+                    if( connectionFreed )
+                        return; //connection has been removed by handler
+                    m_connectionFreedFlag = nullptr;
                 }
+
+                processAnotherSendTaskIfAny();
                 return;
             }
             size_t bytesWritten = 0;
@@ -129,10 +147,9 @@ namespace nx_api
             }
             //assuming that all bytes will be written or none
             if( !BaseType::sendBufAsync( m_writeBuffer ) )
-            {
-                auto sendCompletionHandlerBak = std::move( m_sendCompletionHandler );
-                sendCompletionHandlerBak( SystemError::getLastOSErrorCode() );
-            }
+                reportErrorAndCloseConnection( SystemError::getLastOSErrorCode() );
+
+            //on completion readyToSendData will be called
         }
 
         //TODO #ak add message body streaming
@@ -141,17 +158,23 @@ namespace nx_api
             Initiates asynchoronous message send
         */
         template<class Handler>
-        bool sendMessage( MessageType msg, Handler handler )
+        bool sendMessage( MessageType msg, Handler&& handler )
         {
-            //TODO: #ak interleaving is not supported yet
-            assert( m_isSendingMessage == 0 );
+            auto newTask = std::make_shared<SendTask>(
+                std::move( msg ),
+                std::forward<Handler>( handler ) ); //TODO #ak get rid of this when generic lambdas are available
+            return socket()->dispatch(
+                [this, newTask]()
+                {
+                    m_sendQueue.push_back( std::move( *newTask ) );
+                    if( m_sendQueue.size() > 1 )
+                        return; //already processing another message
 
-            m_sendCompletionHandler = std::move(handler);
-            sendMessageInternal( std::move(msg) );
-            return true;
+                    processAnotherSendTaskIfAny();
+                } );
         }
 
-        bool sendMessage( MessageType msg ) // template can not be resolved by default value
+        bool sendMessage( MessageType msg ) // template cannot be resolved by default value
         {
             return sendMessage( std::move(msg),
                                 std::function< void( SystemError::ErrorCode ) >() );
@@ -160,29 +183,121 @@ namespace nx_api
         template<class BufferType, class Handler>
         bool sendData( BufferType&& data, Handler&& handler )
         {
-            assert( m_isSendingMessage == 0 && m_writeBuffer.isEmpty() );
-            m_sendCompletionHandler = std::forward<Handler>( handler );
-            m_writeBuffer = std::forward<BufferType>( data );
-            m_serializerState = SerializerState::done;
-            return BaseType::sendBufAsync( m_writeBuffer );
+            auto newTask = std::make_shared<SendTask>(
+                std::forward<BufferType>( data ),
+                std::forward<Handler>( handler ) );
+            return socket()->dispatch(
+                [this, newTask]()
+                {
+                    m_sendQueue.push_back( std::move( *newTask ) );
+                    if( m_sendQueue.size() > 1 )
+                        return; //already processing another message
+
+                    processAnotherSendTaskIfAny();
+                } );
         }
 
     private:
+        struct SendTask
+        {
+        public:
+            SendTask()
+            :
+                asyncSendIssued( false )
+            {
+            }
+
+            template<typename HandlerRefType>
+                SendTask(
+                    MessageType&& _msg,
+                    HandlerRefType&& _handler )
+            :
+                msg( std::move(_msg) ),
+                handler( std::forward<HandlerRefType>(_handler) ),
+                asyncSendIssued( false )
+            {
+            }
+
+            template<typename HandlerRefType>
+                SendTask(
+                    nx::Buffer&& _buf,
+                    HandlerRefType&& _handler )
+            :
+                buf( std::move(_buf) ),
+                handler( std::forward<HandlerRefType>(_handler) ),
+                asyncSendIssued( false )
+            {
+            }
+
+            SendTask( SendTask&& right )
+            :
+                msg( std::move( right.msg ) ),
+                buf( std::move( right.buf ) ),
+                handler( std::move( right.handler ) ),
+                asyncSendIssued( right.asyncSendIssued )
+            {
+            }
+
+            MessageType msg;
+            boost::optional<nx::Buffer> buf;
+            std::function<void( SystemError::ErrorCode )> handler;
+            bool asyncSendIssued;
+
+        private:
+            SendTask( const SendTask& );
+            SendTask& operator=( const SendTask& );
+        };
+
         MessageType m_request;
         ParserType m_parser;
         SerializerType m_serializer;
         SerializerState::Type m_serializerState;
         nx::Buffer m_writeBuffer;
-        std::atomic<int> m_isSendingMessage;
         std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
+        std::deque<SendTask> m_sendQueue;
+        bool* m_connectionFreedFlag;
 
         void sendMessageInternal( MessageType&& msg )
         {
             //serializing message
             m_serializer.setMessage( std::move(msg) );
             m_serializerState = SerializerState::needMoreBufferSpace;
-            m_isSendingMessage = 1;
             readyToSendData();
+        }
+
+        void processAnotherSendTaskIfAny()
+        {
+            //sending next message in queue (if any)
+            if( m_sendQueue.empty() || m_sendQueue.front().asyncSendIssued )
+                return;
+            auto& task = m_sendQueue.front();
+            task.asyncSendIssued = true;
+            if( task.buf )
+            {
+                assert( m_writeBuffer.isEmpty() );
+                m_writeBuffer = std::move( task.buf.get() );
+                m_serializerState = SerializerState::done;
+                if( !BaseType::sendBufAsync( m_writeBuffer ) )
+                    reportErrorAndCloseConnection( SystemError::getLastOSErrorCode() );
+            }
+            else //if( task.msg )
+            {
+                sendMessageInternal( std::move( task.msg ) );
+            }
+        }
+
+        void reportErrorAndCloseConnection( SystemError::ErrorCode errorCode )
+        {
+            bool connectionFreed = false;
+            m_connectionFreedFlag = &connectionFreed;
+            assert( !m_sendQueue.empty() );
+            auto handler = std::move( m_sendQueue.front().handler );
+            handler( errorCode );
+            if( connectionFreed )
+                return; //connection has been removed by handler
+            m_connectionFreedFlag = nullptr;
+            connectionManager()->closeConnection(
+                static_cast<typename CustomConnectionManagerType::ConnectionType*>(this) );
         }
     };
 

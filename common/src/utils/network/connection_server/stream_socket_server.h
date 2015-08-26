@@ -26,6 +26,17 @@ template<class _ConnectionType>
 public:
     typedef _ConnectionType ConnectionType;
 
+    virtual ~StreamConnectionHolder()
+    {
+        //we MUST be sure to remove all connections
+        std::map<ConnectionType*, std::shared_ptr<ConnectionType>> connections;
+        {
+            std::lock_guard<std::mutex> lk( m_mutex );
+            connections.swap( m_connections );
+        }
+        connections.clear();
+    }
+
     void closeConnection( ConnectionType* connection )
     {
         std::unique_lock<std::mutex> lk( m_mutex );

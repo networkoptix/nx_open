@@ -156,17 +156,50 @@ TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
         HostAddress::localhost,
         m_testHttpServer->serverAddress().port ) ) );
 
-    for( int i = 0; i < REQUESTS_TO_SEND; ++i )
+    int msgCounter = 0;
+    for( ; msgCounter < REQUESTS_TO_SEND; ++msgCounter )
     {
         nx_http::insertOrReplaceHeader(
             &request.headers,
-            nx_http::HttpHeader( "Seq", nx::String::number(i) ) );
+            nx_http::HttpHeader( "Seq", nx::String::number( msgCounter ) ) );
         //sending request
         auto serializedMessage = request.serialized();
         ASSERT_EQ( sock->send( serializedMessage ), serializedMessage.size() );
     }
 
-    //TODO #ak reading responses out of socket
+    //reading responses out of socket
+    nx_http::HttpStreamReader httpMsgReader;
+
+    nx::Buffer readBuf;
+    readBuf.resize( 4096 );
+    int dataSize = 0;
+    sock->setRecvTimeout( 2000 );
+    while( msgCounter > 0 )
+    {
+        auto bytesRead = sock->recv(
+            readBuf.data() + dataSize,
+            readBuf.size() - dataSize );
+        if( bytesRead == 0 || bytesRead == -1 )
+            break;  //read error on connection closed
+        dataSize += bytesRead;
+        size_t bytesParsed = 0;
+        if( !httpMsgReader.parseBytes(
+                QnByteArrayConstRef( readBuf, 0, dataSize ),
+                &bytesParsed ) )
+            break;  //parse error
+        readBuf.remove( 0, bytesParsed );
+        dataSize -= bytesParsed;
+        if( httpMsgReader.state() == nx_http::HttpStreamReader::messageDone )
+        {
+            ASSERT_TRUE( httpMsgReader.message().response != nullptr );
+            auto seqIter = httpMsgReader.message().response->headers.find( "Seq" );
+            ASSERT_TRUE( seqIter != httpMsgReader.message().response->headers.end() );
+            ASSERT_EQ( seqIter->second.toInt(), REQUESTS_TO_SEND-msgCounter );
+            --msgCounter;
+        }
+    }
+
+    ASSERT_EQ( msgCounter, 0 );
 }
 
 }
