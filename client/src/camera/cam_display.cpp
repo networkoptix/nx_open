@@ -1190,7 +1190,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             return true; // jump finished, but old data received
 
         // Some clips has very low key frame rate. This condition protect audio buffer overflowing and improve seeking for such clips
-        if (ad && ad->timestamp < m_jumpTime - m_audioBufferSize/2*1000)
+        if (m_jumpTime != DATETIME_NOW && ad && ad->timestamp < m_jumpTime - m_audioBufferSize/2*1000)
             return true; // skip packet
         // clear everything we can
         m_bofReceived = false;
