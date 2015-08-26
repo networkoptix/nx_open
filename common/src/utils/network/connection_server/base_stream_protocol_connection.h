@@ -164,16 +164,8 @@ namespace nx_api
         {
             auto newTask = std::make_shared<SendTask>(
                 std::move( msg ),
-                std::forward<Handler>( handler ) ); //TODO #ak get rid of this when generic lambdas are available
-            return this->socket()->dispatch(
-                [this, newTask]()
-                {
-                    m_sendQueue.push_back( std::move( *newTask ) );
-                    if( m_sendQueue.size() > 1 )
-                        return; //already processing another message
-
-                    processAnotherSendTaskIfAny();
-                } );
+                std::forward<Handler>( handler ) ); //TODO #ak get rid of shared_ptr here when generic lambdas are available
+            return addNewTaskToQueue( std::move( newTask ) );
         }
 
         bool sendMessage( MessageType msg ) // template cannot be resolved by default value
@@ -188,15 +180,7 @@ namespace nx_api
             auto newTask = std::make_shared<SendTask>(
                 std::forward<BufferType>( data ),
                 std::forward<Handler>( handler ) );
-            return this->socket()->dispatch(
-                [this, newTask]()
-                {
-                    m_sendQueue.push_back( std::move( *newTask ) );
-                    if( m_sendQueue.size() > 1 )
-                        return; //already processing another message
-
-                    processAnotherSendTaskIfAny();
-                } );
+            return addNewTaskToQueue( std::move( newTask ) );
         }
 
     private:
@@ -265,6 +249,19 @@ namespace nx_api
             m_serializer.setMessage( std::move(msg) );
             m_serializerState = SerializerState::needMoreBufferSpace;
             readyToSendData();
+        }
+
+        bool addNewTaskToQueue( std::shared_ptr<SendTask> newTask )
+        {
+            return this->socket()->dispatch(
+                [this, newTask]()
+                {
+                    m_sendQueue.push_back( std::move( *newTask ) );
+                    if( m_sendQueue.size() > 1 )
+                        return; //already processing another message
+
+                    processAnotherSendTaskIfAny();
+                } );
         }
 
         void processAnotherSendTaskIfAny()
