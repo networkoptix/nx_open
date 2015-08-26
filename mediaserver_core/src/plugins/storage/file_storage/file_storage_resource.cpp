@@ -261,7 +261,7 @@ bool QnFileStorageResource::mountTmpDrive(const QString &url) const
         storageUrl.host() + 
         storageUrl.path().replace(lit("/"), lit("\\"));
 
-    if (getUrl().startsWith("file://") && !storageUrl.userName().isEmpty())
+    if (url.startsWith("smb://") && !storageUrl.userName().isEmpty())
     {
         NETRESOURCE netRes;
         memset(&netRes, 0, sizeof(netRes));
