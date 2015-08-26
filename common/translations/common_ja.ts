@@ -231,12 +231,6 @@
             <numerusform>最初の発生: %1 時分 %2 月日(%n 時間トータル)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>直近の %n 秒間ビデオフレーム信号を受信していません.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
         <translation>RTPパケットロスが直前のシーケンス=%1 から次のシーケンス=%2.・迄で検知されました.</translation>
@@ -304,6 +298,12 @@
     <message>
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -617,6 +617,14 @@
     <message>
         <source>Invalid Type</source>
         <translation type="unfinished">無効なタイプ</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

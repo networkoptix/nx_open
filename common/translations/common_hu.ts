@@ -223,12 +223,6 @@
             <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>Nem volt fogadott video képkocka az elmúlt %n másodpercben.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
         <translation>.A kapcsolat a kamerához (elsődleges stream) váratlanul bezárult.</translation>
@@ -304,6 +298,12 @@
     <message>
         <source>%1 --&gt; %2</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -617,6 +617,14 @@
     <message>
         <source>Invalid Type</source>
         <translation type="unfinished">Érvénytelen típus</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

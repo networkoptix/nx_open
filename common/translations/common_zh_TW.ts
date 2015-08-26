@@ -231,12 +231,6 @@
             <numerusform>第一次出現: %1 在 %2 (共 %n 次)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>在過去的 %n 秒 無接收的影像.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
         <translation>RTP 封包遺失偵測，前一個序列.=%1 下一個序列.=%2.</translation>
@@ -304,6 +298,12 @@
     <message>
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -617,6 +617,14 @@
     <message>
         <source>Invalid Type</source>
         <translation type="unfinished">無效的類型</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

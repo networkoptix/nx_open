@@ -231,12 +231,6 @@
             <numerusform>첫번째 발생: %2의 %1 (%n 전체 시간)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>최근 %n초 동안 비디오 프레임 받지 못함.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
         <translation>RTP 패킷 손실이 발생함,  prev seq.=%1 next seq.=%2.</translation>
@@ -304,6 +298,12 @@
     <message>
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -617,6 +617,14 @@
     <message>
         <source>Invalid Type</source>
         <translation type="unfinished">유효하지 않은 방식</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
