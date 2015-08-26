@@ -48,6 +48,7 @@ namespace nx_http
 
     private:
         std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
+        bool m_isPersistent;
 
         void prepareAndSendResponse(
             nx_http::Message&& response,
@@ -55,6 +56,8 @@ namespace nx_http
         void responseSent();
         void someMsgBodyRead( SystemError::ErrorCode, BufferType buf );
         void someMessageBodySent();
+        void fullMessageHasBeenSent();
+        void checkForConnectionPersistency( const Message& request );
 
         HttpServerConnection( const HttpServerConnection& );
         HttpServerConnection& operator=( const HttpServerConnection& );
