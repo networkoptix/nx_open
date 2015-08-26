@@ -774,6 +774,7 @@ void QnCamDisplay::blockTimeValue(qint64 time)
             m_nextReverseTime[i] = AV_NOPTS_VALUE;
             m_display[i]->blockTimeValue(time);
         }
+        QMutexLocker lock(&m_audioChangeMutex);
         m_audioDisplay->blockTimeValue(time);
     }
 }
@@ -785,6 +786,7 @@ void QnCamDisplay::blockTimeValueSafe(qint64 time)
             m_nextReverseTime[i] = AV_NOPTS_VALUE;
             m_display[i]->blockTimeValueSafe(time);
         }
+        QMutexLocker lock(&m_audioChangeMutex);
         m_audioDisplay->blockTimeValue(time);
     }
 }
@@ -819,6 +821,10 @@ void QnCamDisplay::onBeforeJump(qint64 time)
         m_eofSignalSended = false;
     }
     clearUnprocessedData();
+    {
+        QMutexLocker lock(&m_audioChangeMutex);
+        m_audioDisplay->clearAudioBuffer();
+    }
 
     if (m_skipPrevJumpSignal > 0) {
         m_skipPrevJumpSignal--;
@@ -896,7 +902,10 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
             m_display[i]->unblockTimeValue();
         }
     }
-    m_audioDisplay->clearAudioBuffer();
+    {
+        QMutexLocker lock(&m_audioChangeMutex);
+        m_audioDisplay->clearAudioBuffer();
+    }
     m_firstAfterJumpTime = qint64(AV_NOPTS_VALUE);
     m_prevLQ = -1;
     clearMetaDataInfo();
@@ -968,6 +977,7 @@ void QnCamDisplay::unblockTimeValue()
 {
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
         m_display[i]->unblockTimeValue();
+    QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->unblockTimeValue();
 }
 
@@ -975,6 +985,7 @@ void QnCamDisplay::processNewSpeed(float speed)
 {
     if (qAbs(speed - 1.0) > FPS_EPS && qAbs(speed) > FPS_EPS)
     {
+        QMutexLocker lock(&m_audioChangeMutex);
         m_audioDisplay->clearAudioBuffer();
     }
 
@@ -1061,7 +1072,7 @@ bool QnCamDisplay::canAcceptData() const
 
 bool QnCamDisplay::needBuffering(qint64 vTime) const
 {
-    
+    QMutexLocker lock(&m_audioChangeMutex);
     qint64 aTime = m_audioDisplay->startBufferingTime();
     if (aTime == qint64(AV_NOPTS_VALUE))
         return false;
@@ -1740,6 +1751,7 @@ qint64 QnCamDisplay::getDisplayedMin() const
 qint64 QnCamDisplay::getCurrentTime() const 
 {
     if (!m_hasVideo) {
+        QMutexLocker lock(&m_audioChangeMutex);
         if (m_speed < 0)
             return AV_NOPTS_VALUE;
         else if (m_playAudio)

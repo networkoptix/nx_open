@@ -140,6 +140,14 @@ QnByteArrayConstRef QnByteArrayConstRef::trimmed( const value_type* charsToTrim 
     return result;
 }
 
+void QnByteArrayConstRef::pop_front( size_type count )
+{
+    Q_ASSERT( count <= m_count );
+
+    m_offset += count;
+    m_count -= count;
+}
+
 bool QnByteArrayConstRef::isEqualCaseInsensitive( const char* str, size_t strLength ) const
 {
     if( strLength == (size_t)-1 )
