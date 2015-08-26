@@ -21,7 +21,7 @@ public:
     virtual
     bool addMapping( const QUrl& url, const HostAddress& internalIp,
                      quint16 internalPort, quint16 externalPort,
-                     Protocol protocol, const QString& description,
+                     Protocol protocol, const QString& description, quint64 duration,
                      std::function< void( bool ) > callback ) override;
 
     virtual
@@ -30,11 +30,11 @@ public:
 
     virtual
     bool getMapping( const QUrl& url, quint32 index,
-                     std::function< void( const MappingInfo& ) > callback );
+                     std::function< void( MappingInfo ) > callback ) override;
 
     virtual
     bool getMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
-                     std::function< void( const MappingInfo& ) > callback );
+                     std::function< void( MappingInfo ) > callback ) override;
 
     typedef std::map<
             std::pair< quint16 /*port*/, Protocol /*protocol*/ >,

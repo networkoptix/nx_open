@@ -50,7 +50,7 @@ public slots:
 private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
     void at_localInterfacesChanged();
-    void at_portMappingChanged(quint16 internalPort, quint16 externalPort, QString externalIp);
+    void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();

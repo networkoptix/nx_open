@@ -2,7 +2,6 @@
 
 #include <common/common_globals.h>
 #include <api/global_settings.h>
-#include <utils/network/upnp/upnp_port_mapper_internal.h>
 
 #include <gtest.h>
 #include <queue>
@@ -52,37 +51,33 @@ TEST( UpnpPortMapper, NormalUsage )
     AsyncClientMock& clientMock = portMapper.clientMock();
 
     // Map 7001 and 80
-    SyncQueue< PortMapper::MappingInfo > queue7001;
+    SyncQueue< SocketAddress > queue7001;
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
-                 [&]( const PortMapper::MappingInfo& info )
+                 [&]( SocketAddress info )
                  { queue7001.push( info ); } ) );
 
-    const auto map7001 = queue7001.pop();
-    EXPECT_EQ( map7001.internalPort, 7001 );
-    EXPECT_EQ( map7001.externalPort, 7001 );
-    EXPECT_EQ( map7001.externalIp, "12.34.56.78" );
+    EXPECT_EQ( queue7001.pop().toString(), "12.34.56.78:7001" );
     EXPECT_EQ( clientMock.mappings().size(), 1 );
 
     const auto addr7001 = clientMock.mappings()[ tcpPort( 7001 ) ].first;
-    EXPECT_EQ( addr7001.toString().toUtf8(), QByteArray( "192.168.0.10:7001" ) );
+    EXPECT_EQ( addr7001.toString(), lit( "192.168.0.10:7001" ) );
 
-    SyncQueue< PortMapper::MappingInfo > queue80;
+    SyncQueue< SocketAddress > queue80;
     EXPECT_TRUE( portMapper.enableMapping( 80, PortMapper::Protocol::TCP,
-                 [&]( const PortMapper::MappingInfo& info )
+                 [&]( SocketAddress info )
                  { queue80.push( info ); } ) );
 
     const auto map80 = queue80.pop();
-    EXPECT_EQ( map80.internalPort, 80 );
-    EXPECT_EQ( map80.externalIp, "12.34.56.78" );
-    ASSERT_GT( map80.externalPort, 80 );
+    EXPECT_EQ( map80.address.toString(), lit("12.34.56.78") );
+    EXPECT_GT( map80.port, 80 );
     EXPECT_EQ( clientMock.mappingsCount(), 2 );
 
     // Unmap 7001 and 80
     EXPECT_TRUE( portMapper.disableMapping( 7001, PortMapper::Protocol::TCP ) );
     EXPECT_EQ( clientMock.mappingsCount(), 1 );
 
-    const auto addr80 = clientMock.mappings()[ tcpPort( map80.externalPort ) ].first;
-    EXPECT_EQ( addr80.toString().toUtf8(), QByteArray( "192.168.0.10:80" ) );
+    const auto addr80 = clientMock.mappings()[ tcpPort( map80.port ) ];
+    EXPECT_EQ( addr80.first.toString(), lit( "192.168.0.10:80" ) );
 
     EXPECT_TRUE( portMapper.disableMapping( 80, PortMapper::Protocol::TCP ) );
     EXPECT_EQ( clientMock.mappingsCount(), 0 );
@@ -101,15 +96,13 @@ TEST( UpnpPortMapper, ReuseExisting )
         std::make_pair( SocketAddress( lit( "192.168.0.10" ), 7001 ), QString() ) ) ) );
     EXPECT_EQ( clientMock.mappingsCount(), 1 );
 
-    SyncQueue< PortMapper::MappingInfo > queue7001;
+    SyncQueue< SocketAddress > queue7001;
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
-                 [&]( const PortMapper::MappingInfo& info )
-                 { queue7001.push( info ); } ) );
+                 [&]( SocketAddress info )
+                 { queue7001.push( std::move( info ) ); } ) );
 
-    const auto map7001 = queue7001.pop(); // existed mapping should be in use
-    EXPECT_EQ( map7001.internalPort, 7001 );
-    EXPECT_EQ( map7001.externalPort, 6666 );
-    EXPECT_EQ( map7001.externalIp, "12.34.56.78" );
+    // existed mapping should be in use
+    EXPECT_EQ( queue7001.pop().toString(), lit("12.34.56.78:6666") );
     EXPECT_EQ( clientMock.mappingsCount(), 1 );
 
     // existed mapping should be removed when if need
@@ -125,15 +118,12 @@ TEST( UpnpPortMapper, CheckMappings )
     AsyncClientMock& clientMock = portMapper.clientMock();
 
     // Map 7001
-    SyncQueue< PortMapper::MappingInfo > queue7001;
+    SyncQueue< SocketAddress > queue7001;
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
-                 [&]( const PortMapper::MappingInfo& info )
-                 { queue7001.push( info ); } ) );
+                 [&]( SocketAddress info )
+                 { queue7001.push( std::move(info) ); } ) );
 
-    const auto map7001 = queue7001.pop();
-    EXPECT_EQ( map7001.internalPort, 7001 );
-    EXPECT_EQ( map7001.externalPort, 7001 );
-    EXPECT_EQ( map7001.externalIp, "12.34.56.78" );
+    EXPECT_EQ( queue7001.pop().toString(), "12.34.56.78:7001" );
     EXPECT_EQ( clientMock.mappingsCount(), 1 );
 
     EXPECT_TRUE( clientMock.rmMapping( 7001, PortMapper::Protocol::TCP ) );
@@ -159,7 +149,7 @@ TEST( UpnpPortMapper, DISABLED_RealRouter )
     PortMapper portMapper( 10000 );
 
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
-                 [&]( const PortMapper::MappingInfo& ) {} ) );
+                 [&]( SocketAddress ) {} ) );
 
     QThread::sleep( 60 * 60 ); // vary long time ;)
 }

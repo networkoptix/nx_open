@@ -1300,30 +1300,28 @@ void MediaServerProcess::at_localInterfacesChanged()
     updateAddressesList();
 }
 
-void MediaServerProcess::at_portMappingChanged(
-        quint16 internalPort, quint16 externalPort, QString externalIp)
+void MediaServerProcess::at_portMappingChanged(QString address)
 {
     if (isStopping())
         return;
 
-    Q_ASSERT_X(internalPort == m_mediaServer->getPort(), Q_FUNC_INFO,
-               "Unexpected internal port has been mapped");
-
-    if (externalPort)
+    SocketAddress mappedAddress(address);
+    if (mappedAddress.port)
     {
-        NX_LOG(lit("%1 New external address %2:%3 has been mapped")
-               .arg(Q_FUNC_INFO).arg(externalIp).arg(externalPort), cl_logALWAYS)
+        NX_LOG(lit("%1 New external address %2 has been mapped")
+               .arg(Q_FUNC_INFO).arg(address), cl_logALWAYS)
 
-        m_forwardedAddresses[externalIp] = externalPort;
+        m_forwardedAddresses[mappedAddress.address] = mappedAddress.port;
         updateAddressesList();
     }
     else
     {
-        const auto oldIp = m_forwardedAddresses.find(externalIp);
+        const auto oldIp = m_forwardedAddresses.find(mappedAddress.address);
         if (oldIp != m_forwardedAddresses.end())
         {
             NX_LOG(lit("%1 External address %2:%3 has been unmapped")
-                   .arg(Q_FUNC_INFO).arg(externalIp).arg(externalPort), cl_logALWAYS)
+                   .arg(Q_FUNC_INFO).arg(oldIp->first.toString())
+                   .arg(oldIp->second), cl_logALWAYS)
 
             m_forwardedAddresses.erase(oldIp);
             updateAddressesList();
@@ -2024,16 +2022,11 @@ void MediaServerProcess::run()
     nx_upnp::PortMapper upnpPortMapper;
     upnpPortMapper.enableMapping(m_mediaServer->getPort(),
                                  nx_upnp::PortMapper::Protocol::TCP,
-                                 [this](nx_upnp::PortMapper::MappingInfo info)
+                                 [this](SocketAddress address)
     {
-        Q_ASSERT_X(info.protocol == nx_upnp::PortMapper::Protocol::TCP, Q_FUNC_INFO,
-                   "Unexpected protochol has been mapped");
-
         const auto result = QMetaObject::invokeMethod(
             this, "at_portMappingChanged", Qt::AutoConnection,
-            Q_ARG(quint16, info.internalPort),
-            Q_ARG(quint16, info.externalPort),
-            Q_ARG(QString, info.externalIp.toString()));
+            Q_ARG(QString, address.toString()));
 
         Q_ASSERT_X(result, Q_FUNC_INFO, "Could not call at_portMappingChanged(...)");
     });

@@ -23,18 +23,6 @@ public:
     static const quint64 DEFAULT_CHECK_MAPPINGS_INTERVAL;
     typedef AsyncClient::Protocol Protocol;
 
-    struct MappingInfo
-    {
-        quint16     internalPort;
-        quint16     externalPort;
-        HostAddress externalIp;
-        Protocol    protocol;
-
-        MappingInfo( quint16 inPort = 0, quint16 exPort = 0,
-                     const HostAddress& exIp = HostAddress(),
-                     Protocol prot = Protocol::TCP );
-    };
-
     /*!
      * Asks to forward the @param port to some external port
      *
@@ -43,22 +31,38 @@ public:
      *         remapped or mapping is not valid any more)
      */
     bool enableMapping( quint16 port, Protocol protocol,
-                        std::function< void( MappingInfo ) > callback );
+                        std::function< void( SocketAddress ) > callback );
 
     /*!
      * Asks to cancel @param port forwarding
      *
      *  @returns false if @param port hasnt been mapped
-     *  @param waitForFinish enforces function to block until callback is finished
      */
-    bool disableMapping( quint16 port, Protocol protocol, bool waitForFinish = true );
+    bool disableMapping( quint16 port, Protocol protocol );
 
 protected: // for testing only
-    class Callback;
-    class Device;
+    class FailCounter
+    {
+    public:
+        FailCounter();
+        void success();
+        void failure();
+        bool isOk();
 
-    void enableMappingOnDevice( Device& device, bool isCheck,
-                                std::pair< quint16, Protocol > request );
+    private:
+        size_t m_failsInARow;
+        size_t m_lastFail;
+    };
+
+    struct Device
+    {
+        QUrl url;
+        HostAddress internalIp;
+        HostAddress externalIp;
+
+        FailCounter failCounter;
+        std::map< std::pair< quint16, Protocol >, SocketAddress > mapped;
+    };
 
     virtual bool processPacket(
         const QHostAddress& localAddress, const SocketAddress& devAddress,
@@ -71,21 +75,27 @@ protected: // for testing only
     virtual void onTimer( const quint64& timerID ) override;
 
 private:
-    void addNewMapper( const HostAddress& localAddress,
+    void addNewDevice( const HostAddress& localAddress,
                        const QUrl& url, const QString& serial );
+
+    void updateExternalIp( Device& device );
+    void checkMapping( Device& device, quint16 inPort, quint16 exPort, Protocol protocol );
+    void ensureMapping( Device& device, quint16 inPort, Protocol protocol );
+    void makeMapping( Device& device, quint16 inPort, quint16 desiredPort,
+                      Protocol protocol, size_t retries = 5 );
 
 protected: // for testing only
     QMutex m_mutex;
     std::unique_ptr<AsyncClient> m_upnpClient;
-    size_t m_asyncInProgress;
-    QWaitCondition m_asyncCondition;
     quint64 m_timerId;
     const QString m_description;
     const quint64 m_checkMappingsInterval;
 
-    std::map< std::pair< quint16, Protocol >, std::shared_ptr< Callback > > m_mappings;
-    std::map< QString, std::unique_ptr< Device > > m_devices;
+    std::map< std::pair< quint16, Protocol >,
+              std::function< void( SocketAddress ) > > m_mapRequests;
+
     // TODO: replace unique_ptr with try_emplace when avaliable
+    std::map< QString, Device > m_devices;
 };
 
 } // namespace nx_upnp

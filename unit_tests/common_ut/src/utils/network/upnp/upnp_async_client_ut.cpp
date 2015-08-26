@@ -8,9 +8,10 @@
 namespace nx_upnp {
 namespace test {
 
-static const QUrl URL( lit("http://192.168.1.1:57166/ctl/IPConn") );
+static const QUrl URL( lit("http://192.168.20.1:52869/ctl/IPConn") );
 static const auto TCP = AsyncClient::Protocol::TCP;
-static const QString IP = lit( "192.168.1.170" );
+static const QString INTERNAL_IP = lit( "192.168.20.77" );
+static const QString EXTERNAL_IP = lit( "10.0.2.161" );
 static const QString DESC = lit( "test" );
 
 // TODO: implement over test HTTP server
@@ -21,7 +22,7 @@ TEST( UpnpAsyncClient, DISABLED_GetIp )
         std::promise< HostAddress > prom;
         EXPECT_TRUE( client.externalIp( URL,
                      [&]( const HostAddress& v ) { prom.set_value( v ); } ) );
-        EXPECT_EQ( prom.get_future().get().toString().toUtf8(), QByteArray( "10.0.2.130" ) );
+        EXPECT_EQ( prom.get_future().get().toString(), EXTERNAL_IP );
     }
     {
         std::promise< AsyncClient::MappingInfo > prom;
@@ -52,14 +53,14 @@ TEST( UpnpAsyncClient, DISABLED_Mapping )
     AsyncClient client;
     {
          std::promise< bool > prom;
-         EXPECT_TRUE( client.addMapping( URL, IP, 80, 80, TCP, DESC,
+         EXPECT_TRUE( client.addMapping( URL, INTERNAL_IP, 80, 80, TCP, DESC, 0,
                       [&]( bool v ) { prom.set_value( v ); } ) );
 
          EXPECT_FALSE( prom.get_future().get() ); // wrong port
     }
     {
         std::promise< bool > prom;
-        EXPECT_TRUE( client.addMapping( URL, IP, 80, 8877, TCP, DESC,
+        EXPECT_TRUE( client.addMapping( URL, INTERNAL_IP, 80, 8877, TCP, DESC, 0,
                      [&]( bool v ) { prom.set_value( v ); } ) );
 
         ASSERT_TRUE( prom.get_future().get() );
@@ -71,15 +72,15 @@ TEST( UpnpAsyncClient, DISABLED_Mapping )
                      { prom.set_value( SocketAddress( m.internalIp,
                                                       m.internalPort ) ); } ) );
 
-        EXPECT_EQ( prom.get_future().get().toString().toUtf8(),
-                   SocketAddress( IP, 80 ).toString().toUtf8() );
+        EXPECT_EQ( prom.get_future().get().toString(),
+                   SocketAddress( INTERNAL_IP, 80 ).toString() );
     }
     {
         std::promise< bool > prom;
         EXPECT_TRUE( client.deleteMapping( URL, 8877, TCP,
                      [&]( bool v ) { prom.set_value( v ); } ) );
 
-        EXPECT_TRUE( prom.get_future().get() ); // no such mapping
+        EXPECT_TRUE( prom.get_future().get() );
     }
 }
 

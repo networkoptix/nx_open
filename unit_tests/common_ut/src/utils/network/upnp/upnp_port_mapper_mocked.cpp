@@ -1,7 +1,6 @@
 #include "upnp_port_mapper_mocked.h"
 
 #include <common/common_globals.h>
-#include <utils/network/upnp/upnp_port_mapper_internal.h>
 
 #include <QtConcurrent>
 
@@ -25,7 +24,7 @@ bool AsyncClientMock::externalIp(
 bool AsyncClientMock::addMapping(
         const QUrl& /*url*/, const HostAddress& internalIp,
         quint16 internalPort, quint16 externalPort,
-        Protocol protocol, const QString& description,
+        Protocol protocol, const QString& description, quint64 duration,
         std::function< void( bool ) > callback )
 {
     QMutexLocker lock( &m_mutex );
@@ -57,7 +56,7 @@ bool AsyncClientMock::deleteMapping(
 
 bool AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint32 index,
-        std::function< void( const MappingInfo& ) > callback )
+        std::function< void( MappingInfo ) > callback )
 {
     QMutexLocker lock( &m_mutex );
     if( m_mappings.size() <= index )
@@ -82,7 +81,7 @@ bool AsyncClientMock::getMapping(
 
 bool AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
-        std::function< void( const MappingInfo& ) > callback )
+        std::function< void( MappingInfo ) > callback )
 {
     QMutexLocker lock( &m_mutex );
     const auto it = m_mappings.find( std::make_pair( externalPort, protocol ) );
