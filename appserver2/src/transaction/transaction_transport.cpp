@@ -384,7 +384,7 @@ SocketAddress QnTransactionTransport::remoteSocketAddr() const
 
 nx_http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransport::authData() const
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return m_httpAuthCacheItem;
 }
 
