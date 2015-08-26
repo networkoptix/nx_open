@@ -233,13 +233,6 @@
             <numerusform>Primera aparición: %1 en %2 %n veces en total)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>No fotograma de vídeo recibido en los últimos%n segundos.</numerusform>
-            <numerusform>No fotograma de vídeo recibido en los últimos%n segundos.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
         <translation>La pérdida del paquete RTP detectado, prev seq.=%1 siguiente seq.=%2.</translation>
@@ -307,6 +300,13 @@
     <message>
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -620,6 +620,14 @@
     <message>
         <source>Invalid Type</source>
         <translation type="unfinished">Tipo no válido</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

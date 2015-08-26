@@ -1046,6 +1046,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Testing...</source>
         <translation type="unfinished">проверка...</translation>
     </message>
+    <message>
+        <source>LDAP Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LdapUsersDialog</name>
@@ -2703,6 +2707,14 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Audit Trail...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Check IO Module Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -4238,6 +4250,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
         <translation type="unfinished">Запись не может быть включения на некоторых камерах</translation>
+    </message>
+    <message>
+        <source>Schedule settings are not compatible with some cameras.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
