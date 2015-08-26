@@ -38,7 +38,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     QnCommandLineParser commandLineParser;
 
     /* Options used to open new client window. */
-    addParserParam(commandLineParser, &result.noSingleApplication, "--no-single-application");
+    addParserParam(commandLineParser, &result.allowMultipleClientInstances, "--no-single-application");
     addParserParam(commandLineParser, &result.authenticationString, "--auth" );
     addParserParam(commandLineParser, &result.screen, "--screen");
     addParserParam(commandLineParser, &result.delayedDrop, "--delayed-drop");
@@ -46,7 +46,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     
     /* Development options */
 #ifdef ENABLE_DYNAMIC_TRANSLATION
-    addParserParam(commandLineParser, &result.translationPath, "--translation");
+    addParserParam(commandLineParser, &result.dynamicTranslationPath, "--translation");
 #endif
 
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
@@ -56,7 +56,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.devModeKey, "--dev-mode-key");
     addParserParam(commandLineParser, &result.softwareYuv, "--soft-yuv");
     addParserParam(commandLineParser, &result.forceLocalSettings, "--local-settings");
-    addParserParam(commandLineParser, &result.noFullScreen, "--no-fullscreen");
+    addParserParam(commandLineParser, &result.fullScreenDisabled, "--no-fullscreen");
     addParserParam(commandLineParser, &result.skipMediaFolderScan, "--skip-media-folder-scan");
     addParserParam(commandLineParser, &result.engineVersion, "--override-version");
 
@@ -64,17 +64,22 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.logLevel, "--log-level");
     addParserParam(commandLineParser, &result.ec2TranLogLevel, "--ec2-tran-log-level", lit("none"));
 
-    addParserParam(commandLineParser, &result.noClientUpdate, "--no-client-update");
-    addParserParam(commandLineParser, &result.noVSync, "--no-vsync");
+    addParserParam(commandLineParser, &result.clientUpdateDisabled, "--no-client-update");
+    addParserParam(commandLineParser, &result.vsyncDisabled, "--no-vsync");
 
     /* Runtime settings */
-    addParserParam(commandLineParser, &result.noVersionMismatchCheck, "--no-version-mismatch-check");
-    addParserParam(commandLineParser, &result.sVideoWallGuid, "--videowall");
-    addParserParam(commandLineParser, &result.sVideoWallItemGuid,"--videowall-instance");
+    addParserParam(commandLineParser, &result.versionMismatchCheckDisabled, "--no-version-mismatch-check");
+
+    QString strVideoWallGuid;
+    QString strVideoWallItemGuid;
+    addParserParam(commandLineParser, &strVideoWallGuid, "--videowall");
+    addParserParam(commandLineParser, &strVideoWallItemGuid, "--videowall-instance");
     addParserParam(commandLineParser, &result.lightMode, "--light-mode", lit("full"));
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
+    result.videoWallGuid = QnUuid(strVideoWallGuid);
+    result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
     return result;
 }
 
@@ -86,14 +91,14 @@ QnStartupParameters QnStartupParameters::createDefault()
 QnStartupParameters::QnStartupParameters()
     : screen(kInvalidScreen)
 
-    , noSingleApplication(false)
+    , allowMultipleClientInstances(false)
     , skipMediaFolderScan(false)
-    , noVersionMismatchCheck(false)
-    , noVSync(false)
-    , noClientUpdate(false)
+    , versionMismatchCheckDisabled(false)
+    , vsyncDisabled(false)
+    , clientUpdateDisabled(false)
     , softwareYuv(false)
     , forceLocalSettings(false)
-    , noFullScreen(kDefaultNoFullScreen)
+    , fullScreenDisabled(kDefaultNoFullScreen)
 
     , devModeKey()
     , authenticationString()
@@ -101,10 +106,10 @@ QnStartupParameters::QnStartupParameters()
     , instantDrop()
     , logLevel()
     , ec2TranLogLevel()
-    , translationPath()
+    , dynamicTranslationPath()
     , lightMode()
-    , sVideoWallGuid()
-    , sVideoWallItemGuid()
+    , videoWallGuid()
+    , videoWallItemGuid()
     , engineVersion()
     , dynamicCustomizationPath()
 {

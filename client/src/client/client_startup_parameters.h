@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <utils/common/uuid.h>
+
 struct QnStartupParameters
 {
     enum { kInvalidScreen = -1 };
@@ -12,14 +14,14 @@ struct QnStartupParameters
 
     int screen;
 
-    bool noSingleApplication;
+    bool allowMultipleClientInstances;
     bool skipMediaFolderScan;
-    bool noVersionMismatchCheck;
-    bool noVSync;
-    bool noClientUpdate;
+    bool versionMismatchCheckDisabled;
+    bool vsyncDisabled;
+    bool clientUpdateDisabled;
     bool softwareYuv;
     bool forceLocalSettings;
-    bool noFullScreen;
+    bool fullScreenDisabled;
 
     QString devModeKey;
     QString authenticationString;
@@ -27,10 +29,10 @@ struct QnStartupParameters
     QString instantDrop;
     QString logLevel;
     QString ec2TranLogLevel;
-    QString translationPath;
+    QString dynamicTranslationPath;
     QString lightMode;
-    QString sVideoWallGuid;
-    QString sVideoWallItemGuid;
+    QnUuid videoWallGuid;
+    QnUuid videoWallItemGuid;
     QString engineVersion;
     QString dynamicCustomizationPath;
 

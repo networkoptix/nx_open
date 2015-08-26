@@ -306,27 +306,24 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         }
     }
 
-    QnUuid videowallGuid(startupParams.sVideoWallGuid);
-    QnUuid videowallInstanceGuid(startupParams.sVideoWallItemGuid);
-
     QString logFileNameSuffix;
-    if (!videowallGuid.isNull()) {
+    if (!startupParams.videoWallGuid.isNull()) {
         qnRuntime->setVideoWallMode(true);
-        startupParams.noSingleApplication = true;
-        startupParams.noFullScreen = true;
-        startupParams.noVersionMismatchCheck = true;
+        startupParams.allowMultipleClientInstances= true;
+        startupParams.fullScreenDisabled = true;
+        startupParams.versionMismatchCheckDisabled = true;
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
 
-        logFileNameSuffix = videowallInstanceGuid.isNull() 
-            ? videowallGuid.toString() 
-            : videowallInstanceGuid.toString();
+        logFileNameSuffix = startupParams.videoWallItemGuid.isNull() 
+            ? startupParams.videoWallGuid.toString() 
+            : startupParams.videoWallItemGuid.toString();
         logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
     }
 
     initLog(startupParams.logLevel, logFileNameSuffix, startupParams.ec2TranLogLevel);
 
 	// TODO: #Elric why QString???
-    if (!startupParams.lightMode.isEmpty() && videowallGuid.isNull()) {
+    if (!startupParams.lightMode.isEmpty() && startupParams.videoWallGuid.isNull()) {
         bool ok;
         Qn::LightModeFlags lightModeOverride(startupParams.lightMode.toInt(&ok));
         if (ok)
@@ -344,9 +341,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setLightMode(qnSettings->lightMode() | Qn::LightModeNoNewWindow);
 #endif
 
-    qnSettings->setVSyncEnabled(!startupParams.noVSync);
+    qnSettings->setVSyncEnabled(!startupParams.vsyncDisabled);
 
-    qnSettings->setClientUpdateDisabled(startupParams.noClientUpdate);
+    qnSettings->setClientUpdateDisabled(startupParams.clientUpdateDisabled);
 
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     QString skinRoot = dynamicCustomizationPath.isEmpty() 
@@ -395,7 +392,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     new QnQtbugWorkaround(application);
 #endif
 
-    if(!startupParams.noSingleApplication) {
+    if(!startupParams.allowMultipleClientInstances) {
         QString argsMessage;
         for (int i = 1; i < argc; ++i)
             argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
@@ -411,13 +408,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
 
     /* Initialize connections. */
-    if (!videowallGuid.isNull()) {
-        QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
-        QnAppServerConnectionFactory::setInstanceGuid(videowallInstanceGuid);
+    if (!startupParams.videoWallGuid.isNull()) {
+        QnAppServerConnectionFactory::setVideowallGuid(startupParams.videoWallGuid);
+        QnAppServerConnectionFactory::setInstanceGuid(startupParams.videoWallItemGuid);
     }
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
-        getConnectionFactory( videowallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient ) );
+        getConnectionFactory( startupParams.videoWallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient ) );
     ec2::ResourceContext resCtx(
         QnServerCameraFactory::instance(),
         qnResPool,
@@ -428,11 +425,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
-    runtimeData.peer.peerType = videowallInstanceGuid.isNull()
+    runtimeData.peer.peerType = startupParams.videoWallItemGuid.isNull()
         ? Qn::PT_DesktopClient
         : Qn::PT_VideowallClient;
     runtimeData.brand = QnAppInfo::productNameShort();
-    runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
+    runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     qnSettings->save();
@@ -506,12 +503,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     mainWindow->show();
-    if (!startupParams.noFullScreen)
+    if (!startupParams.fullScreenDisabled)
         context->action(Qn::EffectiveMaximizeAction)->trigger();
     else
         mainWindow->updateDecorationsState();
 
-    if(startupParams.noVersionMismatchCheck)
+    if(startupParams.versionMismatchCheckDisabled)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
     /* Process input files. */
@@ -526,7 +523,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         }
     }
 
-    if(!startupParams.noSingleApplication)
+    if(!startupParams.allowMultipleClientInstances)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
 #ifdef _DEBUG
@@ -540,7 +537,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     qApp->processEvents();
 
     // show beta version warning message for the main instance only
-    if (!startupParams.noSingleApplication &&
+    if (!startupParams.allowMultipleClientInstances &&
         !qnRuntime->isDevMode() &&
         QnAppInfo::beta())
         context->action(Qn::BetaVersionMessageAction)->trigger();
@@ -592,20 +589,20 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if (startupParams.instantDrop.isEmpty() && !haveInputFiles) {
         /* Set authentication parameters from command line. */
         QUrl appServerUrl = QUrl::fromUserInput(startupParams.authenticationString);
-        if (!videowallGuid.isNull()) {
+        if (!startupParams.videoWallGuid.isNull()) {
             Q_ASSERT(appServerUrl.isValid());
             if (!appServerUrl.isValid()) {
                 return -1;
             }
-            appServerUrl.setUserName(videowallGuid.toString());
+            appServerUrl.setUserName(startupParams.videoWallGuid.toString());
         }
         context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
     }
 
-    if (!videowallGuid.isNull()) {
+    if (!startupParams.videoWallGuid.isNull()) {
         context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
-                             .withArgument(Qn::VideoWallGuidRole, videowallGuid)
-                             .withArgument(Qn::VideoWallItemGuidRole, videowallInstanceGuid));
+                             .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
+                             .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
     } else if(!startupParams.delayedDrop.isEmpty()) { /* Drop resources if needed. */
         Q_ASSERT(startupParams.instantDrop.isEmpty());
 
