@@ -55,6 +55,9 @@ class QnMulticastModuleFinder : public QnLongRunnable {
     //! \param compatibilityMode         New compatibility mode state.
     void setCompatibilityMode(bool compatibilityMode);
 
+    //! Returns \fn run (DEBUG ONLY!)
+    static bool isDisabled;
+
 public slots:
     virtual void pleaseStop() override;
 private slots:

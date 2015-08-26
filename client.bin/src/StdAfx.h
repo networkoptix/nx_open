@@ -140,7 +140,6 @@ extern "C" {
 #include <QtCore/QThreadPool>
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
-#include <QtNetwork/QUdpSocket>
 #include <QtWidgets/QVBoxLayout>
 #include <QtCore/QWaitCondition>
 #include <QtGui/QWheelEvent>

@@ -554,6 +554,11 @@ bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned 
     // Get the address of the requested host
     m_connected = false;
 
+    const auto attrStr = remoteAddress.toString();
+    for( const auto& filter : connectFilters )
+        if( attrStr.startsWith( filter ) )
+            return false;
+
     sockaddr_in destAddr;
     if (!fillAddr(remoteAddress, destAddr))
         return false;
@@ -737,6 +742,8 @@ void CommunicatingSocket::close()
     m_connected = false;
     Socket::close();
 }
+
+QList<QString> CommunicatingSocket::connectFilters;
 
 void CommunicatingSocket::shutdown()
 {

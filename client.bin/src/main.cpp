@@ -58,6 +58,9 @@ extern "C"
 #include <utils/common/log.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/network/http/http_mod_manager.h>
+#include <utils/network/system_socket.h>
+#include <utils/network/multicast_module_finder.h>
+
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
@@ -289,6 +292,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noClientUpdate = false;
     bool softwareYuv = false;
     bool forceLocalSettings = false;
+    QString connectFilters;
+    auto& isMMfinderDisabled = QnMulticastModuleFinder::isDisabled;
 
     QnCommandLineParser commandLineParser;
 
@@ -314,12 +319,15 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
     commandLineParser.addParameter(&engineVersion,          "--override-version",           NULL,   QString());
 
+    commandLineParser.addParameter(&connectFilters,         "--connect-filters",            NULL,   QString());
+    commandLineParser.addParameter(&isMMfinderDisabled,     "--disable-mmfinder",           NULL,   QString());
+
     /* Persistent settings override. */
     commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
     commandLineParser.addParameter(&ec2TranLogLevel,        "--ec2-tran-log-level",
         "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", lit("none"));
     commandLineParser.addParameter(&noClientUpdate,         "--no-client-update",           NULL,   QString());
-    commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());    
+    commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
 
     /* Runtime settings */
     commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
@@ -328,6 +336,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
+
+    if (!connectFilters.isEmpty())
+        CommunicatingSocket::connectFilters = connectFilters.split(lit(","));
 
     QnClientModule client(forceLocalSettings);
 
