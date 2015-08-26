@@ -11,6 +11,8 @@
 #include <functional>
 #include <mutex>
 
+#include <boost/optional.hpp>
+
 #include "base_protocol_message_types.h"
 #include "base_server_connection.h"
 
@@ -238,7 +240,7 @@ namespace nx_api
             {
             }
 
-            MessageType msg;
+            boost::optional<MessageType> msg;
             boost::optional<nx::Buffer> buf;
             std::function<void( SystemError::ErrorCode )> handler;
             bool asyncSendIssued;
@@ -272,17 +274,17 @@ namespace nx_api
                 return;
             auto& task = m_sendQueue.front();
             task.asyncSendIssued = true;
-            if( task.buf )
+            if( task.msg )
+            {
+                sendMessageInternal( std::move( task.msg.get() ) );
+            }
+            else if( task.buf )
             {
                 assert( m_writeBuffer.isEmpty() );
                 m_writeBuffer = std::move( task.buf.get() );
                 m_serializerState = SerializerState::done;
                 if( !BaseType::sendBufAsync( m_writeBuffer ) )
                     reportErrorAndCloseConnection( SystemError::getLastOSErrorCode() );
-            }
-            else //if( task.msg )
-            {
-                sendMessageInternal( std::move( task.msg ) );
             }
         }
 
