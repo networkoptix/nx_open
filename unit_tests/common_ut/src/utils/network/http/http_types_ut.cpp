@@ -205,7 +205,6 @@ TEST( HttpHeaderTest, ContentRange_toString )
 }
 
 
-
 //////////////////////////////////////////////
 //   Via header tests
 //////////////////////////////////////////////
@@ -248,7 +247,7 @@ TEST( HttpHeaderTest, Via_parse )
     via.entries.clear();
     EXPECT_TRUE( via.parse("HTTP/1.0 ricky") );
     EXPECT_EQ( via.entries.size(), 1 );
-    EXPECT_EQ( via.entries[0].protoName, QByteArray("HTTP") );
+    EXPECT_EQ( via.entries[0].protoName.get(), QByteArray("HTTP") );
     EXPECT_EQ( via.entries[0].protoVersion, QByteArray("1.0") );
     EXPECT_EQ( via.entries[0].receivedBy, QByteArray("ricky") );
 
@@ -347,7 +346,7 @@ TEST( HttpHeaderTest, Via_toString )
 
 
 //////////////////////////////////////////////
-//   Via header tests
+//   Accept-Encoding header tests
 //////////////////////////////////////////////
 
 TEST( HttpHeaderTest, AcceptEncoding_parse )
