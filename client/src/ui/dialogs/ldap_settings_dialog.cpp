@@ -118,17 +118,17 @@ QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
 
     QnLdapSettings result;
 
-    QUrl url = QUrl::fromUserInput(q->ui->serverLineEdit->text());
+    QUrl url = QUrl::fromUserInput(q->ui->serverLineEdit->text().trimmed());
     if (url.isValid()) {
         if (url.port() == -1)
             url.setPort(QnLdapSettings::defaultPort(url.scheme() == lit("ldaps")));
         result.uri = url;
     }
     
-    result.adminDn = q->ui->adminDnLineEdit->text();
-    result.adminPassword = q->ui->passwordLineEdit->text();
-    result.searchBase = q->ui->searchBaseLineEdit->text();
-    result.searchFilter = q->ui->searchFilterLineEdit->text();
+    result.adminDn = q->ui->adminDnLineEdit->text().trimmed();
+    result.adminPassword = q->ui->passwordLineEdit->text().trimmed();
+    result.searchBase = q->ui->searchBaseLineEdit->text().trimmed();
+    result.searchFilter = q->ui->searchFilterLineEdit->text().trimmed();
     return result;
 }
 
