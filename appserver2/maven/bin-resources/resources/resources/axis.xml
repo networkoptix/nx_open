@@ -119,7 +119,7 @@
             <param name = "MaxFPS"
                    default_value ="30"/>
         </params>
-        </resource>	
+        </resource> 
         <resource name = "AXISP3905" public = "AXISP3904"/> 
         <resource name = "AXISM1025" public = "AXISM1011"/>         
         <resource name = "AXISQ6045" public = "AXISQ6032"/>       
@@ -165,10 +165,23 @@
                     default_value ="60"/>
             </params>       
         </resource>   
- 
         <resource name = "AXISQ6115" public = "AXISP1365"/>
         <resource name = "AXISQ6114" public = "AXISQ6115"/>
-        
- 
+        <resource name = "AXISP8221" public = "AXIS_COMMON">
+            <params>
+                <param name = "ioConfigCapability" default_value ="1"/>
+                <param name = "ioDisplayName" default_value ="A1,A2,A3,A4,B1,B2,B3,B4"/>  
+                <param name = "noVideoSupport" default_value ="1"/>
+                <param name = "forcedAudioStream" default_value ="1"/>
+                <param name = "hasDualStreaming" default_value ="0"/>
+            </params>
+        </resource> 
+        <resource name = "AXISM1124" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                    default_value ="30"/>
+            </params>       
+        </resource>  
+        <resource name = "AXISM1125" public = "AXISM1124"/>
     </oem>
 </resources>
