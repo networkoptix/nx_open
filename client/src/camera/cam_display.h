@@ -207,7 +207,7 @@ protected:
     bool m_ignoringVideo;
     bool m_isRealTimeSource;
     QnAudioFormat m_expectedAudioFormat;
-    QMutex m_audioChangeMutex;
+    mutable QMutex m_audioChangeMutex;
     bool m_videoBufferOverflow;
     bool m_singleShotMode;
     bool m_singleShotQuantProcessed;
