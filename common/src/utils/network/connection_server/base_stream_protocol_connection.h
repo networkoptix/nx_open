@@ -163,7 +163,7 @@ namespace nx_api
             auto newTask = std::make_shared<SendTask>(
                 std::move( msg ),
                 std::forward<Handler>( handler ) ); //TODO #ak get rid of this when generic lambdas are available
-            return socket()->dispatch(
+            return this->socket()->dispatch(
                 [this, newTask]()
                 {
                     m_sendQueue.push_back( std::move( *newTask ) );
@@ -186,7 +186,7 @@ namespace nx_api
             auto newTask = std::make_shared<SendTask>(
                 std::forward<BufferType>( data ),
                 std::forward<Handler>( handler ) );
-            return socket()->dispatch(
+            return this->socket()->dispatch(
                 [this, newTask]()
                 {
                     m_sendQueue.push_back( std::move( *newTask ) );
@@ -296,7 +296,7 @@ namespace nx_api
             if( connectionFreed )
                 return; //connection has been removed by handler
             m_connectionFreedFlag = nullptr;
-            connectionManager()->closeConnection(
+            this->connectionManager()->closeConnection(
                 static_cast<typename CustomConnectionManagerType::ConnectionType*>(this) );
         }
     };

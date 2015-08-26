@@ -7,7 +7,7 @@
 
 namespace nx_cc {
 
-bool CloudServerSocket::listen( int queueLen )
+bool CloudServerSocket::listen( int /*queueLen*/ )
 {
     //TODO #ak
     return false;
@@ -19,7 +19,7 @@ AbstractStreamSocket* CloudServerSocket::accept()
     return nullptr;
 }
 
-void CloudServerSocket::cancelAsyncIO( bool waitForRunningHandlerCompletion )
+void CloudServerSocket::cancelAsyncIO( bool /*waitForRunningHandlerCompletion*/ )
 {
     //TODO #ak
 }
@@ -27,7 +27,7 @@ void CloudServerSocket::cancelAsyncIO( bool waitForRunningHandlerCompletion )
 bool CloudServerSocket::acceptAsyncImpl(
     std::function<void(
         SystemError::ErrorCode,
-        AbstractStreamSocket* )>&& handler )
+        AbstractStreamSocket* )>&& /*handler*/ )
 {
     //TODO #ak
     return false;
