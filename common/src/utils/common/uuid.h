@@ -6,6 +6,8 @@
 #ifndef NX_UUID_H
 #define NX_UUID_H
 
+#include <string>
+
 #include <boost/optional.hpp>
 
 #include <QtCore/QByteArray>
@@ -37,6 +39,7 @@ public:
     const QByteArray& toByteArray() const;
     const QByteArray& toRfc4122() const;
     const QString& toString() const;
+    std::string toStdString() const;
 
     bool operator!=( const QnUuid& other ) const
     {

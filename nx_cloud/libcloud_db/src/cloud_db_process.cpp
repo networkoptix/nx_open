@@ -25,6 +25,7 @@
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
 #include "http_handlers/add_account_handler.h"
+#include "http_handlers/bind_system_handler.h"
 #include "http_handlers/get_account_handler.h"
 #include "http_handlers/verify_email_address_handler.h"
 #include "managers/account_manager.h"
@@ -199,7 +200,7 @@ void CloudDBProcess::registerApiHandlers(
     nx_http::MessageDispatcher* const msgDispatcher,
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
-    SystemManager* const /*systemManager*/ )
+    SystemManager* const systemManager )
 {
     msgDispatcher->registerRequestProcessor<AddAccountHttpHandler>(
         AddAccountHttpHandler::HANDLER_PATH,
@@ -209,14 +210,20 @@ void CloudDBProcess::registerApiHandlers(
 
     msgDispatcher->registerRequestProcessor<VerifyEmailAddressHandler>(
         VerifyEmailAddressHandler::HANDLER_PATH,
-        [accountManager, &authorizationManager]() ->std::unique_ptr<VerifyEmailAddressHandler> {
+        [accountManager, &authorizationManager]() -> std::unique_ptr<VerifyEmailAddressHandler> {
             return std::make_unique<VerifyEmailAddressHandler>( accountManager, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<GetAccountHttpHandler>(
         GetAccountHttpHandler::HANDLER_PATH,
-        [accountManager, &authorizationManager]() ->std::unique_ptr<GetAccountHttpHandler> {
+        [accountManager, &authorizationManager]() -> std::unique_ptr<GetAccountHttpHandler> {
             return std::make_unique<GetAccountHttpHandler>( accountManager, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<BindSystemHandler>(
+        BindSystemHandler::HANDLER_PATH,
+        [systemManager, &authorizationManager]() -> std::unique_ptr<BindSystemHandler> {
+            return std::make_unique<BindSystemHandler>( systemManager, authorizationManager );
         } );
 }
 
@@ -225,6 +232,7 @@ bool CloudDBProcess::updateDB( nx::db::DBManager* const dbManager )
     //updating DB structure to actual state
     nx::db::DBStructureUpdater dbStructureUpdater( dbManager );
     dbStructureUpdater.addUpdateScript( db::createAccountData );
+    dbStructureUpdater.addUpdateScript( db::createSystemData );
     return dbStructureUpdater.updateStructSync();
 }
 

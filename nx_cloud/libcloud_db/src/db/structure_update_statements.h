@@ -44,6 +44,29 @@ CREATE TABLE email_verification (                                   \
 );                                                                  \
 ";
 
+static const char createSystemData[] =
+"                                                                   \
+CREATE TABLE system_status (                                        \
+    code                INTEGER PRIMARY KEY,                        \
+    description         TEXT                                        \
+);                                                                  \
+                                                                    \
+INSERT INTO system_status( code, description )                      \
+                   VALUES ( 1,    'not activated' );                \
+INSERT INTO system_status( code, description )                      \
+                   VALUES ( 2,    'activated' );                    \
+                                                                    \
+CREATE TABLE system (                                               \
+    id                  BLOB(16) NOT NULL PRIMARY KEY,              \
+    name                TEXT NOT NULL,                              \
+    auth_key            TEXT NOT NULL,                              \
+    account_id          BLOB(16) NOT NULL,                          \
+    status_code         INTEGER NOT NULL,                           \
+    FOREIGN KEY( account_id ) REFERENCES account( id ),             \
+    FOREIGN KEY( status_code ) REFERENCES system_status( code )     \
+);                                                                  \
+";
+
 
 }   //db
 }   //cdb

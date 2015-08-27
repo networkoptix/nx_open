@@ -5,6 +5,12 @@
 
 #include "system_manager.h"
 
+#include <QtSql/QSqlQuery>
+
+#include <utils/common/log.h>
+#include <utils/serialization/sql.h>
+#include <utils/serialization/sql_functions.h>
+
 #include "access_control/authorization_manager.h"
 #include "data/cdb_ns.h"
 
@@ -20,26 +26,29 @@ SystemManager::SystemManager( nx::db::DBManager* const dbManager )
 
 void SystemManager::bindSystemToAccount(
     const AuthorizationInfo& authzInfo,
-    data::SystemData&& systemData,
-    std::function<void(ResultCode)> completionHandler )
+    data::SystemRegistrationData registrationData,
+    std::function<void(ResultCode, data::SystemData)> completionHandler )
 {
     QnUuid accountID;
     if( authzInfo.get(cdb::param::accountID, &accountID) )
     {
-        completionHandler( ResultCode::notAuthorized );
+        completionHandler( ResultCode::notAuthorized, data::SystemData() );
         return;
     }
 
+    data::SystemRegistrationDataWithAccountID registrationDataWithAccountID(
+        std::move( registrationData ) );
+
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::SystemData>(
-        std::bind(&SystemManager::insertSystemToDB, this, _1, _2),
-        std::move(systemData),
-        std::bind(&SystemManager::systemAdded, this, _1, _2, std::move(completionHandler)) );
+    m_dbManager->executeUpdate<data::SystemRegistrationDataWithAccountID, data::SystemData>(
+        std::bind(&SystemManager::insertSystemToDB, this, _1, _2, _3),
+        std::move(registrationDataWithAccountID),
+        std::bind(&SystemManager::systemAdded, this, _1, _2, _3, std::move(completionHandler)) );
 }
 
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
-    const DataFilter& filter,
+    const DataFilter& /*filter*/,
     std::function<void(ResultCode, TransactionSequence, std::vector<data::SystemData>)> completionHandler,
     std::function<void(DataChangeEvent)> eventReceiver )
 {
@@ -70,22 +79,35 @@ void SystemManager::getSystems(
 }
 
 nx::db::DBResult SystemManager::insertSystemToDB(
-    QSqlDatabase* const tran,
-    const data::SystemData& newSystem )
+    QSqlDatabase* const connection,
+    const data::SystemRegistrationDataWithAccountID& newSystem,
+    data::SystemData* const systemData )
 {
-    //sql: inserting (/updating?) record
-    //sql: fetching newly created (/existing?) record (if needed)
-
-    //TODO #ak sql: fetching transaction id
-    TransactionSequence transactionID = 0;
+    QSqlQuery insertSystemQuery( *connection );
+    insertSystemQuery.prepare(
+        "INSERT INTO system( id, name, auth_key, account_id, status_code ) "
+                   " VALUES( :id, :name, :authKey, :ownerAccountID, :status )");
+    systemData->id = QnUuid::createUuid().toStdString();
+    systemData->name = newSystem.name;
+    systemData->authKey = QnUuid::createUuid().toStdString();
+    systemData->ownerAccountID = newSystem.accountID.toStdString();
+    systemData->status = data::SystemStatus::ssNotActivated;
+    QnSql::bind( *systemData, &insertSystemQuery );
+    if( !insertSystemQuery.exec() )
+    {
+        NX_LOG( lit( "Could not insert system into DB. %1" ).
+            arg( connection->lastError().text() ), cl_logDEBUG1 );
+        return db::DBResult::ioError;
+    }
 
     return nx::db::DBResult::ok;
 }
 
 void SystemManager::systemAdded(
     nx::db::DBResult dbResult,
+    data::SystemRegistrationDataWithAccountID systemRegistrationData,
     data::SystemData systemData,
-    std::function<void(ResultCode)> completionHandler )
+    std::function<void(ResultCode, data::SystemData)> completionHandler )
 {
     if( dbResult == nx::db::DBResult::ok )
     {
@@ -95,7 +117,8 @@ void SystemManager::systemAdded(
     completionHandler(
         dbResult == nx::db::DBResult::ok
             ? ResultCode::ok
-            : ResultCode::dbError );
+            : ResultCode::dbError,
+        std::move(systemData) );
 }
 
 }   //cdb
