@@ -3476,20 +3476,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Copiar para Área de Trabalho</translation>
     </message>
     <message>
-        <source>Diagnostics for camera %1.</source>
-        <translation>Diagnósticos para câmera %1.</translation>
-    </message>
-    <message>
         <source>Confirming server availability.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Confirming camera is accessible.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished">Conferindo se a câmera provê fluxo de mídia</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
@@ -3497,6 +3485,42 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Diagnostics complete!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diagnostics for %1 %2.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..); Example: &quot;IO Module Diagnostics&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming %1 is accessible.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming camera is accessible.&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target %1 provides media stream.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming target IO module provides media stream.&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4742,10 +4766,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>License was successfully activated.</source>
         <translation>A licença foi ativada com sucesso.</translation>
-    </message>
-    <message>
-        <source>%1 %2</source>
-        <translation type="unfinished">%1% {1 %2?}</translation>
     </message>
     <message numerus="yes">
         <source>At least %n %2 are required</source>
