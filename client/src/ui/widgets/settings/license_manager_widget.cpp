@@ -317,7 +317,9 @@ void QnLicenseManagerWidget::updateDetailsButtonEnabled()
     QModelIndex idx = ui->gridLicenses->selectionModel()->currentIndex();
     ui->detailsButton->setEnabled(idx.isValid());
     QnLicensePtr license = m_model->license(idx);
-    ui->removeButton->setEnabled(license && !license->isValid());
+
+    QnLicense::ErrorCode errCode = QnLicense::NoError; /* Do not allow to remove valid licenses. */
+    ui->removeButton->setEnabled(license && !license->isValid(&errCode) && errCode != QnLicense::FutureLicense); 
 }
 
 
@@ -416,6 +418,8 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
                 licenses.append(license);
             else if (errCode == QnLicense::Expired)
                 licenses.append(license); // ignore expired error code
+            else if (errCode == QnLicense::FutureLicense)
+                licenses.append(license); // add future licenses
         }
     }
 

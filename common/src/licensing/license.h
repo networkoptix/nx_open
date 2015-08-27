@@ -43,7 +43,8 @@ public:
         InvalidBrand,               /**< License belong to other customization */
         Expired,                    /**< Expired */
         InvalidType,                /**< Such license type isn't allowed for that device. */
-        TooManyLicensesPerDevice    /**< Too many licenses of this type per device */
+        TooManyLicensesPerDevice,   /**< Too many licenses of this type per device. */
+        FutureLicense               /**< License type is unknown, may be license from future version. */
     };
 
     enum ValidationMode {
