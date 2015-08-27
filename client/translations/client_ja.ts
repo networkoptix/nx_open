@@ -1099,6 +1099,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Features</source>
         <translation>機能</translation>
     </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LicenseManagerWidget</name>
@@ -2488,22 +2492,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Pause</source>
         <translation>一時停止</translation>
-    </message>
-    <message>
-        <source>Ctrl+-</source>
-        <translation>Ctrl+-</translation>
-    </message>
-    <message>
-        <source>Speed Down</source>
-        <translation>スロー再生</translation>
-    </message>
-    <message>
-        <source>Ctrl++</source>
-        <translation>Ctrl++</translation>
-    </message>
-    <message>
-        <source>Speed Up</source>
-        <translation>早送り再生</translation>
     </message>
     <message>
         <source>Ctrl+Left</source>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -606,8 +606,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalide Signature</source>
-        <translation>Invalid Signature</translation>
+        <source>Invalid Signature</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
@@ -627,6 +627,10 @@
     </message>
     <message>
         <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

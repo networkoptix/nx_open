@@ -1100,6 +1100,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Features</source>
         <translation>คุณสมบัติ</translation>
     </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LicenseManagerWidget</name>
@@ -2489,22 +2493,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Pause</source>
         <translation>หยุด</translation>
-    </message>
-    <message>
-        <source>Ctrl+-</source>
-        <translation>Ctrl+-</translation>
-    </message>
-    <message>
-        <source>Speed Down</source>
-        <translation>ลดความเร็ว</translation>
-    </message>
-    <message>
-        <source>Ctrl++</source>
-        <translation>Ctrl++</translation>
-    </message>
-    <message>
-        <source>Speed Up</source>
-        <translation>เพิ่มความเร็ว</translation>
     </message>
     <message>
         <source>Ctrl+Left</source>

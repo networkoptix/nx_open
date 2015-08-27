@@ -609,7 +609,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalide Signature</source>
+        <source>Invalid Signature</source>
         <translation type="unfinished">Ungültige Signatur</translation>
     </message>
     <message>
@@ -630,6 +630,10 @@
     </message>
     <message>
         <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

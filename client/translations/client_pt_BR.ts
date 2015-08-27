@@ -1099,6 +1099,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Features</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LicenseManagerWidget</name>
@@ -1938,14 +1942,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Alt+F4</translation>
     </message>
     <message>
-        <source>Ctrl++</source>
-        <translation>Ctrl++</translation>
-    </message>
-    <message>
-        <source>Ctrl+-</source>
-        <translation>Ctrl+-</translation>
-    </message>
-    <message>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
@@ -2314,10 +2310,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Mostrar Lista</translation>
     </message>
     <message>
-        <source>Speed Up</source>
-        <translation>+ Velocidade</translation>
-    </message>
-    <message>
         <source>Show Motion/Smart Search</source>
         <translation>Mostrar Procura Movimento/Smart</translation>
     </message>
@@ -2532,10 +2524,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Open Layout(s) in a New Window</source>
         <translation>Abrir Layout(s) em Nova Janela</translation>
-    </message>
-    <message>
-        <source>Speed Down</source>
-        <translation>- Velocidade</translation>
     </message>
     <message>
         <source>Instant Drop Resources</source>

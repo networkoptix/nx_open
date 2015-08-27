@@ -397,7 +397,7 @@ QString QnLicense::errorMessage(ErrorCode errCode)
     case NoError:
         return QString();
     case InvalidSignature:
-        return tr("Invalide Signature");    //TODO: #GDM migrate after 2.4
+        return tr("Invalid Signature");
     case InvalidHardwareID:
         return tr("Server with matching hardware ID not found");
     case InvalidBrand:

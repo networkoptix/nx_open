@@ -1100,6 +1100,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Features</source>
         <translation>Особенности</translation>
     </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LicenseManagerWidget</name>
@@ -2590,22 +2594,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Space</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Speed Down</source>
-        <translation>Замедлить</translation>
-    </message>
-    <message>
-        <source>Ctrl++</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Speed Up</source>
-        <translation>Ускорить</translation>
     </message>
     <message>
         <source>Ctrl+Left</source>
