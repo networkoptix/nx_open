@@ -218,7 +218,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
 }
 
 void QnMulticastModuleFinder::run() {
-    if (!isDisabled)
+    if (isDisabled)
         return;
 
     initSystemThreadId();
