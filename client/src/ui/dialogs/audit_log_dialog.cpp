@@ -413,6 +413,7 @@ QList<QnAuditLogModel::Column> detailSessionColumns(bool showUser)
 void QnAuditLogDialog::setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes)
 {
     setPaletteColor(checkbox, QPalette::Active, QPalette::Foreground, color);
+    setPaletteColor(checkbox, QPalette::Inactive, QPalette::Foreground, color);
     checkbox->setProperty(checkBoxFilterProperty, static_cast<int>(filteredTypes));
     m_filterCheckboxes << checkbox;
     checkbox->disconnect(this);
