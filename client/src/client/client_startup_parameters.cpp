@@ -83,11 +83,6 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     return result;
 }
 
-QnStartupParameters QnStartupParameters::createDefault()
-{
-    return QnStartupParameters();
-}
-
 QnStartupParameters::QnStartupParameters()
     : screen(kInvalidScreen)
 

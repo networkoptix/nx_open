@@ -7,10 +7,10 @@ struct QnStartupParameters
 {
     enum { kInvalidScreen = -1 };
 
+    QnStartupParameters();
+
     static QnStartupParameters fromCommandLineArg(int argc
         , char **argv);
-
-    static QnStartupParameters createDefault();
 
     int screen;
 
@@ -35,7 +35,4 @@ struct QnStartupParameters
     QnUuid videoWallItemGuid;
     QString engineVersion;
     QString dynamicCustomizationPath;
-
-private:
-    QnStartupParameters();
 };
