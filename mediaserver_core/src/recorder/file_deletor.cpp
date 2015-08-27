@@ -4,7 +4,7 @@
 #include "storage_manager.h"
 
 static const int POSTPONE_FILES_INTERVAL = 1000*60;
-static const int SPACE_CLEARANCE_INTERVAL = 15 * 1000;
+static const int SPACE_CLEARANCE_INTERVAL = 15;
 
 QnFileDeletor* QnFileDeletor_inst = 0;
 
@@ -31,6 +31,7 @@ QnFileDeletor* QnFileDeletor::instance()
 void QnFileDeletor::run()
 {
     initSystemThreadId();
+    srand(time(0));
     while (!m_needStop)
     {
         if (m_postponeTimer.elapsed() > POSTPONE_FILES_INTERVAL) {
@@ -38,7 +39,9 @@ void QnFileDeletor::run()
             m_postponeTimer.restart();
         }
         
-        if (qnStorageMan && m_storagesTimer.elapsed() > SPACE_CLEARANCE_INTERVAL)
+        static const int RAND_RANGE = 5; // in range [-5..+5] seconds
+        int thresholdSecs = (SPACE_CLEARANCE_INTERVAL - RAND_RANGE) + rand() % (RAND_RANGE*2 + 1);
+        if (qnStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
         {
             qnStorageMan->clearSpace();
             m_storagesTimer.restart();

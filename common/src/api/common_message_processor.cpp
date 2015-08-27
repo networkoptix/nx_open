@@ -203,7 +203,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourcePar
 {
     QnResourcePtr resource = qnResPool->getResourceById(param.resourceId);
     if (resource)
-        resource->setProperty(param.name, param.value, false);
+        resource->setProperty(param.name, param.value, QnResource::NO_MARK_DIRTY);
     else
         propertyDictionary->setValue(param.resourceId, param.name, param.value, false);
 }

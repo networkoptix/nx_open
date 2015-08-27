@@ -76,7 +76,7 @@ PtsToClockMapper::PtsToClockMapper(
     m_prevPtsValid( false ),
     m_correction( 0 )
 {
-    assert( ptsBits < sizeof(pts_type)*CHAR_BIT );
+    assert( ptsBits <= sizeof(pts_type)*CHAR_BIT );
 }
 
 PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )

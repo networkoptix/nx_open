@@ -6,6 +6,7 @@
 #ifndef ILP_STREAM_READER_H
 #define ILP_STREAM_READER_H
 
+#include <atomic>
 #include <memory>
 
 #include <utils/thread/mutex.h>
@@ -72,6 +73,7 @@ private:
     QnWaitCondition m_cond;
     QnMutex m_mutex;
     CyclicAllocator m_allocator;
+    std::atomic<int> m_isInGetNextData;
  
     int doRequest( nx_http::HttpClient* const httpClient );
     void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );

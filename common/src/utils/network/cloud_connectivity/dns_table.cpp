@@ -9,21 +9,21 @@
 namespace nx_cc
 {
     void DnsTable::addPeerAddress(
-        const QString& peerName,
-        const HostAddress& hostAddress,
-        const std::vector<DnsAttribute>& attributes )
+        const QString& /*peerName*/,
+        const HostAddress& /*hostAddress*/,
+        const std::vector<DnsAttribute>& /*attributes*/ )
     {
         //TODO #ak
     }
 
-    void DnsTable::forgetPeer( const QString& peerName )
+    void DnsTable::forgetPeer( const QString& /*peerName*/ )
     {
         //TODO #ak
     }
 
     void DnsTable::forcePeerAddressResolved(
-        const QString& peerName,
-        const DnsEntry& dnsEntry )
+        const QString& /*peerName*/,
+        const DnsEntry& /*dnsEntry*/ )
     {
         //TODO #ak
     }
@@ -31,7 +31,7 @@ namespace nx_cc
     DnsTable::ResolveResult DnsTable::resolveAsync(
         const HostAddress& hostName,
         std::vector<DnsEntry>* const dnsEntries,
-        std::function<void( std::vector<DnsEntry> )> completionHandler )
+        std::function<void( std::vector<DnsEntry> )> /*completionHandler*/ )
     {
         //TODO #ak implement local network resolve
 

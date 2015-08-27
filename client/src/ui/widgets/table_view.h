@@ -16,6 +16,8 @@ public:
     explicit QnTableView(QWidget *parent = 0);
     virtual ~QnTableView();
 
+    QModelIndex mouseIndex() const { return m_lastMouseModelIndex; }
+
 protected:
     virtual bool edit(const QModelIndex &index, EditTrigger trigger, QEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;

@@ -15,6 +15,17 @@
     </message>
 </context>
 <context>
+    <name>QnActiResource</name>
+    <message>
+        <source>Output %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Camera output</source>
@@ -121,10 +132,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Conflicting Server #%1: %2</source>
         <translation></translation>
     </message>
@@ -181,10 +188,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Unknown event has occurred</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation></translation>
     </message>
@@ -197,15 +200,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
         <translation></translation>
     </message>
     <message>
@@ -254,10 +249,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation></translation>
     </message>
@@ -277,16 +268,52 @@
         <source>Conflicting Server: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
         <source>OK</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Not authorized. URL %1.</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -408,6 +435,10 @@
         <source>Parameters:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished">Not authorized. URL %1.</translation>
+    </message>
 </context>
 <context>
     <name>QnCommandLineParser</name>
@@ -423,12 +454,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
+        <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation></translation>
     </message>
     <message>
-        <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation></translation>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -442,12 +473,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation></translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation></translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -484,8 +515,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation></translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -511,59 +542,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation></translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Expired</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
         <translation></translation>
     </message>
     <message>
@@ -573,6 +556,70 @@
     <message>
         <source>Unknown error</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trial Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalide Signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -606,24 +653,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation></translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation></translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation></translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation></translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -641,6 +688,20 @@
     </message>
 </context>
 <context>
+    <name>QnPlAxisResource</name>
+    <message>
+        <source>Can&apos;t initialize IO port settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPlOnvifResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -654,24 +715,24 @@
         <translation></translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Trial license</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
         <translation></translation>
     </message>
     <message>
         <source>Watermark: </source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Trial License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -798,19 +859,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
         <translation></translation>
     </message>
     <message>
@@ -861,6 +910,18 @@
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
@@ -890,6 +951,17 @@
     </message>
 </context>
 <context>
+    <name>QnThirdPartyResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -900,12 +972,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation></translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation></translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -8,6 +8,7 @@
 
 #include <utils/common/event_processors.h>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -16,8 +17,6 @@
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
-
-#include <plugins/resource/server_camera/server_camera.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
@@ -78,7 +77,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
     // init actions model
     {
-        QStandardItem *anyActionItem = new QStandardItem(tr("Any action"));
+        QStandardItem *anyActionItem = new QStandardItem(tr("Any Action"));
         anyActionItem->setData(QnBusiness::UndefinedAction);
         anyActionItem->setData(false, ProlongedActionRole);
         m_actionTypesModel->appendRow(anyActionItem);
@@ -237,19 +236,6 @@ void QnEventLogDialog::updateData()
     m_dirty = false;
 }
 
-QList<QnMediaServerResourcePtr> QnEventLogDialog::getServerList() const
-{
-    QList<QnMediaServerResourcePtr> result;
-    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
-    foreach(const QnResourcePtr& r, resList) {
-        QnMediaServerResourcePtr mServer = r.dynamicCast<QnMediaServerResource>();
-        if (mServer)
-            result << mServer;
-    }
-
-    return result;
-}
-
 void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                              QnBusiness::EventType eventType,
                              QnBusiness::ActionType actionType)
@@ -258,8 +244,8 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
     m_allEvents.clear();
 
 
-    QList<QnMediaServerResourcePtr> mediaServerList = getServerList();
-    foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
+    auto mediaServerList = qnResPool->getAllServers();
+    for (const QnMediaServerResourcePtr& mserver: mediaServerList)
     {
         if (mserver->getStatus() == Qn::Online)
         {

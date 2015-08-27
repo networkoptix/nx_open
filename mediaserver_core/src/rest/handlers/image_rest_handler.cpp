@@ -23,7 +23,8 @@ extern "C"
 #include "decoders/video/ffmpeg.h"
 #include "qmath.h"
 #include "camera/get_image_helper.h"
-#include <utils/common/util.h>
+#include <http/custom_headers.h>
+#include "utils/common/util.h"
 
 int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time)
 {
@@ -59,7 +60,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first == "res_id" || params[i].first == "physicalId")
+        if (params[i].first == "res_id" || params[i].first == Qn::CAMERA_UNIQUE_ID_HEADER_NAME )
         {
             resParamFound = true;
             res = qSharedPointerDynamicCast<QnVirtualCameraResource> (qnResPool->getNetResourceByPhysicalId(params[i].second));

@@ -121,7 +121,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Downmix audio from 5.1 to 2.1:</string>
+         <string>Downmix Audio from 5.1 to 2.1</string>
         </property>
        </widget>
       </item>
@@ -146,7 +146,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="pauseOnInactivityLabel">
         <property name="text">
-         <string>Auto pause video:</string>
+         <string>Auto Pause Video</string>
         </property>
        </widget>
       </item>
@@ -197,7 +197,7 @@
            <item>
             <widget class="QLabel" name="idleTimeoutLabel2">
              <property name="text">
-              <string>minutes of inactivity</string>
+              <string>Minutes of Inactivity</string>
              </property>
             </widget>
            </item>
@@ -222,7 +222,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="autoStartLabel">
         <property name="text">
-         <string>Run application when PC boots up:</string>
+         <string>Run Application when PC Boots:</string>
         </property>
        </widget>
       </item>
@@ -236,7 +236,7 @@
       <item row="3" column="0">
        <widget class="QLabel" name="doubleBufferLabel">
         <property name="text">
-         <string>Double buffering:</string>
+         <string>Double Buffering:</string>
         </property>
        </widget>
       </item>
@@ -295,14 +295,14 @@
      <item>
       <widget class="QPushButton" name="browseLogsButton">
        <property name="text">
-        <string>Browse logs</string>
+        <string>Browse Logs</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="clearCacheButton">
        <property name="text">
-        <string>Clear local cache</string>
+        <string>Clear Local Cache</string>
        </property>
       </widget>
      </item>

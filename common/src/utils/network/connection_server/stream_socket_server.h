@@ -26,6 +26,17 @@ template<class _ConnectionType>
 public:
     typedef _ConnectionType ConnectionType;
 
+    virtual ~StreamConnectionHolder()
+    {
+        //we MUST be sure to remove all connections
+        std::map<ConnectionType*, std::shared_ptr<ConnectionType>> connections;
+        {
+            std::lock_guard<std::mutex> lk( m_mutex );
+            connections.swap( m_connections );
+        }
+        connections.clear();
+    }
+
     void closeConnection( ConnectionType* connection )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
@@ -36,13 +47,19 @@ public:
     {
         std::unique_lock<std::mutex> lk( m_mutex );
         for( auto& connection : m_connections )
-            action( connection.first );
+            action( connection.first ); //TODO #ak it is not safe to call external method with mutex locked
     }
 
 protected:
     std::mutex m_mutex;
     //TODO #ak this map types seems strange. Replace with std::set?
-    std::map<ConnectionType*, std::unique_ptr<ConnectionType>> m_connections;
+    std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
+
+    void saveConnection( std::shared_ptr<ConnectionType> connection )
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        m_connections.emplace( connection.get(), std::move( connection ) );
+    }
 };
 
 //!Listens local tcp address, accepts incoming connections and forwards them to the specified handler
@@ -110,21 +127,19 @@ public:
 
         if( newConnection )
         {
-            std::unique_ptr<ConnectionType> conn( new ConnectionType(
+            auto conn = std::make_shared<ConnectionType>(
                 static_cast<CustomServerType*>(this),
-                std::unique_ptr<AbstractStreamSocket>(newConnection) ) );
+                std::unique_ptr<AbstractStreamSocket>(newConnection) );
             if( conn->startReadingConnection() )
-            {
-                std::unique_lock<std::mutex> lk( BaseType::m_mutex );
-                ConnectionType* connectionPtr = conn.get();
-                BaseType::m_connections.emplace( connectionPtr, std::move(conn) );
-            }
+                this->saveConnection( std::move( conn ) );
         }
-        m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) );
+        if( !m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) ) )
+        {
+            //TODO #ak
+        }
     }
 
 private:
-    //TODO #ak do we really need shared_ptr here?
     std::unique_ptr<AbstractStreamServerSocket> m_socket;
 
     StreamSocketServer( StreamSocketServer& );

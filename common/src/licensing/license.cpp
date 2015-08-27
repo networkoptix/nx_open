@@ -68,17 +68,7 @@ namespace {
     }
 
 
-struct LicenseTypeInfo
-{
-    LicenseTypeInfo(): licenseType(Qn::LC_Count), allowedForARM(0) {}
-    LicenseTypeInfo(Qn::LicenseType licenseType,  const QnLatin1Array& className, bool allowedForARM):
-        licenseType(licenseType), className(className), allowedForARM(allowedForARM) {}
-
-    Qn::LicenseType licenseType;
-    QnLatin1Array className;
-    bool allowedForARM;
-};
-
+/** Make sure class names totally the same as on the activation server. */
 static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
 {
     LicenseTypeInfo(Qn::LC_Trial,           "trial",         1),
@@ -87,9 +77,22 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_Edge,            "edge",          1),
     LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0),
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
-    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1)
+    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
+    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      0),
+    LicenseTypeInfo(Qn::LC_Start,           "starter",       0)
 };
 } // anonymous namespace
+
+LicenseTypeInfo::LicenseTypeInfo() : 
+    licenseType(Qn::LC_Count), 
+    allowedForARM(0) 
+{}
+
+LicenseTypeInfo::LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className, bool allowedForARM) :
+    licenseType(licenseType),
+    className(className),
+    allowedForARM(allowedForARM)
+{}
 
 
 // -------------------------------------------------------------------------- //
@@ -160,8 +163,10 @@ QString QnLicense::displayName(Qn::LicenseType licenseType) {
     case Qn::LC_Professional:   return tr("Professional");
     case Qn::LC_Edge:           return tr("Edge");
     case Qn::LC_VMAX:           return tr("Vmax");
-    case Qn::LC_AnalogEncoder:  return tr("Analog encoder");
+    case Qn::LC_AnalogEncoder:  return tr("Analog Encoder");
     case Qn::LC_VideoWall:      return tr("Video Wall");
+    case Qn::LC_IO:             return tr("I/O Module");
+    case Qn::LC_Start:          return tr("Start");
     default:
         break;
     }
@@ -174,13 +179,15 @@ QString QnLicense::longDisplayName() const {
 
 QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     switch (licenseType) {
-    case Qn::LC_Trial:          return tr("Trial licenses");
-    case Qn::LC_Analog:         return tr("Analog licenses");
-    case Qn::LC_Professional:   return tr("Professional licenses");
-    case Qn::LC_Edge:           return tr("Edge licenses");
-    case Qn::LC_VMAX:           return tr("Vmax licenses");
-    case Qn::LC_AnalogEncoder:  return tr("Analog encoder licenses");
-    case Qn::LC_VideoWall:      return tr("Video Wall licenses");
+    case Qn::LC_Trial:          return tr("Trial Licenses");
+    case Qn::LC_Analog:         return tr("Analog Licenses");
+    case Qn::LC_Professional:   return tr("Professional Licenses");
+    case Qn::LC_Edge:           return tr("Edge Licenses");
+    case Qn::LC_VMAX:           return tr("Vmax Licenses");
+    case Qn::LC_AnalogEncoder:  return tr("Analog Encoder Licenses");
+    case Qn::LC_VideoWall:      return tr("Video Wall Licenses");
+    case Qn::LC_IO:             return tr("I/O Module Licenses");
+    case Qn::LC_Start:          return tr("Start Licenses");
     default:
         break;
     }
@@ -296,25 +303,64 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
         return gotError(errCode, Expired);
     
     bool isArmBox = checkForARMBox(info.data.box);
-    if (isArmBox && !licenseTypeInfo[type()].allowedForARM)
+    if (isArmBox && !isAllowedForArm())
         return gotError(errCode, InvalidType); // strict allowed license type for ARM devices
-#if 1
-    if (isArmBox && type() == Qn::LC_Edge) 
-    {
-        for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
-            if (license->hardwareId() == hardwareId() && license->type() == type()) 
-            {
-				// Only single EDGE license per ARM device is allowed
-                if (mode != VM_Regular && license->key() != key())
-                    return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid for any of special (non regular) mode
-                else if (license->key() < key())
-                    return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
-            }
-        }
-    }
-#endif
+
+    if (isArmBox && type() == Qn::LC_Edge)
+        return isValidEdgeLicense(errCode, mode);
+
+    if (type() == Qn::LC_Start)
+        return isValidStartLicense(errCode, mode);
+
     return gotError(errCode, NoError);
 }
+
+bool QnLicense::isValidEdgeLicense(ErrorCode* errCode, ValidationMode mode) const {
+    for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
+        // skip other license types and current license itself
+        if (license->type() != type() || license->key() == key())
+            continue;
+
+        // Only single EDGE license per ARM device is allowed
+        if (license->hardwareId() == hardwareId()) {
+            if (mode != VM_Regular)
+                return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid for any of special (non regular) mode
+            else if (license->key() < key())
+                return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
+        }
+    }
+
+    return gotError(errCode, NoError);
+}
+
+bool QnLicense::isValidStartLicense(ErrorCode* errCode, ValidationMode mode) const {
+    Q_UNUSED(mode);
+
+    // Only single Start license per system is allowed
+    for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
+        // skip other license types and current license itself
+        if (license->type() != type() || license->key() == key())
+            continue;
+
+        // skip other licenses if they have less channels
+        if (license->cameraCount() < cameraCount())
+            continue;
+
+        if (license->cameraCount() > cameraCount())
+            return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid if it has less channels
+
+        // we found another license with the same number of channels
+        if (license->key() < key())
+            return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
+    }
+
+    return gotError(errCode, NoError);
+}
+
+bool QnLicense::isAllowedForArm() const {
+    return ::licenseTypeInfo[type()].allowedForARM;
+}
+
 
 QByteArray QnLicense::toString() const
 {
@@ -341,15 +387,15 @@ QString QnLicense::errorMessage(ErrorCode errCode)
     case NoError:
         return QString();
     case InvalidSignature:
-        return tr("Invalid signature");
+        return tr("Invalide Signature");
     case InvalidHardwareID:
-        return tr("Server with necessary hardware ID is not found");
+        return tr("Server with matching hardware ID not found");
     case InvalidBrand:
-        return tr("Invalid customization");
+        return tr("Invalid Customization");
     case Expired:
         return tr("Expired"); // license is out of date
     case InvalidType:
-        return tr("Invalid type");
+        return tr("Invalid Type");
     case TooManyLicensesPerDevice:
         return tr("Only single license is allowed for this device");
     default:
@@ -364,17 +410,19 @@ Qn::LicenseType QnLicense::type() const
     if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
         return Qn::LC_Trial;
 
-    if (xclass().toLower().toUtf8() == licenseTypeInfo[Qn::LC_VideoWall].className)
+    if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_VideoWall].className)
         return Qn::LC_VideoWall;
 
     if (!expiration().isEmpty())
         return Qn::LC_Trial;
     
     for (int i = 0; i < Qn::LC_Count; ++i) {
-        if (xclass().toLower().toUtf8() == licenseTypeInfo[i].className)
-            return licenseTypeInfo[i].licenseType;
+        if (xclass().toLower().toUtf8() == ::licenseTypeInfo[i].className)
+            return ::licenseTypeInfo[i].licenseType;
     }
 
+    //TODO: #ivigasin create "invalid" class for this case
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid license class");
     return Qn::LC_Professional; // default value
 }
 
@@ -443,6 +491,10 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
         m_expiration = QLatin1String("");
         m_isValid1 = true;
     }
+}
+
+LicenseTypeInfo QnLicense::licenseTypeInfo(Qn::LicenseType licenseType) {
+    return ::licenseTypeInfo[licenseType];
 }
 
 // -------------------------------------------------------------------------- //

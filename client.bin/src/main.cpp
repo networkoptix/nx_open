@@ -31,7 +31,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
-
+#include <QScopedPointer>
 #include <QtSingleApplication>
 
 extern "C"
@@ -305,6 +305,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
 
     /* Development options */
+#define ENABLE_DYNAMIC_TRANSLATION
 #ifdef ENABLE_DYNAMIC_TRANSLATION
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
 #endif
@@ -336,11 +337,34 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
+        
+    /// We should load translations before major client's services are started to prevent races
+    typedef QScopedPointer<QnClientTranslationManager> TranslationManager;
+    TranslationManager translationManager(new QnClientTranslationManager());
+
+    QnTranslation translation;
+    if(!translationPath.isEmpty()) /* From command line. */
+        translation = translationManager->loadTranslation(translationPath);
+
+
+    if(translation.isEmpty()) /* By path. */
+    {
+        typedef QScopedPointer<QnClientSettings> ClientSettings;
+        const ClientSettings settings(new QnClientSettings(forceLocalSettings));
+        translation = translationManager->loadTranslation(settings->translationPath());
+    }
+
+    /* Check if qnSettings value is invalid. */
+    if (translation.isEmpty()) 
+        translation = translationManager->defaultTranslation();
+
+    translationManager->installTranslation(translation);
 
     if (!connectFilters.isEmpty())
         CommunicatingSocket::connectFilters = connectFilters.split(lit(","));
 
     QnClientModule client(forceLocalSettings);
+    qnCommon->store<QnClientTranslationManager>(translationManager.take());
 
     /* Parse command line. */
 #ifdef _DEBUG
@@ -526,24 +550,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
 
-    //===========================================================================
+    // ===========================================================================
 
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
-
-    /* Load translation. */
-    QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
-    QnTranslation translation;
-    if(!translationPath.isEmpty()) /* From command line. */
-        translation = translationManager->loadTranslation(translationPath);
-
-    if(translation.isEmpty()) /* By path. */
-        translation = translationManager->loadTranslation(qnSettings->translationPath());
-
-    /* Check if qnSettings value is invalid. */
-    if (translation.isEmpty()) 
-        translation = translationManager->defaultTranslation();
-
-    translationManager->installTranslation(translation);
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
@@ -634,7 +643,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     resourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
 
-    //============================
+    // ============================
     //QnResourceDirectoryBrowser
     if(!skipMediaFolderScan) {
         QnResourceDirectoryBrowser::instance().setLocal(true);
@@ -708,6 +717,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->stop();
 
     QnAppServerConnectionFactory::setEc2Connection(NULL);
+
+    ec2ConnectionFactory.reset();
+
     QnAppServerConnectionFactory::setUrl(QUrl());
 
     /* Write out settings. */

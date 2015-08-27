@@ -1,10 +1,12 @@
 #ifndef SYNC_QUEUE_H
 #define SYNC_QUEUE_H
 
+#include <functional>
 #include <queue>
 
 #include "mutex.h"
 #include "wait_condition.h"
+
 
 namespace nx {
 

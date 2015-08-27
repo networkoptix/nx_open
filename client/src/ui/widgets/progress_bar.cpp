@@ -2,7 +2,7 @@
 
 #include <ui/style/noptix_style.h>
 
-QnProgressBar::QnProgressBar(QWidget *parent /*= 0*/):
+QnProgressBar::QnProgressBar(QWidget *parent /* = 0*/):
     base_type(parent)
 {
 

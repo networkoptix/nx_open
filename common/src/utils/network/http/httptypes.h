@@ -9,6 +9,7 @@
 #include <cstring>
 #include <functional>
 #include <map>
+#include <vector>
 
 #include <boost/optional.hpp>
 
@@ -367,6 +368,12 @@ namespace nx_http
     //!Contains http header structures
     namespace header
     {
+        //!Parses string "name1=val1; name2=val2; ...". ; separator can be specified
+        void parseDigestAuthParams(
+            const ConstBufferRefType& authenticateParamsStr,
+            QMap<BufferType, BufferType>* const params,
+            char sep = ',' );
+
         //!Http authentication scheme enumeration
         namespace AuthScheme
         {
@@ -436,6 +443,8 @@ namespace nx_http
             void serialize( BufferType* const dstBuffer ) const;
             BufferType serialized() const;
             void clear();
+
+            StringType userid() const;
 
         private:
             Authorization( const Authorization& );

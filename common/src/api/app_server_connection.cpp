@@ -61,9 +61,8 @@ QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
 
 QUrl QnAppServerConnectionFactory::url() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
-
         QnMutexLocker locker( &factory->m_mutex );
+        Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
         return factory->m_url;
     }
 

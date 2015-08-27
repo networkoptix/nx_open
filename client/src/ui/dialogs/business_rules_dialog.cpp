@@ -209,7 +209,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
         return;
 
     if (QMessageBox::warning(this,
-                             tr("Confirm rules reset"),
+                             tr("Confirm Rules Reset"),
                              tr("Are you sure you want to reset rules to the defaults?") + L'\n' +
                                 tr("This action CANNOT be undone!"),
                              QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
@@ -248,7 +248,7 @@ void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode err
         return;
 
     if( errorCode != ec2::ErrorCode::ok ) {
-        QMessageBox::critical(this, tr("Error while deleting rule"), ec2::toString(errorCode));
+        QMessageBox::critical(this, tr("Error while deleting rule."), ec2::toString(errorCode));
         m_pendingDeleteRules.append(m_deleting[handle]);
         return;
     }
@@ -317,7 +317,7 @@ bool QnBusinessRulesDialog::saveAll() {
 
     if (!invalid_modified.isEmpty()) {
         QMessageBox::StandardButton btn =  QMessageBox::question(this,
-                          tr("Confirm save"),
+                          tr("Confirm Save"),
                           tr("Some rules are not valid. Should they be disabled?"),
                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                           QMessageBox::Cancel);
@@ -473,7 +473,7 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
         return true;
 
     QMessageBox::StandardButton btn =  QMessageBox::question(this,
-        tr("Confirm exit"),
+        tr("Confirm Exit"),
         tr("Unsaved changes will be lost. Save?"),
         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
         QMessageBox::Cancel);

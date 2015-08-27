@@ -17,14 +17,14 @@
    <item>
     <widget class="QCheckBox" name="autoRunCheckBox">
      <property name="text">
-      <string>Start Video Wall when the Windows starts</string>
+      <string>Launch video wall when Windows starts.</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QCheckBox" name="shortcutCheckbox">
      <property name="text">
-      <string>Shortcut on the desktop</string>
+      <string>Place shortcut on desktop.</string>
      </property>
     </widget>
    </item>

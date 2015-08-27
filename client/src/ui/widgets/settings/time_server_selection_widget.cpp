@@ -39,7 +39,7 @@ namespace {
 #define PRINT_DEBUG(MSG) 
 #endif 
 
-QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /*= NULL*/):
+QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NULL*/):
     QnAbstractPreferencesWidget(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::TimeServerSelectionWidget),

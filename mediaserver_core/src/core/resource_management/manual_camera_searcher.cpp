@@ -79,6 +79,7 @@ namespace {
                                                 resource->getUrl(),
                                                 qnResTypePool->getResourceType(resource->getTypeId())->getName(),
                                                 cameraResource->getVendor(),
+                                                cameraResource->getUniqueId(),
                                                 resourceExistsInPool(resource));
     }
 }

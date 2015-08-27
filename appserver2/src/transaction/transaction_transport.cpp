@@ -274,6 +274,9 @@ QnTransactionTransport::~QnTransactionTransport()
 
     if (m_connected)
         connectDone(m_remotePeer.id);
+
+    if (m_ttFinishCallback)
+        m_ttFinishCallback();
 }
 
 void QnTransactionTransport::addData(QByteArray&& data)
@@ -379,6 +382,12 @@ SocketAddress QnTransactionTransport::remoteSocketAddr() const
     return addr;
 }
 
+nx_http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransport::authData() const
+{
+    QnMutexLocker lock( &m_mutex );
+    return m_httpAuthCacheItem;
+}
+
 QnTransactionTransport::State QnTransactionTransport::getState() const
 {
     QnMutexLocker lock( &m_mutex );
@@ -455,7 +464,7 @@ void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& ht
     }
     else {
         QUrl url = QnAppServerConnectionFactory::url();
-        httpClient->setUserName(url.userName());
+        httpClient->setUserName(url.userName().toLower());
         if (dbManager) {
             QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
             if (adminUser) {
@@ -519,6 +528,10 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     m_httpClient->addAdditionalHeader(
         Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME,
         ConnectionType::toString(m_connectionType) );   //incoming means this peer wants to receive data via this connection
+    m_httpClient->addAdditionalHeader(
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME,
+        qnCommon->runningInstanceGUID().toByteArray() );
+    
 
     // Client reconnects to the server
     if( m_localPeer.isClient() ) {
@@ -1228,7 +1241,6 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                 m_httpClient->response()->headers,
                 Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
         {
-
             //inserting base64 decoder before the last filter
             m_incomingTransactionStreamParser = nx_bsf::insert(
                 m_incomingTransactionStreamParser,
@@ -1260,6 +1272,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
             setExtraDataBuffer(data);
             m_peerRole = prOriginating;
+            m_httpAuthCacheItem = client->authCacheItem();
             setState(QnTransactionTransport::Connected);
         }
         else {
@@ -1570,6 +1583,11 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
         return;
 
     serializeAndSendNextDataBuffer();
+}
+
+void QnTransactionTransport::setBeforeDestroyCallback(std::function<void ()> ttFinishCallback)
+{
+    m_ttFinishCallback = ttFinishCallback;
 }
 
 }

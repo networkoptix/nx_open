@@ -19,6 +19,12 @@ namespace QnUbjson {
 
 #ifndef QN_NO_QT
     template<class T>
+    void serialize(const T &value, QByteArray *target) {
+        QnUbjsonWriter<QByteArray> stream(target);
+        QnUbjson::serialize(value, &stream);
+    }
+
+    template<class T>
     QByteArray serialized(const T &value) {
         QByteArray result;
         QnUbjsonWriter<QByteArray> stream(&result);

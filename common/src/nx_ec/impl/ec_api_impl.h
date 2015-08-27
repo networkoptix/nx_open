@@ -93,6 +93,10 @@ namespace ec2
         serverError,
         unsupported,
         unauthorized,
+        //!Can't check authorization because of LDAP server is offline
+        temporary_unauthorized,
+        //!Requested operation is currently forbidden (e.g., read-only mode is enabled)
+        forbidden,
         //!Response parse error
         badResponse,
         //!Error executing DB request

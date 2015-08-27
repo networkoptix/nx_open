@@ -15,6 +15,17 @@
     </message>
 </context>
 <context>
+    <name>QnActiResource</name>
+    <message>
+        <source>Output %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>User Defined (%1)</source>
@@ -161,14 +172,6 @@
         <translation>サーバー &quot;%1&quot; 開始</translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>サーバー &quot;%1&quot; ライセンス問題</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>不明なイベント</translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation>イベント: %1</translation>
     </message>
@@ -181,16 +184,8 @@
         <translation>URL:・%1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>入力ポート:・%1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>理由:・%1</translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
-        <translation>競合アドレス: %1</translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -251,10 +246,6 @@
         <translation>RTPパケットロス検知.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>サーバーが停止しました.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>クラッシュ後にサーバーが再開されました.</translation>
     </message>
@@ -274,16 +265,52 @@
         <source>Conflicting Server: %1</source>
         <translation>重複サーバー: %1</translation>
     </message>
+    <message>
+        <source>start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished">不明なイベント</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished">入力ポート:・%1</translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished">競合アドレス: %1</translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>・URL・%1.は、承認されていません.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -405,6 +432,10 @@
         <source>Parameters:</source>
         <translation>パラメーター:</translation>
     </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished">・URL・%1.は、承認されていません.</translation>
+    </message>
 </context>
 <context>
     <name>QnCommandLineParser</name>
@@ -420,12 +451,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>ウィンドウズエクスプローラーの軌道に失敗しました</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>ウィンドウズエクスプローラを起動するパスにexplorer.exeを見つけることができませんでした.</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished">ウィンドウズエクスプローラーの軌道に失敗しました</translation>
     </message>
 </context>
 <context>
@@ -439,12 +470,12 @@
         <translation>コーデック%1のエンコーダーを見つけられません.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>音声エンコーダーを初期化出来ません.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished">音声エンコーダーを初期化出来ません.</translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>音声デコーダーを初期化出来ません.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished">音声デコーダーを初期化出来ません.</translation>
     </message>
 </context>
 <context>
@@ -481,8 +512,8 @@
         <translation>コーデック%1のエンコーダーを見つけられません.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>ビデオエンコーダーを初期化出来ません.</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished">ビデオエンコーダーを初期化出来ません.</translation>
     </message>
 </context>
 <context>
@@ -508,60 +539,12 @@
         <translation>Vmax</translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>アナログエンコーダー</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>ビデオウォール</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>トライアルライセンス</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>アナログライセンス</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>プロフェッショナルライセンス</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>エッジライセンス</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>Vmaxライセンス</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>アナログエンコーダーライセンス</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>ビデオウォールライセンス</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>無効な署名</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>サーバーの有効なハードウェアIDが見つかりません</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>無効なカスタマイズ</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>期限切れ</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>無効なタイプ</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -570,6 +553,70 @@
     <message>
         <source>Unknown error</source>
         <translation>不明なエラー</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Encoder</source>
+        <translation type="unfinished">アナログエンコーダー</translation>
+    </message>
+    <message>
+        <source>Trial Licenses</source>
+        <translation type="unfinished">トライアルライセンス</translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished">アナログライセンス</translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished">プロフェッショナルライセンス</translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished">エッジライセンス</translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished">Vmaxライセンス</translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished">アナログエンコーダーライセンス</translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished">ビデオウォールライセンス</translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalide Signature</source>
+        <translation type="unfinished">無効な署名</translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished">無効なカスタマイズ</translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
+        <translation type="unfinished">無効なタイプ</translation>
     </message>
 </context>
 <context>
@@ -599,24 +646,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>ライセンスキーのアクティベートエラー　データベースエラーが発生しました.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>ライセンスキーのアクティベートエラー　サポート窓口にお問合せ下さい.</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>無効なライセンスキーが入力されました　サポート窓口に問合せて正しいライセンスキーを入力してください.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished">ライセンスキーのアクティベートエラー　データベースエラーが発生しました.</translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>互換性のないライセンスキーを入力しました　サポート窓口にお問合せ下さい.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished">無効なライセンスキーが入力されました　サポート窓口に問合せて正しいライセンスキーを入力してください.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>このライセンスキーはハードウェアID {{hwid}}  {{time}} に既にアクティベートされています..</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">互換性のないライセンスキーを入力しました　サポート窓口にお問合せ下さい.</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">このライセンスキーはハードウェアID {{hwid}}  {{time}} に既にアクティベートされています..</translation>
     </message>
 </context>
 <context>
@@ -634,6 +681,20 @@
     </message>
 </context>
 <context>
+    <name>QnPlAxisResource</name>
+    <message>
+        <source>Can&apos;t initialize IO port settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPlOnvifResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -647,24 +708,24 @@
         <translation>未知の値</translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>無償ライセンス</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>ハードウェアID:</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>トライアルライセンス</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>以下にライセンス:</translation>
-    </message>
-    <message>
         <source>Watermark: </source>
         <translation>電子透かし:</translation>
+    </message>
+    <message>
+        <source>Trial License</source>
+        <translation type="unfinished">トライアルライセンス</translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished">以下にライセンス:</translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished">無償ライセンス</translation>
     </message>
 </context>
 <context>
@@ -791,20 +852,8 @@
         <translation>メール送信中にエラーが発生しました</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>ストレージが一杯です</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>ストレージが構成されていません</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>ユーザー %1 にEmailアドレスが設定されていません</translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>複数のサーバー時刻が異なっており正確な時刻が検出できませんでした.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -854,6 +903,18 @@
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>アーカイブインデックスリビルド終了サーバー:</translation>
     </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished">ストレージが一杯です</translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished">ストレージが構成されていません</translation>
+    </message>
+    <message>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
@@ -883,6 +944,17 @@
     </message>
 </context>
 <context>
+    <name>QnThirdPartyResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -893,12 +965,12 @@
         <translation>未知のトランスコード手段.</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>オープンCLトランスコードが実装されていません</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished">オープンCLトランスコードが実装されていません</translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>未知のトランスコード手段</translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished">未知のトランスコード手段</translation>
     </message>
 </context>
 <context>

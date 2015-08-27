@@ -13,6 +13,7 @@
 #include <network/universal_tcp_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/concurrent.h>
+#include <utils/network/http/auth_tools.h>
 #include <utils/network/simple_http_client.h>
 
 #include <rest/active_connections_rest_handler.h>
@@ -26,6 +27,7 @@
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
+#include "rest/time_sync_rest_handler.h"
 #include "rest/server/rest_connection_processor.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
@@ -302,6 +304,7 @@ namespace ec2
             } );
 
         restProcessorPool->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler());
+        restProcessorPool->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler());
 
         //using HTTP processor since HTTP REST does not support HTTP interleaving
         //restProcessorPool->registerHandler(
@@ -312,6 +315,11 @@ namespace ec2
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
     {
         m_resCtx = resCtx;
+    }
+
+    void Ec2DirectConnectionFactory::setConfParams( std::map<QString, QVariant> confParams )
+    {
+        m_settingsInstance.loadParams( std::move( confParams ) );
     }
 
     int Ec2DirectConnectionFactory::establishDirectConnection( const QUrl& url, impl::ConnectHandlerPtr handler )
@@ -352,8 +360,8 @@ namespace ec2
 
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
-        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest(
-            loginInfo.login, addr.password(), QnAuthHelper::REALM );
+        loginInfo.passwordHash = nx_http::calcHa1(
+            loginInfo.login.toLower(), QnAppInfo::realm(), addr.password() );
         loginInfo.clientInfo = clientInfo;
 
         {
@@ -362,6 +370,10 @@ namespace ec2
                 return INVALID_REQ_ID;
             ++m_runningRequests;
         }
+
+        const auto info = QString::fromUtf8( QJson::serialized( clientInfo )  );
+        NX_LOG( lit("%1 to %2 with %3").arg( Q_FUNC_INFO ).arg( addr.toString() ).arg( info ),
+                cl_logDEBUG1 );
 
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
@@ -500,7 +512,7 @@ namespace ec2
         const QUrl& ecURL,
         impl::TestConnectionHandlerPtr handler )
     {
-        if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized )
+        if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized || errorCode == ErrorCode::temporary_unauthorized)
         {
             handler->done( reqID, errorCode, connectionInfo );
             QnMutexLocker lk( &m_mutex );
@@ -531,6 +543,7 @@ namespace ec2
 #endif
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+        connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
         
 		if (!loginInfo.clientInfo.id.isNull())
         {
@@ -542,7 +555,7 @@ namespace ec2
 			if (result != ErrorCode::ok)
 				return result;
 
-			if (infos.size() && clientInfo == infos.front())
+            if (infos.size() && QJson::serialized(clientInfo) == QJson::serialized(infos.front()))
 			{
 				NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
 					cl_logDEBUG2);
@@ -588,8 +601,8 @@ namespace ec2
 
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
-        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest(
-            loginInfo.login, addr.password(), QnAuthHelper::REALM );
+        loginInfo.passwordHash = nx_http::calcHa1(
+            loginInfo.login.toLower(), QnAppInfo::realm(), addr.password() );
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
         m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(

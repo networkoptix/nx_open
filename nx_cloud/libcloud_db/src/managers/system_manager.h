@@ -55,8 +55,8 @@ public:
     //!Binds system to an account associated with \a authzInfo
     void bindSystemToAccount(
         const AuthorizationInfo& authzInfo,
-        data::SystemData&& systemData,
-        std::function<void(ResultCode)> completionHandler );
+        data::SystemRegistrationData registrationData,
+        std::function<void(ResultCode, data::SystemData)> completionHandler );
     void unbindSystem(
         const AuthorizationInfo& authzInfo,
         const QnUuid& systemID,
@@ -101,11 +101,13 @@ private:
 
     nx::db::DBResult insertSystemToDB(
         QSqlDatabase* const tran,
-        const data::SystemData& newSystem );
+        const data::SystemRegistrationDataWithAccountID& newSystem,
+        data::SystemData* const systemData );
     void systemAdded(
         nx::db::DBResult resultCode,
+        data::SystemRegistrationDataWithAccountID systemRegistrationData,
         data::SystemData systemData,
-        std::function<void(ResultCode)> completionHandler );
+        std::function<void(ResultCode, data::SystemData)> completionHandler );
 };
 
 }   //cdb

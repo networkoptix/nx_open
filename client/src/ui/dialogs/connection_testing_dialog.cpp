@@ -30,6 +30,13 @@
 
 #include "compatibility.h"
 
+namespace {
+    const int timerIntervalMs = 100;
+
+    //TODO: #GDM move timeout constant to more common module
+    const int connectionTimeoutMs = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
+}
+
 
 QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
     QnButtonBoxDialog(parent),
@@ -41,10 +48,10 @@ QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
     ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(false);
 
     ui->progressBar->setValue(0);
-    ui->progressBar->setMaximum(100);
+    ui->progressBar->setMaximum(connectionTimeoutMs / timerIntervalMs);
 
     connect(m_timeoutTimer, &QTimer::timeout, this, &QnConnectionTestingDialog::tick);
-    m_timeoutTimer->setInterval(100);
+    m_timeoutTimer->setInterval(timerIntervalMs);
     m_timeoutTimer->setSingleShot(false);
 }
 
@@ -68,7 +75,7 @@ void QnConnectionTestingDialog::tick() {
     }
 
     m_timeoutTimer->stop();
-    updateUi(false, tr("Request timed out."));
+    updateUi(false, tr("Request timeout"));
 }
 
 void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo) {
@@ -85,7 +92,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
 }
 
 void QnConnectionTestingDialog::updateUi(bool success, const QString &details, int helpTopicId) {
-    ui->statusLabel->setText(success ? tr("Success") : tr("Failed"));
+    ui->statusLabel->setText(success ? tr("Success") : tr("Test Failed"));
     ui->descriptionLabel->setText(details);
     ui->descriptionLabel->setVisible(!details.isEmpty());
 

@@ -11,6 +11,7 @@
 #include "common/common_module.h"
 #include "transaction/transaction_transport.h"
 #include "http/custom_headers.h"
+#include "audit/audit_manager.h"
 
 
 namespace ec2
@@ -215,6 +216,14 @@ void QnTransactionTcpProcessor::run()
     }
     else
     {
+        std::function<void ()> ttFinishCallback;
+        if (remotePeer.isClient()) {
+            auto session = authSession();
+            //session.userAgent = toString(remotePeer.peerType);
+            qnAuditManager->at_connectionOpened(session);
+            ttFinishCallback = std::bind(&QnAuditManager::at_connectionClosed, qnAuditManager, session);
+        }
+
         auto base64EncodingRequiredHeaderIter = d->request.headers.find( Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME );
         if( base64EncodingRequiredHeaderIter != d->request.headers.end() )
             d->response.headers.insert( *base64EncodingRequiredHeaderIter );
@@ -226,8 +235,13 @@ void QnTransactionTcpProcessor::run()
             remotePeer,
             remoteSystemIdentityTime,
             d->request,
-            contentEncoding );
+            contentEncoding,
+            ttFinishCallback
+            );
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
+
+        QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid );
+
         d->socket.clear();
     }
 }

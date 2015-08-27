@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 #include <utils/common/uuid.h>
@@ -26,6 +28,8 @@ protected slots:
 
 private:
     void connectToCurrentSystem(const QSet<QnUuid> &targets, const QString &initialUser = QString(), const QString &initialPassword = QString());
+    bool validateStartLicenses(const QSet<QnUuid> &targets, const QString &user, const QString &password);
+    bool serverHasStartLicenses(const QnMediaServerResourcePtr &server, const QString &user, const QString &password);
 
 private slots:
     void at_connectTool_finished(int errorCode);

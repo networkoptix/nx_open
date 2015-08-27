@@ -3,7 +3,9 @@
 * akolesnikov@networkoptix.com
 ***********************************************************/
 
+#ifndef USE_OWN_MUTEX
 #define USE_OWN_MUTEX
+#endif
 
 #include <gtest/gtest.h>
 

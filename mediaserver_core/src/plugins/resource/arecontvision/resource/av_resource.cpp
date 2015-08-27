@@ -336,7 +336,7 @@ bool QnPlAreconVisionResource::isH264() const
     return getProperty(lit("Codec")) == lit("H.264");
 }
 
-//===============================================================================================================================
+// ===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString &id, QString &value) {
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());

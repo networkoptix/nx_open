@@ -10,118 +10,125 @@ Expandable.MaskedSettingsPanel
     id: thisComponent;
 
     changed:  (maskedArea && maskedArea.changed?  true : false);
-    
-    function tryApplyChanges()
+
+    function tryApplyChanges(warnings)
     {
         if (!changed)
             return true;
         return maskedArea.tryApplyChanges();
     }
 
+    onMaskedAreaChanged:
+    {
+        if (warned)
+            maskedArea.systemNameControl.forceActiveFocus();
+    }
+
     propertiesGroupName: qsTr("Set System Name and Password");
 
-    propertiesDelegate: Component
+    propertiesDelegate: FocusScope
     {
-        id: updatePage;
+        property bool changed: systemName.changed || password.changed;
+        property alias systemNameControl: systemName;
 
-        Item
+        height: settingsColumn.height;
+
+
+        Dialogs.ErrorDialog
         {
-            property bool changed: systemName.changed || password.changed;
-            height: settingsColumn.height;
+            id: errorDialog;
+        }
 
-            
-            Dialogs.ErrorDialog
+        readonly property string errorTemplate: qsTr("Invalid %1 specified. Can't apply changes");
+        function tryApplyChanges()
+        {
+            if (systemName.changed)
             {
-                id: errorDialog;
+                if (systemName.text.trim().length === 0)
+                {
+                    errorDialog.message = errorTemplate.arg(qsTr("system name"));
+                    errorDialog.show();
+
+                    systemName.forceActiveFocus();
+                    return false;
+                }
+
+                rtuContext.changesManager().addSystemChange(systemName.text);
             }
-            
-            readonly property string errorTemplate: qsTr("Invalid %1 specified. Can't apply changes");
-            function tryApplyChanges()
+            if (password.changed)
             {
-                if (systemName.changed)
+                if (password.text.trim().length === 0)
                 {
-                    if (systemName.text.trim().length === 0)
-                    {
-                        errorDialog.message = errorTemplate.arg(qsTr("system name"));
-                        errorDialog.show();
-                        
-                        systemName.focus = true;
-                        return false;
-                    }
+                    errorDialog.message = errorTemplate.arg(qsTr("password"));
+                    errorDialog.show();
 
-                    rtuContext.changesManager().addSystemChange(systemName.text);
+                    password.forceActiveFocus();
+                    return false;
                 }
-                if (password.changed)
-                {
-                    if (password.text.trim().length === 0)
-                    {
-                        errorDialog.message = errorTemplate.arg(qsTr("password"));
-                        errorDialog.show();
-                        
-                        password.focus = true;
-                        return false;
-                    }
 
-                    rtuContext.changesManager().addPasswordChange(password.text);
-                }
-                return true;
+                rtuContext.changesManager().addPasswordChange(password.text);
+            }
+            return true;
+        }
+
+        Base.Column
+        {
+            id: settingsColumn;
+
+            anchors
+            {
+                left: parent.left;
+                top: parent.top;
+                leftMargin: Common.SizeManager.spacing.base;
             }
 
-            Base.Column
+            Base.Text
             {
-                id: settingsColumn;
+                thin: false;
+                text: qsTr("System Name");
+            }
 
-                anchors
-                {
-                    left: parent.left;
-                    top: parent.top;
-                    leftMargin: Common.SizeManager.spacing.base;
-                }
+            Base.TextField
+            {
+                id: systemName;
 
-                Base.Text
-                {
-                    thin: false;
-                    text: qsTr("System Name");
-                }
+                readonly property string kDifferentSystems: qsTr("<different systems>");
 
-                Base.TextField
-                {
-                    id: systemName;
-                    
-                    readonly property string kDifferentSystems: qsTr("<different systems>");
+                implicitWidth: implicitHeight * 6;
 
-                    implicitWidth: implicitHeight * 6;
+                clearOnInitValue: ((rtuContext.selection.systemName.length === 0)
+                    && rtuContext.selection.count !== 1);
+                initialText: (clearOnInitValue ?
+                    kDifferentSystems : rtuContext.selection.systemName);
+            }
 
-                    clearOnInitValue: (rtuContext.selection.systemName.length === 0);
-                    initialText: (clearOnInitValue ?
-                        kDifferentSystems : rtuContext.selection.systemName);
-                }
+            Item
+            {
+                id: spacer;
+                width: 1;
+                height: Common.SizeManager.spacing.base;
+            }
 
-                Item
-                {
-                    id: spacer;
-                    width: 1;
-                    height: Common.SizeManager.spacing.base;
-                }
+            Base.Text
+            {
+                thin: false;
+                text: qsTr("System Password");
+            }
 
-                Base.Text
-                {
-                    thin: false;
-                    text: qsTr("System Password");
-                }
+            Base.TextField
+            {
+                id: password;
 
-                Base.TextField
-                {
-                    id: password;
+                KeyNavigation.backtab: systemName;
+               // KeyNavigation.tab: password;
 
-                    readonly property string kDifferentPasswords: qsTr("<different passwords>");
+                readonly property string kDifferentPasswords: qsTr("<different passwords>");
 
-                    implicitWidth: systemName.implicitWidth;
+                implicitWidth: systemName.implicitWidth;
 
-                    clearOnInitValue: (rtuContext.selection.password.length === 0);
-                    initialText: (clearOnInitValue ?
-                        kDifferentPasswords : rtuContext.selection.password);
-                }
+                clearOnInitValue: (rtuContext.selection.password.length === 0);
+                initialText: (clearOnInitValue ?
+                    kDifferentPasswords : rtuContext.selection.password);
             }
         }
     }

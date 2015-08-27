@@ -5,6 +5,10 @@
 
 #include "waiting_for_qthread_to_empty_event_queue.h"
 
+#include <utils/thread/mutex.h>
+
+#include "qcoreapplication.h"
+
 
 WaitingForQThreadToEmptyEventQueue::WaitingForQThreadToEmptyEventQueue( QThread* thread, int howManyTimesToWait )
 :
@@ -17,9 +21,16 @@ WaitingForQThreadToEmptyEventQueue::WaitingForQThreadToEmptyEventQueue( QThread*
 
 void WaitingForQThreadToEmptyEventQueue::join()
 {
-    QnMutexLocker lk( &m_mutex );
-    while( m_waitsDone < m_howManyTimesToWait )
-        m_condVar.wait( lk.mutex() );
+    if (thread() == QThread::currentThread())
+    {
+        while( m_waitsDone < m_howManyTimesToWait )
+            qApp->processEvents();
+    }
+    else {
+        QnMutexLocker lk( &m_mutex );
+        while( m_waitsDone < m_howManyTimesToWait )
+            m_condVar.wait( lk.mutex() );
+    }
 }
 
 void WaitingForQThreadToEmptyEventQueue::doneWaiting()

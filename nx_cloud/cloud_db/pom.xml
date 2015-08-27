@@ -27,7 +27,7 @@
         <qt.libs>core network concurrent sql</qt.libs>
         <global.libs>-lcommon -ludt -lquazip -lcloud_db</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib Wldap32.lib</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac</linux.oslibs>

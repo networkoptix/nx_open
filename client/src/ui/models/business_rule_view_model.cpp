@@ -616,9 +616,7 @@ QString QnBusinessRuleViewModel::getText(const int column, const bool detailed) 
     case QnBusiness::ModifiedColumn:
         return (m_modified ? QLatin1String("*") : QString());
     case QnBusiness::EventColumn:
-        return eventTypeString(m_eventType,
-                               m_eventState,
-                               m_actionType);
+        return QnBusinessStringsHelper::eventTypeString(m_eventType, m_eventState, m_actionType);
     case QnBusiness::SourceColumn:
         return getSourceText(detailed);
     case QnBusiness::SpacerColumn:
@@ -850,9 +848,9 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     case QnBusiness::ShowPopupAction:
     {
         if (m_actionParams.userGroup == QnBusiness::AdminOnly)
-            return tr("Administrators only");
+            return tr("Administrators Only");
         else
-            return tr("All users");
+            return tr("All Users");
     }
     case QnBusiness::CameraRecordingAction:
     {
@@ -868,7 +866,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     {
         QString filename = m_actionParams.soundUrl;
         if (filename.isEmpty())
-            return tr("Select a sound");
+            return tr("Select Sound");
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         return soundModel->titleByFilename(filename);
     }
@@ -876,7 +874,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     {
         QString text = m_actionParams.sayText;
         if (text.isEmpty())
-            return tr("Enter text");
+            return tr("Enter Text");
         return text;
     }
     default:
@@ -931,24 +929,4 @@ QString QnBusinessRuleViewModel::toggleStateToModelString(QnBusiness::EventState
         return tr("Starts/Stops");
     }
     return QString();
-}
-
-QString QnBusinessRuleViewModel::toggleStateToString(QnBusiness::EventState state) {
-    switch (state) {
-    case QnBusiness::ActiveState:
-        return tr("start");
-    case QnBusiness::InactiveState:
-        return tr("stop");
-    default:
-        break;
-    }
-    return QString();
-}
-
-QString QnBusinessRuleViewModel::eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType) {
-    QString typeStr = QnBusinessStringsHelper::eventName(eventType);
-    if (QnBusiness::hasToggleState(actionType))
-        return tr("While %1").arg(typeStr);
-    else
-        return tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
 }

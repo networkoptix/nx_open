@@ -9,11 +9,12 @@
 #include <server/server_globals.h>
 
 #include <utils/common/log.h>
-#include "utils/common/util.h"
-#include "utils/common/model_functions.h"
+#include <utils/common/util.h>
+#include <utils/common/string.h>
+#include <utils/common/model_functions.h>
 #include <utils/fs/file.h>
-#include "utils/network/tcp_connection_priv.h"
-#include "utils/network/tcp_listener.h"
+#include <utils/network/tcp_connection_priv.h>
+#include <utils/network/tcp_listener.h>
 
 #include "core/resource_management/resource_pool.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
@@ -27,11 +28,11 @@
 #include "camera/video_camera.h"
 #include "camera/camera_pool.h"
 #include "network/authenticate_helper.h"
-
-#include <media_server/settings.h>
-
+#include "streaming/streaming_params.h"
+#include "media_server/settings.h"
 #include "cached_output_stream.h"
 #include "common/common_module.h"
+#include "audit/audit_manager.h"
 
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
@@ -81,7 +82,9 @@ public:
             m_dataOutput->stop();
     }
 
-    void copyLastGopFromCamera(QnVideoCamera* camera)
+    void setAuditHandle(const AuditHandle& handle) { m_auditHandle = handle; }
+
+    void copyLastGopFromCamera(const QnVideoCameraPtr& camera)
     {
         CLDataQueue tmpQueue(20);
         camera->copyLastGop(true, 0, tmpQueue, 0);
@@ -148,6 +151,9 @@ protected:
                 m_needStop = true; // EOF reached
             return true;
         }
+
+        if (media && m_auditHandle)
+            qnAuditManager->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
         {
@@ -257,6 +263,7 @@ private:
     qint64 m_lastRtTime;
     bool m_liveMode;
     bool m_needKeyData;
+    AuditHandle m_auditHandle;
 
     QByteArray toHttpChunk( const char* data, size_t size )
     {
@@ -534,9 +541,9 @@ void QnProgressiveDownloadingConsumer::run()
 
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
-        QByteArray position = decodedUrlQuery.queryItemValue("pos").toLatin1();
+        QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
         bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
+        auto camera = qnCameraPool->getVideoCamera(resource);
 
         //QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
         //if (camRes && camRes->isAudioEnabled())
@@ -550,6 +557,7 @@ void QnProgressiveDownloadingConsumer::run()
             maxFramesToCacheBeforeDrop,
             isLive);
 
+        qint64 timeUSec = DATETIME_NOW;
         if (isLive)
         {
             //if camera is offline trying to put it online
@@ -576,11 +584,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         else {
             bool utcFormatOK = false;
-            qint64 timeMs = position.toLongLong(&utcFormatOK); // try UTC format
-            if (!utcFormatOK)
-                timeMs = QDateTime::fromString(position, Qt::ISODate).toMSecsSinceEpoch(); // try ISO format
-            timeMs *= 1000;
-
+            timeUSec = parseDateTime( position );
 
             if (isUTCRequest)
             {
@@ -593,7 +597,7 @@ void QnProgressiveDownloadingConsumer::run()
                 }
                 if (archive) {
                     archive->open(resource);
-                    archive->seek(timeMs, true);
+                    archive->seek( timeUSec, true);
                     qint64 timestamp = AV_NOPTS_VALUE;
                     int counter = 0;
                     while (counter < 20)
@@ -637,7 +641,7 @@ void QnProgressiveDownloadingConsumer::run()
 
             d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(Qn::CR_Archive)));
             d->archiveDP->open();
-            d->archiveDP->jumpTo(timeMs, timeMs);
+            d->archiveDP->jumpTo( timeUSec, timeUSec );
             d->archiveDP->start();
             dataProvider = d->archiveDP;
         }
@@ -665,6 +669,9 @@ void QnProgressiveDownloadingConsumer::run()
         sendResponse(CODE_OK, mimeType);
 
         //dataConsumer.sendResponse();
+
+        dataConsumer.setAuditHandle(qnAuditManager->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false));
+
         dataConsumer.start();
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed

@@ -66,6 +66,7 @@ libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
 libQt5Concurrent.so.5.2.1 \
 libQt5Core.so.5.2.1 \
@@ -76,6 +77,10 @@ libQt5Sql.so.5.2.1 \
 libQt5Xml.so.5.2.1 \
 libQt5XmlPatterns.so.5.2.1 \
 libsigar.so \
+libsasl2.so.3.0.0 \
+liblber-2.4.so.2.10.5 \
+libldap-2.4.so.2.10.5 \
+libldap_r-2.4.so.2.10.5 \
 libswresample.so.0.15.100 \
 libswscale.so.2.1.100 \
 libquazip.so.1.0.0 )
@@ -106,7 +111,8 @@ pushd $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
 LIBS="`find ./ -name '*.so.*.*.*'`"
 for var in $LIBS
 do
-    ln -s $var "`echo $var | cut -d . -f 1,2,3,4`"
+    LINK_TARGET="`echo $var | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
+    ln -s $var $LINK_TARGET
 done
 popd
 

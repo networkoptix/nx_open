@@ -72,6 +72,12 @@ const QString& QnUuid::toString() const
     return m_stringRepresentation.get();
 }
 
+std::string QnUuid::toStdString() const
+{
+    const auto& byteArray = toByteArray();
+    return std::string( byteArray.constData(), byteArray.size() );
+}
+
 QnUuid QnUuid::fromRfc4122( const QByteArray& bytes )
 {
     QnUuid _uuid;

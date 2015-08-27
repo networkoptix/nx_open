@@ -15,6 +15,17 @@
     </message>
 </context>
 <context>
+    <name>QnActiResource</name>
+    <message>
+        <source>Output %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>User Defined (%1)</source>
@@ -161,14 +172,6 @@
         <translation>Servidor &quot;%1&quot; iniciado</translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; had license issue</source>
-        <translation>Servidor &quot;%1&quot; tenía problema de licencia</translation>
-    </message>
-    <message>
-        <source>Unknown event has occurred</source>
-        <translation>Ha ocurrido un evento desconocido</translation>
-    </message>
-    <message>
         <source>Event: %1</source>
         <translation>Evento: %1</translation>
     </message>
@@ -181,16 +184,8 @@
         <translation>Url: %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>Puerto de entrada: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>Razón: %1</translation>
-    </message>
-    <message>
-        <source>Conflict address: %1</source>
-        <translation>Dirección en conflicto: %1</translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -254,10 +249,6 @@
         <translation>La pérdida del paquete RTP detectado.</translation>
     </message>
     <message>
-        <source>Server terminated.</source>
-        <translation>Servidor terminado.</translation>
-    </message>
-    <message>
         <source>Server started after crash.</source>
         <translation>Servidor iniciado después de la falla.</translation>
     </message>
@@ -277,16 +268,52 @@
         <source>Conflicting Server: %1</source>
         <translation>Conflicto de servidor: %1</translation>
     </message>
+    <message>
+        <source>start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 --&gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown event has occurred</source>
+        <translation type="unfinished">Ha ocurrido un evento desconocido</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished">Puerto de entrada: %1</translation>
+    </message>
+    <message>
+        <source>Conflict Address: %1</source>
+        <translation type="unfinished">Dirección en conflicto: %1</translation>
+    </message>
+    <message>
+        <source>Connection to server is lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>No autorizado. Url %1.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -408,6 +435,10 @@
         <source>Parameters:</source>
         <translation>Parámetros:</translation>
     </message>
+    <message>
+        <source>Not authorised. Url %1.</source>
+        <translation type="unfinished">No autorizado. Url %1.</translation>
+    </message>
 </context>
 <context>
     <name>QnCommandLineParser</name>
@@ -423,12 +454,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching Windows Explorer failed</source>
-        <translation>No se pudo iniciar el explorador de Windows</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>No se pudo encontrar explorer.exe en la ruta para iniciar el Explorador de Windows.</translation>
+    </message>
+    <message>
+        <source>Launching file explorer failed.</source>
+        <translation type="unfinished">No se pudo iniciar el explorador de Windows</translation>
     </message>
 </context>
 <context>
@@ -442,12 +473,12 @@
         <translation>No se pudo encontrar el codificador para codec %1.</translation>
     </message>
     <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation>No se pudo inicializar el codificador de audio.</translation>
+        <source>Could not initialise audio encoder.</source>
+        <translation type="unfinished">No se pudo inicializar el codificador de audio.</translation>
     </message>
     <message>
-        <source>Could not initialize audio decoder.</source>
-        <translation>No se pudo inicializar el decodificador de audio.</translation>
+        <source>Could not initialise audio decoder.</source>
+        <translation type="unfinished">No se pudo inicializar el decodificador de audio.</translation>
     </message>
 </context>
 <context>
@@ -484,8 +515,8 @@
         <translation>No se pudo encontrar el codificador para codec %1.</translation>
     </message>
     <message>
-        <source>Could not initialize video encoder.</source>
-        <translation>No se pudo inicializar el codificador de video.</translation>
+        <source>Could not initialise video encoder.</source>
+        <translation type="unfinished">No se pudo inicializar el codificador de video.</translation>
     </message>
 </context>
 <context>
@@ -511,60 +542,12 @@
         <translation>Vmax</translation>
     </message>
     <message>
-        <source>Analog encoder</source>
-        <translation>Codificador analógico</translation>
-    </message>
-    <message>
         <source>Video Wall</source>
         <translation>Pared de vídeo</translation>
     </message>
     <message>
-        <source>Trial licenses</source>
-        <translation>Las licencias de prueba</translation>
-    </message>
-    <message>
-        <source>Analog licenses</source>
-        <translation>Licencias analógicas</translation>
-    </message>
-    <message>
-        <source>Professional licenses</source>
-        <translation>Licencias profesionales</translation>
-    </message>
-    <message>
-        <source>Edge licenses</source>
-        <translation>Licencias Edge</translation>
-    </message>
-    <message>
-        <source>Vmax licenses</source>
-        <translation>Licencias Vmax</translation>
-    </message>
-    <message>
-        <source>Analog encoder licenses</source>
-        <translation>Licencias de codificador analógico</translation>
-    </message>
-    <message>
-        <source>Video Wall licenses</source>
-        <translation>Licencias para pared de vídeo</translation>
-    </message>
-    <message>
-        <source>Invalid signature</source>
-        <translation>Firma no válida</translation>
-    </message>
-    <message>
-        <source>Server with necessary hardware ID is not found</source>
-        <translation>No se encuentra el servidor con el ID de hardware necesario</translation>
-    </message>
-    <message>
-        <source>Invalid customization</source>
-        <translation>Personalización no es válida</translation>
-    </message>
-    <message>
         <source>Expired</source>
         <translation>Vencio</translation>
-    </message>
-    <message>
-        <source>Invalid type</source>
-        <translation>Tipo no válido</translation>
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
@@ -573,6 +556,70 @@
     <message>
         <source>Unknown error</source>
         <translation>Error desconocido</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Encoder</source>
+        <translation type="unfinished">Codificador analógico</translation>
+    </message>
+    <message>
+        <source>Trial Licenses</source>
+        <translation type="unfinished">Las licencias de prueba</translation>
+    </message>
+    <message>
+        <source>Analog Licenses</source>
+        <translation type="unfinished">Licencias analógicas</translation>
+    </message>
+    <message>
+        <source>Professional Licenses</source>
+        <translation type="unfinished">Licencias profesionales</translation>
+    </message>
+    <message>
+        <source>Edge Licenses</source>
+        <translation type="unfinished">Licencias Edge</translation>
+    </message>
+    <message>
+        <source>Vmax Licenses</source>
+        <translation type="unfinished">Licencias Vmax</translation>
+    </message>
+    <message>
+        <source>Analog Encoder Licenses</source>
+        <translation type="unfinished">Licencias de codificador analógico</translation>
+    </message>
+    <message>
+        <source>Video Wall Licenses</source>
+        <translation type="unfinished">Licencias para pared de vídeo</translation>
+    </message>
+    <message>
+        <source>I/O Module Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalide Signature</source>
+        <translation type="unfinished">Firma no válida</translation>
+    </message>
+    <message>
+        <source>Server with matching hardware ID not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Customization</source>
+        <translation type="unfinished">Personalización no es válida</translation>
+    </message>
+    <message>
+        <source>Invalid Type</source>
+        <translation type="unfinished">Tipo no válido</translation>
     </message>
 </context>
 <context>
@@ -606,24 +653,24 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation>Hubo un problema al activar su clave de licencia. Error en la base de datos se ha producido.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>Hubo un problema al activar su clave de licencia. Datos no válidos recibidos. Póngase en contacto con el equipo de asistencia para informar del asunto.</translation>
     </message>
     <message>
-        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>La clave de licencia que ha introducido no es válida. Compruebe por favor que la clave de licencia es introducida correctamente. Si el problema persiste, póngase en contacto con el equipo de asistencia para confirmar si la clave de licencia es válida o para obtener una clave de licencia válida.</translation>
+        <source>There was a problem activating your license key. A database error has occurred.</source>
+        <translation type="unfinished">Hubo un problema al activar su clave de licencia. Error en la base de datos se ha producido.</translation>
     </message>
     <message>
-        <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>Intentas activar una licencia incompatible con su software. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
+        <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
+        <translation type="unfinished">La clave de licencia que ha introducido no es válida. Compruebe por favor que la clave de licencia es introducida correctamente. Si el problema persiste, póngase en contacto con el equipo de asistencia para confirmar si la clave de licencia es válida o para obtener una clave de licencia válida.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation>Esta clave de licencia se ha activado anteriormente en el hardware id { {hwid}} { {tiempo} }. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
+        <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">Intentas activar una licencia incompatible con su software. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <translation type="unfinished">Esta clave de licencia se ha activado anteriormente en el hardware id { {hwid}} { {tiempo} }. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
     </message>
 </context>
 <context>
@@ -641,6 +688,20 @@
     </message>
 </context>
 <context>
+    <name>QnPlAxisResource</name>
+    <message>
+        <source>Can&apos;t initialize IO port settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPlOnvifResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -654,24 +715,24 @@
         <translation>Desconocido</translation>
     </message>
     <message>
-        <source>FREE license</source>
-        <translation>Licencia GRATIS</translation>
-    </message>
-    <message>
         <source>Hardware ID: </source>
         <translation>Hardware ID:</translation>
     </message>
     <message>
-        <source>Trial license</source>
-        <translation>Las licencias de prueba</translation>
-    </message>
-    <message>
-        <source>Licensed to: </source>
-        <translation>Licencia para:</translation>
-    </message>
-    <message>
         <source>Watermark: </source>
         <translation>Filigrana:</translation>
+    </message>
+    <message>
+        <source>Trial License</source>
+        <translation type="unfinished">Las licencias de prueba</translation>
+    </message>
+    <message>
+        <source>Licensed To: </source>
+        <translation type="unfinished">Licencia para:</translation>
+    </message>
+    <message>
+        <source>FREE License</source>
+        <translation type="unfinished">Licencia GRATIS</translation>
     </message>
 </context>
 <context>
@@ -798,20 +859,8 @@
         <translation>Error al enviar correo electrónico</translation>
     </message>
     <message>
-        <source>Storages are full</source>
-        <translation>Almacenamientos están llenos</translation>
-    </message>
-    <message>
-        <source>Storages are not configured</source>
-        <translation>Almacenamientos no están configurados</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>Dirección de correo electrónico no está configurado para el usuario %1</translation>
-    </message>
-    <message>
-        <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>Múltiples servidores tienen diferentes hora y la hora correcta no se puede detectar automáticamente.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
@@ -861,6 +910,18 @@
         <source>Rebuilding archive index is completed on the following Server:</source>
         <translation>La reconstrucción del índice del archivo es completada en el Servidor siguiente:</translation>
     </message>
+    <message>
+        <source>Storage is full</source>
+        <translation type="unfinished">Almacenamientos están llenos</translation>
+    </message>
+    <message>
+        <source>Storage is not configured</source>
+        <translation type="unfinished">Almacenamientos no están configurados</translation>
+    </message>
+    <message>
+        <source>Server times are not synchronised and a common time could not be detected automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
@@ -890,6 +951,17 @@
     </message>
 </context>
 <context>
+    <name>QnThirdPartyResource</name>
+    <message>
+        <source>Otput %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -900,12 +972,12 @@
         <translation>Método transcodificación Desconocido.</translation>
     </message>
     <message>
-        <source>OpenCLTranscode is not implemented</source>
-        <translation>OpenCLTranscode no está implementada</translation>
+        <source>OpenCLTranscode is not implemented.</source>
+        <translation type="unfinished">OpenCLTranscode no está implementada</translation>
     </message>
     <message>
-        <source>Unknown Transcode Method</source>
-        <translation>Método de transcodificación desconocido</translation>
+        <source>Unknown transcode method</source>
+        <translation type="unfinished">Método de transcodificación desconocido</translation>
     </message>
 </context>
 <context>

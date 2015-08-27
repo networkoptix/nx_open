@@ -132,7 +132,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Status overlay. */
     m_statusOverlayWidget = new QnStatusOverlayWidget(this);
-    addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
+    addOverlayWidget(m_statusOverlayWidget, UserVisible, true, false, StatusLayer);
 
 
     /* Initialize resource. */
@@ -243,7 +243,7 @@ void QnResourceWidget::createHeaderOverlay() {
     m_headerOverlayWidget->setLayout(headerOverlayLayout);
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
-    addOverlayWidget(m_headerOverlayWidget, AutoVisible, true, true, true, true);
+    addOverlayWidget(m_headerOverlayWidget, AutoVisible, true, true, HudLayer);
 }
 
 void QnResourceWidget::createFooterOverlay() {

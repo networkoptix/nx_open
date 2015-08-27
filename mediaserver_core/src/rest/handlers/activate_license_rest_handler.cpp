@@ -75,11 +75,11 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
 
     QString licenseKey = requestParams.value("key");
     if (licenseKey.isEmpty()) {
-        result.setError(QnJsonRestResult::MissingParameter, tr("Parameter 'key' is missed"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'key' is missed"));
         return CODE_OK;
     }
     if (licenseKey.length() != 19 || licenseKey.count("-") != 3) {
-        result.setError(QnJsonRestResult::MissingParameter, tr("Invalid license serial number provided. Serial number MUST be in format AAAA-BBBB-CCCC-DDDD"));
+        result.setError(QnJsonRestResult::MissingParameter, lit("Invalid license serial number provided. Serial number MUST be in format AAAA-BBBB-CCCC-DDDD"));
         return CODE_OK;
     }
 
@@ -91,7 +91,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         CLHttpStatus errCode = makeRequest(licenseKey, isCheckMode, response);
         if (errCode != CL_HTTP_SUCCESS || response.isEmpty())
         {
-            result.setError(QnJsonRestResult::CantProcessRequest, tr("Network error has occurred during license activation. Error code: %1").arg(errCode));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Network error has occurred during license activation. Error code: %1").arg(errCode));
             return CODE_OK;
         }
     
@@ -99,7 +99,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         if (QJson::deserialize(response, &errorMessage)) 
         {
             QString message = QnLicenseUsageHelper::activationMessage(errorMessage);
-            result.setError(QnJsonRestResult::CantProcessRequest, tr("Can't activate license:  %1").arg(message));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't activate license:  %1").arg(message));
             return CODE_OK;
         }
 
@@ -110,7 +110,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         QnLicense::ErrorCode licenseErrCode;
         if (!license->isValid(&licenseErrCode, QnLicense::VM_CheckInfo)) 
         {
-            result.setError(QnJsonRestResult::CantProcessRequest, tr("Can't activate license:  %1").arg(QnLicense::errorMessage(licenseErrCode)));
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't activate license:  %1").arg(QnLicense::errorMessage(licenseErrCode)));
             return CODE_OK;
         }
     }    
@@ -120,7 +120,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
     licenses << license;
     const ec2::ErrorCode errorCode = connect->getLicenseManager()->addLicensesSync(licenses);
     if( errorCode != ec2::ErrorCode::ok) {
-        result.setError(QnJsonRestResult::CantProcessRequest, tr("Internal server error: %1").arg(ec2::toString(errorCode)));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error: %1").arg(ec2::toString(errorCode)));
         return CODE_OK;
     }
     fromResourceToApi(license, reply);

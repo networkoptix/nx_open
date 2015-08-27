@@ -20,7 +20,8 @@ namespace nx_http
         nx_http::HttpStreamSocketServer* socketServer,
         std::unique_ptr<AbstractCommunicatingSocket> sock )
     :
-        BaseType( socketServer, std::move(sock) )
+        BaseType( socketServer, std::move(sock) ),
+        m_isPersistent( false )
     {
     }
 
@@ -36,7 +37,8 @@ namespace nx_http
         //TODO #ak pipelining support
         //    can add sequence to sendResponseFunc and use it to queue responses
 
-        using namespace std::placeholders;
+        //checking if connection is persistent
+        checkForConnectionPersistency( request );
 
         //TODO #ak performing authentication
         //    authentication manager should be able to return some custom data
@@ -61,11 +63,17 @@ namespace nx_http
             }
         }
 
-        auto sendResponseFunc = [this](
+        auto strongRef = shared_from_this();
+        std::weak_ptr<HttpServerConnection> weakThis = strongRef;
+
+        auto sendResponseFunc = [this, weakThis](
             nx_http::Message&& response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
         {
-            prepareAndSendResponse(
+            auto strongThis = weakThis.lock();
+            if( !strongThis )
+                return; //connection has been removed while request has been processed
+            strongThis->prepareAndSendResponse(
                 std::move(response),
                 std::move(responseMsgBody) );
         };
@@ -103,6 +111,11 @@ namespace nx_http
 
         //TODO #ak connection persistency
 
+        if( !responseMsgBody )
+            nx_http::insertOrReplaceHeader(
+                &msg.response->headers,
+                nx_http::HttpHeader( "Content-Length", "0" ) );
+
         m_currentMsgBody = std::move(responseMsgBody);
         //TODO #ak check sendMessage error code
         sendMessage(
@@ -115,7 +128,7 @@ namespace nx_http
         //TODO #ak check sendData error code
         if( !m_currentMsgBody )
         {
-            closeConnection();
+            fullMessageHasBeenSent();
             return;
         }
 
@@ -141,7 +154,7 @@ namespace nx_http
         if( buf.isEmpty() )
         {
             //done with message body
-            closeConnection();
+            fullMessageHasBeenSent();
             return;
         }
 
@@ -166,5 +179,27 @@ namespace nx_http
             closeConnection();
             return;
         }
+    }
+
+    void HttpServerConnection::fullMessageHasBeenSent()
+    {
+        //if connection is NOT persistent then closing it
+        if( !m_isPersistent )
+            closeConnection();
+    }
+
+    void HttpServerConnection::checkForConnectionPersistency( const Message& msg )
+    {
+        if( msg.type != MessageType::request )
+            return;
+
+        const auto& request = *msg.request;
+
+        if( request.requestLine.version == nx_http::http_1_1 )
+            m_isPersistent = nx_http::getHeaderValue( request.headers, "Connection" ).toLower() != "close";
+        else if( request.requestLine.version == nx_http::http_1_0 )
+            m_isPersistent = nx_http::getHeaderValue( request.headers, "Connection" ).toLower() == "keep-alive";
+        else    //e.g., RTSP
+            m_isPersistent = false;
     }
 }

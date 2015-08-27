@@ -18,8 +18,10 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/resource_media_layout.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
+#include <utils/common/string.h>
 
 #include "utils/network/tcp_connection_priv.h"
+#include "utils/network/rtsp/rtsp_types.h"
 #include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "camera/camera_pool.h"
 #include "utils/network/rtpsession.h"
@@ -41,7 +43,9 @@
 #include <media_server/settings.h>
 #include <utils/common/model_functions.h>
 #include "http/custom_headers.h"
+#include "audit/audit_manager.h"
 #include "media_server/settings.h"
+#include "streaming/streaming_params.h"
 
 class QnTcpListener;
 
@@ -104,6 +108,8 @@ public:
     QnRtspConnectionProcessorPrivate():
         QnTCPConnectionProcessorPrivate(),
         liveMode(Mode_Live),
+        auditRecordMode(Mode_Live),
+        lastMediaPacketTime(AV_NOPTS_VALUE),
         dataProcessor(0),
         sessionTimeOut(0),
         useProprietaryFormat(false),
@@ -155,7 +161,7 @@ public:
         dataProcessor = 0;
 
         if (mediaRes) {
-            QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes->toResourcePtr());
+            auto camera = qnCameraPool->getVideoCamera(mediaRes->toResourcePtr());
             if (camera)
                 camera->notInUse(this);
         }
@@ -171,6 +177,10 @@ public:
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     QSharedPointer<QnThumbnailsStreamReader> thumbnailsDP;
     Mode liveMode;
+    AuditHandle auditRecordHandle;
+    Mode auditRecordMode;
+    QElapsedTimer lastReportTime;
+    qint64 lastMediaPacketTime;
 
     QnRtspDataConsumer* dataProcessor;
 
@@ -212,8 +222,24 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStre
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
-    directDisconnectAll();
+    Q_D(QnRtspConnectionProcessor);
+	directDisconnectAll();
+    if (d->auditRecordHandle && d->lastMediaPacketTime != AV_NOPTS_VALUE)
+        qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, d->lastMediaPacketTime);
+
+    d->auditRecordHandle.reset();
     stop();
+}
+
+void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
+{
+    Q_D(QnRtspConnectionProcessor);
+    if (d->auditRecordHandle && d->lastReportTime.isValid() && d->lastReportTime.elapsed() >= QnAuditManager::MIN_PLAYBACK_TIME_TO_LOG)
+    {  
+        qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, timestampUsec);
+        d->lastReportTime.restart();
+    }
+    d->lastMediaPacketTime = timestampUsec;
 }
 
 void QnRtspConnectionProcessor::parseRequest()
@@ -240,7 +266,7 @@ void QnRtspConnectionProcessor::parseRequest()
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
 
-    if (nx_http::getHeaderValue(d->request.headers, "User-Agent").toLower().contains("network optix"))
+    if (!nx_http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
         d->useProprietaryFormat = true;
     else {
         d->sessionTimeOut = DEFAULT_RTSP_TIMEOUT;
@@ -259,11 +285,11 @@ void QnRtspConnectionProcessor::parseRequest()
             d->codecId = CODEC_ID_NONE;
     };
 
-    QString pos = urlQuery.queryItemValue("pos").split('/')[0];
+    const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
     if (pos.isEmpty())
         processRangeHeader();
     else
-        d->startTime = pos.toLongLong();
+        d->startTime = parseDateTime( pos ); //pos.toLongLong();
     QByteArray resolutionStr = urlQuery.queryItemValue("resolution").split('/')[0].toUtf8();
     if (!resolutionStr.isEmpty())
     {
@@ -451,7 +477,7 @@ QByteArray QnRtspConnectionProcessor::getRangeStr()
         if (d->useProprietaryFormat)
         {
             // range in usecs since UTC
-            range = "npt=";
+            range = "clock=";
             if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += "now";
             else
@@ -581,7 +607,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
     bool canCheckLive = (dataType == QnAbstractMediaData::VIDEO) || (d->startTime == DATETIME_NOW);
     if (canCheckLive)
     {
-        QnVideoCamera* camera = 0;
+        QnVideoCameraPtr camera;
         if (getResource())
             camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
         if (camera) {
@@ -865,45 +891,14 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
         return AV_NOPTS_VALUE;
 }
 
-void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* dst)
-{
-    if (strValue == "now")
-    {
-        //*dst = getRtspTime();
-        *dst = DATETIME_NOW;
-    }
-    else {
-        double val = strValue.toDouble();
-        // some client got time in seconds, some in microseconds, convert all to microseconds
-        *dst = val < 1000000 ? val * 1000000.0 : val;
-    }
-}
-
 void QnRtspConnectionProcessor::processRangeHeader()
 {
     Q_D(QnRtspConnectionProcessor);
-    QString rangeStr = nx_http::getHeaderValue(d->request.headers, "Range");
+    const auto rangeStr = nx_http::getHeaderValue(d->request.headers, "Range");
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-    parseRangeHeader(rangeStr, &d->startTime, &d->endTime);
+    nx_rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime);
     if (cameraResource && d->startTime == 0 && !d->useProprietaryFormat)
         d->startTime = DATETIME_NOW;
-}
-
-void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64* startTime, qint64* endTime)
-{
-    QStringList rangeType = rangeStr.trimmed().split("=");
-    if (rangeType.size() < 2)
-        return;
-    if (rangeType[0] == "npt")
-    {
-        QStringList values = rangeType[1].split("-");
-        
-        extractNptTime(values[0], startTime);
-        if (values.size() > 1 && !values[1].isEmpty())
-            extractNptTime(values[1], endTime);
-        else
-            *endTime = DATETIME_NOW;
-    }
 }
 
 void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & /*resource*/)
@@ -964,7 +959,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     else 
         d->dataProcessor->clearUnprocessedData();
 
-    QnVideoCamera* camera = 0;
+    QnVideoCameraPtr camera;
     if (d->mediaRes) {
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
@@ -1107,7 +1102,7 @@ int QnRtspConnectionProcessor::composePlay()
     d->lastPlayCSeq = nx_http::getHeaderValue(d->request.headers, "CSeq").toInt();
 
 
-    QnVideoCamera* camera = 0;
+    QnVideoCameraPtr camera;
     if (d->mediaRes)
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
     if (d->liveMode == Mode_Live) {
@@ -1246,6 +1241,14 @@ int QnRtspConnectionProcessor::composePlay()
         currentDP->start();
     if (d->liveMode == Mode_Live && d->liveDpLow)
         d->liveDpLow->start();
+    
+    if (d->liveMode != Mode_ThumbNails) 
+    {
+        const qint64 startTimeUsec = d->liveMode == Mode_Live ? DATETIME_NOW : d->startTime;
+        bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
+        d->auditRecordHandle = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUsec, isExport);
+        d->lastReportTime.restart();
+    }
 
     return CODE_OK;
 }
@@ -1429,7 +1432,7 @@ void QnRtspConnectionProcessor::run()
     {
         for (int i = 0; i < 3 && !m_needStop; ++i)
         {
-            if(!qnAuthHelper->authenticate(d->request, d->response))
+            if(qnAuthHelper->authenticate(d->request, d->response) != Qn::Auth_OK)
             {
                 sendResponse(CODE_AUTH_REQUIRED);
                 if (readRequest()) 

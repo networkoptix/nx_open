@@ -1,12 +1,21 @@
 
 #include "user_resource.h"
-#include "network/authenticate_helper.h"
-#include <utils/crypt/linux_passwd_crypt.h>
 
+#include <utils/crypt/linux_passwd_crypt.h>
+#include <utils/common/app_info.h>
+#include <utils/common/synctime.h>
+#include <utils/network/http/auth_tools.h>
+
+
+static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
+static const int MSEC_PER_SEC = 1000;
 
 QnUserResource::QnUserResource():
     m_permissions(0),
-    m_isAdmin(false)
+    m_isAdmin(false),
+	m_isLdap(false),
+	m_isEnabled(true),
+    m_passwordExpirationTimestamp(0)
 {
     addFlags(Qn::user | Qn::remote);
 }
@@ -57,31 +66,52 @@ void QnUserResource::generateHash() {
     hash.append("$");
     hash.append(md5.result().toHex());
 
-    QByteArray digest = QnAuthHelper::createUserPasswordDigest(getName().toLower(), password, QnAuthHelper::REALM);
+    QByteArray digest = nx_http::calcHa1(
+        getName().toLower(),
+        QnAppInfo::realm(),
+        password );
 
+    setRealm(QnAppInfo::realm());
     setHash(hash);
     setDigest(digest);
     setCryptSha512Hash( linuxCryptSha512( password.toUtf8(), generateSalt( LINUX_CRYPT_SALT_LENGTH ) ) );
 }
 
 bool QnUserResource::checkPassword(const QString &password) {
-    QList<QByteArray> values =  getHash().split(L'$');
-    if (values.size() != 3)
-        return false;
+    QnMutexLocker locker( &m_mutex );
+    
+    if( !m_digest.isEmpty() )
+    {
+        return nx_http::calcHa1( m_name.toLower(), m_realm, password ) == m_digest;
+    }
+    else
+    {
+        //hash is obsolete. Cannot remove it to maintain update from version < 2.3
+        //  hash becomes empty after changing user's realm
+        QList<QByteArray> values = m_hash.split(L'$');
+        if (values.size() != 3)
+            return false;
 
-    QByteArray salt = values[1];
-    QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(salt);
-    md5.addData(password.toUtf8());
-    return md5.result().toHex() == values[2];
+        QByteArray salt = values[1];
+        QCryptographicHash md5(QCryptographicHash::Md5);
+        md5.addData(salt);
+        md5.addData(password.toUtf8());
+        return md5.result().toHex() == values[2];
+    }
 }
 
-void QnUserResource::setDigest(const QByteArray& digest)
+void QnUserResource::setDigest(const QByteArray& digest, bool isValidated)
 {
     {
         QnMutexLocker locker( &m_mutex );
         if (m_digest == digest)
             return;
+        if( m_isLdap )
+        {
+            m_passwordExpirationTimestamp = isValidated
+                ? qnSyncTime->currentMSecsSinceEpoch() + LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC
+                : 0;
+        }
         m_digest = digest;
     }
     emit digestChanged(::toSharedPointer(this));
@@ -108,6 +138,18 @@ QByteArray QnUserResource::getCryptSha512Hash() const
 {
     QnMutexLocker locker( &m_mutex );
     return m_cryptSha512Hash;
+}
+
+QString QnUserResource::getRealm() const
+{
+    QnMutexLocker locker( &m_mutex );
+    return m_realm;
+}
+
+void QnUserResource::setRealm( const QString& realm )
+{
+    QnMutexLocker locker( &m_mutex );
+    m_realm = realm;
 }
 
 quint64 QnUserResource::getPermissions() const
@@ -142,6 +184,37 @@ void QnUserResource::setAdmin(bool isAdmin)
         m_isAdmin = isAdmin;
     }
     emit adminChanged(::toSharedPointer(this));
+}
+
+bool QnUserResource::isLdap() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_isLdap;
+}
+
+void QnUserResource::setLdap(bool isLdap)
+{
+    QnMutexLocker locker(&m_mutex);
+    if (m_isLdap == isLdap)
+        return;
+    m_isLdap = isLdap;
+
+    emit ldapChanged(::toSharedPointer(this));
+}
+
+bool QnUserResource::isEnabled() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_isEnabled;
+}
+
+void QnUserResource::setEnabled(bool isEnabled)
+{
+    QnMutexLocker locker(&m_mutex);
+    if (m_isEnabled == isEnabled)
+        return;
+    m_isEnabled = isEnabled;
+    emit enabledChanged(::toSharedPointer(this));
 }
 
 QString QnUserResource::getEmail() const
@@ -201,10 +274,77 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
             m_email = localOther->m_email;
             modifiedFields << "emailChanged";
         }
+
+		if (m_realm != localOther->m_realm) {
+            m_realm = localOther->m_realm;
+            modifiedFields << "realmChanged";
+        }
+
+        if (m_isEnabled != localOther->m_isEnabled) {
+            m_isEnabled = localOther->m_isEnabled;
+            modifiedFields << "enabledChanged";
+        }
+
+        if (m_isLdap != localOther->m_isLdap) {
+            m_isLdap = localOther->m_isLdap;
+            modifiedFields << "ldapChanged";
+        }
     }
 }
 
 Qn::ResourceStatus QnUserResource::getStatus() const
 {
     return Qn::Online;
+}
+
+qint64 QnUserResource::passwordExpirationTimestamp() const
+{
+    QnMutexLocker lk( &m_mutex );
+    return m_passwordExpirationTimestamp;
+}
+
+bool QnUserResource::passwordExpired() const
+{
+    if( !isLdap() )
+        return false;
+
+    return passwordExpirationTimestamp() < qnSyncTime->currentMSecsSinceEpoch();
+}
+
+Qn::AuthResult QnUserResource::doPasswordProlongation()
+{
+    if( !isLdap() )
+        return Qn::Auth_OK;
+
+    QString name;
+    QString digest;
+    {
+        QnMutexLocker lk( &m_mutex );
+        name = m_name;
+        digest = QLatin1String(m_digest);
+    }
+
+    auto errorCode = QnLdapManager::instance()->authenticateWithDigest( name, digest );
+    if( errorCode != Qn::Auth_OK ) {
+        if (!passwordExpired())
+            return Qn::Auth_OK;
+        else
+            return errorCode;
+    }
+
+    QnMutexLocker lk( &m_mutex );
+    if( m_name != name || QLatin1String(m_digest) != digest )  //user data has been updated somehow while performing ldap request
+        return m_passwordExpirationTimestamp > qnSyncTime->currentMSecsSinceEpoch() ? Qn::Auth_OK : Qn::Auth_PasswordExpired;
+    m_passwordExpirationTimestamp =
+        qnSyncTime->currentMSecsSinceEpoch() +
+        LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC;
+    return Qn::Auth_OK;
+}
+
+Qn::AuthResult QnUserResource::checkDigestValidity( const QByteArray& digest )
+{
+    if( !isLdap() )
+        return Qn::Auth_OK;
+
+    return QnLdapManager::instance()->authenticateWithDigest( getName(), QLatin1String(digest) );
 }

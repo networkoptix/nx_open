@@ -105,7 +105,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
     if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
         QMessageBox::critical(
             mainWindow(),
-            tr("Could not get position from camera"),
+            tr("Unable to get position from camera."),
             tr("An error has occurred while trying to get current position from camera %1.").arg(resource->getName()) + L'\n' 
           + tr("Please wait for the camera to go online.")
         );
@@ -147,7 +147,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
         if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
             QMessageBox::critical(
                 mainWindow(),
-                tr("Could not set position for camera"),
+                tr("Unable to set position for camera."),
                 tr("An error has occurred while trying to set current position for camera %1.").arg(resource->getName()) + L'\n' 
               + tr("Please wait for the camera to go online.")
             );
@@ -200,7 +200,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
         if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
             QMessageBox::critical(
                 mainWindow(),
-                tr("Could not set position to camera"),
+                tr("Unable to set position of camera."),
                 tr("An error has occurred while trying to set current position for camera %1.").arg(resource->getName()) + L'\n' 
               + tr("Please wait for the camera to go online.")
             );

@@ -2,6 +2,26 @@ $icon-font-path: "../fonts/";
 
 @import 'sass-bootstrap/lib/_variables.scss';
 
+*{
+  font-family: "Roboto";
+}
+
+/* Space out content a bit */
+body {
+  padding-bottom: 20px;
+  height:100%;
+}
+
+@media only screen and (device-width: 768px) {
+  /*Kill bounce effect*/
+  body,
+  html {
+    position: fixed;
+    width: 100%;
+  }
+}
+
+
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
 .browsehappy {
@@ -9,11 +29,6 @@ $icon-font-path: "../fonts/";
     background: #ccc;
     color: #000;
     padding: 0.2em 0;
-}
-
-/* Space out content a bit */
-body {
-    padding-bottom: 20px;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -364,50 +379,12 @@ $state-danger-border:            darken(adjust-hue($state-danger-bg, -10), 5%) !
 }
 
 
-.tree .active>a{
-  font-weight: bold;
-}
-.tree .offline {
-  color:silver;
-}
-
-.small .nav>li>a, .small .nav>li>.span-element{
-  padding:5px 15px;
-  display: block;
-}
 .offline {
   color:silver;
-}
-.viewport-vertical{
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100%;
-  width: 257px;
-  top: 0px;
-  padding-top: 60px;
 }
 
 html, body {height: 100%;}
 
-.viewport-container{
-  padding: 0px;
-}
-.tree li>a, .tree li>.span-element {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-
-.nav>li>ul>li>a,
-.nav>li>ul>li>.span-element {
-  padding-left: 30px !important;
-}
-
-.nav>li ul>li>ul>li>a,
-.nav>li ul>li>ul>li>.span-element {
-  padding-left: 50px !important;
-}
 
 span.danger{
   color:$alert-danger-text;
@@ -420,6 +397,7 @@ span.danger{
   background-size:130px 40px;
   margin:5px;
   color:transparent;
+  font-size:0;
   border:none;
 }
 .btn.googleplay{
@@ -429,6 +407,7 @@ span.danger{
   background-size:130px 40px;
   margin:5px;
   color:transparent;
+  font-size:0;
   border:none;
 }
 
@@ -439,4 +418,7 @@ span.danger{
 .label>a{
   color:white;
   text-decoration: underline;
+}
+.navbar-default{
+  border:none;
 }

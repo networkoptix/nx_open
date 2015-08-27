@@ -17,7 +17,7 @@ static const int MAX_DECODE_THREAD = 4;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
 int CLFFmpegVideoDecoder::hwcounter = 0;
 
-//================================================
+// ================================================
 
 struct FffmpegLog
 {

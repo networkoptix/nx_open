@@ -13,9 +13,9 @@
 #include "multiple_camera_settings_widget.h"
 #include "single_camera_settings_widget.h"
 
-QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchContext *context): 
+QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     m_emptyTab(Qn::GeneralSettingsTab)
 {
     /* Create per-mode widgets. */
@@ -31,8 +31,6 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchConte
 
     m_singleWidget = new QnSingleCameraSettingsWidget(this);
 
-    connect(m_multiWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
-    connect(m_singleWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(m_multiWidget,  SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
 
@@ -279,10 +277,6 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
         emit hasChangesChanged();
 
     emit modeChanged();
-}
-
-void QnCameraSettingsWidget::at_moreLicensesRequested() {
-    menu()->trigger(Qn::PreferencesLicensesTabAction);
 }
 
 bool QnCameraSettingsWidget::isValidMotionRegion(){

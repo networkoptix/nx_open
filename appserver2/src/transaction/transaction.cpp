@@ -151,7 +151,7 @@ namespace ec2
             REGISTER_COMMAND(getStatisticsReport),
             REGISTER_COMMAND(triggerStatisticsReport),
 
-            REGISTER_COMMAND(getTransactionLog)
+            REGISTER_COMMAND(getTransactionLog),
         };
 
         QString toString(Value val) 

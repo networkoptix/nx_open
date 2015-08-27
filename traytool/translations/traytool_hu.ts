@@ -5,112 +5,112 @@
     <name>QObject</name>
     <message>
         <source>System Tray</source>
-        <translation type="unfinished"></translation>
+        <translation>Tálca</translation>
     </message>
     <message>
         <source>There is no system tray on this system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem található a tálca.</translation>
     </message>
     <message>
         <source>Application will now quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az alkalmazás most bezárúl.</translation>
     </message>
 </context>
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <source>Insufficient privileges to manage services</source>
-        <translation type="unfinished"></translation>
+        <source>Insufficient rights to manage services.</source>
+        <translation type="unfinished">Nem megfelelő jogosultság a szolgáltatások kezeléséhez</translation>
     </message>
     <message>
-        <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation type="unfinished"></translation>
+        <source>UAC must be enabled to request privileges for non-admin users.</source>
+        <translation type="unfinished">Nem rendszergazda felhasználóknak engedélyezni kell az UAC-t a jogok kéréséhez</translation>
     </message>
 </context>
 <context>
     <name>QnSystrayWindow</name>
     <message>
         <source>Access denied.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hozzáférés megtagadva.</translation>
     </message>
     <message>
         <source>Specified database does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>A megadott adatbázis nem létezik.</translation>
     </message>
     <message>
         <source>Specified parameter is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>A megadott paraméter érvénytelen.</translation>
     </message>
     <message>
         <source>Could not access installed services</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet hozzáférni a telepített szolgáltatásokhoz</translation>
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba történ a telepített szolgáltatások hozzáférése közben:</translation>
     </message>
     <message>
         <source>No %1 services installed</source>
-        <translation type="unfinished"></translation>
+        <translation>A(z) %1 szolgáltatások nincsenek telepítve</translation>
     </message>
     <message>
         <source>Media server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>A media szerver leállt</translation>
     </message>
     <message>
         <source>Media server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>A media szerver elindult</translation>
     </message>
     <message>
         <source> (stopped)</source>
-        <translation type="unfinished"></translation>
+        <translation> (leállítva)</translation>
     </message>
     <message>
         <source> (starting)</source>
-        <translation type="unfinished"></translation>
+        <translation> (indul)</translation>
     </message>
     <message>
         <source> (stopping)</source>
-        <translation type="unfinished"></translation>
+        <translation> (leáll)</translation>
     </message>
     <message>
         <source> (started)</source>
-        <translation type="unfinished"></translation>
+        <translation> (elindult)</translation>
     </message>
     <message>
         <source> (resuming)</source>
-        <translation type="unfinished"></translation>
+        <translation> (újraindul)</translation>
     </message>
     <message>
         <source> (paused)</source>
-        <translation type="unfinished"></translation>
+        <translation> (szüneteltetve)</translation>
     </message>
     <message>
         <source> (pausing)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Media server is going to be stopped. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>(szünetel)</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Kilépés</translation>
     </message>
     <message>
         <source>Show &amp;Media Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Media szerver napló megjelenítése</translation>
     </message>
     <message>
         <source>Start Media Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Media szerver indítása</translation>
     </message>
     <message>
         <source>Stop Media Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Media szerver leállítása</translation>
     </message>
     <message>
         <source>Media Server Web Page</source>
+        <translation>Media szerver Weboldal</translation>
+    </message>
+    <message>
+        <source>Media server will be stopped. Continue?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

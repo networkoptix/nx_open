@@ -51,6 +51,7 @@ public:
     {
     }
 
+    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 

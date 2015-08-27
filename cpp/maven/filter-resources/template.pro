@@ -30,6 +30,8 @@ CONFIG(debug, debug|release) {
   }
   win* {
     LIBS = ${windows.oslibs.debug}
+  } else {
+    DEFINES += _DEBUG
   }
   DEFINES += USE_OWN_MUTEX
   #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
@@ -101,7 +103,6 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${root.dir}/common/src \
                 ${root.dir}/mediaserver_core/src \
                 ${libdir}/include \
-                ${environment.dir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
@@ -120,7 +121,7 @@ win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
   ICON = ${customization.dir}/icons/hdw_logo.ico
   LIBS += ${windows.oslibs}
-  DEFINES += ${windows.defines}
+  DEFINES += NOMINMAX= ${windows.defines}
   DEFINES += ${global.windows.defines}
   win32-msvc* {
     # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
@@ -181,3 +182,7 @@ mac {
 
   INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
 }
+
+INCLUDEPATH += ${environment.dir}/boost_1_56_0
+INCLUDEPATH += ${environment.dir}/include/ffmpeg-misc-headers-win32
+INCLUDEPATH += ${environment.dir}/include/glext

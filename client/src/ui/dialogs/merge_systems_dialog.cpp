@@ -16,7 +16,7 @@
 #include "utils/common/util.h"
 
 QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
-    QDialog(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnMergeSystemsDialog),
     m_mergeTool(new QnMergeSystemsTool(this))
@@ -129,6 +129,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     m_url.clear();
     m_user.clear();
     m_password.clear();
+    updateConfigurationBlock();
 
     QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
     QString password = ui->passwordEdit->text();
@@ -149,7 +150,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     m_user = lit("admin");
     m_password = password;
     m_mergeTool->pingSystem(m_url, m_user, m_password);
-    ui->buttonBox->showProgress(tr("testing..."));
+    ui->buttonBox->showProgress(tr("Testing..."));
 }
 
 void QnMergeSystemsDialog::at_mergeButton_clicked() {
@@ -162,14 +163,16 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     m_mergeButton->setEnabled(false);
 
     m_mergeTool->mergeSystem(m_discoverer, m_url, m_user, m_password, ownSettings);
-    ui->buttonBox->showProgress(tr("merging systems..."));
+    ui->buttonBox->showProgress(tr("Merging Systems..."));
 }
 
 void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode) {
     ui->buttonBox->hideProgress();
 
     switch (errorCode) {
-    case QnMergeSystemsTool::NoError: {
+    case QnMergeSystemsTool::NoError:
+    case QnMergeSystemsTool::StarterLicenseError:
+    {
         QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
         if (server && server->getStatus() == Qn::Online && moduleInformation.systemName == qnCommon->localSystemName()) {
             if (m_url.host() == lit("localhost") || m_url.host() == lit("127.0.0.1"))
@@ -184,13 +187,19 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
         m_mergeButton->show();
         ui->remoteSystemRadioButton->setText(moduleInformation.systemName);
         updateErrorLabel(QString());
+        if (errorCode == QnMergeSystemsTool::StarterLicenseError)
+            updateErrorLabel(
+            tr("Warning: You are about to merge Systems with START licenses.\n"\
+               "As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.\n"\
+               "If you understand this and would like to proceed please click Merge to continue.\n")
+            );
         break;
     }
     case QnMergeSystemsTool::AuthentificationError:
         updateErrorLabel(tr("The password is invalid."));
         break;
     case QnMergeSystemsTool::VersionError:
-        updateErrorLabel(tr("The found system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
+        updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
         break;
     default:
         updateErrorLabel(tr("The system was not found."));
@@ -218,7 +227,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode, const QnMod
             message = tr("The password is invalid.");
             break;
         case QnMergeSystemsTool::VersionError:
-            updateErrorLabel(tr("The found system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
+            updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
             break;
         case QnMergeSystemsTool::BackupError:
             message = tr("Could not create a backup of the server database.");

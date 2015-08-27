@@ -82,6 +82,12 @@ void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
         m_firstCamera.clear();
 }
 
+void QnMediaServerResource::beforeDestroy()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_firstCamera.clear();
+}
+
 void QnMediaServerResource::atResourceChanged()
 {
     m_panicModeCache.update();
@@ -509,5 +515,5 @@ void QnMediaServerResource::setAuthKey(const QString& authKey)
 
 QString QnMediaServerResource::realm() const
 {
-    return QnAuthHelper::REALM;
+    return QnAppInfo::realm();
 }

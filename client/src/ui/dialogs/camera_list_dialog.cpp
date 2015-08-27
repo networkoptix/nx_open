@@ -28,14 +28,6 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
-  /*  QList<QnCameraListModel::Column> columns;
-    columns << QnCameraListModel::RecordingColumn << QnCameraListModel::NameColumn << QnCameraListModel::VendorColumn << QnCameraListModel::ModelColumn <<
-               QnCameraListModel::FirmwareColumn << QnCameraListModel::DriverColumn << QnCameraListModel::IpColumn << QnCameraListModel::UniqIdColumn << QnCameraListModel::ServerColumn;
-
-    m_model->setColumns(columns);
-    m_model->setResources(qnResPool->getAllEnabledCameras());
-    */
-
     m_resourceSearch->setSourceModel(m_model);
     updateCriterion();
 
@@ -151,7 +143,7 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
 }
 
 void QnCameraListDialog::at_exportAction_triggered() {
-    QnGridWidgetHelper::exportToFile(ui->camerasView, this, tr("Export selected cameras to file"));
+    QnGridWidgetHelper::exportToFile(ui->camerasView, this, tr("Export selected cameras to a file."));
 }
 
 void QnCameraListDialog::at_clipboardAction_triggered() {

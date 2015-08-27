@@ -36,15 +36,23 @@ TextInput
         bottom: 0;
     }
 
-    KeyNavigation.backtab: prevOctet;
-    KeyNavigation.tab: nextOctet;
-    KeyNavigation.left: prevOctet;
-    KeyNavigation.right: nextOctet;
+    KeyNavigation.backtab: (prevOctet ? prevOctet : null);
+    KeyNavigation.tab: (nextOctet ? nextOctet : null);
+    KeyNavigation.left: (prevOctet ? prevOctet : null);
+    KeyNavigation.right: (nextOctet ? nextOctet : null);
 
     Keys.onPressed:
     {
         if ((event.key === Qt.Key_Backspace) && !length)
+        {
             impl.moveToPrevOctet();
+        }
+        else if ((event.text === '.') && (cursorPosition == length))
+        {
+            if (!text.length)
+                text = "0";
+            impl.moveToNextOctet();
+        }
         else
             event.accepted = false;
     }

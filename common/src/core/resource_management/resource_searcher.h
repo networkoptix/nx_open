@@ -91,7 +91,7 @@ private:
 };
 
 
-//=====================================================================
+// =====================================================================
 class QnAbstractNetworkResourceSearcher : virtual public QnAbstractResourceSearcher
 {
 protected:
@@ -103,7 +103,7 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) = 0;
 };
 
-//=====================================================================
+// =====================================================================
 
 class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance?
 {

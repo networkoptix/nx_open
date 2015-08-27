@@ -72,6 +72,31 @@ Base.Column
 
             width: parent.width * (currentCount + 1) / (changesCount + 1);
         }
+    }
 
+    Base.Text
+    {
+        id: patienceText;
+
+        visible: false;
+
+        font.pixelSize: Common.SizeManager.fontSizes.medium;
+        text: qsTr("Please be patient, the operation can take up to several minutes");
+    }
+
+    Timer
+    {
+        id: patienceTimer;
+
+        interval: 5 * 1000;
+        repeat: false;
+
+        onTriggered:
+        {
+            patienceText.visible = true;
+            patienceTimer.stop();
+        }
+
+        Component.onCompleted: { patienceTimer.start(); }
     }
 }
