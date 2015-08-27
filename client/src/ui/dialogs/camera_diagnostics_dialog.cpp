@@ -23,7 +23,9 @@ QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::Window
     ui(new Ui::CameraDiagnosticsDialog),
     m_tool(NULL),
     m_started(false),
-    m_finished(false)
+    m_finished(false),
+    m_targetDevice(),
+    m_upperCaseDevice()
 {
     ui->setupUi(this);
     
@@ -46,7 +48,13 @@ void QnCameraDiagnosticsDialog::setResource(const QnVirtualCameraResourcePtr &re
 
     m_resource = resource;
 
-    updateTitleText();
+    const bool isPureIoModule = 
+        (m_resource && !resource->hasVideo(nullptr) && resource->hasFlags(Qn::io_module));
+
+    m_upperCaseDevice = (isPureIoModule ? tr("IO Module") : tr("Camera"));
+    m_targetDevice = (isPureIoModule ? tr("IO module") : tr("camera"));
+
+    updateTexts();
     clearLog();
 }
 
@@ -92,12 +100,20 @@ void QnCameraDiagnosticsDialog::stop() {
     updateOkButtonEnabled();
 }
 
-void QnCameraDiagnosticsDialog::updateTitleText() {
-    if(!m_resource) {
+void QnCameraDiagnosticsDialog::updateTexts() {
+    
+    if(!m_resource)
+    {
         ui->titleLabel->clear();
-    } else {
-        ui->titleLabel->setText(tr("Diagnostics for camera %1.").arg(getResourceName(m_resource)));
-    }
+        return;
+    } 
+    
+    //: %1 - will be substituted by type of device ("camera", "io module", etc..); %2 - will be substituted by model of device; Example: "Diagnostics for camera X1323"
+    const QString titleLabelText = tr("Diagnostics for %1 %2.");
+    ui->titleLabel->setText(titleLabelText.arg(m_targetDevice).arg(getResourceName(m_resource)));
+
+    //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..); Example: "IO Module Diagnostics"
+    setWindowTitle(tr("%1 Diagnostics").arg(m_upperCaseDevice));
 }
 
 void QnCameraDiagnosticsDialog::updateOkButtonEnabled() {
@@ -113,9 +129,11 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     case CameraDiagnostics::Step::mediaServerAvailability:
         return tr("Confirming server availability.");
     case CameraDiagnostics::Step::cameraAvailability:
-        return tr("Confirming camera is accessible.");
+        //: %1 - will be substituted by type of device ("camera", "IO module", etc..); Example: "Confirming camera is accessible."
+        return tr("Confirming %1 is accessible.").arg(m_targetDevice);
     case CameraDiagnostics::Step::mediaStreamAvailability:
-        return tr("Confirming target camera provides media stream.");
+        //: %1 - will be substituted by type of device ("camera", "IO module", etc..); Example: "Confirming target IO module provides media stream."
+        return tr("Confirming target %1 provides media stream.").arg(m_targetDevice);
     case CameraDiagnostics::Step::mediaStreamIntegrity: 
         return tr("Evaluating media stream for errors.");
     default:

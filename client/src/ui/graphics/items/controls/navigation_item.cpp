@@ -249,9 +249,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     addAction(action(Qn::JumpToStartAction));
     addAction(action(Qn::JumpToEndAction));
 
-    addAction(action(Qn::SpeedDownAction));
-    addAction(action(Qn::SpeedUpAction));
-
     addAction(action(Qn::VolumeDownAction));
     addAction(action(Qn::VolumeUpAction));
     
@@ -263,10 +260,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 #ifdef QN_ENABLE_BOOKMARKS
     addAction(action(Qn::ToggleBookmarksSearchAction));
 #endif
-
-    //connect(speedDownAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepBackward())); // TODO
-    //connect(speedUpAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepForward())); // TODO
-    // TODO: #Elric handlers must be implemented elsewhere
 
     connect(action(Qn::VolumeUpAction),         SIGNAL(triggered()), m_volumeSlider,        SLOT(stepForward()));
     connect(action(Qn::VolumeDownAction),       SIGNAL(triggered()), m_volumeSlider,        SLOT(stepBackward()));
@@ -392,11 +385,12 @@ void QnNavigationItem::updateJumpButtonsTooltips() {
 void QnNavigationItem::updatePlaybackButtonsEnabled() {
     bool playable = navigator()->isPlayingSupported();
     bool forwardable = !navigator()->isLive();
+    bool hasVideo = navigator()->hasVideo();
 
     m_jumpBackwardButton->setEnabled(playable);
-    m_stepBackwardButton->setEnabled(playable);
+    m_stepBackwardButton->setEnabled(playable && hasVideo); /*< We cannot step by audio. */
     m_playButton->setEnabled(playable);
-    m_stepForwardButton->setEnabled(playable && forwardable);
+    m_stepForwardButton->setEnabled(playable && forwardable && hasVideo); /*< We cannot step by audio. */
     m_jumpForwardButton->setEnabled(playable && forwardable);
     
     m_speedSlider->setEnabled(playable);

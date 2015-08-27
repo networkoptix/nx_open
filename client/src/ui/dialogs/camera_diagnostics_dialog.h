@@ -34,10 +34,10 @@ public:
     void stop();
 
 private:
-    static QString diagnosticsStepText(int stepType);
+    QString diagnosticsStepText(int stepType);
 
 private slots:
-    void updateTitleText();
+    void updateTexts();
     void updateOkButtonEnabled();
     void clearLog();
 
@@ -55,6 +55,8 @@ private:
     bool m_started, m_finished;
 
     QString m_lastLine;
+    QString m_targetDevice;
+    QString m_upperCaseDevice;
 };
 
 

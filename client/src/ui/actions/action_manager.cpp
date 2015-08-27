@@ -1633,18 +1633,6 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Pause")).
         condition(new QnArchiveActionCondition(this));
 
-    factory(Qn::SpeedDownAction).
-        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
-        shortcut(tr("Ctrl+-")).
-        text(tr("Speed Down")).
-        condition(new QnArchiveActionCondition(this));
-
-    factory(Qn::SpeedUpAction).
-        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
-        shortcut(tr("Ctrl++")).
-        text(tr("Speed Up")).
-        condition(new QnArchiveActionCondition(this));
-
     factory(Qn::PreviousFrameAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("Ctrl+Left")).

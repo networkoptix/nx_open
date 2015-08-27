@@ -1099,6 +1099,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Features</source>
         <translation>기능</translation>
     </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LicenseManagerWidget</name>
@@ -2490,22 +2494,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>일시정지</translation>
     </message>
     <message>
-        <source>Ctrl+-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Speed Down</source>
-        <translation>속도 낮춤</translation>
-    </message>
-    <message>
-        <source>Ctrl++</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Speed Up</source>
-        <translation>속도 올림</translation>
-    </message>
-    <message>
         <source>Ctrl+Left</source>
         <translation></translation>
     </message>
@@ -3456,10 +3444,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>상세 정보 복사</translation>
     </message>
     <message>
-        <source>Diagnostics for camera %1.</source>
-        <translation>%1 카메라 진단.</translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation></translation>
     </message>
@@ -3472,19 +3456,47 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished">서버 가용성 확인</translation>
     </message>
     <message>
-        <source>Confirming camera is accessible.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished">미디어 스트림을 제공하는지 확인 중</translation>
-    </message>
-    <message>
         <source>Evaluating media stream for errors.</source>
         <translation type="unfinished">오류에 대한 미디어 스트림 확인 중</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diagnostics for %1 %2.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..); Example: &quot;IO Module Diagnostics&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming %1 is accessible.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming camera is accessible.&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target %1 provides media stream.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming target IO module provides media stream.&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4717,10 +4729,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>License was successfully activated.</source>
         <translation>인증이 완료 되었습니다.</translation>
-    </message>
-    <message>
-        <source>%1 %2</source>
-        <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
         <source>At least %n %2 are required</source>
