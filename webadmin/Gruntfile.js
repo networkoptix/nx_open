@@ -132,6 +132,12 @@ module.exports = function (grunt) {
                 {context: '/media/',    host: '10.0.2.186', port: 7011},
                 {context: '/proxy/',    host: '10.0.2.186', port: 7011}/**/
 
+                // Olya - external
+                /*{context: '/api/',      host: '95.31.136.2', port: 7011},
+                {context: '/ec2/',      host: '95.31.136.2', port: 7011},
+                {context: '/hls/',      host: '95.31.136.2', port: 7011},
+                {context: '/media/',    host: '95.31.136.2', port: 7011},
+                {context: '/proxy/',    host: '95.31.136.2', port: 7011}/**/
 
                 // Olya
                 /*{context: '/api/',      host: '10.0.2.169', port: 7011},
@@ -139,6 +145,13 @@ module.exports = function (grunt) {
                 {context: '/hls/',      host: '10.0.2.169', port: 7011},
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
                 {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
+
+                // Sasha
+                /*{context: '/api/',      host: '10.0.2.119', port: 7042},
+                {context: '/ec2/',      host: '10.0.2.119', port: 7042},
+                {context: '/hls/',      host: '10.0.2.119', port: 7042},
+                {context: '/media/',    host: '10.0.2.119', port: 7042},
+                {context: '/proxy/',    host: '10.0.2.119', port: 7042}/**/
 
                 // Andrey
                 /*{context: '/api/',      host: '10.0.2.95', port: 7001},

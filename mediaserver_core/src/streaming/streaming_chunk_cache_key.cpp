@@ -69,6 +69,15 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     m_isLive = it != auxiliaryParams.end();
 }
 
+StreamingChunkCacheKey::StreamingChunkCacheKey( const QString& uniqueResourceID )
+:
+    m_uniqueResourceID( uniqueResourceID ),
+    m_channel( 0 ),
+    m_startTimestamp( 0 ),
+    m_duration( 0 )
+{
+}
+
 //!data source (camera id, stream id)
 const QString& StreamingChunkCacheKey::srcResourceUniqueID() const
 {

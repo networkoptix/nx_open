@@ -32,7 +32,6 @@
 #include "api_camera_bookmark_data.h"
 #include "api_camera_server_item_data.h"
 #include "api_email_data.h"
-#include "api_ldap_data.h"
 #include "api_full_info_data.h"
 #include "api_layout_data.h"
 #include "api_license_data.h"
@@ -401,22 +400,6 @@ void fromApiToResource(const ApiEmailSettingsData &src, QnEmailSettings &dst) {
     dst.email = src.from;
     dst.password = src.password;
     dst.connectionType = src.connectionType;
-}
-
-void fromResourceToApi(const QnLdapSettings &src, ApiLdapSettingsData &dst) {
-    dst.uri = src.uri.toString();
-    dst.adminDn = src.adminDn;
-    dst.adminPassword = src.adminPassword;
-    dst.searchBase = src.searchBase;
-    dst.searchFilter = src.searchFilter;
-}
-
-void fromApiToResource(const ApiLdapSettingsData &src, QnLdapSettings &dst) {
-    dst.uri = src.uri;
-    dst.adminDn = src.adminDn;
-    dst.adminPassword = src.adminPassword;
-    dst.searchBase = src.searchBase;
-    dst.searchFilter = src.searchFilter;
 }
 
 void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, const ResourceContext &ctx) {

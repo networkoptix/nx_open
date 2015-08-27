@@ -108,9 +108,6 @@ private:
     void fillAccessRightsAdvanced(quint64 rights);
     quint64 readAccessRightsAdvanced();
 
-    /* Update placeholders in the password edit fields. */
-    void updatePlaceholders();
-
     /** Utility function to access checkboxes. */
     bool isCheckboxChecked(quint64 right);
 

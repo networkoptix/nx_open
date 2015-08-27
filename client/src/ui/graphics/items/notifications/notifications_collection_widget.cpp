@@ -71,7 +71,7 @@ QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
     m_particle = new QnParticleItem(this);
 
     m_balloon = new QnToolTipWidget(this);
-    m_balloon->setText(tr("You have new notifications"));
+    m_balloon->setText(tr("You have new notifications."));
     m_balloon->setOpacity(0.0);
 
     connect(m_balloon,  &QGraphicsWidget::geometryChanged,  this, &QnBlinkingImageButtonWidget::updateBalloonTailPos);

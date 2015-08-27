@@ -67,7 +67,7 @@ void QnConnectToCurrentSystemTool::start(const QSet<QnUuid> &targets, const QStr
     }
 
     emit progressChanged(0);
-    emit stateChanged(tr("Configuring server(s)"));
+    emit stateChanged(tr("Configuring Server(s)"));
 
     QnConfigurePeerTask *task = new QnConfigurePeerTask(this);
     task->setUser(m_user);
@@ -121,7 +121,7 @@ void QnConnectToCurrentSystemTool::updatePeers() {
         return;
     }
 
-    emit stateChanged(tr("Updating server(s)"));
+    emit stateChanged(tr("Updating Server(s)"));
     emit progressChanged(waitProgress);
 
     m_updateTool = new QnMediaServerUpdateTool(this);

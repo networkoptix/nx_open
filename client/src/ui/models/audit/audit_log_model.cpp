@@ -208,12 +208,12 @@ void QnAuditLogModel::setDetail(QnAuditRecord* record, bool showDetail)
 
 QnAuditLogModel::QnAuditLogModel(QObject *parent):
     base_type(parent)
+    , m_index(new DataIndex())
 {
-    m_index = new DataIndex();
+    
 }
 
 QnAuditLogModel::~QnAuditLogModel() {
-    delete m_index;
 }
 
 void QnAuditLogModel::setData(const QnAuditRecordRefList &data) {
@@ -236,18 +236,7 @@ void QnAuditLogModel::clear() {
     endResetModel();
 }
 
-QModelIndex QnAuditLogModel::index(int row, int column, const QModelIndex &parent) const 
-{
-    return hasIndex(row, column, parent) 
-        ? createIndex(row, column, (void*)0) 
-        : QModelIndex();
-}
-
-QModelIndex QnAuditLogModel::parent(const QModelIndex &) const {
-    return QModelIndex();
-}
-
-QString QnAuditLogModel::getResourceNameString(QnUuid id) 
+QString QnAuditLogModel::getResourceNameById(const QnUuid &id) 
 {
     return getResourceName(qnResPool->getResourceById(id));
 }
@@ -267,9 +256,10 @@ QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool s
         return QString();
 }
 
-QString QnAuditLogModel::formatDuration(int duration)
+QString QnAuditLogModel::formatDuration(int durationSecs)
 {
-    int seconds = duration % 60;
+    int duration = durationSecs;
+    /* int seconds = duration % 60; */
     duration /= 60;
     int minutes = duration % 60;
     duration /= 60;
@@ -363,7 +353,7 @@ QString QnAuditLogModel::getResourcesString(const std::vector<QnUuid>& resources
     {
         if (!result.isEmpty())
             result += lit(",");
-        result += getResourceNameString(res);
+        result += getResourceNameById(res);
     }
     return result;
 }
@@ -391,7 +381,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
         result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraInsert:
-        result +=  tr("%n cameras", "", data->resources.size());
+        result +=  tr("%n cameras", "", static_cast<int>(data->resources.size()));
         break;
     default:
         result = getResourcesString(data->resources);
@@ -419,7 +409,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
         case Qn::AR_CameraInsert:
         case Qn::AR_CameraUpdate:
         {
-            QString txt = tr("%n cameras", "", data->resources.size());
+            QString txt = tr("%n cameras", "", static_cast<int>(data->resources.size()));
             QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
             if (hovered)
                 result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(linkColor).arg(txt);
@@ -442,7 +432,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
                         else
                             result += QString(lit("<font size=5>%1</font>")).arg(circleSymbol);
                     }
-                    result += getResourceNameString(camera);
+                    result += getResourceNameById(camera);
                 }
             }
             return result;
@@ -536,8 +526,15 @@ void QnAuditLogModel::sort(int column, Qt::SortOrder order) {
 }
 
 int QnAuditLogModel::rowCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent);
-    return m_index->size(); // TODO: #Elric incorrect, should return zero for non-root nodes.
+    if(!parent.isValid())
+        return m_index->size();
+    return 0;
+}
+
+int QnAuditLogModel::columnCount(const QModelIndex &parent /* = QModelIndex()*/) const {
+    if(!parent.isValid())
+        return m_columns.size();
+    return 0;
 }
 
 int QnAuditLogModel::minWidthForColumn(const Column &column) const
@@ -875,4 +872,8 @@ void QnAuditLogModel::calcColorInterleaving()
         }
         m_interleaveInfo[i] = colorIndex;
     }
+}
+
+void QnAuditLogModel::setHeaderHeight(int value) {
+    m_headerHeight = value;
 }

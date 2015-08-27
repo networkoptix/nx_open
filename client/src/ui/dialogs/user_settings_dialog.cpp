@@ -26,10 +26,6 @@ namespace Qn {
     const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
 }
 
-namespace {
-    const QString defaultPlaceholder(6, L'*');
-}
-
 QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent): 
     base_type(parent),
     ui(new Ui::UserSettingsDialog()),
@@ -151,6 +147,11 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
         ui->emailLabel->setVisible(visible);
         ui->emailEdit->setReadOnly(!editable);
         break;
+    case Enabled:
+        ui->enabledCheckBox->setVisible(visible);
+        ui->enabledLabel->setVisible(visible);
+        setReadOnly(ui->enabledCheckBox, !editable);
+        break;
     default:
         break;
     }
@@ -216,30 +217,18 @@ void QnUserSettingsDialog::updateFromResource() {
     if(m_mode == Mode::NewUser) {
         ui->loginEdit->clear();
         ui->emailEdit->clear();
+        ui->enabledCheckBox->setChecked(true);
 
         loadAccessRightsToUi(Qn::GlobalLiveViewerPermissions);
     } else {
         ui->loginEdit->setText(m_user->getName());
         ui->emailEdit->setText(m_user->getEmail());
+        ui->enabledCheckBox->setChecked(m_user->isEnabled());
 
         loadAccessRightsToUi(accessController()->globalPermissions(m_user));
     }
-    updatePlaceholders();
     updateLogin();
     updatePassword();
-
-    ui->enabledCheckBox->setChecked(m_user->isEnabled());
-
-    ui->enabledCheckBox->setEnabled(m_user->getName() != lit("admin"));
-
-    bool ldap = m_user->isLdap();
-
-    ui->loginEdit->setReadOnly(ldap);
-    ui->emailEdit->setReadOnly(ldap);
-    ui->passwordEdit->setVisible(!ldap);
-    ui->passwordLabel->setVisible(!ldap);
-    ui->confirmPasswordEdit->setVisible(!ldap);
-    ui->confirmPasswordLabel->setVisible(!ldap);
 
     setHasChanges(false);
 }
@@ -347,7 +336,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
                 !ui->confirmPasswordEdit->text().isEmpty())
                 && !m_currentPassword.isEmpty() && ui->currentPasswordEdit->text() != m_currentPassword) {
                     if(ui->currentPasswordEdit->text().isEmpty()) {
-                        hint = tr("To change your password, please enter your current password.");
+                        hint = tr("To modify your password, please enter existing one.");
                         valid = false;
                     } else {
                         hint = tr("Invalid current password.");
@@ -361,7 +350,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         if (m_mode == Mode::OtherUser && ui->loginEdit->text().trimmed() != m_user->getName()) {
             /* ..and have not entered new password. */
             if (ui->passwordEdit->text().isEmpty()) {
-                hint = tr("User was renamed. Password must be updated.");
+                hint = tr("User has been renamed. Password must be updated.");
                 valid = false;
             }
         } 
@@ -592,21 +581,6 @@ void QnUserSettingsDialog::at_advancedButton_toggled() {
         widget = widget->parentWidget();
     }
     updateSizeLimits();
-}
-
-void QnUserSettingsDialog::updatePlaceholders() {
-
-    bool showPlaceholder = m_mode == Mode::OwnUser;
-
-    QString placeholder = showPlaceholder 
-        ? defaultPlaceholder 
-        : QString();
-
-    ui->currentPasswordEdit->clear();
-    ui->passwordEdit->clear();
-    ui->passwordEdit->setPlaceholderText(placeholder);
-    ui->confirmPasswordEdit->clear();
-    ui->confirmPasswordEdit->setPlaceholderText(placeholder);
 }
 
 // Utility functions

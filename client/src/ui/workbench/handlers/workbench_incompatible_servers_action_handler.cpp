@@ -38,7 +38,7 @@ QnWorkbenchIncompatibleServersActionHandler::~QnWorkbenchIncompatibleServersActi
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered() {
     if (m_connectTool) {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Please, wait before the previously requested servers will be added to your system."));
+        QMessageBox::critical(mainWindow(), tr("Error"), tr("Please wait. Requested servers will be added to your system."));
         return;
     }
 
@@ -117,7 +117,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
 
     switch (errorCode) {
     case QnConnectToCurrentSystemTool::NoError:
-        QMessageBox::information(mainWindow(), tr("Information"), tr("The selected servers has been successfully connected to your system!"));
+        QMessageBox::information(mainWindow(), tr("Information"), tr("Rejoice! Selected servers have been successfully connected to your system!"));
         break;
     case QnConnectToCurrentSystemTool::AuthentificationFailed: {
         QMessageBox::critical(mainWindow(), tr("Error"), tr("Authentication failed.") + L'\n' + tr("Please, check the password you have entered."));
@@ -185,5 +185,5 @@ bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(const Q
 
     /* Warn that some of the licenses will be deactivated. */
     QnLicenseListHelper remoteHelper(remoteLicensesList);
-    return remoteHelper.totalLicenseByType(Qn::LC_Start) > 0;
+    return remoteHelper.totalLicenseByType(Qn::LC_Start, true) > 0;
 }

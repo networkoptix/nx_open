@@ -42,7 +42,7 @@ namespace {
 
 }
 
-QnPeerUpdateInformation::QnPeerUpdateInformation(const QnMediaServerResourcePtr &server /*= QnMediaServerResourcePtr()*/):
+QnPeerUpdateInformation::QnPeerUpdateInformation(const QnMediaServerResourcePtr &server /* = QnMediaServerResourcePtr()*/):
     server(server),
     stage(QnPeerUpdateStage::Init),
     updateInformation(0),

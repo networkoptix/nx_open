@@ -55,10 +55,16 @@ StreamingChunkTranscoder::StreamingChunkTranscoder( Flags flags )
             Qt::DirectConnection );
         m_transcodeThreads[i]->start();
     }
+
+    Qn::directConnect(
+        qnResPool, &QnResourcePool::resourceRemoved,
+        this, &StreamingChunkTranscoder::onResourceRemoved );
 }
 
 StreamingChunkTranscoder::~StreamingChunkTranscoder()
 {
+    directDisconnectAll();
+
     //cancelling all scheduled transcodings
     {
         QMutexLocker lk( &m_mutex );
@@ -96,7 +102,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
         return false;
     }
 
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera( resource );
+    auto camera = qnCameraPool->getVideoCamera( resource );
     Q_ASSERT( camera );
 
     //validating transcoding parameters
@@ -403,4 +409,23 @@ void StreamingChunkTranscoder::onTranscodingFinished(
         return;
     }
     m_dataSourceCache.put( key, data, (key.duration() / USEC_IN_MSEC) * 3 );  //ideally, <max chunk length from previous playlist> * <chunk count in playlist>
+}
+
+void StreamingChunkTranscoder::onResourceRemoved( const QnResourcePtr& resource )
+{
+    const auto resourceIDStr = resource->getId().toString();
+    if( resourceIDStr.isEmpty() )
+        return;
+
+    auto nextResourceIDStr = resourceIDStr;
+    //we want to remove all cache elements having id resourceIDStr. 
+    //  That's why we need to generate next id value
+    //  We can be sure that unicode char will not overflow because nextResourceIDStr 
+    //      contains only ascii symbols (guid)
+    nextResourceIDStr[nextResourceIDStr.size()-1] =
+        QChar(nextResourceIDStr[nextResourceIDStr.size()-1].unicode()+1);
+
+    m_dataSourceCache.removeRange(
+        StreamingChunkCacheKey( resourceIDStr ),
+        StreamingChunkCacheKey( nextResourceIDStr ) );
 }

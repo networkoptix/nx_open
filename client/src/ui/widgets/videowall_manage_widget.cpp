@@ -17,7 +17,7 @@ namespace {
     const QSize minimumWidgetSizeHint(400, 300);
 }
 
-QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /*= 0*/):
+QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /* = 0*/):
     base_type(parent),
     d_ptr(new QnVideowallManageWidgetPrivate(this)),
     m_dragProcessor(new DragProcessor(this)),

@@ -99,8 +99,8 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(QWidget *editor, QAbstractItemM
 
             QnPtzManageModel::RowData existing = ptzModel->rowData(existingId);
             QString message = (existing.rowType == QnPtzManageModel::PresetRow)
-                              ? tr("This hotkey is used by preset \"%1\"").arg(existing.presetModel.preset.name)
-                              : tr("This hotkey is used by tour \"%1\"").arg(existing.tourModel.tour.name);
+                              ? tr("This hotkey is used by preset \"%1\".").arg(existing.presetModel.preset.name)
+                              : tr("This hotkey is used by tour \"%1\".").arg(existing.tourModel.tour.name);
 
             QnMessageBox messageBox(QnMessageBox::Question, 0, tr("Change hotkey"), message, QnMessageBox::Cancel);
             messageBox.addButton(tr("Reassign"), QnMessageBox::AcceptRole);

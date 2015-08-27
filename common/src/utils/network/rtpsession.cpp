@@ -758,7 +758,7 @@ const QByteArray& RTPSession::getSdp() const
     return m_sdp;
 }
 
-//===================================================================
+// ===================================================================
 
 QByteArray RTPSession::calcDefaultNonce() const
 {
@@ -1488,12 +1488,12 @@ int RTPSession::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& 
 // demux text data only
 bool RTPSession::readTextResponce(QByteArray& response)
 {
-    bool readMoreData = m_responseBufferLen == 0;
     int ignoreDataSize = 0;
+    int prevBufferLen = 0;
     for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock->isConnected(); ++i)
     {
-        if (readMoreData) {
-            int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
+        if (m_responseBufferLen == 0 || m_responseBufferLen == prevBufferLen) {
+            int readed = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
             if (readed <= 0)
             {
                 if( readed == 0 )
@@ -1509,6 +1509,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
                 return false;	//error occured or connection closed
             }
             m_responseBufferLen += readed;
+            prevBufferLen = m_responseBufferLen;
         }
         if (m_responseBuffer[0] == '$') {
             // binary data
@@ -1530,7 +1531,6 @@ bool RTPSession::readTextResponce(QByteArray& response)
                 return true;
             }
         }
-        readMoreData = true;
         if (m_responseBufferLen == RTSP_BUFFER_LEN)
         {
             NX_LOG( lit("RTSP response from %1 has exceeded max response size (%2)").
@@ -1884,7 +1884,7 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
                 m_auth,
                 response,
                 &request,
-                &m_rtspAuthCtx ) != Auth_OK)
+                &m_rtspAuthCtx ) != Qn::Auth_OK)
             return false;
     }
 

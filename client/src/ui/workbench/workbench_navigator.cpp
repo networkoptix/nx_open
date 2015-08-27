@@ -112,6 +112,11 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     discardCacheTimer->setInterval(discardCacheIntervalMs);
     discardCacheTimer->setSingleShot(false);
     connect(discardCacheTimer, &QTimer::timeout, this, &QnWorkbenchNavigator::clearLoaderCache);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
+    {
+        if (res.dynamicCast<QnStorageResource>())
+            clearLoaderCache();
+    });
     discardCacheTimer->start();
 
     for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {

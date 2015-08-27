@@ -20,6 +20,22 @@ Chunk.prototype.debug = function(){
     console.log(new Array(this.level + 1).join(" "), this.title, this.level,  this.children.length);
 };
 
+
+function isDate(val){
+    return val instanceof Date;
+}
+function NumberToDate(date){
+    if(typeof(date)=='number' || typeof(date)=='Number'){
+        date = Math.round(date);
+        date = new Date(date);
+    }
+    if(!isDate(date)){
+        console.error("non date " + (typeof date) + ": " + date );
+        return null;
+    }
+    return date;
+}
+
 // Additional mini-library for declaring and using settings for ruler levels
 function Interval (ms,seconds,minutes,hours,days,months,years){
     this.seconds = seconds;
@@ -30,22 +46,10 @@ function Interval (ms,seconds,minutes,hours,days,months,years){
     this.years = years;
     this.milliseconds = ms
 };
-if(!Number.isInteger) {
-    Number.isInteger = function (num) {
-        return (typeof num === 'number') && (Math.round(num) === num);
-    };
-};
-function isDate(val){
-    return val instanceof Date;
-}
+
 Interval.prototype.addToDate = function(date, count){
-    if(Number.isInteger(date)) {
-        date = new Date(date);
-    }
-    if(!isDate(date)){
-        console.error("non date " + (typeof date) + ": " + date );
-        return date;
-    }
+    date = NumberToDate(date);
+
     if(typeof(count)==='undefined') {
         count = 1;
     }
@@ -127,11 +131,9 @@ Interval.prototype.alignToPast = function(dateToAlign){
 
 //Check if current date aligned by interval
 Interval.prototype.checkDate = function(date){
-    if(Number.isInteger(date)) {
-        date = new Date(date);
-    }
-    if(!isDate(date)){
-        console.error("checkDate - non date" , date);
+    date = NumberToDate(date);
+
+    if(!date ){
         return false;
     }
 
@@ -154,34 +156,37 @@ var RulerModel = {
      * @type {{detailization: number}[]}
      */
     levels: [
-        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy' , marksW:15, smallW: 20, middleW: 25, width: 30 , topW: 0, topFormat:'yyyy' }, // root
-        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy' , marksW:15, smallW: 20, middleW: 25, width: 30 },
+        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy' , marksW:15, smallW: 40, middleW: 400, width: 4000 , topW: 0, topFormat:'yyyy' }, // root
+        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy' , marksW:15, smallW: 40, middleW: 400, width: 9000 },
         {
             name:'Year', //Years
             format:'yyyy',//Format string for date
             interval:  new Interval(0,0,0,0,0,0,1),// Interval for marks
-            width: 30, // Minimal width for label. We should choose minimal width in order to not intresect labels on timeline
+            marksW:15,   // width for marks without label
+            smallW: 40,  // width for smallest label
+            middleW: 120, // width for middle label
+            width: 720, // width for label. We should choose minimal width in order to not intresect labels on timeline
             topW: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
-        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , marksW:15, smallW: 30, middleW: 60, width: 90 },
-        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , marksW:15, smallW: 30, middleW: 60, width: 90 },
-        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , marksW:15, smallW: 30, middleW: 60, width: 90 , topW: 170, topFormat:'mmmm yyyy'},
-        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , marksW:5,  smallW: 20, middleW: 40, width: 60 , topW: 170, topFormat:'d mmmm yyyy' ,contained:1},
-        { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 60, middleW: 80, width: 100},
-        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 60, width: 80 },
-        { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 60, width: 80 },
-        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 60, width: 80 },
-        { name:'30 minutes' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 60, width: 80 },
-        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 60, width: 80 },
-        { name:'5 minutes'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 60, width: 80 },
-        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 60, width: 80 , topW: 170, topFormat:'d mmmm yyyy HH:MM'},
-        { name:'30 seconds' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 60, middleW: 80, width: 100},
-        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 60, width: 80 },
-        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 60, width: 70 },
-        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 45, middleW: 50, width: 60 , topW: 200, topFormat:'d mmmm yyyy HH:MM:ss'},
-        { name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 60, middleW: 100, width: 120},
-        { name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 60, width: 80 }
+        { name:'6 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 360, width: 3600 },
+        { name:'3 Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 1800, width: 9000 },
+        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 100000,   width: 600 , topW: 170, topFormat:'mmmm yyyy'},
+        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , marksW:5,  smallW: 20, middleW: 100,      width: 200 , topW: 170, topFormat:'d mmmm yyyy' ,contained:1},
+        { name:'12 hours'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 200,      width: 1200},
+        { name:'6 hours'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 600,      width: 1800 },
+        { name:'3 hours'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 300,      width: 900 },
+        { name:'Hour'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 },
+        { name:'30 minutes' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 300,      width: 1500 },
+        { name:'10 minutes' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
+        { name:'5 minutes'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 250,      width: 500 },
+        { name:'1 minute'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 , topW: 170, topFormat:'d mmmm yyyy HH:MM'},
+        { name:'30 seconds' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 300,      width: 1500},
+        { name:'10 seconds' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
+        { name:'5 seconds'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 250,      width: 100000 },
+        { name:'1 second'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 , topW: 200, topFormat:'d mmmm yyyy HH:MM:ss'}
+        //{ name:'500 ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 250,      width: 100000},
+        //{ name:'100 ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 }
     ],
 
     getLevelIndex: function(searchdetailization,width){
@@ -220,14 +225,14 @@ var RulerModel = {
 };
 
 //Provider for records from mediaserver
-function CameraRecordsProvider(cameras,mediaserver,$q,width) {
+function CameraRecordsProvider(cameras,mediaserver,$q,width,timeCorrection) {
 
     this.cameras = cameras;
     this.mediaserver = mediaserver;
     this.$q = $q;
     this.chunksTree = null;
     this.requestedCache = [];
-    this.width = width;
+    this.timeCorrection = timeCorrection || 0;
     var self = this;
     //1. request first detailization to get initial bounds
 
@@ -238,8 +243,9 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width) {
         if(!self.chunksTree){
             return; //No chunks for this camera
         }
+
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,self.width);
+        var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,width);
         if(nextLevel<RulerModel.levels.length-1) {
             self.requestInterval(self.chunksTree.start, self.now(), nextLevel + 1);
         }
@@ -320,8 +326,8 @@ CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start,en
 
 CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     var deferred = this.$q.defer();
-    this.start = start;
-    this.end = end;
+    //this.start = start;
+    //this.end = end;
     this.level = level;
     var detailization = RulerModel.levels[level].interval.getMilliseconds();
 
@@ -331,7 +337,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
     if(!self.lockRequests) {
         self.lockRequests = true; // We may lock requests here if we have no tree yet
-        this.mediaserver.getRecords('/', this.cameras[0], start, end, detailization)
+        this.mediaserver.getRecords('/', this.cameras[0], Math.max(start - this.timeCorrection,0), end - this.timeCorrection, detailization)
             .then(function (data) {
 
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
@@ -340,7 +346,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
                 _.forEach(chunks,function(chunk){
                     chunk.durationMs = parseInt(chunk.durationMs);
-                    chunk.startTimeMs = parseInt(chunk.startTimeMs);
+                    chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeCorrection;
                 });
 
                 var chunksToIterate = chunks.length;
@@ -508,7 +514,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
  * @param parent - parent for recursive call
  * @param result - heap for recursive call
  */
-CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent,debugLevel){
+CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent, debugLevel){
     parent = parent || this.chunksTree;
 
     if(!parent){
@@ -525,10 +531,10 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     if(parent.children.length == 0){
-        if(!debugLevel) {
+        //if(!debugLevel) {
             result.push(parent); // Bad chunk, but no choice
             return;
-        }
+        //}
     }
 
     // Iterate children:
@@ -551,7 +557,7 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
  * ShortCache - special collection for short chunks with best detailization for calculating playing position and date
  * @constructor
  */
-function ShortCache(cameras,mediaserver,$q){
+function ShortCache(cameras,mediaserver,$q,timeCorrection){
 
     this.$q = $q;
 
@@ -573,6 +579,8 @@ function ShortCache(cameras,mediaserver,$q){
     this.requestDetailization = 1;//the deepest detailization possible
     this.limitChunks = 100; // limit for number of chunks
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
+
+    this.timeCorrection = timeCorrection || 0;
 }
 ShortCache.prototype.init = function(start){
     this.liveMode = false;
@@ -612,8 +620,8 @@ ShortCache.prototype.update = function(requestPosition,position){
     // Get next {{limitChunks}} chunks
     this.mediaserver.getRecords('/',
             this.cameras[0],
-            requestPosition,
-            (new Date()).getTime()+1000,
+            Math.max(requestPosition - this.timeCorrection,0),
+            (new Date()).getTime() + 100000 - this.timeCorrection,
             this.requestDetailization,
             this.limitChunks).
         then(function(data){
@@ -623,7 +631,7 @@ ShortCache.prototype.update = function(requestPosition,position){
 
             _.forEach(chunks,function(chunk){
                 chunk.durationMs = parseInt(chunk.durationMs);
-                chunk.startTimeMs = parseInt(chunk.startTimeMs);
+                chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeCorrection;
 
                 if(chunk.durationMs == -1){
                     chunk.durationMs = (new Date()).getTime() - chunk.startTimeMs;//in future
@@ -652,6 +660,8 @@ ShortCache.prototype.update = function(requestPosition,position){
                     self.checkPoints[lastCheckPointPosition] = lastCheckPointDate; // Too many checkpoints at this point
                 }
             }
+
+            self.setPlayingPosition(self.played);
         });
 };
 
@@ -789,8 +799,8 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
+    var needZoomOut = !this.çheckZoomOut();
     this.end = end;
-    var needZoomOut =  this.fullZoomOutValue() - this.zoom() < this.zoomAccuracy;
     this.updateTotalInterval();
     if(needZoomOut){
         this.zoom(1);
@@ -814,6 +824,7 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.msPerPixel = this.bound(this.minMsPerPixel, this.msPerPixel, this.maxMsPerPixel);
     this.anchorPoint = this.bound(0, this.anchorPoint, 1);
     this.anchorDate = this.bound(this.start, Math.round(this.anchorDate), this.end);
+
 
     this.visibleStart = Math.round(this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint);
     this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));
@@ -933,7 +944,15 @@ ScaleManager.prototype.boundZoom = function(zoomTarget){
 
 
 ScaleManager.prototype.calcLevels = function(msPerPixel) {
-    var levels = {};
+    var zerolevel = RulerModel.levels[0];
+    var levels = {
+        top:{index:0,level:zerolevel},
+        labels:{index:0,level:zerolevel},
+        middle:{index:0,level:zerolevel},
+        small:{index:0,level:zerolevel},
+        marks:{index:0,level:zerolevel},
+        events:{index:0,level:zerolevel}
+    };
     for (var i = 0; i < RulerModel.levels.length; i++) {
         var level = RulerModel.levels[i];
 
@@ -966,12 +985,12 @@ ScaleManager.prototype.calcLevels = function(msPerPixel) {
             break;
         }
     }
-    if(levels.top.index == levels.labels.index && levels.top.index > 0){
+    /*if(levels.top.index == levels.labels.index && levels.top.index > 0){
         do{
             levels.top.index --;
             levels.top.level = RulerModel.levels[levels.top.index];
         }while(!levels.top.level.topW && levels.top.index);
-    }
+    }*/
     return levels;
 };
 ScaleManager.prototype.updateLevels = function() {
@@ -1082,6 +1101,12 @@ ScaleManager.prototype.targetLevels = function(zoomTarget){
     return this.calcLevels(msPerPixel);
 };
 
+ScaleManager.prototype.çheckZoomOut = function(){
+    return this.zoom() < this.fullZoomOutValue() - this.zoomAccuracy;
+};
+ScaleManager.prototype.çheckZoomIn = function(){
+    return this.zoom() > this.fullZoomInValue() + this.zoomAccuracy;
+};
 ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
     if(typeof(zoomValue)=="undefined"){
         return this.msToZoom(this.msPerPixel);

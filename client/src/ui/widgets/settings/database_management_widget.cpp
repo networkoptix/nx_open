@@ -95,7 +95,7 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     if( errorCode != ec2::ErrorCode::ok )
     {
         NX_LOG( lit("Failed to dump Server database: %1").arg(ec2::toString(errorCode)), cl_logERROR );
-        QMessageBox::information(this, tr("Information"), tr("Failed to dump Server database to '%1'").arg(fileName));
+        QMessageBox::information(this, tr("Information"), tr("Failed to dump server database to %1.").arg(fileName));
         return;
     }
 
@@ -122,7 +122,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         return;
     }
 
-    if (QMessageBox::warning(this, tr("Warning"), tr("Are you sure you want to start restoring database? All current data will be lost."),
+    if (QMessageBox::warning(this, tr("Warning"), tr("Are you sure you would like to restore the database? All existing data will be lost."),
                              QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
         file.close();
         return;
@@ -150,7 +150,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     if (!conn) {
         QMessageBox::information(this,
             tr("Information"),
-            tr("You need to connect to a server before doing backup"));
+            tr("You need to connect to a server prior to performing a backup."));
         return;
     }
 

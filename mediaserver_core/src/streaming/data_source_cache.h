@@ -49,13 +49,17 @@ public:
         const StreamingChunkCacheKey& key,
         DataSourceContextPtr data,
         const int unsigned livetimeMs = DEFAULT_LIVE_TIME_MS );
+    //!Removes keys within range [beginKey, endKey)
+    void removeRange(
+        const StreamingChunkCacheKey& beginKey,
+        const StreamingChunkCacheKey& endKey );
 
     //!Implementation of TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
 
 private:
     mutable QMutex m_mutex;
-    std::map<StreamingChunkCacheKey, DataSourceContextPtr> m_cachedDataProviders;
+    std::map<StreamingChunkCacheKey, std::pair<DataSourceContextPtr, quint64>> m_cachedDataProviders;
     std::map<quint64, StreamingChunkCacheKey> m_timers;
     bool m_terminated;
 };

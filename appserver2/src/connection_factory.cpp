@@ -26,6 +26,7 @@
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
+#include "rest/time_sync_rest_handler.h"
 #include "rest/server/rest_connection_processor.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
@@ -304,6 +305,7 @@ namespace ec2
             } );
 
         restProcessorPool->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler());
+        restProcessorPool->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler());
 
         //using HTTP processor since HTTP REST does not support HTTP interleaving
         //restProcessorPool->registerHandler(
@@ -511,7 +513,7 @@ namespace ec2
         const QUrl& ecURL,
         impl::TestConnectionHandlerPtr handler )
     {
-        if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized )
+        if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized || errorCode == ErrorCode::temporary_unauthorized)
         {
             handler->done( reqID, errorCode, connectionInfo );
             QMutexLocker lk( &m_mutex );

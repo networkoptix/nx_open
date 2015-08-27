@@ -3,52 +3,33 @@
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <stdexcept>
-#include <vector>
-#include <map>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 
 #include <utils/common/singleton.h>
 #include <utils/common/ldap.h>
+#include "common/common_globals.h"
 
-struct QnLdapUser {
-    QString dn;
-    QString login;
-    QString fullName;
-    QString email;
-};
-
-typedef QList<QnLdapUser> QnLdapUsers;
-
-class QnLdapException : std::exception {
-public:
-    QnLdapException(const char *msg)
-        : _msg(msg) {
-    }
-
-    const char* what() const
-#ifdef __GNUC__
-    noexcept (true)
-#endif
- {
-        return _msg.c_str();
-    }
-private:
-    std::string _msg;
-};
 
 class QnLdapManagerPrivate;
 
 class QnLdapManager : public Singleton<QnLdapManager> {
 public:
+
     QnLdapManager();
     ~QnLdapManager();
 
+    bool fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings);
     bool fetchUsers(QnLdapUsers &users);
 
-    QString realm() const;
+    Qn::AuthResult realm(QString* realm) const;
 
-    bool authenticateWithDigest(const QString &login, const QString &ha1);
+    Qn::AuthResult authenticateWithDigest(const QString &login, const QString &ha1);
     bool testSettings(const QnLdapSettings& settings);
+
+private:
+    mutable QMap<QString, QString> m_realmCache;
+    mutable QMutex m_realmCacheMutex;
 };
 
 #endif // LDAP_MANAGER_H_

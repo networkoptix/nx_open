@@ -12,6 +12,7 @@ HTTP_LOG_LEVEL=none
 
 export LD_LIBRARY_PATH=$PREFIX/lib
 export VMS_PLUGIN_DIR=$PREFIX/plugins
+export SASL_PATH=$LD_LIBRARY_PATH/sasl2
 
 echo "/media/mmcblk0p1/cores/core.%p" > /proc/sys/kernel/core_pattern
 if [ ! -e "/media/mmcblk0p1/cores" ]; then
@@ -54,12 +55,20 @@ startquiet() {
     start
 }
 
+SECONDS_TO_WAIT_BEFORE_KILL_9=30
+
 stop() {
     echo -n "Stopping $BIN_NAME..... "
     /usr/bin/killall $1 $BIN_NAME 1>/dev/null
-    while [ `/bin/pidof $BIN_NAME` ]
+    local i=0
+    while [ "`/bin/pidof $BIN_NAME`" ]
     do
         /bin/sleep 1
+        let i++
+        if [ $i -gt $SECONDS_TO_WAIT_BEFORE_KILL_9 ]; then
+            echo -n "sending 9 signal...    "
+            /usr/bin/killall -9 $BIN_NAME 1>/dev/null 2>&1
+        fi
     done
     echo "OK"
 }
@@ -97,7 +106,7 @@ kill_ms_if_high_mem_usage() {
     MEM_USAGE=`cat /proc/$MSERVER_PID/status | grep VmRSS | cut -d: -f2 | tr -d "\t " | cut -d "k" -f 1`
 
     if [ "$MEM_USAGE" -gt 89000 ]; then
-        kill -SEGV $MSERVER_PID
+        kill -FPE $MSERVER_PID
     fi
 }
 

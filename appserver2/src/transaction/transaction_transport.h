@@ -165,6 +165,8 @@ public:
     QUrl remoteAddr() const;
     SocketAddress remoteSocketAddr() const;
 
+    nx_http::AuthInfoCache::AuthorizationCacheItem authData() const;
+
     ApiPeerData remotePeer() const { return m_remotePeer; }
 
     // This is multi thread getters/setters
@@ -223,6 +225,7 @@ public:
     void connectionFailure();
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
+    static void fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey );
 
 private:
     struct DataToSend
@@ -301,6 +304,7 @@ private:
     int m_waiterCount;
     QWaitCondition m_cond;
     std::function<void ()> m_ttFinishCallback;
+
 private:
     void default_initializer();
     void sendHttpKeepAlive( quint64 taskID );
@@ -317,7 +321,6 @@ private:
     void serializeAndSendNextDataBuffer();
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
-    void fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey );
     /*!
         \note MUST be called with \a m_mutex locked
     */

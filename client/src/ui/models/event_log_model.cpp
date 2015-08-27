@@ -370,7 +370,7 @@ QString QnEventLogModel::getResourceNameString(const QnUuid &id) {
 QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value) {
     switch (value) {
     case QnBusiness::EveryOne:
-        return tr("All users");
+        return tr("All Users");
     case QnBusiness::AdminOnly:
         return tr("Administrators Only");
     default:
@@ -473,13 +473,15 @@ bool QnEventLogModel::hasMotionUrl(const QModelIndex &index) const {
 }
 
 int QnEventLogModel::columnCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent);
-    return m_columns.size(); // TODO: #Elric incorrect, should return zero for non-root nodes.
+    if(!parent.isValid())
+        return m_columns.size();
+    return 0;
 }
 
 int QnEventLogModel::rowCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent);
-    return m_index->size(); // TODO: #Elric incorrect, should return zero for non-root nodes.
+    if(!parent.isValid())
+        return m_index->size();
+    return 0;
 }
 
 QVariant QnEventLogModel::headerData(int section, Qt::Orientation orientation, int role) const {

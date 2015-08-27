@@ -34,8 +34,8 @@ private:
     void updateData();
 
 private slots:
-    void at_gotStatiscits(int httpStatus, const QnRecordingStatsReply& data, int requestNum);
-    void at_gotStorageSpace(int httpStatus, const QnStorageSpaceReply& data, int requestNum);
+    void at_gotStatiscits(int status, const QnRecordingStatsReply& data, int requestNum);
+    void at_gotStorageSpace(int status, const QnStorageSpaceReply& data, int requestNum);
     void at_eventsGrid_clicked(const QModelIndex & index);
     void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();

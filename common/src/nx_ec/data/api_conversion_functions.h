@@ -45,9 +45,6 @@ namespace ec2 {
     void fromResourceToApi(const QnEmailSettings &src, ApiEmailSettingsData &dst);
     void fromApiToResource(const ApiEmailSettingsData &src, QnEmailSettings &dst);
 
-    void fromResourceToApi(const QnLdapSettings &src, ApiLdapSettingsData &dst);
-    void fromApiToResource(const ApiLdapSettingsData &src, QnLdapSettings &dst);
-
     void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, const ResourceContext &ctx);
 
     void fromApiToResource(const ApiLayoutItemData &src, QnLayoutItemData &dst);

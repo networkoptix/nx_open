@@ -10,7 +10,12 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.playerApi = false;
         $scope.cameras = {};
         $scope.liveOnly = true;
-        $scope.storage.cameraId   = $scope.storage.cameraId   || $routeParams.cameraId || null;
+        $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
+
+        if(!$routeParams.cameraId &&  $scope.storage.cameraId){
+            $location.path('/view/' + $scope.storage.cameraId, false);
+        }
+
         $scope.activeCamera = null;
 
         var isAdmin = false;
@@ -18,6 +23,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         var canViewArchive = false;
         var availableCameras = null;
 
+        var timeCorrection = 0;
+        var minTimeLag = 2000;// Two seconds
 
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
@@ -51,7 +58,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         if(window.jscd.browser == 'Microsoft Internet Explorer' && ! browserSupports('webm',false)){
-            $scope.ieNoWebm = true;
+            if(window.jscd.osVersion < 10) { //For 10th version webm codec doesn't work
+                $scope.ieNoWebm = true;
+            }
         }
 
         if(window.jscd.mobile) {
@@ -89,7 +98,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             if(type=='hls'){
                 return !!window.jscd.flashVersion ; // flash hls support
             }
-
             return false;
         }
         function cameraSupports(type){
@@ -164,6 +172,8 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.positionProvider.init(playing);
             if(live){
                 playing = (new Date()).getTime();
+            }else{
+                playing = Math.round(playing);
             }
             var cameraId = $scope.activeCamera.physicalId;
             var serverUrl = '';
@@ -180,7 +190,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             var positionMedia = !live ? "&pos=" + (playing) : "";
             var positionHls = !live ? "&startTimestamp=" + (playing) : "";
 
-            // TODO: check resolution ? 
+            // TODO: check resolution ?
             $scope.acitveVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + $scope.activeResolution + positionHls   + authParam ), type: mimeTypes['hls'], transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?resolution=' + $scope.activeResolution + positionMedia + authParam ), type: mimeTypes['webm'], transport:'webm' },
@@ -208,6 +218,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.selectCameraById = function (cameraId, position, silent) {
+            if($scope.activeCamera && $scope.activeCamera.id == cameraId){
+                return;
+            }
             var oldTimePosition = null;
             if($scope.positionProvider && !$scope.positionProvider.liveMode){
                 oldTimePosition = $scope.positionProvider.playedPosition;
@@ -219,8 +232,8 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             $scope.activeCamera = getCamera ($scope.storage.cameraId  );
             if (!silent && $scope.activeCamera) {
-                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
-                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
 
                 $scope.liveOnly = true;
                 if(canViewArchive) {
@@ -557,6 +570,15 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.positionSelected = false;
             }
         });
+
+        mediaserver.getTime().then(function(result){
+            var serverTime = parseInt(result.data.reply.utcTime);
+            var clientTime = (new Date()).getTime();
+            if(Math.abs(clientTime - serverTime) > minTimeLag){
+                timeCorrection = clientTime - serverTime;
+            }
+        });
+
         mediaserver.getCurrentUser().then(function(result){
             isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
             canViewLive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewLivePermission);

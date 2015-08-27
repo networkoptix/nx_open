@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Camera settings</string>
+   <string>Camera Settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_8">
    <item>
@@ -212,7 +212,7 @@
        <item>
         <widget class="QCheckBox" name="enableAudioCheckBox">
          <property name="text">
-          <string>Enable audio</string>
+          <string>Enable Audio</string>
          </property>
         </widget>
        </item>
@@ -276,7 +276,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Motion is not available for this camera</string>
+          <string>Motion is not available for this camera.</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -289,13 +289,13 @@
        <item>
         <widget class="QGroupBox" name="motionSettingsGroupBox">
          <property name="title">
-          <string>Motion settings</string>
+          <string>Motion Settings</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Motion detection:</string>
+             <string>Motion Detection</string>
             </property>
            </widget>
           </item>
@@ -304,7 +304,7 @@
             <item>
              <widget class="QRadioButton" name="cameraMotionButton">
               <property name="text">
-               <string>Hardware (Camera built-in)</string>
+               <string>Hardware (camera built-in)</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -314,7 +314,7 @@
             <item>
              <widget class="QRadioButton" name="softwareMotionButton">
               <property name="text">
-               <string>Software (Max FPS may be slightly decreased on Server)</string>
+               <string>Software - maximum FPS could decrease slightly on server</string>
               </property>
               <property name="checked">
                <bool>false</bool>
@@ -363,7 +363,7 @@
             <item>
              <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>Motion mask (0)</string>
+               <string>Motion Mask (0)</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -423,7 +423,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Camera motion web page:</string>
+             <string>Camera web page:</string>
             </property>
             <property name="openExternalLinks">
              <bool>false</bool>
@@ -464,7 +464,7 @@
          <item>
           <widget class="QPushButton" name="resetMotionRegionsButton">
            <property name="text">
-            <string>Reset motion regions</string>
+            <string>Reset Motion Regions</string>
            </property>
           </widget>
          </item>
@@ -474,7 +474,7 @@
      </widget>
      <widget class="QWidget" name="fisheyeTab">
       <attribute name="title">
-       <string>Dewarping</string>
+       <string>Fisheye</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <property name="leftMargin">

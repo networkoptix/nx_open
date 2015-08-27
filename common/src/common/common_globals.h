@@ -33,7 +33,7 @@ namespace Qn
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType)
+            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
@@ -86,8 +86,7 @@ public:
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        ShareIpCapability                   = 0x020,
-        IOModuleCapability                  = 0x040,
+        ShareIpCapability                   = 0x020
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -692,8 +691,29 @@ public:
          */
         LC_Start,
 
+        /** 
+         * Invalid license. Required when the correct license type is not known in current version.
+         */
+        LC_Invalid,
+
         LC_Count
     };
+
+    /**
+    * Authentication error code
+    */
+    enum AuthResult
+    {
+        Auth_OK,            // OK
+        Auth_WrongLogin,    // invalid login
+        Auth_WrongInternalLogin, // invalid login used for internal auth scheme
+        Auth_WrongDigest,   // invalid or empty digest
+        Auth_WrongPassword, // invalid password
+        Auth_Forbidden,     // no auth mehod found or custom auth scheme without login/password is failed
+        Auth_PasswordExpired, // Password is expired
+        Auth_ConnectError   // can't connect to the external system to authenticate
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -744,7 +764,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
-        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType),
+        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult),
     (metatype)(lexical)
 )
 

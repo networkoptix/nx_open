@@ -333,10 +333,10 @@ QnTranscoder::OperationResult QnTranscoder::setAudioCodec(CodecID codec, Transco
             break;
             */
         case TM_OpenCLTranscode:
-            m_lastErrMessage = tr("OpenCLTranscode is not implemented");
+            m_lastErrMessage = tr("OpenCLTranscode is not implemented.");
             break;
         default:
-            m_lastErrMessage = tr("Unknown Transcode Method");
+            m_lastErrMessage = tr("Unknown transcode method");
             break;
     }
     return m_lastErrMessage.isEmpty() 

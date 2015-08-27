@@ -173,8 +173,15 @@ namespace ec2
             {
                 case nx_http::StatusCode::ok:
                     break;
-                case nx_http::StatusCode::unauthorized:
+                case nx_http::StatusCode::unauthorized: {
+                    QString authResultStr = nx_http::getHeaderValue(httpClient->response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
+                    if (!authResultStr.isEmpty()) {
+                        Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
+                        if (authResult == Qn::Auth_ConnectError)
+                            return handler( ErrorCode::temporary_unauthorized, OutputData() );
+                    }
                     return handler( ErrorCode::unauthorized, OutputData() );
+                }
                 case nx_http::StatusCode::notImplemented:
                     return handler( ErrorCode::unsupported, OutputData() );
                 default:

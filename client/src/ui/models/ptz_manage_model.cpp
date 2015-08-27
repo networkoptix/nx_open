@@ -50,7 +50,7 @@ void QnPtzManageModel::addTour() {
     if (m_tours.isEmpty())
         lastRow++;
 
-    QString name = generateUniqueString(collectTourNames(), QString(), tr("New tour %1"));
+    QString name = generateUniqueString(collectTourNames(), QString(), tr("New Tour %1"));
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_tours << name;
@@ -114,7 +114,7 @@ void QnPtzManageModel::addPreset() {
     if (m_presets.isEmpty())
         lastRow++;
 
-    QString name = generateUniqueString(collectPresetNames(), QString(), tr("Saved position %1"));
+    QString name = generateUniqueString(collectPresetNames(), QString(), tr("Saved Position %1"));
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_presets << name;
@@ -649,7 +649,7 @@ bool QnPtzManageModel::tourIsValid(const QnPtzTourItemModel &tourModel) const {
 QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel &tourModel, QString *stateString) const {
     if (tourModel.tour.spots.size() < 2) {
         if (stateString)
-            *stateString = tr("Tour should contain at least 2 positions");
+            *stateString = tr("Tour should contain at least 2 positions.");
         return IncompleteTour;
     }
 
@@ -676,7 +676,7 @@ QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel
 
     if (stateString) {
         qint64 time = estimatedTimeSecs(tourModel.tour);
-        *stateString = tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minute(s)", 0, time / 60));
+        *stateString = tr("Tour Time: %1.").arg((time < 60) ? tr("less than a minute") : tr("about %n minute(s)", 0, time / 60));
     }
     return ValidTour;
 }

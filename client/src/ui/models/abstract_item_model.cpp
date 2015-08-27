@@ -10,7 +10,7 @@ QnAbstractItemModelResetter::~QnAbstractItemModelResetter() {
     m_model->endResetModel();
 }
 
-QnAbstractItemModel::QnAbstractItemModel(QObject *parent /*= 0*/):
+QnAbstractItemModel::QnAbstractItemModel(QObject *parent /* = 0*/):
     QAbstractItemModel(parent)
 {}
 

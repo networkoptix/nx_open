@@ -312,7 +312,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     result.timeout = testSmtpTimeoutMSec / 1000;
 
     if (!result.isValid()) {
-        QMessageBox::warning(this, tr("Invalid data"), tr("Provided parameters are not valid. Could not perform a test."));
+        QMessageBox::warning(this, tr("Invalid data"), tr("Provided parameters not valid. Could not perform test."));
         return;
     }
 
@@ -381,7 +381,7 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
         return;
     }
 
-    stopTesting(tr("Timed out"));
+    stopTesting(tr("Timed Out"));
 }
 
 void QnSmtpSettingsWidget::validateEmailSimple() {
@@ -396,15 +396,15 @@ void QnSmtpSettingsWidget::validateEmailSimple() {
     if (!targetEmail.isEmpty()) {
         QnEmailAddress email(targetEmail); 
         if (!email.isValid())
-            errorText = tr("Email is not valid");
+            errorText = tr("E-Mail is not valid");
         else if (email.smtpServer().isNull())
-            errorText = tr("No preset found. Use 'Advanced' option");
+            errorText = tr("No preset found. Use 'Advanced' option.");
     }
 
     if (errorText.isEmpty() && !supportEmail.isEmpty()) {
         QnEmailAddress support(supportEmail);
         if (!support.isValid())
-            errorText = tr("Support email is not valid");
+            errorText = tr("Support email is not valid.");
     } 
 
     ui->detectErrorLabel->setText(errorText);
@@ -422,13 +422,13 @@ void QnSmtpSettingsWidget::validateEmailAdvanced() {
     if (!targetEmail.isEmpty()) {
         QnEmailAddress email(targetEmail); 
         if (!email.isValid())
-            errorText = tr("Email is not valid");
+            errorText = tr("E-Mail is not valid");
     }
 
     if (errorText.isEmpty() && !supportEmail.isEmpty()) {
         QnEmailAddress support(supportEmail);
         if (!support.isValid())
-            errorText = tr("Support email is not valid");
+            errorText = tr("Support email is not valid.");
     }
 
     ui->supportEmailWarningLabel->setText(errorText);
