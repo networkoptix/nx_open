@@ -35,7 +35,9 @@
 #include <ui/models/audit/audit_log_detail_model.h>
 #include <QMouseEvent>
 #include "core/resource/layout_resource.h"
+
 #include "ui/common/geometry.h"
+#include <ui/common/palette.h>
 #include "ui/style/globals.h"
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include "ui/workbench/workbench_context_aware.h"
@@ -53,6 +55,9 @@ namespace {
         SessionTab,
         CameraTab
     };
+
+    const char* checkBoxCheckedProperty("checkboxChecked");
+    const char* checkBoxFilterProperty("checkboxFilter");
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
@@ -316,7 +321,7 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
     for (const QCheckBox* checkBox: m_filterCheckboxes) 
     {
         if (!checkBox->isChecked()) 
-            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
+            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property(checkBoxFilterProperty).toInt();
     }
 
 
@@ -407,10 +412,8 @@ QList<QnAuditLogModel::Column> detailSessionColumns(bool showUser)
 
 void QnAuditLogDialog::setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes)
 {
-    QPalette palette = checkbox->palette();
-    palette.setColor(checkbox->foregroundRole(), color);
-    checkbox->setPalette(palette);
-    checkbox->setProperty("filter", (int) filteredTypes);
+    setPaletteColor(checkbox, QPalette::Active, QPalette::Foreground, color);
+    checkbox->setProperty(checkBoxFilterProperty, static_cast<int>(filteredTypes));
     m_filterCheckboxes << checkbox;
     checkbox->disconnect(this);
     connect(checkbox, &QCheckBox::stateChanged, this, &QnAuditLogDialog::at_typeCheckboxChanged);
@@ -463,8 +466,19 @@ void QnAuditLogDialog::at_currentTabChanged()
     const Qn::AuditRecordTypes camerasTypes = Qn::AR_ViewLive | Qn::AR_ViewArchive | Qn::AR_ExportVideo | Qn::AR_CameraUpdate | Qn::AR_CameraInsert | Qn::AR_CameraRemove;
 
     for(QCheckBox* checkBox: m_filterCheckboxes) {
-        Qn::AuditRecordTypes eventTypes = (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
-        checkBox->setEnabled(allEnabled || (camerasTypes & eventTypes));
+        Qn::AuditRecordTypes eventTypes =static_cast<Qn::AuditRecordTypes>(checkBox->property(checkBoxFilterProperty).toInt());
+        bool allowed = allEnabled || (camerasTypes & eventTypes);
+
+        if (checkBox->isEnabled() == allowed) 
+            continue;
+
+        checkBox->setEnabled(allowed);
+        if (allowed) {
+            checkBox->setChecked(checkBox->property(checkBoxCheckedProperty).toBool());
+        } else {
+            checkBox->setProperty(checkBoxCheckedProperty, checkBox->isChecked());
+            checkBox->setChecked(false);
+        }
     }
     at_filterChanged();
 }
@@ -746,7 +760,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
             w += m_itemDelegate->playButtonSize().width() + COLUMN_SPACING*2;
             w += ui->gridDetails->verticalScrollBar()->width() + 2;
             bool needAdjust =  ui->gridDetails->width() < w;
-            ui->gridDetails->setMinimumSize(w, -1);
+            ui->gridDetails->setMinimumSize(w, 0);
             if (needAdjust)
                 ui->gridDetails->adjustSize();
         }, Qt::QueuedConnection
