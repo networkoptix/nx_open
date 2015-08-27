@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-struct QnStartupParameters;
+#include <client/client_startup_parameters.h>
 
 class QnClientModule: public QObject 
 {
