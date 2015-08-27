@@ -47,7 +47,7 @@ QnVideoCameraPool* QnVideoCameraPool::instance()
 
 void QnVideoCameraPool::updateActivity()
 {
-    QMutexLocker lock(&m_staticMtx);
+    QnMutexLocker lock(&m_staticMtx);
     for (const auto&camera: m_cameras)
         camera->updateActivity();
 }
