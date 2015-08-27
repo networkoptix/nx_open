@@ -136,7 +136,7 @@ public:
                 break;
             case cameraInitializationInProgress:
                 //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..)
-                errorMessageParts   << tr("%1 initialization process in progress").arg(upperCaseTarget);
+                errorMessageParts   << tr("%1 initialization process in progress.").arg(upperCaseTarget);
                 break;
             default:
             {
