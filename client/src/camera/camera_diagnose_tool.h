@@ -102,7 +102,7 @@ namespace CameraDiagnostics
         QnMediaServerResourcePtr m_server;
         bool m_result;
         QString m_errorMessage;
-
+        bool m_deviceIsIoModuleOnly;
         void doMediaServerAvailabilityStep();
     };
 }

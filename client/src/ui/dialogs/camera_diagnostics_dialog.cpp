@@ -23,7 +23,9 @@ QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::Window
     ui(new Ui::CameraDiagnosticsDialog),
     m_tool(NULL),
     m_started(false),
-    m_finished(false)
+    m_finished(false),
+    m_targetDevice(),
+    m_upperCaseDevice()
 {
     ui->setupUi(this);
     
@@ -46,7 +48,13 @@ void QnCameraDiagnosticsDialog::setResource(const QnVirtualCameraResourcePtr &re
 
     m_resource = resource;
 
-    updateTitleText();
+    const bool isSingleIOModule = 
+        (m_resource && !resource->hasVideo(nullptr) && resource->hasFlags(Qn::io_module));
+
+    m_upperCaseDevice = (isSingleIOModule ? tr("IO Module") : tr("Camera"));
+    m_targetDevice = (isSingleIOModule ? tr("IO module") : tr("camera"));
+
+    updateTexts();
     clearLog();
 }
 
@@ -92,12 +100,18 @@ void QnCameraDiagnosticsDialog::stop() {
     updateOkButtonEnabled();
 }
 
-void QnCameraDiagnosticsDialog::updateTitleText() {
-    if(!m_resource) {
+void QnCameraDiagnosticsDialog::updateTexts() {
+    
+    if(!m_resource)
+    {
         ui->titleLabel->clear();
-    } else {
-        ui->titleLabel->setText(tr("Diagnostics for camera %1.").arg(getResourceName(m_resource)));
-    }
+        return;
+    } 
+    
+    const QString titleLabelText = tr("Diagnostics for %1 %2.");
+    ui->titleLabel->setText(titleLabelText.arg(m_targetDevice).arg(getResourceName(m_resource)));
+
+    setWindowTitle(tr("%1 Diagnostics").arg(m_upperCaseDevice));
 }
 
 void QnCameraDiagnosticsDialog::updateOkButtonEnabled() {
@@ -113,9 +127,9 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     case CameraDiagnostics::Step::mediaServerAvailability:
         return tr("Confirming server availability.");
     case CameraDiagnostics::Step::cameraAvailability:
-        return tr("Confirming camera is accessible.");
+        return tr("Confirming %1 is accessible.").arg(m_targetDevice);
     case CameraDiagnostics::Step::mediaStreamAvailability:
-        return tr("Confirming target camera provides media stream.");
+        return tr("Confirming target %1 provides media stream.").arg(m_targetDevice);
     case CameraDiagnostics::Step::mediaStreamIntegrity: 
         return tr("Evaluating media stream for errors.");
     default:

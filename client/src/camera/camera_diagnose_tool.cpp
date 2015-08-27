@@ -22,12 +22,14 @@ namespace CameraDiagnostics
         m_cameraID( cameraID ),
         m_state( sInit ),
         m_step( Step::mediaServerAvailability ),
-        m_result( false )
+        m_result( false ),
+        m_deviceIsIoModuleOnly( false )
     {
         QnSecurityCamResourcePtr secCamRes = qnResPool->getResourceById<QnSecurityCamResource>( cameraID );
         if( !secCamRes )
             return;
 
+        m_deviceIsIoModuleOnly = (!secCamRes->hasVideo(nullptr) && secCamRes->hasFlags(Qn::io_module));
         QnMediaServerResourcePtr serverResource = secCamRes->getParentServer();
         if( !serverResource )
             return;
@@ -89,7 +91,10 @@ namespace CameraDiagnostics
         }
 
         m_result = true;
-        m_errorMessage = ErrorCode::toString(ErrorCode::noError, QList<QString>());
+        const ErrorCode::ErrorTarget target = (m_deviceIsIoModuleOnly 
+            ? ErrorCode::kIoModuleTarget : ErrorCode::kCameraTarget);
+        m_errorMessage = ErrorCode::toString(ErrorCode::noError, target, QList<QString>());
+
         emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
 
         emit diagnosticsStepStarted( static_cast<Step::Value>(m_step+1) );
@@ -140,7 +145,9 @@ namespace CameraDiagnostics
         }
 
         m_result = reply.errorCode == ErrorCode::noError;
-        m_errorMessage = ErrorCode::toString(reply.errorCode, reply.errorParams);
+        const ErrorCode::ErrorTarget target = (m_deviceIsIoModuleOnly 
+            ? ErrorCode::kIoModuleTarget : ErrorCode::kCameraTarget);
+        m_errorMessage = ErrorCode::toString(reply.errorCode, target, reply.errorParams);
         emit diagnosticsStepResult( static_cast<Step::Value>(reply.performedStep), m_result, m_errorMessage );
 
         const Step::Value nextStep = static_cast<Step::Value>(reply.performedStep+1);
