@@ -520,7 +520,11 @@ qreal QnWorkbenchNavigator::minimalSpeed() const {
     if (!isPlayingSupported())
         return 0.0;
 
-    return hasVideo() 
+    if (QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
+        if (!reader->isNegativeSpeedSupported())
+            return 0.0;
+
+    return hasVideo()
         ? -16.0 
         : 0.0;
 }
