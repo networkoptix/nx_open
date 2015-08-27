@@ -8,6 +8,8 @@
 
 #include "http_server_connection.h"
 
+#include <boost/optional.hpp>
+
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 
 
@@ -25,7 +27,7 @@ namespace nx_http
         virtual bool authenticate(
             const HttpServerConnection& connection,
             const nx_http::Request& request,
-            header::WWWAuthenticate* const wwwAuthenticate,
+            boost::optional<header::WWWAuthenticate>* const wwwAuthenticate,
             stree::AbstractResourceWriter* authProperties ) = 0;
     };
 }

@@ -29,6 +29,7 @@ INSERT INTO account_status( code, description )                     \
                                                                     \
 CREATE TABLE account (                                              \
     id                  BLOB(16) NOT NULL PRIMARY KEY,              \
+    login               TEXT UNIQUE,                                \
     email               TEXT UNIQUE,                                \
     password_ha1        TEXT,                                       \
     full_name           TEXT,                                       \

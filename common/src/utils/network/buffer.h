@@ -6,6 +6,7 @@
 #ifndef NX_BUFFER_H
 #define NX_BUFFER_H
 
+#include <string>
 #include <stdint.h>
 
 #include <limits>
@@ -37,6 +38,11 @@ namespace nx
             - QString compartability (with checkups for non ASCII symbols)
      */
     typedef QByteArray String;
+
+    bool operator==( const std::string& left, const nx::String& right );
+    bool operator==( const nx::String& left, const std::string& right );
+    bool operator!=( const std::string& left, const nx::String& right );
+    bool operator!=( const nx::String& left, const std::string& right );
 }
 
 #endif  //NX_BUFFER_H

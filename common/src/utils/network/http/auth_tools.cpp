@@ -128,6 +128,65 @@ namespace nx_http
         return md5HashCalc.result().toHex();
     }
 
+
+    namespace
+    {
+        bool calcDigestResponse(
+            const QByteArray& method,
+            const StringType& userName,
+            const boost::optional<StringType>& userPassword,
+            const boost::optional<BufferType>& predefinedHA1,
+            const QUrl& url,
+            const QMap<BufferType, BufferType>& inputParams,
+            QMap<BufferType, BufferType>* const outputParams )
+        {
+            //reading params
+            QMap<BufferType, BufferType>::const_iterator nonceIter = inputParams.find( "nonce" );
+            const BufferType nonce = nonceIter != inputParams.end() ? nonceIter.value() : BufferType();
+            QMap<BufferType, BufferType>::const_iterator realmIter = inputParams.find( "realm" );
+            const BufferType realm = realmIter != inputParams.end() ? realmIter.value() : BufferType();
+            QMap<BufferType, BufferType>::const_iterator qopIter = inputParams.find( "qop" );
+            const BufferType qop = qopIter != inputParams.end() ? qopIter.value() : BufferType();
+
+            if( qop.indexOf( "auth-int" ) != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
+                return false;   //qop=auth-int is not supported
+
+            const BufferType& ha1 = predefinedHA1
+                ? predefinedHA1.get()
+                : calcHa1(
+                    userName,
+                    realm,
+                    userPassword ? userPassword.get() : QByteArray() );
+            //HA2, qop=auth-int is not supported
+            const BufferType& ha2 = calcHa2(
+                method,
+                url.path().toLatin1() );
+            //response
+            outputParams->insert( "username", userName );
+            outputParams->insert( "realm", realm );
+            outputParams->insert( "nonce", nonce );
+            outputParams->insert( "uri", url.path().toLatin1() );
+
+            const BufferType nonceCount = "00000001";     //TODO #ak generate it
+            const BufferType clientNonce = "0a4f113b";    //TODO #ak generate it
+
+            QByteArray digestResponse;
+            if( qop.isEmpty() )
+            {
+                digestResponse = calcResponse( ha1, nonce, ha2 );
+            }
+            else
+            {
+                digestResponse = calcResponseAuthInt( ha1, nonce, nonceCount, clientNonce, qop, ha2 );
+                outputParams->insert( "qop", qop );
+                outputParams->insert( "nc", nonceCount );
+                outputParams->insert( "cnonce", clientNonce );
+            }
+            outputParams->insert( "response", digestResponse );
+            return true;
+        }
+    }
+
     bool calcDigestResponse(
         const QByteArray& method,
         const StringType& userName,
@@ -140,49 +199,42 @@ namespace nx_http
         if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
             return false;
 
-        //reading params
-        QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
-        const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
-        QMap<BufferType, BufferType>::const_iterator realmIter = wwwAuthenticateHeader.params.find("realm");
-        const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
-        QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
-        const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
+        //TODO #ak have to set digestAuthorizationHeader->digest->userid somewhere
 
-        if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
-            return false;   //qop=auth-int is not supported
-
-        const BufferType& ha1 = predefinedHA1
-            ? predefinedHA1.get()
-            : calcHa1(
-                userName,
-                realm,
-                userPassword ? userPassword.get() : QByteArray() );
-        //HA2, qop=auth-int is not supported
-        const BufferType& ha2 = calcHa2(
+        return calcDigestResponse(
             method,
-            url.path().toLatin1() );
-        //response
-        digestAuthorizationHeader->addParam( "username", userName );
-        digestAuthorizationHeader->addParam( "realm", realm );
-        digestAuthorizationHeader->addParam( "nonce", nonce );
-        digestAuthorizationHeader->addParam( "uri", url.path().toLatin1() );
+            userName,
+            userPassword,
+            predefinedHA1,
+            url,
+            wwwAuthenticateHeader.params,
+            &digestAuthorizationHeader->digest->params );
+    }
 
-        const BufferType nonceCount = "00000001";     //TODO #ak generate it
-        const BufferType clientNonce = "0a4f113b";    //TODO #ak generate it
-
-        QByteArray digestResponse;
-        if( qop.isEmpty() )
-        {
-            digestResponse = calcResponse( ha1, nonce, ha2 );
-        }
-        else
-        {
-            digestResponse = calcResponseAuthInt( ha1, nonce, nonceCount, clientNonce, qop, ha2 );
-            digestAuthorizationHeader->addParam( "qop", qop );
-            digestAuthorizationHeader->addParam( "nc", nonceCount );
-            digestAuthorizationHeader->addParam( "cnonce", clientNonce );
-        }
-        digestAuthorizationHeader->addParam( "response", digestResponse );
-        return true;
+    bool validateAuthorization(
+        const StringType& method,
+        const StringType& userName,
+        const boost::optional<StringType>& userPassword,
+        const boost::optional<BufferType>& predefinedHA1,
+        const QUrl& url,
+        const header::DigestAuthorization& digestAuthorizationHeader )
+    {
+        QMap<BufferType, BufferType> outputParams;
+        if( !calcDigestResponse(
+                method,
+                userName,
+                userPassword,
+                predefinedHA1,
+                url,
+                digestAuthorizationHeader.digest->params,
+                &outputParams ) )
+            return false;
+        auto calculatedResponseIter = outputParams.find( "response" );
+        if( calculatedResponseIter == outputParams.end() )
+            return false;
+        auto responseIter = digestAuthorizationHeader.digest->params.find( "response" );
+        if( responseIter == digestAuthorizationHeader.digest->params.end() )
+            return false;
+        return calculatedResponseIter.value() == responseIter.value();
     }
 }

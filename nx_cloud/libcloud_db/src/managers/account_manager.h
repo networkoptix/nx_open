@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <utils/db/db_manager.h>
+#include <utils/network/buffer.h>
 
 #include "access_control/auth_types.h"
 #include "data/account_data.h"
@@ -70,10 +71,24 @@ public:
         updateFunc( it->second );
         return true;
     }
-    std::map<KeyType, CachedType> m_data;
+
+    //!Linear search through the cache
+    template<class Func>
+    bool findIf( 
+        const Func& func,
+        CachedType* const value ) const
+    {
+        QnMutexLocker lk( &m_mutex );
+        auto it = std::find_if( m_data.begin(), m_data.end(), func );
+        if( it == m_data.end() )
+            return false;
+        *value = it->second;
+        return true;
+    }
 
 private:
     mutable QnMutex m_mutex;
+    std::map<KeyType, CachedType> m_data;
 };
 
 /*!
@@ -108,6 +123,10 @@ public:
     void getAccount(
         const AuthorizationInfo& authzInfo,
         std::function<void(ResultCode, data::AccountData)> completionHandler );
+
+    bool findAccountByUserName(
+        const nx::String& userName,
+        data::AccountData* const accountData ) const;
     
 private:
     const conf::Settings& m_settings;

@@ -47,7 +47,7 @@ namespace nx_http
         stree::ResourceContainer authInfo;
         if( const auto auth = nx_http::ServerManagers::instance()->authenticationManager() )
         {
-            header::WWWAuthenticate wwwAuthenticate;
+            boost::optional<header::WWWAuthenticate> wwwAuthenticate;
             if( !auth->authenticate(
                     *this,
                     *request.request,
@@ -56,9 +56,12 @@ namespace nx_http
             {
                 nx_http::Message response( nx_http::MessageType::response );
                 response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
-                response.response->headers.emplace(
-                    header::WWWAuthenticate::NAME,
-                    wwwAuthenticate.serialized() );
+                if( wwwAuthenticate )
+                {
+                    response.response->headers.emplace(
+                        header::WWWAuthenticate::NAME,
+                        wwwAuthenticate.get().serialized() );
+                }
                 return prepareAndSendResponse( std::move( response ), nullptr );
             }
         }

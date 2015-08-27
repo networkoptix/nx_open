@@ -6,6 +6,9 @@
 #include "account_data.h"
 
 #include <utils/common/model_functions.h>
+#include <utils/network/buffer.h>
+
+#include "cdb_ns.h"
 
 
 namespace nx {
@@ -20,15 +23,23 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(AccountStatus,
 )
 
 
-bool AccountData::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
+bool AccountData::getAsVariant( int resID, QVariant* const value ) const
 {
-    //TODO #ak
-    return false;
+    switch( resID )
+    {
+        case param::accountID:
+            *value = QVariant::fromValue(id);
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData )
 {
     accountData->id = QnUuid(urlQuery.queryItemValue( lit("id") ));
+    accountData->login = urlQuery.queryItemValue( lit("login") ).toStdString();
     accountData->email = urlQuery.queryItemValue( lit("email") ).toStdString();
     accountData->passwordHa1 = urlQuery.queryItemValue( lit("passwordHa1") ).toStdString();
     accountData->fullName = urlQuery.queryItemValue( lit("fullName") ).toStdString();

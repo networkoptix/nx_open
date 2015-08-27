@@ -6,6 +6,8 @@
 #ifndef cloud_db_authentication_manager_h
 #define cloud_db_authentication_manager_h
 
+#include <random>
+
 #include <utils/common/singleton.h>
 #include <utils/network/http/server/abstract_authentication_manager.h>
 
@@ -14,6 +16,9 @@
 
 namespace nx {
 namespace cdb {
+
+class AccountManager;
+class SystemManager;
 
 //!Performs authentication based on various parameters
 /*!
@@ -27,21 +32,32 @@ class AuthenticationManager
     public Singleton<AuthenticationManager>
 {
 public:
+    AuthenticationManager(
+        const AccountManager& accountManager,
+        const SystemManager& systemManager );
+
     //!Implementation of nx_http::AuthenticationManager::authenticate
     virtual bool authenticate(
         const nx_http::HttpServerConnection& connection,
         const nx_http::Request& request,
-        nx_http::header::WWWAuthenticate* const wwwAuthenticate,
+        boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
         stree::AbstractResourceWriter* authProperties ) override;
 
 private:
-    ///*!
-    //    \param inputParams It can be HTTP request and originating peer network info
-    //    \note \a completionHandler is allowed to be called from within this method
-    //*/
-    //bool authenticate(
-    //    const stree::AbstractResourceReader& inputParams,
-    //    std::function<void(AuthenticationInfo)> completionHandler ) const;
+    const AccountManager& m_accountManager;
+    const SystemManager& m_systemManager;
+    std::random_device m_rd;
+    std::uniform_int_distribution<size_t> m_dist;
+
+    bool findHa1(
+        const nx_http::HttpServerConnection& connection,
+        const nx_http::Request& request,
+        const nx_http::StringType& username,
+        nx::Buffer* const ha1,
+        stree::AbstractResourceWriter* const authProperties ) const;
+    void addWWWAuthenticateHeader(
+        boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate );
+    nx::Buffer generateNonce();
 };
 
 }   //cdb

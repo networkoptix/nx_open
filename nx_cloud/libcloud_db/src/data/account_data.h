@@ -39,8 +39,10 @@ class AccountData
 {
 public:
     QnUuid id;
+    //!Unique user login
+    std::string login;
     std::string email;
-    //!Hex representgation of HA1 (see rfc2617) digest of user's password. Realm is usually NetworkOptix
+    //!Hex representation of HA1 (see rfc2617) digest of user's password. Realm is usually NetworkOptix
     std::string passwordHa1;
     std::string fullName;
     AccountStatus statusCode;
@@ -58,7 +60,7 @@ public:
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
 bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData );
 
-#define AccountData_Fields (id)(email)(passwordHa1)(fullName)(statusCode)
+#define AccountData_Fields (id)(login)(email)(passwordHa1)(fullName)(statusCode)
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

@@ -99,8 +99,6 @@ int CloudDBProcess::executeApplication()
         return 2;
     }
 
-    AuthorizationManager authorizationManager;
-
     EMailManager emailManager( settings );
 
     //creating data managers
@@ -122,8 +120,12 @@ int CloudDBProcess::executeApplication()
     nx_http::MessageDispatcher httpMessageDispatcher;
     httpServerManagers.setDispatcher( &httpMessageDispatcher );
 
-    AuthenticationManager authenticationManager;
+    AuthenticationManager authenticationManager( 
+        accountManager,
+        systemManager );
     httpServerManagers.setAuthenticationManager( &authenticationManager );
+
+    AuthorizationManager authorizationManager;
 
     //registering HTTP handlers
     registerApiHandlers(

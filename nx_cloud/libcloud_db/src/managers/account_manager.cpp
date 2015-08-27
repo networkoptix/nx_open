@@ -96,6 +96,18 @@ void AccountManager::getAccount(
     completionHandler( ResultCode::ok, std::move(resultData) );
 }
 
+bool AccountManager::findAccountByUserName(
+    const nx::String& userName,
+    data::AccountData* const accountData ) const
+{
+    //TODO #ak improve search
+    return m_cache.findIf(
+        [&]( const std::pair<const QnUuid, data::AccountData>& val ) {
+            return val.second.login == userName;
+        },
+        accountData );
+}
+
 db::DBResult AccountManager::fillCache()
 {
     std::promise<db::DBResult> cacheFilledPromise;
@@ -118,7 +130,7 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
 {
     QSqlQuery readAccountsQuery( *connection );
     readAccountsQuery.prepare(
-        "SELECT id, email, password_ha1 as passwordHa1, "
+        "SELECT id, login, email, password_ha1 as passwordHa1, "
                "full_name as fullName, status_code as statusCode "
         "FROM account" );
     if( !readAccountsQuery.exec() )
@@ -154,8 +166,8 @@ db::DBResult AccountManager::insertAccount(
     const QnUuid accountID = QnUuid::createUuid();
     QSqlQuery insertAccountQuery( *connection );
     insertAccountQuery.prepare( 
-        "INSERT INTO account (id, email, password_ha1, full_name, status_code) "
-                    "VALUES  (:id, :email, :passwordHa1, :fullName, :statusCode)");
+        "INSERT INTO account (id, login, email, password_ha1, full_name, status_code) "
+                    "VALUES  (:id, :login, :email, :passwordHa1, :fullName, :statusCode)");
     QnSql::bind( accountData, &insertAccountQuery );
     insertAccountQuery.bindValue( ":id", QnSql::serialized_field(accountID) );
     insertAccountQuery.bindValue( ":statusCode", data::asAwaitingEmailConfirmation );
