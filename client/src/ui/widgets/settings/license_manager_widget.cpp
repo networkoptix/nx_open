@@ -134,7 +134,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         foreach (QnLicenseUsageHelper* helper, helpers) {
             foreach (Qn::LicenseType lt, helper->licenseTypes()) {
                 if (helper->totalLicenses(lt) > 0)
-                    msg += L'\n' + tr("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                    msg += L'\n' + lit("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
             }
         }
 
