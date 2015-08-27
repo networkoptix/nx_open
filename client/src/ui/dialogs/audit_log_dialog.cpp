@@ -517,6 +517,20 @@ void QnAuditLogDialog::at_updateDetailModel()
         auto data = filterChildDataByCameras(checkedRows);
         m_detailModel->setData(data);
     }
+
+    /// TODO: #ynikitenkov introduce expanded-state management in model
+
+    /// Collapses all expanded descriptions (cameras, for examples)
+    for (int row = 0; row != m_detailModel->rowCount(); ++row)
+    {
+        const QModelIndex index = m_detailModel->QnAuditLogModel::index(row, 0);
+        const QVariant data = index.data(Qn::AuditRecordDataRole);
+        if (!data.canConvert<QnAuditRecord *>())
+            continue;
+
+        QnAuditRecord * const record = data.value<QnAuditRecord *>();
+        m_detailModel->setDetail(record, false);
+    }
 }
 
 int calcHeaderHeight(QHeaderView* header)
@@ -630,6 +644,7 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
     headers->setVisible(true);
     headers->setSectionsClickable(true);
     headers->setSectionResizeMode(QHeaderView::ResizeToContents);
+    headers->setStretchLastSection(true);
 
     gridMaster->setHorizontalHeader(headers);
     gridMaster->setItemDelegate(m_itemDelegate);
@@ -787,6 +802,9 @@ void QnAuditLogDialog::at_eventsGrid_clicked(const QModelIndex& index)
     
     int height = ui->gridDetails->itemDelegate()->sizeHint(QStyleOptionViewItem(), index).height();
     ui->gridDetails->setRowHeight(index.row(), height);
+
+    ui->gridDetails->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    ui->gridDetails->horizontalHeader()->setStretchLastSection(true);
 }
 
 void QnAuditLogDialog::at_ItemEntered(const QModelIndex& index)
