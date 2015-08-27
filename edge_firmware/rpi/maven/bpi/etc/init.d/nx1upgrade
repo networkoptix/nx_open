@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# VERSION: ${release.version}.${buildNumber}
+
+## This command will run each time after networkoptix-embedded-tools is installed
+
+export BOOTPART=/dev/mmcblk0p2
+export MNTBOOTPART=/mnt/boot
+mkdir -p $MNTBOOTPART
+mount -t ext4 $BOOTPART $MNTBOOTPART
+cp -f $MNTBOOTPART/opt/networkoptix/mediaserver/var/ecs_static.sqlite $MNTBOOTHDDPART/opt
+rm -Rf $MNTBOOTPART/opt/networkoptix
+tar xfv /tmp/$DISTRIB.tar.gz -C $MNTBOOTPART
+mkdir -p $MNTBOOTPART/opt/networkoptix/mediaserver/var
+mv -f $MNTBOOTHDDPART/opt/ecs_static.sqlite $MNTBOOTPART/opt/networkoptix/mediaserver/var
+umount $BOOTPART
+
+exit 0
