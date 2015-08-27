@@ -10,7 +10,7 @@ class QnClientModule: public QObject
     Q_OBJECT
 
 public:
-    QnClientModule(const QnStartupParameters &startupParams
+    QnClientModule(const QnStartupParameters &startupParams = QnStartupParameters()
         , QObject *parent = NULL);
 
     virtual ~QnClientModule();
