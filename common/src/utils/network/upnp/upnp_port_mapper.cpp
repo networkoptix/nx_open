@@ -1,7 +1,6 @@
 #include "upnp_port_mapper.h"
 
 #include "common/common_globals.h"
-#include "utils/common/guard.h"
 #include "utils/common/log.h"
 
 static const size_t BREAK_FAULTS_COUNT = 5; // faults in a row
@@ -43,10 +42,10 @@ const quint64 PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL = 10 * 60 * 1000; // 1
 bool PortMapper::enableMapping( quint16 port, Protocol protocol,
                                 std::function< void( SocketAddress ) > callback )
 {
-    const auto request = std::make_pair( port, protocol );
+    PortId portId( port, protocol );
 
     QMutexLocker lock( &m_mutex );
-    if( !m_mapRequests.emplace( request, std::move( callback ) ).second )
+    if( !m_mapRequests.emplace( std::move( portId ), std::move( callback ) ).second )
         return false; // port already mapped
 
     // ask to map this port on all known devices
@@ -59,16 +58,17 @@ bool PortMapper::enableMapping( quint16 port, Protocol protocol,
 bool PortMapper::disableMapping( quint16 port, Protocol protocol )
 {
     QMutexLocker lock( &m_mutex );
-    const auto it = m_mapRequests.find( std::make_pair( port, protocol ) );
+    const auto it = m_mapRequests.find( PortId( port, protocol ) );
     if( it == m_mapRequests.end() )
         return false;
 
     for( auto& device : m_devices )
     {
-        const auto map = device.second.mapped.find( it->first );
-        if( map != device.second.mapped.end() )
-            m_upnpClient->deleteMapping( device.second.url, map->second.port,
-                                         map->first.second, []( bool ){} );
+        const auto mapping = device.second.mapped.find( it->first );
+        if( mapping != device.second.mapped.end() )
+            m_upnpClient->deleteMapping(
+                device.second.url, mapping->second, mapping->first.protocol,
+                []( bool ){ /* TODO: think what can we do */ } );
     }
 
     m_mapRequests.erase( it );
@@ -99,6 +99,18 @@ bool PortMapper::FailCounter::isOk()
 
     const auto breakTime = m_lastFail + BREAK_TIME_PER_FAULT * m_failsInARow;
     return QDateTime::currentDateTime().toTime_t() > breakTime;
+}
+
+PortMapper::PortId::PortId( quint16 port_, Protocol protocol_ )
+    : port( port_ ), protocol( protocol_ )
+{
+}
+
+bool PortMapper::PortId::operator < ( const PortId& rhs ) const
+{
+    if( port < rhs.port ) return true;
+    if( port == rhs.port && protocol < rhs.protocol ) return true;
+    return false;
 }
 
 bool PortMapper::processPacket(
@@ -140,9 +152,9 @@ void PortMapper::onTimer( const quint64& /*timerID*/ )
     for( auto& device : m_devices )
     {
         updateExternalIp( device.second );
-        for( const auto& map : device.second.mapped )
-            checkMapping( device.second, map.first.first,
-                          map.second.port, map.first.second );
+        for( const auto& mapping : device.second.mapped )
+            checkMapping( device.second, mapping.first.port,
+                          mapping.second, mapping.first.protocol );
     }
 
     if( m_timerId )
@@ -162,7 +174,7 @@ void PortMapper::addNewDevice( const HostAddress& localAddress,
 
     updateExternalIp( newDevice );
     for( const auto map : m_mapRequests )
-        ensureMapping( newDevice, map.first.first, map.first.second );
+        ensureMapping( newDevice, map.first.port, map.first.protocol );
 
     NX_LOG( lit( "%1 New device %2 ( %3 ) has been found on %4" )
             .arg( QLatin1String( Q_FUNC_INFO ) ).arg( url.toString() )
@@ -192,29 +204,8 @@ void PortMapper::updateExternalIp( Device& device )
             }
 
             device.failCounter.success();
-            if( device.externalIp == externalIp )
-                return;
-
-            std::swap( device.externalIp, externalIp );
-            for( auto& map : device.mapped )
-            {
-                // move all mapings to different external ip
-                map.second.address = device.externalIp;
-
-                const auto it = m_mapRequests.find( map.first );
-                if( it != m_mapRequests.end() )
-                {
-                    if( externalIp != HostAddress() )
-                    {
-                        // all mappings with old ip are not valid
-                        callbackGuards.push_back( Guard( std::bind(
-                            it->second, SocketAddress( externalIp, 0 ) ) ) );
-                    }
-
-                    callbackGuards.push_back( Guard( std::bind(
-                        it->second, map.second ) ) );
-                }
-            }
+            if( device.externalIp != externalIp )
+                callbackGuards = changeIpEvents( device, std::move(externalIp) );
         }
     });
 
@@ -222,6 +213,7 @@ void PortMapper::updateExternalIp( Device& device )
         device.failCounter.failure();
 }
 
+// TODO: reduse the size of method
 void PortMapper::checkMapping( Device& device, quint16 inPort, quint16 exPort,
                                Protocol protocol )
 {
@@ -244,17 +236,16 @@ void PortMapper::checkMapping( Device& device, quint16 inPort, quint16 exPort,
         }
 
         // save and report, that mapping has gone
-        const auto mapId = std::make_pair( inPort, protocol );
-        device.mapped.erase( device.mapped.find( mapId ) );
-        const auto req = m_mapRequests.find( mapId );
-        if( req == m_mapRequests.end() )
+        device.mapped.erase( device.mapped.find( PortId( inPort, protocol ) ) );
+        const auto request = m_mapRequests.find( PortId( inPort, protocol ) );
+        if( request == m_mapRequests.end() )
         {
             // no need to provide this mapping any longer
             return;
         }
 
         SocketAddress invalid( device.externalIp, 0 );
-        const auto callback = req->second;
+        const auto callback = request->second;
 
         // try to map over again (in case of router reboot)
         ensureMapping( device, inPort, protocol );
@@ -267,6 +258,7 @@ void PortMapper::checkMapping( Device& device, quint16 inPort, quint16 exPort,
         device.failCounter.failure();
 }
 
+// TODO: reduse the size of method
 void PortMapper::ensureMapping( Device& device, quint16 inPort, Protocol protocol )
 {
     if( !device.failCounter.isOk() )
@@ -278,16 +270,20 @@ void PortMapper::ensureMapping( Device& device, quint16 inPort, Protocol protoco
         QMutexLocker lk( &m_mutex );
         device.failCounter.success();
 
-        const auto mapId = std::make_pair( inPort, protocol );
-        const auto it = device.mapped.find( mapId );
-        const auto req = m_mapRequests.find( mapId );
-        if( req == m_mapRequests.end() )
+        // Save existing mappings in case if router can silently remap them
+        device.engagedPorts.clear();
+        for( const auto mapping : list )
+            device.engagedPorts.insert( PortId( mapping.externalPort, mapping.protocol ) );
+
+        const auto deviceMap = device.mapped.find( PortId( inPort, protocol ) );
+        const auto request = m_mapRequests.find( PortId( inPort, protocol ) );
+        if( request == m_mapRequests.end() )
         {
             // no need to provide this mapping any longer
             return;
         }
 
-        const auto callback = req->second;
+        const auto callback = request->second;
         for( const auto mapping : list )
             if( mapping.internalIp == device.internalIp &&
                 mapping.internalPort == inPort &&
@@ -298,28 +294,28 @@ void PortMapper::ensureMapping( Device& device, quint16 inPort, Protocol protoco
                         .arg( QLatin1String( Q_FUNC_INFO ) )
                         .arg( mapping.toString() ), cl_logDEBUG1 );
 
-                SocketAddress mapedAddress( device.externalIp, mapping.externalPort );
-                if( it == device.mapped.end() || it->second != mapedAddress )
+                if( deviceMap == device.mapped.end() ||
+                    deviceMap->second != mapping.externalPort )
                 {
                     // the change should be saved and reported
-                    device.mapped[ mapId ] = mapedAddress;
+                    device.mapped[ PortId( inPort, protocol ) ] = mapping.externalPort;
 
                     lk.unlock();
-                    callback( mapedAddress );
+                    callback( SocketAddress( device.externalIp, mapping.externalPort ) );
                 }
 
                 return;
             }
 
         // to ensure mapping we should create it from scratch
-        makeMapping( device, inPort, inPort, protocol );
+        makeMapping( device, inPort, protocol );
 
-        if( it != device.mapped.end() )
+        if( deviceMap != device.mapped.end() )
         {
             SocketAddress invalid( device.externalIp, 0 );
 
             // address lose should be saved and reported
-            device.mapped.erase( it );
+            device.mapped.erase( deviceMap );
 
             lk.unlock();
             callback( invalid );
@@ -336,11 +332,17 @@ static std::default_random_engine randomEngine(
 static std::uniform_int_distribution<> portDistribution(
         PORT_SAFE_RANGE_BEGIN, PORT_SAFE_RANGE_END );
 
-void PortMapper::makeMapping( Device& device, quint16 inPort, quint16 desiredPort,
+// TODO: reduse the size of method
+void PortMapper::makeMapping( Device& device, quint16 inPort,
                               Protocol protocol, size_t retries )
 {
     if( !device.failCounter.isOk() )
         return;
+
+    quint16 desiredPort;
+    do
+        desiredPort = portDistribution( randomEngine );
+    while( device.engagedPorts.count( PortId( desiredPort, protocol ) ) );
 
     const bool result = m_upnpClient->addMapping(
         device.url, device.internalIp, inPort, desiredPort, protocol, m_description,
@@ -352,42 +354,60 @@ void PortMapper::makeMapping( Device& device, quint16 inPort, quint16 desiredPor
         {
             device.failCounter.failure();
 
-            if( retries > 0 ) // try to forward different port number
-            {
-                const auto newPort = portDistribution( randomEngine );
-                makeMapping( device, inPort, newPort, protocol, retries - 1 );
-            }
-            else // give up forwarding on this device
-            {
+            if( retries > 0 )
+                makeMapping( device, inPort, protocol, retries - 1 );
+            else
                 NX_LOG( lit( "%1 Cound not forward any port on %2" )
                         .arg( QLatin1String( Q_FUNC_INFO ) )
                         .arg( device.url.toString() ), cl_logERROR );
-            }
-
             return;
         }
 
         device.failCounter.success();
 
         // save successful mapping and call callback
-        SocketAddress mappedAddress( device.externalIp, desiredPort );
-        const auto mapId = std::make_pair( inPort, protocol );
-        const auto req = m_mapRequests.find( mapId );
-        if( req == m_mapRequests.end() )
+        const auto request = m_mapRequests.find( PortId( inPort, protocol ) );
+        if( request == m_mapRequests.end() )
         {
             // no need to provide this mapping any longer
             return;
         }
 
-        const auto callback = req->second;
-        device.mapped[ mapId ] = mappedAddress;
+        const auto callback = request->second;
+        device.mapped[ PortId( inPort, protocol ) ] = desiredPort;
+        device.engagedPorts.insert( PortId( desiredPort, protocol ) );
 
         lk.unlock();
-        callback( std::move( mappedAddress ) );
+        callback( SocketAddress( device.externalIp, desiredPort ) );
     } );
 
     if( !result )
         device.failCounter.failure();
+}
+
+std::list< Guard > PortMapper::changeIpEvents( Device& device, HostAddress externalIp )
+{
+    std::list< Guard > callbackGuards;
+
+    std::swap( device.externalIp, externalIp );
+    for( auto& map : device.mapped )
+    {
+        const auto it = m_mapRequests.find( map.first );
+        if( it != m_mapRequests.end() )
+        {
+            if( externalIp != HostAddress() )
+            {
+                // all mappings with old ip are not valid
+                callbackGuards.push_back( Guard( std::bind(
+                    it->second, SocketAddress( externalIp, 0 ) ) ) );
+            }
+
+            callbackGuards.push_back( Guard( std::bind(
+                it->second, SocketAddress( device.externalIp, map.second ) ) ) );
+        }
+    }
+
+    return callbackGuards;
 }
 
 } // namespace nx_upnp

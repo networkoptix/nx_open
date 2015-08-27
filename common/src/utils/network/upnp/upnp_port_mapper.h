@@ -5,6 +5,7 @@
 #include "upnp_async_client.h"
 
 #include "utils/common/app_info.h"
+#include "utils/common/guard.h"
 
 #include <QWaitCondition>
 
@@ -54,6 +55,15 @@ protected: // for testing only
         size_t m_lastFail;
     };
 
+    struct PortId
+    {
+        quint16 port;
+        Protocol protocol;
+
+        PortId( quint16 port_, Protocol protocol_ );
+        bool operator < ( const PortId& rhs ) const;
+    };
+
     struct Device
     {
         QUrl url;
@@ -61,7 +71,8 @@ protected: // for testing only
         HostAddress externalIp;
 
         FailCounter failCounter;
-        std::map< std::pair< quint16, Protocol >, SocketAddress > mapped;
+        std::map< PortId, quint16 > mapped; //!< internal port -> external port
+        std::set< PortId > engagedPorts;    //!< external ports
     };
 
     virtual bool processPacket(
@@ -81,8 +92,9 @@ private:
     void updateExternalIp( Device& device );
     void checkMapping( Device& device, quint16 inPort, quint16 exPort, Protocol protocol );
     void ensureMapping( Device& device, quint16 inPort, Protocol protocol );
-    void makeMapping( Device& device, quint16 inPort, quint16 desiredPort,
-                      Protocol protocol, size_t retries = 5 );
+    void makeMapping( Device& device, quint16 inPort, Protocol protocol, size_t retries = 5 );
+
+    std::list< Guard > changeIpEvents( Device& device, HostAddress oldIp );
 
 protected: // for testing only
     QMutex m_mutex;
@@ -91,10 +103,7 @@ protected: // for testing only
     const QString m_description;
     const quint64 m_checkMappingsInterval;
 
-    std::map< std::pair< quint16, Protocol >,
-              std::function< void( SocketAddress ) > > m_mapRequests;
-
-    // TODO: replace unique_ptr with try_emplace when avaliable
+    std::map< PortId, std::function< void( SocketAddress ) > > m_mapRequests;
     std::map< QString, Device > m_devices;
 };
 
