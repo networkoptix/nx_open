@@ -216,16 +216,19 @@ namespace nx_http
         const StringType& userName,
         const boost::optional<StringType>& userPassword,
         const boost::optional<BufferType>& predefinedHA1,
-        const QUrl& url,
         const header::DigestAuthorization& digestAuthorizationHeader )
     {
+        auto uriIter = digestAuthorizationHeader.digest->params.find( "uri" );
+        if( uriIter == digestAuthorizationHeader.digest->params.end() )
+            return false;
+
         QMap<BufferType, BufferType> outputParams;
         if( !calcDigestResponse(
                 method,
                 userName,
                 userPassword,
                 predefinedHA1,
-                url,
+                QUrl(QLatin1String(uriIter.value())),
                 digestAuthorizationHeader.digest->params,
                 &outputParams ) )
             return false;

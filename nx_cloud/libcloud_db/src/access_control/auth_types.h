@@ -49,6 +49,9 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 
     bool accessAllowedToOwnDataOnly() const;
+
+private:
+    stree::ResourceContainer m_rc;
 };
 
 }   //cdb

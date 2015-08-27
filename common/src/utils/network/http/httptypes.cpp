@@ -813,6 +813,24 @@ namespace nx_http
             }
         }
 
+        void serializeAuthParams(
+            BufferType* const dstBuffer,
+            const QMap<BufferType, BufferType>& params )
+        {
+            for( QMap<BufferType, BufferType>::const_iterator
+                it = params.begin();
+                it != params.end();
+                ++it )
+            {
+                if( it != params.begin() )
+                    dstBuffer->append( ", " );
+                dstBuffer->append( it.key());
+                dstBuffer->append( "=\"" );
+                dstBuffer->append( it.value() );
+                dstBuffer->append( "\"" );
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////
         //  Authorization
         ///////////////////////////////////////////////////////////////////
@@ -848,18 +866,7 @@ namespace nx_http
 
         void DigestCredentials::serialize( BufferType* const dstBuffer ) const
         {
-            for( QMap<BufferType, BufferType>::const_iterator
-                it = params.begin();
-                it != params.end();
-                ++it )
-            {
-                if( it != params.begin() )
-                    dstBuffer->append( ", " );
-                dstBuffer->append( it.key());
-                dstBuffer->append( "=\"" );
-                dstBuffer->append( it.value() );
-                dstBuffer->append( "\"" );
-            }
+            serializeAuthParams( dstBuffer, params );
         }
 
 
@@ -1047,11 +1054,18 @@ namespace nx_http
             return true;
         }
 
+        void WWWAuthenticate::serialize( BufferType* const dstBuffer ) const
+        {
+            dstBuffer->append( AuthScheme::toString( authScheme ) );
+            dstBuffer->append( " " );
+            serializeAuthParams( dstBuffer, params );
+        }
+
         BufferType WWWAuthenticate::serialized() const
         {
-            //TODO #ak
-            assert( false );
-            return BufferType();
+            BufferType dest;
+            serialize( &dest );
+            return dest;
         }
 
 

@@ -70,7 +70,6 @@ namespace nx_http
         const StringType& userName,
         const boost::optional<StringType>& userPassword,
         const boost::optional<BufferType>& predefinedHA1,
-        const QUrl& url,
         const header::DigestAuthorization& digestAuthorizationHeader );
 }
 

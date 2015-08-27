@@ -14,6 +14,8 @@
 #include <QtCore/QDir>
 
 #include <api/global_settings.h>
+#include <network/auth_restriction_list.h>
+#include <utils/network/http/auth_tools.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
@@ -120,9 +122,13 @@ int CloudDBProcess::executeApplication()
     nx_http::MessageDispatcher httpMessageDispatcher;
     httpServerManagers.setDispatcher( &httpMessageDispatcher );
 
+    QnAuthMethodRestrictionList authRestrictionList;
+    authRestrictionList.allow( AddAccountHttpHandler::HANDLER_PATH, AuthMethod::noAuth );
+    authRestrictionList.allow( VerifyEmailAddressHandler::HANDLER_PATH, AuthMethod::noAuth );
     AuthenticationManager authenticationManager( 
         accountManager,
-        systemManager );
+        systemManager,
+        authRestrictionList );
     httpServerManagers.setAuthenticationManager( &authenticationManager );
 
     AuthorizationManager authorizationManager;

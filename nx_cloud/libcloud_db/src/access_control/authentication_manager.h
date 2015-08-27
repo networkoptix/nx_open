@@ -14,6 +14,8 @@
 #include "auth_types.h"
 
 
+class QnAuthMethodRestrictionList;
+
 namespace nx {
 namespace cdb {
 
@@ -34,7 +36,8 @@ class AuthenticationManager
 public:
     AuthenticationManager(
         const AccountManager& accountManager,
-        const SystemManager& systemManager );
+        const SystemManager& systemManager,
+        const QnAuthMethodRestrictionList& authRestrictionList );
 
     //!Implementation of nx_http::AuthenticationManager::authenticate
     virtual bool authenticate(
@@ -46,6 +49,7 @@ public:
 private:
     const AccountManager& m_accountManager;
     const SystemManager& m_systemManager;
+    const QnAuthMethodRestrictionList& m_authRestrictionList;
     std::random_device m_rd;
     std::uniform_int_distribution<size_t> m_dist;
 

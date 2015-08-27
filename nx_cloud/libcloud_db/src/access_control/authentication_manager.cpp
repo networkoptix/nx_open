@@ -7,6 +7,7 @@
 
 #include <limits>
 
+#include <network/auth_restriction_list.h>
 #include <utils/network/http/auth_tools.h>
 
 #include "../data/cdb_ns.h"
@@ -21,10 +22,12 @@ using namespace nx_http;
 
 AuthenticationManager::AuthenticationManager(
     const AccountManager& accountManager,
-    const SystemManager& systemManager )
+    const SystemManager& systemManager,
+    const QnAuthMethodRestrictionList& authRestrictionList )
 :
     m_accountManager( accountManager ),
     m_systemManager( systemManager ),
+    m_authRestrictionList( authRestrictionList ),
     m_dist( 0, std::numeric_limits<size_t>::max() )
 {
 }
@@ -35,7 +38,13 @@ bool AuthenticationManager::authenticate(
     boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
     stree::AbstractResourceWriter* authProperties )
 {
-    //TODO #ak check if authentication is not required
+    //TODO #ak use QnAuthHelper class to support all that authentication types
+
+    const auto allowedAuthMethods = m_authRestrictionList.getAllowedAuthMethods( request );
+    if( allowedAuthMethods & AuthMethod::noAuth )
+        return true;
+    if( !(allowedAuthMethods & AuthMethod::httpDigest) )
+        return false;
 
     auto authHeaderIter = request.headers.find( header::Authorization::NAME );
     if( authHeaderIter == request.headers.end() )
@@ -77,7 +86,6 @@ bool AuthenticationManager::authenticate(
         usernameIter.value(),
         boost::none,
         ha1,
-        request.requestLine.url,
         authzHeader );
 }
 
@@ -108,6 +116,7 @@ void AuthenticationManager::addWWWAuthenticateHeader(
     wwwAuthenticate->get().authScheme = header::AuthScheme::digest;
     wwwAuthenticate->get().params.insert( "nonce", generateNonce() );
     wwwAuthenticate->get().params.insert( "realm", QN_PRODUCT_NAME_SHORT );
+    wwwAuthenticate->get().params.insert( "algorithm", "MD5" );
 }
 
 nx::Buffer AuthenticationManager::generateNonce()

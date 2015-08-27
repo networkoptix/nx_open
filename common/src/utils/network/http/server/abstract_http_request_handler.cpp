@@ -66,16 +66,6 @@ namespace nx_http
     {
         m_responseMsg.response->statusLine.statusCode = statusCode;
         m_responseMsg.response->statusLine.reasonPhrase = StatusCode::toString( statusCode );
-        if( dataSource )
-        {
-            m_responseMsg.response->headers.emplace( "Content-Type", dataSource->mimeType() );
-            const auto contentLength = dataSource->contentLength();
-            if( contentLength )
-                m_responseMsg.response->headers.emplace(
-                    "Content-Size",
-                    QByteArray::number( static_cast< qulonglong >(
-                        contentLength.get() ) ) );
-        }
 
         //this object is allowed to be removed within m_completionHandler, 
         //  so creating local data
