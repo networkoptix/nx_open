@@ -57,22 +57,26 @@ public:
             case cannotOpenCameraMediaPort:
                 requiredParamCount = 2;
                 errorMessageParts   << tr("Cannot open media url %1. Failed to connect to media port %2.")
+                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
                                     << tr("Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.").arg(target);
                 break;
             case connectionClosedUnexpectedly:
                 requiredParamCount = 2;
                 errorMessageParts   << tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly.")
+                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
                                     << tr("Make sure the %1 is plugged into the network. Try to reboot the %1.").arg(target);
                 break;
             case responseParseError:
                 requiredParamCount = 2;
-                errorMessageParts   << tr("Could not parse %1 response. Url %2, request name %3.").arg(target, lit("%1"), lit("%2"))
+                errorMessageParts   << tr("Could not parse %1 response. Url %2, request name %3.").arg(target)
+                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
                                     << tr("Please try to reboot the %1, then restore factory defaults on the web-page.").arg(target)
                                     << tr("Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case noMediaTrack:
                 requiredParamCount = 1;
                 errorMessageParts   << tr("No supported media tracks at url %1.")
+                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
                                     << tr("Please try to reboot the %1, then restore factory defaults on the web-page.").arg(target)
                                     << tr("Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
@@ -83,29 +87,36 @@ public:
             case unsupportedProtocol:
                 requiredParamCount = 2;
                 errorMessageParts   << tr("Cannot open media url %1. Unsupported media protocol %2.")
+                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
                                     << tr("Please try to reboot the %1, then restore factory defaults on the web-page.").arg(target)
                                     << tr("Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case cannotConfigureMediaStream:
                 requiredParamCount = 1;
                 errorMessageParts   << tr("Failed to configure parameter %1.")
+                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
                                     << tr("First, try to turn on recording (if it's off) and decrease fps in %1 settings.").arg(target)
+                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
                                     << tr("If it doesn't help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.").arg(target);
                 break;
             case requestFailed:
                 requiredParamCount = 2;
-                errorMessageParts   << tr("%1 request \"%2\" failed with error \"%3\".").arg(upperCaseTarget, lit("%1"), lit("%2"))
+                                    //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..)
+                errorMessageParts   << tr("%1 request \"%2\" failed with error \"%3\".").arg(upperCaseTarget)
+                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
                                     << tr("Please try to reboot the %1, then restore factory defaults on the web-page.").arg(target)
                                     << tr("Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case notImplemented:
                 requiredParamCount = 0;
+                //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..)
                 errorMessageParts   << tr("Unknown %1 Issue.").arg(upperCaseTarget)
                                     << tr("Please contact support.");
                 break;
             case ioError:
                 requiredParamCount = 1;
                 errorMessageParts   << tr("An input/output error has occurred. OS message: \"%1\".")
+                                    //: %1 - will be substituted by type of device ("camera", "io module", etc..)
                                     << tr("Make sure the %1 is plugged into the network. Try to reboot the %1.").arg(target);
                 break;
             case serverTerminated:
@@ -113,15 +124,18 @@ public:
                 break;
             case cameraInvalidParams:
                 requiredParamCount = 1;
-                errorMessageParts   << tr("Invalid data was received from the %1: %2.").arg(target, lit("%1"));
+                //: %1 - will be substituted by type of device ("camera", "io module", etc..)
+                errorMessageParts   << tr("Invalid data was received from the %1: %2.").arg(target);
                 break;
             case badMediaStream:
+                //: %1 - will be substituted by type of device ("camera", "io module", etc..)
                 errorMessageParts   << tr("Too many media errors. Please open %1 issues dialog for more details.").arg(target);
                 break;
             case noMediaStream:
                 errorMessageParts   << tr("Media stream is opened but no media data was received.");
                 break;
             case cameraInitializationInProgress:
+                //: %1 - will be substituted by type of device ("Camera", "IO Module", etc..)
                 errorMessageParts   << tr("%1 initialization process in progress").arg(upperCaseTarget);
                 break;
             default:
