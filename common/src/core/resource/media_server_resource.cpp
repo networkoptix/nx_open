@@ -235,6 +235,11 @@ void QnMediaServerResource::setStorageDataToUpdate(const QnStorageResourceList& 
     m_storagesToRemove = storagesToRemove;
 }
 
+bool QnMediaServerResource::hasUpdatedStorages() const
+{
+    return m_storagesToUpdate.size() + m_storagesToRemove.size() > 0;
+}
+
 QPair<int, int> QnMediaServerResource::saveUpdatedStorages()
 {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
