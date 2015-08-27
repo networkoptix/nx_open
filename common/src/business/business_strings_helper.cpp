@@ -207,7 +207,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
 
     switch (params.eventType) {
     case CameraInputEvent: {
-        result = tr("Input port: %1").arg(params.getInputPortId());
+        result = tr("Input port: %1").arg(params.inputPortId);
         break;
     }
     case StorageFailureEvent:
