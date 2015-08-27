@@ -116,6 +116,7 @@ namespace {
 #define FROM_WCHAR_ARRAY QString::fromWCharArray
 #define DIGEST_MD5 L"DIGEST-MD5"
 #define EMPTY_STR L""
+#define LDAP_RESULT ULONG
 #else
 
 #define LDAP_DEPRECATED 1
@@ -127,6 +128,7 @@ namespace {
 #define EMPTY_STR ""
 #define PWSTR char*
 #define PWCHAR char*
+#define LDAP_RESULT int
 #endif
 
 #define LdapErrorStr(rc) FROM_WCHAR_ARRAY(ldap_err2string(rc))
@@ -336,10 +338,9 @@ Qn::AuthResult LdapSession::authenticateWithDigest(const QString &login, const Q
 
     // The servresp will contain the digest-challange after the first call.
     berval *servresp = NULL;
-    long res;
-    ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
-    ldap_get_option(m_ld, LDAP_OPT_ERROR_NUMBER, &res);
+    LDAP_RESULT res = ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
     if (res != LDAP_SASL_BIND_IN_PROGRESS)
+        m_lastError = LdapErrorStr(res);
         return Qn::Auth_ConnectError;
     
     QMap<QByteArray, QByteArray> responseDictionary;
@@ -396,12 +397,13 @@ Qn::AuthResult LdapSession::authenticateWithDigest(const QString &login, const Q
     cred.bv_len = authRequest.size();
 
     servresp = NULL;
-    ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
-    ldap_get_option(m_ld, LDAP_OPT_ERROR_NUMBER, &res);
+    res = ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
     if (res == LDAP_SUCCESS)
         return Qn::Auth_OK;
-    else
+    else {
+        m_lastError = LdapErrorStr(res);
         return Qn::Auth_WrongPassword;
+    }
 }
 
 QString LdapSession::getRealm()
@@ -414,11 +416,11 @@ QString LdapSession::getRealm()
 
     // The servresp will contain the digest-challange after the first call.
     berval *servresp = NULL;
-    long res;
-    ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
-    ldap_get_option(m_ld, LDAP_OPT_ERROR_NUMBER, &res);
-    if (res != LDAP_SASL_BIND_IN_PROGRESS)
+    LDAP_RESULT res = ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
+    if (res != LDAP_SASL_BIND_IN_PROGRESS) {
+        m_lastError = LdapErrorStr(res);
         return result;
+    }
     
     QMap<QByteArray, QByteArray> responseDictionary;
     QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
