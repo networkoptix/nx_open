@@ -31,6 +31,7 @@ QtvSound::QtvSound(ALCdevice *device, const QnAudioFormat &audioFormat)
     m_device = device;
     m_deinitialized = false;
     m_isValid = setup();
+    m_paused = false;
 }
 
 QtvSound::~QtvSound()
@@ -269,7 +270,7 @@ bool QtvSound::internalPlay(const void* data, uint size)
     checkOpenALErrorDebug(m_device);
     alSourceQueueBuffers(m_source, 1, &buf);
     checkOpenALErrorDebug(m_device);
-    return playImpl();
+    return m_paused ? true : playImpl();
 }
 
 bool QtvSound::outError(int err, const char* strerr)
@@ -310,12 +311,14 @@ int QtvSound::checkOpenALErrorDebug(ALCdevice *device)
 void QtvSound::suspend()
 {
     QMutexLocker lock(&m_mtx);
+    m_paused = true;
     alSourcePause(m_source);
 }
 
 void QtvSound::resume()
 {
     QMutexLocker lock(&m_mtx);
+    m_paused = false;
     playImpl();
 }
 
@@ -327,6 +330,7 @@ void QtvSound::clear()
     internalClear();
     //m_isValid = setup();
     m_deinitialized = true;
+    m_paused = false;
 }
 
 void QtvSound::internalClear()
