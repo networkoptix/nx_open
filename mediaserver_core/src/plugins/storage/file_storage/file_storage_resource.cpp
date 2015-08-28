@@ -9,6 +9,7 @@
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
 #include "utils/fs/file.h"
+#include <utils/common/app_info.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -27,6 +28,7 @@
 #   include <sys/stat.h>
 #   include <fcntl.h>
 #   include <unistd.h>
+#   include <errno.h>
 #endif
 
 #ifdef WIN32
@@ -40,10 +42,14 @@
 #ifndef Q_OS_WIN
     const QString QnFileStorageResource::FROM_SEP = lit("\\");
     const QString QnFileStorageResource::TO_SEP = lit("/");
+    const QString NX_TEMP_FOLDER_NAME = QnAppInfo::productNameShort() + "_temp_folder_";
+    std::atomic<bool> QnFileStorageResource::m_firstCall(true);
 #else
     const QString QnFileStorageResource::FROM_SEP = lit("/");
     const QString QnFileStorageResource::TO_SEP = lit("\\");
 #endif
+
+
 
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
@@ -201,8 +207,57 @@ QString QnFileStorageResource::translateUrlToRemote(const QString &url) const
 }
 
 #ifndef _WIN32
+void QnFileStorageResource::removeOldDirs()
+{
+    QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(
+        QStringList() << (lit("*") + NX_TEMP_FOLDER_NAME + lit("*")),
+        QDir::AllDirs | QDir::NoDotAndDotDot
+    );
+
+    for (const QFileInfo &entry : tmpEntries)
+    {
+        int ecode = umount(entry.absoluteFilePath().toLatin1().constData());
+        if (ecode != 0)
+        {
+            bool safeToRemove = true;
+
+            switch (errno)
+            {
+            case EBUSY:
+            case ENOMEM:
+            case EPERM:
+                safeToRemove = false;
+                break;
+            }
+
+            if (!safeToRemove)
+            {
+                NX_LOG(
+                    lit("QnFileStorageResource::removeOldDirs: umount %1 failed").arg(entry.absoluteFilePath()),
+                    cl_logDEBUG2
+                );
+                continue;
+            }
+        }
+
+        if (!QDir(entry.absoluteFilePath()).removeRecursively())
+        {
+            NX_LOG(
+                lit("QnFileStorageResource::removeOldDirs: remove %1 failed").arg(entry.absoluteFilePath()),
+                cl_logDEBUG2
+            );
+        }
+    }
+}
+
 int QnFileStorageResource::mountTmpDrive(const QString &remoteUrl)
 {
+    if (m_firstCall)
+    {
+        m_firstCall = false;
+        removeOldDirs();
+    }
+
     QUrl url(remoteUrl);
     if (!url.isValid())
         return -1;
@@ -222,7 +277,7 @@ int QnFileStorageResource::mountTmpDrive(const QString &remoteUrl)
         return randomStringStream.str();
     };
 
-    m_localPath = QString::fromStdString("/tmp/" + randomString());
+    m_localPath = "/tmp/" + NX_TEMP_FOLDER_NAME + QString::fromStdString(randomString());
     int retCode = rmdir(m_localPath.toLatin1().constData());
 
     retCode = mkdir(

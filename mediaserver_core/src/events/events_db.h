@@ -2,8 +2,10 @@
 #define __EVENTS_DB_H_
 
 #include <QtSql/QtSql>
-#include "business/actions/abstract_business_action.h"
-#include "business/events/abstract_business_event.h"
+
+#include <core/resource/resource_fwd.h>
+#include <business/business_fwd.h>
+
 #include "utils/db/db_helper.h"
 #include "api/model/audit/audit_record.h"
 
@@ -20,7 +22,7 @@ public:
     bool saveActionToDB(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& actionRes);
     bool removeLogForRes(QnUuid resId);
 
-    QList<QnAbstractBusinessActionPtr> getActions(
+    QnBusinessActionDataList getActions(
         const QnTimePeriod& period,
         const QnResourceList& resList,
         const QnBusiness::EventType& eventType = QnBusiness::UndefinedEvent, 
@@ -45,14 +47,16 @@ public:
     static void fini();
 
     bool createDatabase();
-    static void migrate();
 
     virtual QnDbTransaction* getTransaction() override;
 protected:
     QnEventsDB();
+
+    virtual bool afterInstallUpdate(const QString& updateName) override;
 private:
     bool cleanupEvents();
     bool cleanupAuditLog();
+    bool migrateBusinessParams();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,

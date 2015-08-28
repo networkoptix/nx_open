@@ -6,6 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <business/business_strings_helper.h>
+#include <utils/common/model_functions.h>
 
 namespace QnBusiness {
     bool requiresCameraResource(ActionType actionType) {
@@ -58,7 +59,6 @@ namespace QnBusiness {
         switch(actionType) {
         case UndefinedAction:
         case CameraOutputOnceAction:
-        case BookmarkAction:
         case SendMailAction:
         case DiagnosticsAction:
         case ShowPopupAction:
@@ -70,6 +70,7 @@ namespace QnBusiness {
         case CameraRecordingAction:
         case PanicRecordingAction:
         case PlaySoundAction:
+        case BookmarkAction:
             return true;
 
         default:
@@ -93,7 +94,6 @@ namespace QnBusiness {
             << SayTextAction;
         return result;
     }
-
 }
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters& runtimeParams):
@@ -175,3 +175,5 @@ QString QnAbstractBusinessAction::getExternalUniqKey() const
 {
     return lit("action_") + QString::number(static_cast<int>(m_actionType)) + L'_';
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessActionData, (ubjson)(json)(xml)(csv_record), QnBusinessActionData_Fields, (optional, true) )

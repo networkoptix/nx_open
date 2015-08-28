@@ -584,13 +584,24 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
     
-    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
-    if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isEmpty() && m_primaryResolution.height() > 0) 
+    if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
     {
-        qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
-        setCustomAspectRatio(ar);
+        QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+        bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
+        if (forcedAR && m_primaryResolution.height() > 0) 
+        {
+            qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
+            setCustomAspectRatio(ar);
+        }
+        
+        QString defaultAR = resourceData.value<QString>(lit("defaultAR"));
+        QStringList parts = defaultAR.split(L'x');
+        if (parts.size() == 2) {
+            qreal ar = parts[0].toFloat() / parts[1].toFloat();
+            setCustomAspectRatio(ar);
+        }
     }
+
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -955,7 +966,7 @@ void QnPlOnvifResource::notificationReceived(
             toSharedPointer(),
             portSourceIter->value,
             newPortState,
-            qnSyncTime->currentMSecsSinceEpoch() );   //it is not absolutely correct, but better than de-synchronized timestamp from camera
+            qnSyncTime->currentUSecsSinceEpoch() );   //it is not absolutely correct, but better than de-synchronized timestamp from camera
     }
 }
 

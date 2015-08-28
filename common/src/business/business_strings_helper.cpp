@@ -16,9 +16,13 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include "business/business_event_rule.h"
+#include "core/resource/camera_history.h"
+#include "events/ip_conflict_business_event.h"
+#include "business_event_rule.h"
+
 
 namespace {
     static const QString plainTextDelimiter(lit("\n"));
@@ -60,8 +64,12 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
 QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     using namespace QnBusiness;
 
-    if (value >= UserEvent)
-        return tr("User Defined (%1)").arg((int)value - (int)UserEvent);
+    if (value >= UserDefinedEvent) {
+        QString result = tr("User Defined");
+        if (value > UserDefinedEvent)
+            result += tr(" (%1)").arg((int)value - (int)UserDefinedEvent); // reserved for future use
+        return result;
+    }
 
     switch( value )
     {
@@ -87,7 +95,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     using namespace QnBusiness;
 
     QString resourceName = eventSource(params, useIp);
-    switch (params.getEventType()) {
+    switch (params.eventType) {
     case UndefinedEvent:
         return tr("Undefined event has occurred on %1").arg(resourceName);
 
@@ -119,7 +127,9 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Server \"%1\" Started").arg(resourceName);
     case LicenseIssueEvent:
         return tr("Server \'%1\' has a license problem").arg(resourceName);
-
+    case UserDefinedEvent:
+        return !params.caption.isEmpty() ? params.caption :
+               !params.description.isEmpty() ? params.description : resourceName;
     default:
         break;
     }
@@ -128,7 +138,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 
 QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameters &params, int /*resourceCount*/)
 {
-    return lit("Multiple %1 events have occured").arg(eventName(params.getEventType()));
+    return lit("Multiple %1 events have occured").arg(eventName(params.eventType));
 }
 
 QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, bool useIp, bool useHtml) {
@@ -138,13 +148,24 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
             : plainTextDelimiter;
 
     QnBusinessEventParameters params = action->getRuntimeParams();
-    QnBusiness::EventType eventType = params.getEventType();
+    QnBusiness::EventType eventType = params.eventType;
 
     QString result;
     result += tr("Event: %1").arg(eventName(eventType));
 
     result += delimiter;
     result += tr("Source: %1").arg(eventSource(params, useIp));
+
+    if (eventType == QnBusiness::UserDefinedEvent) {
+        if (!params.caption.isEmpty()) {
+            result += delimiter;
+            result += tr("Caption: %1").arg(params.caption);
+        }
+        if (!params.description.isEmpty()) {
+            result += delimiter;
+            result += tr("Description: %1").arg(params.description);
+        }
+    }
 
     if (useHtml && eventType == QnBusiness::CameraMotionEvent) {
         result += delimiter;
@@ -159,7 +180,7 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
 
 QVariantHash QnBusinessStringsHelper::eventDescriptionMap(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, bool useIp) {
     QnBusinessEventParameters params = action->getRuntimeParams();
-    QnBusiness::EventType eventType = params.getEventType();
+    QnBusiness::EventType eventType = params.eventType;
 
     QVariantHash contextMap;
 
@@ -185,9 +206,9 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     Q_UNUSED(aggregationCount)
     QString result;
 
-    switch (params.getEventType()) {
+    switch (params.eventType) {
     case CameraInputEvent: {
-        result = tr("Input Port: %1").arg(params.getInputPortId());
+        result = tr("Input port: %1").arg(params.inputPortId);
         break;
     }
     case StorageFailureEvent:
@@ -199,20 +220,20 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case CameraIpConflictEvent: {
-        result += tr("Conflict Address: %1").arg(params.getSource());
-
+        result += tr("Conflict Address: %1").arg(params.caption);
+        result += delimiter;
         int n = 0;
-        for (const QString& mac: params.getConflicts()) {
+        for (const QString& mac: params.description.split(QnIPConflictBusinessEvent::Delimiter)) {
             result += delimiter;
-            result += tr("Camera #%1 MAC: %2").arg(++n).arg(mac);
+            result += tr("MAC #%1: %2 ").arg(++n).arg(mac);
         }
         break;
     }
     case ServerConflictEvent: {
-        if (!params.getConflicts().isEmpty()) {
+        if (!params.description.isEmpty()) {
             QnCameraConflictList conflicts;
-            conflicts.sourceServer = params.getSource();
-            conflicts.decode(params.getConflicts());
+            conflicts.sourceServer = params.caption;
+            conflicts.decode(params.description);
             int n = 0;
             for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
                 const QString &server = itr.key();
@@ -221,16 +242,19 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
                 int m = 0;
                 for (const QString &camera: conflicts.camerasByServer[server]) {
                     result += delimiter;
-                    result += tr("Camera #%1 MAC: %2").arg(++m).arg(camera);
+                    result += tr("MAC #%1: %2 ").arg(++n).arg(camera);
                 }
 
             }
         } else {
-            result += tr("Conflicting Server: %1").arg(params.getSource());
+            result += tr("Conflicting Server: %1").arg(params.caption);
         }
         break;
     }
     case ServerStartEvent: 
+        break;
+    case UserDefinedEvent:
+        result += params.description.isEmpty() ? params.caption : params.description;
         break;
     default:
         break;
@@ -261,14 +285,14 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
 
     detailsMap[tpTimestamp] = eventTimestampShort(params, aggregationCount);
 
-    switch (params.getEventType()) {
+    switch (params.eventType) {
     case CameraDisconnectEvent: {
         detailsMap[tpSource] = eventSource(params, useIp);
         break;
     }
 
     case CameraInputEvent: {
-        detailsMap[tpInputPort] = params.getInputPortId();
+        detailsMap[tpInputPort] = params.inputPortId;
         break;
     }
     case StorageFailureEvent:
@@ -280,10 +304,10 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
         break;
     }
     case CameraIpConflictEvent: {
-        detailsMap[lit("cameraConflictAddress")] = params.getSource();
+        detailsMap[lit("cameraConflictAddress")] = params.caption;
         QVariantList conflicts;
         int n = 0;
-        foreach (const QString& mac, params.getConflicts()) {
+        foreach (const QString& mac, params.description.split(QnConflictBusinessEvent::Delimiter)) {
             QVariantHash conflict;
             conflict[lit("number")] = ++n;
             conflict[lit("mac")] = mac;
@@ -295,8 +319,8 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
     }
     case ServerConflictEvent: {
         QnCameraConflictList conflicts;
-        conflicts.sourceServer = params.getSource();
-        conflicts.decode(params.getConflicts());
+        conflicts.sourceServer = params.caption;
+        conflicts.decode(params.description);
 
         QVariantList conflictsList;
         int n = 0;
@@ -321,7 +345,7 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
 
 
 QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount) {
-    quint64 ts = params.getEventTimestamp();
+    quint64 ts = params.eventTimestampUsec;
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
 
     int count = qMax(aggregationCount, 1);
@@ -336,7 +360,7 @@ QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParame
 }
 
 QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount) {
-    quint64 ts = params.getEventTimestamp();
+    quint64 ts = params.eventTimestampUsec;
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
 
     int count = qMax(aggregationCount, 1);
@@ -351,18 +375,21 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
 }
 
 QString QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params, bool useIp) {
-    QnUuid id = params.getEventResourceId();
+    QnUuid id = params.eventResourceId;
     QnResourcePtr res = !id.isNull() ? qnResPool->getResourceById(id) : QnResourcePtr();
-    return getFullResourceName(res, useIp);
+	if (!res)
+        return params.resourceName;
+    else		
+        return getFullResourceName(res, useIp);
 }
 
 QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& params) {
     using namespace QnBusiness;
     
-    QString reasonParamsEncoded = params.getReasonParamsEncoded();
+    QString reasonParamsEncoded = params.description;
 
     QString result;
-    switch (params.getReasonCode()) {
+    switch (params.reasonCode) {
     case NetworkNoFrameReason: {
         int msecs = QnNetworkIssueBusinessEvent::decodeTimeoutMsecs(reasonParamsEncoded, 5000);
         result = tr("No video frame received during last %n seconds.", 0, msecs / 1000);
@@ -462,7 +489,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(
 }
 
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool /*isPublic*/) {
-    QnUuid id = params.getEventResourceId();
+    QnUuid id = params.eventResourceId;
     QnNetworkResourcePtr res = !id.isNull() ? 
                             qnResPool->getResourceById<QnNetworkResource>(id) : 
                             QnNetworkResourcePtr();
@@ -474,7 +501,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
         return QString();
 
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
-    quint64 ts = params.getEventTimestamp();
+    quint64 ts = params.eventTimestampUsec;
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
     if (history) {
@@ -500,6 +527,8 @@ QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState stat
         return tr("start");
     case QnBusiness::InactiveState:
         return tr("stop");
+    case QnBusiness::UndefinedState:
+        return tr("undefined");
     default:
         break;
     }

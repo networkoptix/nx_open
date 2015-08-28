@@ -25,7 +25,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
-#include <utils/common/email.h>
+#include <utils/email/email.h>
 #include <utils/media/audio_player.h>
 #include "core/resource_management/resource_pool.h"
 
@@ -98,27 +98,17 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventTypesModel->appendRow(row);
     }
 
-    QList<QnBusiness::EventState> values;
-    values << QnBusiness::ActiveState << QnBusiness::InactiveState;
-    foreach (QnBusiness::EventState val, values) {
-        QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventStatesModel->appendRow(row);
-    }
-
     for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {      
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
         item->setData(actionType);
         item->setData(QnBusiness::hasToggleState(actionType), ProlongedActionRole);
-
+        
         QList<QStandardItem *> row;
         row << item;
         m_actionTypesModel->appendRow(row);
     }
     updateActionTypesModel();
+    updateEventStateModel();
 }
 
 QnBusinessRuleViewModel::~QnBusinessRuleViewModel() {
@@ -254,7 +244,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
 
             // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
             // This code will fail silently if someone changes the header. Please write it properly.           
-            params.userGroup = (QnBusinessActionParameters::UserGroup)value.toInt(); 
+            params.userGroup = (QnBusiness::UserGroup)value.toInt(); 
             setActionParams(params);
             break;
         }
@@ -292,7 +282,10 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
 void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) {
     m_id = businessRule->id();
     m_modified = false;
-    m_eventType = businessRule->eventType();
+    if (m_eventType != businessRule->eventType()) {
+        m_eventType = businessRule->eventType();
+        updateEventStateModel();
+    }
 
     m_eventResources = businessRule->eventResources();
 
@@ -397,6 +390,7 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
     }
 
     updateActionTypesModel();
+    updateEventStateModel();
 
     emit dataChanged(this, fields);
     //TODO: #GDM #Business check others, params and resources should be merged
@@ -527,10 +521,8 @@ QnBusinessActionParameters QnBusinessRuleViewModel::actionParams() const
     return m_actionParams;
 }
 
-void QnBusinessRuleViewModel::setActionParams(const QnBusinessActionParameters &params)
-{
-    bool hasChanges = !params.equalTo(m_actionParams);
-    if (!hasChanges)
+void QnBusinessRuleViewModel::setActionParams(const QnBusinessActionParameters &params) {
+    if (params == m_actionParams)
         return;
 
     m_actionParams = params;
@@ -686,7 +678,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
         }
         case QnBusiness::ShowPopupAction:
         {
-            if (m_actionParams.userGroup == QnBusinessActionParameters::AdminOnly)
+            if (m_actionParams.userGroup == QnBusiness::AdminOnly)
                 return qnResIconCache->icon(QnResourceIconCache::User);
             else
                 return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -795,6 +787,19 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
     return true;
 }
 
+void QnBusinessRuleViewModel::updateEventStateModel()
+{
+    m_eventStatesModel->clear();
+    foreach (QnBusiness::EventState val, QnBusiness::allowedEventStates(m_eventType)) {
+        QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
+        item->setData(val);
+
+        QList<QStandardItem *> row;
+        row << item;
+        m_eventStatesModel->appendRow(row);
+    }
+};
+
 void QnBusinessRuleViewModel::updateActionTypesModel() {
     QModelIndexList prolongedActions = m_actionTypesModel->match(m_actionTypesModel->index(0,0),
                                                                  ProlongedActionRole, true, -1, Qt::MatchExactly);
@@ -849,7 +854,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     }
     case QnBusiness::ShowPopupAction:
     {
-        if (m_actionParams.userGroup == QnBusinessActionParameters::AdminOnly)
+        if (m_actionParams.userGroup == QnBusiness::AdminOnly)
             return tr("Administrators Only");
         else
             return tr("All Users");
@@ -928,7 +933,7 @@ QString QnBusinessRuleViewModel::toggleStateToModelString(QnBusiness::EventState
     case QnBusiness::ActiveState:
         return tr("Starts");
     case QnBusiness::UndefinedState:
-        return tr("Starts/Stops");
+        return tr("Occures");
     }
     return QString();
 }

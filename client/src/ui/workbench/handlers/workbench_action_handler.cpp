@@ -1512,7 +1512,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 
         // TODO: #Elric move submitToResources here.
         QnMediaServerUserAttributesPtr newAttrValue = QnMediaServerUserAttributesPool::instance()->get(server->getId());
-        if (!(*newAttrValue == oldAttrValue)) {
+        if (!(*newAttrValue == oldAttrValue) || server->hasUpdatedStorages()) {
             const auto serverAttrs = QnMediaServerUserAttributesList() << newAttrValue;
             const auto handler = [this, server]( int reqID, ec2::ErrorCode errorCode ) 
                 { at_resources_saved( reqID, errorCode, QnResourceList() << server ); };

@@ -3,6 +3,6 @@
 
 #include "mustache/mustache.h"
 
-QString renderTemplateFromFile(const QString& path, const QString& filename, const QVariantHash& contextMap);
+QString renderTemplateFromFile(const QString& filename, const QVariantHash& contextMap);
 
 #endif // _MUSTACHE_MUSTACHE_HELPER_H_

@@ -125,6 +125,7 @@ signals:
 
 private:
     void updateActionTypesModel();
+    void updateEventStateModel();
 
     /**
      * @brief getSourceText     Get text for the Source field.
