@@ -51,7 +51,7 @@ if [ ! -z $CHECKBOOTHDDPART ] && [ ! -z $CHECKDATAHDDPART ]; then
     mount -t ext4 $BOOTHDDPART $MNTBOOTHDDPART
     if [ -f $MNTBOOTHDDPART/restored ] && [ -f $MNTBOOTHDDPART/boot/vmlinuz*bananian ]; then HDDNX1=true; else HDDNX1=false; fi
     ARCHIVE_DB=`ls $MNTDATAHDDPART/*Media/ | grep hi_quality`
-    if [[ -f $MNTDATAHDDPART/*Media/*.sqlite ]] then ARCHIVE=true; else ARCHIVE=false; fi
+    if [[ -f $MNTDATAHDDPART/*Media/*.sqlite ]]; then ARCHIVE=true; else ARCHIVE=false; fi
     for p in $( lsof | grep $MNTBOOTHDDPART | awk {'print $2'} ); do kill $p; done
     sleep 2
     umount $BOOTHDDPART
