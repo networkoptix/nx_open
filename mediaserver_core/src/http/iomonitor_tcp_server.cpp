@@ -81,11 +81,9 @@ void QnIOMonitorConnectionProcessor::run()
             sendMultipartData();
             d->waitCond.wait(&d->waitMutex);
         }
-		// todo: it's still have minor race condition because of Qt::DirectConnection isn't safe
-		// qt calls unlock/relock signalSlot mutex before method invocation
         disconnect( camera.data(), nullptr, this, nullptr );
-        camera->inputPortListenerDetached();
         lock.unlock();
+        camera->inputPortListenerDetached();
         d->socket->terminateAsyncIO(true);
     }
 }
