@@ -1133,6 +1133,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
     bool isOffline = false;
     bool isUnauthorized = false;
+    bool hasVideo = m_resource && m_resource->hasVideo(m_display->mediaProvider());
     checkWrongState(&isOffline, &isUnauthorized);
 
     if (m_camera && m_camera->hasFlags(Qn::io_module))
@@ -1180,16 +1181,18 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
             return Qn::NoDataOverlay;
         QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
-            return base_type::calculateStatusOverlay(Qn::Online, m_resource && m_resource->hasVideo(m_display->mediaProvider()));
+            return base_type::calculateStatusOverlay(Qn::Online, hasVideo);
         else
             return Qn::NoDataOverlay;
     } else if (m_display->isPaused()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
+        else if (!hasVideo)
+            return Qn::NoVideoDataOverlay;
         else
             return Qn::EmptyOverlay;
     } else {
-        return base_type::calculateStatusOverlay(Qn::Online, m_resource && m_resource->hasVideo(m_display->mediaProvider()));
+        return base_type::calculateStatusOverlay(Qn::Online, hasVideo);
     }
 }
 
