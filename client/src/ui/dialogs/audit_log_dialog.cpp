@@ -35,7 +35,9 @@
 #include <ui/models/audit/audit_log_detail_model.h>
 #include <QMouseEvent>
 #include "core/resource/layout_resource.h"
+
 #include "ui/common/geometry.h"
+#include <ui/common/palette.h>
 #include "ui/style/globals.h"
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include "ui/workbench/workbench_context_aware.h"
@@ -53,6 +55,9 @@ namespace {
         SessionTab,
         CameraTab
     };
+
+    const char* checkBoxCheckedProperty("checkboxChecked");
+    const char* checkBoxFilterProperty("checkboxFilter");
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
@@ -316,7 +321,7 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
     for (const QCheckBox* checkBox: m_filterCheckboxes) 
     {
         if (!checkBox->isChecked()) 
-            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
+            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property(checkBoxFilterProperty).toInt();
     }
 
 
@@ -407,10 +412,9 @@ QList<QnAuditLogModel::Column> detailSessionColumns(bool showUser)
 
 void QnAuditLogDialog::setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes)
 {
-    QPalette palette = checkbox->palette();
-    palette.setColor(checkbox->foregroundRole(), color);
-    checkbox->setPalette(palette);
-    checkbox->setProperty("filter", (int) filteredTypes);
+    setPaletteColor(checkbox, QPalette::Active, QPalette::Foreground, color);
+    setPaletteColor(checkbox, QPalette::Inactive, QPalette::Foreground, color);
+    checkbox->setProperty(checkBoxFilterProperty, static_cast<int>(filteredTypes));
     m_filterCheckboxes << checkbox;
     checkbox->disconnect(this);
     connect(checkbox, &QCheckBox::stateChanged, this, &QnAuditLogDialog::at_typeCheckboxChanged);
@@ -463,8 +467,19 @@ void QnAuditLogDialog::at_currentTabChanged()
     const Qn::AuditRecordTypes camerasTypes = Qn::AR_ViewLive | Qn::AR_ViewArchive | Qn::AR_ExportVideo | Qn::AR_CameraUpdate | Qn::AR_CameraInsert | Qn::AR_CameraRemove;
 
     for(QCheckBox* checkBox: m_filterCheckboxes) {
-        Qn::AuditRecordTypes eventTypes = (Qn::AuditRecordTypes) checkBox->property("filter").toInt();
-        checkBox->setEnabled(allEnabled || (camerasTypes & eventTypes));
+        Qn::AuditRecordTypes eventTypes =static_cast<Qn::AuditRecordTypes>(checkBox->property(checkBoxFilterProperty).toInt());
+        bool allowed = allEnabled || (camerasTypes & eventTypes);
+
+        if (checkBox->isEnabled() == allowed) 
+            continue;
+
+        checkBox->setEnabled(allowed);
+        if (allowed) {
+            checkBox->setChecked(checkBox->property(checkBoxCheckedProperty).toBool());
+        } else {
+            checkBox->setProperty(checkBoxCheckedProperty, checkBox->isChecked());
+            checkBox->setChecked(false);
+        }
     }
     at_filterChanged();
 }
@@ -516,6 +531,20 @@ void QnAuditLogDialog::at_updateDetailModel()
         QnAuditRecordRefList checkedRows = m_camerasModel->checkedRows();
         auto data = filterChildDataByCameras(checkedRows);
         m_detailModel->setData(data);
+    }
+
+    /// TODO: #ynikitenkov introduce expanded-state management in model
+
+    /// Collapses all expanded descriptions (cameras, for examples)
+    for (int row = 0; row != m_detailModel->rowCount(); ++row)
+    {
+        const QModelIndex index = m_detailModel->QnAuditLogModel::index(row, 0);
+        const QVariant data = index.data(Qn::AuditRecordDataRole);
+        if (!data.canConvert<QnAuditRecord *>())
+            continue;
+
+        QnAuditRecord * const record = data.value<QnAuditRecord *>();
+        m_detailModel->setDetail(record, false);
     }
 }
 
@@ -630,6 +659,7 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
     headers->setVisible(true);
     headers->setSectionsClickable(true);
     headers->setSectionResizeMode(QHeaderView::ResizeToContents);
+    headers->setStretchLastSection(true);
 
     gridMaster->setHorizontalHeader(headers);
     gridMaster->setItemDelegate(m_itemDelegate);
@@ -731,7 +761,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
             w += m_itemDelegate->playButtonSize().width() + COLUMN_SPACING*2;
             w += ui->gridDetails->verticalScrollBar()->width() + 2;
             bool needAdjust =  ui->gridDetails->width() < w;
-            ui->gridDetails->setMinimumSize(w, -1);
+            ui->gridDetails->setMinimumSize(w, 0);
             if (needAdjust)
                 ui->gridDetails->adjustSize();
         }, Qt::QueuedConnection
@@ -787,6 +817,9 @@ void QnAuditLogDialog::at_eventsGrid_clicked(const QModelIndex& index)
     
     int height = ui->gridDetails->itemDelegate()->sizeHint(QStyleOptionViewItem(), index).height();
     ui->gridDetails->setRowHeight(index.row(), height);
+
+    ui->gridDetails->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    ui->gridDetails->horizontalHeader()->setStretchLastSection(true);
 }
 
 void QnAuditLogDialog::at_ItemEntered(const QModelIndex& index)
