@@ -1,7 +1,7 @@
 #include "custom_business_event.h"
 
 QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState, qint64 timeStamp, const QString& resourceName, const QString& caption, const QString& description):
-    base_type(toggleState == QnBusiness::UndefinedState ? QnBusiness::CustomInstantEvent : QnBusiness::CustomProlongedEvent, QnResourcePtr(), toggleState, timeStamp),
+    base_type(QnBusiness::UserDefinedEvent, QnResourcePtr(), toggleState, timeStamp),
     m_resourceName(resourceName),
     m_caption(caption),
     m_description(description)

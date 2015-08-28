@@ -60,7 +60,7 @@ namespace QnBusiness
         case AnyBusinessEvent:
             result << CameraMotionEvent << CameraInputEvent <<
                       AnyCameraEvent << AnyServerEvent <<
-                      CustomProlongedEvent << CustomInstantEvent;
+                      UserDefinedEvent;
             break;
         default:
             break;
@@ -82,8 +82,7 @@ namespace QnBusiness
             << ServerConflictEvent 
             << ServerStartEvent 
             << LicenseIssueEvent
-            << CustomProlongedEvent
-            << CustomInstantEvent;
+            << UserDefinedEvent;
         return result;
     }
 
@@ -97,11 +96,21 @@ namespace QnBusiness
         case AnyBusinessEvent:
         case CameraMotionEvent:
         case CameraInputEvent:
-        case CustomProlongedEvent:
+        case UserDefinedEvent:
             return true;
         default:
             return false;
         }
+    }
+
+    QList<EventState> allowedEventStates(EventType eventType)
+    {
+        QList<EventState> result;
+        if (hasToggleState(eventType))
+            result << QnBusiness::ActiveState << QnBusiness::InactiveState;
+        if (!hasToggleState(eventType) || eventType == UserDefinedEvent)
+            result << QnBusiness::UndefinedState;
+        return result;
     }
 
     bool requiresCameraResource(EventType eventType) {

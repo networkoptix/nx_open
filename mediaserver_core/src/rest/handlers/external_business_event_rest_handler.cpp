@@ -49,10 +49,8 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
         businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
     businessParams.sourceServerId = qnCommon->moduleGUID();
 
-    // default value for type is 'CustomEvent'
-    if (businessParams.eventType == QnBusiness::UndefinedEvent) {
-        businessParams.eventType = eventState == QnBusiness::UndefinedState ? QnBusiness::CustomInstantEvent : QnBusiness::CustomProlongedEvent;
-    }
+    if (businessParams.eventType == QnBusiness::UndefinedEvent)
+        businessParams.eventType = QnBusiness::UserDefinedEvent; // default value for type is 'CustomEvent'
 
     if (!qnBusinessRuleConnector->createEventFromParams(businessParams, eventState))
         result.setError(QnRestResult::InvalidParameter, "Invalid event parameters");

@@ -71,9 +71,6 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
-    if (eventType >= QnBusiness::UserEvent)
-        return;
-
     int healthMessage = eventType - QnBusiness::SystemHealthEvent;
     if (healthMessage >= 0) {
         QnUuid resourceId = params.eventResourceId;

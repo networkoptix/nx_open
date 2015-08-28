@@ -106,11 +106,6 @@ public:
         /** Not enough licenses */
         LicenseIssueEvent = 10,
 
-        /** Custom prolonged event */
-        CustomProlongedEvent = 11,
-        /** Custom prolonged event */
-        CustomInstantEvent = 12,
-
         /** System health message. */
         SystemHealthEvent = 500,
 
@@ -120,7 +115,7 @@ public:
         AnyBusinessEvent = 602,
 
         /** Base index for the user defined events. */
-        UserEvent = 1000
+        UserDefinedEvent = 1000
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventType)
 

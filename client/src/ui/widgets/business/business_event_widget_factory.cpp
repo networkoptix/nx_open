@@ -10,8 +10,7 @@ QnAbstractBusinessParamsWidget* QnBusinessEventWidgetFactory::createWidget(QnBus
     switch (eventType) {
     case QnBusiness::CameraInputEvent:
         return new QnCameraInputBusinessEventWidget(parent);
-    case QnBusiness::CustomInstantEvent:
-    case QnBusiness::CustomProlongedEvent:
+    case QnBusiness::UserDefinedEvent:
         return new QnCustomBusinessEventWidget(parent);
     default:
         return new QnEmptyBusinessEventWidget(parent);

@@ -98,17 +98,6 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventTypesModel->appendRow(row);
     }
 
-    QList<QnBusiness::EventState> values;
-    values << QnBusiness::ActiveState << QnBusiness::InactiveState;
-    foreach (QnBusiness::EventState val, values) {
-        QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventStatesModel->appendRow(row);
-    }
-
     for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {      
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
         item->setData(actionType);
@@ -119,6 +108,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_actionTypesModel->appendRow(row);
     }
     updateActionTypesModel();
+    updateEventStateModel();
 }
 
 QnBusinessRuleViewModel::~QnBusinessRuleViewModel() {
@@ -292,7 +282,10 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
 void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) {
     m_id = businessRule->id();
     m_modified = false;
-    m_eventType = businessRule->eventType();
+    if (m_eventType != businessRule->eventType()) {
+        m_eventType = businessRule->eventType();
+        updateEventStateModel();
+    }
 
     m_eventResources = businessRule->eventResources();
 
@@ -397,6 +390,7 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
     }
 
     updateActionTypesModel();
+    updateEventStateModel();
 
     emit dataChanged(this, fields);
     //TODO: #GDM #Business check others, params and resources should be merged
@@ -793,6 +787,19 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
     return true;
 }
 
+void QnBusinessRuleViewModel::updateEventStateModel()
+{
+    m_eventStatesModel->clear();
+    foreach (QnBusiness::EventState val, QnBusiness::allowedEventStates(m_eventType)) {
+        QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
+        item->setData(val);
+
+        QList<QStandardItem *> row;
+        row << item;
+        m_eventStatesModel->appendRow(row);
+    }
+};
+
 void QnBusinessRuleViewModel::updateActionTypesModel() {
     QModelIndexList prolongedActions = m_actionTypesModel->match(m_actionTypesModel->index(0,0),
                                                                  ProlongedActionRole, true, -1, Qt::MatchExactly);
@@ -926,7 +933,7 @@ QString QnBusinessRuleViewModel::toggleStateToModelString(QnBusiness::EventState
     case QnBusiness::ActiveState:
         return tr("Starts");
     case QnBusiness::UndefinedState:
-        return tr("Starts/Stops");
+        return tr("Occures");
     }
     return QString();
 }

@@ -64,8 +64,12 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
 QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     using namespace QnBusiness;
 
-    if (value >= UserEvent)
-        return tr("User Defined (%1)").arg((int)value - (int)UserEvent);
+    if (value >= UserDefinedEvent) {
+        QString result = tr("User Defined");
+        if (value > UserDefinedEvent)
+            result += tr(" (%1)").arg((int)value - (int)UserDefinedEvent); // reserved for future use
+        return result;
+    }
 
     switch( value )
     {
@@ -79,8 +83,6 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     case ServerConflictEvent:   return tr("Server Conflict");
     case ServerStartEvent:      return tr("Server Started");
     case LicenseIssueEvent:     return tr("License Issue");
-    case CustomProlongedEvent:  return tr("User defined event (prolonged)");
-    case CustomInstantEvent:    return tr("User defined event (instant)");
     case AnyCameraEvent:        return tr("Any Camera Issue");
     case AnyServerEvent:        return tr("Any Server Issue");
     case AnyBusinessEvent:      return tr("Any Event");
@@ -125,8 +127,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Server \"%1\" Started").arg(resourceName);
     case LicenseIssueEvent:
         return tr("Server \'%1\' has a license problem").arg(resourceName);
-    case CustomInstantEvent:
-    case CustomProlongedEvent:
+    case UserDefinedEvent:
         return !params.caption.isEmpty() ? params.caption :
                !params.description.isEmpty() ? params.description : resourceName;
     default:
@@ -155,7 +156,7 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     result += delimiter;
     result += tr("Source: %1").arg(eventSource(params, useIp));
 
-    if (eventType == QnBusiness::CustomInstantEvent || eventType == QnBusiness::CustomProlongedEvent) {
+    if (eventType == QnBusiness::UserDefinedEvent) {
         if (!params.caption.isEmpty()) {
             result += delimiter;
             result += tr("Caption: %1").arg(params.caption);
@@ -252,8 +253,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     }
     case ServerStartEvent: 
         break;
-    case CustomProlongedEvent:
-    case CustomInstantEvent:
+    case UserDefinedEvent:
         result += params.description.isEmpty() ? params.caption : params.description;
         break;
     default:
@@ -527,6 +527,8 @@ QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState stat
         return tr("start");
     case QnBusiness::InactiveState:
         return tr("stop");
+    case QnBusiness::UndefinedState:
+        return tr("undefined");
     default:
         break;
     }

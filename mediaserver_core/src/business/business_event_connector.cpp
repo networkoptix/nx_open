@@ -155,6 +155,14 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
 {
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
     bool isOnState = eventState == QnBusiness::ActiveState;
+    if (params.eventType >= QnBusiness::UserDefinedEvent)
+    {
+        if (params.resourceName.isEmpty() && params.caption.isEmpty() &&  params.description.isEmpty())
+            return false;
+        at_customEvent(params.resourceName, params.caption, params.description, eventState, params.eventTimestampUsec);
+        return true;
+    }
+
     switch (params.eventType)
     {
         case QnBusiness::CameraMotionEvent:
@@ -210,12 +218,6 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
             if (!resource)
                 resource = qnResPool->getResourceById(params.sourceServerId);
             at_licenseIssueEvent(resource, params.eventTimestampUsec, params.reasonCode, params.description);
-            break;
-        case QnBusiness::CustomProlongedEvent:
-        case QnBusiness::CustomInstantEvent:
-            if (params.resourceName.isEmpty() && params.caption.isEmpty() &&  params.description.isEmpty())
-                return false;
-            at_customEvent(params.resourceName, params.caption, params.description, eventState, params.eventTimestampUsec);
             break;
         default:
             return false;

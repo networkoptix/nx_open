@@ -1325,6 +1325,15 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!m_dbJustCreated)
             m_needResyncCameraUserAttributes = true;
     }
+    else if (updateName == lit(":/updates/43_add_business_rules.sql")) {
+        for(const auto& bRule: QnBusinessEventRule::getRulesUpd43())
+        {
+            ApiBusinessRuleData bRuleData;
+            fromResourceToApi(bRule, bRuleData);
+            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+                return false;
+        }
+    }
 
     return true;
 }

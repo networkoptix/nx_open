@@ -40,25 +40,6 @@
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
 
-namespace {
-    QString toggleStateToString(QnBusiness::EventState value, bool prolonged) {
-        switch( value )
-        {
-            case QnBusiness::InactiveState:
-                return QObject::tr("Stops");
-            case QnBusiness::ActiveState:
-                return QObject::tr("Starts");
-            case QnBusiness::UndefinedState:
-            if (prolonged)
-                return QObject::tr("Starts/Stops");
-            else
-                return QObject::tr("Occurs");
-        }
-        return QString();
-    }
-
-} // namespace
-
 QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
@@ -306,7 +287,7 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
 }
 
 void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index) {
-    if (!m_model || m_updating)
+    if (!m_model || m_updating || index == -1)
         return;
 
     bool prolonged = QnBusiness::hasToggleState(m_model->eventType()) && !QnBusiness::hasToggleState(m_model->actionType());
