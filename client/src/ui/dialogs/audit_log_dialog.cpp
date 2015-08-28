@@ -394,18 +394,18 @@ QSize QnAuditLogDialog::calcButtonSize() const
     return result;
 }
 
-QList<QnAuditLogModel::Column> detailSessionColumns(bool showUser)
+QList<QnAuditLogModel::Column> detailSessionColumns()
 {
     QList<QnAuditLogModel::Column> columns;
-    columns << 
-        QnAuditLogModel::DateColumn <<
-        QnAuditLogModel::TimeColumn;
-    if (showUser)
-        columns << QnAuditLogModel::UserNameColumn << QnAuditLogModel::UserHostColumn;
-    columns <<
-        QnAuditLogModel::EventTypeColumn <<
-        QnAuditLogModel::DescriptionColumn <<
-        QnAuditLogModel::PlayButtonColumn;
+    columns
+        << QnAuditLogModel::DateColumn 
+        << QnAuditLogModel::TimeColumn
+        << QnAuditLogModel::UserNameColumn 
+        << QnAuditLogModel::UserHostColumn
+        << QnAuditLogModel::EventTypeColumn
+        << QnAuditLogModel::DescriptionColumn 
+        << QnAuditLogModel::PlayButtonColumn
+        ;
     
     return columns;
 }
@@ -659,7 +659,7 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
     headers->setVisible(true);
     headers->setSectionsClickable(true);
     headers->setSectionResizeMode(QHeaderView::ResizeToContents);
-    headers->setStretchLastSection(true);
+//    headers->setStretchLastSection(true);
 
     gridMaster->setHorizontalHeader(headers);
     gridMaster->setItemDelegate(m_itemDelegate);
@@ -697,7 +697,6 @@ void QnAuditLogDialog::setupCamerasGrid()
     ui->gridCameras->setModel(m_camerasModel);
 
     setupMasterGridCommon(ui->gridCameras);
-    ui->gridCameras->horizontalHeader()->setStretchLastSection(true);
 }
 
 QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
@@ -731,8 +730,9 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
 
     // setup detail grid
 
+    auto detailColumns = detailSessionColumns();
     m_detailModel = new QnAuditLogDetailModel(this);
-    m_detailModel->setColumns(detailSessionColumns(true));
+    m_detailModel->setColumns(detailColumns);
     ui->gridDetails->setModel(m_detailModel);
     ui->gridDetails->setItemDelegate(m_itemDelegate);
     ui->gridDetails->setWordWrap(true);
@@ -741,31 +741,13 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     ui->gridDetails->horizontalHeader()->setMinimumSectionSize(48);
     
     ui->gridDetails->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->gridDetails->horizontalHeader()->setStretchLastSection(true);
+    ui->gridDetails->horizontalHeader()->setSectionResizeMode(detailColumns.indexOf(QnAuditLogModel::DescriptionColumn), QHeaderView::Stretch);
 
     ui->gridDetails->setMouseTracking(true);
 
 
-    connect(ui->gridDetails, &QTableView::pressed, this, &QnAuditLogDialog::at_ItemPressed);
-    connect(ui->gridDetails, &QTableView::entered, this, &QnAuditLogDialog::at_ItemEntered);
-
-    connect (ui->gridDetails->horizontalHeader(), &QHeaderView::sectionResized, this, 
-        [this] (int logicalIndex, int oldSize, int newSize) 
-        {
-            QN_UNUSED(logicalIndex, oldSize, newSize);
-
-            int w = 0;
-            const QHeaderView* headers = ui->gridDetails->horizontalHeader();
-            for (int i = 0; i < headers->count() - 1; ++i)
-                w += headers->sectionSize(i);
-            w += m_itemDelegate->playButtonSize().width() + COLUMN_SPACING*2;
-            w += ui->gridDetails->verticalScrollBar()->width() + 2;
-            bool needAdjust =  ui->gridDetails->width() < w;
-            ui->gridDetails->setMinimumSize(w, 0);
-            if (needAdjust)
-                ui->gridDetails->adjustSize();
-        }, Qt::QueuedConnection
-    );
+    connect(ui->gridDetails, &QTableView::pressed, this, &QnAuditLogDialog::at_itemPressed);
+    connect(ui->gridDetails, &QTableView::entered, this, &QnAuditLogDialog::at_itemEntered);
     setupContextMenu(ui->gridDetails);
 
     QDate dt = QDateTime::currentDateTime().date();
@@ -817,12 +799,9 @@ void QnAuditLogDialog::at_eventsGrid_clicked(const QModelIndex& index)
     
     int height = ui->gridDetails->itemDelegate()->sizeHint(QStyleOptionViewItem(), index).height();
     ui->gridDetails->setRowHeight(index.row(), height);
-
-    ui->gridDetails->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-    ui->gridDetails->horizontalHeader()->setStretchLastSection(true);
 }
 
-void QnAuditLogDialog::at_ItemEntered(const QModelIndex& index)
+void QnAuditLogDialog::at_itemEntered(const QModelIndex& index)
 {
     if (index.data(Qn::ColumnDataRole) == QnAuditLogModel::DescriptionColumn)
         ui->gridDetails->setCursor(Qt::PointingHandCursor);
@@ -971,7 +950,7 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, Qn::ActionId A
     context()->menu()->trigger(ActionId, params);
 }
 
-void QnAuditLogDialog::at_ItemPressed(const QModelIndex& index)
+void QnAuditLogDialog::at_itemPressed(const QModelIndex& index)
 {
     if (index.data(Qn::ColumnDataRole) != QnAuditLogModel::PlayButtonColumn)
         return;
