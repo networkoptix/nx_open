@@ -73,6 +73,9 @@ float QnPhysicalCameraResource::getResolutionAspectRatio(const QSize& resolution
     // SD NTCS/PAL resolutions have non standart SAR. fix it
     if (resolution.width() == 720 && (resolution.height() == 480 || resolution.height() == 576))
         result = float(4.0 / 3.0);
+    // SD NTCS/PAL resolutions have non standart SAR. fix it
+    else if (resolution.width() == 960 && (resolution.height() == 480 || resolution.height() == 576))
+        result = float(16.0 / 9.0);
     return result;
 }
 
