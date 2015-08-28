@@ -203,6 +203,21 @@
         },
         {
             "keys": [
+                "Honeywell|HVE4"
+            ],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationA01,VideoEncoderConfigurationA05",
+                    "VideoEncoderConfigurationA02,VideoEncoderConfigurationA06",
+                    "VideoEncoderConfigurationA03,VideoEncoderConfigurationA07",
+                    "VideoEncoderConfigurationA04,VideoEncoderConfigurationA08"
+                ]
+            }
+        },
+        {
+            "keys": [
                 "DW|DWC-MPTZ20X", 
                 "DW|DWC-MPZ20XFM|2.1.0.8", "DW|DWC-MPZ20XFM"
             ],

@@ -500,6 +500,7 @@ private:
         DeviceSoapWrapper* const soapWrapper,
         CapabilitiesResp* const response );
     void fillFullUrlInfo( const CapabilitiesResp& response );
+    CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
 };
 
 #endif //ENABLE_ONVIF
