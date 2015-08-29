@@ -74,9 +74,23 @@ namespace CameraDiagnostics
             unknown
         };
 
+        enum ErrorTarget
+        {
+            kCameraTarget
+            , kIoModuleTarget
+        };
+
         //!Returns textual description of error with  parameters
-        QString toString( Value val, const QList<QString>& errorParams = QList<QString>() );
-        QString toString( int val, const QList<QString>& errorParams = QList<QString>() );
+
+        typedef QList<QString> ErrorParams;
+
+        QString toString(Value val
+            , ErrorTarget target = kCameraTarget
+            , const ErrorParams& errorParams = ErrorParams());
+
+        QString toString(int val
+            , ErrorTarget target = kCameraTarget
+            , const ErrorParams& errorParams = ErrorParams());
     }
 
     /*!

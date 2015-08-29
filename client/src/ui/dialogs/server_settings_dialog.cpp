@@ -29,7 +29,6 @@ void QnServerSettingsDialog::showNonModal(const QnMediaServerResourcePtr &server
         return (dialog->m_server->getId() == server->getId());
     });
 
-    QnServerSettingsDialog *dlg = nullptr;
     if (it == g_currentShowingDialogs.end())
         it = g_currentShowingDialogs.insert(server->getId(), new QnServerSettingsDialog(server, callback, parent));
 
@@ -74,21 +73,29 @@ QnServerSettingsDialog::~QnServerSettingsDialog()
 {
 }
 
-void QnServerSettingsDialog::reject()
+bool QnServerSettingsDialog::tryClose(bool force)
 {
+    if (!base_type::tryClose(force))
+        return false;
+
     g_currentShowingDialogs.remove(m_server->getId());
-    base_type::reject();
     deleteLater();
+
+    return true;
+}
+
+void QnServerSettingsDialog::submitData()
+{
+    base_type::submitData();
+    if (m_onAcceptClickedCallback)
+        m_onAcceptClickedCallback();
 }
 
 void QnServerSettingsDialog::accept()
 {
+    if (!base_type::tryAccept())
+        return;
+
     g_currentShowingDialogs.remove(m_server->getId());
-    base_type::accept();
-
-    if (m_onAcceptClickedCallback)
-        m_onAcceptClickedCallback();
-
     deleteLater();
 }
-

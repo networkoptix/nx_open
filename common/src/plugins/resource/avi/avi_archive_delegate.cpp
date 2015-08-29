@@ -126,7 +126,8 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_eofReached(false),
     m_fastStreamFind(false),
     m_hasVideo(true),
-    m_lastSeekTime(AV_NOPTS_VALUE)
+    m_lastSeekTime(AV_NOPTS_VALUE),
+    m_openMutex(QMutex::Recursive)
 {
     close();
     m_audioLayout.reset( new QnAviAudioLayout(this) );

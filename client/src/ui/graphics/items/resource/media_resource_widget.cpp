@@ -601,6 +601,9 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         m_renderer->setChannelCount(0);
     }
 
+    bool hasVideo = m_resource->hasVideo(m_display ? m_display->mediaProvider() : nullptr);
+    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo);
+
     emit displayChanged();
 }
 
@@ -1016,7 +1019,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         
     }
     if (m_resource->hasVideo(m_display->mediaProvider()))
-        return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
+    {
+        return lit(" %1x%2 %3fps @ %4Mbps%5 %6\t%7")
             .arg(size.width())
             .arg(size.height())
             .arg(fps, 0, 'f', 2)
@@ -1024,12 +1028,15 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             .arg(codecString)
             .arg(hqLqString)
             .arg(timeString);
+    }
     else
-        return lit("@ %1Mbps%2 %3\t%4")
-        .arg(mbps, 0, 'f', 2)
-        .arg(codecString)
-        .arg(hqLqString)
-        .arg(timeString);
+    {
+        return lit(" %1Mbps%2 %3\t%4")
+            .arg(mbps, 0, 'f', 2)
+            .arg(codecString)
+            .arg(hqLqString)
+            .arg(timeString);
+    }
 }
 
 QString QnMediaResourceWidget::calculateTitleText() const {
@@ -1096,8 +1103,6 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     {
         if (hasVideo)
             result |= IoModuleButton;
-        else
-            result &= ~RotateButton;    /// Do not allow rotate widget if it is IO module only
     }
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo) {
@@ -1128,6 +1133,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
     bool isOffline = false;
     bool isUnauthorized = false;
+    bool hasVideo = m_resource && m_resource->hasVideo(m_display->mediaProvider());
     checkWrongState(&isOffline, &isUnauthorized);
 
     if (m_camera && m_camera->hasFlags(Qn::io_module))
@@ -1175,16 +1181,18 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
             return Qn::NoDataOverlay;
         QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
-            return base_type::calculateStatusOverlay(Qn::Online, m_resource && m_resource->hasVideo(m_display->mediaProvider()));
+            return base_type::calculateStatusOverlay(Qn::Online, hasVideo);
         else
             return Qn::NoDataOverlay;
     } else if (m_display->isPaused()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
+        else if (!hasVideo)
+            return Qn::NoVideoDataOverlay;
         else
             return Qn::EmptyOverlay;
     } else {
-        return base_type::calculateStatusOverlay(Qn::Online, m_resource && m_resource->hasVideo(m_display->mediaProvider()));
+        return base_type::calculateStatusOverlay(Qn::Online, hasVideo);
     }
 }
 

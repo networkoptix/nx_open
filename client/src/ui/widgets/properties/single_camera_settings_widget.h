@@ -126,6 +126,9 @@ private:
     void connectToMotionWidget();
 
     void showMaxFpsWarningIfNeeded();
+
+    int tabIndex(Qn::CameraSettingsTab tab) const;
+    void setTabEnabledSafe(Qn::CameraSettingsTab tab, bool enabled);
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)

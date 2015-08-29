@@ -220,12 +220,6 @@
             <numerusform>เกิดขึ้นครั้งแรก: %1 บน %2 (%n เวลาทั้งหมดl)</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>ไม่มีเฟรมวิดีโอได้รับในช่วงวินาที %n สุดท้าย.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
         <translation>การเชื่อมต่อกับกล้อง (ช่องทางหลัก) ถูกปิดอย่างไม่คาดคิด.</translation>
@@ -306,6 +300,12 @@
         <source>Connection to server is lost.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>No data received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -318,20 +318,8 @@
         <translation>เซิร์ฟเวอร์ถูกหยุดการทำงาน.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the camera: %1.</source>
-        <translation>ข้อมูลที่ไม่ถูกต้อง ไม่ได้รับการตอบสนองจากกล้อง %1.</translation>
-    </message>
-    <message>
-        <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation>ข้อผิดพลาดของสื่อมากเกิน กรุณาเปิดกล่องโต้ตอบสำหรับรายละเอียดเพิ่มเติม.</translation>
-    </message>
-    <message>
         <source>Media stream is opened but no media data was received.</source>
         <translation>มีเดียสตรีมถูกเปิด แต่ไม่มีข้อมูลที่ได้รับ.</translation>
-    </message>
-    <message>
-        <source>Camera initialization process in progress</source>
-        <translation>เริ่มต้นกระบวนการความคืบหน้าของกล้อง</translation>
     </message>
     <message>
         <source>Unknown error. Please contact support.</source>
@@ -362,32 +350,12 @@
         <translation>ไม่สามารถเชื่อมต่อพอร์ต http. %1.</translation>
     </message>
     <message>
-        <source>Make sure the camera is plugged into the network.</source>
-        <translation>ตรวจสอบให้แน่ใจว่ากล้องเชื่อมต่อเข้ากับเครือข่าย.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
         <translation>ไม่สามารถเปิดสื่อ url%1 ไม่สามารถเชื่อมต่อไปยังสื่อพอร์ต %2.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>ตรวจสอบให้แน่ใจว่าพอร์ต %2 เข้าถึงได้ (เช่นการส่งต่อไป) โปรดลองรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
         <translation>ไม่สามารถเปิดสื่อ url %1 การเชื่อมต่อกับพอร์ต %2 ถูกปิดโดยไม่ได้ตั้งใจ.</translation>
-    </message>
-    <message>
-        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>ตรวจสอบให้แน่ใจว่ากล้องเสียบเข้ากับเครือข่าย ลองรีบูตกล้องอีกครั้ง.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>ไม่สามารถแยกการตอบสนองของกล้อง url %1 โปรดระบุชื่อ %2.</translation>
-    </message>
-    <message>
-        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>โปรดลองรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
@@ -406,22 +374,6 @@
         <translation>การกำหนดค่าพารามิเตอร์ไม่ถูกต้อง %1.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>เริ่มแรก พยายามที่จะเปิดการบันทึก (ถ้าปิดอยู่) และลดเฟรมต่อวินาทีในการตั้งค่ากล้อง.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation>ถ้ายังไม่ได้ ให้คืนค่าเริ่มต้นจากโรงงานในเว็บกล้อง หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน. </translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>คำขอกล้อง &quot;%1&quot; ล้มเหลวเกิดข้อผิดพลาด &quot;%2&quot;.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.</source>
-        <translation>ไม่รู้จักกล้อง.</translation>
-    </message>
-    <message>
         <source>Please contact support.</source>
         <translation>กรุณาติดต่อฝ่ายสนับสนุน.</translation>
     </message>
@@ -436,6 +388,88 @@
     <message>
         <source>Not authorised. Url %1.</source>
         <translation type="unfinished">ไม่ได้รับอนุญาต. Url %1.</translation>
+    </message>
+    <message>
+        <source>camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the %1 is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse %1 response. Url %2, request name %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
+----------
+%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown %1 Issue.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the %1: %2.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open %1 issues dialog for more details.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 initialization process in progress.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -604,7 +638,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalide Signature</source>
+        <source>Invalid Signature</source>
         <translation type="unfinished">ลายเซ็นไม่ถูกต้อง</translation>
     </message>
     <message>
@@ -618,6 +652,18 @@
     <message>
         <source>Invalid Type</source>
         <translation type="unfinished">ชนิดไม่ถูกต้อง</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
