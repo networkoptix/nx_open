@@ -134,14 +134,9 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
 void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const
                                             QString& fileName, const QString& format, 
                                             QnStorageResourcePtr storage, 
-                                            QnStreamRecorder::Role role, 
-                                            Qn::Corner timestamps,
-                                            qint64 timeOffsetMs, qint64 serverTimeZoneMs,
-                                            QRectF srcRect,
-                                            const ImageCorrectionParams& contrastParams,
-                                            const QnItemDewarpingParams& itemDewarpingParams,
-                                            int rotationAngle,
-                                            qreal customAR)
+                                            QnStreamRecorder::Role role,
+                                            qint64 serverTimeZoneMs,
+                                            QnImageFilterHelper transcodeParams)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
@@ -175,15 +170,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
         if (storage)
             m_exportRecorder->setStorage(storage);
 
-        QnImageFilterHelper extraParams;
-        extraParams.setSrcRect(srcRect);
-        extraParams.setContrastParams(contrastParams);
-        extraParams.setDewarpingParams(resource()->getDewarpingParams(), itemDewarpingParams);
-        extraParams.setRotation(rotationAngle);
-        extraParams.setCustomAR(customAR);
-        extraParams.setTimeCorner(timestamps, timeOffsetMs, 0);
-        extraParams.setVideoLayout(resource()->getVideoLayout());
-        m_exportRecorder->setExtraTranscodeParams(extraParams);
+        m_exportRecorder->setExtraTranscodeParams(transcodeParams);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);
