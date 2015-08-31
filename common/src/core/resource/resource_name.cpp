@@ -36,9 +36,10 @@ namespace {
             return capitalize       ? tr("%n Device(s)", 0, count)      : tr("%n device(s)", 0, count); 
         }
 
-        static QString selectDevice() {
-            return tr("Please select at least one device.");
-        }
+        static QString selectCamera()   {   return tr("Please select at least one device."); }
+        static QString selectDevice()   {   return tr("Please select at least one device."); }
+        static QString anyCamera()      {   return tr("Any Camera"); }
+        static QString anyDevice()      {   return tr("Any Device"); }
 
     };
 
@@ -102,5 +103,15 @@ QString getDevicesName(const QnVirtualCameraResourceList &devices, bool capitali
 }
 
 QString selectDevice() {
+    /* Quick check - if there are no io modules in the system at all. */
+    if (!qnResPool->containsIoModules())
+        return QnResourceNameStrings::selectCamera();
     return QnResourceNameStrings::selectDevice();
+}
+
+QString anyDevice() {
+    /* Quick check - if there are no io modules in the system at all. */
+    if (!qnResPool->containsIoModules())
+        return QnResourceNameStrings::anyCamera();
+    return QnResourceNameStrings::anyDevice();
 }

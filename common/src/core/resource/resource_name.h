@@ -28,3 +28,4 @@ inline QString getDevicesNameLower(const QnVirtualCameraResourceList &devices = 
 }
 
 QString selectDevice();
+QString anyDevice();

@@ -12,10 +12,9 @@ namespace {
     class QnBusinessResourceValidationStrings {
         Q_DECLARE_TR_FUNCTIONS(QnBusinessResourceValidationStrings)
     public:
-        static QString anyCamera() { return tr("<Any Camera>"); }
-        static QString selectCamera() { return tr("Select at least one camera."); }
-        static QString multipleCameras(int total) { return tr("%n Camera(s)", "", total); }
-        static QString subsetCameras(int count, int total) { return tr("%n of %1 cameras", "", count).arg(total); } 
+        static QString subsetCameras(int count, const QnVirtualCameraResourceList &total) { 
+            return tr("%n of %1", "", count).arg(getDevicesName(total, false)); 
+        } 
     };
 
     template <typename CheckingPolicy>
@@ -34,18 +33,18 @@ namespace {
     QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool detailed, const QString &baseText, int invalid) {
         if (cameras.isEmpty())
             return CheckingPolicy::emptyListIsValid()
-                    ? QnBusinessResourceValidationStrings::anyCamera()
-                    : QnBusinessResourceValidationStrings::selectCamera();
+                    ? lit("<%1>").arg(anyDevice())
+                    : selectDevice();
 
         if (detailed && invalid > 0)
             return baseText.arg(
                         (cameras.size() == 1)
                          ? getShortResourceName(cameras.first())
-                         : QnBusinessResourceValidationStrings::subsetCameras(invalid, cameras.size())
+                         : QnBusinessResourceValidationStrings::subsetCameras(invalid, cameras)
                            );
         if (cameras.size() == 1)
             return getShortResourceName(cameras.first());
-        return QnBusinessResourceValidationStrings::multipleCameras(cameras.size());
+        return getDevicesName(cameras);
 
     }
 
