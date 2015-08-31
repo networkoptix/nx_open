@@ -14,7 +14,7 @@ namespace {
     public:       
         static QString cameras(bool capitalize, int count) { 
             if (count == 0)
-                return capitalize   ? tr("Cameras")                     : tr("cameras"); 
+                return capitalize   ? tr("Camera(s)")                   : tr("camera(s)"); 
             if (count == 1)
                 return capitalize   ? tr("Camera")                      : tr("camera"); 
             return capitalize       ? tr("%n Camera(s)", 0, count)      : tr("%n camera(s)", 0, count); 
@@ -22,7 +22,7 @@ namespace {
 
         static QString iomodules(bool capitalize, int count) {
             if (count == 0)
-                return capitalize   ? tr("IO Modules")                  : tr("IO modules"); 
+                return capitalize   ? tr("IO Module(s)")                : tr("IO module(s)"); 
             if (count == 1)
                 return capitalize   ? tr("IO Module")                   : tr("IO module");
             return capitalize       ? tr("%n IO Module(s)", 0, count)   : tr("%n IO module(s)", 0, count); 
@@ -30,13 +30,13 @@ namespace {
 
         static QString devices(bool capitalize, int count) { 
             if (count == 0)
-                return capitalize   ? tr("Devices")                     : tr("devices"); 
+                return capitalize   ? tr("Device(s)")                   : tr("device(s)"); 
             if (count == 1)
                 return capitalize   ? tr("Device")                      : tr("device");
             return capitalize       ? tr("%n Device(s)", 0, count)      : tr("%n device(s)", 0, count); 
         }
 
-        static QString selectCamera()   {   return tr("Please select at least one device."); }
+        static QString selectCamera()   {   return tr("Please select at least one camera."); }
         static QString selectDevice()   {   return tr("Please select at least one device."); }
         static QString anyCamera()      {   return tr("Any Camera"); }
         static QString anyDevice()      {   return tr("Any Device"); }
