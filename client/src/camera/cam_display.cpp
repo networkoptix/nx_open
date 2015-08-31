@@ -1766,10 +1766,8 @@ qint64 QnCamDisplay::getCurrentTime() const
         QMutexLocker lock(&m_audioChangeMutex);
         if (m_speed < 0)
             return AV_NOPTS_VALUE;
-        else if (m_playAudio)
-            return m_audioDisplay->getCurrentTime();
         else
-            return m_audioDisplay->lastAudioTime(); //m_lastAudioPacketTime;
+            return m_audioDisplay->getCurrentTime();
     }
     if (m_display[0] && m_display[0]->isTimeBlocked())
         return m_display[0]->getTimestampOfNextFrameToRender();

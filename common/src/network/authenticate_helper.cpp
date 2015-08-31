@@ -201,6 +201,8 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
         if( authorization.isEmpty() )
         {
             Qn::AuthResult authResult = Qn::Auth_WrongDigest;
+            if (usedAuthMethod)
+                *usedAuthMethod = AuthMethod::httpDigest;
             QnUserResourcePtr userResource;
             if( !nxUserName.isEmpty() )
             {
