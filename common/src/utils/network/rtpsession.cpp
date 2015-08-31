@@ -1489,10 +1489,11 @@ int RTPSession::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& 
 bool RTPSession::readTextResponce(QByteArray& response)
 {
     int ignoreDataSize = 0;
+    int prevBufferLen = 0;
     for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock->isConnected(); ++i)
     {
-        if (m_responseBufferLen == 0) {
-            int readed = readSocketWithBuffering(m_responseBuffer, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
+        if (m_responseBufferLen == 0 || m_responseBufferLen == prevBufferLen) {
+            int readed = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
             if (readed <= 0)
             {
                 if( readed == 0 )
@@ -1508,6 +1509,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
                 return false;	//error occured or connection closed
             }
             m_responseBufferLen += readed;
+            prevBufferLen = m_responseBufferLen;
         }
         if (m_responseBuffer[0] == '$') {
             // binary data

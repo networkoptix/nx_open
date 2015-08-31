@@ -39,6 +39,7 @@
 #include "utils/common/timermanager.h"
 #include "gsoap_async_call_wrapper.h"
 #include "plugins/resource/d-link/dlink_ptz_controller.h"
+#include "core/onvif/onvif_config_data.h"
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -584,13 +585,24 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
     
-    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
-    if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isEmpty() && m_primaryResolution.height() > 0) 
+    if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
     {
-        qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
-        setCustomAspectRatio(ar);
+        QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+        bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
+        if (forcedAR && m_primaryResolution.height() > 0) 
+        {
+            qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
+            setCustomAspectRatio(ar);
+        }
+        
+        QString defaultAR = resourceData.value<QString>(lit("defaultAR"));
+        QStringList parts = defaultAR.split(L'x');
+        if (parts.size() == 2) {
+            qreal ar = parts[0].toFloat() / parts[1].toFloat();
+            setCustomAspectRatio(ar);
+        }
     }
+
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -955,7 +967,7 @@ void QnPlOnvifResource::notificationReceived(
             toSharedPointer(),
             portSourceIter->value,
             newPortState,
-            qnSyncTime->currentMSecsSinceEpoch() );   //it is not absolutely correct, but better than de-synchronized timestamp from camera
+            qnSyncTime->currentUSecsSinceEpoch() );   //it is not absolutely correct, but better than de-synchronized timestamp from camera
     }
 }
 
@@ -1605,12 +1617,12 @@ bool QnPlOnvifResource::trustMaxFPS()
     return result;
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
+CameraDiagnostics::Result QnPlOnvifResource::getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse)
 {
     VideoConfigsReq confRequest;
-    VideoConfigsResp confResponse;
+    result->clear();
 
-    int soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
+    int soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, *confResponse); // get encoder list
     if (soapRes != SOAP_OK) {
 #ifdef PL_ONVIF_DEBUG
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't get list of video encoders from camera (URL: "
@@ -1624,35 +1636,59 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
         return CameraDiagnostics::ServerTerminatedResult();
 
 
-    QString login = soapWrapper.getLogin();
-    QString password = soapWrapper.getPassword();
-    std::string endpoint = soapWrapper.getEndpointUrl().toStdString();
-
     int confRangeStart = 0;
-    int confRangeEnd = (int) confResponse.Configurations.size();
+    int confRangeEnd = (int) confResponse->Configurations.size();
     if (m_maxChannels > 1)
     {
         // determine amount encoder configurations per each video source
         confRangeStart = confRangeEnd/m_maxChannels * getChannel();
         confRangeEnd = confRangeStart + confRangeEnd/m_maxChannels;
 
-        if (confRangeEnd > (int) confResponse.Configurations.size()) {
+        if (confRangeEnd > (int) confResponse->Configurations.size()) {
 #ifdef PL_ONVIF_DEBUG
             qWarning() << "invalid channel number " << getChannel()+1 << "for camera" << getHostAddress() << "max channels=" << m_maxChannels;
 #endif
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurationOptions"), soapWrapper.getLastError());
         }
     }
-
-    QList<VideoOptionsLocal> optionsList;
+    
     for (int confNum = confRangeStart; confNum < confRangeEnd; ++confNum)
     {
-        onvifXsd__VideoEncoderConfiguration* configuration = confResponse.Configurations[confNum];
-        if (!configuration)
-            continue;
+        onvifXsd__VideoEncoderConfiguration* configuration = confResponse->Configurations[confNum];
+        if (configuration)
+            result->push_back(QString::fromStdString(configuration->token));
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
+{
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    QnOnvifConfigDataPtr forcedParams = resourceData.value<QnOnvifConfigDataPtr>(lit("forcedOnvifParams"));
+    QStringList videoEncodersTokens;
+    VideoConfigsResp confResponse;
+
+    if (forcedParams && forcedParams->videoEncoders.size() >= getChannel()) {
+        videoEncodersTokens = forcedParams->videoEncoders[getChannel()].split(L',');
+    }
+    else {
+        auto error = getVideoEncoderTokens(soapWrapper, &videoEncodersTokens, &confResponse);
+        if (error.errorCode != CameraDiagnostics::ErrorCode::noError)
+            return error;
+    }
+
+    QString login = soapWrapper.getLogin();
+    QString password = soapWrapper.getPassword();
+    std::string endpoint = soapWrapper.getEndpointUrl().toStdString();
+
+    QList<VideoOptionsLocal> optionsList;
+    for(const QString& encoderToken: videoEncodersTokens)
+    {
 
         int retryCount = getMaxOnvifRequestTries();
-        soapRes = SOAP_ERR;
+        int soapRes = SOAP_ERR;
 
         for (;soapRes != SOAP_OK && retryCount >= 0; --retryCount)
         {
@@ -1661,8 +1697,8 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 
             VideoOptionsReq optRequest;
             VideoOptionsResp optResp;
-            optRequest.ConfigurationToken = &configuration->token;
-            optRequest.ProfileToken = NULL;
+            std::string tokenStdStr = encoderToken.toStdString();
+            optRequest.ConfigurationToken = &tokenStdStr;
 
             MediaSoapWrapper soapWrapper(endpoint, login, password, m_timeDrift);
 
@@ -1679,10 +1715,10 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
         }
 
             if (optResp.Options->H264 || optResp.Options->JPEG)
-                optionsList << VideoOptionsLocal(QString::fromStdString(configuration->token), optResp, isH264Allowed());
+                optionsList << VideoOptionsLocal(encoderToken, optResp, isH264Allowed());
 #ifdef PL_ONVIF_DEBUG
             else
-                qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: video encoder '" << optRequest.ConfigurationToken->c_str()
+                qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: video encoder '" << encoderToken
                     << "' contains no data for H264/JPEG (URL: "  << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() << ")." << "Ignoring and use default codec list";
 #endif
         }

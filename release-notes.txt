@@ -1,48 +1,36 @@
 -----------------------------------------------2.4.0.xxxx-----------------------------------------
-
 Features:
-#6052 - Audit monitor
-#5965 - Storage using information
-#5832 - ACTI encoder support 
-#5820, VMS-276 - IO module
-Ldap
-Storage SDK
-Web-client
+VMS-333 - Audit trail for users and cameras.
+VMS-350 - Storage using information
+VMS-340 - ACTI encoder support 
+VMS-295- Added Axis IO module integration
+VMS-305 - LDAP integration
+VMS-328 - Added Storage SDK on web admin page
 
 Improvements:
-#6025 - Add compatibility for paxton plugin with server 2.3.1, 2.3.2 and 2.4.
-#5900,VMS-277 - multiple server writing to same NAS ( server side  issue ) 
-#5767 - Autoupdates: multiple servers support
-VMS-289 - Client Login: When you start qulu the keyboard focus is not on the login box
+VMS-363 - Added Started licenses
+VMS-341 - Decrease CPU usage on Jaguar
+VMS-323 - Some improvements in statistics and crash reports
+VMS-277 -  Added warning if there's more than one server is recording on the same storage.
+VMS-339 - If there's 2 servers are recording on the same storage, archive data is cleaned in random for them.
 VMS-306 - Buffer secondary stream for better HLS performance
-VMS-307 - camera name stays permanently
+VMS-310 - Added smb support for linux
+VMS-344(????) - Autoupdates: multiple servers support
+VMS-614 - Latest Arecont and Axis cameras are supported
+VMS-613 - DWC-BVI2IR camera is now supported
+VMS-520 - "Check for updates automatically" is on by default
+VMS-441 - Time synchronization improvements
+VMS-314 - Remove hardcoded realm from digest authentication
 
 Bug fixes:
-#6024 - Support: It's impossible to take videostreams and different information with client from remote server
-#6015 - Server api: Bug in generating images
-#5970 - Couldn't do anything with storages while fast archive scan
-#5796 - Large CPU usage on Jaguar
-
-#6051 - AbstractStorageResource interface tests
-#6047 - Add helper class for safe direct signal/slot connection
-
-NXtool improvements:
-NXTOOL-1 - Add an ability to update servers via NxTool 
-NXTOOL-10 - Add date\time validation and error dialogs 
-NXTOOL-14 - Change DNS server and default gateway for several servers 
-NXTOOL-20 - NxTool. Edit all button shouldn't be shown if it's nothing to edit.
-NXTOOL-26 - Display detailed server info
-NXTOOL-29 - Make "Enter password" button blink if user tries to do something
-NXTOOL-31 - NxTool. Don't show Update message for several servers, if user doesn't edit partition
-NXTOOL-35 - Save NxTool position between runs
-
-Gathering statistics (improvements):
-#5996 - Need to introduce a way to check if there's a real audio track from camera
-5912 - Storage size is not spaceLimit
-5908 - while reporting stats, server should report actual OS (not just win64 or linux)
-5312 - statistics: network interfaces info (number and bandwidth)
-VMS-323 - Include customization into statistics and crash reports
-
+VMS-529 - Motion mask can't be changed for panoramic AV cameras in smart search mode
+VMS-332 - Small issues in server API
+VMS-625 - Sometimes traffic(videostreams, system info, etc.) couldn't be proxied correctly. It could lead to 'Loading' instead of the stream at some devices
+VMS-289 - When client is started the keyboard focus is not on the login box. Fixed.
+VMS-349 - It's impossible to take videostreams and different information with client from remote server if there's 2 public IP
+VMS-635 - Unrecorded cameras are shown as offline without autodiscovery. Fixed.
+VMS-610 - Sometime edge mediaserver cannot be stopped.
+VMS-342 - Couldn't do anything with storages while fast archive scan. Fixed.
 
 ----------------------------------------------2.3.2.xxxx------------------------------------------
 

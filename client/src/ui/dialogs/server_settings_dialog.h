@@ -31,6 +31,8 @@ public:
         , const AcceptCallback &callback
         , QWidget *parent = nullptr);
 
+    bool tryClose(bool force);
+
 private:
     QnServerSettingsDialog(const QnMediaServerResourcePtr &server
         , const AcceptCallback &callback
@@ -38,9 +40,9 @@ private:
 
     virtual ~QnServerSettingsDialog();
 
-    void accept() override;
+    void submitData() override;
 
-    void reject() override;
+    void accept() override;
 
 private:
     Q_DISABLE_COPY(QnServerSettingsDialog)

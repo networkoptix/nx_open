@@ -713,6 +713,9 @@ bool QnCamDisplay::doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed
                         if (m_jumpTime != DATETIME_NOW)
                             m_isLongWaiting &= (displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
                         firstWait = false;
+                        if (m_isLongWaiting)
+                            m_audioDisplay->suspend();
+
                     }
                     QnSleep::msleep(1);
                 }
@@ -720,6 +723,8 @@ bool QnCamDisplay::doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed
                     break;
                 }
             }
+            if (m_isLongWaiting)
+                m_audioDisplay->resume();
             m_isLongWaiting = false;
         }
     }

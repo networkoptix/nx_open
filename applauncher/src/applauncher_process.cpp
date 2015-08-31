@@ -144,6 +144,12 @@ int ApplauncherProcess::run()
 {
     if( !m_taskServer.listen( launcherPipeName ) )
     {
+        if( m_quitMode )
+        {
+            //asking already-running instance to stop
+            return addTaskToThePipe( applauncher::api::QuitTask().serialize() );
+        }
+
         //another instance already running?
 #ifdef Q_OS_WIN
         launchMostRecentClient();

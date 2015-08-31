@@ -1110,6 +1110,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Features</source>
         <translation>Funktionen</translation>
     </message>
+    <message>
+        <source>This license type requires higher software version.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LicenseManagerWidget</name>
@@ -2504,22 +2508,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Pause</translation>
     </message>
     <message>
-        <source>Ctrl+-</source>
-        <translation>Strg+-</translation>
-    </message>
-    <message>
-        <source>Speed Down</source>
-        <translation>langsamer</translation>
-    </message>
-    <message>
-        <source>Ctrl++</source>
-        <translation>Strg++</translation>
-    </message>
-    <message>
-        <source>Speed Up</source>
-        <translation>schneller</translation>
-    </message>
-    <message>
         <source>Ctrl+Left</source>
         <translation>Strg+Links</translation>
     </message>
@@ -3495,10 +3483,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>In Zwischenablage kopieren</translation>
     </message>
     <message>
-        <source>Diagnostics for camera %1.</source>
-        <translation>Diagnose von Kamera %1.</translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -3511,19 +3495,47 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished">Prüfe Serververfügbarkeit</translation>
     </message>
     <message>
-        <source>Confirming camera is accessible.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Confirming target camera provides media stream.</source>
-        <translation type="unfinished">Prüfe ob Kamerastream verfügbar</translation>
-    </message>
-    <message>
         <source>Evaluating media stream for errors.</source>
         <translation type="unfinished">Prüfe Media-Stream auf Fehler</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IO module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diagnostics for %1 %2.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..); %2 - will be substituted by model of device; Example: &quot;Diagnostics for camera X1323&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Diagnostics</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..); Example: &quot;IO Module Diagnostics&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming %1 is accessible.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming camera is accessible.&quot;</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target %1 provides media stream.</source>
+        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;IO module&quot;, etc..); Example: &quot;Confirming target IO module provides media stream.&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4770,11 +4782,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Remove license</source>
         <translation>Lizenz entfernen</translation>
-    </message>
-    <message>
-        <source>%1 %2</source>
-        <translatorcomment>Add a developer comment please. What is this?</translatorcomment>
-        <translation>%1% {%2}</translation>
     </message>
     <message numerus="yes">
         <source>At least %n %2 are required</source>

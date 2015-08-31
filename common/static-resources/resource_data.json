@@ -106,7 +106,8 @@
         },
         {
             "keys": [
-                "ACTI|V32"
+                "ACTI|V32",
+                "ACTi Corporation|V32"
             ],
             "forceONVIF": true
         },
@@ -163,6 +164,13 @@
         },
         {
             "keys": [
+                "ACTi|V32"
+            ],
+            "defaultAR": "16x9",
+            "ptzTraits": "EightWayPtz"
+        },
+        {
+            "keys": [
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-ENCODER"
@@ -193,6 +201,21 @@
                 "AXIS|AXISM7016Group1", "AXIS|AXISM7016Group2", "AXIS|AXISM7016Group3", "AXIS|AXISM7016Group4"
             ],
             "axisMaxZoomSpeed": 70
+        },
+        {
+            "keys": [
+                "Honeywell|HVE4"
+            ],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationA01,VideoEncoderConfigurationA05",
+                    "VideoEncoderConfigurationA02,VideoEncoderConfigurationA06",
+                    "VideoEncoderConfigurationA03,VideoEncoderConfigurationA07",
+                    "VideoEncoderConfigurationA04,VideoEncoderConfigurationA08"
+                ]
+            }
         },
         {
             "keys": [

@@ -21,6 +21,11 @@ namespace {
     const int stateCheckInterval = 1000;
     const char *ioPortPropertyName = "ioPort";
 
+    const int maxPortNameLength = 20;
+    const int inputFontSize = 15;
+    const int outputFontSize = 12;
+    const int portFontSize = 12;
+
     class IndicatorWidget : public GraphicsPixmap {
         QPixmap m_onPixmap;
         QPixmap m_offPixmap;
@@ -81,18 +86,6 @@ namespace {
             result->setColumnAlignment(column.first, column.second);
 
         return result;
-    }
-
-    QString trimName(const QString &name)
-    {
-        enum { kMaxPortNameLength = 20 };
-        if (name.length() <= kMaxPortNameLength)
-            return name;
-
-        static const QString kFinalizer = lit("...");
-        static const int kFinalizerLength = kFinalizer.length();
-
-        return name.left(kMaxPortNameLength - kFinalizerLength) + kFinalizer;
     }
 }
 
@@ -219,24 +212,39 @@ void QnIoModuleOverlayWidgetPrivate::setCamera(const QnVirtualCameraResourcePtr 
     updateControls();
 }
 
-QGraphicsLayoutItem *QnIoModuleOverlayWidgetPrivate::createButton(QnIoModuleOverlayWidgetPrivate::ModelData *data)
-{
-    QPushButton *button = new QPushButton(trimName(data->ioConfigData.outputName));
+QGraphicsLayoutItem *QnIoModuleOverlayWidgetPrivate::createButton(QnIoModuleOverlayWidgetPrivate::ModelData *data) {
+    QFont font = qApp->font();
+    font.setPixelSize(outputFontSize);
+
+    QFontMetrics metrics(font);
+    int maxWidth = metrics.width(QString(maxPortNameLength, L'w'));  
+
+    QPushButton *button = new QPushButton(metrics.elidedText(data->ioConfigData.outputName, Qt::ElideRight, maxWidth));
+    button->setFont(font);
+
     button->setProperty(ioPortPropertyName, data->ioConfigData.id);
-    button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     button->setAutoDefault(false);
     QObject::connect(button, &QPushButton::clicked, this, &QnIoModuleOverlayWidgetPrivate::at_buttonClicked);
 
     Q_Q(QnIoModuleOverlayWidget);
     QGraphicsProxyWidget *buttonProxy = new QGraphicsProxyWidget(q);
     buttonProxy->setWidget(button);
+
     return buttonProxy;
 }
 
 QGraphicsLayoutItem *QnIoModuleOverlayWidgetPrivate::createLabel(QnIoModuleOverlayWidgetPrivate::ModelData *data)
 {
+    QFont font = qApp->font();
+    font.setPixelSize(inputFontSize);
+
+    QFontMetrics metrics(font);
+    int maxWidth = metrics.width(QString(maxPortNameLength, L'w'));  
+
     Q_Q(QnIoModuleOverlayWidget);
-    GraphicsLabel *descriptionLabel = new GraphicsLabel(trimName(data->ioConfigData.inputName), q);
+    GraphicsLabel *descriptionLabel = new GraphicsLabel(metrics.elidedText(data->ioConfigData.inputName, Qt::ElideRight, maxWidth), q);
+    descriptionLabel->setFont(font);
     descriptionLabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
     descriptionLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
@@ -249,7 +257,11 @@ void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::M
 
     Q_Q(QnIoModuleOverlayWidget);
 
+    QFont font = qApp->font();
+    font.setPixelSize(portFontSize);
+
     GraphicsLabel *portIdLabel = new GraphicsLabel(data->ioConfigData.id, q);
+    portIdLabel->setFont(font);
     portIdLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
     portIdLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
     QPalette palette = portIdLabel->palette();
@@ -278,15 +290,16 @@ void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::M
     controlsLayout->addItem(data->indicator, itemsCount, startColumn + kIndicatorColumnOffset);
 
     QGraphicsLayoutItem * const thirdItem = (isOutput ? createButton(data) : createLabel(data));
-    controlsLayout->addItem(thirdItem, itemsCount, startColumn + kCaptionColumnOffset);
+    controlsLayout->addItem(thirdItem, itemsCount, startColumn + kCaptionColumnOffset, Qt::AlignCenter);
 
     ++itemsCount;
 
     enum 
     {
         kNoSpacing = 0
-        , kSpacingSize = 24 
+        , kSpacingSize = 48 
     };
+
     controlsLayout->setColumnFixedWidth(kSpacerColumn, m_inputsCount ? kSpacingSize : kNoSpacing);
 }
 
@@ -370,7 +383,7 @@ void QnIoModuleOverlayWidgetPrivate::at_buttonClicked() {
         return;
 
     QnBusinessEventParameters eventParams;
-    eventParams.setEventTimestamp(qnSyncTime->currentUSecsSinceEpoch());
+    eventParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
 
     QnBusinessActionParameters params;
     params.relayOutputId = it->ioConfigData.id;

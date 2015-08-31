@@ -319,6 +319,9 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     if (type() == Qn::LC_Start)
         return isValidStartLicense(errCode, mode);
 
+    if (type() == Qn::LC_Invalid)
+        return gotError(errCode, FutureLicense);
+
     return gotError(errCode, NoError);
 }
 
@@ -394,7 +397,7 @@ QString QnLicense::errorMessage(ErrorCode errCode)
     case NoError:
         return QString();
     case InvalidSignature:
-        return tr("Invalide Signature");
+        return tr("Invalid Signature");
     case InvalidHardwareID:
         return tr("Server with matching hardware ID not found");
     case InvalidBrand:
@@ -405,6 +408,8 @@ QString QnLicense::errorMessage(ErrorCode errCode)
         return tr("Invalid Type");
     case TooManyLicensesPerDevice:
         return tr("Only single license is allowed for this device");
+    case FutureLicense:
+        return tr("This license type requires higher software version.");
     default:
         return tr("Unknown error");
     }

@@ -318,13 +318,9 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     lit("mkv"),
                                     m_storage,
                                     role,
-                                    Qn::NoCorner,
-                                    timeOffset, serverTimeZone,
-                                    itemData.zoomRect,
-                                    itemData.contrastParams,
-                                    itemData.dewarpingParams,
-                                    itemData.rotation,
-                                    customAr);
+                                    serverTimeZone,
+                                    QnImageFilterHelper() // no transcode params
+                                    );
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_targetFilename).fileName()));
     return true;

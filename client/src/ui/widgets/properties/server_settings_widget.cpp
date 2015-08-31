@@ -250,6 +250,7 @@ void QnServerSettingsWidget::updateFromSettings() {
 }
 
 void QnServerSettingsWidget::submitToSettings() {
+    m_server->setStorageDataToUpdate(QnStorageResourceList(), ec2::ApiIdDataList());
     if(m_hasStorageChanges) {
         QnStorageResourceList newStorages;
         foreach(const QnStorageSpaceData &item, tableItems()) 
