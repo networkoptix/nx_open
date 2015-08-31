@@ -140,12 +140,6 @@ void QnAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 min
     //    m_audioQueue.dequeue()->releaseRef();
 }
 
-qint64 QnAudioStreamDisplay::lastAudioTime() const
-{
-    QMutexLocker lock(&m_audioQueueMutex);
-    return m_lastAudioTime;
-}
-
 bool QnAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
 {
     if (m_forceDownmix && format.channelCount() > 2)
