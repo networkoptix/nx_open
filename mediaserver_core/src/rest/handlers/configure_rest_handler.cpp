@@ -34,7 +34,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
 {
     Q_UNUSED(path)
 
-    if (ec2::Settings::instance()->dbReadOnly()) {
+    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
         return nx_http::StatusCode::forbidden;
     }
