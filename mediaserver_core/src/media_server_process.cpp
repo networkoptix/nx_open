@@ -1023,7 +1023,7 @@ void MediaServerProcess::updateAddressesList()
            .arg(Q_FUNC_INFO).arg(containerToQString(serverAddresses)), cl_logDEBUG1);
 
     const QUrl defaultUrl(m_mediaServer->getApiUrl());
-    const SocketAddress defaultAddress(defaultUrl.host(), port);
+    const SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
     if (std::find(serverAddresses.begin(), serverAddresses.end(),
                   defaultAddress) == serverAddresses.end())
     {

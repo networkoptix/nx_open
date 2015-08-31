@@ -83,7 +83,7 @@ void DataSourceCache::removeRange(
     const StreamingChunkCacheKey& endKey )
 {
     std::list<TimerManager::TimerGuard> timerGuards;
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     for( auto
         it = m_cachedDataProviders.lower_bound( beginKey );
         it != m_cachedDataProviders.end() && (it->first < endKey);

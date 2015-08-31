@@ -326,22 +326,21 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         return;
     }
 
-//    if (url.port() == m_server->getPort())
-//        url.setPort(-1);
-    // TODO: #dklychkov fix it in 2.4
-    url.setPort(-1);
+    if (url.port() == -1)
+        url.setPort(m_server->getPort());
 
-    QUrl explicitUrl = url;
-    explicitUrl.setPort(m_server->getPort());
+    QUrl implicitUrl = url;
+    implicitUrl.setPort(-1);
     if (m_serverAddressesModel->addressList().contains(url) ||
+        m_serverAddressesModel->addressList().contains(implicitUrl) ||
         m_serverAddressesModel->manualAddressList().contains(url) ||
-        m_serverAddressesModel->manualAddressList().contains(explicitUrl))
+        m_serverAddressesModel->manualAddressList().contains(implicitUrl))
     {
         reportUrlEditingError(QnServerAddressesModel::ExistingUrl);
         return;
     }
 
-    m_serverAddressesModel->addAddress(explicitUrl);
+    m_serverAddressesModel->addAddress(url);
 }
 
 void QnRoutingManagementWidget::at_removeButton_clicked() {
