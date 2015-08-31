@@ -1413,10 +1413,10 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
-    const bool ioModule = m_camera->hasFlags(Qn::io_module);
+    const bool ioModule = m_camera && m_camera->hasFlags(Qn::io_module);
     const bool ioBtnChecked = (button && button->isChecked());
-    const bool onlyIoData = (ioModule && !m_camera->hasVideo(m_display->mediaProvider()));
-    const bool correctLicenceStatus = (cameraLicenseStatus(m_camera) == LicenseUsed);
+    const bool onlyIoData = (ioModule && m_camera && !m_camera->hasVideo(m_display->mediaProvider()));
+    const bool correctLicenceStatus = !m_camera || (cameraLicenseStatus(m_camera) == LicenseUsed);
 
     const auto resource = m_display->resource();
     
@@ -1434,23 +1434,26 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
 }
 
 void QnMediaResourceWidget::updateOverlayButton() {
-    Qn::ResourceStatusOverlay overlay = calculateStatusOverlay();    
 
-    if (overlay == Qn::OfflineOverlay) {
-        if (menu()->canTrigger(Qn::CameraDiagnosticsAction, m_camera)) {
-            statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::DiagnosticsButton);
-            return;
-        }
-    } else if (overlay == Qn::IoModuleDisabledOverlay) {
-        switch (cameraLicenseStatus(m_camera)) {
-        case LicenseNotUsed:
-            statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::IoEnableButton);
-            return;
-        case LicenseOverflow:
-            statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::MoreLicensesButton);
-            return;
-        default:
-            break;
+    if (m_camera) {
+        Qn::ResourceStatusOverlay overlay = calculateStatusOverlay();    
+
+        if (overlay == Qn::OfflineOverlay) {
+            if (menu()->canTrigger(Qn::CameraDiagnosticsAction, m_camera)) {
+                statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::DiagnosticsButton);
+                return;
+            }
+        } else if (overlay == Qn::IoModuleDisabledOverlay) {
+            switch (cameraLicenseStatus(m_camera)) {
+            case LicenseNotUsed:
+                statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::IoEnableButton);
+                return;
+            case LicenseOverflow:
+                statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::MoreLicensesButton);
+                return;
+            default:
+                break;
+            }
         }
     }
 
@@ -1458,7 +1461,8 @@ void QnMediaResourceWidget::updateOverlayButton() {
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
-    menu()->trigger(Qn::CameraDiagnosticsAction, m_camera);
+    if (m_camera)
+        menu()->trigger(Qn::CameraDiagnosticsAction, m_camera);
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
