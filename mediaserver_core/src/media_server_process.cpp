@@ -2145,7 +2145,10 @@ void MediaServerProcess::run()
     */
 
     QnResourceDiscoveryManager::instance()->setReady(true);
-    QnResourceDiscoveryManager::instance()->start();
+    if( !ec2Connection->connectionInfo().ecDbReadOnly )
+        QnResourceDiscoveryManager::instance()->start();
+    //else
+    //    we are not able to add cameras to DB anyway, so no sense to do discover
 
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
