@@ -5972,7 +5972,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Sélectionner les caméras...</translation>
     </message>
     <message>
-        <source>Slect Resources...</source>
+        <source>Select Resources...</source>
         <translation type="unfinished">Sélectionner les ressources...</translation>
     </message>
 </context>

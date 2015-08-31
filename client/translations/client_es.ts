@@ -5948,7 +5948,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Select cameras...</translation>
     </message>
     <message>
-        <source>Slect Resources...</source>
+        <source>Select Resources...</source>
         <translation type="unfinished">Seleccione los recursos...</translation>
     </message>
 </context>
