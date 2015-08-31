@@ -4,6 +4,7 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_criterion.h>
 
@@ -23,7 +24,7 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent):
     invalidWidget->setAlignment(Qt::AlignCenter);
     m_invalidWidget = invalidWidget;
 
-    QLabel *emptyWidget = new QLabel(tr("No cameras selected."), this);
+    QLabel *emptyWidget = new QLabel(tr("No %1 selected.").arg(getDevicesNameLower()), this);
     emptyWidget->setAlignment(Qt::AlignCenter);
     m_emptyWidget = emptyWidget;
 

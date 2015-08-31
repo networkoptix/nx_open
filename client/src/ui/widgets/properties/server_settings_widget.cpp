@@ -14,7 +14,7 @@
 #include <QtGui/QMouseEvent>
 
 #include <api/model/storage_space_reply.h>
-
+#include <core/resource/resource_name.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -593,10 +593,10 @@ void QnServerSettingsWidget::updateFailoverLabel() {
             return tr("At least two servers are required for this feature.");
 
         if (qnResPool->getAllCameras(m_server, true).size() > ui->maxCamerasSpinBox->value())
-            return tr("This server already has more than max cameras");
+            return tr("This server already has more than max %1").arg(getDevicesNameLower());
 
         if (!m_server->isRedundancy() && !m_maxCamerasAdjusted)
-            return tr("To avoid malfunction adjust max number of cameras");
+            return tr("To avoid malfunction adjust max number of %1").arg(getDevicesNameLower());
 
         return QString();
     };

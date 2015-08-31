@@ -17,6 +17,7 @@
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
@@ -428,7 +429,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MoveCameraAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget | Qn::MultiTarget).
         requiredPermissions(Qn::RemovePermission).
-        text(tr("Move Cameras")).
+        text(tr("Move %1").arg(getDevicesName())).
         condition(hasFlags(Qn::network));
 
     factory(Qn::NextLayoutAction).

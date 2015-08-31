@@ -6,6 +6,7 @@
 #include <QtGui/QDesktopServices>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -538,7 +539,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
         camerasToAdd << info;
     }
     if (camerasToAdd.empty()){
-        QMessageBox::information(this, tr("No cameras selected."), tr("Please select at least one camera."));
+        QMessageBox::information(this, tr("No %1 selected.").arg(getDevicesNameLower()), selectDevice());
         return;
     }
 
@@ -561,7 +562,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
             QMessageBox::information(
                 this,
                 tr("Success"),
-                tr("%n cameras added successfully.", "", camerasToAdd.size()) + L'\n' + tr("It might take a few moments to populate them in the tree."),
+                tr("%n %1 added successfully.", "", camerasToAdd.size()).arg(getDevicesNameLower()) + L'\n' + tr("It might take a few moments to populate them in the tree."),
                 QMessageBox::Ok
             );
         } else {
@@ -569,7 +570,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
                 setState(CamerasOffline);
                 return;
             }
-            QMessageBox::critical(this, tr("Error"), tr("Error while adding %n cameras.", "", camerasToAdd.size()));
+            QMessageBox::critical(this, tr("Error"), tr("Error while adding %n %1.", "", camerasToAdd.size()).arg(getDevicesNameLower()));
         }
     }
     setState(CamerasFound);
@@ -615,7 +616,7 @@ void QnCameraAdditionDialog::at_server_statusChanged(const QnResourcePtr &resour
         case CamerasFound:
         case Adding:
             setState(CamerasOffline);
-            updateServerStatus(tr("Server is offline, cameras can only be added to an online server."));
+            updateServerStatus(tr("Server is offline, %1 can only be added to an online server.").arg(getDevicesNameLower()));
             break;
         default:
             break;
@@ -645,7 +646,7 @@ void QnCameraAdditionDialog::at_resPool_resourceRemoved(const QnResourcePtr &res
         break;
     case CamerasFound:
     case Adding:
-        updateServerStatus(tr("Server has been removed - cannot add cameras."));
+        updateServerStatus(tr("Server has been removed - cannot add %1.").arg(getDevicesNameLower()));
         break;
     default:
         break;
@@ -660,7 +661,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 
     if (status != 0) {
         setState(Initial);
-        QMessageBox::warning(this, tr("Error"), tr("Error while searching for camera(s)."));
+        QMessageBox::warning(this, tr("Error"), tr("Error while searching for %1.").arg(getDevicesNameLower()));
         return;
     }
 
@@ -680,22 +681,22 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
     case QnManualCameraSearchStatus::CheckingHost:
         if (m_state == Searching) {
             int hostNum = m_subnetMode ? 2 : 1;
-            ui->progressBar->setFormat(tr("Scanning hosts... (%1)", "", hostNum)
-                                       .arg(tr("%n cameras found", "", result.cameras.size())));
+            const QString found = tr("%n %1 found", "", result.cameras.size()).arg(getDevicesNameLower());
+            ui->progressBar->setFormat(tr("Scanning hosts... (%1)", "", hostNum).arg(found));
         }
         break;
     case QnManualCameraSearchStatus::Finished:
     case QnManualCameraSearchStatus::Aborted:
         if (m_state == Searching)
-            m_server->apiConnection()->searchCameraAsyncStop(m_processUuid); //clear mediaserver cache
+            m_server->apiConnection()->searchCameraAsyncStop(m_processUuid); //clear server cache
 
         if (result.cameras.size() > 0) {
             setState(CamerasFound);
             if (newCameras == 0)
-                QMessageBox::information(this, tr("Finished"), tr("All cameras are already in the resource tree."));
+                QMessageBox::information(this, tr("Finished"), tr("All %1 are already in the resource tree.").arg(getDevicesNameLower()));
         } else {
             setState(Initial);
-            QMessageBox::information(this, tr("Finished"), tr("No cameras found."));
+            QMessageBox::information(this, tr("Finished"), tr("No %1 found.").arg(getDevicesNameLower()));
         }
         m_processUuid = QnUuid();
     }
@@ -732,10 +733,10 @@ bool QnCameraAdditionDialog::tryClose(bool force) {
 void QnCameraAdditionDialog::updateTitle() {
     if (m_server) {
         QString name = getResourceName(m_server);
-        setWindowTitle(tr("Add cameras to %1").arg(name));
+        setWindowTitle(tr("Add %1 to %2").arg(getDevicesNameLower()).arg(name));
         ui->serverNameLabel->setText(name);
     } else {
-        setWindowTitle(tr("Add cameras..."));
+        setWindowTitle(tr("Add %1...").arg(getDevicesNameLower()));
         ui->serverNameLabel->setText(tr("Select target server..."));
     }
 }

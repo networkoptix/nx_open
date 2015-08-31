@@ -7,6 +7,7 @@
 #include <api/app_server_connection.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/user_resource.h>
@@ -154,11 +155,12 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
         &&  (m_settingsWidget->hasDbChanges());
 
     if (askConfirmation) {
+        auto notSavedCameras = m_settingsWidget->cameras();
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
             this,
-            m_settingsWidget->cameras(),
-            tr("Camera(s) not saved."),
-            tr("Save changes to the following %n camera(s)?", "", m_settingsWidget->cameras().size()),
+            notSavedCameras,
+            tr("%1 not saved.").arg(getDevicesName(notSavedCameras)),
+            tr("Save changes to the following %1?").arg(getDevicesNameLower(notSavedCameras)),
             QDialogButtonBox::Yes | QDialogButtonBox::No
             );
         if(button == QDialogButtonBox::Yes)
@@ -234,7 +236,7 @@ void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const Qn
 
     QnResourceListDialog::exec(this, cameras,
         tr("Error"),
-        tr("Could not save the following %n cameras to Server.", "", cameras.size()),
+        tr("Could not save the following %1 to Server.").arg(getDevicesNameLower(cameras)),
         QDialogButtonBox::Ok);
 }
 

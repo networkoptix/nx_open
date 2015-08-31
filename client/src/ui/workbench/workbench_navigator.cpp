@@ -24,6 +24,7 @@ extern "C"
 #include <client/client_runtime_settings.h>
 
 #include <camera/resource_display.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -1254,7 +1255,7 @@ void QnWorkbenchNavigator::updateLines() {
         m_timeSlider->setLineVisible(SyncedLine, !isZoomed);
 
         m_timeSlider->setLineComment(CurrentLine, m_currentWidget->resource()->getName());
-        m_timeSlider->setLineComment(SyncedLine, tr("All Cameras"));
+        m_timeSlider->setLineComment(SyncedLine, tr("All %1").arg(getDevicesName()));
     } else {
         m_timeSlider->setLineVisible(CurrentLine, false);
         m_timeSlider->setLineVisible(SyncedLine, false);

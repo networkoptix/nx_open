@@ -6,6 +6,8 @@
 
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
+
+#include <core/resource/resource_name.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -79,9 +81,9 @@ namespace {
                 return label;
             };
 
-            m_motionLabel = addWarningLabel(tr("Schedule motion type is not supported by some cameras."));
-            m_dtsLabel = addWarningLabel(tr("Recording cannot be enabled for some cameras."));
-            m_noVideoLabel = addWarningLabel(tr("Schedule settings are not compatible with some cameras."));
+            m_motionLabel = addWarningLabel(tr("Schedule motion type is not supported by some %1.").arg(getDevicesNameLower()));
+            m_dtsLabel = addWarningLabel(tr("Recording cannot be enabled for some %1.").arg(getDevicesNameLower()));
+            m_noVideoLabel = addWarningLabel(tr("Schedule settings are not compatible with some %1.").arg(getDevicesNameLower()));
         }
 
         virtual bool validate(const QnResourceList &selected) override {
@@ -840,14 +842,31 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     }
 
     if(m_cameras.size() > 1) {
-        QMessageBox::warning(this, tr("Warning"), tr("Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras' motion setup page to ensure it is supported and enabled."));
+        QMessageBox::warning(
+            this, 
+            tr("Warning"),
+            tr("Motion Recording is disabled or not supported by some of the selected %1. Please go to the motion setup page to ensure it is supported and enabled.")
+                .arg(getDevicesNameLower(m_cameras))
+            );
     } else {
         if (hasMotion && !hasDualStreaming) {
-            QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming is not supported by this camera."));
+            QMessageBox::warning(
+                this, 
+                tr("Warning"), 
+                tr("Dual-Streaming is not supported by this %1.")
+                    .arg(getDevicesNameLower(m_cameras)));
         } else if(!hasMotion && !hasDualStreaming) {
-            QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming and Motion Detection are not available for this camera."));
+            QMessageBox::warning(
+                this, 
+                tr("Warning"), 
+                tr("Dual-Streaming and Motion Detection are not available for this %1.")
+                    .arg(getDevicesNameLower(m_cameras)));
         } else /* Has dual streaming but not motion */ {
-            QMessageBox::warning(this, tr("Warning"), tr("Motion Recording is disabled. Please go to the motion setup page to setup the camera's motion area and sensitivity."));
+            QMessageBox::warning(
+                this, 
+                tr("Warning"), 
+                tr("Motion Recording is disabled. Please go to the motion setup page to setup the %1's motion area and sensitivity.")
+                    .arg(getDevicesNameLower(m_cameras)));
         }
     }
 }

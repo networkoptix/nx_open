@@ -4,21 +4,26 @@
 
 #include <QtGui/QPalette>
 
-#include <core/resource/resource.h>
-#include <core/resource/network_resource.h>
-
-#include "core/resource_management/resource_pool.h"
-#include "ui/style/resource_icon_cache.h"
-#include "client/client_globals.h"
-#include <utils/math/math.h>
-#include "client/client_settings.h"
-#include <ui/common/ui_resource_name.h>
-#include "ui/style/skin.h"
 #include "api/common_message_processor.h"
+
 #include "business/business_strings_helper.h"
+
+#include "client/client_globals.h"
+#include "client/client_settings.h"
+
+#include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
+#include "core/resource_management/resource_pool.h"
+
+#include <ui/common/ui_resource_name.h>
+#include "ui/style/resource_icon_cache.h"
+#include "ui/style/skin.h"
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
+#include <utils/math/math.h>
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
@@ -346,7 +351,15 @@ QString QnAuditLogModel::buttonNameForEvent(Qn::AuditRecordType eventType)
     return QString();
 }
 
-QString QnAuditLogModel::getResourcesString(const std::vector<QnUuid>& resources)
+QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid>& resources) {
+    QnVirtualCameraResourceList result;
+    for (const auto& id: resources)
+        if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id))
+            result << camera;
+    return result;
+}
+
+QString QnAuditLogModel::getResourcesString(const std::vector<QnUuid>& resources) 
 {
     QString result;
     for (const auto& res: resources)
@@ -381,7 +394,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
         result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraInsert:
-        result +=  tr("%n cameras", "", static_cast<int>(data->resources.size()));
+        result += getDevicesName(getCameras(data->resources));
         break;
     default:
         result = getResourcesString(data->resources);
@@ -409,7 +422,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
         case Qn::AR_CameraInsert:
         case Qn::AR_CameraUpdate:
         {
-            QString txt = tr("%n cameras", "", static_cast<int>(data->resources.size()));
+            QString txt = getDevicesName(getCameras(data->resources));
             QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
             if (hovered)
                 result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(linkColor).arg(txt);
