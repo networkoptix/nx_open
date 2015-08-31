@@ -94,7 +94,7 @@ void QnResourceSelectionDialog::init() {
         break;
     default:
         scope = QnResourcePoolModel::FullScope;
-        setWindowTitle(tr("Slect Resources..."));
+        setWindowTitle(tr("Select Resources..."));
         ui->detailsWidget->hide();
         resize(minimumSize());
         break;

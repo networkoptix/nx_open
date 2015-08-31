@@ -5901,7 +5901,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">เลือกกล้อง...</translation>
     </message>
     <message>
-        <source>Slect Resources...</source>
+        <source>Select Resources...</source>
         <translation type="unfinished">เลือกเครื่องมือ...</translation>
     </message>
 </context>

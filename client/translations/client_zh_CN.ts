@@ -5900,7 +5900,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">选择摄像机...</translation>
     </message>
     <message>
-        <source>Slect Resources...</source>
+        <source>Select Resources...</source>
         <translation type="unfinished">选择资源...</translation>
     </message>
 </context>

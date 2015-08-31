@@ -5948,8 +5948,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Select Cameras...</translation>
     </message>
     <message>
-        <source>Slect Resources...</source>
-        <translation type="unfinished">Slect Resources...</translation>
+        <source>Select Resources...</source>
+        <translation type="unfinished">Select Resources...</translation>
     </message>
 </context>
 <context>
