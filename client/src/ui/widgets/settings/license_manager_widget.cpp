@@ -134,7 +134,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         foreach (QnLicenseUsageHelper* helper, helpers) {
             foreach (Qn::LicenseType lt, helper->licenseTypes()) {
                 if (helper->totalLicenses(lt) > 0)
-                    msg += L'\n' + tr("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                    msg += L'\n' + lit("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
             }
         }
 
@@ -317,7 +317,9 @@ void QnLicenseManagerWidget::updateDetailsButtonEnabled()
     QModelIndex idx = ui->gridLicenses->selectionModel()->currentIndex();
     ui->detailsButton->setEnabled(idx.isValid());
     QnLicensePtr license = m_model->license(idx);
-    ui->removeButton->setEnabled(license && !license->isValid());
+
+    QnLicense::ErrorCode errCode = QnLicense::NoError; /* Do not allow to remove valid licenses. */
+    ui->removeButton->setEnabled(license && !license->isValid(&errCode) && errCode != QnLicense::FutureLicense); 
 }
 
 
@@ -416,6 +418,8 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
                 licenses.append(license);
             else if (errCode == QnLicense::Expired)
                 licenses.append(license); // ignore expired error code
+            else if (errCode == QnLicense::FutureLicense)
+                licenses.append(license); // add future licenses
         }
     }
 

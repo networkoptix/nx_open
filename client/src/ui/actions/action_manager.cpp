@@ -1335,6 +1335,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Check Camera Issues...")).
+        conditionalText(tr("Check IO Module Issues..."), new QnIoModuleActionCondition(this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
@@ -1345,6 +1346,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Camera Rules...")).
+        conditionalText(tr("IO Module Rules..."), new QnIoModuleActionCondition(this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::ExactlyOne, this),
@@ -1629,18 +1631,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Space")).
         text(tr("Play")).
         toggledText(tr("Pause")).
-        condition(new QnArchiveActionCondition(this));
-
-    factory(Qn::SpeedDownAction).
-        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
-        shortcut(tr("Ctrl+-")).
-        text(tr("Speed Down")).
-        condition(new QnArchiveActionCondition(this));
-
-    factory(Qn::SpeedUpAction).
-        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
-        shortcut(tr("Ctrl++")).
-        text(tr("Speed Up")).
         condition(new QnArchiveActionCondition(this));
 
     factory(Qn::PreviousFrameAction).

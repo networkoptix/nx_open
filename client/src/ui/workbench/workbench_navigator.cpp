@@ -422,7 +422,7 @@ bool QnWorkbenchNavigator::setLive(bool live) {
 
 bool QnWorkbenchNavigator::isPlayingSupported() const {
     if (m_currentMediaWidget) 
-        return m_currentMediaWidget->display()->archiveReader();
+        return m_currentMediaWidget->display()->archiveReader() && !m_currentMediaWidget->display()->isStillImage();
     return false;
 }
 
@@ -477,7 +477,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
 }
 
 qreal QnWorkbenchNavigator::speed() const {
-    if(!m_currentMediaWidget || m_currentMediaWidget->display()->isStillImage())
+    if(!isPlayingSupported())
         return 0.0;
 
     if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
@@ -503,24 +503,39 @@ void QnWorkbenchNavigator::setSpeed(qreal speed) {
     }
 }
 
+bool QnWorkbenchNavigator::hasVideo() const {
+    if (!m_currentMediaWidget)
+        return false;
+
+    auto reader = m_currentMediaWidget->display()->archiveReader();
+    if (!reader)
+        return false;
+
+    //TODO: #GDM archiveReader()->hasVideo() cannot be used because always returns true for online sources
+    return m_currentMediaWidget->resource()->hasVideo(reader);
+}
+
+
 qreal QnWorkbenchNavigator::minimalSpeed() const {
-    if(!m_currentMediaWidget || m_currentMediaWidget->display()->isStillImage())
+    if (!isPlayingSupported())
         return 0.0;
 
-    if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
-        return reader->isNegativeSpeedSupported() ? -16.0 : 0.0;
+    if (QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
+        if (!reader->isNegativeSpeedSupported())
+            return 0.0;
 
-    return 1.0;
+    return hasVideo()
+        ? -16.0 
+        : 0.0;
 }
 
 qreal QnWorkbenchNavigator::maximalSpeed() const {
-    if(!m_currentMediaWidget || m_currentMediaWidget->display()->isStillImage())
+    if (!isPlayingSupported())
         return 0.0;
 
-    if(m_currentMediaWidget->display()->archiveReader() != NULL)
-        return 16.0;
-
-    return 1.0;
+    return hasVideo() 
+        ? 16.0 
+        : 1.0;
 }
 
 qint64 QnWorkbenchNavigator::position() const {

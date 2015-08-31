@@ -392,7 +392,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     switch (params.reasonCode) {
     case NetworkNoFrameReason: {
         int msecs = QnNetworkIssueBusinessEvent::decodeTimeoutMsecs(reasonParamsEncoded, 5000);
-        result = tr("No video frame received during last %n seconds.", 0, msecs / 1000);
+        result = tr("No data received during last %n seconds.", 0, msecs / 1000);
         break;
     }
     case NetworkConnectionClosedReason: {

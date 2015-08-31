@@ -106,7 +106,8 @@
         },
         {
             "keys": [
-                "ACTI|V32"
+                "ACTI|V32",
+                "ACTi Corporation|V32"
             ],
             "forceONVIF": true
         },

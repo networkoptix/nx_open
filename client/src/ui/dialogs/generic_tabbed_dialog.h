@@ -24,6 +24,7 @@ protected:
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
     void setPageEnabled(int key, bool enabled);
 
+    bool tryAccept();
     virtual void loadData();
     virtual void submitData();
 

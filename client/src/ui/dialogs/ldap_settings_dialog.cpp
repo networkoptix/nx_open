@@ -143,10 +143,10 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
     if (url.port() == QnLdapSettings::defaultPort(url.scheme() == lit("ldaps")))
         url.setPort(-1);
     q->ui->serverLineEdit->setText(url.toString());
-    q->ui->adminDnLineEdit->setText(settings.adminDn);
-    q->ui->passwordLineEdit->setText(settings.adminPassword);
-    q->ui->searchBaseLineEdit->setText(settings.searchBase);
-    q->ui->searchFilterLineEdit->setText(settings.searchFilter);
+    q->ui->adminDnLineEdit->setText(settings.adminDn.trimmed());
+    q->ui->passwordLineEdit->setText(settings.adminPassword.trimmed());
+    q->ui->searchBaseLineEdit->setText(settings.searchBase.trimmed());
+    q->ui->searchFilterLineEdit->setText(settings.searchFilter.trimmed());
     q->ui->testStackWidget->setCurrentWidget(q->ui->testResultPage);
     q->ui->testResultLabel->setText(QString());
 }
@@ -166,7 +166,7 @@ void QnLdapSettingsDialogPrivate::at_timeoutTimer_timeout() {
 void QnLdapSettingsDialogPrivate::at_serverLineEdit_editingFinished() {
     Q_Q(QnLdapSettingsDialog);
 
-    QUrl url = QUrl::fromUserInput(q->ui->serverLineEdit->text());
+    QUrl url = QUrl::fromUserInput(q->ui->serverLineEdit->text().trimmed());
     if (!url.isValid())
         return;
 

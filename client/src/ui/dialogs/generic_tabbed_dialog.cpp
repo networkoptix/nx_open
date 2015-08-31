@@ -43,12 +43,17 @@ void QnGenericTabbedDialog::reject() {
     base_type::reject();
 }
 
-void QnGenericTabbedDialog::accept() {
+bool QnGenericTabbedDialog::tryAccept() {
     if (!confirm())
-        return;
+        return false;
 
     submitData();
     base_type::accept();
+    return true;
+}
+
+void QnGenericTabbedDialog::accept() {
+    tryAccept();
 }
 
 void QnGenericTabbedDialog::loadData() {

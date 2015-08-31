@@ -80,6 +80,8 @@ public:
     Q_SLOT bool setPlaying(bool playing);
     bool isPlayingSupported() const;
 
+    bool hasVideo() const;
+
     qreal speed() const;
     Q_SLOT void setSpeed(qreal speed);
     qreal minimalSpeed() const;

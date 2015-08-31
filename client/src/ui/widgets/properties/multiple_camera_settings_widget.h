@@ -74,6 +74,9 @@ protected:
 private:
     void setHasDbChanges(bool hasChanges);
 
+    int tabIndex(Qn::CameraSettingsTab tab) const;
+    void setTabEnabledSafe(Qn::CameraSettingsTab tab, bool enabled);
+
 private:
     Q_DISABLE_COPY(QnMultipleCameraSettingsWidget)
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)

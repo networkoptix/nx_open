@@ -592,6 +592,11 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
         connect(m_resource->toResource(),SIGNAL(videoLayoutChanged(const QnResourcePtr &)), this, SLOT(at_videoLayoutChanged()));
 
+        connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this, [this](bool /* live */)
+        {
+            updateIoModuleVisibility(true);
+        });
+
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
@@ -600,6 +605,9 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         setChannelLayout(QnConstResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout()));
         m_renderer->setChannelCount(0);
     }
+
+    bool hasVideo = m_resource->hasVideo(m_display ? m_display->mediaProvider() : nullptr);
+    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo);
 
     emit displayChanged();
 }
@@ -1016,7 +1024,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         
     }
     if (m_resource->hasVideo(m_display->mediaProvider()))
-        return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
+    {
+        return lit(" %1x%2 %3fps @ %4Mbps%5 %6\t%7")
             .arg(size.width())
             .arg(size.height())
             .arg(fps, 0, 'f', 2)
@@ -1024,12 +1033,15 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             .arg(codecString)
             .arg(hqLqString)
             .arg(timeString);
+    }
     else
-        return lit("@ %1Mbps%2 %3\t%4")
-        .arg(mbps, 0, 'f', 2)
-        .arg(codecString)
-        .arg(hqLqString)
-        .arg(timeString);
+    {
+        return lit(" %1Mbps%2 %3\t%4")
+            .arg(mbps, 0, 'f', 2)
+            .arg(codecString)
+            .arg(hqLqString)
+            .arg(timeString);
+    }
 }
 
 QString QnMediaResourceWidget::calculateTitleText() const {
@@ -1096,8 +1108,6 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     {
         if (hasVideo)
             result |= IoModuleButton;
-        else
-            result &= ~RotateButton;    /// Do not allow rotate widget if it is IO module only
     }
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo) {
@@ -1126,20 +1136,22 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     QnResourcePtr resource = m_display->resource();
 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
-    bool isOffline = false;
-    bool isUnauthorized = false;
-    checkWrongState(&isOffline, &isUnauthorized);
+    const ResourceStates states = getResourceStates();
 
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
-        if (isOffline)
+        if (states.isOffline)
             return Qn::OfflineOverlay;
 
-        if (isUnauthorized)
+        if (states.isUnauthorized)
             return Qn::UnauthorizedOverlay;
+
+        if (!states.isRealTimeSource)
+            return Qn::NoVideoDataOverlay;
             
         if (m_ioCouldBeShown) /// If vidget could be shown then licences Ok
             return Qn::EmptyOverlay;
+
 
         const bool buttonIsVisible = (buttonBar()->visibleButtons() & IoModuleButton);
         const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
@@ -1160,9 +1172,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         return Qn::NoDataOverlay;
 
         
-    } else if (isOffline) {
+    } else if (states.isOffline) {
         return Qn::OfflineOverlay;
-    } else if (isUnauthorized) {
+    } else if (states.isUnauthorized) {
         return Qn::UnauthorizedOverlay;
     } else if (m_camera && m_camera->isDtsBased() && !m_camera->isLicenseUsed()) {
         return Qn::AnalogWithoutLicenseOverlay;
@@ -1175,16 +1187,18 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
             return Qn::NoDataOverlay;
         QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
-            return base_type::calculateStatusOverlay(Qn::Online, m_resource && m_resource->hasVideo(m_display->mediaProvider()));
+            return base_type::calculateStatusOverlay(Qn::Online, states.hasVideo);
         else
             return Qn::NoDataOverlay;
     } else if (m_display->isPaused()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
+        else if (!states.hasVideo)
+            return Qn::NoVideoDataOverlay;
         else
             return Qn::EmptyOverlay;
     } else {
-        return base_type::calculateStatusOverlay(Qn::Online, m_resource && m_resource->hasVideo(m_display->mediaProvider()));
+        return base_type::calculateStatusOverlay(Qn::Online, states.hasVideo);
     }
 }
 
@@ -1383,21 +1397,18 @@ void QnMediaResourceWidget::updateCustomAspectRatio() {
     m_display->camDisplay()->setOverridenAspectRatio(m_resource->customAspectRatio());
 }
 
-bool QnMediaResourceWidget::checkWrongState(bool *isOffline
-    , bool *isUnauthorized) const
+QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates() const
 {
     const auto camDisplay = (m_display ? m_display->camDisplay() : nullptr);
-    const bool realtimeSource = (camDisplay ? camDisplay->isRealTimeSource() : false);
     const auto resource = (m_display ? m_display->resource() : QnResourcePtr());
-    const bool localIsOffline = (realtimeSource && (!resource || (resource->getStatus() == Qn::Offline)));
-    const bool localIsUnauthorized = (realtimeSource && (resource && (resource->getStatus() == Qn::Unauthorized)));
-    
-    if (isOffline)
-        *isOffline = localIsOffline;
-    if (isUnauthorized)
-        *isUnauthorized = localIsUnauthorized;
 
-    return (localIsOffline || localIsUnauthorized);
+    ResourceStates result;
+    result.isRealTimeSource = (camDisplay ? camDisplay->isRealTimeSource() : false);
+    result.isOffline = (result.isRealTimeSource && (!resource || (resource->getStatus() == Qn::Offline)));
+    result.isUnauthorized = (result.isRealTimeSource && (resource && (resource->getStatus() == Qn::Unauthorized)));
+    result.hasVideo = (m_resource && m_resource->hasVideo(m_display->mediaProvider()));
+
+    return result;
 }
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
@@ -1412,7 +1423,9 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
 
     m_ioCouldBeShown = ((ioBtnChecked || onlyIoData) && correctLicenceStatus);
-    const OverlayVisibility visibility =  (m_ioCouldBeShown && !checkWrongState() ? Visible : Invisible);
+    const ResourceStates states = getResourceStates();
+    const bool correctState = (!states.isOffline && !states.isUnauthorized && states.isRealTimeSource);
+    const OverlayVisibility visibility =  (m_ioCouldBeShown && correctState ? Visible : Invisible);
     setOverlayWidgetVisibility(m_ioModuleOverlayWidget, visibility);
     updateOverlayWidgetsVisibility(animate);
 

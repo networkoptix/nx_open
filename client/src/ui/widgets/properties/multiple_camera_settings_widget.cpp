@@ -115,36 +115,40 @@ Qn::CameraSettingsTab QnMultipleCameraSettingsWidget::currentTab() const {
     
     QWidget *tab = ui->tabWidget->currentWidget();
 
-    if(tab == ui->tabRecording) {
-        return Qn::RecordingSettingsTab;
-    } else if(tab == ui->expertTab) {
-        return Qn::ExpertCameraSettingsTab;
-    } else {
-        qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
+    if (tab == ui->tabGeneral)
         return Qn::GeneralSettingsTab;
-    }
+
+    if (tab == ui->tabRecording) 
+        return Qn::RecordingSettingsTab;
+    
+    if(tab == ui->expertTab) 
+        return Qn::ExpertCameraSettingsTab;
+
+    qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
+    return Qn::GeneralSettingsTab;
 }
 
 void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     /* Using field names here so that changes in UI file will lead to compilation errors. */
 
+    if (!ui->tabWidget->isTabEnabled(tabIndex(tab))) {
+        ui->tabWidget->setCurrentWidget(ui->tabGeneral);
+        return;
+    }
+
     switch(tab) {
     case Qn::GeneralSettingsTab:
+    case Qn::IOPortsSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabGeneral);
         break;
     case Qn::RecordingSettingsTab:
     case Qn::MotionSettingsTab:
     case Qn::AdvancedCameraSettingsTab:
-        if (ui->tabWidget->isTabEnabled(Qn::RecordingSettingsTab))
-            ui->tabWidget->setCurrentWidget(ui->tabRecording);
-        else
-            ui->tabWidget->setCurrentWidget(ui->tabGeneral);
+        ui->tabWidget->setCurrentWidget(ui->tabRecording);
         break;
     case Qn::ExpertCameraSettingsTab:
-        if (ui->tabWidget->isTabEnabled(Qn::ExpertCameraSettingsTab))
-            ui->tabWidget->setCurrentWidget(ui->expertTab);
-        else
-            ui->tabWidget->setCurrentWidget(ui->tabGeneral);
+        
+        ui->tabWidget->setCurrentWidget(ui->expertTab);
         break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
@@ -303,9 +307,8 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
             ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);            
-            ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !isDtsBased);
-            ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
-            ui->expertTab->setEnabled(!isDtsBased && hasVideo);
+            setTabEnabledSafe(Qn::RecordingSettingsTab, !isDtsBased);
+            setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
             QnCheckbox::setupTristateCheckbox(ui->enableAudioCheckBox, sameAudioEnabled, audioEnabled);
 
             {           
@@ -432,6 +435,29 @@ void QnMultipleCameraSettingsWidget::setHasDbChanges(bool hasChanges) {
 
     emit hasChangesChanged();
 }
+
+
+int QnMultipleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const {
+    switch (tab) {
+    case Qn::GeneralSettingsTab:
+        return ui->tabWidget->indexOf(ui->tabGeneral);
+    case Qn::RecordingSettingsTab:
+        return ui->tabWidget->indexOf(ui->tabRecording);
+    case Qn::ExpertCameraSettingsTab:
+        return ui->tabWidget->indexOf(ui->expertTab);
+    default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        break;
+    }
+    return -1;
+}
+
+void QnMultipleCameraSettingsWidget::setTabEnabledSafe(Qn::CameraSettingsTab tab, bool enabled) {
+    if (!enabled && currentTab() == tab)
+        setCurrentTab(Qn::GeneralSettingsTab);
+    ui->tabWidget->setTabEnabled(tabIndex(tab), enabled);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
