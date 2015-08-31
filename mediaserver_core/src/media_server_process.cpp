@@ -2358,6 +2358,9 @@ protected:
         m_main.reset(new MediaServerProcess(m_argc, m_argv));
 
         int res = application()->exec();
+
+        m_main.reset();
+
 #ifdef Q_OS_WIN
         // stop the service unexpectedly to let windows service management system restart it
         if (restartFlag) {
