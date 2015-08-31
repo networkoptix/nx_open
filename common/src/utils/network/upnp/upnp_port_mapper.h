@@ -97,7 +97,7 @@ private:
     std::list< Guard > changeIpEvents( Device& device, HostAddress oldIp );
 
 protected: // for testing only
-    QMutex m_mutex;
+    QnMutex m_mutex;
     std::unique_ptr<AsyncClient> m_upnpClient;
     quint64 m_timerId;
     const QString m_description;

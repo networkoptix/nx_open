@@ -30,7 +30,7 @@ PortMapper::~PortMapper()
 {
     quint64 timerId;
     {
-        QMutexLocker lock( &m_mutex );
+        QnMutexLocker lock( &m_mutex );
         timerId = m_timerId;
         m_timerId = 0;
     }
@@ -46,7 +46,7 @@ bool PortMapper::enableMapping( quint16 port, Protocol protocol,
 {
     PortId portId( port, protocol );
 
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     if( !m_mapRequests.emplace( std::move( portId ), std::move( callback ) ).second )
         return false; // port already mapped
 
@@ -59,7 +59,7 @@ bool PortMapper::enableMapping( quint16 port, Protocol protocol,
 
 bool PortMapper::disableMapping( quint16 port, Protocol protocol )
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     const auto it = m_mapRequests.find( PortId( port, protocol ) );
     if( it == m_mapRequests.end() )
         return false;
@@ -138,7 +138,7 @@ bool PortMapper::searchForMappers( const HostAddress& localAddress,
         url.setPort( devAddress.port );
         url.setPath( service.controlUrl );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         addNewDevice( localAddress, url, devInfo.serialNumber );
     }
 
@@ -150,7 +150,7 @@ bool PortMapper::searchForMappers( const HostAddress& localAddress,
 
 void PortMapper::onTimer( const quint64& /*timerID*/ )
 {
-    QMutexLocker lock( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     for( auto& device : m_devices )
     {
         updateExternalIp( device.second );
@@ -193,7 +193,7 @@ void PortMapper::updateExternalIp( Device& device )
     {
         std::list< Guard > callbackGuards;
         {
-            QMutexLocker lock( &m_mutex );
+            QnMutexLocker lock( &m_mutex );
             NX_LOG( lit( "%1 externalIp='%2' on device %3" )
                     .arg( QLatin1String( Q_FUNC_INFO ) )
                     .arg( externalIp.toString() )
@@ -226,7 +226,7 @@ void PortMapper::checkMapping( Device& device, quint16 inPort, quint16 exPort,
         device.url, exPort, protocol,
         [ this, &device, inPort, exPort, protocol ]( AsyncClient::MappingInfo info )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         device.failCounter.success();
 
         if( info.internalPort == inPort &&
@@ -269,7 +269,7 @@ void PortMapper::ensureMapping( Device& device, quint16 inPort, Protocol protoco
     const bool result = m_upnpClient->getAllMappings( device.url,
         [ this, &device, inPort, protocol ]( AsyncClient::MappingList list )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         device.failCounter.success();
 
         // Save existing mappings in case if router can silently remap them
@@ -351,7 +351,7 @@ void PortMapper::makeMapping( Device& device, quint16 inPort,
         m_checkMappingsInterval * MAPPING_TIME_RATIO,
         [ this, &device, inPort, desiredPort, protocol, retries ]( bool success )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( !success )
         {
             device.failCounter.failure();
