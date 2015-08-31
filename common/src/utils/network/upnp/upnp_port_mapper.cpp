@@ -3,6 +3,8 @@
 #include "common/common_globals.h"
 #include "utils/common/log.h"
 
+#include <random>
+
 static const size_t BREAK_FAULTS_COUNT = 5; // faults in a row
 static const size_t BREAK_TIME_PER_FAULT = 1 * 60; // wait 1 minute per fault in a row
 static const size_t BREAK_TIME_MAX = 2 * 60 * 60; // dont wait more than 2 hours
@@ -329,7 +331,7 @@ void PortMapper::ensureMapping( Device& device, quint16 inPort, Protocol protoco
 // TODO: move into function below when supported
 static std::default_random_engine randomEngine(
         std::chrono::system_clock::now().time_since_epoch().count() );
-static std::uniform_int_distribution<> portDistribution(
+static std::uniform_int_distribution<quint16> portDistribution(
         PORT_SAFE_RANGE_BEGIN, PORT_SAFE_RANGE_END );
 
 // TODO: reduse the size of method
