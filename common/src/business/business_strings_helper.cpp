@@ -17,6 +17,7 @@
 #include <core/resource/resource_name.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include "business/business_event_rule.h"
 
@@ -408,9 +409,15 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         break;
     }
     case LicenseRemoved: {
-        QString disabledCameras = reasonParamsEncoded;
-        result = tr("Recording on %n camera(s) is disabled: ", NULL, disabledCameras.split(L',').size());
-        result += disabledCameras;
+        QnVirtualCameraResourceList disabledCameras;
+        for (const QString &id: reasonParamsEncoded.split(L';'))
+            if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id))) 
+                disabledCameras << camera;
+        Q_ASSERT_X(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
+        
+        result = tr("Recording on %1 is disabled: ").arg(getDevicesName(disabledCameras, false));
+        for (const auto &camera: disabledCameras)
+            result += L'\n' + getFullResourceName(camera, true);
         break;
     }
     default:
