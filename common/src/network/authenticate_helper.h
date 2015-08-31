@@ -44,6 +44,7 @@ namespace AuthMethod
         tempUrlQueryParam   = 0x40
     };
     Q_DECLARE_FLAGS(Values, Value);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Values);
 }
 
 /*!
