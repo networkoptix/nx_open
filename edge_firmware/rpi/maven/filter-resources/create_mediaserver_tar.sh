@@ -144,11 +144,13 @@ cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$
 #start script and platform specific scripts
 cp -R ./etc $BUILD_DIR
 chmod -R 755 $BUILD_DIR/etc/init.d
+mv -f $BUILD_DIR/etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
 
 #additional platform specific files
 cp -R ./root $BUILD_DIR
 mkdir -p $BUILD_DIR/root/tools/nx
 cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
+mv -f $BUILD_DIR/opt/networkoptix $BUILD_DIR/opt/$CUSTOMIZATION
 
 #building package
 pushd $BUILD_DIR
