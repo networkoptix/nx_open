@@ -1,29 +1,36 @@
 #include "action_text_factories.h"
 
+#include <ui/actions/action_parameter_types.h>
+#include <ui/actions/action_parameters.h>
+
 #include <core/resource/resource_name.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_item_index.h>
+
+#include <utils/common/warnings.h>
 
 QnActionTextFactory::QnActionTextFactory(QObject *parent): 
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {}
 
-Qn::ActionVisibility QnActionTextFactory::text(const QnResourceList &) { 
-    return Qn::InvisibleAction; 
+QString QnActionTextFactory::text(const QnResourceList &) const { 
+    return QString(); 
 }
 
-Qn::ActionVisibility QnActionTextFactory::text(const QnLayoutItemIndexList &layoutItems) { 
+QString QnActionTextFactory::text(const QnLayoutItemIndexList &layoutItems) const { 
     return text(QnActionParameterTypes::resources(layoutItems));
 }
 
-Qn::ActionVisibility QnActionTextFactory::text(const QnResourceWidgetList &widgets) { 
+QString QnActionTextFactory::text(const QnResourceWidgetList &widgets) const { 
     return text(QnActionParameterTypes::layoutItems(widgets));
 }
 
-Qn::ActionVisibility QnActionTextFactory::text(const QnWorkbenchLayoutList &layouts) { 
+QString QnActionTextFactory::text(const QnWorkbenchLayoutList &layouts) const { 
     return text(QnActionParameterTypes::resources(layouts));
 }
 
-Qn::ActionVisibility QnActionTextFactory::text(const QnActionParameters &parameters) {
+QString QnActionTextFactory::text(const QnActionParameters &parameters) const {
     switch(parameters.type()) {
     case Qn::ResourceType:
         return text(parameters.resources());
@@ -39,6 +46,6 @@ Qn::ActionVisibility QnActionTextFactory::text(const QnActionParameters &paramet
     }
 }
 
-QString QnDevicesNameActionTextFactory::text(const QnResourceList &resources) {
+QString QnDevicesNameActionTextFactory::text(const QnResourceList &resources) const {
     return m_template.arg(getDevicesName(resources.filtered<QnVirtualCameraResource>()));
 }

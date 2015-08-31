@@ -1,5 +1,7 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
+#include <ui/actions/action_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnActionTextFactory: public QObject, public QnWorkbenchContextAware {
@@ -21,39 +23,40 @@ public:
      * \param parameters                Parameters to check.
      * \returns                         Check result.
      */
-    virtual QString text(const QnActionParameters &parameters);
+    virtual QString text(const QnActionParameters &parameters) const;
 
     /**
      * Specialized condition function that catches all action parameters that
      * are convertible to a resource list (<tt>Qn::ResourceType</tt>).
      */
-    virtual QString text(const QnResourceList &resources);
+    virtual QString text(const QnResourceList &resources) const;
 
     /**
      * Specialized condition function that catches all action parameters that
      * are convertible to a list of layout items (<tt>Qn::LayoutItemType</tt>).
      */
-    virtual QString text(const QnLayoutItemIndexList &layoutItems);
+    virtual QString text(const QnLayoutItemIndexList &layoutItems) const;
 
     /**
      * Specialized condition function that catches all action parameters that
      * are convertible to a list of resource widgets. (<tt>Qn::WidgetType</tt>).
      */
-    virtual QString text(const QnResourceWidgetList &widgets);
+    virtual QString text(const QnResourceWidgetList &widgets) const;
 
     /**
      * Specialized condition function that catches all action parameters that
      * are convertible to a list of workbench layouts. (<tt>Qn::LayoutType</tt>).
      */
-    virtual QString text(const QnWorkbenchLayoutList &layouts);
+    virtual QString text(const QnWorkbenchLayoutList &layouts) const;
 };
 
 class QnDevicesNameActionTextFactory: public QnActionTextFactory {
+public:
     QnDevicesNameActionTextFactory(const QString &textTemplate, QObject *parent = NULL): 
         QnActionTextFactory(parent),
         m_template(textTemplate)
     {}
-    virtual QString text(const QnResourceList &resources) override;
+    virtual QString text(const QnResourceList &resources) const override;
 private:
     const QString m_template;
 };

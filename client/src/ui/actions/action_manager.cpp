@@ -1395,7 +1395,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Add %1...").arg(getDevicesName())).
+        text(tr("Add Device(s)...")).   //intentionally hardcode devices here
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),
@@ -1404,7 +1404,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CameraListByServerAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        dynamicText(new QnDevicesNameActionTextFactory(tr("%1 List by Server..."), this));
+        dynamicText(new QnDevicesNameActionTextFactory(tr("%1 List by Server..."), this)).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),
