@@ -255,7 +255,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
         {
             m_requests << mserver->apiConnection()->getEventLogAsync(
                 fromMsec, toMsec,
-                m_filterCameraList.filtered<QnResource>(),
+                m_filterCameraList,
                 eventType,
                 actionType,
                 QnUuid(),
@@ -275,14 +275,15 @@ void QnEventLogDialog::retranslateUi()
     ui->cameraButton->setText(cameraButtonText);
 
     /// Updates action type combobox model
-    const auto actions = QnBusiness::allActions();
-    for (int row = 0; row != actions.size(); ++row)
+    for (int row = 0; row != m_actionTypesModel->rowCount(); ++row)
     {
-        const QString actionName = QnBusinessStringsHelper::actionName(actions[row]);
+        const auto item = m_actionTypesModel->item(row);
+        const auto type = static_cast<QnBusiness::ActionType>(item->data().toInt());
+        if (type == QnBusiness::UndefinedAction)
+            continue;
 
-        enum { kStandardItemsBefore = 1 };
-        const auto index = m_actionTypesModel->index(row + kStandardItemsBefore, 0);
-        m_actionTypesModel->setData(index, actionName, Qt::DisplayRole);
+        const QString actionName = QnBusinessStringsHelper::actionName(type);
+        item->setText(actionName);
     }
 }
 
@@ -533,7 +534,7 @@ void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
 void QnEventLogDialog::at_cameraButton_clicked()
 {
     QnResourceSelectionDialog dialog(this);
-    dialog.setSelectedResources(m_filterCameraList.filtered<QnResource>());
+    dialog.setSelectedResources(m_filterCameraList);
 
     if (dialog.exec() == QDialog::Accepted)
         setCameraList(dialog.selectedResources().filtered<QnVirtualCameraResource>());
