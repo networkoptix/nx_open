@@ -105,14 +105,16 @@ bool QnFileStorageResource::initOrUpdate() const
 
     if (m_dirty)
     {
+        m_dirty = false;
         if (getUrl().contains("://"))
         {
             if (mountTmpDrive() != 0)
-                return false;
+                m_valid = false;
+            else
+                m_valid = true;
         }
-        m_dirty = false;
     }
-    return true;
+    return m_valid;
 }
 
 
@@ -350,6 +352,7 @@ void QnFileStorageResource::setUrl(const QString& url)
 QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
     m_storageBitrateCoeff(1.0),
     m_dirty(false),
+    m_valid(false),
     m_capabilities(0),
     m_storageManager(storageManager)
 {
@@ -477,6 +480,9 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
 
 bool QnFileStorageResource::isAvailable() const 
 {
+    if (!m_valid)
+        m_dirty = true;
+
     if (!initOrUpdate())
         return false;
 

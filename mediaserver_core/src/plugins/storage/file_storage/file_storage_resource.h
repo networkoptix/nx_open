@@ -78,6 +78,7 @@ private:
     // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
     float m_storageBitrateCoeff;
     mutable bool m_dirty;
+    mutable bool m_valid;
 
 private:
     mutable QMutex      m_mutexPermission;
