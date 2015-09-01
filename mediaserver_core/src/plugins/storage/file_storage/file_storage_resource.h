@@ -64,7 +64,6 @@ private:
     QString translateUrlToLocal(const QString &url) const;
     QString translateUrlToRemote(const QString &url) const;
 
-#ifndef _WIN32
     // mounts network (smb) folder to temporary local path
     // returns not 0 if something went wrong, 0 otherwise
     int mountTmpDrive() const;
@@ -74,10 +73,6 @@ public:
     // This could happen if server crashed and ~FileStorageResource
     // was not called.
     static void removeOldDirs();
-    // Try to remove old dirs only once, when the first
-    // file storage resource constructor is called.
-    static std::atomic<bool> m_firstCall;
-#endif
 
 private:
     // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling

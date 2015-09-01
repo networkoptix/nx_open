@@ -41,7 +41,6 @@
 #ifndef Q_OS_WIN
     const QString QnFileStorageResource::FROM_SEP = lit("\\");
     const QString QnFileStorageResource::TO_SEP = lit("/");
-    std::atomic<bool> QnFileStorageResource::m_firstCall(true);
 #else
     const QString QnFileStorageResource::FROM_SEP = lit("/");
     const QString QnFileStorageResource::TO_SEP = lit("\\");
@@ -106,7 +105,6 @@ bool QnFileStorageResource::initOrUpdate() const
 
     if (m_dirty)
     {
-        m_dirty = false;
         if (getUrl().contains("://"))
         {
             if (mountTmpDrive() != 0)
@@ -116,6 +114,7 @@ bool QnFileStorageResource::initOrUpdate() const
                 m_storageManager->addLocalPathInUse(m_localPath);
 #endif
         }
+        m_dirty = false;
     }
     return true;
 }
@@ -213,9 +212,9 @@ QString QnFileStorageResource::translateUrlToRemote(const QString &url) const
     }
 }
 
-#ifndef _WIN32
 void QnFileStorageResource::removeOldDirs()
 {
+#ifndef _WIN32
     QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(
         QStringList() << (lit("*") + NX_TEMP_FOLDER_NAME + lit("*")),
         QDir::AllDirs | QDir::NoDotAndDotDot
@@ -255,7 +254,10 @@ void QnFileStorageResource::removeOldDirs()
             );
         }
     }
+#endif
 }
+
+#ifndef _WIN32
 
 int QnFileStorageResource::mountTmpDrive() const
 {
@@ -312,30 +314,33 @@ bool QnFileStorageResource::updatePermissions() const
         NETRESOURCE netRes;
         memset(&netRes, 0, sizeof(netRes));
         netRes.dwType = RESOURCETYPE_DISK;
+        QUrl storageUrl(getUrl());
+        QString path = storageUrl.path().mid((1));
         netRes.lpRemoteName = (LPWSTR) path.constData();
         LPWSTR password = (LPWSTR) storageUrl.password().constData();
         LPWSTR user = (LPWSTR) storageUrl.userName().constData();
         if (WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0) != NO_ERROR)
             return false;
     }
+    return true;
 }
 
-bool QnFileStorageResource::mountTmpDrive() const
+int QnFileStorageResource::mountTmpDrive() const
 {
     QUrl storageUrl(getUrl());
     if (!storageUrl.isValid())
-        return false;
+        return -1;
 
     QString path = 
         lit("\\\\") + 
         storageUrl.host() + 
         storageUrl.path().replace(lit("/"), lit("\\"));
 
-    if (!updatePermissons())
-        return false;
+    if (!updatePermissions())
+        return -1;
 
     m_localPath = path;
-    return true;
+    return 0;
 }
 #endif
 
