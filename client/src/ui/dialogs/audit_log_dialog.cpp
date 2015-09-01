@@ -427,17 +427,22 @@ void QnAuditLogDialog::at_typeCheckboxChanged()
     bool hasUnchecked = false;
     for (const auto& checkbox: m_filterCheckboxes)
     {
+        if (!checkbox->isEnabled())
+            continue;
+
         if (checkbox->isChecked())
             hasChecked = true;
         else
             hasUnchecked = true;
     }
+
     Qt::CheckState checkState = Qt::Unchecked;
     if (hasChecked && hasUnchecked)
         checkState = Qt::PartiallyChecked;
     else if(hasChecked)
         checkState = Qt::Checked;
 
+    //TODO: #GDM get rid of this magic and use common setupTristateCheckbox framework
     ui->selectAllCheckBox->blockSignals(true);
     ui->selectAllCheckBox->setCheckState(checkState);
     ui->selectAllCheckBox->blockSignals(false);
@@ -455,6 +460,8 @@ void QnAuditLogDialog::at_selectAllCheckboxChanged()
 
     for (const auto& checkbox: m_filterCheckboxes)
     {
+        if (!checkbox->isEnabled())
+            continue;
         checkbox->blockSignals(true);
         checkbox->setChecked(state == Qt::Checked);
         checkbox->blockSignals(false);
